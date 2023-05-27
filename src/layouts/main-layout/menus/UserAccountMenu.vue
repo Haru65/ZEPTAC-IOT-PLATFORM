@@ -290,7 +290,7 @@
 
     <!--begin::Menu item-->
     <div class="menu-item px-5">
-      <a @click="signOut()" class="menu-link px-5"> Sign Out </a>
+      <a @click="signOut()" class="menu-link px-5"> Logout </a>
     </div>
     <!--end::Menu item-->
   </div>
@@ -341,7 +341,7 @@ export default defineComponent({
 
     const signOut = () => {
       store.logout();
-      router.push({ name: "sign-in" });
+      router.push({ name: "login" });
     };
 
     const setLang = (lang: string) => {

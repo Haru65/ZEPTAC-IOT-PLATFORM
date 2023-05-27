@@ -107,7 +107,7 @@ const MainMenuConfig: Array<MenuItem> = [
             sub: [
               {
                 heading: "signIn",
-                route: "/sign-in",
+                route: "/login",
               },
               {
                 heading: "signUp",

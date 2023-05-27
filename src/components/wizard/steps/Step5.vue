@@ -10,8 +10,8 @@
       <!--begin::Notice-->
       <div class="text-gray-400 fw-semobold fs-6">
         If you need more info, please
-        <router-link to="/sign-in" class="link-primary fw-bold"
-          >Sign In</router-link
+        <router-link to="/login" class="link-primary fw-bold"
+          >Login</router-link
         >.
       </div>
       <!--end::Notice-->

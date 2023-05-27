@@ -31,12 +31,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/layouts/AuthLayout.vue"),
     children: [
       {
-        path: "/sign-in",
-        name: "sign-in",
+        path: "/login",
+        name: "login",
         component: () =>
           import("@/views/crafted/authentication/basic-flow/SignIn.vue"),
         meta: {
-          pageTitle: "Sign In",
+          pageTitle: "Login",
         },
       },
       {
@@ -111,7 +111,7 @@ router.beforeEach((to, from, next) => {
     if (authStore.isAuthenticated) {
       next();
     } else {
-      next({ name: "sign-in" });
+      next({ name: "login" });
     }
   } else {
     next();

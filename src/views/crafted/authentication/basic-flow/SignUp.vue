@@ -19,7 +19,7 @@
         <div class="text-gray-400 fw-semobold fs-4">
           Already have an account?
 
-          <router-link to="/sign-in" class="link-primary fw-bold">
+          <router-link to="/login" class="link-primary fw-bold">
             Sign in here
           </router-link>
         </div>
