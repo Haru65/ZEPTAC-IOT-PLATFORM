@@ -136,13 +136,13 @@
           <!--begin::Links-->
           <div class="d-flex fw-normal">
             <a
-              href="https://keenthemes.com"
+              href="https://zeptac.com"
               class="text-success px-5"
               target="_blank"
               >Terms</a
             >
             <a
-              href="https://devs.keenthemes.com"
+              href="https://devs.zeptac.com"
               class="text-success px-5"
               target="_blank"
               >Plans</a
@@ -348,8 +348,8 @@ export default defineComponent({
       accountTeamSize: "50+",
       accountName: "",
       accountPlan: "1",
-      businessName: "Keenthemes Inc.",
-      businessDescriptor: "KEENTHEMES",
+      businessName: "Zeptac Inc.",
+      businessDescriptor: "ZEPTAC",
       businessType: "1",
       businessDescription: "",
       businessEmail: "corp@support.com",

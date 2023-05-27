@@ -36,7 +36,7 @@
       >
         <!--begin::Card title-->
         <h3 class="card-title fs-3 fw-bold text-white flex-column m-0">
-          Metronic Builder
+          Builder
           <small class="text-white opacity-50 fs-7 fw-semibold pt-1"
             >Get your product deeply customized</small
           >
@@ -269,7 +269,7 @@
                     >
                     <a
                       class="fw-semibold"
-                      href="https://preview.keenthemes.com/html/metronic/docs/icons/keenicons"
+                      href="#"
                       target="_blank"
                       >Learn more</a
                     >

@@ -358,7 +358,7 @@ export default defineComponent({
         name: "Brian Cox",
         image: getAssetPath("media/avatars/300-25.jpg"),
         time: "1 Hour",
-        text: "You can unwatch this repository immediately by clicking here: Keenthemes.com",
+        text: "You can unwatch this repository immediately by clicking here: Zeptac.com",
       },
       {
         type: "out",

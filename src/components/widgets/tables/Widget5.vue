@@ -159,7 +159,7 @@
                     >
                   </td>
                   <td class="text-end text-muted fw-semobold">
-                    Laravel,Metronic
+                    Laravel
                   </td>
                   <td class="text-end">
                     <span class="badge badge-light-primary">Success</span>
@@ -517,7 +517,7 @@
                     >
                   </td>
                   <td class="text-end text-muted fw-semobold">
-                    Laravel,Metronic
+                    Laravel
                   </td>
                   <td class="text-end">
                     <span class="badge badge-light-primary">Success</span>

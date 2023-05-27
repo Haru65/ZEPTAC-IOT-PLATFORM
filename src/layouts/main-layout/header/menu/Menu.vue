@@ -42,7 +42,7 @@
             <!--begin:Menu link-->
             <a
               class="menu-link"
-              href="https://preview.keenthemes.com/metronic8/vue/docs/#/utilities"
+              href="#"
               title="Check out over 200 in-house components, plugins and ready for use solutions"
               data-bs-toggle="tooltip"
               data-bs-trigger="hover"
@@ -62,7 +62,7 @@
             <!--begin:Menu link-->
             <a
               class="menu-link"
-              href="https://preview.keenthemes.com/metronic8/vue/docs/#/doc-overview"
+              href="#"
               title="Check out the complete documentation"
               data-bs-toggle="tooltip"
               data-bs-trigger="hover"
@@ -82,7 +82,7 @@
             <!--begin:Menu link-->
             <a
               class="menu-link"
-              href="https://preview.keenthemes.com/metronic8/vue/docs/#/changelog"
+              href="#"
             >
               <span class="menu-icon">
                 <KTIcon icon-name="code" icon-class="fs-3" />

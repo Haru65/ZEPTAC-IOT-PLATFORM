@@ -147,7 +147,7 @@
           <!--begin::Illustration-->
           <img
             class="mw-100 mh-200px"
-            alt="metronic"
+            alt="Zeptac"
             :src="getIllustrationsPath('1.png')"
           />
           <!--end::Illustration-->

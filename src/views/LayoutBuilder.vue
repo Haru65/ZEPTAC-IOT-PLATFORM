@@ -312,7 +312,7 @@
                   >{{ " " }}
                   <a
                     class="fw-semibold"
-                    href="https://preview.keenthemes.com/html/metronic/docs/icons/keenicons"
+                    href="#"
                     target="_blank"
                     >Learn more</a
                   >
@@ -495,14 +495,14 @@
                     v-model="config.sidebar.default.menu.iconType"
                     class="form-check-input w-20px h-20px"
                     type="radio"
-                    value="keenthemes"
+                    value="zeptac"
                     id="kt_builder_icon_font"
                   />
                   <!--begin::Label-->
                   <label
                     class="form-check-label text-gray-700 fw-bold text-nowrap"
                     for="kt_builder_icon_font"
-                    >Keenthemes</label
+                    >Zeptac</label
                   >
                   <!--end::Label-->
                 </div>

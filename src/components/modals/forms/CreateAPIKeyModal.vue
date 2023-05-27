@@ -138,7 +138,7 @@
                   <option value="">Select a Category...</option>
                   <option value="1">CRM</option>
                   <option value="2">Project Alice</option>
-                  <option value="3">Keenthemes</option>
+                  <option value="3">Zeptac</option>
                   <option value="4">General</option>
                 </Field>
                 <div class="fv-plugins-message-container">

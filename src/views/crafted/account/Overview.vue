@@ -43,7 +43,7 @@
 
         <!--begin::Col-->
         <div class="col-lg-8 fv-row">
-          <span class="fw-semobold fs-6">Keenthemes</span>
+          <span class="fw-semobold fs-6">Zeptac</span>
         </div>
         <!--end::Col-->
       </div>
@@ -81,7 +81,7 @@
         <!--begin::Col-->
         <div class="col-lg-8">
           <a href="#" class="fw-semobold fs-6 text-dark text-hover-primary"
-            >keenthemes.com</a
+            >zeptac.com</a
           >
         </div>
         <!--end::Col-->
