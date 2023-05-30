@@ -5,14 +5,15 @@
     id="kt_app_sidebar_footer"
   >
     <a
-      href="#"
+      href= "{{ process.env.VITE_APP_PORTAL_WEBSITE_URL }}"
       class="btn btn-flex flex-center btn-custom btn-primary overflow-hidden text-nowrap px-0 h-40px w-100"
       data-bs-toggle="tooltip"
       data-bs-trigger="hover"
       data-bs-dismiss-="click"
       title="200+ in-house components and 3rd-party plugins"
     >
-      <span class="btn-label">Docs &amp; Components</span>
+      
+      <span class="btn-label">Contact Support</span>
       <KTIcon icon-name="document" icon-class="btn-icon fs-2 m-0" />
     </a>
   </div>

@@ -78,7 +78,7 @@ const customers: Array<ICustomer> = [
     id: Math.floor(Math.random() * 99999) + 1,
     name: "Mikaela Collins",
     email: "mikaela@pexcom.com",
-    company: "Zeptac",
+    company: "Portal",
     payment: {
       icon: getAssetPath("media/svg/card-logos/american-express.svg"),
       ccnumber: "**** " + Math.floor(Math.random() * (9999 - 1000 + 1) + 1000),
@@ -222,7 +222,7 @@ const customers: Array<ICustomer> = [
     id: Math.floor(Math.random() * 99999) + 1,
     name: "Mikaela Collins",
     email: "mikaela@pexcom.com",
-    company: "Zeptac",
+    company: "Portal",
     payment: {
       icon: getAssetPath("media/svg/card-logos/american-express.svg"),
       ccnumber: "**** " + Math.floor(Math.random() * (9999 - 1000 + 1) + 1000),
@@ -366,7 +366,7 @@ const customers: Array<ICustomer> = [
     id: Math.floor(Math.random() * 99999) + 1,
     name: "Mikaela Collins",
     email: "mikaela@pexcom.com",
-    company: "Zeptac",
+    company: "Portal",
     payment: {
       icon: getAssetPath("media/svg/card-logos/american-express.svg"),
       ccnumber: "**** " + Math.floor(Math.random() * (9999 - 1000 + 1) + 1000),
@@ -510,7 +510,7 @@ const customers: Array<ICustomer> = [
     id: Math.floor(Math.random() * 99999) + 1,
     name: "Mikaela Collins",
     email: "mikaela@pexcom.com",
-    company: "Zeptac",
+    company: "Portal",
     payment: {
       icon: getAssetPath("media/svg/card-logos/american-express.svg"),
       ccnumber: "**** " + Math.floor(Math.random() * (9999 - 1000 + 1) + 1000),
@@ -654,7 +654,7 @@ const customers: Array<ICustomer> = [
     id: Math.floor(Math.random() * 99999) + 1,
     name: "Mikaela Collins",
     email: "mikaela@pexcom.com",
-    company: "Zeptac",
+    company: "Portal",
     payment: {
       icon: getAssetPath("media/svg/card-logos/american-express.svg"),
       ccnumber: "**** " + Math.floor(Math.random() * (9999 - 1000 + 1) + 1000),
@@ -798,7 +798,7 @@ const customers: Array<ICustomer> = [
     id: Math.floor(Math.random() * 99999) + 1,
     name: "Mikaela Collins",
     email: "mikaela@pexcom.com",
-    company: "Zeptac",
+    company: "Portal",
     payment: {
       icon: getAssetPath("media/svg/card-logos/american-express.svg"),
       ccnumber: "**** " + Math.floor(Math.random() * (9999 - 1000 + 1) + 1000),

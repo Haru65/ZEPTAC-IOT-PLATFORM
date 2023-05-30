@@ -51,8 +51,8 @@
             <!--begin::Heading-->
             <h2 class="fw-bold mb-5">
               Support at
-              <a href="https://devs.zeptac.com" class=""
-                >devs.zeptac.com</a
+              <a href="https://devs.portal.com" class=""
+                >devs.portal.com</a
               >
             </h2>
             <!--end::Heading-->
@@ -64,14 +64,14 @@
               >
               <a
                 class="explore-link d-none"
-                href="https://zeptac.com/licensing"
+                href="https://portal.com/licensing"
                 >FAQs</a
               >
             </div>
             <!--end::Description-->
             <!--begin::Link-->
             <a
-              href="https://devs.zeptac.com"
+              href="https://devs.portal.com"
               class="btn btn-lg explore-btn-primary w-100"
               >Get Support</a
             >

@@ -168,7 +168,7 @@
             <img
               class="w-15px h-15px rounded-1 ms-2"
               :src="currentLangugeLocale.flag"
-              alt="Zeptac"
+              alt="Portal"
             />
           </span>
         </span>
@@ -188,7 +188,7 @@
               <img
                 class="rounded-1"
                 :src="getAssetPath('media/flags/united-states.svg')"
-                alt="Zeptac"
+                alt="Portal"
               />
             </span>
             English
@@ -208,7 +208,7 @@
               <img
                 class="rounded-1"
                 :src="getAssetPath('media/flags/spain.svg')"
-                alt="Zeptac"
+                alt="Portal"
               />
             </span>
             Spanish
@@ -228,7 +228,7 @@
               <img
                 class="rounded-1"
                 :src="getAssetPath('media/flags/germany.svg')"
-                alt="Zeptac"
+                alt="Portal"
               />
             </span>
             German
@@ -248,7 +248,7 @@
               <img
                 class="rounded-1"
                 :src="getAssetPath('media/flags/japan.svg')"
-                alt="Zeptac"
+                alt="Portal"
               />
             </span>
             Japanese
@@ -268,7 +268,7 @@
               <img
                 class="rounded-1"
                 :src="getAssetPath('media/flags/france.svg')"
-                alt="Zeptac"
+                alt="Portal"
               />
             </span>
             French

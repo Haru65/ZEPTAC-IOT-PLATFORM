@@ -136,13 +136,13 @@
           <!--begin::Links-->
           <div class="d-flex fw-normal">
             <a
-              href="https://zeptac.com"
+              href="https://portal.com"
               class="text-success px-5"
               target="_blank"
               >Terms</a
             >
             <a
-              href="https://devs.zeptac.com"
+              href="https://devs.portal.com"
               class="text-success px-5"
               target="_blank"
               >Plans</a
@@ -348,8 +348,8 @@ export default defineComponent({
       accountTeamSize: "50+",
       accountName: "",
       accountPlan: "1",
-      businessName: "Zeptac Inc.",
-      businessDescriptor: "ZEPTAC",
+      businessName: "Portal Inc.",
+      businessDescriptor: "PORTAL",
       businessType: "1",
       businessDescription: "",
       businessEmail: "corp@support.com",

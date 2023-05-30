@@ -526,7 +526,7 @@
                     <Field
                       name="businessName"
                       class="form-control form-control-lg form-control-solid"
-                      value="Zeptac Inc."
+                      value="Portal Inc."
                     />
                     <ErrorMessage
                       class="fv-plugins-message-container invalid-feedback"
@@ -564,7 +564,7 @@
 
                         <div class='d-flex flex-stack text-dark fw-bold mb-2'>
                             <div>USD345.00</div>
-                            <div>ZEPTAC*</div>
+                            <div>PORTAL*</div>
                         </div>
 
                         <div class='d-flex flex-stack text-muted mb-2'>
@@ -587,7 +587,7 @@
                     <Field
                       name="shortenedDescriptor"
                       class="form-control form-control-lg form-control-solid"
-                      value="ZEPTAC"
+                      value="PORTAL"
                     />
                     <ErrorMessage
                       class="fv-plugins-message-container invalid-feedback"
@@ -1127,8 +1127,8 @@ export default defineComponent({
       teamSize: "1-1",
       teamAccountName: "",
       accountPlan: "1",
-      businessName: "Zeptac Inc.",
-      shortenedDescriptor: "ZEPTAC",
+      businessName: "Portal Inc.",
+      shortenedDescriptor: "PORTAL",
       corporationType: "1",
       businessDescription: "",
       contactEmail: "corp@support.com",

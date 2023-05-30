@@ -8,7 +8,7 @@
         --#{$prefix}#{$breakpoint}:#{$value};
     }
 
-    // Zeptac scrollbar component 
+    // scrollbar component 
     --#{$prefix}scrollbar-size: #{$scrollbar-size};
     --#{$prefix}scrollbar-overlay-size: #{$scrollbar-overlay-size};
     --#{$prefix}scrollbar-overlay-space: #{$scrollbar-overlay-space};
@@ -118,12 +118,12 @@
     --#{$prefix}scrolltop-icon-color: #{$scrolltop-icon-color};
     --#{$prefix}scrolltop-icon-color-hover: #{$scrolltop-icon-color-hover};
 
-    // Zeptac drawer component
+    // drawer component
     --#{$prefix}drawer-box-shadow: #{$drawer-box-shadow};
     --#{$prefix}drawer-bg-color: #{$drawer-bg-color};
     --#{$prefix}drawer-overlay-bg-color: #{$drawer-overlay-bg-color};
 
-    // Zeptac menu component
+    // menu component
     --#{$prefix}menu-dropdown-box-shadow: #{$menu-dropdown-box-shadow};
     --#{$prefix}menu-dropdown-bg-color: #{$menu-dropdown-bg-color};
     --#{$prefix}menu-heading-color: #{$menu-heading-color};
@@ -136,24 +136,24 @@
     --#{$prefix}menu-link-bg-color-here: #{$menu-link-bg-color-here};
     --#{$prefix}menu-link-bg-color-active: #{$menu-link-bg-color-active};    
 
-    // Zeptac scrollbar component 
+    // scrollbar component 
     --#{$prefix}scrollbar-color: #{$scrollbar-color};
     --#{$prefix}scrollbar-hover-color: #{$scrollbar-hover-color};
     --#{$prefix}scrollbar-size: #{$scrollbar-size};
     --#{$prefix}scrollbar-overlay-size: #{$scrollbar-overlay-size};
     --#{$prefix}scrollbar-overlay-space: #{$scrollbar-overlay-space};
 
-    // Zeptac overlay component 
+    // overlay component 
     --#{$prefix}overlay-bg: #{$overlay-bg};
 
-    // Zeptac blockui component
+    // blockui component
     --#{$prefix}blockui-overlay-bg: #{$blockui-overlay-bg};
 
-    // Zeptac rating component
+    // rating component
     --#{$prefix}rating-color-default: #{$rating-color-default};
     --#{$prefix}rating-color-active: #{$rating-color-active};
 
-    // Zeptac ribbon component 
+    // ribbon component 
     --#{$prefix}ribbon-label-box-shadow: #{$ribbon-label-box-shadow};
     --#{$prefix}ribbon-label-bg: #{$ribbon-label-bg};
     --#{$prefix}ribbon-label-border-color: #{$ribbon-label-border-color};
@@ -270,12 +270,12 @@
     --#{$prefix}scrolltop-icon-color: #{$scrolltop-icon-color-dark};
     --#{$prefix}scrolltop-icon-color-hover: #{$scrolltop-icon-color-hover-dark};
 
-    // Zeptac drawer component
+    // drawer component
     --#{$prefix}drawer-box-shadow: #{$drawer-box-shadow-dark};
     --#{$prefix}drawer-bg-color: #{$drawer-bg-color-dark};
     --#{$prefix}drawer-overlay-bg-color: #{$drawer-overlay-bg-color-dark};
 
-    // Zeptac menu component
+    // menu component
     --#{$prefix}menu-dropdown-box-shadow: #{$menu-dropdown-box-shadow-dark};
     --#{$prefix}menu-dropdown-bg-color: #{$menu-dropdown-bg-color-dark};
     --#{$prefix}menu-heading-color: #{$menu-heading-color-dark};
@@ -289,21 +289,21 @@
     --#{$prefix}menu-link-bg-color-here: #{$menu-link-bg-color-here-dark};
     --#{$prefix}menu-link-bg-color-active: #{$menu-link-bg-color-active-dark};
     
-    // Zeptac scrollbar component 
+    // scrollbar component 
     --#{$prefix}scrollbar-color: #{$scrollbar-color-dark};
     --#{$prefix}scrollbar-hover-color: #{$scrollbar-hover-color-dark};
 
-    // Zeptac overlay component 
+    // overlay component 
     --#{$prefix}overlay-bg: #{$overlay-bg-dark};
 
-    // Zeptac blockui component
+    // blockui component
     --#{$prefix}blockui-overlay-bg: #{$blockui-overlay-bg-dark};
 
-    // Zeptac rating component
+    // rating component
     --#{$prefix}rating-color-default: #{$rating-color-default-dark};
     --#{$prefix}rating-color-active: #{$rating-color-active-dark};
 
-    // Zeptac ribbon component 
+    // ribbon component 
     --#{$prefix}ribbon-label-box-shadow: #{$ribbon-label-box-shadow-dark};
     --#{$prefix}ribbon-label-bg: #{$ribbon-label-bg-dark};
     --#{$prefix}ribbon-label-border-color: #{$ribbon-label-border-color-dark};

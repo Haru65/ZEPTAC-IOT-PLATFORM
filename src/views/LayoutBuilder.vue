@@ -495,14 +495,14 @@
                     v-model="config.sidebar.default.menu.iconType"
                     class="form-check-input w-20px h-20px"
                     type="radio"
-                    value="zeptac"
+                    value="portal"
                     id="kt_builder_icon_font"
                   />
                   <!--begin::Label-->
                   <label
                     class="form-check-label text-gray-700 fw-bold text-nowrap"
                     for="kt_builder_icon_font"
-                    >Zeptac</label
+                    >Portal</label
                   >
                   <!--end::Label-->
                 </div>

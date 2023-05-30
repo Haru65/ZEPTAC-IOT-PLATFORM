@@ -26,7 +26,7 @@
       <Field
         name="businessName"
         class="form-control form-control-lg form-control-solid"
-        value="Zeptac Inc."
+        value="Portal Inc."
       />
       <ErrorMessage
         name="businessName"
@@ -56,7 +56,7 @@
       <Field
         name="businessDescriptor"
         class="form-control form-control-lg form-control-solid"
-        value="ZEPTAC"
+        value="PORTAL"
       />
       <!--end::Input-->
       <ErrorMessage

@@ -11,7 +11,7 @@ import type { App } from "vue";
 import KTIcon from "@/core/helpers/kt-icon/KTIcon.vue";
 
 /**
- * @description Initialize Zeptac custom components
+ * @description Initialize Portal custom components
  */
 const initializeComponents = () => {
   ThemeModeComponent.init();
@@ -26,7 +26,7 @@ const initializeComponents = () => {
 };
 
 /**
- * @description Reinitialize Zeptac custom components
+ * @description Reinitialize Portal custom components
  */
 const reinitializeComponents = () => {
   ThemeModeComponent.init();

@@ -58,7 +58,7 @@
                   type="text"
                   class="form-control form-control-solid me-3 flex-grow-1"
                   name="search"
-                  value="https://zeptac.com/?ref=skitechnology"
+                  value="https://portal.com/?ref=skitechnology"
                 />
 
                 <button

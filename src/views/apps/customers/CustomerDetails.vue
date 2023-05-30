@@ -122,7 +122,7 @@
               <div class="fw-bold mt-5">Billing Email</div>
               <div class="text-gray-600">
                 <a href="#" class="text-gray-600 text-hover-primary"
-                  >info@zeptac.com</a
+                  >info@portal.com</a
                 >
               </div>
               <!--begin::Details item-->
