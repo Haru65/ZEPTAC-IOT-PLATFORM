@@ -25,6 +25,24 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
     ],
+  },  {
+    path: "/",
+    redirect: "/admindashboard",
+    component: () => import("@/layouts/main-layout/AdminLayout.vue"),
+    meta: {
+      middleware: "auth",
+    },
+    children: [
+      {
+        path: "/admindashboard",
+        name: "admindashboard",
+        component: () => import("@/views/Dashboard.vue"),
+        meta: {
+          pageTitle: "Dashboard",
+          breadcrumbs: ["Dashboards"],
+        },
+      },
+    ],
   },
   {
     path: "/",
