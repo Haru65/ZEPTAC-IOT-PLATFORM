@@ -38,7 +38,7 @@ const routes: Array<RouteRecordRaw> = [
         name: "admindashboard",
         component: () => import("@/views/Dashboard.vue"),
         meta: {
-          pageTitle: "Dashboard",
+          pageTitle: "Admin Dashboard",
           breadcrumbs: ["Dashboards"],
         },
       },
