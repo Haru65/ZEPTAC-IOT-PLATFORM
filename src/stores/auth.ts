@@ -5,8 +5,11 @@ import JwtService from "@/core/services/JwtService";
 
 export interface User {
   name: string;
+  surname: string;
   email: string;
+  password: string;
   api_token: string;
+  data: string;
 }
 
 export const useAuthStore = defineStore("auth", () => {
@@ -15,10 +18,16 @@ export const useAuthStore = defineStore("auth", () => {
   const isAuthenticated = ref(!!JwtService.getToken());
 
   function setAuth(authUser: User) {
+    console.log(authUser);
     isAuthenticated.value = true;
     user.value = authUser;
     errors.value = {};
     JwtService.saveToken(user.value.api_token);
+  }
+
+  function saveUser(user : User){
+    console.log(user);
+    JwtService.saveUser(JSON.stringify(user));
   }
 
   function setError(error: any) {
@@ -36,6 +45,7 @@ export const useAuthStore = defineStore("auth", () => {
     return ApiService.post("login", credentials)
       .then(({ data }) => {
         setAuth(data);
+        saveUser(data);
       })
       .catch(({ response }) => {
         setError(response.data.errors);
@@ -66,6 +76,7 @@ export const useAuthStore = defineStore("auth", () => {
       });
   }
 
+  // before every page a call is made with a JWT token to request user credentials
   function verifyAuth() {
     if (JwtService.getToken()) {
       ApiService.setHeader();
@@ -91,5 +102,6 @@ export const useAuthStore = defineStore("auth", () => {
     register,
     forgotPassword,
     verifyAuth,
+    purgeAuth,
   };
 });

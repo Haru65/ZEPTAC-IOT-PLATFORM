@@ -1,4 +1,5 @@
 const ID_TOKEN_KEY = "id_token" as string;
+const USER = "user" as string;
 
 /**
  * @description get token form localStorage
@@ -15,6 +16,10 @@ export const saveToken = (token: string): void => {
   window.localStorage.setItem(ID_TOKEN_KEY, token);
 };
 
+export const saveUser = (user: string): void => {
+  window.localStorage.setItem(USER, user);
+};
+
 /**
  * @description remove token form localStorage
  */
@@ -22,4 +27,4 @@ export const destroyToken = (): void => {
   window.localStorage.removeItem(ID_TOKEN_KEY);
 };
 
-export default { getToken, saveToken, destroyToken };
+export default { getToken, saveToken, destroyToken,saveUser };

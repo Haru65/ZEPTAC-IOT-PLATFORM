@@ -42,7 +42,7 @@ import {
   watch,
 } from "vue";
 import KTHeader from "@/layouts/main-layout/header/Header.vue";
-import KTSidebar from "@/layouts/main-layout/sidebar/Sidebar.vue";
+import KTSidebar from "@/layouts/main-layout/adminsidebar/Sidebar.vue";
 import KTContent from "@/layouts/main-layout/content/Content.vue";
 import KTToolbar from "@/layouts/main-layout/toolbar/Toolbar.vue";
 import KTFooter from "@/layouts/main-layout/footer/Footer.vue";
