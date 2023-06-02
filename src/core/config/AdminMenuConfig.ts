@@ -12,8 +12,8 @@ const AdminMenuConfig: Array<MenuItem> = [
   {
     pages: [
       {
-        heading: "Admin Dashboard",
-        route: "/admindashboard",
+        heading: "Dashboard",
+        route: "/dashboard",
         keenthemesIcon: "element-1",
         bootstrapIcon: "bi-app-indicator",
       }
@@ -21,25 +21,26 @@ const AdminMenuConfig: Array<MenuItem> = [
   },
   {
     heading: "Admin",
-    route: "/admin",
+    route: "/company",
     pages: [
       {
         sectionTitle: "Company",
-        route: "/admin/company",
+        route: "/company",
         keenthemesIcon: "office-bag",
         bootstrapIcon: "bi-archive",
         sub: [
           {
             heading: "Add Company",
-            route: "/admin/company/add",
+            route: "/company/add",
           },
           {
            heading: "List Company",
-           route: "/admin/company/List",
+           route: "/company/list",
           },
         ],
       }
-    ,{
+    ,
+    {
       sectionTitle: "Users",
       route: "/users",
       keenthemesIcon: "profile-user",
@@ -47,11 +48,11 @@ const AdminMenuConfig: Array<MenuItem> = [
       sub: [
         {
           heading: "Add User",
-          route: "/admin/users/add",
+          route: "/users/add",
         },
         {
          heading: "List Users",
-         route: "/admin/users/List",
+         route: "/users/list",
         },
       ],
     }]

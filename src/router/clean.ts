@@ -21,11 +21,29 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/Dashboard.vue"),
         meta: {
           pageTitle: "Welcome Admin",
-          breadcrumbs: ["Dashboards"],
+          breadcrumbs: ["Dashboard"],
         },
       },
-    ],
-  }, 
+      {
+        path: "/company/list",
+        name: "company-list",
+        component: () => import("@/views/apps/companies/CompanyListing.vue"),
+        meta: {
+          pageTitle: "Company List",
+          breadcrumbs: ["Company List"],
+        },
+      },
+      {
+        path: "/users/list",
+        name: "users-list",
+        component: () => import("@/views/apps/users/UserListing.vue"),
+        meta: {
+          pageTitle: "User List",
+          breadcrumbs: ["User List"],
+        },
+      },
+    ]
+  },
   {
     path: "/",
     component: () => import("@/layouts/AuthLayout.vue"),
