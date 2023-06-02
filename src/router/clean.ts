@@ -27,7 +27,8 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/company/list",
         name: "company-list",
-        component: () => import("@/views/apps/companies/CompanyListing.vue"),
+        component: () =>
+          import("@/views/apps/admin/companies/CompanyListing.vue"),
         meta: {
           pageTitle: "Company List",
           breadcrumbs: ["Company List"],
@@ -36,13 +37,72 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/users/list",
         name: "users-list",
-        component: () => import("@/views/apps/users/UserListing.vue"),
+        component: () => import("@/views/apps/admin/users/UserListing.vue"),
         meta: {
           pageTitle: "User List",
           breadcrumbs: ["User List"],
         },
       },
-    ]
+      {
+        path: "/employee/list",
+        name: "employee-list",
+        component: () =>
+          import("@/views/apps/hr/employees/EmployeeListing.vue"),
+        meta: {
+          pageTitle: "Employee List",
+          breadcrumbs: ["Employee List"],
+        },
+      },
+      {
+        path: "/leads/list",
+        name: "leads-list",
+        component: () => import("@/views/apps/sales/leads/LeadsListing.vue"),
+        meta: {
+          pageTitle: "Leads List",
+          breadcrumbs: ["Leads List"],
+        },
+      },
+      {
+        path: "/customers/list",
+        name: "customers-list",
+        component: () =>
+          import("@/views/apps/sales/customers/CustomersListing.vue"),
+        meta: {
+          pageTitle: "Customers List",
+          breadcrumbs: ["Customers List"],
+        },
+      },
+      {
+        path: "/pricelist/list",
+        name: "price-list",
+        component: () =>
+          import("@/views/apps/sales/pricelist/PriceListListing.vue"),
+        meta: {
+          pageTitle: "Price List",
+          breadcrumbs: ["Price List"],
+        },
+      },
+      {
+        path: "/quotations/list",
+        name: "quotation-list",
+        component: () =>
+          import("@/views/apps/sales/quotations/QuotationListing.vue"),
+        meta: {
+          pageTitle: "Quotation List",
+          breadcrumbs: ["Quotation List"],
+        },
+      },
+      {
+        path: "/invoices/list",
+        name: "invoices-list",
+        component: () =>
+          import("@/views/apps/sales/invoices/InvoicesListing.vue"),
+        meta: {
+          pageTitle: "Invocies List",
+          breadcrumbs: ["Invoices List"],
+        },
+      },
+    ],
   },
   {
     path: "/",

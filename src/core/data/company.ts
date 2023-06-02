@@ -2,9 +2,9 @@ import { getAssetPath } from "@/core/helpers/assets";
 
 interface ICompany {
   id: number;
-  company_name: string;
-  company_email: string;
-  company_address: string;
+  name: string;
+  email: string;
+  address: string;
   date: string;
 }
 
@@ -23,11 +23,11 @@ const company: Array<ICompany> = [
   // },
   {
     id: 1,
-    company_name: "Decode Digital",
-    company_email: "decodedigital@gmail.com",
-    company_address: "Vico Naka",
-    date:new Date().toDateString()
-  }
+    name: "Decode Digital",
+    email: "decodedigital@gmail.com",
+    address: "Vico Naka",
+    date: new Date().toDateString(),
+  },
 ];
 
 export type { ICompany };

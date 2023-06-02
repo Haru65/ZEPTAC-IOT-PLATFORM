@@ -58,15 +58,15 @@
       <Datatable @on-sort="sort" @on-items-select="onItemSelect" :data="tableData" :header="tableHeader"
         :enable-items-per-page-dropdown="true" :checkbox-enabled="true" checkbox-label="id">
         <template v-slot:name="{ row: company }">
-          {{ company.company_name }}
+          {{ company.name }}
         </template>
         <template v-slot:email="{ row: company }">
-          <a href="#" class="text-gray-600 text-hover-primary mb-1">
-            {{ company.company_email }}
+          <a v-bind:href="'mailto:' + company.email" class="text-gray-600 text-hover-primary mb-1">
+            {{ company.email }}
           </a>
         </template>
         <template v-slot:company="{ row: company }">
-          {{ company.company_address }}
+          {{ company.address }}
         </template>
         <template v-slot:date="{ row: company }">
           {{ company.date }}
@@ -113,7 +113,7 @@ import company from "@/core/data/company";
 import arraySort from "array-sort";
 
 export default defineComponent({
-  name: "customers-listing",
+  name: "company-listing",
   components: {
     Datatable,
     ExportCustomerModal,

@@ -16,7 +16,7 @@ const AdminMenuConfig: Array<MenuItem> = [
         route: "/dashboard",
         keenthemesIcon: "element-1",
         bootstrapIcon: "bi-app-indicator",
-      }
+      },
     ],
   },
   {
@@ -34,28 +34,28 @@ const AdminMenuConfig: Array<MenuItem> = [
             route: "/company/add",
           },
           {
-           heading: "List Company",
-           route: "/company/list",
+            heading: "List Company",
+            route: "/company/list",
           },
         ],
-      }
-    ,
-    {
-      sectionTitle: "Users",
-      route: "/users",
-      keenthemesIcon: "profile-user",
-      bootstrapIcon: "bi-archive",
-      sub: [
-        {
-          heading: "Add User",
-          route: "/users/add",
-        },
-        {
-         heading: "List Users",
-         route: "/users/list",
-        },
-      ],
-    }]
+      },
+      {
+        sectionTitle: "Users",
+        route: "/users",
+        keenthemesIcon: "profile-user",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add User",
+            route: "/users/add",
+          },
+          {
+            heading: "List Users",
+            route: "/users/list",
+          },
+        ],
+      },
+    ],
   },
   // {
   //   heading: "apps",
@@ -139,26 +139,27 @@ const AdminMenuConfig: Array<MenuItem> = [
     pages: [
       {
         sectionTitle: "Employees",
-        route: "/hr/employees",
+        route: "/employee",
         keenthemesIcon: "office-bag",
         bootstrapIcon: "bi-archive",
         sub: [
           {
             heading: "Add Employee",
-            route: "/hr/employees/add",
+            route: "employee/add",
           },
           {
-           heading: "List Employees",
-           route: "/hr/employees/list",
+            heading: "List Employees",
+            route: "/employee/list",
           },
         ],
-      }
-    ,{
-      heading: "Trainings", 
-      route: "/hr/trainings",
-      keenthemesIcon: "educare",
-      bootstrapIcon: "bi-archive",
-    }]
+      },
+      {
+        heading: "Trainings",
+        route: "/trainings",
+        keenthemesIcon: "educare",
+        bootstrapIcon: "bi-archive",
+      },
+    ],
   },
   {
     heading: "Sales",
@@ -172,90 +173,90 @@ const AdminMenuConfig: Array<MenuItem> = [
         sub: [
           {
             heading: "Add Leads",
-            route: "/sales/leads/add",
+            route: "/leads/add",
           },
           {
-           heading: "List Leads",
-           route: "/sales/leads/list",
+            heading: "List Leads",
+            route: "/leads/list",
           },
         ],
       },
       {
         sectionTitle: "Customers",
-        route: "/sales/customers",
+        route: "/customers",
         keenthemesIcon: "user-edit",
         bootstrapIcon: "bi-archive",
         sub: [
           {
             heading: "Add Customers",
-            route: "/sales/customers/add",
+            route: "/customers/add",
           },
           {
-           heading: "List Customers",
-           route: "/sales/customers/list",
+            heading: "List Customers",
+            route: "/customers/list",
           },
         ],
       },
       {
         sectionTitle: "Price List Items",
-        route: "/sales/pricelist",
+        route: "/pricelist",
         keenthemesIcon: "bill",
         bootstrapIcon: "bi-archive",
         sub: [
           {
             heading: "Add Items",
-            route: "/sales/pricelist/add",
+            route: "/pricelist/add",
           },
           {
-           heading: "List Items",
-           route: "/sales/pricelist/list",
+            heading: "List Items",
+            route: "/pricelist/list",
           },
         ],
       },
       {
         sectionTitle: "Quotations",
-        route: "/sales/quotations",
+        route: "/quotations",
         keenthemesIcon: "note-2",
         bootstrapIcon: "bi-archive",
         sub: [
           {
             heading: "Add Quotations",
-            route: "/sales/quotations/add",
+            route: "/quotations/add",
           },
           {
-           heading: "List Quotations",
-           route: "/sales/quotations/list",
+            heading: "List Quotations",
+            route: "/quotations/list",
           },
         ],
       },
       {
         sectionTitle: "Invoices",
-        route: "/sales/invoices",
+        route: "/invoices",
         keenthemesIcon: "message-programming",
         bootstrapIcon: "bi-archive",
         sub: [
           {
             heading: "Add Invoices",
-            route: "/sales/invoices/add",
+            route: "/invoices/add",
           },
           {
-           heading: "List Invoices",
-           route: "/sales/invoices/list",
+            heading: "List Invoices",
+            route: "/invoices/list",
           },
         ],
-      }
-    ]
+      },
+    ],
   },
   {
     heading: "Modules",
     route: "/modules",
-    pages:[
+    pages: [
       {
-      sectionTitle:"CleanRoom",
-      route: "/modules/cleanroom",
-      keenthemesIcon: "element-plus",
-      bootstrapIcon: "bi-archive",
-      sub:[
+        sectionTitle: "CleanRoom",
+        route: "/modules/cleanroom",
+        keenthemesIcon: "element-plus",
+        bootstrapIcon: "bi-archive",
+        sub: [
           {
             sectionTitle: "Validation Report",
             route: "/modules/validationreport",
@@ -263,7 +264,7 @@ const AdminMenuConfig: Array<MenuItem> = [
               {
                 heading: "Report List",
                 route: "/modules/validationreport/list",
-              }
+              },
             ],
           },
           {
@@ -277,8 +278,8 @@ const AdminMenuConfig: Array<MenuItem> = [
                 route: "/modules/instruments/add",
               },
               {
-               heading: "List Instruments",
-               route: "/modules/instruments/list",
+                heading: "List Instruments",
+                route: "/modules/instruments/list",
               },
             ],
           },
@@ -295,11 +296,11 @@ const AdminMenuConfig: Array<MenuItem> = [
               {
                 heading: "Task Allocation",
                 route: "/moudules/validation/taskallocation",
-              }, 
+              },
               {
                 heading: "Expense Sheet",
                 route: "/moudules/validation/expensesheet",
-              }
+              },
             ],
           },
           {
@@ -313,14 +314,15 @@ const AdminMenuConfig: Array<MenuItem> = [
                 route: "/modules/externalaudit/validation",
               },
               {
-               heading: "Quality Procedure",
-               route: "/modules/externalaudit/quality",
+                heading: "Quality Procedure",
+                route: "/modules/externalaudit/quality",
               },
             ],
-          }
-      ]
-    }
-  ]}
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 export default AdminMenuConfig;

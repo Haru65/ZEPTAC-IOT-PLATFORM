@@ -62,13 +62,15 @@
           <div class="d-flex justify-content-start align-items-center">
             <img :src="user.profile" class="w-45px rounded-circle" alt="" />
             <span style="margin-left: 5.5%;">
-              {{ user.name }}
+              <span class="text-gray-600 text-hover-primary mb-1">
+                {{ user.name }}
+              </span>
             </span>
           </div>
         </template>
         <!-- defualt data -->
         <template v-slot:email="{ row: user }">
-          <a href="#" class="text-gray-600 text-hover-primary mb-1">
+          <a v-bind:href="'mailto:' + user.email" class="text-gray-600 text-hover-primary mb-1">
             {{ user.email }}
           </a>
         </template>
@@ -126,7 +128,7 @@ import user from "@/core/data/users";
 import arraySort from "array-sort";
 
 export default defineComponent({
-  name: "customers-listing",
+  name: "users-listing",
   components: {
     Datatable,
     ExportCustomerModal,
