@@ -153,7 +153,7 @@ const AdminMenuConfig: Array<MenuItem> = [
         ],
       }
     ,{
-      heading: "Trainings",
+      heading: "Trainings", 
       route: "/hr/trainings",
       keenthemesIcon: "educare",
       bootstrapIcon: "bi-archive",
