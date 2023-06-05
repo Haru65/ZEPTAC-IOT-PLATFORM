@@ -9,9 +9,7 @@
         'container-xxl': !contentWidthFluid,
       }"
     >
-      <RouterView>
-        
-      </RouterView>
+      <RouterView/>
     </div>
     <!--end::Content container-->
   </div>

@@ -61,8 +61,6 @@ export default defineComponent({
         : getAssetPath("media/auth/bg1-dark.jpg");
 
     onMounted(() => {
-      LayoutService.emptyElementClassesAndAttributes(document.body);
-
       storeBody.addBodyClassname("bg-body");
       storeBody.addBodyAttribute({
         qualifiedName: "style",

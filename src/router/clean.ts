@@ -164,6 +164,37 @@ const routes: Array<RouteRecordRaw> = [
     path: "/:pathMatch(.*)*",
     redirect: "/404",
   },
+  {
+    path: "/",
+    component: () => import("@/layouts/SystemLayout.vue"),
+    children: [
+      {
+        // theterms route
+        path: "/terms",
+        name: "terms",
+        component: () => import("@/views/crafted/pricing/Terms.vue"),
+        meta: {
+          pageTitle: "Terms",
+        },
+      },
+      {
+        path: "/plans",
+        name: "plans",
+        component: () => import("@/views/crafted/pricing/Plans.vue"),
+        meta: {
+          pageTitle: "Plans",
+        },
+      },
+      {
+        path: "/contactus",
+        name: "contactus",
+        component: () => import("@/views/crafted/pricing/ContactUs.vue"),
+        meta: {
+          pageTitle: "Contact Us",
+        },
+      },
+    ],
+  },
 ];
 
 const router = createRouter({
