@@ -110,8 +110,8 @@ import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
 import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
-import type { IPriceList } from "@/core/data/pricelist";
-import pricelist from "@/core/data/pricelist";
+import type { IPriceList } from "@/core/apis/pricelist";
+import pricelist from "@/core/apis/pricelist";
 import arraySort from "array-sort";
 
 export default defineComponent({

@@ -173,8 +173,8 @@ import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
 import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
-import type { ICustomer } from "@/core/data/customers";
-import customers from "@/core/data/customers";
+import type { ICustomer } from "@/core/apis/customers";
+import customers from "@/core/apis/customers";
 import arraySort from "array-sort";
 
 export default defineComponent({

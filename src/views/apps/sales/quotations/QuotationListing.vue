@@ -112,8 +112,8 @@ import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
 import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
-import type { IQuotations } from "@/core/data/quotation";
-import quotations from "@/core/data/quotation";
+import type { IQuotations } from "@/core/apis/quotation";
+import quotations from "@/core/apis/quotation";
 import arraySort from "array-sort";
 
 export default defineComponent({

@@ -357,7 +357,7 @@ import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import { hideModal } from "@/core/helpers/dom";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
-import { countries } from "@/core/data/countries";
+import { countries } from "@/core/apis/countries";
 
 interface NewAddressData {
   firstName: string;

@@ -112,8 +112,8 @@ import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
 import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
-import type { IInvoices } from "@/core/data/invoices";
-import invoices from "@/core/data/invoices";
+import type { IInvoices } from "@/core/apis/invoices";
+import invoices from "@/core/apis/invoices";
 import arraySort from "array-sort";
 
 export default defineComponent({

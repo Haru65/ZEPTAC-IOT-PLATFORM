@@ -58,12 +58,12 @@
       <Datatable @on-sort="sort" @on-items-select="onItemSelect" :data="tableData" :header="tableHeader"
         :enable-items-per-page-dropdown="true" :checkbox-enabled="true" checkbox-label="id">
         <!-- img data -->
-        <template v-slot:profile="{ row: user }">
+        <template v-slot:name="{ row: user }">
           <div class="d-flex justify-content-start align-items-center">
-            <img :src="user.profile" class="w-45px rounded-circle" alt="" />
+            <!-- <img :src="user.name" class="w-45px rounded-circle" alt="" /> -->
             <span style="margin-left: 5.5%;">
               <span class="text-gray-600 text-hover-primary mb-1">
-                {{ user.name }}
+                {{ user.first_name + " " + user.last_name }}
               </span>
             </span>
           </div>
@@ -123,8 +123,9 @@ import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
 import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
-import type { IUser } from "@/core/data/users";
-import user from "@/core/data/users";
+import type { IUser } from "@/core/apis/users";
+import user from "@/core/apis/users";
+import {user_listing} from "@/core/apis/users";
 import arraySort from "array-sort";
 
 export default defineComponent({
@@ -137,8 +138,8 @@ export default defineComponent({
   setup() {
     const tableHeader = ref([
       {
-        columnName: "Profile",
-        columnLabel: "profile",
+        columnName: "Name",
+        columnLabel: "name",
         sortEnabled: true,
         columnWidth: 155,
       },
@@ -181,9 +182,10 @@ export default defineComponent({
     ]);
     const selectedIds = ref<Array<number>>([]);
 
+    
     const tableData = ref<Array<IUser>>(user);
     const initCustomers = ref<Array<IUser>>([]);
-
+    
     onMounted(() => {
       initCustomers.value.splice(0, tableData.value.length, ...tableData.value);
     });
