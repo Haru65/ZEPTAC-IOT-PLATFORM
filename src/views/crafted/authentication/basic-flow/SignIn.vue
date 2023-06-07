@@ -138,7 +138,7 @@ export default defineComponent({
   setup() {
     const store = useAuthStore();
     const router = useRouter();
-    
+
     // Clear existing errors
     store.logout();
 
@@ -179,7 +179,7 @@ export default defineComponent({
           },
         }).then(() => {
           // Go to page after successfully login
-          router.push({ name: "admindashboard" });
+          router.push({ name: "dashboard" });
         });
       } else {
         Swal.fire({
@@ -199,7 +199,7 @@ export default defineComponent({
       //Deactivate indicator
       submitButton.value?.removeAttribute("data-kt-indicator");
       // eslint-disable-next-line
-        submitButton.value!.disabled = false;
+      submitButton.value!.disabled = false;
     };
 
     return {

@@ -1,11 +1,6 @@
 <template>
   <!--begin::Modal - View Users-->
-  <div
-    class="modal fade"
-    id="kt_modal_view_users"
-    tabindex="-1"
-    aria-hidden="true"
-  >
+  <div class="modal fade" id="kt_modal_view_users" tabindex="-1" aria-hidden="true">
     <!--begin::Modal dialog-->
     <div class="modal-dialog mw-650px">
       <!--begin::Modal content-->
@@ -13,10 +8,7 @@
         <!--begin::Modal header-->
         <div class="modal-header pb-0 border-0 justify-content-end">
           <!--begin::Close-->
-          <div
-            class="btn btn-sm btn-icon btn-active-color-primary"
-            data-bs-dismiss="modal"
-          >
+          <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
             <KTIcon icon-name="cross" icon-class="fs-1" />
           </div>
           <!--end::Close-->
@@ -46,19 +38,13 @@
             <div class="mh-375px scroll-y me-n7 pe-7">
               <template v-for="(user, index) in users" :key="index">
                 <!--begin::User-->
-                <div
-                  class="d-flex flex-stack py-5 border-bottom border-gray-300 border-bottom-dashed"
-                >
+                <div class="d-flex flex-stack py-5 border-bottom border-gray-300 border-bottom-dashed">
                   <!--begin::Details-->
                   <div class="d-flex align-items-center">
                     <!--begin::Avatar-->
                     <div class="symbol symbol-35px symbol-circle">
                       <img v-if="user.avatar" alt="Pic" :src="user.avatar" />
-                      <span
-                        v-else
-                        :class="`bg-light-${user.state} text-${user.state}`"
-                        class="symbol-label fw-semobold"
-                      >
+                      <span v-else :class="`bg-light-${user.state} text-${user.state}`" class="symbol-label fw-semobold">
                         {{ user.name.charAt(0) }}
                       </span>
                     </div>
@@ -67,11 +53,10 @@
                     <!--begin::Details-->
                     <div class="ms-6">
                       <!--begin::Name-->
-                      <a
-                        href="#"
-                        class="d-flex align-items-center fs-5 fw-bold text-dark text-hover-primary"
-                      >
-                        {{ user.name }}
+                      <a href="#" class="d-flex align-items-center fs-5 fw-bold text-dark text-hover-primary">
+                        <span class="text-gray-600 text-hover-primary mb-1">
+                          {{ user.name }}
+                        </span>
 
                         <span class="badge badge-light fs-8 fw-semobold ms-2">
                           {{ user.position }}
@@ -123,15 +108,8 @@
             <!--end::Label-->
 
             <!--begin::Switch-->
-            <label
-              class="form-check form-switch form-check-custom form-check-solid"
-            >
-              <input
-                class="form-check-input"
-                type="checkbox"
-                value=""
-                checked
-              />
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              <input class="form-check-input" type="checkbox" value="" checked />
 
               <span class="form-check-label fw-semobold text-gray-400">
                 Allowed

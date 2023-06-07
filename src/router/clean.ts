@@ -20,26 +20,86 @@ const routes: Array<RouteRecordRaw> = [
         name: "dashboard",
         component: () => import("@/views/Dashboard.vue"),
         meta: {
-          pageTitle: "Dashboard",
-          breadcrumbs: ["Dashboards"],
+          pageTitle: "Welcome Admin",
+          breadcrumbs: ["Dashboard"],
         },
       },
-    ],
-  },  {
-    path: "/",
-    redirect: "/admindashboard",
-    component: () => import("@/layouts/main-layout/AdminLayout.vue"),
-    meta: {
-      middleware: "auth",
-    },
-    children: [
       {
-        path: "/admindashboard",
-        name: "admindashboard",
-        component: () => import("@/views/Dashboard.vue"),
+        path: "/company/list",
+        name: "company-list",
+        component: () =>
+          import("@/views/apps/admin/companies/CompanyListing.vue"),
         meta: {
-          pageTitle: "Admin Dashboard",
-          breadcrumbs: ["Dashboards"],
+          pageTitle: "Company List",
+          breadcrumbs: ["Company List"],
+        },
+      },
+      {
+        path: "/users/list",
+        name: "users-list",
+        component: () => import("@/views/apps/admin/users/UserListing.vue"),
+        meta: {
+          pageTitle: "User List",
+          breadcrumbs: ["User List"],
+        },
+      },
+      {
+        path: "/employee/list",
+        name: "employee-list",
+        component: () =>
+          import("@/views/apps/hr/employees/EmployeeListing.vue"),
+        meta: {
+          pageTitle: "Employee List",
+          breadcrumbs: ["Employee List"],
+        },
+      },
+      {
+        path: "/leads/list",
+        name: "leads-list",
+        component: () => import("@/views/apps/sales/leads/LeadsListing.vue"),
+        meta: {
+          pageTitle: "Leads List",
+          breadcrumbs: ["Leads List"],
+        },
+      },
+      {
+        path: "/customers/list",
+        name: "customers-list",
+        component: () =>
+          import("@/views/apps/sales/customers/CustomersListing.vue"),
+        meta: {
+          pageTitle: "Customers List",
+          breadcrumbs: ["Customers List"],
+        },
+      },
+      {
+        path: "/pricelist/list",
+        name: "price-list",
+        component: () =>
+          import("@/views/apps/sales/pricelist/PriceListListing.vue"),
+        meta: {
+          pageTitle: "Price List",
+          breadcrumbs: ["Price List"],
+        },
+      },
+      {
+        path: "/quotations/list",
+        name: "quotation-list",
+        component: () =>
+          import("@/views/apps/sales/quotations/QuotationListing.vue"),
+        meta: {
+          pageTitle: "Quotation List",
+          breadcrumbs: ["Quotation List"],
+        },
+      },
+      {
+        path: "/invoices/list",
+        name: "invoices-list",
+        component: () =>
+          import("@/views/apps/sales/invoices/InvoicesListing.vue"),
+        meta: {
+          pageTitle: "Invocies List",
+          breadcrumbs: ["Invoices List"],
         },
       },
     ],
@@ -103,6 +163,37 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/:pathMatch(.*)*",
     redirect: "/404",
+  },
+  {
+    path: "/",
+    component: () => import("@/layouts/SystemLayout.vue"),
+    children: [
+      {
+        // theterms route
+        path: "/terms",
+        name: "terms",
+        component: () => import("@/views/crafted/pricing/Terms.vue"),
+        meta: {
+          pageTitle: "Terms",
+        },
+      },
+      {
+        path: "/plans",
+        name: "plans",
+        component: () => import("@/views/crafted/pricing/Plans.vue"),
+        meta: {
+          pageTitle: "Plans",
+        },
+      },
+      {
+        path: "/contactus",
+        name: "contactus",
+        component: () => import("@/views/crafted/pricing/ContactUs.vue"),
+        meta: {
+          pageTitle: "Contact Us",
+        },
+      },
+    ],
   },
 ];
 

@@ -19,7 +19,7 @@
         class="menu menu-column menu-rounded menu-sub-indention px-3"
         data-kt-menu="true"
       >
-        <template v-for="(item, i) in MainMenuConfig" :key="i">
+        <template v-for="(item, i) in AdminMenuConfig" :key="i">
           <div v-if="item.heading" class="menu-item pt-5">
             <div class="menu-content">
               <span class="menu-heading fw-bold text-uppercase fs-7">
@@ -162,7 +162,7 @@
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import MainMenuConfig from "@/core/config/MainMenuConfig";
+import AdminMenuConfig from "@/core/config/AdminMenuConfig";
 import { sidebarMenuIcons } from "@/core/helpers/config";
 import { useI18n } from "vue-i18n";
 
@@ -194,7 +194,7 @@ export default defineComponent({
 
     return {
       hasActiveChildren,
-      MainMenuConfig,
+      AdminMenuConfig,
       sidebarMenuIcons,
       translate,
       getAssetPath,

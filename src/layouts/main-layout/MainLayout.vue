@@ -6,7 +6,7 @@
       <KTHeader />
       <!--begin::Wrapper-->
       <div class="app-wrapper flex-column flex-row-fluid" id="kt_app_wrapper">
-        <KTSidebar />
+        <KTSidebar v-if="true" />
         <!--begin::Main-->
         <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
           <!--begin::Content wrapper-->
@@ -65,7 +65,7 @@ export default defineComponent({
     KTDrawers,
     KTScrollTop,
     KTModals,
-    KTCustomize,
+    // KTCustomize,
   },
   setup() {
     const route = useRoute();

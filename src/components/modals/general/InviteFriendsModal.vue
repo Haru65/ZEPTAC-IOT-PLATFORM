@@ -1,11 +1,6 @@
 <template>
   <!--begin::Modal - Invite Friends-->
-  <div
-    class="modal fade"
-    id="kt_modal_invite_friends"
-    tabindex="-1"
-    aria-hidden="true"
-  >
+  <div class="modal fade" id="kt_modal_invite_friends" tabindex="-1" aria-hidden="true">
     <!--begin::Modal dialog-->
     <div class="modal-dialog mw-650px">
       <!--begin::Modal content-->
@@ -13,10 +8,7 @@
         <!--begin::Modal header-->
         <div class="modal-header pb-0 border-0 justify-content-end">
           <!--begin::Close-->
-          <div
-            class="btn btn-sm btn-icon btn-active-color-primary"
-            data-bs-dismiss="modal"
-          >
+          <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
             <KTIcon icon-name="cross" icon-class="fs-1" />
           </div>
           <!--end::Close-->
@@ -42,31 +34,20 @@
 
           <!--begin::Google Contacts Invite-->
           <div class="btn btn-light-primary fw-bold w-100 mb-8">
-            <img
-              alt="Logo"
-              :src="getAssetPath('media/svg/brand-logos/google-icon.svg')"
-              class="h-20px me-3"
-            />
+            <img alt="Logo" :src="getAssetPath('media/svg/brand-logos/google-icon.svg')" class="h-20px me-3" />
             Invite Gmail Contacts
           </div>
           <!--end::Google Contacts Invite-->
 
           <!--begin::Separator-->
           <div class="separator d-flex flex-center mb-8">
-            <span
-              class="text-uppercase bg-body fs-7 fw-semobold text-gray-400 px-3"
-              >or</span
-            >
+            <span class="text-uppercase bg-body fs-7 fw-semobold text-gray-400 px-3">or</span>
           </div>
           <!--end::Separator-->
 
           <!--begin::Textarea-->
-          <textarea
-            class="form-control form-control-solid mb-8"
-            rows="3"
-            placeholder="Type or paste emails here"
-          >
-          </textarea>
+          <textarea class="form-control form-control-solid mb-8" rows="3" placeholder="Type or paste emails here">
+            </textarea>
           <!--end::Textarea-->
 
           <!--begin::Users-->
@@ -79,19 +60,13 @@
             <div class="mh-300px scroll-y me-n7 pe-7">
               <template v-for="(user, index) in users" :key="index">
                 <!--begin::User-->
-                <div
-                  class="d-flex flex-stack py-4 border-bottom border-gray-300 border-bottom-dashed"
-                >
+                <div class="d-flex flex-stack py-4 border-bottom border-gray-300 border-bottom-dashed">
                   <!--begin::Details-->
                   <div class="d-flex align-items-center">
                     <!--begin::Avatar-->
                     <div class="symbol symbol-35px symbol-circle">
                       <img v-if="user.avatar" alt="Pic" :src="user.avatar" />
-                      <span
-                        v-else
-                        :class="`bg-light-${user.state} text-${user.state}`"
-                        class="symbol-label fw-semobold"
-                      >
+                      <span v-else :class="`bg-light-${user.state} text-${user.state}`" class="symbol-label fw-semobold">
                         {{ user.name.charAt(0) }}
                       </span>
                     </div>
@@ -99,11 +74,10 @@
 
                     <!--begin::Details-->
                     <div class="ms-5">
-                      <a
-                        href="#"
-                        class="fs-5 fw-bold text-gray-900 text-hover-primary mb-2"
-                        >{{ user.name }}</a
-                      >
+                      <a href="#" class="fs-5 fw-bold text-gray-900 text-hover-primary mb-2"> <span
+                          class="text-gray-600 text-hover-primary mb-1">
+                          {{ user.name }}
+                        </span></a>
 
                       <div class="fw-semobold text-gray-400">
                         {{ user.email }}
@@ -115,12 +89,8 @@
 
                   <!--begin::Access menu-->
                   <div class="ms-2 w-100px">
-                    <select
-                      v-model="user.access"
-                      class="form-select form-select-solid form-select-sm"
-                      data-control="select2"
-                      data-hide-search="true"
-                    >
+                    <select v-model="user.access" class="form-select form-select-solid form-select-sm"
+                      data-control="select2" data-hide-search="true">
                       <option value="1">Guest</option>
                       <option value="2">Owner</option>
                       <option value="3">Can Edit</option>
@@ -147,15 +117,8 @@
             <!--end::Label-->
 
             <!--begin::Switch-->
-            <label
-              class="form-check form-switch form-check-custom form-check-solid"
-            >
-              <input
-                class="form-check-input"
-                type="checkbox"
-                value="1"
-                checked
-              />
+            <label class="form-check form-switch form-check-custom form-check-solid">
+              <input class="form-check-input" type="checkbox" value="1" checked />
 
               <span class="form-check-label fw-semobold text-gray-400">
                 Allowed
