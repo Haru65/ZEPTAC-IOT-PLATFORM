@@ -103,6 +103,7 @@
         :header="tableHeader"
         :enable-items-per-page-dropdown="true"
         :checkbox-enabled="true"
+        :loading="loading"
         checkbox-label="id"
       >
         <template v-slot:name="{ row: customer }">
@@ -125,37 +126,21 @@
           {{ customer.date }}
         </template>
         <template v-slot:actions="{ row: customer }">
-          <a
-            href="#"
-            class="btn btn-sm btn-light btn-active-light-primary"
-            data-kt-menu-trigger="click"
-            data-kt-menu-placement="bottom-end"
-            data-kt-menu-flip="top-end"
-            >Actions
-            <KTIcon icon-name="down" icon-class="fs-5 m-0" />
-          </a>
-          <!--begin::Menu-->
-          <div
-            class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semobold fs-7 w-125px py-4"
-            data-kt-menu="true"
-          >
-            <!--begin::Menu item-->
-            <div class="menu-item px-3">
-              <router-link
-                to="/apps/customers/customer-details"
-                class="menu-link px-3"
-                >View</router-link
-              >
-            </div>
-            <!--end::Menu item-->
-            <!--begin::Menu item-->
-            <div class="menu-item px-3">
-              <a @click="deleteCustomer(customer.id)" class="menu-link px-3"
-                >Delete</a
-              >
-            </div>
-            <!--end::Menu item-->
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row">
+            <span class="menu-link px-3">
+              <i
+                class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+              ></i>
+            </span>
+            <span>
+              <i
+                @click="deleteCustomer(customer.id)"
+                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
+              ></i>
+            </span>
           </div>
+          <!--end::Menu FLex-->
           <!--end::Menu-->
         </template>
       </Datatable>
@@ -173,8 +158,8 @@ import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
 import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
-import type { ICustomer } from "@/core/apis/customers";
-import customers from "@/core/apis/customers";
+import type { ICustomer } from "@/core/model/customers";
+import customers from "@/core/model/customers";
 import arraySort from "array-sort";
 
 export default defineComponent({
@@ -185,6 +170,7 @@ export default defineComponent({
     AddCustomerModal,
   },
   setup() {
+    const loading = ref(true);
     const tableHeader = ref([
       {
         columnName: "Customer Name",
@@ -220,7 +206,7 @@ export default defineComponent({
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
-        columnWidth: 135,
+        columnWidth: 75,
       },
     ]);
     const selectedIds = ref<Array<number>>([]);
@@ -293,6 +279,7 @@ export default defineComponent({
       sort,
       onItemSelect,
       getAssetPath,
+      loading
     };
   },
 });

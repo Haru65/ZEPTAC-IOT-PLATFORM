@@ -300,7 +300,7 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { computed, defineComponent, ref } from "vue";
 import { useRoute } from "vue-router";
 import Dropdown4 from "@/components/dropdown/Dropdown4.vue";
-import contacts from "@/core/apis/contacts";
+import contacts from "@/core/model/contacts";
 import MessageIn from "@/components/messenger-parts/MessageIn.vue";
 import MessageOut from "@/components/messenger-parts/MessageOut.vue";
 

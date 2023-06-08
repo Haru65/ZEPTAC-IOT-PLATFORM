@@ -13,7 +13,7 @@
 @import "./core/layout/base/layout";
 @import "layout/layout";
 
-
+@media (width >=788px) {
 // scrollbar css
 /* width */
 ::-webkit-scrollbar {
@@ -33,4 +33,5 @@
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: var(--el-color-primary-dark-2);
+}
 }

@@ -5,9 +5,17 @@
       <div class="card-title">
         <!--begin::Search-->
         <div class="d-flex align-items-center position-relative my-1">
-          <KTIcon icon-name="magnifier" icon-class="fs-1 position-absolute ms-6" />
-          <input type="text" v-model="search" @input="searchItems()" class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search Employee" />
+          <KTIcon
+            icon-name="magnifier"
+            icon-class="fs-1 position-absolute ms-6"
+          />
+          <input
+            type="text"
+            v-model="search"
+            @input="searchItems()"
+            class="form-control form-control-solid w-250px ps-15"
+            placeholder="Search Employee"
+          />
         </div>
         <!--end::Search-->
       </div>
@@ -15,16 +23,29 @@
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
         <!--begin::Toolbar-->
-        <div v-if="selectedIds.length === 0" class="d-flex justify-content-end" data-kt-customer-table-toolbar="base">
+        <div
+          v-if="selectedIds.length === 0"
+          class="d-flex justify-content-end"
+          data-kt-customer-table-toolbar="base"
+        >
           <!--begin::Export-->
-          <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal"
-            data-bs-target="#kt_customers_export_modal">
+          <button
+            type="button"
+            class="btn btn-light-primary me-3"
+            data-bs-toggle="modal"
+            data-bs-target="#kt_Employee_export_modal"
+          >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
           </button>
           <!--end::Export-->
           <!--begin::Add customer-->
-          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_customer">
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#kt_modal_add_customer"
+          >
             <KTIcon icon-name="plus" icon-class="fs-2" />
             Add Employee
           </button>
@@ -32,21 +53,41 @@
         </div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->
-        <div v-else class="d-flex justify-content-end align-items-center" data-kt-customer-table-toolbar="selected">
+        <div
+          v-else
+          class="d-flex justify-content-end align-items-center"
+          data-kt-customer-table-toolbar="selected"
+        >
           <div class="fw-bold me-5">
-            <span class="me-2">{{ selectedIds.length }}</span>Selected
+            <span class="me-2">{{ selectedIds.length }}</span
+            >Selected
           </div>
-          <button type="button" class="btn btn-danger" @click="deleteFewCustomers()">
+          <button
+            type="button"
+            class="btn btn-danger"
+            @click="deleteFewEmployee()"
+          >
             Delete Selected
           </button>
         </div>
         <!--end::Group actions-->
         <!--begin::Group actions-->
-        <div class="d-flex justify-content-end align-items-center d-none" data-kt-customer-table-toolbar="selected">
+        <div
+          class="d-flex justify-content-end align-items-center d-none"
+          data-kt-customer-table-toolbar="selected"
+        >
           <div class="fw-bold me-5">
-            <span class="me-2" data-kt-customer-table-select="selected_count"></span>Selected
+            <span
+              class="me-2"
+              data-kt-customer-table-select="selected_count"
+            ></span
+            >Selected
           </div>
-          <button type="button" class="btn btn-danger" data-kt-customer-table-select="delete_selected">
+          <button
+            type="button"
+            class="btn btn-danger"
+            data-kt-customer-table-select="delete_selected"
+          >
             Delete Selected
           </button>
         </div>
@@ -55,13 +96,21 @@
       <!--end::Card toolbar-->
     </div>
     <div class="card-body pt-0">
-      <Datatable @on-sort="sort" @on-items-select="onItemSelect" :data="tableData" :header="tableHeader"
-        :enable-items-per-page-dropdown="true" :checkbox-enabled="true" checkbox-label="id">
+      <Datatable
+        @on-sort="sort"
+        @on-items-select="onItemSelect"
+        :data="tableData"
+        :header="tableHeader"
+        :enable-items-per-page-dropdown="true"
+        :checkbox-enabled="true"
+        :loading="loading"
+        checkbox-label="id"
+      >
         <!-- img data -->
         <template v-slot:profile="{ row: employee }">
           <div class="d-flex justify-content-start align-items-center">
             <img :src="employee.profile" class="w-45px rounded-circle" alt="" />
-            <span style="margin-left: 5.5%;">
+            <span style="margin-left: 5.5%">
               <span class="text-gray-600 text-hover-primary mb-1">
                 {{ employee.name }}
               </span>
@@ -70,7 +119,10 @@
         </template>
         <!-- defualt data -->
         <template v-slot:email="{ row: employee }">
-          <a v-bind:href="'mailto:' + employee.email" class="text-gray-600 text-hover-primary mb-1">
+          <a
+            v-bind:href="'mailto:' + employee.email"
+            class="text-gray-600 text-hover-primary mb-1"
+          >
             {{ employee.email }}
           </a>
         </template>
@@ -78,7 +130,7 @@
           {{ employee.mobile }}
         </template>
         <template v-slot:role="{ row: employee }">
-          {{ employee.role }}
+          {{ employee.role_id }}
         </template>
         <template v-slot:company_name="{ row: employee }">
           {{ employee.company_name }}
@@ -86,26 +138,22 @@
         <template v-slot:date="{ row: employee }">
           {{ employee.date }}
         </template>
-        <template v-slot:actions="{ row: customer }">
-          <a href="#" class="btn btn-sm btn-light btn-active-light-primary" data-kt-menu-trigger="click"
-            data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">Actions
-            <KTIcon icon-name="down" icon-class="fs-5 m-0" />
-          </a>
-          <!--begin::Menu-->
-          <div
-            class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semobold fs-7 w-125px py-4"
-            data-kt-menu="true">
-            <!--begin::Menu item-->
-            <div class="menu-item px-3">
-              <router-link to="/apps/customers/customer-details" class="menu-link px-3">View</router-link>
-            </div>
-            <!--end::Menu item-->
-            <!--begin::Menu item-->
-            <div class="menu-item px-3">
-              <a @click="deleteCustomer(customer.id)" class="menu-link px-3">Delete</a>
-            </div>
-            <!--end::Menu item-->
+        <template v-slot:actions="{ row: employee }">
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row">
+            <span class="menu-link px-3">
+              <i
+                class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+              ></i>
+            </span>
+            <span>
+              <i
+                @click="deleteCustomer(employee.id)"
+                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
+              ></i>
+            </span>
           </div>
+          <!--end::Menu FLex-->
           <!--end::Menu-->
         </template>
       </Datatable>
@@ -123,9 +171,11 @@ import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
 import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
-import type { IEmployee } from "@/core/apis/employee";
-import employee from "@/core/apis/employee";
+import type { IEmployee } from "@/core/model/employee";
 import arraySort from "array-sort";
+import ApiService from "@/core/services/ApiService";
+import Permissions_Roles from "@/core/config/PermissionsRolesConfig";
+import moment from "moment";
 
 export default defineComponent({
   name: "employee-listing",
@@ -135,6 +185,7 @@ export default defineComponent({
     AddCustomerModal,
   },
   setup() {
+    const loading = ref(true);
     const tableHeader = ref([
       {
         columnName: "Profile",
@@ -176,19 +227,47 @@ export default defineComponent({
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
-        columnWidth: 135,
+        columnWidth: 75,
       },
     ]);
+
+    // functions
+    // get_employees
+    const employee_listing = async () => {
+      try {
+        ApiService.setHeader();
+        const response = await ApiService.get("/employee");
+        tableData.value = response.data.result.data.map(
+          ({ created_at, role_id, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+            role_id: Permissions_Roles.get_role(role_id),
+          })
+        );
+        console.log(tableData.value);
+        initEmployee.value.splice(
+          0,
+          tableData.value.length,
+          ...tableData.value
+        );
+      } catch (error) {
+        console.error(error);
+      } finally {
+        console.log("done");
+      }
+    };
     const selectedIds = ref<Array<number>>([]);
+    const tableData = ref<Array<IEmployee>>([]);
+    const initEmployee = ref<Array<IEmployee>>([]);
 
-    const tableData = ref<Array<IEmployee>>(employee);
-    const initCustomers = ref<Array<IEmployee>>([]);
-
-    onMounted(() => {
-      initCustomers.value.splice(0, tableData.value.length, ...tableData.value);
+    onMounted(async () => {
+      await employee_listing();
+      setTimeout(() => {
+        loading.value = false;
+      }, 250);
     });
 
-    const deleteFewCustomers = () => {
+    const deleteFewEmployee = () => {
       selectedIds.value.forEach((item) => {
         deleteCustomer(item);
       });
@@ -205,7 +284,7 @@ export default defineComponent({
 
     const search = ref<string>("");
     const searchItems = () => {
-      tableData.value.splice(0, tableData.value.length, ...initCustomers.value);
+      tableData.value.splice(0, tableData.value.length, ...initEmployee.value);
       if (search.value !== "") {
         let results: Array<IEmployee> = [];
         for (let j = 0; j < tableData.value.length; j++) {
@@ -245,10 +324,11 @@ export default defineComponent({
       search,
       searchItems,
       selectedIds,
-      deleteFewCustomers,
+      deleteFewEmployee,
       sort,
       onItemSelect,
       getAssetPath,
+      loading,
     };
   },
 });

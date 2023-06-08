@@ -74,26 +74,22 @@
           {{ pricelist.date }}
         </template>
         <template v-slot:actions="{ row: pricelist }">
-          <a href="#" class="btn btn-sm btn-light btn-active-light-primary" data-kt-menu-trigger="click"
-            data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">Actions
-            <KTIcon icon-name="down" icon-class="fs-5 m-0" />
-          </a>
-          <!--begin::Menu-->
-          <div
-            class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semobold fs-7 w-125px py-4"
-            data-kt-menu="true">
-            <!--begin::Menu item-->
-            <div class="menu-item px-3">
-              <router-link to="/apps/customers/customer-details" class="menu-link px-3">View</router-link>
+             <!--begin::Menu Flex-->
+            <div class="d-flex flex-lg-row">
+              <span class="menu-link px-3">
+                <i
+                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                ></i>
+              </span>
+              <span>
+                <i
+                  @click="deleteCustomer(pricelist.id)"
+                  class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
+                ></i>
+              </span>
             </div>
-            <!--end::Menu item-->
-            <!--begin::Menu item-->
-            <div class="menu-item px-3">
-              <a @click="deleteCustomer(pricelist.id)" class="menu-link px-3">Delete</a>
-            </div>
-            <!--end::Menu item-->
-          </div>
-          <!--end::Menu-->
+            <!--end::Menu FLex-->
+            <!--end::Menu-->
         </template>
       </Datatable>
     </div>
@@ -110,8 +106,8 @@ import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
 import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
-import type { IPriceList } from "@/core/apis/pricelist";
-import pricelist from "@/core/apis/pricelist";
+import type { IPriceList } from "@/core/model/pricelist";
+import pricelist from "@/core/model/pricelist";
 import arraySort from "array-sort";
 
 export default defineComponent({
@@ -127,7 +123,7 @@ export default defineComponent({
         columnName: "Name",
         columnLabel: "name",
         sortEnabled: true,
-        columnWidth: 135,
+        columnWidth: 75,
       },
       {
         columnName: "Description",
@@ -151,7 +147,7 @@ export default defineComponent({
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
-        columnWidth: 135,
+        columnWidth: 75,
       },
     ]);
     const selectedIds = ref<Array<number>>([]);

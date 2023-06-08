@@ -17,26 +17,27 @@ interface IUser {
   is_active: number;
 }
 
-const user: Array<IUser> = [
-]
+const user: Array<IUser> = [];
 
 export function user_listing() {
   ApiService.setHeader();
-  ApiService.get("/users").then((response) => {
-    const users = response.data.result.data;
-    users.forEach((element) => {
-      user.push(element);
+  ApiService.get("/users")
+    .then((response) => {
+      const users = response.data.result.data;
+      users.forEach((element) => {
+        user.push(element);
+      });
+    })
+    .catch((err) => {
+      console.error(err);
     });
-  }).catch((err) => {
-    console.error(err);
-  })
 
   return null;
 }
 
 user_listing();
 
-console.log(user)
+console.log(user);
 
 export type { IUser };
 export default user;

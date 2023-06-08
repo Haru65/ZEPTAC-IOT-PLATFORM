@@ -40,7 +40,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import interactionPlugin from "@fullcalendar/interaction";
 import type {CalendarOptions} from "@fullcalendar/core";
-import events, {TODAY} from "@/core/apis/events";
+import events, {TODAY} from "@/core/model/events";
 import NewEventModal from "@/components/modals/forms/NewEventModal.vue";
 import {Modal} from "bootstrap";
 
