@@ -20,6 +20,10 @@ export const saveUser = (user: string): void => {
   window.localStorage.setItem(USER, user);
 };
 
+export const destroyUser = (): void => {
+  window.localStorage.removeItem(USER);
+};
+
 /**
  * @description remove token form localStorage
  */
@@ -27,4 +31,4 @@ export const destroyToken = (): void => {
   window.localStorage.removeItem(ID_TOKEN_KEY);
 };
 
-export default { getToken, saveToken, destroyToken,saveUser };
+export default { getToken, saveToken, destroyToken, saveUser, destroyUser };

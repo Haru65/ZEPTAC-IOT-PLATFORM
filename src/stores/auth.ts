@@ -25,7 +25,7 @@ export const useAuthStore = defineStore("auth", () => {
     JwtService.saveToken(user.value.api_token);
   }
 
-  function saveUser(user : User){
+  function saveUser(user: User) {
     console.log(user);
     JwtService.saveUser(JSON.stringify(user));
   }
@@ -39,6 +39,7 @@ export const useAuthStore = defineStore("auth", () => {
     user.value = {} as User;
     errors.value = [];
     JwtService.destroyToken();
+    JwtService.destroyUser();
   }
 
   function login(credentials: User) {
