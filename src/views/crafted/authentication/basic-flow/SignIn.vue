@@ -171,12 +171,9 @@ export default defineComponent({
         Swal.fire({
           text: "You have successfully logged in!",
           icon: "success",
-          buttonsStyling: false,
-          confirmButtonText: "Ok, got it!",
-          heightAuto: false,
-          customClass: {
-            confirmButton: "btn fw-semobold btn-light-primary",
-          },
+          showConfirmButton: false,
+          heightAuto: true,
+          timer: 1000,
         }).then(() => {
           // Go to page after successfully login
           router.push({ name: "dashboard" });

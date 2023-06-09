@@ -40,15 +40,10 @@
           </button>
           <!--end::Export-->
           <!--begin::Add customer-->
-          <button
-            type="button"
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#kt_modal_add_customer"
-          >
+          <router-link to="./add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
             Add Company
-          </button>
+          </router-link>
           <!--end::Add customer-->
         </div>
         <!--end::Toolbar-->

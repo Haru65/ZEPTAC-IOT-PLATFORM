@@ -35,6 +35,15 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/company/add",
+        name: "company-add",
+        component: () => import("@/views/apps/admin/companies/CompanyAdd.vue"),
+        meta: {
+          pageTitle: "Company Add",
+          breadcrumbs: ["Company Add"],
+        },
+      },
+      {
         path: "/users/list",
         name: "users-list",
         component: () => import("@/views/apps/admin/users/UserListing.vue"),

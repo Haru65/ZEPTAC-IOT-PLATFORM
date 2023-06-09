@@ -52,32 +52,19 @@
 // basic imports
 import { getAssetPath, getIllustrationsPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted } from "vue";
-import LayoutService from "@/core/services/LayoutService";
-import { useBodyStore } from "@/stores/body";
-import { themeMode } from "@/core/helpers/config";
-// if using default options
-import { vScrollReveal } from "vue-scroll-reveal";
 // OR if using custom default options
-import { createScrollRevealDirective } from "vue-scroll-reveal";
 
 export default defineComponent({
+  // eslint-disable-next-line vue/multi-word-component-names
   name: "Plans",
   components: {},
   setup() {
-    const storeBody = useBodyStore();
-
-    const vScrollReveal = createScrollRevealDirective({
-      delay: 1000,
-      duration: 150,
-    });
-
     onMounted(() => {
       console.log("onMounted");
     });
     return {
       getAssetPath,
       getIllustrationsPath,
-      vScrollReveal,
     };
   },
 });

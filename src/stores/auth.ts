@@ -18,7 +18,7 @@ export const useAuthStore = defineStore("auth", () => {
   const isAuthenticated = ref(!!JwtService.getToken());
 
   function setAuth(authUser: User) {
-    console.log(authUser);
+    // console.log(authUser);
     isAuthenticated.value = true;
     user.value = authUser;
     errors.value = {};
@@ -26,12 +26,19 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   function saveUser(user: User) {
-    console.log(user);
+    // console.log(user);
     JwtService.saveUser(JSON.stringify(user));
   }
 
   function setError(error: any) {
     errors.value = { ...error };
+    console.error(error.value);
+  }
+
+  // for login auth only custom error
+  function setAuthError(error: any) {
+    errors.value = { error };
+    // console.log(errors);
   }
 
   function purgeAuth() {
@@ -45,11 +52,13 @@ export const useAuthStore = defineStore("auth", () => {
   function login(credentials: User) {
     return ApiService.post("login", credentials)
       .then(({ data }) => {
+        // console.log(data);
         setAuth(data);
         saveUser(data);
       })
       .catch(({ response }) => {
-        setError(response.data.errors);
+        console.error(response.data.message);
+        setAuthError(response.data.message);
       });
   }
 
@@ -63,6 +72,7 @@ export const useAuthStore = defineStore("auth", () => {
         setAuth(data);
       })
       .catch(({ response }) => {
+        console.error(response.data.message);
         setError(response.data.errors);
       });
   }
@@ -73,6 +83,7 @@ export const useAuthStore = defineStore("auth", () => {
         setError({});
       })
       .catch(({ response }) => {
+        console.error(response.data.message);
         setError(response.data.errors);
       });
   }
@@ -86,8 +97,11 @@ export const useAuthStore = defineStore("auth", () => {
           setAuth(data);
         })
         .catch(({ response }) => {
-          setError(response.data.errors);
-          purgeAuth();
+          if (response.data.error_code) {
+            console.error(response.data.message);
+            setError(response.data.message);
+            purgeAuth();
+          }
         });
     } else {
       purgeAuth();

@@ -15,7 +15,7 @@
         <!--begin::Heading-->
         <div class="text-center mb-10">
           <!--begin::Title-->
-          <h1 class="text-dark mb-3">Contact Us</h1>
+          <h1 class="text-dark mb-3" style="font-size: 2.3rem">Contact Us</h1>
           <!--end::Title-->
         </div>
         <!--end::Heading-->
@@ -76,10 +76,11 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, ref, onMounted } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import { useAuthStore, type User } from "@/stores/auth";
-import { useRouter } from "vue-router";
-import { useBodyStore } from "@/stores/body";
+
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
+import { useBodyStore } from "@/stores/body";
+import LayoutService from "@/core/services/LayoutService";
 
 export default defineComponent({
   name: "ContactUs",
@@ -89,38 +90,34 @@ export default defineComponent({
     ErrorMessage,
   },
   setup() {
-    const storeBody = useBodyStore();
     const store = useAuthStore();
-    const router = useRouter();
+    const bodyStore = useBodyStore();
 
-    const bgImage =
-      themeMode.value !== "dark"
-        ? getAssetPath("media/auth/bg1-dark.jpg")
-        : getAssetPath("media/auth/bg1.jpg");
+    const bgImage = getAssetPath("media/patterns/layered-waves-haikei.svg");
 
     onMounted(() => {
-      storeBody.addBodyClassname("bg-body");
-      storeBody.addBodyAttribute({
+      LayoutService.emptyElementClassesAndAttributes(document.body);
+
+      bodyStore.addBodyClassname("bg-body");
+      bodyStore.addBodyAttribute({
         qualifiedName: "style",
-        value: `background-image: url("${bgImage}")`,
+        value: `background-image: url("${bgImage}");background-repeat:no-repeat;background-size:cover`,
       });
     });
-    // Clear existing errors
-    store.logout();
 
     const submitButton = ref<HTMLButtonElement | null>(null);
 
     //Create form validation object
     const login = Yup.object().shape({
       email: Yup.string().email().required().label("Email"),
-      password: Yup.string().min(4).required().label("Password"),
     });
 
     //Form submit function
     const onSubmitLogin = async (values: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       values = values as User;
       // Clear existing errors
-      store.logout();
+      console.warn("Clicked");
 
       if (submitButton.value) {
         // eslint-disable-next-line
@@ -130,8 +127,10 @@ export default defineComponent({
       }
 
       // Send login request
-      await store.login(values);
+      // await store.login(values);
       const error = Object.values(store.errors);
+
+      // const error = [new Proxy({ 0: "sdd" }, {})];
 
       if (error.length === 0) {
         Swal.fire({
@@ -143,10 +142,7 @@ export default defineComponent({
           customClass: {
             confirmButton: "btn fw-semobold btn-light-primary",
           },
-        }).then(() => {
-          // Go to page after successfully login
-          router.push({ name: "dashboard" });
-        });
+        }).then(() => {});
       } else {
         Swal.fire({
           text: error[0] as string,
@@ -157,9 +153,7 @@ export default defineComponent({
           customClass: {
             confirmButton: "btn fw-semobold btn-light-danger",
           },
-        }).then(() => {
-          store.errors = {};
-        });
+        }).then(() => {});
       }
 
       //Deactivate indicator
