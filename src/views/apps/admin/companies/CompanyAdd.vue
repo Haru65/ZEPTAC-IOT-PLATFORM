@@ -366,7 +366,7 @@
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, ref, watch } from "vue";
-import { countries } from "@/core/model/countries";
+import { countries, INstates } from "@/core/model/countries";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 
 export default defineComponent({
@@ -407,11 +407,10 @@ export default defineComponent({
 
         if (newVal === "India") {
           formData.value.state = "";
-          state.value.push({
-            name: "Maharashtra",
-            code: "MH",
+          INstates.forEach((ele) => {
+            state.value.push(ele);
           });
-        } else { 
+        } else {
           formData.value.state = "";
         }
       }
