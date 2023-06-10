@@ -135,7 +135,7 @@
   </section>
 </template>
 
-<script>
+<script lang="ts">
 // basic imports
 import { getAssetPath, getIllustrationsPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted } from "vue";

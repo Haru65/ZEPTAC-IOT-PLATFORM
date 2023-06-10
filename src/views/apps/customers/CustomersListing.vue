@@ -158,8 +158,8 @@ import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
 import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
-import type { ICustomer } from "@/core/model/customers";
-import customers from "@/core/model/customers";
+import type { ICustomers } from "@/core/model/customers";
+// import customers from "@/core/model/customers";
 import arraySort from "array-sort";
 
 export default defineComponent({
@@ -211,8 +211,8 @@ export default defineComponent({
     ]);
     const selectedIds = ref<Array<number>>([]);
 
-    const tableData = ref<Array<ICustomer>>(customers);
-    const initCustomers = ref<Array<ICustomer>>([]);
+    const tableData = ref<Array<ICustomers>>([]);
+    const initCustomers = ref<Array<ICustomers>>([]);
 
     onMounted(() => {
       initCustomers.value.splice(0, tableData.value.length, ...tableData.value);
@@ -237,7 +237,7 @@ export default defineComponent({
     const searchItems = () => {
       tableData.value.splice(0, tableData.value.length, ...initCustomers.value);
       if (search.value !== "") {
-        let results: Array<ICustomer> = [];
+        let results: Array<ICustomers> = [];
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
             results.push(tableData.value[j]);
