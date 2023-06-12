@@ -128,7 +128,7 @@
             </span>
             <span>
               <i
-                @click="deleteCustomer(company.id)"
+                @click="deleteCustomer(company.id, true)"
                 class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
@@ -155,6 +155,8 @@ import type { ICompany } from "@/core/model/company";
 import arraySort from "array-sort";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
+import Swal from "sweetalert2/dist/sweetalert2.js";
+import { deleteCompany } from "@/stores/api";
 
 export default defineComponent({
   name: "company-listing",
@@ -234,16 +236,59 @@ export default defineComponent({
     });
 
     const deleteFewCustomers = () => {
-      selectedIds.value.forEach((item) => {
-        deleteCustomer(item);
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover this imaginary file!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "red",
+        confirmButtonText: "Yes, I am sure!",
+        cancelButtonText: "No, cancel it!",
+        closeOnConfirm: false,
+        closeOnCancel: false,
+        dangerMode: true,
+      }).then((result: { [x: string]: any }) => {
+        if (result["isConfirmed"]) {
+          // Put your function here
+          selectedIds.value.forEach((item) => {
+            deleteCustomer(item, false);
+          });
+          selectedIds.value.length = 0;
+        }
       });
-      selectedIds.value.length = 0;
     };
 
-    const deleteCustomer = (id: number) => {
-      for (let i = 0; i < tableData.value.length; i++) {
-        if (tableData.value[i].id === id) {
-          tableData.value.splice(i, 1);
+    const deleteCustomer = (id: number, mul: boolean) => {
+      if (mul) {
+        for (let i = 0; i < tableData.value.length; i++) {
+          if (tableData.value[i].id === id) {
+            Swal.fire({
+              title: "Are you sure?",
+              text: "You will not be able to recover this imaginary file!",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "red",
+              confirmButtonText: "Yes, I am sure!",
+              cancelButtonText: "No, cancel it!",
+              closeOnConfirm: false,
+              closeOnCancel: false,
+              dangerMode: true,
+            }).then((result: { [x: string]: any }) => {
+              if (result["isConfirmed"]) {
+                // Put your function here
+                deleteCompany(id);
+                tableData.value.splice(i, 1);
+              }
+            });
+          }
+        }
+      } else {
+        for (let i = 0; i < tableData.value.length; i++) {
+          if (tableData.value[i].id === id) {
+            // Put your function here
+            deleteCompany(id);
+            tableData.value.splice(i, 1);
+          }
         }
       }
     };
