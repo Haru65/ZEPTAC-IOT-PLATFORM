@@ -174,7 +174,7 @@ import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
 import type { IEmployee } from "@/core/model/employee";
 import arraySort from "array-sort";
 import ApiService from "@/core/services/ApiService";
-import Permissions_Roles from "@/core/config/PermissionsRolesConfig";
+import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
 
 export default defineComponent({
@@ -241,7 +241,7 @@ export default defineComponent({
           ({ created_at, role_id, ...rest }) => ({
             ...rest,
             created_at: moment(created_at).format("MMMM Do YYYY"),
-            role_id: Permissions_Roles.get_role(role_id),
+            role_id: get_role(role_id),
           })
         );
         console.log(tableData.value);

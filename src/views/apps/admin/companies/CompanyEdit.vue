@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 99%">
+  <div style="width: 99%" class="bg-body p-12 rounded">
     <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered">
       <!--begin::Modal content-->

@@ -79,6 +79,15 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/users/add",
+        name: "users-add",
+        component: () => import("@/views/apps/admin/users/UserAdd.vue"),
+        meta: {
+          pageTitle: "User Add",
+          breadcrumbs: ["User Add"],
+        },
+      },
+      {
         path: "/employee/list",
         name: "employee-list",
         component: () =>
@@ -252,7 +261,7 @@ router.beforeEach((to, from, next) => {
 
   // before page access check if page requires authentication
   if (to.meta.middleware == "auth") {
-    if (authStore.isAuthenticated) {
+    if (authStore.isAuthenticated !== null) {
       next();
     } else {
       next({ name: "login" });
