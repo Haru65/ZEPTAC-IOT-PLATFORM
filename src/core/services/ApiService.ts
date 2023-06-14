@@ -57,6 +57,16 @@ class ApiService {
     return ApiService.vueInstance.axios.get(`${resource}/${slug}`);
   }
 
+  // company listing unique
+  public static companyget(
+    resource: string,
+    slug = "" as string
+  ): Promise<AxiosResponse> {
+    console.log(resource);
+    console.log(slug);
+    return ApiService.vueInstance.axios.get(`${resource}?${slug}`);
+  }
+
   /**
    * @description set the POST HTTP request
    * @param resource: string

@@ -3,6 +3,7 @@ import {
   createWebHistory,
   type RouteRecordRaw,
 } from "vue-router";
+import { getCompany } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 
@@ -41,6 +42,31 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Company Add",
           breadcrumbs: ["Company Add"],
+        },
+      },
+      {
+        path: "/company/edit/:id",
+        name: "company-edit",
+        beforeEnter: async (to, from, next) => {
+          const companyId = to.params.id;
+          console.log(companyId);
+          try {
+            const response = await getCompany(companyId);
+            // console.log(response);
+            if (response.error) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () => import("@/views/apps/admin/companies/CompanyEdit.vue"),
+        meta: {
+          pageTitle: "Company Edit",
+          breadcrumbs: ["Company Edit"],
         },
       },
       {
