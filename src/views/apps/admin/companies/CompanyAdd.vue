@@ -1,348 +1,213 @@
 <template>
-  <div style="width: 99%">
+  <div style="width: 99%" class="bg-body p-12 rounded">
     <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered">
       <!--begin::Modal content-->
       <div class="modal-content">
         <!--begin::Form-->
-        <el-form
-          @submit.prevent="submit()"
-          :model="formData"
-          :rules="rules"
-          ref="formRef"
+        <VForm
+          id="kt_account_profile_details_form"
+          class="form"
+          novalidate
+          @submit="onsubmit()"
+          :validation-schema="companyDetailsValidator"
         >
-          <!--flex -->
-          <div class="row g-9 mb-7">
-            <!--begin::Modal body-->
-            <div class="modal-body p-10 p-lg-17 col-md-6 fv-row">
-              <!--begin::Scroll-->
-              <div class="me-n7 pe-7">
-                <!--begin::Input group-->
-                <div class="fv-row mb-7">
-                  <!--begin::Label-->
-                  <label class="required fs-6 fw-semobold mb-2"
-                    >Company Name</label
-                  >
-                  <!--end::Label-->
+          <!--begin::Card body-->
+          <div class="card-body border-top p-9">
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >Company Name & Address</label
+              >
+              <!--end::Label-->
 
-                  <!--begin::Input-->
-                  <el-form-item prop="company_name">
-                    <el-input
-                      v-model="formData.company_name"
-                      type="text"
-                      placeholder=""
-                    />
-                  </el-form-item>
-                  <!--end::Input-->
-                </div>
-                <!--end::Input group-->
-
-                <!--begin::Input group-->
-                <div class="fv-row mb-15">
-                  <!--begin::Label-->
-                  <label class="fs-6 fw-semobold mb-2">Address</label>
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <el-form-item prop="address">
-                    <el-input v-model="formData.address" type="text" />
-                  </el-form-item>
-                  <!--end::Input-->
-                </div>
-                <!--begin::Input group-->
-
-                <div class="fv-row mb-7">
-                  <!--begin::Label-->
-                  <label class="required fs-6 fw-semobold mb-2"
-                    >Contact Person</label
-                  >
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <el-form-item prop="contact_person">
-                    <el-input
-                      v-model="formData.contact_person"
-                      type="text"
-                      placeholder=""
-                    />
-                  </el-form-item>
-                  <!--end::Input-->
-                </div>
-                <!--end::Input group-->
-
-                <!--begin::Input group-->
-                <div class="fv-row">
-                  <!--begin::Label-->
-                  <label class="fs-6 fw-semobold mb-2">Contact</label>
-                  <!--end::Label-->
-                  <!--begin::Input-->
-                  <el-form-item prop="mobile_number">
-                    <el-input v-model="formData.mobile_number" type="text" />
-                  </el-form-item>
-                  <!--end::Input-->
-                </div>
-                <!--begin::Input group-->
-
-                <!--begin::Input group-->
-                <div class="fv-row mb-7">
-                  <!--begin::Label-->
-                  <label class="required fs-6 fw-semobold mb-2">Email</label>
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <el-form-item prop="email">
-                    <el-input
-                      v-model="formData.email"
-                      type="text"
-                      placeholder=""
-                    />
-                  </el-form-item>
-                  <!--end::Input-->
-                </div>
-                <!--end::Input group-->
-
-                <!--begin::Input group-->
-                <div class="row g-9 mb-7">
+              <!--begin::Col-->
+              <div class="col-lg-8">
+                <!--begin::Row-->
+                <div class="row">
                   <!--begin::Col-->
-
-                  <!-- begin:Col -->
-                  <div class="col-md-6 fv-row">
-                    <div>
-                      <!--begin::Label-->
-                      <label class="fs-6 fw-semobold mb-2">
-                        <span class="required">Country</span>
-
-                        <i
-                          class="fas fa-exclamation-circle ms-1 fs-7"
-                          data-bs-toggle="tooltip"
-                          title="Country of origination"
-                        ></i>
-                      </label>
-                      <!--end::Label-->
-
-                      <!--begin::Input-->
-                      <el-select v-model="formData.country" filterable>
-                        <el-option value="">Select a Country...</el-option>
-                        <el-option
-                          v-for="(item, i) in countries"
-                          :key="`countries-select-option-${i}`"
-                          :value="item.name"
-                        >
-                          {{ item.name }}
-                        </el-option>
-                      </el-select>
-                      <!--end::Input-->
+                  <div class="col-lg-6 fv-row">
+                    <Field
+                      type="text"
+                      name="cname"
+                      class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                      placeholder="Company name"
+                      v-model="companyDetails.name"
+                    />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="cname" />
+                      </div>
                     </div>
                   </div>
-
-                  <div class="col-md-6 fv-row" v-if="!state.length">
-                    <!--begin::Label-->
-                    <label class="required fs-6 fw-semobold mb-2">
-                      State
-                    </label>
-                    <!--end::Label-->
-
-                    <!--begin::Input-->
-                    <el-form-item prop="state">
-                      <el-input class="w-100" v-model="formData.state" />
-                    </el-form-item>
-                    <!--end::Input-->
-                  </div>
+                  <!--end::Col-->
 
                   <!--begin::Col-->
-                  <div class="col-md-6 fv-row" v-if="state.length">
-                    <div>
-                      <!--begin::Label-->
-                      <label class="fs-6 fw-semobold mb-2">
-                        <span class="required">State</span>
-
-                        <i
-                          class="fas fa-exclamation-circle ms-1 fs-7"
-                          data-bs-toggle="tooltip"
-                          title="Country of origination"
-                        ></i>
-                      </label>
-                      <!--end::Label-->
-
-                      <!--begin::Input-->
-                      <el-select
-                        v-model="formData.state"
-                        filterable
-                        :disabled="!state.length"
-                      >
-                        <el-option
-                          prop="state"
-                          v-model="formData.state"
-                          value=""
-                          >Select a Country...</el-option
-                        >
-                        <el-option
-                          v-for="(item, i) in state"
-                          :key="`countries-select-option-${i}`"
-                          :value="item.name"
-                        >
-                          {{ item.name }}
-                        </el-option>
-                      </el-select>
-                      <!--end::Input-->
+                  <div class="col-lg-6 fv-row">
+                    <Field
+                      type="text"
+                      name="caddr"
+                      class="form-control form-control-lg form-control-solid"
+                      placeholder="Company address"
+                      v-model="companyDetails.address"
+                    />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="caddr" />
+                      </div>
                     </div>
                   </div>
                   <!--end::Col-->
                 </div>
-                <!--end::Input group-->
-                <!--end::Input group-->
+                <!--end::Row-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
 
-                <!--begin::Input group-->
-                <div class="row g-9 mb-7">
-                  <!--begin::Col-->
-                  <div class="col-md-6 fv-row">
-                    <!--begin::Label-->
-                    <label class="required fs-6 fw-semobold mb-2"
-                      >PinCode</label
-                    >
-                    <!--end::Label-->
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >Email</label
+              >
+              <!--end::Label-->
 
-                    <!--begin::Input-->
-                    <el-form-item prop="pincode">
-                      <el-input v-model="formData.pincode" />
-                    </el-form-item>
-                    <!--end::Input-->
+              <!--begin::Col-->
+              <div class="col-lg-8 fv-row">
+                <Field
+                  type="text"
+                  name="email"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Email"
+                  v-model="companyDetails.email"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="email" />
                   </div>
-                  <!--end::Col-->
-
-                  <div class="col-md-6 fv-row">
-                    <!--begin::Label-->
-                    <label class="required fs-6 fw-semobold mb-2"> City </label>
-                    <!--end::Label-->
-
-                    <!--begin::Input-->
-                    <el-form-item prop="city">
-                      <el-input v-model="formData.city" />
-                    </el-form-item>
-                    <!--end::Input-->
-                  </div>
-                  <!--end::Col-->
                 </div>
               </div>
-              <!--end::Billing form-->
+              <!--end::Col-->
             </div>
-            <!--end::Modal body-->
+            <!--end::Input group-->
 
-            <!--begin::Modal body-->
-            <div class="modal-body p-10 p-lg-17 col-md-6 fv-row">
-              <!--begin::Scroll-->
-              <div>
-                <!--begin::Input group-->
-                <div class="fv-row mb-14">
-                  <!--begin::Label-->
-                  <label class="fs-6 fw-semobold mb-2">
-                    <span class="required">GST Details</span>
-                  </label>
-                  <!--end::Label-->
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label fw-semobold fs-6">
+                <span class="required">Contact Phone</span>
 
-                  <!--begin::Input-->
-                  <el-form-item prop="gst_details">
-                    <el-input v-model="formData.gst_details" />
-                  </el-form-item>
-                  <!--end::Input-->
+                <i
+                  class="fas fa-exclamation-circle ms-1 fs-7"
+                  data-bs-toggle="tooltip"
+                  title="Phone number must be active"
+                ></i>
+              </label>
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8 fv-row">
+                <Field
+                  type="tel"
+                  name="phone"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Phone number"
+                  v-model="companyDetails.phone"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="phone" />
+                  </div>
                 </div>
-                <!--end::Input group-->
-
-                <!--begin::Input group-->
-                <div class="fv-row mb-14">
-                  <!--begin::Label-->
-                  <label class="fs-6 fw-semobold mb-2">
-                    <span class="required">Selected Package</span>
-                  </label>
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <el-form-item prop="selected_package">
-                    <el-input v-model="formData.selected_package" />
-                  </el-form-item>
-                  <!--end::Input-->
-                </div>
-                <!--end::Input group-->
-
-                <!--begin::Input group-->
-                <div class="fv-row mb-14">
-                  <!--begin::Label-->
-                  <label class="fs-6 fw-semobold mb-2">
-                    <span class="required">Price</span>
-                  </label>
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <el-form-item prop="price">
-                    <el-input v-model="formData.price" />
-                  </el-form-item>
-                  <!--end::Input-->
-                </div>
-                <!--end::Input group-->
-
-                <!--begin::Input group-->
-                <div class="fv-row mb-14">
-                  <!--begin::Label-->
-                  <label class="fs-6 fw-semobold mb-2">
-                    <span class="required">Pending Payment</span>
-                  </label>
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <el-form-item prop="pending_payment">
-                    <el-input v-model="formData.pending_payment" />
-                  </el-form-item>
-                  <!--end::Input-->
-                </div>
-                <!--end::Input group-->
-
-                <!--begin::Input group-->
-                <div class="fv-row mb-15">
-                  <!--begin::Label-->
-                  <label class="fs-6 fw-semobold mb-2">
-                    <span class="required">User Limit</span>
-                  </label>
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <el-form-item prop="user_limit">
-                    <el-input v-model="formData.user_limit" />
-                  </el-form-item>
-                  <!--end::Input-->
-                </div>
-                <!--end::Input group-->
-
-                <!--begin::Input group-->
-                <div class="fv-row mb-15">
-                  <!--begin::Label-->
-                  <label class="fs-6 fw-semobold mb-2">
-                    <span class="required">User Licence Payment</span>
-                  </label>
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <el-form-item prop="user_licence_payment">
-                    <el-input v-model="formData.user_licence_payment" />
-                  </el-form-item>
-                  <!--end::Input-->
-                </div>
-                <!--end::Input group-->
               </div>
-              <!--end::Billing form-->
+              <!--end::Col-->
             </div>
-            <!--end::Modal body-->
+            <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <!--end::Input group-->
+
+            <!--begin::Input group-->
+
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label fw-semobold fs-6">
+                <span class="required">Password</span>
+
+                <i
+                  class="fas fa-exclamation-circle ms-1 fs-7"
+                  data-bs-toggle="tooltip"
+                  title="Phone number must be active"
+                ></i>
+              </label>
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8 fv-row">
+                <Field
+                  type="password"
+                  name="password"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Password"
+                  v-model="companyDetails.password"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="password" />
+                  </div>
+                </div>
+              </div>
+              <!--end::Col-->
+            </div>
+
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >Role</label
+              >
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8 fv-row">
+                <Field
+                  as="select"
+                  name="role"
+                  class="form-select form-select-solid form-select-lg"
+                  v-model="companyDetails.role"
+                >
+                  <option
+                    v-for="ele in roleArray"
+                    :key="ele.id"
+                    :value="ele.id"
+                  >
+                    {{ ele.name }}
+                  </option>
+                </Field>
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="role" />
+                  </div>
+                </div>
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+            <!--begin::Col-->
           </div>
-          <!-- flex -->
-          <!--begin::Modal footer-->
           <div class="modal-footer flex-center">
             <!--begin::Button-->
-            <button type="reset" class="btn btn-lg btn-danger">Discard</button>
+            <button type="reset" class="btn btn-lg btn-danger w-25">
+              Discard
+            </button>
             <!--end::Button-->
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
             <!--begin::Button-->
             <button
               :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary"
+              class="btn btn-lg btn-primary w-25"
               type="submit"
             >
               <span v-if="!loading" class="indicator-label"> Submit </span>
@@ -355,8 +220,8 @@
             </button>
             <!--end::Button-->
           </div>
-          <!--end::Modal footer-->
-        </el-form>
+          <!--end::Input group-->
+        </VForm>
         <!--end::Form-->
       </div>
     </div>
@@ -368,206 +233,74 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, ref, watch } from "vue";
 import { countries, INstates } from "@/core/model/countries";
 import Swal from "sweetalert2/dist/sweetalert2.js";
+import { addCompany } from "@/stores/api";
+import { ErrorMessage, Field, Form as VForm } from "vee-validate";
+import * as Yup from "yup";
+
+interface companyDetails {
+  avatar: string;
+  name: string;
+  address: string;
+  email: string;
+  phone: string;
+  password: string;
+  role: number;
+}
 
 export default defineComponent({
-  name: "add-customer-modal",
-  components: {},
+  name: "company-add",
+  components: {
+    ErrorMessage,
+    Field,
+    VForm,
+  },
   setup() {
-    const formRef = ref<null | HTMLFormElement>(null);
-    const addCompanyModalRef = ref<null | HTMLElement>(null);
-    const loading = ref<boolean>(false);
-    const formData = ref({
-      company_name: "",
-      is_active: "",
+    const updateEmailButton = ref<HTMLElement | null>(null);
+    const updatePasswordButton = ref<HTMLElement | null>(null);
+
+    const loading = ref(false);
+
+    const emailFormDisplay = ref(false);
+    const passwordFormDisplay = ref(false);
+
+    const companyDetailsValidator = Yup.object().shape({
+      cname: Yup.string().required().label("Company name"),
+      caddr: Yup.string().required().label("Company address"),
+      email: Yup.string().required().label("Email"),
+      phone: Yup.string().required().label("Phone"),
+      password: Yup.string().required().label("Password"),
+    });
+
+    const companyDetails = ref<companyDetails>({
+      avatar: getAssetPath("media/avatars/300-1.jpg"),
+      name: "",
       address: "",
-      city: "",
-      state: "",
-      country: "",
-      pincode: "",
-      contact_person: "",
       email: "",
-      mobile_number: "",
-      gst_details: "",
-      selected_package: "",
-      price: "",
-      pending_payment: "",
-      user_limit: "",
-      user_licence_payment: "",
+      phone: "",
+      password: "",
+      role: 2,
     });
 
-    // country state filter
-    const state = ref([{ code: "", name: "" }]);
-    state.value.pop();
-    watch(
-      () => formData.value.country,
-      (newVal) => {
-        while (state.value.length) {
-          state.value.pop();
-        }
+    const onsubmit = () => {
+      loading.value = true;
+      console.warn("Nice");
+    };
 
-        if (newVal === "India") {
-          formData.value.state = "";
-          INstates.forEach((ele) => {
-            state.value.push(ele);
-          });
-        } else {
-          formData.value.state = "";
-        }
-      }
-    );
-
-    const rules = ref({
-      company_name: [
-        {
-          required: true,
-          message: "Company name is required",
-          trigger: "change",
-        },
-      ],
-      email: [
-        {
-          required: true,
-          message: "Company email is required",
-          trigger: "change",
-        },
-      ],
-      address: [
-        {
-          required: true,
-          message: "Company Address is required",
-          trigger: "change",
-        },
-      ],
-      city: [
-        {
-          required: true,
-          message: "Company City is required",
-          trigger: "change",
-        },
-      ],
-      state: [
-        {
-          required: true,
-          message: "Company State is required",
-          trigger: "change",
-        },
-      ],
-      pincode: [
-        {
-          required: true,
-          message: "Company Pincode is required",
-          trigger: "change",
-        },
-      ],
-
-      contact_person: [
-        {
-          required: true,
-          message: "Company Contact Person Name is required",
-          trigger: "change",
-        },
-      ],
-      mobile_number: [
-        {
-          required: true,
-          message: "Company Contact No is required",
-          trigger: "change",
-        },
-      ],
-      gst_details: [
-        {
-          required: true,
-          message: "Company GST Details required",
-          trigger: "change",
-        },
-      ],
-      selected_package: [
-        {
-          required: true,
-          message: "Package is required",
-          trigger: "change",
-        },
-      ],
-      price: [
-        {
-          required: true,
-          message: "Price is required",
-          trigger: "change",
-        },
-      ],
-      pending_payment: [
-        {
-          required: true,
-          message: "Pending Payment is required",
-          trigger: "change",
-        },
-      ],
-      user_limit: [
-        {
-          required: true,
-          message: "User Limit is required",
-          trigger: "change",
-        },
-      ],
-      user_licence_payment: [
-        {
-          required: true,
-          message: "Licence Payment is required",
-          trigger: "change",
-        },
-      ],
-    });
-
-    const submit = () => {
-      if (!formRef.value) {
-        return;
-      }
-
-      formRef.value.validate((valid: boolean) => {
-        if (valid) {
-          loading.value = true;
-
-          setTimeout(() => {
-            loading.value = false;
-            Swal.fire({
-              text: "Form has been successfully submitted!",
-              icon: "success",
-              buttonsStyling: false,
-              confirmButtonText: "Ok, got it!",
-              heightAuto: false,
-              customClass: {
-                confirmButton: "btn btn-primary",
-              },
-            }).then(() => {
-              console.log("Done");
-            });
-          }, 2000);
-        } else {
-          Swal.fire({
-            text: "Sorry, looks like there are some errors detected, please try again.",
-            icon: "error",
-            buttonsStyling: false,
-            confirmButtonText: "Ok, got it!",
-            heightAuto: false,
-            customClass: {
-              confirmButton: "btn btn-primary",
-            },
-          });
-          return false;
-        }
-      });
+    const removeImage = () => {
+      companyDetails.value.avatar = "/media/avatars/blank.png";
     };
 
     return {
-      formData,
-      rules,
-      submit,
-      formRef,
-      loading,
-      addCompanyModalRef,
+      companyDetails,
+      emailFormDisplay,
+      passwordFormDisplay,
+      removeImage,
+      companyDetailsValidator,
+      updateEmailButton,
+      updatePasswordButton,
       getAssetPath,
-      countries,
-      state,
+      onsubmit,
+      loading,
     };
   },
 });

@@ -38,6 +38,13 @@
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
           </button>
+          <button
+            type="button"
+            class="btn btn-light-warning me-3"
+            @click="onpageChange()"
+          >
+            {{ total }} More Results
+          </button>
           <!--end::Export-->
           <!--begin::Add customer-->
           <router-link to="./add" class="btn btn-primary">
@@ -65,28 +72,6 @@
             Delete Selected
           </button>
         </div>
-        <!--end::Group actions-->
-        <!--begin::Group actions-->
-        <div
-          class="d-flex justify-content-end align-items-center d-none"
-          data-kt-customer-table-toolbar="selected"
-        >
-          <div class="fw-bold me-5">
-            <span
-              class="me-2"
-              data-kt-customer-table-select="selected_count"
-            ></span
-            >Selected
-          </div>
-          <button
-            type="button"
-            class="btn btn-danger"
-            data-kt-customer-table-select="delete_selected"
-          >
-            Delete Selected
-          </button>
-        </div>
-        <!--end::Group actions-->
       </div>
       <!--end::Card toolbar-->
     </div>
@@ -98,10 +83,13 @@
         :header="tableHeader"
         :enable-items-per-page-dropdown="true"
         :checkbox-enabled="true"
+        :itemsPerPageDropdownEnabled="true"
+        :items-per-page="25"
+        @page-change="onpageChange"
         checkbox-label="id"
         :loading="loading"
       >
-        <template v-slot:name="{ row: company }">
+        <template v-slot:company_name="{ row: company }">
           {{ company.company_name }}
         </template>
         <template v-slot:email="{ row: company }">
@@ -122,13 +110,15 @@
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span class="menu-link px-3">
-              <i
-                class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-              ></i>
+              <router-link :to="`./edit/${company.id}`">
+                <i
+                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                ></i>
+              </router-link>
             </span>
             <span>
               <i
-                @click="deleteCustomer(company.id)"
+                @click="deleteCustomer(company.id, false)"
                 class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
@@ -155,6 +145,8 @@ import type { ICompany } from "@/core/model/company";
 import arraySort from "array-sort";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
+import Swal from "sweetalert2/dist/sweetalert2.js";
+import { deleteCompany, getCompanies } from "@/stores/api";
 
 export default defineComponent({
   name: "company-listing",
@@ -164,11 +156,10 @@ export default defineComponent({
     AddCustomerModal,
   },
   setup() {
-    const loading = ref(true);
     const tableHeader = ref([
       {
         columnName: "Company Name",
-        columnLabel: "name",
+        columnLabel: "company_name",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -198,13 +189,51 @@ export default defineComponent({
       },
     ]);
 
+    const loading = ref(true);
+    // staring from 2
+    let page = ref(1);
+    let limit = ref(50);
+    const selectedIds = ref<Array<number>>([]);
+    const tableData = ref<Array<ICompany>>([]);
+    const initCompanies = ref<Array<ICompany>>([]);
+    const total = ref(0);
     // functions
+
+    // more
+    const onpageChange = async () => {
+      ApiService.setHeader();
+      const response = await getCompanies(
+        `page=${page.value}&limit=${limit.value}`
+      );
+      if (total.value > 0) {
+        tableData.value.push(
+          ...response.result.data.data.map(({ created_at, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+          }))
+        );
+        initCompanies.value.splice(
+          tableData.value.length,
+          0,
+          ...tableData.value.filter((value, index, self) => {
+            return self.indexOf(value) === index;
+          })
+        );
+      }
+      page.value = page.value + 1;
+      total.value = total.value - response.result.data.data.length;
+    };
+
     // get_compaines
     const company_listing = async () => {
       try {
         ApiService.setHeader();
-        const response = await ApiService.get("/company");
-        tableData.value = response.data.result.data.map(
+        const response = await getCompanies(`page=${page.value}`);
+        page.value = page.value + 1;
+        console.log(response.result.total_count);
+        // first 20 displayed
+        total.value = response.result.total_count - limit.value;
+        tableData.value = response.result.data.data.map(
           ({ created_at, ...rest }) => ({
             ...rest,
             created_at: moment(created_at).format("MMMM Do YYYY"),
@@ -222,10 +251,6 @@ export default defineComponent({
       }
     };
 
-    const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<ICompany>>([]);
-    const initCompanies = ref<Array<ICompany>>([]);
-
     onMounted(async () => {
       await company_listing();
       setTimeout(() => {
@@ -234,16 +259,56 @@ export default defineComponent({
     });
 
     const deleteFewCustomers = () => {
-      selectedIds.value.forEach((item) => {
-        deleteCustomer(item);
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover this imaginary file!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "red",
+        confirmButtonText: "Yes, I am sure!",
+        cancelButtonText: "No, cancel it!",
+      }).then((result: { [x: string]: any }) => {
+        if (result["isConfirmed"]) {
+          // Put your function here
+          selectedIds.value.forEach((item) => {
+            deleteCustomer(item, true);
+          });
+          selectedIds.value.length = 0;
+        }
       });
-      selectedIds.value.length = 0;
     };
 
-    const deleteCustomer = (id: number) => {
-      for (let i = 0; i < tableData.value.length; i++) {
-        if (tableData.value[i].id === id) {
-          tableData.value.splice(i, 1);
+    const deleteCustomer = (id: number, mul: boolean) => {
+      if (!mul) {
+        for (let i = 0; i < tableData.value.length; i++) {
+          if (tableData.value[i].id === id) {
+            Swal.fire({
+              title: "Are you sure?",
+              text: "You will not be able to recover this imaginary file!",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "red",
+              confirmButtonText: "Yes, I am sure!",
+              cancelButtonText: "No, cancel it!",
+              closeOnConfirm: false,
+              closeOnCancel: false,
+              dangerMode: true,
+            }).then((result: { [x: string]: any }) => {
+              if (result["isConfirmed"]) {
+                // Put your function here
+                deleteCompany(id);
+                tableData.value.splice(i, 1);
+              }
+            });
+          }
+        }
+      } else {
+        for (let i = 0; i < tableData.value.length; i++) {
+          if (tableData.value[i].id === id) {
+            // Put your function here
+            deleteCompany(id);
+            tableData.value.splice(i, 1);
+          }
         }
       }
     };
@@ -295,6 +360,8 @@ export default defineComponent({
       onItemSelect,
       getAssetPath,
       loading,
+      onpageChange,
+      total,
     };
   },
 });

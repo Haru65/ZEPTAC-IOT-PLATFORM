@@ -28,6 +28,11 @@ const roles = {
     7: "Customer",
 };
 
+const rolesArray = Object.keys(roles).map((id) => ({
+    id: parseInt(id),
+    name: roles[parseInt(id)],
+}));
+
 const get_role = (id: number) => {
     if (id in roles) {
         // Return the value of the key
@@ -38,4 +43,4 @@ const get_role = (id: number) => {
     }
 };
 
-export default { permissions, get_role };
+export { rolesArray, permissions, get_role };

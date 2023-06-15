@@ -41,15 +41,10 @@
             </button>
             <!--end::Export-->
             <!--begin::Add customer-->
-            <button
-              type="button"
-              class="btn btn-primary"
-              data-bs-toggle="modal"
-              data-bs-target="#kt_modal_add_customer"
-            >
+            <router-link to="./add" class="btn btn-primary">
               <KTIcon icon-name="plus" icon-class="fs-2" />
               Add User
-            </button>
+            </router-link>
 
             <!--end::Add customer-->
           </div>
@@ -177,8 +172,7 @@ import type { IUser } from "@/core/model/users";
 import arraySort from "array-sort";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
-import Permissions_Roles from "@/core/config/PermissionsRolesConfig";
-import type { Loading } from "element-plus/es/components/loading/src/service";
+import { get_role } from "@/core/config/PermissionsRolesConfig";
 
 export default defineComponent({
   name: "users-listing",
@@ -245,7 +239,7 @@ export default defineComponent({
           ({ created_at, role_id, ...rest }) => ({
             ...rest,
             created_at: moment(created_at).format("MMMM Do YYYY"),
-            role_id: Permissions_Roles.get_role(role_id),
+            role_id: get_role(role_id),
           })
         );
         initCustomers.value.splice(

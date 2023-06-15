@@ -3,6 +3,7 @@ import {
   createWebHistory,
   type RouteRecordRaw,
 } from "vue-router";
+import { getCompany } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 
@@ -44,12 +45,46 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/company/edit/:id",
+        name: "company-edit",
+        beforeEnter: async (to, from, next) => {
+          const companyId = to.params.id;
+          console.log(companyId);
+          try {
+            const response = await getCompany(companyId);
+            // console.log(response);
+            if (response.error) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () => import("@/views/apps/admin/companies/CompanyEdit.vue"),
+        meta: {
+          pageTitle: "Company Edit",
+          breadcrumbs: ["Company Edit"],
+        },
+      },
+      {
         path: "/users/list",
         name: "users-list",
         component: () => import("@/views/apps/admin/users/UserListing.vue"),
         meta: {
           pageTitle: "User List",
           breadcrumbs: ["User List"],
+        },
+      },
+      {
+        path: "/users/add",
+        name: "users-add",
+        component: () => import("@/views/apps/admin/users/UserAdd.vue"),
+        meta: {
+          pageTitle: "User Add",
+          breadcrumbs: ["User Add"],
         },
       },
       {
@@ -226,7 +261,7 @@ router.beforeEach((to, from, next) => {
 
   // before page access check if page requires authentication
   if (to.meta.middleware == "auth") {
-    if (authStore.isAuthenticated) {
+    if (authStore.isAuthenticated !== null) {
       next();
     } else {
       next({ name: "login" });
