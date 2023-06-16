@@ -5,301 +5,378 @@
       <!--begin::Modal content-->
       <div class="modal-content">
         <!--begin::Form-->
-        <el-form
-          @submit.prevent="onsubmit()"
-          :model="formData"
-          :rules="rules"
-          ref="formRef"
+        <VForm
+          id="kt_account_profile_details_form"
+          class="form"
+          novalidate
+          :validation-schema="companyDetailsValidator"
         >
-          <!--flex -->
-          <div class="row g-9 mb-7">
-            <!--begin::Modal body-->
-            <div class="modal-body p-10 p-lg-17 col-md-6 fv-row">
-              <!--begin::Scroll-->
-              <div class="me-n7 pe-7">
-                <!--begin::Input group-->
-                <div class="fv-row mb-7">
-                  <!--begin::Label-->
-                  <label class="required fs-6 fw-semobold mb-2"
-                    >Company Name</label
-                  >
-                  <!--end::Label-->
+          <!--begin::Card body-->
+          <div class="card-body border-top p-9">
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >Company Name & company_Address</label
+              >
+              <!--end::Label-->
 
-                  <!--begin::Input-->
-                  <el-form-item prop="company_name">
-                    <el-input
-                      v-model="formData.company_name"
+              <!--begin::Col-->
+              <div class="col-lg-8">
+                <!--begin::Row-->
+                <div class="row">
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row">
+                    <Field
                       type="text"
-                      placeholder=""
+                      name="company_name"
+                      class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                      placeholder="Company name"
+                      v-model="companyDetails.company_name"
                     />
-                  </el-form-item>
-                  <!--end::Input-->
-                </div>
-                <!--end::Input group-->
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="company_name" />
+                      </div>
+                    </div>
+                  </div>
+                  <!--end::Col-->
 
-                <!--begin::Input group-->
-                <div class="fv-row mb-15">
-                  <!--begin::Label-->
-                  <label class="fs-6 fw-semobold mb-2">Address</label>
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <el-form-item prop="address">
-                    <el-input v-model="formData.address" type="text" />
-                  </el-form-item>
-                  <!--end::Input-->
-                </div>
-                <!--begin::Input group-->
-
-                <div class="fv-row mb-12">
-                  <!--begin::Label-->
-                  <label class="required fs-6 fw-semobold mb-2"
-                    >Contact Person</label
-                  >
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <el-form-item prop="contact_person">
-                    <el-input
-                      v-model="formData.contact_person"
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row">
+                    <Field
                       type="text"
-                      placeholder=""
+                      name="company_address"
+                      class="form-control form-control-lg form-control-solid"
+                      placeholder="Company company_address"
+                      v-model="companyDetails.address"
                     />
-                  </el-form-item>
-                  <!--end::Input-->
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="company_address" />
+                      </div>
+                    </div>
+                  </div>
+                  <!--end::Col-->
                 </div>
-                <!--end::Input group-->
-
-                <!--begin::Input group-->
-                <div class="fv-row mb-11">
-                  <!--begin::Label-->
-                  <label class="fs-6 fw-semobold mb-2">Contact</label>
-                  <!--end::Label-->
-                  <!--begin::Input-->
-                  <el-form-item prop="mobile_number">
-                    <el-input v-model="formData.mobile_number" type="text" />
-                  </el-form-item>
-                  <!--end::Input-->
-                </div>
-                <!--begin::Input group-->
-
-                <!--begin::Input group-->
-                <div class="fv-row mb-9">
-                  <!--begin::Label-->
-                  <label class="required fs-6 fw-semobold mb-2">Email</label>
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <el-form-item prop="email">
-                    <el-input
-                      v-model="formData.email"
-                      type="text"
-                      placeholder=""
-                    />
-                  </el-form-item>
-                  <!--end::Input-->
-                </div>
-                <!--end::Input group-->
-
-                <!--begin::Input group-->
+                <!--end::Row-->
               </div>
-              <!--end::Billing form-->
+              <!--end::Col-->
             </div>
-            <!--end::Modal body-->
+            <!--end::Input group-->
 
-            <!--begin::Modal body-->
-            <div class="modal-body p-10 p-lg-17 col-md-6 fv-row">
-              <!--begin::Scroll-->
-              <div>
-                <div class="row g-9 mb-14">
-                  <!--begin::Col-->
-                  <div class="col-md-6 fv-row">
-                    <!--begin::Label-->
-                    <label class="fs-6 fw-semobold mb-2">
-                      <span class="required">Country</span>
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >Contact Person</label
+              >
+              <!--end::Label-->
 
-                      <i
-                        class="fas fa-exclamation-circle ms-1 fs-7"
-                        data-bs-toggle="tooltip"
-                        title="Country of origination"
-                      ></i>
-                    </label>
-                    <!--end::Label-->
-
-                    <!--begin::Input-->
-                    <el-select v-model="formData.country" filterable>
-                      <el-option value="">Select a Country...</el-option>
-                      <el-option
-                        v-for="(item, i) in countries"
-                        :key="`countries-select-option-${i}`"
-                        :value="item.name"
-                      >
-                        {{ item.name }}
-                      </el-option>
-                    </el-select>
-                    <!--end::Input-->
+              <!--begin::Col-->
+              <div class="col-lg-8 fv-row">
+                <Field
+                  type="text"
+                  name="contact_person"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Contact Person"
+                  v-model="companyDetails.contact_person"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="contact_person" />
                   </div>
-
-                  <!--begin::Col-->
-                  <div class="col-md-6 fv-row" v-show="state.length">
-                    <!--begin::Label-->
-                    <label class="fs-6 fw-semobold mb-2">
-                      <span class="required">State</span>
-
-                      <i
-                        class="fas fa-exclamation-circle ms-1 fs-7"
-                        data-bs-toggle="tooltip"
-                        title="Country of origination"
-                      ></i>
-                    </label>
-                    <!--end::Label-->
-
-                    <!--begin::Input-->
-                    <el-select
-                      v-model="formData.state"
-                      filterable
-                      :disabled="!state.length"
-                      prop="state"
-                    >
-                      <el-option value="">Select a Country...</el-option>
-                      <el-option
-                        v-for="item in state"
-                        :key="`${item}`"
-                        :value="item"
-                      >
-                        {{ item }}
-                      </el-option>
-                    </el-select>
-                    <!--end::Input-->
-                  </div>
-                  <!--end::Col-->
-                  <!--begin::Col-->
-                  <div class="col-md-6 fv-row" v-show="!state.length">
-                    <!--begin::Label-->
-                    <label class="required fs-6 fw-semobold mb-2">State</label>
-                    <!--end::Label-->
-                    <!--begin::Input-->
-                    <el-form-item prop="state">
-                      <el-input v-model="formData.state" />
-                    </el-form-item>
-                    <!--end::Input-->
-                  </div>
-                  <!--end::Col-->
-                </div>
-                <!--end::Input group-->
-                <!--end::Input group-->
-
-                <!--begin::Input group-->
-                <div class="row g-9 mb-9">
-                  <!--begin::Col-->
-                  <div class="col-md-6 fv-row">
-                    <!--begin::Label-->
-                    <label class="required fs-6 fw-semobold mb-2"
-                      >PinCode</label
-                    >
-                    <!--end::Label-->
-
-                    <!--begin::Input-->
-                    <el-form-item prop="pincode">
-                      <el-input v-model="formData.pincode" />
-                    </el-form-item>
-                    <!--end::Input-->
-                  </div>
-                  <!--end::Col-->
-
-                  <div class="col-md-6 fv-row">
-                    <!--begin::Label-->
-                    <label class="required fs-6 fw-semobold mb-2"> City </label>
-                    <!--end::Label-->
-
-                    <!--begin::Input-->
-                    <el-form-item prop="city">
-                      <el-input v-model="formData.city" />
-                    </el-form-item>
-                    <!--end::Input-->
-                  </div>
-                  <!--end::Col-->
-                </div>
-
-                <div class="fv-row mb-18 mt-15">
-                  <!--begin::Label-->
-                  <label class="fs-6 fw-semobold mb-2">
-                    <span class="required">GST Details</span>
-                  </label>
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <el-form-item prop="gst_details">
-                    <el-input type="textarea" v-model="formData.gst_details" />
-                  </el-form-item>
-                  <!--end::Input-->
-                </div>
-
-                <div class="row g-9 mb-14">
-                  <!--begin::Input group-->
-                  <div class="col-md-6 fv-row">
-                    <!--begin::Label-->
-                    <label class="fs-6 fw-semobold mb-2">
-                      <span class="required">&nbsp;&nbsp;User Limit</span>
-                    </label>
-                    <!--end::Label-->
-                    <br />
-                    <el-input-number
-                      prop="user_limit"
-                      v-model="formData.user_limit"
-                      class="mx-4"
-                      :min="1"
-                      :max="10"
-                      size="mx-4"
-                      controls-position="right"
-                    />
-                    <!--end::Input-->
-                  </div>
-                  <!--end::Input group-->
-
-                  <!--begin::Input group-->
-                  <div class="col-md-6 fv-row">
-                    <!--begin::Label-->
-                    <label class="fs-6 fw-semobold mb-2">
-                      <span class="required">Select a Package</span>
-
-                      <i
-                        class="fas fa-exclamation-circle ms-1 fs-7"
-                        data-bs-toggle="tooltip"
-                        title="Select a Package"
-                      ></i>
-                    </label>
-                    <!--end::Label-->
-
-                    <!--begin::Input-->
-                    <el-select
-                      v-model="formData.selected_package"
-                      filterable
-                      prop="selected_package"
-                    >
-                      <el-option value="">Select a Package...</el-option>
-                      <el-option
-                        v-for="(item, i) in packages"
-                        :key="`${i}`"
-                        :value="item"
-                      >
-                        {{ item }}
-                      </el-option>
-                    </el-select>
-                    <!--end::Input-->
-                  </div>
-                  <!--end::Input group-->
                 </div>
               </div>
-              <!--end::Billing form-->
+              <!--end::Col-->
             </div>
-            <!--end::Modal body-->
+            <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label fw-semobold fs-6">
+                <span class="required">Contact Phone</span>
+
+                <i
+                  class="fas fa-exclamation-circle ms-1 fs-7"
+                  data-bs-toggle="tooltip"
+                  title="Phone number must be active"
+                ></i>
+              </label>
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8 fv-row">
+                <Field
+                  type="tel"
+                  name="contact"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Phone number"
+                  v-model="companyDetails.mobile_number"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="contact" />
+                  </div>
+                </div>
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <!--end::Input group-->
+
+            <div class="row">
+              <!--begin::Input group-->
+              <div class="row mb-6">
+                <!--begin::Label-->
+                <label class="col-lg-4 col-form-label fw-semobold fs-6">
+                  <span class="required">Email</span>
+
+                  <i
+                    class="fas fa-exclamation-circle ms-1 fs-7"
+                    data-bs-toggle="tooltip"
+                    title="Phone number must be active"
+                  ></i>
+                </label>
+                <!--end::Label-->
+
+                <!--begin::Col-->
+                <div class="col-lg-8 fv-row">
+                  <Field
+                    type="text"
+                    name="email"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Email"
+                    v-model="companyDetails.email"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="email" />
+                    </div>
+                  </div>
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Input group-->
+
+              <!--begin::Input group-->
+              <div class="row mb-6">
+                <!--begin::Label-->
+                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                  >Country & State</label
+                >
+                <!--end::Label-->
+
+                <!--begin::Col-->
+                <div class="col-lg-8">
+                  <!--begin::Row-->
+                  <div class="row">
+                    <!--begin::Col-->
+                    <div class="col-lg-6 fv-row">
+                      <Field
+                        as="select"
+                        name="role"
+                        class="form-select form-select-solid form-select-lg"
+                        v-model="companyDetails.country"
+                      >
+                        <option value="">Select Country ..</option>
+                        <option
+                          v-for="ele in countries"
+                          :key="ele.name"
+                          :value="ele.name"
+                        >
+                          {{ ele.name }}
+                        </option>
+                      </Field>
+                    </div>
+                    <!--end::Col-->
+
+                    <!--begin::Col-->
+                    <div v-if="state.length" class="col-lg-6 fv-row">
+                      <div>
+                        <Field
+                          as="select"
+                          name="state"
+                          class="form-select form-select-solid form-select-lg"
+                          v-model="companyDetails.state"
+                        >
+                          <option value="">Select State ...</option>
+                          <option v-for="ele in state" :key="ele" :value="ele">
+                            {{ ele }}
+                          </option>
+                        </Field>
+                      </div>
+                    </div>
+
+                    <div v-if="!state.length" class="col-lg-6 fv-row">
+                      <div>
+                        <Field
+                          type="text"
+                          name="state"
+                          class="form-control form-control-lg form-control-solid"
+                          placeholder="Please Type State."
+                          v-model="companyDetails.state"
+                        />
+                        <div class="fv-plugins-message-container">
+                          <div class="fv-help-block">
+                            <ErrorMessage name="state" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!--end::Col-->
+                  </div>
+                  <!--end::Row-->
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Input group-->
+
+              <!--begin::Input group-->
+              <div class="row mb-6">
+                <!--begin::Label-->
+                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                  >City & Pincode</label
+                >
+                <!--end::Label-->
+                <!--begin::Col-->
+                <div class="col-lg-8">
+                  <!--begin::Row-->
+                  <div class="row">
+                    <!--begin::Col-->
+                    <div class="col-lg-6 fv-row">
+                      <Field
+                        type="text"
+                        name="city"
+                        class="form-control form-control-lg form-control-solid"
+                        placeholder="City"
+                        v-model="companyDetails.city"
+                      />
+                      <div class="fv-plugins-message-container">
+                        <div class="fv-help-block">
+                          <ErrorMessage name="city" />
+                        </div>
+                      </div>
+                    </div>
+                    <!--end::Col-->
+
+                    <!--begin::Col-->
+                    <div class="col-lg-6 fv-row">
+                      <Field
+                        type="text"
+                        name="pincode"
+                        class="form-control form-control-lg form-control-solid"
+                        placeholder="Pincode"
+                        v-model="companyDetails.pincode"
+                      />
+                      <div class="fv-plugins-message-container">
+                        <div class="fv-help-block">
+                          <ErrorMessage name="pincode" />
+                        </div>
+                      </div>
+                    </div>
+                    <!--end::Col-->
+                  </div>
+                  <!--end::Row-->
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Input group-->
+
+              <!--begin::Input group-->
+              <div class="row mb-3">
+                <!--begin::Label-->
+                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                  >GST Detials</label
+                >
+                <!--end::Label-->
+                <!--begin::Col-->
+                <div class="col-lg-8">
+                  <!--begin::Row-->
+                  <!--begin::Col-->
+                  <div class="col-lg fv-row">
+                    <Field
+                      type="text"
+                      as="textarea"
+                      name="gst_details"
+                      class="form-control form-control-lg form-control-solid"
+                      placeholder="GST"
+                      v-model="companyDetails.gst_details"
+                    />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="gst_details" />
+                      </div>
+                    </div>
+                  </div>
+                  <!--end::Col-->
+                  <!--end::Row-->
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Input group-->
+              <!--begin::Input group-->
+              <div class="row mb-6">
+                <!--begin::Label-->
+                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                  >User Limit & Package</label
+                >
+                <!--end::Label-->
+
+                <!--begin::Col-->
+                <div class="col-lg-8">
+                  <!--begin::Row-->
+                  <div class="row">
+                    <!--begin::Col-->
+                    <div class="col-lg-6 fv-row">
+                      <Field
+                        as="select"
+                        name="user_limit"
+                        class="form-select form-select-solid form-select-lg"
+                        v-model="companyDetails.user_limit"
+                      >
+                        <option v-for="ele in limit" :key="ele" :value="ele">
+                          {{ ele }}
+                        </option>
+                      </Field>
+                    </div>
+                    <!--end::Col-->
+
+                    <!--begin::Col-->
+                    <div class="col-lg-6 fv-row">
+                      <div>
+                        <Field
+                          as="select"
+                          name="package"
+                          class="form-select form-select-solid form-select-lg"
+                          v-model="companyDetails.selected_package"
+                        >
+                          <option value="">Select a Package ...</option>
+                          <option
+                            v-for="ele in packages"
+                            :key="ele"
+                            :value="ele"
+                          >
+                            {{ ele }}
+                          </option>
+                        </Field>
+                      </div>
+                    </div>
+                    <!--end::Col-->
+                  </div>
+                  <!--end::Row-->
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Input group-->
+            </div>
           </div>
-          <!-- flex -->
-          <!--begin::Modal footer-->
           <div class="modal-footer flex-center">
             <!--begin::Button-->
-            <button @click="DeleteCompany()" class="btn btn-lg btn-danger w-25">
+            <button @click="deletecompany()" class="btn btn-lg btn-danger w-25">
               Discard
             </button>
             <!--end::Button-->
@@ -308,7 +385,8 @@
             <button
               :data-kt-indicator="loading ? 'on' : null"
               class="btn btn-lg btn-primary w-25"
-              @click="onsubmit()"
+              type="submit"
+              @click="submit()"
             >
               <span v-if="!loading" class="indicator-label"> Update </span>
               <span v-if="loading" class="indicator-progress">
@@ -320,8 +398,8 @@
             </button>
             <!--end::Button-->
           </div>
-          <!--end::Modal footer-->
-        </el-form>
+          <!--end::Input group-->
+        </VForm>
         <!--end::Form-->
       </div>
     </div>
@@ -333,59 +411,99 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref, watch } from "vue";
 import { countries, INstates } from "@/core/model/countries";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { deleteCompany, getCompany, updateCompany } from "@/stores/api";
-import packag from "@/core/config/PackagesConfig";
-import { useRoute } from "vue-router";
-import router from "@/router";
+import { updateCompany, getCompany, deleteCompany } from "@/stores/api";
+import { ErrorMessage, Field, Form as VForm } from "vee-validate";
+import * as Yup from "yup";
+import packages from "@/core/config/PackagesConfig";
+import { useRoute, useRouter } from "vue-router";
+
+interface companyDetails {
+  company_name: string;
+  address: string;
+  contact_person: string;
+  mobile_number: string;
+  email: string;
+  country: string;
+  state: string;
+  pincode: string;
+  city: string;
+  gst_details: string;
+  user_limit: number;
+  selected_package: string;
+}
 
 export default defineComponent({
-  name: "add-customer-modal",
-  components: {},
+  name: "company-add",
+  components: {
+    ErrorMessage,
+    Field,
+    VForm,
+  },
   setup() {
-    const route = useRoute();
-    const formRef = ref<null | HTMLFormElement>(null);
-    const addCompanyModalRef = ref<null | HTMLElement>(null);
-    const loading = ref<boolean>(false);
+    const updateEmailButton = ref<HTMLElement | null>(null);
+    const updatePasswordButton = ref<HTMLElement | null>(null);
+
+    const loading = ref(false);
+    const router = useRoute();
+    const route = useRouter();
+
+    const CompanyId = router.params.id;
+    const emailFormDisplay = ref(false);
+    const passwordFormDisplay = ref(false);
+
     const state = ref([""]);
-    const packages = ref(packag);
-    const companyId = route.params.id;
-    const formData = ref({
-      company_name: " ",
-      address: " ",
-      city: " ",
-      state: " ",
-      country: "Select Country",
-      pincode: " ",
-      contact_person: " ",
-      email: " ",
-      mobile_number: " ",
-      gst_details: "Details ?",
-      selected_package: "Select a Package",
-      user_limit: "1",
+
+    const limit = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+    const companyDetailsValidator = Yup.object().shape({
+      company_name: Yup.string().required().label("Compnay Name"),
+      company_address: Yup.string().required().label("Company company_Address"),
+      contact_person: Yup.string().required().label("Contact Person"),
+      contact: Yup.string().required().label("Contact"),
+      email: Yup.string().required().label("Email"),
+      country: Yup.string().required().label("Country"),
+      state: Yup.string().required().label("State"),
+      city: Yup.string().required().label("State"),
+      pincode: Yup.string().required().label("Pincode"),
+      gst_details: Yup.string().required().label("GST Detials"),
     });
 
+    const companyDetails = ref<companyDetails>({
+      company_name: "",
+      address: "",
+      contact_person: "",
+      mobile_number: "",
+      email: "",
+      country: "",
+      state: "",
+      pincode: "",
+      city: "",
+      gst_details: "",
+      user_limit: 1,
+      selected_package: "",
+    });
 
-    // onmounted()
     onMounted(async () => {
-      const response = await getCompany(companyId);
+      const response = await getCompany(CompanyId);
+      console.log(CompanyId);
       console.log(response);
-      formData.value = {
+      companyDetails.value = {
         company_name: response.company_name,
         address: response.address,
-        city: response.city,
-        state: response.state,
-        country: response.country,
-        pincode: response.pincode,
         contact_person: response.contact_person,
-        email: response.email,
         mobile_number: response.mobile_number,
+        email: response.email,
+        country: response.country,
+        state: response.state,
+        pincode: response.pincode,
+        city: response.city,
         gst_details: response.gst_details,
-        selected_package: response.selected_package,
         user_limit: response.user_limit,
+        selected_package: response.selected_package,
       };
     }),
       watch(
-        () => formData.value.country,
+        () => companyDetails.value.country,
         (newVal) => {
           while (state.value.length) {
             state.value.pop();
@@ -395,201 +513,112 @@ export default defineComponent({
               state.value.push(ele.name);
             });
           } else {
-            formData.value.state = "Please Write Country Name";
+            companyDetails.value.state = "Please Write Country Name";
           }
         }
       );
 
-    const rules = ref({
-      company_name: [
-        {
-          required: true,
-          message: "Company name is required",
-          trigger: "change",
+    const deletecompany = () => {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        customClass: {
+          confirmButton: "btn btn-primary rounded",
+          cancelButton: "btn btn-danger rounded",
         },
-      ],
-      email: [
-        {
-          required: true,
-          message: "Company email is required",
-          trigger: "change",
-        },
-      ],
-      address: [
-        {
-          required: true,
-          message: "Company Address is required",
-          trigger: "change",
-        },
-      ],
-      city: [
-        {
-          required: true,
-          message: "Company City is required",
-          trigger: "change",
-        },
-      ],
-      state: [
-        {
-          required: true,
-          message: "Company State is required",
-          trigger: "change",
-        },
-      ],
-      pincode: [
-        {
-          required: true,
-          message: "Company Pincode is required",
-          trigger: "change",
-        },
-      ],
-      contact_person: [
-        {
-          required: true,
-          message: "Company Contact Person Name is required",
-          trigger: "change",
-        },
-      ],
-      mobile_number: [
-        {
-          required: true,
-          message: "Company Contact No is required",
-          trigger: "change",
-        },
-      ],
-      gst_details: [
-        {
-          required: true,
-          message: "Company GST Details required",
-          trigger: "change",
-        },
-      ],
-      selected_package: [
-        {
-          required: true,
-          message: "Package is required",
-          trigger: "change",
-        },
-      ],
-      user_limit: [
-        {
-          required: true,
-          message: "User Limit is required",
-          trigger: "change",
-        },
-      ],
-    });
-
-    const onsubmit = () => {
-      if (!formRef.value) {
-        return null;
-      }
-      formRef.value.validate(async (valid: boolean) => {
-        const formvalid = await updateCompany(formData.value, companyId);
-        console.log(formvalid.error);
-        // if error is preset catch block to
-        if (!formvalid.error) {
-          // check if API side correct
-          if (valid) {
-            loading.value = true;
-            setTimeout(async () => {
-              Swal.fire({
-                text: "Company Detials has been successfully updated!",
-                icon: "success",
-                buttonsStyling: false,
-                confirmButtonText: "Ok, got it!",
-                heightAuto: false,
-                customClass: {
-                  confirmButton: "btn btn-primary",
-                },
-              }).then(() => {
-                loading.value = false;
-              });
-            }, 500);
-          } else {
-            // if Anything Wrong happends
+        confirmButtonText: "Confirm",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          deleteCompany(CompanyId).then(() => {
             Swal.fire({
-              text: formvalid.error.response.data.errors,
-              icon: "error",
-              buttonsStyling: false,
-              confirmButtonText: "Ok, got it!",
-              heightAuto: false,
+              title: "Done",
+              icon: "success",
+              text: "Company has been deleted.",
               customClass: {
-                confirmButton: "btn btn-primary",
+                confirmButton: "btn btn-primary rounded",
               },
             });
-            return false;
-          }
-        } else {
-          if (formvalid.error.response.data.errors) {
-            const errors = Object.values(formvalid.error.response.data.errors);
-            Swal.fire({
-              title: formvalid.error.response.data.message,
-              text: errors.join("\n"),
-              icon: "error",
-              buttonsStyling: false,
-              confirmButtonText: "Ok, got it!",
-              heightAuto: false,
-              customClass: {
-                confirmButton: "btn btn-primary",
-              },
-            });
-          } else {
-            const exception = Object.values(
-              formvalid.error.response.data.exception
-            );
-            console.error(exception);
-            Swal.fire({
-              title: formvalid.error.response.data.message,
-              text: "An Exception Occured",
-              icon: "error",
-              buttonsStyling: false,
-              confirmButtonText: "Ok, got it!",
-              heightAuto: false,
-              customClass: {
-                confirmButton: "btn btn-primary",
-              },
-            });
-          }
-          return false;
+            route.go(-1);
+          });
         }
       });
     };
 
- // deletecompany
-    const DeleteCompany = () => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover this imaginary file!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "red",
-        confirmButtonText: "Yes, I am sure!",
-        cancelButtonText: "No, cancel it!",
-        closeOnConfirm: false,
-        closeOnCancel: false,
-        dangerMode: true,
-      }).then((result: { [x: string]: any }) => {
-        if (result["isConfirmed"]) {
-          // Put your function here
-          deleteCompany(companyId);
-          router.go(-1);
+    const submit = async () => {
+      loading.value = true;
+      console.warn("Nice");
+      try {
+        // Call your API here with the form values
+        const response = await updateCompany(companyDetails.value, CompanyId);
+        console.log(response.error);
+        if (!response.error) {
+          // Handle successful API response
+          console.log("API response:", response);
+          showSuccessAlert(
+            "Success",
+            "Company details have been successfully updated!"
+          );
+        } else {
+          // Handle API error response
+          const errorData = response.error;
+          console.log("API error:", errorData);
+          // console.log("API error:", errorData.response.data.errors);
+          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
         }
+      } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
+        showErrorAlert("Error", "An error occurred during the API call.");
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    const showSuccessAlert = (title, message) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "success",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
+      });
+    };
+
+    const showErrorAlert = (title, message) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "error",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
       });
     };
 
     return {
-      formData,
-      rules,
-      onsubmit,
-      formRef,
-      loading,
-      addCompanyModalRef,
+      companyDetails,
+      emailFormDisplay,
+      passwordFormDisplay,
+      companyDetailsValidator,
+      updateEmailButton,
+      updatePasswordButton,
       getAssetPath,
+      submit,
       countries,
+      loading,
       state,
       packages,
-      DeleteCompany,
+      limit,
+      deletecompany,
     };
   },
 });

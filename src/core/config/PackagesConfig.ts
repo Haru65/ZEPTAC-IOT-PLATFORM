@@ -1,9 +1,9 @@
-const packages = {
-    1: "Ultra Premium",
-    2: "Super Premium",
-    3: "Premium",
-    4: "Basic",
-    5: "Shared"
-};
+const packages = [
+    "Ultra Premium",
+    "Super Premium",
+    "Premium",
+    "Basic",
+    "Shared",
+];
 
 export default packages;

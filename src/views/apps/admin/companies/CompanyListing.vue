@@ -85,7 +85,7 @@
         :checkbox-enabled="true"
         :itemsPerPageDropdownEnabled="true"
         :items-per-page="25"
-        @page-change="onpageChange"
+        @page-change="more"
         checkbox-label="id"
         :loading="loading"
       >
@@ -200,7 +200,7 @@ export default defineComponent({
     // functions
 
     // more
-    const onpageChange = async () => {
+    const more = async () => {
       ApiService.setHeader();
       const response = await getCompanies(
         `page=${page.value}&limit=${limit.value}`
@@ -224,13 +224,20 @@ export default defineComponent({
       total.value = total.value - response.result.data.data.length;
     };
 
+    const onpageChange = async () => {
+      if (total.value > 0) {
+        await more();
+        total.value -= limit.value;
+      }
+    };
+
     // get_compaines
     const company_listing = async () => {
       try {
         ApiService.setHeader();
         const response = await getCompanies(`page=${page.value}`);
         page.value = page.value + 1;
-        console.log(response.result.total_count);
+        //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count - limit.value;
         tableData.value = response.result.data.data.map(
@@ -247,7 +254,7 @@ export default defineComponent({
       } catch (error) {
         console.error(error);
       } finally {
-        console.log("done");
+        //console.log("done");
       }
     };
 
@@ -362,6 +369,7 @@ export default defineComponent({
       loading,
       onpageChange,
       total,
+      more,
     };
   },
 });

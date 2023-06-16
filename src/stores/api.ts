@@ -6,7 +6,7 @@ import ApiService from "@/core/services/ApiService";
 // gell all comapnies
 export async function getCompanies(data: any) {
     try {
-        console.log(data)
+        //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.companyget("company", data);
         return response.data;
@@ -45,7 +45,7 @@ export async function getCompany(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get("company", data);
-        console.log(response)
+        //console.log(response)
         return response.data.result;
     } catch (errors) {
         console.error(errors);
@@ -58,7 +58,7 @@ export async function updateCompany(data: any, id: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.put("company/" + id, data);
-        console.log(response)
+        //console.log(response)
         return response.data.result;
     } catch (errors) {
         console.error(errors);

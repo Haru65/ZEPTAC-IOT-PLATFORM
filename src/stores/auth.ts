@@ -18,7 +18,7 @@ export const useAuthStore = defineStore("auth", () => {
   const isAuthenticated = ref(JwtService.getToken());
 
   function setAuth(authUser: any) {
-    console.log(authUser);
+    //console.log(authUser);
     isAuthenticated.value = authUser.role_id;
     user.value = authUser;
     errors.value = {};
@@ -30,7 +30,7 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   function saveUser(user: User) {
-    // console.log(user);
+    // //console.log(user);
     JwtService.saveUser(JSON.stringify(user));
   }
 
@@ -42,7 +42,7 @@ export const useAuthStore = defineStore("auth", () => {
   // for login auth only custom error
   function setAuthError(error: any) {
     errors.value = { error };
-    // console.log(errors);
+    // //console.log(errors);
   }
 
   function purgeAuth() {
@@ -56,7 +56,7 @@ export const useAuthStore = defineStore("auth", () => {
   function login(credentials: User) {
     return ApiService.post("login", credentials)
       .then(({ data }) => {
-        // console.log(data);
+        // //console.log(data);
         setAuth(data);
         saveUser(data);
       })
@@ -94,7 +94,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   // before every page a call is made with a JWT token to request user credentials
   function verifyAuth() {
-    console.log(isAuthenticated.value);
+    //console.log(isAuthenticated.value);
     if (JwtService.getToken()) {
       ApiService.setHeader();
       ApiService.post("verify_token", { api_token: JwtService.getToken() })

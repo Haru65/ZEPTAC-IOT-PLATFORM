@@ -37,7 +37,7 @@ export function user_listing() {
 
 user_listing();
 
-console.log(user);
+//console.log(user);
 
 export type { IUser };
 export default user;

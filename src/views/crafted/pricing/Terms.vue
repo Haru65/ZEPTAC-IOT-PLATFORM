@@ -147,7 +147,7 @@ export default defineComponent({
   components: {},
   setup() {
     onMounted(() => {
-      console.log("onMounted");
+      //console.log("onMounted");
     });
     return {
       getAssetPath,

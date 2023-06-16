@@ -2,7 +2,7 @@
   <!--begin::sidebar menu-->
   <div
     class="app-sidebar-menu overflow-hidden flex-column-fluid"
-    v-if="sidebarIdentifier === 'admin-sidebar'"
+    v-if="sidebarIdentifier === 'admin'"
   >
     <!--begin::Menu wrapper-->
     <div
@@ -161,7 +161,7 @@
   <!--begin::sidebar menu-->
   <div
     class="app-sidebar-menu overflow-hidden flex-column-fluid"
-    v-if="sidebarIdentifier === 'companyadmin-sidebar'"
+    v-if="sidebarIdentifier === 'companyadmin'"
   >
     <!--begin::Menu wrapper-->
     <div
@@ -328,6 +328,7 @@ import CompanyAdminMenuConfig from "@/core/config/CompanyAdminMenuConfig";
 import { sidebarMenuIcons } from "@/core/helpers/config";
 import { useI18n } from "vue-i18n";
 import { useAuthStore } from "@/stores/auth";
+import { Identifier } from "@/core/config/WhichUserConfig";
 
 export default defineComponent({
   name: "sidebar-menu",
@@ -336,7 +337,7 @@ export default defineComponent({
     const { t, te } = useI18n();
     const route = useRoute();
     const scrollElRef = ref<null | HTMLElement>(null);
-    const auth = useAuthStore();
+    const sidebarIdentifier = Identifier;
 
     onMounted(() => {
       if (scrollElRef.value) {
@@ -356,24 +357,7 @@ export default defineComponent({
       return route.path.indexOf(match) !== -1;
     };
 
-    const sidebarIdentifier = computed(() => {
-      switch (auth.get_auth()?.toString()) {
-        case "1":
-          return "admin-sidebar";
-        case "2":
-          return "companyadmin-sidebar";
-        // case 'user':
-        //   return 'user-sidebar';
-        // case 'guest':
-        //   return 'guest-sidebar';
-        // case 'moderator':
-        //   return 'moderator-sidebar';
-        // case 'editor':
-        //   return 'editor-sidebar';
-        default:
-          return false;
-      }
-    });
+
 
     return {
       hasActiveChildren,

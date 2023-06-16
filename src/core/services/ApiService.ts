@@ -62,8 +62,8 @@ class ApiService {
     resource: string,
     slug = "" as string
   ): Promise<AxiosResponse> {
-    console.log(resource);
-    console.log(slug);
+    //console.log(resource);
+    //console.log(slug);
     return ApiService.vueInstance.axios.get(`${resource}?${slug}`);
   }
 

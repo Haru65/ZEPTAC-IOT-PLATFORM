@@ -49,10 +49,10 @@ const routes: Array<RouteRecordRaw> = [
         name: "company-edit",
         beforeEnter: async (to, from, next) => {
           const companyId = to.params.id;
-          console.log(companyId);
+          //console.log(companyId);
           try {
             const response = await getCompany(companyId);
-            // console.log(response);
+            // //console.log(response);
             if (response.error) {
               next("/404"); // Redirect to the fallback route
             } else {
@@ -159,6 +159,14 @@ const routes: Array<RouteRecordRaw> = [
           import("@/views/crafted/authentication/basic-flow/SignIn.vue"),
         meta: {
           pageTitle: "Login",
+        },
+        beforeEnter: async (to, from, next) => {
+          const auth = useAuthStore();
+          if (auth.isAuthenticated) {
+            return next("/dashboard");
+          } else {
+            return next();
+          }
         },
       },
       {

@@ -244,7 +244,7 @@ export default defineComponent({
             role_id: get_role(role_id),
           })
         );
-        console.log(tableData.value);
+        //console.log(tableData.value);
         initEmployee.value.splice(
           0,
           tableData.value.length,
@@ -253,7 +253,7 @@ export default defineComponent({
       } catch (error) {
         console.error(error);
       } finally {
-        console.log("done");
+        //console.log("done");
       }
     };
     const selectedIds = ref<Array<number>>([]);

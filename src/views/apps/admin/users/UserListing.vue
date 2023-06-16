@@ -234,7 +234,7 @@ export default defineComponent({
       try {
         ApiService.setHeader();
         const response = await ApiService.get("/users");
-        console.log(response);
+        //console.log(response);
         tableData.value = response.data.result.data.map(
           ({ created_at, role_id, ...rest }) => ({
             ...rest,
@@ -250,7 +250,7 @@ export default defineComponent({
       } catch (error) {
         console.error(error);
       } finally {
-        console.log("done");
+        //console.log("done");
       }
     }
 
@@ -266,7 +266,7 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      console.log("done");
+      //console.log("done");
     });
 
     const deleteFewCustomers = () => {
