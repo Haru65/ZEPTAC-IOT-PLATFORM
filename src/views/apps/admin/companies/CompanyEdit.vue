@@ -416,6 +416,7 @@ import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import packages from "@/core/config/PackagesConfig";
 import { useRoute, useRouter } from "vue-router";
+import { limit } from "@/core/config/WhichUserConfig";
 
 interface companyDetails {
   company_name: string;
@@ -453,17 +454,15 @@ export default defineComponent({
 
     const state = ref([""]);
 
-    const limit = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
     const companyDetailsValidator = Yup.object().shape({
       company_name: Yup.string().required().label("Compnay Name"),
-      company_address: Yup.string().required().label("Company company_Address"),
+      company_address: Yup.string().required().label("Company Address"),
       contact_person: Yup.string().required().label("Contact Person"),
       contact: Yup.string().required().label("Contact"),
-      email: Yup.string().required().label("Email"),
+      email: Yup.string().required().email().label("Email"),
       country: Yup.string().required().label("Country"),
       state: Yup.string().required().label("State"),
-      city: Yup.string().required().label("State"),
+      city: Yup.string().required().label("City"),
       pincode: Yup.string().required().label("Pincode"),
       gst_details: Yup.string().required().label("GST Detials"),
     });

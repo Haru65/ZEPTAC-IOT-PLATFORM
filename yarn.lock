@@ -24,10 +24,10 @@
   resolved "https://registry.npmjs.org/@element-plus/icons-vue/-/icons-vue-2.1.0.tgz"
   integrity sha512-PSBn3elNoanENc1vnCfh+3WA9fimRC7n+fWkf3rE5jvv+aBohNHABC/KAR5KWPecxWxDTVT1ERpRbOMRcOV/vA==
 
-"@esbuild/linux-x64@0.17.19":
+"@esbuild/darwin-arm64@0.17.19":
   version "0.17.19"
-  resolved "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.17.19.tgz"
-  integrity sha512-68ngA9lg2H6zkZcyp22tsVt38mlhWde8l3eJLWkyLrp4HwMUr3c1s/M2t7+kHIhvMjglIBrFpncX1SzMckomGw==
+  resolved "https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.17.19.tgz"
+  integrity sha512-80wEoCfF/hFKM6WE1FyBHc9SfUblloAWx6FJkFWTWiCoht9Mc0ARGEM47e67W9rI09YoUxJL68WHfDRYEAvOhg==
 
 "@eslint-community/eslint-utils@^4.2.0", "@eslint-community/eslint-utils@^4.3.0":
   version "4.4.0"
@@ -3170,6 +3170,11 @@ vue-inline-svg@^3.1.0:
   resolved "https://registry.npmjs.org/vue-inline-svg/-/vue-inline-svg-3.1.2.tgz"
   integrity sha512-K01sLANBnjosObee4JrBu/igXpYIFhQfy4EcEyVWxEWf6nmrxp7Isz6pmeRCsWx6XGrGWfrQH3uNwt4nOmrFdA==
 
+vue-multiselect@^2.1.7:
+  version "2.1.7"
+  resolved "https://registry.npmjs.org/vue-multiselect/-/vue-multiselect-2.1.7.tgz"
+  integrity sha512-KIegcN+Ntwg3cbkY/jhw2s/+XJUM0Lpi/LcKFYCS8PrZHcWBl2iKCVze7ZCnRj3w8H7/lUJ9v7rj9KQiNxApBw==
+
 vue-router@^4.1.5:
   version "4.2.2"
   resolved "https://registry.npmjs.org/vue-router/-/vue-router-4.2.2.tgz"
@@ -3181,6 +3186,11 @@ vue-scroll-reveal@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/vue-scroll-reveal/-/vue-scroll-reveal-2.1.0.tgz"
   integrity sha512-JyWERpXb3MpvxeEYzlINr1Mr+aALXmlvDXZlNpHN/LrGukM1/pk7QBIDelY8HtPbdIATJiEw08nVX2AW0CsIWQ==
+
+vue-simple-search-dropdown@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.npmjs.org/vue-simple-search-dropdown/-/vue-simple-search-dropdown-1.0.1.tgz"
+  integrity sha512-r3LuGFB3WqMDRILx+Z/Y2S9UTLqMh3Y0nv1Oly+tt8oEzvg77r0tfYLHVqQlhsmVPy0GmSuxMMbetMkDRLOEqg==
 
 vue-template-compiler@^2.7.14:
   version "2.7.14"

@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import ApiService from "@/core/services/ApiService";
-import JwtService from "@/core/services/JwtService";
+import JwtService, { UserId } from "@/core/services/JwtService";
 
 export interface User {
   name: string;
@@ -43,6 +43,11 @@ export const useAuthStore = defineStore("auth", () => {
   function setAuthError(error: any) {
     errors.value = { error };
     // //console.log(errors);
+  }
+
+  function getUserId() {
+    const data = JSON.parse(UserId() || "");
+    return data.id;
   }
 
   function purgeAuth() {
@@ -124,5 +129,6 @@ export const useAuthStore = defineStore("auth", () => {
     verifyAuth,
     purgeAuth,
     get_auth,
+    getUserId,
   };
 });

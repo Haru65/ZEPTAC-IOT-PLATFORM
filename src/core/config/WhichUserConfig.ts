@@ -3,6 +3,9 @@ import { computed } from "vue";
 
 const auth = useAuthStore();
 
+const Limit = 10;
+const limit = Array.from({ length: Limit }, (_, index) => index + 1);
+
 const Identifier = computed(() => {
     switch (auth.get_auth()?.toString()) {
         case "1":
@@ -24,4 +27,4 @@ const Identifier = computed(() => {
     }
 });
 
-export { Identifier };
+export { Identifier, limit };

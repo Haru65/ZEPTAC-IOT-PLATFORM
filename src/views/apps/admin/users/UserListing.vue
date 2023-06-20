@@ -173,6 +173,7 @@ import arraySort from "array-sort";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import { get_role } from "@/core/config/PermissionsRolesConfig";
+import { getUsers } from "@/stores/api";
 
 export default defineComponent({
   name: "users-listing",
@@ -232,10 +233,10 @@ export default defineComponent({
     // get users function
     async function users_listing(): Promise<void> {
       try {
-        ApiService.setHeader();
-        const response = await ApiService.get("/users");
-        //console.log(response);
-        tableData.value = response.data.result.data.map(
+
+        const response = await getUsers();
+        console.log(response);
+        tableData.value = response.result.data.map(
           ({ created_at, role_id, ...rest }) => ({
             ...rest,
             created_at: moment(created_at).format("MMMM Do YYYY"),

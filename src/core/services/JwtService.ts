@@ -12,12 +12,18 @@ export const getToken = (): string | null => {
  * @description save token into localStorage
  * @param token: string
  */
+
 export const saveToken = (token: string): void => {
   window.localStorage.setItem(ID_TOKEN_KEY, token);
 };
 
 export const saveUser = (user: string): void => {
   window.localStorage.setItem(USER, user);
+};
+
+// get id for CRUD operations
+export const UserId = (): string | null => {
+  return window.localStorage.getItem(USER);
 };
 
 export const destroyUser = (): void => {
@@ -31,4 +37,11 @@ export const destroyToken = (): void => {
   window.localStorage.removeItem(ID_TOKEN_KEY);
 };
 
-export default { getToken, saveToken, destroyToken, saveUser, destroyUser };
+export default {
+  getToken,
+  saveToken,
+  destroyToken,
+  saveUser,
+  destroyUser,
+  UserId,
+};

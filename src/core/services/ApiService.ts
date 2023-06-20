@@ -67,13 +67,22 @@ class ApiService {
     return ApiService.vueInstance.axios.get(`${resource}?${slug}`);
   }
 
+  public static usersget(
+    resource: string,
+    slug = "" as string
+  ): Promise<AxiosResponse> {
+    //console.log(resource);
+    //console.log(slug);
+    return ApiService.vueInstance.axios.get(`${resource}?${slug}`);
+  }
+
   /**
    * @description set the POST HTTP request
    * @param resource: string
    * @param params: AxiosRequestConfig
    * @returns Promise<AxiosResponse>
    */
-  public static post(resource: string, params: any): Promise<AxiosResponse> {
+  static post(resource: string, params: any): Promise<AxiosResponse> {
     return ApiService.vueInstance.axios.post(`${resource}`, params);
   }
 

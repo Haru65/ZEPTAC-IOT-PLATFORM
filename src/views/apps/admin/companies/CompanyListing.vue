@@ -212,13 +212,17 @@ export default defineComponent({
             created_at: moment(created_at).format("MMMM Do YYYY"),
           }))
         );
-        initCompanies.value.splice(
-          tableData.value.length,
-          0,
-          ...tableData.value.filter((value, index, self) => {
+        initCompanies.value
+          .splice(
+            tableData.value.length,
+            0,
+            ...tableData.value.filter((value, index, self) => {
+              return self.indexOf(value) === index;
+            })
+          )
+          .filter((value, index, self) => {
             return self.indexOf(value) === index;
-          })
-        );
+          });
       }
       page.value = page.value + 1;
       total.value = total.value - response.result.data.data.length;
