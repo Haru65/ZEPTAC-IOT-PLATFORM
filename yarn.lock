@@ -3187,6 +3187,11 @@ vue-scroll-reveal@^2.1.0:
   resolved "https://registry.npmjs.org/vue-scroll-reveal/-/vue-scroll-reveal-2.1.0.tgz"
   integrity sha512-JyWERpXb3MpvxeEYzlINr1Mr+aALXmlvDXZlNpHN/LrGukM1/pk7QBIDelY8HtPbdIATJiEw08nVX2AW0CsIWQ==
 
+vue-search-select@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.npmjs.org/vue-search-select/-/vue-search-select-3.1.0.tgz"
+  integrity sha512-9axiZsrmX2tS/9Wiq+ELECiVwnRC6AjH56VAPUR8/uIKQcCKrpC93vv6K8VJ5m2VcmxJP3xEc3jAguz5lmwbow==
+
 vue-simple-search-dropdown@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/vue-simple-search-dropdown/-/vue-simple-search-dropdown-1.0.1.tgz"

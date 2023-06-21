@@ -5,9 +5,17 @@
       <div class="card-title">
         <!--begin::Search-->
         <div class="d-flex align-items-center position-relative my-1">
-          <KTIcon icon-name="magnifier" icon-class="fs-1 position-absolute ms-6" />
-          <input type="text" v-model="search" @input="searchItems()" class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search Product" />
+          <KTIcon
+            icon-name="magnifier"
+            icon-class="fs-1 position-absolute ms-6"
+          />
+          <input
+            type="text"
+            v-model="search"
+            @input="searchItems()"
+            class="form-control form-control-solid w-250px ps-15"
+            placeholder="Search Product"
+          />
         </div>
         <!--end::Search-->
       </div>
@@ -15,38 +23,45 @@
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
         <!--begin::Toolbar-->
-        <div v-if="selectedIds.length === 0" class="d-flex justify-content-end" data-kt-customer-table-toolbar="base">
+        <div
+          v-if="selectedIds.length === 0"
+          class="d-flex justify-content-end"
+          data-kt-customer-table-toolbar="base"
+        >
           <!--begin::Export-->
-          <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal"
-            data-bs-target="#kt_customers_export_modal">
+          <button
+            type="button"
+            class="btn btn-light-primary me-3"
+            data-bs-toggle="modal"
+            data-bs-target="#kt_customers_export_modal"
+          >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
           </button>
           <!--end::Export-->
           <!--begin::Add customer-->
-          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_customer">
+          <router-link to="./add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Product
-          </button>
+            Add Item
+          </router-link>
           <!--end::Add customer-->
         </div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->
-        <div v-else class="d-flex justify-content-end align-items-center" data-kt-customer-table-toolbar="selected">
+        <div
+          v-else
+          class="d-flex justify-content-end align-items-center"
+          data-kt-customer-table-toolbar="selected"
+        >
           <div class="fw-bold me-5">
-            <span class="me-2">{{ selectedIds.length }}</span>Selected
+            <span class="me-2">{{ selectedIds.length }}</span
+            >Selected
           </div>
-          <button type="button" class="btn btn-danger" @click="deleteFewCustomers()">
-            Delete Selected
-          </button>
-        </div>
-        <!--end::Group actions-->
-        <!--begin::Group actions-->
-        <div class="d-flex justify-content-end align-items-center d-none" data-kt-customer-table-toolbar="selected">
-          <div class="fw-bold me-5">
-            <span class="me-2" data-kt-customer-table-select="selected_count"></span>Selected
-          </div>
-          <button type="button" class="btn btn-danger" data-kt-customer-table-select="delete_selected">
+          <button
+            type="button"
+            class="btn btn-danger"
+            @click="deleteFewCustomers()"
+          >
             Delete Selected
           </button>
         </div>
@@ -55,8 +70,15 @@
       <!--end::Card toolbar-->
     </div>
     <div class="card-body pt-0">
-      <Datatable @on-sort="sort" @on-items-select="onItemSelect" :data="tableData" :header="tableHeader"
-        :enable-items-per-page-dropdown="true" :checkbox-enabled="true" checkbox-label="id">
+      <Datatable
+        @on-sort="sort"
+        @on-items-select="onItemSelect"
+        :data="tableData"
+        :header="tableHeader"
+        :enable-items-per-page-dropdown="true"
+        :checkbox-enabled="true"
+        checkbox-label="id"
+      >
         <!-- img data -->
         <template v-slot:name="{ row: pricelist }">
           <span class="text-gray-600 text-hover-primary mb-1">
@@ -74,29 +96,29 @@
           {{ pricelist.date }}
         </template>
         <template v-slot:actions="{ row: pricelist }">
-             <!--begin::Menu Flex-->
-            <div class="d-flex flex-lg-row">
-              <span class="menu-link px-3">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </span>
-              <span>
-                <i
-                  @click="deleteCustomer(pricelist.id)"
-                  class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
-                ></i>
-              </span>
-            </div>
-            <!--end::Menu FLex-->
-            <!--end::Menu-->
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row">
+            <span class="menu-link px-3">
+              <i
+                class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+              ></i>
+            </span>
+            <span>
+              <i
+                @click="deleteItem(pricelist.id)"
+                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
+              ></i>
+            </span>
+          </div>
+          <!--end::Menu FLex-->
+          <!--end::Menu-->
         </template>
       </Datatable>
     </div>
   </div>
 
-  <ExportCustomerModal></ExportCustomerModal>
-  <AddCustomerModal></AddCustomerModal>
+  <!-- <ExportCustomerModal></ExportCustomerModal> -->
+  <!-- <AddCustomerModal></AddCustomerModal> -->
 </template>
 
 <script lang="ts">
@@ -161,12 +183,12 @@ export default defineComponent({
 
     const deleteFewCustomers = () => {
       selectedIds.value.forEach((item) => {
-        deleteCustomer(item);
+        deleteItem(item);
       });
       selectedIds.value.length = 0;
     };
 
-    const deleteCustomer = (id: number) => {
+    const deleteItem = (id: number) => {
       for (let i = 0; i < tableData.value.length; i++) {
         if (tableData.value[i].id === id) {
           tableData.value.splice(i, 1);
@@ -209,17 +231,18 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-
     // currency foratter
-    const formatter = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'INR'
+    const formatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "INR",
     });
 
     const formatPrice = (value: string) => {
       const parsedValue = parseFloat(value);
       if (isNaN(parsedValue)) {
-        throw new Error('Invalid input: expected a string representing a number');
+        throw new Error(
+          "Invalid input: expected a string representing a number"
+        );
       }
       return formatter.format(parsedValue);
     };
@@ -227,7 +250,7 @@ export default defineComponent({
     return {
       tableData,
       tableHeader,
-      deleteCustomer,
+      deleteItem,
       search,
       searchItems,
       selectedIds,
@@ -235,7 +258,7 @@ export default defineComponent({
       sort,
       onItemSelect,
       getAssetPath,
-      formatPrice
+      formatPrice,
     };
   },
 });

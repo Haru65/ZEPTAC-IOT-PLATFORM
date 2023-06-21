@@ -68,8 +68,7 @@ export default defineComponent({
 @import "assets/sass/element-ui.dark";
 @import "assets/sass/plugins";
 @import "assets/sass/style";
-
-
+@import "vue-search-select/dist/VueSearchSelect.css";
 
 #app {
   display: contents;

@@ -88,6 +88,15 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/users/edit/:id",
+        name: "users-edit",
+        component: () => import("@/views/apps/admin/users/UserEdit.vue"),
+        meta: {
+          pageTitle: "User Edit",
+          breadcrumbs: ["User Edit"],
+        },
+      },
+      {
         path: "/employee/list",
         name: "employee-list",
         component: () =>
@@ -127,6 +136,16 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/pricelist/add",
+        name: "price-list-add",
+        component: () =>
+          import("@/views/apps/sales/pricelist/PriceListAdd.vue"),
+        meta: {
+          pageTitle: "Price List Item Add",
+          breadcrumbs: ["Price List Item Add"],
+        },
+      },
+      {
         path: "/quotations/list",
         name: "quotation-list",
         component: () =>
@@ -137,6 +156,16 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/quotations/add",
+        name: "quotation-add",
+        component: () =>
+          import("@/views/apps/sales/quotations/QuotationAdd.vue"),
+        meta: {
+          pageTitle: "Quotation Add",
+          breadcrumbs: ["Quotation Add"],
+        },
+      },
+      {
         path: "/invoices/list",
         name: "invoices-list",
         component: () =>
@@ -144,6 +173,15 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Invocies List",
           breadcrumbs: ["Invoices List"],
+        },
+      },
+      {
+        path: "/invoices/add",
+        name: "invoices-add",
+        component: () => import("@/views/apps/sales/invoices/InvoicesAdd.vue"),
+        meta: {
+          pageTitle: "Invocies Add",
+          breadcrumbs: ["Invoices Add"],
         },
       },
     ],

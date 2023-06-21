@@ -3,6 +3,7 @@
 
 
 
+
 import ApiService from "@/core/services/ApiService";
 const COMPANY_URL = "company";
 const USER_URL = "users";
@@ -86,6 +87,8 @@ export async function getUsers() {
 }
 
 // USER
+
+// add user
 export async function addUser(data: any) {
     try {
         //console.log(data)
@@ -93,6 +96,46 @@ export async function addUser(data: any) {
         console.log(data);
         const response = await ApiService.post(USER_URL, data);
         return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete user
+// company delete
+export async function deleteUser(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.delete(USER_URL + "/" + data);
+        return response.data.message;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get User
+export async function getUser(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(USER_URL, data);
+        //console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// update company
+export async function updateUser(data: any, id: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.put(USER_URL + "/" + id, data);
+        //console.log(response)
+        return response.data.result;
     } catch (errors) {
         console.error(errors);
         return { error: errors };

@@ -130,7 +130,7 @@
             {{ user.role_id }}
           </template>
           <template v-slot:company_name="{ row: user }">
-            {{ user.company_name }}
+            {{ user.company_name[0].company_name }}
           </template>
           <template v-slot:created_at="{ row: user }">
             {{ user.created_at }}
@@ -139,13 +139,15 @@
             <!--begin::Menu Flex-->
             <div class="d-flex flex-lg-row">
               <span class="menu-link px-3">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
+                <router-link :to="`./edit/${user.id}`">
+                  <i
+                    class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                  ></i>
+                </router-link>
               </span>
               <span>
                 <i
-                  @click="deleteCustomer(user.id)"
+                  @click="deleteCustomer(user.id, false)"
                   class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
                 ></i>
               </span>
@@ -170,10 +172,10 @@ import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.v
 import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
 import type { IUser } from "@/core/model/users";
 import arraySort from "array-sort";
-import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import { get_role } from "@/core/config/PermissionsRolesConfig";
-import { getUsers } from "@/stores/api";
+import { deleteUser, getUsers } from "@/stores/api";
+import Swal from "sweetalert2";
 
 export default defineComponent({
   name: "users-listing",
@@ -233,7 +235,6 @@ export default defineComponent({
     // get users function
     async function users_listing(): Promise<void> {
       try {
-
         const response = await getUsers();
         console.log(response);
         tableData.value = response.result.data.map(
@@ -271,16 +272,53 @@ export default defineComponent({
     });
 
     const deleteFewCustomers = () => {
-      selectedIds.value.forEach((item) => {
-        deleteCustomer(item);
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover this imaginary file!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "red",
+        confirmButtonText: "Yes, I am sure!",
+        cancelButtonText: "No, cancel it!",
+      }).then((result: { [x: string]: any }) => {
+        if (result["isConfirmed"]) {
+          // Put your function here
+          selectedIds.value.forEach((item) => {
+            deleteCustomer(item, true);
+          });
+          selectedIds.value.length = 0;
+        }
       });
-      selectedIds.value.length = 0;
     };
 
-    const deleteCustomer = (id: number) => {
-      for (let i = 0; i < tableData.value.length; i++) {
-        if (tableData.value[i].id === id) {
-          tableData.value.splice(i, 1);
+    const deleteCustomer = (id: number, mul: boolean) => {
+      if (!mul) {
+        for (let i = 0; i < tableData.value.length; i++) {
+          if (tableData.value[i].id === id) {
+            Swal.fire({
+              title: "Are you sure?",
+              text: "You will not be able to recover this imaginary file!",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "red",
+              confirmButtonText: "Yes, I am sure!",
+              cancelButtonText: "No, cancel it!",
+            }).then((result: { [x: string]: any }) => {
+              if (result["isConfirmed"]) {
+                // Put your function here
+                deleteUser(id);
+                tableData.value.splice(i, 1);
+              }
+            });
+          }
+        }
+      } else {
+        for (let i = 0; i < tableData.value.length; i++) {
+          if (tableData.value[i].id === id) {
+            // Put your function here
+            deleteUser(id);
+            tableData.value.splice(i, 1);
+          }
         }
       }
     };

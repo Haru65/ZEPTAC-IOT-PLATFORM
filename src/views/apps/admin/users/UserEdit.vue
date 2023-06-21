@@ -313,8 +313,8 @@
         </div>
         <div class="modal-footer flex-center">
           <!--begin::Button-->
-          <button @click="clear()" class="btn btn-lg btn-danger w-25">
-            Clear
+          <button @click="deleteuser" class="btn btn-lg btn-danger w-25">
+            Delete
           </button>
           <!--end::Button-->
           &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
@@ -323,6 +323,7 @@
             :data-kt-indicator="loading ? 'on' : null"
             class="btn btn-lg btn-primary w-25"
             type="submit"
+            @click="submit()"
           >
             <span v-if="!loading" class="indicator-label"> Submit </span>
             <span v-if="loading" class="indicator-progress">
@@ -347,14 +348,20 @@
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
-import { ModelSelect } from "vue-search-select";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import { rolesArray } from "@/core/config/PermissionsRolesConfig";
-import { addUser, getCompanies } from "@/stores/api";
+import {
+  addUser,
+  getCompanies,
+  getUser,
+  deleteUser,
+  updateUser,
+} from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
-import moment from "moment";
+import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
+import moment from "moment";
 
 interface ProfileDetails {
   avatar: string;
@@ -375,10 +382,12 @@ export default defineComponent({
     ErrorMessage,
     Field,
     VForm,
-    ModelSelect,
   },
   setup() {
     const auth = useAuthStore();
+    const router = useRoute();
+    const route = useRouter();
+    let limit = ref(500);
     const submitButton1 = ref<HTMLElement | null>(null);
     const submitButton2 = ref<HTMLElement | null>(null);
     const submitButton3 = ref<HTMLElement | null>(null);
@@ -387,7 +396,7 @@ export default defineComponent({
     const updateEmailButton = ref<HTMLElement | null>(null);
     const updatePasswordButton = ref<HTMLElement | null>(null);
 
-    let limit = ref(500);
+    const userId = router.params.id;
     const loading = ref(false);
     const Companies = ref([{ id: "", company_name: "" }]);
 
@@ -403,8 +412,27 @@ export default defineComponent({
       console.log(Companies);
     };
 
+    const loadUser = async () => {
+      ApiService.setHeader();
+      const response = await getUser(userId);
+      console.log(response);
+      profileDetails.value = {
+        avatar: getAssetPath("media/avatars/blank.png"),
+        first_name: response.first_name,
+        last_name: response.last_name,
+        email: response.email,
+        phone: response.mobile,
+        password: response.password,
+        roles: response.role_id,
+        company_id: response.company_id,
+        created_by: auth.getUserId(),
+        updated_by: auth.getUserId(),
+      };
+    };
+
     onMounted(async () => {
       Companies.value.pop();
+      await loadUser();
       await getdropcomp();
     });
 
@@ -432,19 +460,20 @@ export default defineComponent({
       updated_by: auth.getUserId(),
     });
 
-    const onsubmit = async () => {
+    const submit = async () => {
       loading.value = true;
-      console.log(profileDetails.value);
       console.warn("Nice");
       try {
         // Call your API here with the form values
-        const response = await addUser(profileDetails.value);
+        const response = await updateUser(profileDetails.value, userId);
         console.log(response.error);
         if (!response.error) {
           // Handle successful API response
           console.log("API response:", response);
-          showSuccessAlert("Success", "User have been successfully inserted!");
-          clear();
+          showSuccessAlert(
+            "Success",
+            "Company details have been successfully updated!"
+          );
         } else {
           // Handle API error response
           const errorData = response.error;
@@ -459,6 +488,34 @@ export default defineComponent({
       } finally {
         loading.value = false;
       }
+    };
+
+    const deleteuser = () => {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        customClass: {
+          confirmButton: "btn btn-primary rounded",
+          cancelButton: "btn btn-danger rounded",
+        },
+        confirmButtonText: "Confirm",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          deleteUser(userId).then(() => {
+            Swal.fire({
+              title: "Done",
+              icon: "success",
+              text: "Company has been deleted.",
+              customClass: {
+                confirmButton: "btn btn-primary rounded",
+              },
+            });
+            route.go(-1);
+          });
+        }
+      });
     };
 
     const showSuccessAlert = (title, message) => {
@@ -499,21 +556,6 @@ export default defineComponent({
       profileDetails.value.avatar = URL.createObjectURL(file);
     };
 
-    const clear = () => {
-      profileDetails.value = {
-        avatar: getAssetPath("media/avatars/blank.png"),
-        first_name: "",
-        last_name: "",
-        email: "",
-        phone: "",
-        password: "",
-        roles: "0",
-        company_id: "0",
-        created_by: auth.getUserId(),
-        updated_by: auth.getUserId(),
-      };
-    };
-
     return {
       submitButton1,
       submitButton2,
@@ -531,9 +573,9 @@ export default defineComponent({
       getAssetPath,
       Companies,
       rolesArray,
-      onsubmit,
+      submit,
       loading,
-      clear,
+      deleteuser,
     };
   },
 });
