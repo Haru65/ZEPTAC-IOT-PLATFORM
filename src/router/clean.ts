@@ -1,6 +1,7 @@
 import {
   createRouter,
   createWebHistory,
+  createMemoryHistory,
   type RouteRecordRaw,
 } from "vue-router";
 import { getCompany } from "@/stores/api";

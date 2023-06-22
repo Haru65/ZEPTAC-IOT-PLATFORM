@@ -313,7 +313,7 @@
         </div>
         <div class="modal-footer flex-center">
           <!--begin::Button-->
-          <button @click="clear()" class="btn btn-lg btn-danger w-25">
+          <button type="reset" class="btn btn-lg btn-danger w-25">
             Clear
           </button>
           <!--end::Button-->

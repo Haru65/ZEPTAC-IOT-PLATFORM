@@ -133,10 +133,9 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref, watch } from "vue";
-import { countries, INstates } from "@/core/model/countries";
+import { defineComponent, onMounted, ref } from "vue";
+import { countries } from "@/core/model/countries";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { addCompany } from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import packages from "@/core/config/PackagesConfig";

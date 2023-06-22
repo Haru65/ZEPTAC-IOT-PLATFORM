@@ -417,7 +417,6 @@ import * as Yup from "yup";
 import packages from "@/core/config/PackagesConfig";
 import { limit } from "@/core/config/WhichUserConfig";
 
-
 interface companyDetails {
   company_name: string;
   address: string;
@@ -577,6 +576,7 @@ export default defineComponent({
         selected_package: " ",
       };
     };
+    
     return {
       companyDetails,
       emailFormDisplay,

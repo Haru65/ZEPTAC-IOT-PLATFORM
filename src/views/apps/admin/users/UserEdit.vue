@@ -352,7 +352,6 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import { rolesArray } from "@/core/config/PermissionsRolesConfig";
 import {
-  addUser,
   getCompanies,
   getUser,
   deleteUser,
