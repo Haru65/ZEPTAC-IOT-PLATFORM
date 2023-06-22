@@ -313,9 +313,7 @@
         </div>
         <div class="modal-footer flex-center">
           <!--begin::Button-->
-          <button type="reset" class="btn btn-lg btn-danger w-25">
-            Clear
-          </button>
+          <button type="reset" class="btn btn-lg btn-danger w-25">Clear</button>
           <!--end::Button-->
           &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
           <!--begin::Button-->
@@ -538,3 +536,16 @@ export default defineComponent({
   },
 });
 </script>
+<style>
+.el-input__wrapper {
+  color: red !important;
+  height: 3.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--bs-gray-100);
+  border-color: var(--bs-gray-100);
+  color: var(--bs-gray-700);
+  transition: color 0.2s ease;
+  appearance: none;
+  
+}
+</style>
