@@ -7,6 +7,8 @@
 import ApiService from "@/core/services/ApiService";
 const COMPANY_URL = "company";
 const USER_URL = "users";
+const CUSTOMERS_URL = "customers";
+const PRICELIST_URL = "pricelist";
 
 // COMPANIES
 
@@ -15,7 +17,7 @@ export async function getCompanies(data: any) {
     try {
         //console.log(data)
         ApiService.setHeader();
-        const response = await ApiService.companyget(COMPANY_URL, data);
+        const response = await ApiService.listingget(COMPANY_URL, data);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -78,15 +80,13 @@ export async function getUsers() {
     try {
         //console.log(data)
         ApiService.setHeader();
-        const response = await ApiService.usersget(USER_URL);
+        const response = await ApiService.listingget(USER_URL);
         return response.data;
     } catch (errors) {
         console.error(errors);
         return { error: errors };
     }
 }
-
-// USER
 
 // add user
 export async function addUser(data: any) {
@@ -136,6 +136,35 @@ export async function updateUser(data: any, id: any) {
         const response = await ApiService.put(USER_URL + "/" + id, data);
         //console.log(response)
         return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// CUSTOMERS
+// get customers
+export async function getCustomers() {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.get(CUSTOMERS_URL);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// PRICELISTS
+// getlists
+export async function getPriceList() {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(PRICELIST_URL);
+        return response.data;
     } catch (errors) {
         console.error(errors);
         return { error: errors };

@@ -373,7 +373,6 @@ export default defineComponent({
     ErrorMessage,
     Field,
     VForm,
-    ModelSelect,
   },
   setup() {
     const auth = useAuthStore();
@@ -537,6 +536,9 @@ export default defineComponent({
 });
 </script>
 <style>
+.el-input__inner {
+  font-weight: 500;
+}
 .el-input__wrapper {
   color: red !important;
   height: 3.5rem;
@@ -546,6 +548,13 @@ export default defineComponent({
   color: var(--bs-gray-700);
   transition: color 0.2s ease;
   appearance: none;
-  
+  line-height: 1.5;
+  border: none !important;
+  padding-top: 0.825rem;
+  padding-bottom: 0.825rem;
+  padding-left: 1.5rem;
+  font-size: 1.15rem;
+  border-radius: 0.625rem;
+  box-shadow: none !important;
 }
 </style>

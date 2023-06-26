@@ -172,7 +172,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/sales/invoices/InvoicesListing.vue"),
         meta: {
-          pageTitle: "Invocies List",
+          pageTitle: "Invoices List",
           breadcrumbs: ["Invoices List"],
         },
       },
@@ -181,7 +181,7 @@ const routes: Array<RouteRecordRaw> = [
         name: "invoices-add",
         component: () => import("@/views/apps/sales/invoices/InvoicesAdd.vue"),
         meta: {
-          pageTitle: "Invocies Add",
+          pageTitle: "Invoices Add",
           breadcrumbs: ["Invoices Add"],
         },
       },

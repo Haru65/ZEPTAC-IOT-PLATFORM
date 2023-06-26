@@ -58,7 +58,7 @@ class ApiService {
   }
 
   // company listing unique
-  public static companyget(
+  public static listingget(
     resource: string,
     slug = "" as string
   ): Promise<AxiosResponse> {
@@ -66,16 +66,6 @@ class ApiService {
     //console.log(slug);
     return ApiService.vueInstance.axios.get(`${resource}?${slug}`);
   }
-
-  public static usersget(
-    resource: string,
-    slug = "" as string
-  ): Promise<AxiosResponse> {
-    //console.log(resource);
-    //console.log(slug);
-    return ApiService.vueInstance.axios.get(`${resource}?${slug}`);
-  }
-
   /**
    * @description set the POST HTTP request
    * @param resource: string
