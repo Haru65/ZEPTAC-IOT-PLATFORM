@@ -1,45 +1,49 @@
 <template>
-  <td class="w-75 pt-8 text-end text-nowrap">
-    <el-select v-model="item.name" filterable @change="handleSelectedChange">
-      <el-option value="0" label="Please Select Item..." key="0"
-        >Please Select Item...</el-option
-      >
-      <el-option
-        v-for="ele in items"
-        :key="ele.id"
-        :label="ele.name"
-        :value="ele.name"
+  <tr>
+    <td class="w-75 pt-8 text-end text-nowrap">
+      <el-select v-model="item.name" filterable @change="handleSelectedChange">
+        <el-option value="0" label="Please Select Item..." key="0"
+          >Please Select Item...</el-option
+        >
+        <el-option
+          v-for="ele in items"
+          :key="ele.id"
+          :label="ele.name"
+          :value="ele.name"
+        />
+      </el-select>
+      <br />
+      <textarea
+        name="notes"
+        class="form-control mt-4 form-control-solid"
+        rows="3"
+        v-model="item.desc"
+        placeholder="Description"
+      ></textarea>
+    </td>
+    <td class="p-8 text-end text-nowrap w-auto">
+      <input
+        type="text"
+        name="price"
+        class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+        placeholder="$ 0.00"
+        v-model="item.pric"
       />
-    </el-select>
-    <br />
-    <textarea
-      name="notes"
-      class="form-control mt-4 form-control-solid"
-      rows="3"
-      v-model="item.desc"
-      placeholder="Description"
-    ></textarea>
-  </td>
-
-  <td class="p-8 text-end text-nowrap w-auto">
-    <input
-      type="text"
-      name="price"
-      class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
-      placeholder="$ 0.00"
-      v-model="item.pric"
-    />
-  </td>
-
-  <td class="pt-5 text-end w-50">
-    <button type="button" class="btn btn-sm btn-icon btn-active-color-primary">
-      <i class="ki-duotone ki-trash fs-3"
-        ><span class="path1"></span><span class="path2"></span
-        ><span class="path3"></span><span class="path4"></span
-        ><span class="path5"></span
-      ></i>
-    </button>
-  </td>
+    </td>
+    <td class="pt-5 text-end">
+      <button
+        type="button"
+        @click="ItemRemove"
+        class="btn btn-sm btn-icon btn-active-color-primary"
+      >
+        <i class="ki-duotone ki-trash fs-3"
+          ><span class="path1"></span><span class="path2"></span
+          ><span class="path3"></span><span class="path4"></span
+          ><span class="path5"></span
+        ></i>
+      </button>
+    </td>
+  </tr>
 </template>
 
 <script lang="ts">
@@ -58,7 +62,6 @@ export default {
   emits: ["myfunc"],
   setup(props, { emit }) {
     const items = ref([{ id: "", name: "", description: "", price: "" }]);
-
     const item = ref<itemDetails>({
       id: "",
       name: "0",
@@ -92,7 +95,6 @@ export default {
       currency: "INR",
     });
 
-
     const handleSelectedChange = (newVal) => {
       // emit the custom event called 'myfunc' with the new selected value as payload
       const data = items.value.find((e) => e.name === newVal) || {
@@ -106,9 +108,14 @@ export default {
       emit("myfunc", item.value);
     };
 
+    const ItemRemove = () => {
+      emit('remove');
+    };
+
     return {
       items,
       item,
+      ItemRemove,
       handleSelectedChange,
     };
   },

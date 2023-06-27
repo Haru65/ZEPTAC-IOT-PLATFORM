@@ -125,13 +125,14 @@
               <!--end::Table head-->
 
               <!--begin::Table body-->
-              <tbody class="w-100">
-                <tr
-                  v-for="index in Selects"
-                  :key="index"
-                  class="border-bottom border-bottom-dashed"
-                >
-                  <CustomSelect v-on:myfunc="myevent($event)"></CustomSelect>
+              <tbody>
+                <tr>
+                  <CustomSelect
+                    v-for="index in Selects"
+                    :key="index"
+                    v-on:myfunc="myevent($event)"
+                    @remove="ItemRemove(index)"
+                  ></CustomSelect>
                 </tr>
               </tbody>
               <!--end::Table body-->
@@ -142,37 +143,23 @@
                   class="border-top border-top-dashed align-top fs-6 fw-bold text-gray-700"
                 >
                   <th class="text-primary">
-                    <span class="btn btn-link py-1" @click="addNewItem()">
+                    <span
+                      class="btn btn-primary p-2 px-4"
+                      @click="addNewItem()"
+                    >
                       Add item
                     </span>
                   </th>
-
-                  <th
-                    colspan="2"
-                    class="border-bottom border-bottom-dashed ps-0"
-                  >
-                    <div class="d-flex flex-column align-Selects-start">
-                      <div class="fs-5">Subtotal</div>
-                    </div>
-                  </th>
-
-                  <th
-                    colspan="2"
-                    class="border-bottom border-bottom-dashed text-end"
-                  >
-                    $<span data-kt-element="sub-total">0.00</span>
-                  </th>
                 </tr>
 
-                <tr class="align-top fw-bold text-gray-700">
-                  <th></th>
-
+                <!-- <tr class="align-top fw-bold text-gray-700">
                   <th colspan="2" class="fs-4 ps-0">Total</th>
-
                   <th colspan="2" class="text-end fs-4 text-nowrap">
-                    $<span data-kt-element="grand-total">{{ Total }}</span>
+                    ₹<span data-kt-element="grand-total">{{
+                      Total.toFixed(2)
+                    }}</span>
                   </th>
-                </tr>
+                </tr> -->
               </tfoot>
               <!--end::Table foot-->
             </table>
@@ -210,7 +197,7 @@ interface itemDetails {
   user: string;
   desc: string;
   pric: string;
-  items: [];
+  items: Array<"">;
 }
 
 export default defineComponent({
@@ -229,6 +216,12 @@ export default defineComponent({
 
     const addNewItem = () => {
       Selects.value++;
+    };
+
+    const ItemRemove = (index) => {
+      itemDetails.value.items.pop();
+      Selects.value--;
+      console.log(itemDetails.value);
     };
 
     const itemDetails = ref<itemDetails>({
@@ -254,15 +247,22 @@ export default defineComponent({
       await GetCustomers();
     });
 
-    const myevent = (data: Object) => {
+    const myevent = (data: any) => {
       // important
-      console.log(data);
       if (Selects.value != itemDetails.value.items.length) {
         itemDetails.value.items.push(data);
       }
+
+      const prices = itemDetails.value.items.map((ele) =>
+        Number(ele.pric.substring(1))
+      );
+      const total = prices.reduce((acc, curr) => acc + curr);
+      Total.value = total;
+      console.log(prices);
       console.log(itemDetails.value);
     };
 
+    // number formating remove
     const submit = async () => {
       loading.value = true;
       console.warn("Nice");
@@ -364,6 +364,7 @@ export default defineComponent({
       disabledDate,
       Selects,
       addNewItem,
+      ItemRemove,
       Total,
       myevent,
     };
