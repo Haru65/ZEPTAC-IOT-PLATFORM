@@ -119,46 +119,19 @@
                 >
                   <th class="min-w-300px w-475px">Item</th>
                   <th class="min-w-150px w-150px">Price</th>
-                  <th class="min-w-100px w-150px text-end">Total</th>
                   <th class="min-w-75px w-75px text-end">Action</th>
                 </tr>
               </thead>
               <!--end::Table head-->
 
               <!--begin::Table body-->
-              <tbody>
+              <tbody class="w-100">
                 <tr
                   v-for="index in Selects"
                   :key="index"
                   class="border-bottom border-bottom-dashed"
                 >
-                  <td class="pe-7">
-                    <CustomSelect :item="item"></CustomSelect>
-                  </td>
-
-                  <td>
-                    <input
-                      type="number"
-                      class="form-control form-control-solid text-end"
-                      name="price"
-                      placeholder="0.00"
-                    />
-                  </td>
-
-                  <td class="pt-8 text-end text-nowrap">$<span>0.00</span></td>
-
-                  <td class="pt-5 text-end">
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-icon btn-active-color-primary"
-                    >
-                      <i class="ki-duotone ki-trash fs-3"
-                        ><span class="path1"></span><span class="path2"></span
-                        ><span class="path3"></span><span class="path4"></span
-                        ><span class="path5"></span
-                      ></i>
-                    </button>
-                  </td>
+                  <CustomSelect v-on:myfunc="myevent($event)"></CustomSelect>
                 </tr>
               </tbody>
               <!--end::Table body-->
@@ -229,7 +202,7 @@ import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import { Form as VForm } from "vee-validate";
 import ApiService from "@/core/services/ApiService";
-import { getCustomers, getPriceList } from "@/stores/api";
+import { getCustomers } from "@/stores/api";
 import CustomSelect from "./CustomComponents/PriceSelect.vue";
 import moment from "moment";
 
@@ -250,14 +223,12 @@ export default defineComponent({
     const loading = ref(false);
     const Total = ref(0);
     const Selects = ref(1);
-    const item = ref([{ id: "", name: "" }]);
-    const date = ref("");
     const duedate = ref("");
+    const date = ref("");
     const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
 
     const addNewItem = () => {
       Selects.value++;
-      console.log(VForm.value);
     };
 
     const itemDetails = ref<itemDetails>({
@@ -278,23 +249,19 @@ export default defineComponent({
       );
     };
 
-    const GetSelects = async () => {
-      ApiService.setHeader();
-      const response = await getPriceList();
-      item.value.push(
-        ...response.result.data.map(({ created_at, ...rest }) => ({
-          ...rest,
-          created_at: moment(created_at).format("MMMM Do YYYY"),
-        }))
-      );
-    };
-
     onMounted(async () => {
       Customers.value.pop();
-      item.value.pop();
       await GetCustomers();
-      await GetSelects();
     });
+
+    const myevent = (data: Object) => {
+      // important
+      console.log(data);
+      if (Selects.value != itemDetails.value.items.length) {
+        itemDetails.value.items.push(data);
+      }
+      console.log(itemDetails.value);
+    };
 
     const submit = async () => {
       loading.value = true;
@@ -396,9 +363,9 @@ export default defineComponent({
       shortcuts,
       disabledDate,
       Selects,
-      item,
       addNewItem,
       Total,
+      myevent,
     };
   },
 });
