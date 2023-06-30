@@ -118,7 +118,6 @@
                   class="border-bottom fs-7 fw-bold text-gray-700 text-uppercase"
                 >
                   <th class="min-w-300px w-475px">Item</th>
-                  <th class="min-w-150px w-150px">Price</th>
                   <th class="min-w-75px w-75px text-end">Action</th>
                 </tr>
               </thead>
@@ -126,14 +125,13 @@
 
               <!--begin::Table body-->
               <tbody>
-                <tr>
-                  <CustomSelect
-                    v-for="index in Selects"
-                    :key="index"
-                    v-on:myfunc="myevent($event)"
-                    @remove="ItemRemove(index)"
-                  ></CustomSelect>
-                </tr>
+                <CustomSelect
+                  v-bind:tasks="Selects"
+                  v-for="(task, index) in Selects"
+                  :key="task.id"
+                  @remove="RemoveItem(index)"
+                  v-on:getval="itemDetailsAddFunc($event)"
+                />
               </tbody>
               <!--end::Table body-->
 
@@ -151,15 +149,6 @@
                     </span>
                   </th>
                 </tr>
-
-                <!-- <tr class="align-top fw-bold text-gray-700">
-                  <th colspan="2" class="fs-4 ps-0">Total</th>
-                  <th colspan="2" class="text-end fs-4 text-nowrap">
-                    ₹<span data-kt-element="grand-total">{{
-                      Total.toFixed(2)
-                    }}</span>
-                  </th>
-                </tr> -->
               </tfoot>
               <!--end::Table foot-->
             </table>
@@ -209,20 +198,15 @@ export default defineComponent({
   setup() {
     const loading = ref(false);
     const Total = ref(0);
-    const Selects = ref(1);
     const duedate = ref("");
     const date = ref("");
     const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
-
-    const addNewItem = () => {
-      Selects.value++;
-    };
-
-    const ItemRemove = (index) => {
-      itemDetails.value.items.pop();
-      Selects.value--;
-      console.log(itemDetails.value);
-    };
+    // number of selects with id to identify
+    const Selects = ref([
+      {
+        id: 0,
+      },
+    ]);
 
     const itemDetails = ref<itemDetails>({
       user: "",
@@ -230,6 +214,32 @@ export default defineComponent({
       desc: "",
       pric: "",
     });
+
+    // maitain index of eaah item add
+    // precise
+    let count = 1;
+    const addNewItem = () => {
+      let data = {
+        id: count,
+      };
+      Selects.value.push(data);
+      count++;
+    };
+
+    // on add model data push to the sub-json vlaue itemDetails
+    const itemDetailsAddFunc = (data) => {
+      // selects id not same don't push;
+      if (Selects.value.length != itemDetails.value.items.length) {
+        itemDetails.value.items.push(data);
+      }
+      console.log(itemDetails.value);
+    };
+
+    const RemoveItem = (index) => {
+      console.log(index);
+      console.log(Selects.value);
+      Selects.value.splice(index, 1);
+    };
 
     const GetCustomers = async () => {
       ApiService.setHeader();
@@ -246,21 +256,6 @@ export default defineComponent({
       Customers.value.pop();
       await GetCustomers();
     });
-
-    const myevent = (data: any) => {
-      // important
-      if (Selects.value != itemDetails.value.items.length) {
-        itemDetails.value.items.push(data);
-      }
-
-      const prices = itemDetails.value.items.map((ele) =>
-        Number(ele.pric.substring(1))
-      );
-      const total = prices.reduce((acc, curr) => acc + curr);
-      Total.value = total;
-      console.log(prices);
-      console.log(itemDetails.value);
-    };
 
     // number formating remove
     const submit = async () => {
@@ -364,9 +359,9 @@ export default defineComponent({
       disabledDate,
       Selects,
       addNewItem,
-      ItemRemove,
+      RemoveItem,
+      itemDetailsAddFunc,
       Total,
-      myevent,
     };
   },
 });

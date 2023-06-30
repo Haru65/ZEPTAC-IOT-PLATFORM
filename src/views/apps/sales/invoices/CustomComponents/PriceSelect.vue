@@ -1,6 +1,6 @@
 <template>
-  <tr>
-    <td class="w-75 pt-8 text-end text-nowrap">
+  <tr class="w-100">
+    <td class="w-50 pt-8 text-end text-nowrap">
       <el-select v-model="item.name" filterable @change="handleSelectedChange">
         <el-option value="0" label="Please Select Item..." key="0"
           >Please Select Item...</el-option
@@ -21,7 +21,7 @@
         placeholder="Description"
       ></textarea>
     </td>
-    <td class="p-8 text-end text-nowrap w-auto">
+    <td class="p-8 text-end text-nowrap w-50">
       <input
         type="text"
         name="price"
@@ -30,10 +30,10 @@
         v-model="item.pric"
       />
     </td>
-    <td class="pt-5 text-end">
+    <td class="pt-5 text-end w-25">
       <button
         type="button"
-        @click="ItemRemove"
+        @click="$emit('remove')"
         class="btn btn-sm btn-icon btn-active-color-primary"
       >
         <i class="ki-duotone ki-trash fs-3"
@@ -59,9 +59,13 @@ interface itemDetails {
 }
 
 export default {
-  emits: ["myfunc"],
+  emits: ["getval", "remove"],
+  props: ["tasks"],
+
   setup(props, { emit }) {
     const items = ref([{ id: "", name: "", description: "", price: "" }]);
+    console.log(props.tasks);
+
     const item = ref<itemDetails>({
       id: "",
       name: "0",
@@ -69,6 +73,7 @@ export default {
       pric: "",
     });
 
+    // get options from DB;
     const getSelects = async () => {
       ApiService.setHeader();
       const response = await getPriceList();
@@ -105,17 +110,12 @@ export default {
       item.value.id = data.id;
       item.value.pric = formatter.format(Number(data.price)).toString();
       item.value.desc = data.description.toString();
-      emit("myfunc", item.value);
-    };
-
-    const ItemRemove = () => {
-      emit('remove');
+      emit("getval", item.value);
     };
 
     return {
       items,
       item,
-      ItemRemove,
       handleSelectedChange,
     };
   },
