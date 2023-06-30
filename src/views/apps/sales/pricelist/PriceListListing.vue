@@ -126,18 +126,16 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
-import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
 import type { IPriceList } from "@/core/model/pricelist";
-import pricelist from "@/core/model/pricelist";
+
 import arraySort from "array-sort";
+import { getPriceList } from "@/stores/api";
+import moment from "moment";
 
 export default defineComponent({
   name: "pricelist-listing",
   components: {
     Datatable,
-    ExportCustomerModal,
-    AddCustomerModal,
   },
   setup() {
     const tableHeader = ref([
@@ -172,13 +170,37 @@ export default defineComponent({
         columnWidth: 75,
       },
     ]);
-    const selectedIds = ref<Array<number>>([]);
 
-    const tableData = ref<Array<IPriceList>>(pricelist);
+    const selectedIds = ref<Array<number>>([]);
+    const tableData = ref<Array<IPriceList>>([]);
     const initCustomers = ref<Array<IPriceList>>([]);
 
-    onMounted(() => {
-      initCustomers.value.splice(0, tableData.value.length, ...tableData.value);
+    // functions
+    // get users function
+    async function pricelist_listing(): Promise<void> {
+      try {
+        const response = await getPriceList();
+        console.log(response);
+        tableData.value = response.result.data.map(
+          ({ created_at, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+          })
+        );
+        initCustomers.value.splice(
+          0,
+          tableData.value.length,
+          ...tableData.value
+        );
+      } catch (error) {
+        console.error(error);
+      } finally {
+        //console.log("done");
+      }
+    }
+
+    onMounted(async () => {
+      await pricelist_listing();
     });
 
     const deleteFewCustomers = () => {

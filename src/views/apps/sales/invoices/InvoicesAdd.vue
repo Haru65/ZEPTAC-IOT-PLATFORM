@@ -3,7 +3,7 @@
     <!--begin::Modal dialog-->
     <div class="card-body p-12">
       <!--begin::Form-->
-      <VForm id="kt_invoice_form" novalidate>
+      <form id="kt_invoice_form" novalidate>
         <!--begin::Wrapper-->
         <div class="d-flex flex-column align-Selects-start flex-xxl-row">
           <!--begin::Input group-->
@@ -20,7 +20,7 @@
 
             <div class="block">
               <el-date-picker
-                v-model="date"
+                v-model="invoiceDetials.invoice_date"
                 type="date"
                 placeholder="Pick a day"
                 :shortcuts="shortcuts"
@@ -45,8 +45,8 @@
             </div>
             <input
               type="text"
+              v-model="invoiceDetials.invoice_no"
               class="form-control form-control-flush fw-bold text-muted fs-3 w-125px"
-              value="2021***"
               placehoder="..."
             />
           </div>
@@ -68,7 +68,7 @@
 
             <div class="block">
               <el-date-picker
-                v-model="duedate"
+                v-model="invoiceDetials.invoice_duedate"
                 type="date"
                 placeholder="Pick a day"
                 :shortcuts="shortcuts"
@@ -91,15 +91,15 @@
         <div class="mb-0">
           <!--begin::Row-->
           <div class="row gx-10">
-            <el-select v-model="itemDetails.user" filterable>
-              <el-option value="0" label="Please Select Customer..." key="0"
+            <el-select v-model="invoiceDetials.customer_id" filterable>
+              <el-option value=" " label="Please Select Customer..." key=" "
                 >Please Select Customer...</el-option
               >
               <el-option
                 v-for="item in Customers"
                 :key="item.id"
-                :label="item.first_name"
-                :value="item.first_name"
+                :label="`${item.first_name} ${item.last_name}`"
+                :value="item.id"
               />
             </el-select>
           </div>
@@ -130,7 +130,8 @@
                   v-for="(task, index) in Selects"
                   :key="task.id"
                   @remove="RemoveItem(index)"
-                  v-on:getval="itemDetailsAddFunc($event)"
+                  v-on:getval="invoiceDetialsAddFunc($event)"
+                  v-on:UpdateTotal="UpdateTotal($event)"
                 />
               </tbody>
               <!--end::Table body-->
@@ -141,12 +142,20 @@
                   class="border-top border-top-dashed align-top fs-6 fw-bold text-gray-700"
                 >
                   <th class="text-primary">
-                    <span
-                      class="btn btn-primary p-2 px-4"
-                      @click="addNewItem()"
-                    >
+                    <span class="btn btn-primary" @click="addNewItem()">
+                      <KTIcon icon-name="plus" icon-class="fs-2" />
                       Add item
                     </span>
+                  </th>
+                </tr>
+                <tr class="align-top fw-bold text-gray-700">
+                  <th></th>
+
+                  <th colspan="2" class="fs-4 ps-0">Total</th>
+                  <th colspan="2" class="text-end fs-4 text-nowrap">
+                    ₹<span data-kt-element="grand-total">{{
+                      invoiceDetials.total.toFixed(2)
+                    }}</span>
                   </th>
                 </tr>
               </tfoot>
@@ -160,13 +169,37 @@
               name="notes"
               class="form-control form-control-solid"
               rows="3"
+              v-model="invoiceDetials.notes"
               placeholder="Thanks for your business"
             ></textarea>
           </div>
           <!--end::Notes-->
         </div>
-        <!--end::Wrapper-->
-      </VForm>
+        <br />
+        <br />
+        <div class="modal-footer flex-center">
+          <!--begin::Button-->
+          <button type="reset" class="btn btn-lg btn-danger w-25">Clear</button>
+          <!--end::Button-->
+          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+          <!--begin::Button-->
+          <span
+            :data-kt-indicator="loading ? 'on' : null"
+            class="btn btn-lg btn-primary w-25"
+            v-on:click="submit"
+            type="submit"
+          >
+            <span v-if="!loading" class="indicator-label"> Submit </span>
+            <span v-if="loading" class="indicator-progress">
+              Please wait...
+              <span
+                class="spinner-border spinner-border-sm align-middle ms-2"
+              ></span>
+            </span>
+          </span>
+          <!--end::Button-->
+        </div>
+      </form>
       <!--end::Form-->
     </div>
   </div>
@@ -178,15 +211,22 @@ import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import { Form as VForm } from "vee-validate";
 import ApiService from "@/core/services/ApiService";
-import { getCustomers } from "@/stores/api";
+import { getCustomers, addInvoice } from "@/stores/api";
+import { useAuthStore } from "@/stores/auth";
 import CustomSelect from "./CustomComponents/PriceSelect.vue";
 import moment from "moment";
+import { useRouter } from "vue-router";
 
-interface itemDetails {
-  user: string;
-  desc: string;
-  pric: string;
+interface invoiceDetials {
+  invoice_no: string;
+  customer_id: string;
   items: Array<"">;
+  invoice_date: string;
+  invoice_duedate: string;
+  notes: string;
+  total: number;
+  created_by: string;
+  updated_by: string;
 }
 
 export default defineComponent({
@@ -196,28 +236,38 @@ export default defineComponent({
     CustomSelect,
   },
   setup() {
+    const auth = useAuthStore();
     const loading = ref(false);
     const Total = ref(0);
-    const duedate = ref("");
-    const date = ref("");
+    const router = useRouter();
     const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
     // number of selects with id to identify
+    // {id:1,id,:2,...}
     const Selects = ref([
       {
         id: 0,
       },
+      {
+        id: 1,
+      },
     ]);
 
-    const itemDetails = ref<itemDetails>({
-      user: "",
+    const invoiceDetials = ref<invoiceDetials>({
+      invoice_no: "21****",
+      customer_id: " ",
       items: [],
-      desc: "",
-      pric: "",
+      invoice_date: "",
+      invoice_duedate: "",
+      notes: "",
+      total: 0,
+      created_by: auth.getUserId(),
+      updated_by: auth.getUserId(),
     });
 
     // maitain index of eaah item add
     // precise
-    let count = 1;
+    let count = Selects.value.length;
+
     const addNewItem = () => {
       let data = {
         id: count,
@@ -226,19 +276,34 @@ export default defineComponent({
       count++;
     };
 
-    // on add model data push to the sub-json vlaue itemDetails
-    const itemDetailsAddFunc = (data) => {
+    // on add model data push to the sub-json vlaue invoiceDetials
+    const invoiceDetialsAddFunc = (data) => {
       // selects id not same don't push;
-      if (Selects.value.length != itemDetails.value.items.length) {
-        itemDetails.value.items.push(data);
+      if (Selects.value.length != invoiceDetials.value.items.length) {
+        invoiceDetials.value.items.push(data);
       }
-      console.log(itemDetails.value);
+      calPrice();
+      console.log(invoiceDetials.value);
     };
 
     const RemoveItem = (index) => {
       console.log(index);
       console.log(Selects.value);
       Selects.value.splice(index, 1);
+      invoiceDetials.value.items.splice(index, 1);
+      calPrice();
+    };
+
+    const UpdateTotal = (data) => {
+      console.log(data);
+      calPrice();
+    };
+
+    const calPrice = () => {
+      const prices = invoiceDetials.value.items.map((ele) =>
+        Number(ele.price.substring(1))
+      );
+      invoiceDetials.value.total = prices.reduce((acc, curr) => acc + curr);
     };
 
     const GetCustomers = async () => {
@@ -261,9 +326,17 @@ export default defineComponent({
     const submit = async () => {
       loading.value = true;
       console.warn("Nice");
+      console.log(invoiceDetials.value);
+      invoiceDetials.value.invoice_date = moment(
+        invoiceDetials.value.invoice_date
+      ).format("YYYY-MM-DD HH:mm:ss");
+      invoiceDetials.value.invoice_duedate = moment(
+        invoiceDetials.value.invoice_duedate
+      ).format("YYYY-MM-DD HH:mm:ss");
+      console.log(invoiceDetials.value);
       try {
         // Call your API here with the form values
-        const response = { error: 1 };
+        const response = await addInvoice(invoiceDetials.value);
         console.log(response.error);
         if (!response.error) {
           // Handle successful API response
@@ -272,8 +345,6 @@ export default defineComponent({
             "Success",
             "Company details have been successfully inserted!"
           );
-
-          clear();
         } else {
           // Handle API error response
           const errorData = response.error;
@@ -301,6 +372,8 @@ export default defineComponent({
         customClass: {
           confirmButton: "btn btn-primary",
         },
+      }).then(() => {
+        clear();
       });
     };
 
@@ -347,20 +420,34 @@ export default defineComponent({
       return null;
     };
 
+    const clear = () => {
+      invoiceDetials.value = {
+        invoice_no: "******",
+        customer_id: " ",
+        items: [],
+        invoice_date: "",
+        invoice_duedate: "",
+        notes: "",
+        total: 0,
+        created_by: auth.getUserId(),
+        updated_by: auth.getUserId(),
+      };
+      router.push({ name: "invoices-list" });
+    };
+
     return {
-      itemDetails,
+      invoiceDetials,
       Customers,
       getAssetPath,
       submit,
       loading,
-      date,
-      duedate,
       shortcuts,
       disabledDate,
       Selects,
       addNewItem,
       RemoveItem,
-      itemDetailsAddFunc,
+      UpdateTotal,
+      invoiceDetialsAddFunc,
       Total,
     };
   },

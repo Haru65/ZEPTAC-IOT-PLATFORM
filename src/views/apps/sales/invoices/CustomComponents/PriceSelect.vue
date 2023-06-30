@@ -23,11 +23,12 @@
     </td>
     <td class="p-8 text-end text-nowrap w-50">
       <input
+        v-on:change="UpdateEvent"
         type="text"
         name="price"
         class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
         placeholder="$ 0.00"
-        v-model="item.pric"
+        v-model="item.price"
       />
     </td>
     <td class="pt-5 text-end w-25">
@@ -55,22 +56,23 @@ interface itemDetails {
   id: string;
   desc: string;
   name: string;
-  pric: string;
+  price: string;
+  total: number;
 }
 
 export default {
-  emits: ["getval", "remove"],
+  emits: ["getval", "remove", "UpdateTotal"],
   props: ["tasks"],
 
   setup(props, { emit }) {
     const items = ref([{ id: "", name: "", description: "", price: "" }]);
     console.log(props.tasks);
-
     const item = ref<itemDetails>({
       id: "",
       name: "0",
       desc: "",
-      pric: "",
+      price: "",
+      total: 0,
     });
 
     // get options from DB;
@@ -107,16 +109,24 @@ export default {
         price: "",
         description: "",
       };
+
+      // compute total
+
       item.value.id = data.id;
-      item.value.pric = formatter.format(Number(data.price)).toString();
+      item.value.price = formatter.format(Number(data.price)).toString();
       item.value.desc = data.description.toString();
       emit("getval", item.value);
+    };
+
+    const UpdateEvent = (newval) => {
+      emit("UpdateTotal", newval.target.value);
     };
 
     return {
       items,
       item,
       handleSelectedChange,
+      UpdateEvent,
     };
   },
 };

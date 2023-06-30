@@ -5,9 +5,17 @@
       <div class="card-title">
         <!--begin::Search-->
         <div class="d-flex align-items-center position-relative my-1">
-          <KTIcon icon-name="magnifier" icon-class="fs-1 position-absolute ms-6" />
-          <input type="text" v-model="search" @input="searchItems()" class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search invoices" />
+          <KTIcon
+            icon-name="magnifier"
+            icon-class="fs-1 position-absolute ms-6"
+          />
+          <input
+            type="text"
+            v-model="search"
+            @input="searchItems()"
+            class="form-control form-control-solid w-250px ps-15"
+            placeholder="Search invoices"
+          />
         </div>
         <!--end::Search-->
       </div>
@@ -15,38 +23,66 @@
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
         <!--begin::Toolbar-->
-        <div v-if="selectedIds.length === 0" class="d-flex justify-content-end" data-kt-customer-table-toolbar="base">
+        <div
+          v-if="selectedIds.length === 0"
+          class="d-flex justify-content-end"
+          data-kt-customer-table-toolbar="base"
+        >
           <!--begin::Export-->
-          <button type="button" class="btn btn-light-primary me-3" data-bs-toggle="modal"
-            data-bs-target="#kt_customers_export_modal">
+          <button
+            type="button"
+            class="btn btn-light-primary me-3"
+            data-bs-toggle="modal"
+            data-bs-target="#kt_customers_export_modal"
+          >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
           </button>
           <!--end::Export-->
           <!--begin::Add customer-->
-          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_customer">
+          <router-link to="./add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add invoices
-          </button>
+            Add Invoice
+          </router-link>
           <!--end::Add customer-->
         </div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->
-        <div v-else class="d-flex justify-content-end align-items-center" data-kt-customer-table-toolbar="selected">
+        <div
+          v-else
+          class="d-flex justify-content-end align-items-center"
+          data-kt-customer-table-toolbar="selected"
+        >
           <div class="fw-bold me-5">
-            <span class="me-2">{{ selectedIds.length }}</span>Selected
+            <span class="me-2">{{ selectedIds.length }}</span
+            >Selected
           </div>
-          <button type="button" class="btn btn-danger" @click="deleteFewCustomers()">
+          <button
+            type="button"
+            class="btn btn-danger"
+            @click="deleteFewCustomers()"
+          >
             Delete Selected
           </button>
         </div>
         <!--end::Group actions-->
         <!--begin::Group actions-->
-        <div class="d-flex justify-content-end align-items-center d-none" data-kt-customer-table-toolbar="selected">
+        <div
+          class="d-flex justify-content-end align-items-center d-none"
+          data-kt-customer-table-toolbar="selected"
+        >
           <div class="fw-bold me-5">
-            <span class="me-2" data-kt-customer-table-select="selected_count"></span>Selected
+            <span
+              class="me-2"
+              data-kt-customer-table-select="selected_count"
+            ></span
+            >Selected
           </div>
-          <button type="button" class="btn btn-danger" data-kt-customer-table-select="delete_selected">
+          <button
+            type="button"
+            class="btn btn-danger"
+            data-kt-customer-table-select="delete_selected"
+          >
             Delete Selected
           </button>
         </div>
@@ -55,8 +91,15 @@
       <!--end::Card toolbar-->
     </div>
     <div class="card-body pt-0">
-      <Datatable @on-sort="sort" @on-items-select="onItemSelect" :data="tableData" :header="tableHeader"
-        :enable-items-per-page-dropdown="true" :checkbox-enabled="true" checkbox-label="id">
+      <Datatable
+        @on-sort="sort"
+        @on-items-select="onItemSelect"
+        :data="tableData"
+        :header="tableHeader"
+        :enable-items-per-page-dropdown="true"
+        :checkbox-enabled="true"
+        checkbox-label="id"
+      >
         <!-- img data -->
         <template v-slot:id="{ row: invoices }">
           <span class="text-gray-600 text-hover-primary mb-1">
@@ -65,7 +108,11 @@
         </template>
         <template v-slot:customer_name="{ row: invoices }">
           <span class="text-gray-600 text-hover-primary mb-1">
-            {{ invoices.customer_name }}
+            {{
+              invoices.customer_name[0].first_name +
+              " " +
+              invoices.customer_name[0].last_name
+            }}
           </span>
         </template>
         <!-- defualt data -->
@@ -73,32 +120,29 @@
           {{ invoices.company }}
         </template>
         <template v-slot:date="{ row: invoices }">
-          {{ invoices.date }}
+          {{ invoices.created_at }}
         </template>
         <template v-slot:actions="{ row: invoices }">
-            <!--begin::Menu Flex-->
-            <div class="d-flex flex-lg-row">
-              <span class="menu-link px-3">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </span>
-              <span>
-                <i
-                  @click="deleteCustomer(invoices.id)"
-                  class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
-                ></i>
-              </span>
-            </div>
-            <!--end::Menu FLex-->
-            <!--end::Menu-->
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row">
+            <span class="menu-link px-3">
+              <i
+                class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+              ></i>
+            </span>
+            <span>
+              <i
+                @click="deleteCustomer(invoices.id)"
+                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
+              ></i>
+            </span>
+          </div>
+          <!--end::Menu FLex-->
+          <!--end::Menu-->
         </template>
       </Datatable>
     </div>
   </div>
-
-  <ExportCustomerModal></ExportCustomerModal>
-  <AddCustomerModal></AddCustomerModal>
 </template>
 
 <script lang="ts">
@@ -106,18 +150,15 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
-import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
 import type { IInvoices } from "@/core/model/invoices";
-import invoices from "@/core/model/invoices";
+import { getInvoiceList } from "@/stores/api";
 import arraySort from "array-sort";
+import moment from "moment";
 
 export default defineComponent({
   name: "invoices-listing",
   components: {
     Datatable,
-    ExportCustomerModal,
-    AddCustomerModal,
   },
   setup() {
     const tableHeader = ref([
@@ -148,11 +189,34 @@ export default defineComponent({
     ]);
     const selectedIds = ref<Array<number>>([]);
 
-    const tableData = ref<Array<IInvoices>>(invoices);
+    const tableData = ref<Array<IInvoices>>([]);
+
     const initInvoices = ref<Array<IInvoices>>([]);
 
-    onMounted(() => {
-      initInvoices.value.splice(0, tableData.value.length, ...tableData.value);
+    async function invoice_listing(): Promise<void> {
+      try {
+        const response = await getInvoiceList();
+        console.log(response);
+        tableData.value = response.result.data.map(
+          ({ created_at, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+          })
+        );
+        initInvoices.value.splice(
+          0,
+          tableData.value.length,
+          ...tableData.value
+        );
+      } catch (error) {
+        console.error(error);
+      } finally {
+        //console.log("done");
+      }
+    }
+
+    onMounted(async () => {
+      await invoice_listing();
     });
 
     const deleteFewCustomers = () => {
@@ -205,17 +269,18 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-
     // currency foratter
-    const formatter = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'INR'
+    const formatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "INR",
     });
 
     const formatPrice = (value: string) => {
       const parsedValue = parseFloat(value);
       if (isNaN(parsedValue)) {
-        throw new Error('Invalid input: expected a string representing a number');
+        throw new Error(
+          "Invalid input: expected a string representing a number"
+        );
       }
       return formatter.format(parsedValue);
     };
@@ -231,7 +296,7 @@ export default defineComponent({
       sort,
       onItemSelect,
       getAssetPath,
-      formatPrice
+      formatPrice,
     };
   },
 });

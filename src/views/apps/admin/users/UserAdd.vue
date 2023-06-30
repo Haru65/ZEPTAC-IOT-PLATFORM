@@ -345,7 +345,6 @@
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
-import { ModelSelect } from "vue-search-select";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import { rolesArray } from "@/core/config/PermissionsRolesConfig";

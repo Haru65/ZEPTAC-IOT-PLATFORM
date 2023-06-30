@@ -9,6 +9,7 @@ const COMPANY_URL = "company";
 const USER_URL = "users";
 const CUSTOMERS_URL = "customers";
 const PRICELIST_URL = "pricelist";
+const INVOICE_URL = "invoice";
 
 // COMPANIES
 
@@ -164,6 +165,32 @@ export async function getPriceList() {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.listingget(PRICELIST_URL);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// INVOICES
+// getlists
+export async function getInvoiceList() {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(INVOICE_URL);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function addInvoice(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(INVOICE_URL, data);
         return response.data;
     } catch (errors) {
         console.error(errors);
