@@ -376,7 +376,7 @@
           </div>
           <div class="modal-footer flex-center">
             <!--begin::Button-->
-            <button @click="deletecompany()" class="btn btn-lg btn-danger w-25">
+            <button @click="deletecompany_()" class="btn btn-lg btn-danger w-25">
               Discard
             </button>
             <!--end::Button-->
@@ -411,7 +411,7 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref, watch } from "vue";
 import { countries, INstates } from "@/core/model/countries";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { updateCompany, getCompany, deleteCompany } from "@/stores/api";
+import { updateCompany, getCompany, deletecompany } from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import packages from "@/core/config/PackagesConfig";
@@ -517,7 +517,7 @@ export default defineComponent({
         }
       );
 
-    const deletecompany = () => {
+    const deletecompany_ = () => {
       Swal.fire({
         title: "Are you sure?",
         text: "You won't be able to revert this!",
@@ -530,7 +530,7 @@ export default defineComponent({
         confirmButtonText: "Confirm",
       }).then((result) => {
         if (result.isConfirmed) {
-          deleteCompany(CompanyId).then(() => {
+          deletecompany(CompanyId).then(() => {
             Swal.fire({
               title: "Done",
               icon: "success",
@@ -617,7 +617,7 @@ export default defineComponent({
       state,
       packages,
       limit,
-      deletecompany,
+      deletecompany_,
     };
   },
 });

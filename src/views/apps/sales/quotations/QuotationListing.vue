@@ -159,6 +159,7 @@ import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
 import type { IQuotations } from "@/core/model/quotation";
 import quotations from "@/core/model/quotation";
 import arraySort from "array-sort";
+import { formatPrice } from "@/core/config/DataFormatter";
 
 export default defineComponent({
   name: "quotation-listing",
@@ -253,21 +254,7 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-    // currency foratter
-    const formatter = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "INR",
-    });
 
-    const formatPrice = (value: string) => {
-      const parsedValue = parseFloat(value);
-      if (isNaN(parsedValue)) {
-        throw new Error(
-          "Invalid input: expected a string representing a number"
-        );
-      }
-      return formatter.format(parsedValue);
-    };
 
     return {
       tableData,

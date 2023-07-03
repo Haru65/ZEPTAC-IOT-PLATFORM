@@ -127,7 +127,7 @@
               <tbody>
                 <CustomSelect
                   v-bind:tasks="invoiceDetials.items"
-                  @remove="RemoveItem($emit)"
+                  v-on:removeitem="RemoveItem($event)"
                   v-on:getval="invoiceDetialsAddFunc($event)"
                   v-on:UpdateTotal="UpdateTotal($event)"
                 />
@@ -177,7 +177,11 @@
         <br />
         <div class="modal-footer flex-center">
           <!--begin::Button-->
-          <button type="reset" class="btn btn-lg btn-danger w-25">Clear</button>
+          <span
+            v-on:click="deleteInvoice()"
+            class="btn btn-lg btn-danger w-25"
+            >Discard</span
+          >
           <!--end::Button-->
           &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
           <!--begin::Button-->
@@ -187,7 +191,7 @@
             v-on:click="submit"
             type="submit"
           >
-            <span v-if="!loading" class="indicator-label"> Submit </span>
+            <span v-if="!loading" class="indicator-label"> Update </span>
             <span v-if="loading" class="indicator-progress">
               Please wait...
               <span
@@ -208,11 +212,16 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
-import { getCustomers, addInvoice, getInvoice } from "@/stores/api";
+import {
+  getCustomers,
+  updateInvoice,
+  getInvoice,
+  deleteinvoice,
+} from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import CustomSelect from "./CustomComponents/PriceSelect.vue";
 import moment from "moment";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { formatPrice } from "@/core/config/DataFormatter";
 
 interface itemsArr {
@@ -245,7 +254,6 @@ export default defineComponent({
     const loading = ref(false);
     const Total = ref(0);
     const router = useRoute();
-    const route = useRouter();
 
     const invoiceId = router.params.id;
 
@@ -286,7 +294,19 @@ export default defineComponent({
     };
 
     const RemoveItem = (index) => {
-      invoiceDetials.value.items.splice(index, 1);
+      console.log(index);
+      removeObjectWithId(invoiceDetials.value.items, index);
+      calPrice();
+    };
+
+    const removeObjectWithId = (arr, id) => {
+      const objWithIdIndex = arr.findIndex((obj) => obj.id === id);
+
+      if (objWithIdIndex > -1) {
+        arr.splice(objWithIdIndex, 1);
+      }
+
+      return arr;
     };
 
     const UpdateTotal = (data) => {
@@ -346,7 +366,7 @@ export default defineComponent({
       // console.log(invoiceDetials.value);
       try {
         // Call your API here with the form values
-        const response = await addInvoice(invoiceDetials.value);
+        const response = await updateInvoice(invoiceDetials.value, invoiceId);
         // console.log(response.error);
         if (!response.error) {
           // Handle successful API response
@@ -371,6 +391,22 @@ export default defineComponent({
       }
     };
 
+    const deleteInvoice = () => {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover this imaginary file!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "red",
+        confirmButtonText: "Yes, I am sure!",
+      }).then((result: { [x: string]: any }) => {
+        if (result["isConfirmed"]) {
+          // Put your function here
+          deleteinvoice(invoiceId);
+        }
+      });
+    };
+
     const showSuccessAlert = (title, message) => {
       Swal.fire({
         title,
@@ -382,9 +418,7 @@ export default defineComponent({
         customClass: {
           confirmButton: "btn btn-primary",
         },
-      }).then(() => {
-        clear();
-      });
+      }).then(() => {});
     };
 
     const showErrorAlert = (title, message) => {
@@ -430,22 +464,6 @@ export default defineComponent({
       return null;
     };
 
-    const clear = () => {
-      invoiceDetials.value = {
-        invoice_no: "******",
-        customer_id: " ",
-        items: [],
-        invoice_date: "",
-        invoice_duedate: "",
-        notes: "",
-        total: 0,
-        is_active: 1,
-        created_by: auth.getUserId(),
-        updated_by: auth.getUserId(),
-      };
-      route.push({ name: "invoices-list" });
-    };
-
     return {
       invoiceDetials,
       Customers,
@@ -458,7 +476,9 @@ export default defineComponent({
       UpdateTotal,
       addNewItem,
       invoiceDetialsAddFunc,
+      deleteInvoice,
       Total,
+      invoiceId,
     };
   },
 });
@@ -468,7 +488,6 @@ export default defineComponent({
 .el-input__inner {
   font-weight: 500;
 }
-
 .el-input__wrapper {
   height: 3.1rem;
   border-radius: 0.5rem;

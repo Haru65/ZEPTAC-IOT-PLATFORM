@@ -60,7 +60,7 @@
           <button
             type="button"
             class="btn btn-danger"
-            @click="deleteFewCustomers()"
+            @click="deleteFewInvoice()"
           >
             Delete Selected
           </button>
@@ -120,19 +120,27 @@
           {{ invoices.company }}
         </template>
         <template v-slot:date="{ row: invoices }">
-          {{ invoices.created_at }}
+          {{ invoices.invoice_date }}
+        </template>
+        <template v-slot:duedate="{ row: invoices }">
+          {{ invoices.invoice_duedate }}
+        </template>
+        <template v-slot:total="{ row: invoices }">
+          {{ formatPrice(invoices.total) }}
         </template>
         <template v-slot:actions="{ row: invoices }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span class="menu-link px-3">
-              <i
-                class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-              ></i>
+              <router-link :to="`./edit/${invoices.id}`">
+                <i
+                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                ></i>
+              </router-link>
             </span>
             <span>
               <i
-                @click="deleteCustomer(invoices.id)"
+                @click="deleteInvoice(invoices.id, false)"
                 class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
@@ -151,9 +159,11 @@ import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { IInvoices } from "@/core/model/invoices";
-import { getInvoiceList } from "@/stores/api";
+import { getInvoiceList, deleteinvoice } from "@/stores/api";
 import arraySort from "array-sort";
+import { formatPrice } from "@/core/config/DataFormatter";
 import moment from "moment";
+import Swal from "sweetalert2";
 
 export default defineComponent({
   name: "invoices-listing",
@@ -175,8 +185,20 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
-        columnName: "Created Date",
+        columnName: "Invoice Date",
         columnLabel: "date",
+        sortEnabled: true,
+        columnWidth: 175,
+      },
+      {
+        columnName: "Invoice Due Date",
+        columnLabel: "duedate",
+        sortEnabled: true,
+        columnWidth: 175,
+      },
+      {
+        columnName: "Total",
+        columnLabel: "total",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -198,9 +220,12 @@ export default defineComponent({
         const response = await getInvoiceList();
         console.log(response);
         tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
+          ({ created_at, invoice_date, invoice_duedate, total, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD/MM/YYYY"),
+            invoice_date: moment(invoice_date).format("DD/MM/YYYY"),
+            invoice_duedate: moment(invoice_duedate).format("DD/MM/YYYY"),
+            total: total,
           })
         );
         initInvoices.value.splice(
@@ -219,17 +244,53 @@ export default defineComponent({
       await invoice_listing();
     });
 
-    const deleteFewCustomers = () => {
-      selectedIds.value.forEach((item) => {
-        deleteCustomer(item);
+    const deleteFewInvoice = () => {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover this imaginary file!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "red",
+        confirmButtonText: "Yes, I am sure!",
+        cancelButtonText: "No, cancel it!",
+      }).then((result: { [x: string]: any }) => {
+        if (result["isConfirmed"]) {
+          // Put your function here
+          selectedIds.value.forEach((item) => {
+            deleteInvoice(item, true);
+          });
+          selectedIds.value.length = 0;
+        }
       });
-      selectedIds.value.length = 0;
     };
 
-    const deleteCustomer = (id: number) => {
-      for (let i = 0; i < tableData.value.length; i++) {
-        if (tableData.value[i].id === id) {
-          tableData.value.splice(i, 1);
+    const deleteInvoice = (id: number, mul: boolean) => {
+      if (!mul) {
+        for (let i = 0; i < tableData.value.length; i++) {
+          if (tableData.value[i].id === id) {
+            Swal.fire({
+              title: "Are you sure?",
+              text: "You will not be able to recover this imaginary file!",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "red",
+              confirmButtonText: "Yes, I am sure!",
+            }).then((result: { [x: string]: any }) => {
+              if (result["isConfirmed"]) {
+                // Put your function here
+                deleteinvoice(id);
+                tableData.value.splice(i, 1);
+              }
+            });
+          }
+        }
+      } else {
+        for (let i = 0; i < tableData.value.length; i++) {
+          if (tableData.value[i].id === id) {
+            // Put your function here
+            deleteinvoice(id);
+            tableData.value.splice(i, 1);
+          }
         }
       }
     };
@@ -269,30 +330,14 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-    // currency foratter
-    const formatter = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "INR",
-    });
-
-    const formatPrice = (value: string) => {
-      const parsedValue = parseFloat(value);
-      if (isNaN(parsedValue)) {
-        throw new Error(
-          "Invalid input: expected a string representing a number"
-        );
-      }
-      return formatter.format(parsedValue);
-    };
-
     return {
       tableData,
       tableHeader,
-      deleteCustomer,
+      deleteInvoice,
       search,
       searchItems,
       selectedIds,
-      deleteFewCustomers,
+      deleteFewInvoice,
       sort,
       onItemSelect,
       getAssetPath,

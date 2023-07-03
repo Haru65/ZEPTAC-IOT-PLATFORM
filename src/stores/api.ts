@@ -39,7 +39,7 @@ export async function addCompany(data: any) {
 }
 
 // company delete
-export async function deleteCompany(data: any) {
+export async function deletecompany(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.delete(COMPANY_URL + "/" + data);
@@ -191,6 +191,44 @@ export async function addInvoice(data) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.post(INVOICE_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get comapany
+export async function getInvoice(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(INVOICE_URL, data);
+        //console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get comapany
+export async function updateInvoice(data: any, id) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.put(INVOICE_URL + "/" + id, data);
+        //console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function deleteinvoice(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(INVOICE_URL + "/" + data);
         return response.data;
     } catch (errors) {
         console.error(errors);

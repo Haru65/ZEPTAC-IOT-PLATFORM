@@ -4,7 +4,7 @@ import {
   createMemoryHistory,
   type RouteRecordRaw,
 } from "vue-router";
-import { getCompany } from "@/stores/api";
+import { getCompany, getInvoice } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 
@@ -183,6 +183,31 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Invoices Add",
           breadcrumbs: ["Invoices Add"],
+        },
+      },
+      {
+        path: "/invoices/edit/:id",
+        name: "invoice-edit",
+        beforeEnter: async (to, from, next) => {
+          const invoiceId = to.params.id;
+          //console.log(companyId);
+          try {
+            const response = await getInvoice(invoiceId);
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () => import("@/views/apps/sales/invoices/InvoicesEdit.vue"),
+        meta: {
+          pageTitle: "Invoice Edit",
+          breadcrumbs: ["Invoice Edit"],
         },
       },
     ],

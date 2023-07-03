@@ -173,6 +173,7 @@ import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.v
 import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
 import type { IEmployee } from "@/core/model/employee";
 import arraySort from "array-sort";
+import { formatPrice } from "@/core/config/DataFormatter";
 import ApiService from "@/core/services/ApiService";
 import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";

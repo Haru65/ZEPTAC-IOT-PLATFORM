@@ -279,7 +279,7 @@ export default defineComponent({
       sort,
       onItemSelect,
       getAssetPath,
-      loading
+      loading,
     };
   },
 });

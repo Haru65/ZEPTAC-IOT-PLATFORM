@@ -1,7 +1,8 @@
 <template>
-  <tr class="w-100">
-    <td class="w-50 pt-8 text-end text-nowrap">
-      <el-select v-model="item.name" filterable @change="handleSelectedChange">
+  <tr class="w-100" v-for="task in tasks" :key="task.id">
+    <td class="pt-8 w-50 text-end text-nowrap">
+      <!-- {{task.id}} -->
+      <el-select v-model="task.id" filterable @change="handleSelectedChange">
         <el-option value="0" label="Please Select Item..." key="0"
           >Please Select Item...</el-option
         >
@@ -9,7 +10,7 @@
           v-for="ele in items"
           :key="ele.id"
           :label="ele.name"
-          :value="ele.name"
+          :value="ele.id"
         />
       </el-select>
       <br />
@@ -17,24 +18,25 @@
         name="notes"
         class="form-control mt-4 form-control-solid"
         rows="3"
-        v-model="item.desc"
+        v-model="task.desc"
         placeholder="Description"
       ></textarea>
     </td>
     <td class="p-8 text-end text-nowrap w-50">
       <input
-        v-on:change="UpdateEvent"
+        v-on:input="UpdateEvent"
         type="text"
         name="price"
         class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+        style="min-width: 20rem"
         placeholder="$ 0.00"
-        v-model="item.price"
+        v-model="task.price"
       />
     </td>
     <td class="pt-5 text-end w-25">
       <button
         type="button"
-        @click="$emit('remove')"
+        @click="onRemoveitem(task.id)"
         class="btn btn-sm btn-icon btn-active-color-primary"
       >
         <i class="ki-duotone ki-trash fs-3"
@@ -57,22 +59,19 @@ interface itemDetails {
   desc: string;
   name: string;
   price: string;
-  total: number;
 }
 
 export default {
-  emits: ["getval", "remove", "UpdateTotal"],
+  emits: ["getval", "removeitem", "UpdateTotal"],
   props: ["tasks"],
 
   setup(props, { emit }) {
     const items = ref([{ id: "", name: "", description: "", price: "" }]);
-    console.log(props.tasks);
     const item = ref<itemDetails>({
       id: "",
       name: "0",
       desc: "",
       price: "",
-      total: 0,
     });
 
     // get options from DB;
@@ -94,37 +93,32 @@ export default {
     onMounted(async () => {
       items.value.pop();
       await getSelects();
-    });
-
-    // currency foratter
-    const formatter = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "INR",
+      console.log(props.tasks);
     });
 
     const handleSelectedChange = (newVal) => {
       // emit the custom event called 'myfunc' with the new selected value as payload
-      const data = items.value.find((e) => e.name === newVal) || {
+      const data = items.value.find((e) => e.id === newVal) || {
         id: "",
         price: "",
         description: "",
       };
-
-      // compute total
-
-      item.value.id = data.id;
-      item.value.price = formatter.format(Number(data.price)).toString();
-      item.value.desc = data.description.toString();
-      emit("getval", item.value);
+      emit("getval", data);
     };
 
     const UpdateEvent = (newval) => {
       emit("UpdateTotal", newval.target.value);
     };
 
+    const onRemoveitem = (index) => {
+      console.log(index);
+      emit("removeitem", index);
+    };
+
     return {
       items,
       item,
+      onRemoveitem,
       handleSelectedChange,
       UpdateEvent,
     };

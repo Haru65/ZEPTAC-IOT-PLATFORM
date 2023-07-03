@@ -67,7 +67,7 @@
           <button
             type="button"
             class="btn btn-danger"
-            @click="deleteFewCustomers()"
+            @click="deleteFewCompany()"
           >
             Delete Selected
           </button>
@@ -118,7 +118,7 @@
             </span>
             <span>
               <i
-                @click="deleteCustomer(company.id, false)"
+                @click="deleteCompany(company.id, false)"
                 class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
@@ -146,7 +146,7 @@ import arraySort from "array-sort";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { deleteCompany, getCompanies } from "@/stores/api";
+import { deletecompany, getCompanies } from "@/stores/api";
 
 export default defineComponent({
   name: "company-listing",
@@ -269,7 +269,7 @@ export default defineComponent({
       }, 250);
     });
 
-    const deleteFewCustomers = () => {
+    const deleteFewCompany = () => {
       Swal.fire({
         title: "Are you sure?",
         text: "You will not be able to recover this imaginary file!",
@@ -282,14 +282,14 @@ export default defineComponent({
         if (result["isConfirmed"]) {
           // Put your function here
           selectedIds.value.forEach((item) => {
-            deleteCustomer(item, true);
+            deleteCompany(item, true);
           });
           selectedIds.value.length = 0;
         }
       });
     };
 
-    const deleteCustomer = (id: number, mul: boolean) => {
+    const deleteCompany = (id: number, mul: boolean) => {
       if (!mul) {
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
@@ -300,14 +300,10 @@ export default defineComponent({
               showCancelButton: true,
               confirmButtonColor: "red",
               confirmButtonText: "Yes, I am sure!",
-              cancelButtonText: "No, cancel it!",
-              closeOnConfirm: false,
-              closeOnCancel: false,
-              dangerMode: true,
             }).then((result: { [x: string]: any }) => {
               if (result["isConfirmed"]) {
                 // Put your function here
-                deleteCompany(id);
+                deletecompany(id);
                 tableData.value.splice(i, 1);
               }
             });
@@ -317,7 +313,7 @@ export default defineComponent({
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
             // Put your function here
-            deleteCompany(id);
+            deletecompany(id);
             tableData.value.splice(i, 1);
           }
         }
@@ -362,11 +358,11 @@ export default defineComponent({
     return {
       tableData,
       tableHeader,
-      deleteCustomer,
+      deleteCompany,
       search,
       searchItems,
       selectedIds,
-      deleteFewCustomers,
+      deleteFewCompany,
       sort,
       onItemSelect,
       getAssetPath,

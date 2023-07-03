@@ -93,12 +93,13 @@
           {{ formatPrice(pricelist.price) }}
         </template>
         <template v-slot:date="{ row: pricelist }">
-          {{ pricelist.date }}
+          {{ pricelist.created_at }}
         </template>
         <template v-slot:actions="{ row: pricelist }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span class="menu-link px-3">
+              <router-link to="./edit/"></router-link>
               <i
                 class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
               ></i>
@@ -127,7 +128,7 @@ import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { IPriceList } from "@/core/model/pricelist";
-
+import { formatPrice } from "@/core/config/DataFormatter";
 import arraySort from "array-sort";
 import { getPriceList } from "@/stores/api";
 import moment from "moment";
@@ -184,7 +185,7 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({ created_at, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD/MM/YYYY"),
           })
         );
         initCustomers.value.splice(
@@ -253,21 +254,7 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-    // currency foratter
-    const formatter = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "INR",
-    });
 
-    const formatPrice = (value: string) => {
-      const parsedValue = parseFloat(value);
-      if (isNaN(parsedValue)) {
-        throw new Error(
-          "Invalid input: expected a string representing a number"
-        );
-      }
-      return formatter.format(parsedValue);
-    };
 
     return {
       tableData,
