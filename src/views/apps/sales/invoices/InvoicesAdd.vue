@@ -5,29 +5,33 @@
       <!--begin::Form-->
       <form id="kt_invoice_form" novalidate>
         <!--begin::Wrapper-->
-        <div class="d-flex flex-column align-Selects-start flex-xxl-row">
+        <div class="d-flex gap-5 flex-column align-items-start flex-xxl-row">
           <!--begin::Input group-->
           <div
-            class="d-flex align-Selects-center flex-equal fw-row me-4 order-2 p-2"
+            class="d-flex align-items-center flex-equal fw-row me-4 order-2"
             data-bs-toggle="tooltip"
             data-bs-trigger="hover"
             data-bs-original-title="Specify invoice date"
             data-kt-initialized="1"
           >
             <!--begin::Date-->
-            <div class="fs-6 fw-bold text-gray-700 text-nowrap m-2">Date:</div>
+            <div class="m-2 fs-6 fw-bold text-gray-700 text-nowrap">Date:</div>
             <!--end::Date-->
-
-            <div class="block">
-              <el-date-picker
-                v-model="invoiceDetials.invoice_date"
-                type="date"
-                placeholder="Pick a day"
-                :shortcuts="shortcuts"
-                :disabled-date="disabledDate"
-              />
+            &nbsp;&nbsp;
+            <!--begin::Input-->
+            <div class="position-relative d-flex align-items-center w-150px">
+              <!--begin::Datepicker-->
+              <div class="block">
+                <el-date-picker
+                  v-model="invoiceDetials.invoice_date"
+                  type="date"
+                  placeholder="Pick a day"
+                  :shortcuts="shortcuts"
+                  :disabled-date="disabledDate"
+                />
+              </div>
+              <!--end::Datepicker-->
             </div>
-
             <!--end::Input-->
           </div>
           <!--end::Input group-->
@@ -40,13 +44,11 @@
             data-bs-original-title="Enter invoice number"
             data-kt-initialized="1"
           >
-            <div class="fs-2 fw-bold text-gray-700 text-nowrap m-2">
-              Invoice #
-            </div>
+            <span class="fs-2 fw-bold text-gray-800">Invoice #</span>
             <input
               type="text"
-              v-model="invoiceDetials.invoice_no"
               class="form-control form-control-flush fw-bold text-muted fs-3 w-125px"
+              value="2021001"
               placehoder="..."
             />
           </div>
@@ -54,31 +56,33 @@
 
           <!--begin::Input group-->
           <div
-            class="d-flex align-Selects-center justify-content-end flex-equal order-3 fw-row"
+            class="d-flex align-items-center justify-content-end flex-equal order-3 fw-row"
             data-bs-toggle="tooltip"
             data-bs-trigger="hover"
             data-bs-original-title="Specify invoice due date"
             data-kt-initialized="1"
           >
             <!--begin::Date-->
-            <div class="fs-6 fw-bold text-gray-700 text-nowrap m-2">
-              Due Date:
-            </div>
+            <div class="fs-6 fw-bold text-gray-700 text-nowrap">Due Date:</div>
             <!--end::Date-->
-
-            <div class="block">
-              <el-date-picker
-                v-model="invoiceDetials.invoice_duedate"
-                type="date"
-                placeholder="Pick a day"
-                :shortcuts="shortcuts"
-                :disabled-date="disabledDate"
-              />
+            &nbsp; &nbsp;
+            <!--begin::Input-->
+            <div class="position-relative d-flex align-items-center w-150px">
+              <!--begin::Datepicker-->
+              <div class="block">
+                <el-date-picker
+                  v-model="invoiceDetials.invoice_duedate"
+                  type="date"
+                  placeholder="Pick a day"
+                  :shortcuts="shortcuts"
+                  :disabled-date="disabledDate"
+                />
+              </div>
+              <!--end::Datepicker-->
             </div>
-
             <!--end::Input-->
           </div>
-          <!--end::Input-->
+          <!--end::Input group-->
         </div>
         <!--end::Input group-->
         <!--end::Top-->
@@ -91,7 +95,11 @@
         <div class="mb-0">
           <!--begin::Row-->
           <div class="row gx-10">
-            <el-select v-model="invoiceDetials.customer_id" filterable>
+            <el-select
+              v-model="invoiceDetials.customer_id"
+              filterable
+              v-on:change="GetUserData(invoiceDetials.customer_id)"
+            >
               <el-option value=" " label="Please Select Customer..." key=" "
                 >Please Select Customer...</el-option
               >
@@ -104,6 +112,60 @@
             </el-select>
           </div>
           <!--end::Row-->
+
+          <div class="mt-2 pt-4">
+            <h4 class="fs-5">Billing Address:</h4>
+            <div class="mt-2">
+              <div class="mb-1" v-show="invoiceDetials.meta">
+                <br />
+                <span>
+                  {{
+                    `${invoiceDetials.meta.first_name} ${invoiceDetials.meta.last_name}`
+                  }}
+                </span>
+                <br />
+                <span v-show="invoiceDetials.meta.company_name">
+                  {{ `${invoiceDetials.meta.company_name}` }}
+                </span>
+                <!-- v-if company_data present -->
+                <div v-show="invoiceDetials.meta.company_name">
+                  <br />
+                  <span>
+                    {{ `${invoiceDetials.meta.address1}` }}
+                  </span>
+                  <br />
+                  <span>
+                    {{ `${invoiceDetials.meta.address2}` }}
+                  </span>
+                </div>
+                <div v-show="invoiceDetials.meta.city">
+                  <span>
+                    {{
+                      `${invoiceDetials.meta.city} - ${invoiceDetials.meta.pincode}`
+                    }}
+                  </span>
+                  <br />
+                  <span>
+                    {{
+                      `${invoiceDetials.meta.state} ${invoiceDetials.meta.country}`
+                    }}
+                  </span>
+                  <br />
+                </div>
+                <br />
+                <a
+                  target="blank"
+                  v-bind:href="`/users/edit/${invoiceDetials.customer_id}`"
+                >
+                  <span class="fs-5"> Edit</span>
+                  <!-- <i
+                      class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                    ></i> -->
+                </a>
+              </div>
+              <br />
+            </div>
+          </div>
 
           <!--begin::Table wrapper-->
           <div class="table-responsive mb-10">
@@ -127,7 +189,7 @@
               <tbody>
                 <CustomSelect
                   v-bind:tasks="invoiceDetials.items"
-                  @remove="RemoveItem($emit)"
+                  v-on:removeitem="RemoveItem($event)"
                   v-on:getval="invoiceDetialsAddFunc($event)"
                   v-on:UpdateTotal="UpdateTotal($event)"
                 />
@@ -147,10 +209,8 @@
                   </th>
                 </tr>
                 <tr class="align-top fw-bold text-gray-700">
-                  <th></th>
-
-                  <th colspan="2" class="fs-4 ps-0">Total</th>
-                  <th colspan="2" class="text-end fs-4 text-nowrap">
+                  <th colspan="1" class="fs-4 ps-0">Total</th>
+                  <th colspan="1" class="text-end fs-4 text-nowrap">
                     ₹<span data-kt-element="grand-total">{{
                       invoiceDetials.total.toFixed(2)
                     }}</span>
@@ -208,7 +268,7 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
-import { getCustomers, addInvoice, getInvoice } from "@/stores/api";
+import { getCustomers, addInvoice, getInvoice, getUser } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import CustomSelect from "./CustomComponents/PriceSelect.vue";
 import moment from "moment";
@@ -222,6 +282,18 @@ interface itemsArr {
   name: string;
 }
 
+interface Meta {
+  first_name: string;
+  last_name: string;
+  company_name: string;
+  address1: string;
+  address2: string;
+  city: string;
+  state: string;
+  pincode: string;
+  country: string;
+}
+
 interface invoiceDetials {
   invoice_no: string;
   customer_id: string;
@@ -230,6 +302,7 @@ interface invoiceDetials {
   invoice_duedate: string;
   notes: string;
   total: number;
+  meta: Meta;
   is_active: number;
   created_by: string;
   updated_by: string;
@@ -246,7 +319,6 @@ export default defineComponent({
     const Total = ref(0);
     const router = useRoute();
     const route = useRouter();
-
     const invoiceId = router.params.id;
 
     const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
@@ -258,11 +330,28 @@ export default defineComponent({
       invoice_date: "",
       invoice_duedate: "",
       notes: "",
+      meta: {
+        company_name: "",
+        first_name: "",
+        last_name: "",
+        address1: "",
+        address2: "",
+        city: "",
+        state: "",
+        pincode: "",
+        country: "",
+      },
       total: 0,
       is_active: 1,
       created_by: auth.getUserId(),
       updated_by: auth.getUserId(),
     });
+
+    const GetUserData = async (id) => {
+      const response = await getUser(id);
+      console.log(response);
+      invoiceDetials.value.meta = response.meta;
+    };
 
     const addNewItem = () => {
       // selects id not same don't push;
@@ -285,8 +374,20 @@ export default defineComponent({
       calPrice();
     };
 
+    const removeObjectWithId = (arr, id) => {
+      const objWithIdIndex = arr.findIndex((obj) => obj.id === id);
+
+      if (objWithIdIndex > -1) {
+        arr.splice(objWithIdIndex, 1);
+      }
+
+      return arr;
+    };
+
     const RemoveItem = (index) => {
-      invoiceDetials.value.items.splice(index, 1);
+      console.log(index);
+      removeObjectWithId(invoiceDetials.value.items, index);
+      calPrice();
     };
 
     const UpdateTotal = (data) => {
@@ -326,6 +427,17 @@ export default defineComponent({
         invoice_duedate: response.invoice_duedate,
         notes: response.notes,
         total: response.total,
+        meta: {
+          company_name: "",
+          first_name: "",
+          last_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          state: "",
+          pincode: "",
+          country: "",
+        },
         is_active: response.is_active,
         created_by: auth.getUserId(),
         updated_by: auth.getUserId(),
@@ -439,6 +551,17 @@ export default defineComponent({
         invoice_duedate: "",
         notes: "",
         total: 0,
+        meta: {
+          company_name: "",
+          first_name: "",
+          last_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          state: "",
+          pincode: "",
+          country: "",
+        },
         is_active: 1,
         created_by: auth.getUserId(),
         updated_by: auth.getUserId(),
@@ -455,6 +578,7 @@ export default defineComponent({
       shortcuts,
       disabledDate,
       RemoveItem,
+      GetUserData,
       UpdateTotal,
       addNewItem,
       invoiceDetialsAddFunc,
@@ -470,7 +594,7 @@ export default defineComponent({
 }
 
 .el-input__wrapper {
-  height: 3.1rem;
+  height: 3rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);
   border-color: var(--bs-gray-100);

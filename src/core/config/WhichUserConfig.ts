@@ -3,6 +3,7 @@ import { computed } from "vue";
 
 const auth = useAuthStore();
 
+// users-limit to subscription
 const Limit = 10;
 const limit = Array.from({ length: Limit }, (_, index) => index + 1);
 

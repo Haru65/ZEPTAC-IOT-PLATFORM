@@ -1,6 +1,6 @@
 <template>
-  <tr class="w-100" v-for="task in tasks" :key="task.id">
-    <td class="pt-8 w-50 text-end text-nowrap">
+  <tr v-for="task in tasks" :key="task.id">
+    <td class="pt-8 w-50 text-end text-nowrap" style="min-width: 20rem">
       <!-- {{task.id}} -->
       <el-select v-model="task.id" filterable @change="handleSelectedChange">
         <el-option value="0" label="Please Select Item..." key="0"
@@ -28,12 +28,11 @@
         type="text"
         name="price"
         class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
-        style="min-width: 20rem"
         placeholder="$ 0.00"
         v-model="task.price"
       />
     </td>
-    <td class="pt-5 text-end w-25">
+    <td class="p-8 text-end text-nowrap w-50">
       <button
         type="button"
         @click="onRemoveitem(task.id)"
