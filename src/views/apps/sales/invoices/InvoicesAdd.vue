@@ -350,9 +350,23 @@ export default defineComponent({
     });
 
     const GetUserData = async (id) => {
-      const response = await getUser(id);
-      console.log(response);
-      invoiceDetials.value.meta = response.meta;
+      if (id != " ") {
+        const response = await getUser(id);
+        console.log(response);
+        invoiceDetials.value.meta = response.meta;
+      } else {
+        invoiceDetials.value.meta = {
+          company_name: "",
+          first_name: "",
+          last_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          state: "",
+          pincode: "",
+          country: "",
+        };
+      }
     };
 
     const addNewItem = () => {
