@@ -153,7 +153,9 @@
                   <br />
                 </div>
                 <br />
+                <!-- firstname as a flag -->
                 <a
+                  v-show="invoiceDetials.meta.first_name"
                   target="blank"
                   v-bind:href="`/users/edit/${invoiceDetials.customer_id}`"
                 >
