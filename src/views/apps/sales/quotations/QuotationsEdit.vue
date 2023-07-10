@@ -56,8 +56,9 @@
                   <span class="fs-2 fw-bold text-gray-800">Invoice #</span>
                   <input
                     type="text"
+                    maxlength="6"
                     class="form-control form-control-flush fw-bold text-muted fs-3 w-125px"
-                    v-model="invoiceDetials.invoice_no"
+                    v-model="invoiceDetials.quotation_no"
                     placehoder="..."
                   />
                 </div>
@@ -257,7 +258,7 @@
         </div>
       </div>
 
-      <div class="flex-lg-auto min-w-lg-500px">
+      <div class="flex-lg-auto min-w-lg-500px" id="invoice">
         <!--begin::Card-->
         <div
           class="card"
@@ -276,18 +277,29 @@
             <div class="mb-10">
               <h2>Invoice</h2>
               <br />
-              <div class="row gx-10">
-                <el-select v-model="invoiceDetials.status" filterable>
+              <div class="row gx-10" v-if="invoiceDetials.status != 3">
+                <el-select
+                  v-model="invoiceDetials.status"
+                  filterable
+                  :disabled="status"
+                >
                   <el-option value=" " label="Please Select Status..." key=" "
                     >Please Select Status...</el-option
                   >
                   <el-option
-                    v-for="item in InvoiceStatusArray"
+                    v-for="item in QuotationStatusArray"
                     :key="item.id"
                     :label="`${item.name}`"
                     :value="item.id"
                   />
                 </el-select>
+              </div>
+              <div v-else>
+                <h3
+                  class="text-start fs-4 text-nowrap badge badge-light-success flex-shrink-0 align-self-center py-3 px-4 fs-7"
+                >
+                  {{ GetQuotationStatus(invoiceDetials.status) }}
+                </h3>
               </div>
               <br />
               <div class="items">
@@ -301,11 +313,11 @@
             </div>
             <!--end::Input group-->
             <div class="total">
-              <div>
+              <div v-if="invoiceDetials.status != 3">
                 <h6
                   class="text-start fs-4 text-nowrap badge badge-light flex-shrink-0 align-self-center py-3 px-4 fs-7"
                 >
-                  {{ GetInvoiceStatus(parseInt(invoiceDetials.status)) }}
+                  {{ GetQuotationStatus(invoiceDetials.status) }}
                 </h6>
               </div>
               <div>
@@ -328,24 +340,42 @@
                 <!--begin::Col-->
                 <div class="col">
                   <span
-                    class="btn btn-light btn-light-danger w-100"
-                    v-on:click="deleteInvoice"
-                    >Delete</span
-                  >
-                </div>
-                <!--end::Col-->
-
-                <!--begin::Col-->
-                <div class="col">
-                  <span
                     class="btn btn-light btn-light-primary w-100"
                     v-on:click="submit"
                     >Update</span
                   >
                 </div>
                 <!--end::Col-->
+                <!--begin::Col-->
+                <div class="col">
+                  <span
+                    class="btn btn-light btn-light-danger w-100"
+                    v-on:click="deleteInvoice"
+                    >Delete</span
+                  >
+                </div>
+                <!--end::Col-->
               </div>
               <!--end::Row-->
+              <div class="mb-0">
+                <!--begin::Row-->
+                <!--end::Row-->
+                <span
+                  v-if="invoiceDetials.status != 3"
+                  v-on:click="SendInvoice"
+                  type="submit"
+                  href="#"
+                  class="btn btn-primary w-100"
+                  id="kt_invoice_submit_button"
+                >
+                  <i class="ki-duotone ki-triangle fs-3"
+                    ><span class="path1"></span><span class="path2"></span
+                    ><span class="path3"></span
+                  ></i>
+                  Convert to Invoice
+                </span>
+              </div>
+              <!--end::Actions-->
             </div>
             <!--end::Actions-->
           </div>
@@ -359,24 +389,25 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, onBeforeMount, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import {
   getCustomers,
-  updateInvoice,
-  getInvoice,
   deleteinvoice,
   getUser,
+  getQuotation,
+  updateQuotation,
+  addInvoice,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
-import CustomSelect from "./CustomComponents/CustomInvoiceItems.vue";
+import CustomSelect from "./CustomComponents/CustomQuotationItems.vue";
 import moment from "moment";
 import { formatPrice } from "@/core/config/DataFormatter";
 import {
-  InvoiceStatusArray,
-  GetInvoiceStatus,
-} from "@/core/config/InvoiceStatusConfig";
+  QuotationStatusArray,
+  GetQuotationStatus,
+} from "@/core/config/QuotationStatusConfig";
 import { useRouter, useRoute } from "vue-router";
 
 interface itemsArr {
@@ -399,12 +430,13 @@ interface Meta {
 }
 
 interface invoiceDetials {
+  quotation_no: string;
   invoice_no: string;
   customer_id: string;
   items: Array<itemsArr>;
   date: string;
   duedate: string;
-  status: string;
+  status: number;
   notes: string;
   total: number;
   meta: Meta;
@@ -422,20 +454,22 @@ export default defineComponent({
     const auth = useAuthStore();
     const loading = ref(false);
     const Total = ref(0);
+    const status = ref(false);
     const route = useRoute();
     const router = useRouter();
 
-    const invoiceId = route.params.id;
+    const quotationid = route.params.id;
 
     const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
 
     const invoiceDetials = ref<invoiceDetials>({
-      invoice_no: "21****",
+      quotation_no: "21****",
       customer_id: " ",
+      invoice_no: "",
       items: [],
       date: "",
       duedate: "",
-      status: "",
+      status: 0,
       notes: "",
       meta: {
         company_name: "",
@@ -526,15 +560,26 @@ export default defineComponent({
       );
     };
 
+    onBeforeMount(() => {
+      QuotationStatusArray.splice(2, 1);
+    });
+
     onMounted(async () => {
       Customers.value.pop();
+
       await GetCustomers();
 
-      const response = await getInvoice(invoiceId);
+      const response = await getQuotation(quotationid);
       console.log(response);
 
+      // check if dropdown set no
+      if (response.status == 3) {
+        status.value = true;
+      }
+
       invoiceDetials.value = {
-        invoice_no: response.invoice_no,
+        quotation_no: response.quotation_no,
+        invoice_no: "",
         customer_id: response.customer_id,
         items: JSON.parse(response.items),
         date: response.date,
@@ -567,16 +612,19 @@ export default defineComponent({
       loading.value = true;
       console.warn("Nice");
       // console.log(invoiceDetials.value);
-      invoiceDetials.value.date = moment(
-        invoiceDetials.value.date
-      ).format("YYYY-MM-DD HH:mm:ss");
+      invoiceDetials.value.date = moment(invoiceDetials.value.date).format(
+        "YYYY-MM-DD HH:mm:ss"
+      );
       invoiceDetials.value.duedate = moment(
         invoiceDetials.value.duedate
       ).format("YYYY-MM-DD HH:mm:ss");
       // console.log(invoiceDetials.value);
       try {
         // Call your API here with the form values
-        const response = await updateInvoice(invoiceDetials.value, invoiceId);
+        const response = await updateQuotation(
+          invoiceDetials.value,
+          quotationid
+        );
         // console.log(response.error);
         if (!response.error) {
           // Handle successful API response
@@ -601,6 +649,67 @@ export default defineComponent({
       }
     };
 
+    // number formating remove
+    const SendInvoice = async () => {
+      loading.value = true;
+      console.warn("Nice");
+      // console.log(invoiceDetials.value);
+      let invoice_no = invoiceDetials.value.quotation_no;
+      invoiceDetials.value.invoice_no = invoice_no;
+
+      // invoiceDetials.value.quotation_no = quotationid.toString();
+      invoiceDetials.value.date = moment(invoiceDetials.value.date).format(
+        "YYYY-MM-DD HH:mm:ss"
+      );
+      invoiceDetials.value.duedate = moment(
+        invoiceDetials.value.duedate
+      ).format("YYYY-MM-DD HH:mm:ss");
+      // console.log(invoiceDetials.value);
+      try {
+        // update the invoice
+        // converted to invoice
+        invoiceDetials.value.status = 3;
+        const res = await updateQuotation(invoiceDetials.value, quotationid);
+        // Call your API here with the form values
+        if (res.error) {
+          // Handle successful API response
+          const errorData = res.error;
+          // console.log("API error:", errorData);
+          console.log("API error:", errorData.response.data.errors);
+          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+        }
+
+        // sending to
+        // set to invoice
+        // draf status
+        invoiceDetials.value.quotation_no = quotationid.toString();
+        invoiceDetials.value.status = 1;
+        const response = await addInvoice(invoiceDetials.value);
+        // console.log(response.error);
+        if (!response.error) {
+          // Handle successful API response
+          // console.log("API response:", response);
+          showSuccessAlert(
+            "Success",
+            "Quotation Successfully Converted  to Invoice"
+          );
+        } else {
+          // Handle API error response
+          const errorData = response.error;
+          // console.log("API error:", errorData);
+          console.log("API error:", errorData.response.data.errors);
+          showErrorAlert("Warning", "Invoice Already Exist For this Quotation");
+        }
+      } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
+        showErrorAlert("Error", "An error occurred during the API call.");
+      } finally {
+        loading.value = false;
+        router.push({ name: "quotation-list" });
+      }
+    };
+
     const deleteInvoice = () => {
       Swal.fire({
         title: "Are you sure?",
@@ -612,7 +721,7 @@ export default defineComponent({
       }).then((result: { [x: string]: any }) => {
         if (result["isConfirmed"]) {
           // Put your function here
-          deleteinvoice(invoiceId);
+          deleteinvoice(quotationid);
           router.push({ name: "invoices-list" });
         }
       });
@@ -687,11 +796,13 @@ export default defineComponent({
       GetUserData,
       UpdateTotal,
       addNewItem,
-      InvoiceStatusArray,
+      QuotationStatusArray,
       invoiceDetialsAddFunc,
-      GetInvoiceStatus,
+      GetQuotationStatus,
       deleteInvoice,
+      SendInvoice,
       Total,
+      status,
     };
   },
 });
@@ -701,6 +812,7 @@ export default defineComponent({
 .el-input__inner {
   font-weight: 500;
 }
+
 .el-input__wrapper {
   height: 3.1rem;
   border-radius: 0.5rem;

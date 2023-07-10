@@ -3,6 +3,7 @@ interface IInvoices {
   customer_name: string;
   invoice_date: string;
   invoice_duedate: string;
+  status: string;
   total: string;
 }
 

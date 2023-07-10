@@ -4,7 +4,7 @@ import {
   createMemoryHistory,
   type RouteRecordRaw,
 } from "vue-router";
-import { getCompany, getInvoice } from "@/stores/api";
+import { getCompany, getInvoice, getQuotation } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 
@@ -150,7 +150,7 @@ const routes: Array<RouteRecordRaw> = [
         path: "/quotations/list",
         name: "quotation-list",
         component: () =>
-          import("@/views/apps/sales/quotations/QuotationListing.vue"),
+          import("@/views/apps/sales/quotations/QuotationsListing.vue"),
         meta: {
           pageTitle: "Quotation List",
           breadcrumbs: ["Quotation List"],
@@ -160,10 +160,35 @@ const routes: Array<RouteRecordRaw> = [
         path: "/quotations/add",
         name: "quotation-add",
         component: () =>
-          import("@/views/apps/sales/quotations/QuotationAdd.vue"),
+          import("@/views/apps/sales/quotations/QuotationsAdd.vue"),
         meta: {
           pageTitle: "Quotation Add",
           breadcrumbs: ["Quotation Add"],
+        },
+      },
+      {
+        path: "/quotations/edit/:id",
+        name: "quotation-edit",
+        beforeEnter: async (to, from, next) => {
+          const quotationId = to.params.id;
+          //console.log(companyId);
+          try {
+            const response = await getQuotation(quotationId);
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () => import("@/views/apps/sales/quotations/QuotationsEdit.vue"),
+        meta: {
+          pageTitle: "Quotation Edit",
+          breadcrumbs: ["Quotation Edit"],
         },
       },
       {

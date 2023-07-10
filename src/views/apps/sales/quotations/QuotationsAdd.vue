@@ -6,7 +6,7 @@
         <div class="card">
           <div class="card-body p-12">
             <!--begin::Form-->
-            <form id="kt_invoice_form" novalidate>
+            <form id="kt_Quotation_form" novalidate>
               <!--begin::Wrapper-->
               <div
                 class="d-flex gap-5 flex-column align-items-start flex-xxl-row"
@@ -16,7 +16,7 @@
                   class="d-flex align-items-center flex-equal fw-row me-4 order-2"
                   data-bs-toggle="tooltip"
                   data-bs-trigger="hover"
-                  data-bs-original-title="Specify invoice date"
+                  data-bs-original-title="Specify Quotation date"
                   data-kt-initialized="1"
                 >
                   <!--begin::Date-->
@@ -32,7 +32,7 @@
                     <!--begin::Datepicker-->
                     <div class="block">
                       <el-date-picker
-                        v-model="invoiceDetials.date"
+                        v-model="QuotationDetials.date"
                         type="date"
                         placeholder="Pick a day"
                         :shortcuts="shortcuts"
@@ -50,14 +50,15 @@
                   class="d-flex flex-center flex-equal fw-row text-nowrap order-1 order-xxl-2 me-4"
                   data-bs-toggle="tooltip"
                   data-bs-trigger="hover"
-                  data-bs-original-title="Enter invoice number"
+                  data-bs-original-title="Enter Quotation number"
                   data-kt-initialized="1"
                 >
-                  <span class="fs-2 fw-bold text-gray-800">Invoice #</span>
+                  <span class="fs-2 fw-bold text-gray-800">Quotation #</span>
                   <input
                     type="text"
                     class="form-control form-control-flush fw-bold text-muted fs-3 w-125px"
-                    v-model="invoiceDetials.invoice_no"
+                    maxlength="6"
+                    v-model="QuotationDetials.quotation_no"
                     placehoder="..."
                   />
                 </div>
@@ -68,7 +69,7 @@
                   class="d-flex align-items-center justify-content-end flex-equal order-3 fw-row"
                   data-bs-toggle="tooltip"
                   data-bs-trigger="hover"
-                  data-bs-original-title="Specify invoice due date"
+                  data-bs-original-title="Specify Quotation due date"
                   data-kt-initialized="1"
                 >
                   <!--begin::Date-->
@@ -84,7 +85,7 @@
                     <!--begin::Datepicker-->
                     <div class="block">
                       <el-date-picker
-                        v-model="invoiceDetials.duedate"
+                        v-model="QuotationDetials.duedate"
                         type="date"
                         placeholder="Pick a day"
                         :shortcuts="shortcuts"
@@ -109,9 +110,9 @@
                 <!--begin::Row-->
                 <div class="row gx-10">
                   <el-select
-                    v-model="invoiceDetials.customer_id"
+                    v-model="QuotationDetials.customer_id"
                     filterable
-                    v-on:change="GetUserData(invoiceDetials.customer_id)"
+                    v-on:change="GetUserData(QuotationDetials.customer_id)"
                   >
                     <el-option
                       value=" "
@@ -128,49 +129,52 @@
                   </el-select>
                 </div>
                 <!--end::Row-->
+
                 <div class="mt-2 pt-4">
                   <h6 class="fw-bold mt-5">Billing Address:</h6>
                   <div class="mt-2">
-                    <div class="mb-1" v-show="invoiceDetials.meta">
+                    <div class="mb-1" v-show="QuotationDetials.meta">
                       <br />
                       <span>
                         {{
-                          `${invoiceDetials.meta.first_name} ${invoiceDetials.meta.last_name}`
+                          `${QuotationDetials.meta.first_name} ${QuotationDetials.meta.last_name}`
                         }}
                       </span>
                       <br />
-                      <span v-show="invoiceDetials.meta.company_name">
-                        {{ `${invoiceDetials.meta.company_name}` }}
+                      <span v-show="QuotationDetials.meta.company_name">
+                        {{ `${QuotationDetials.meta.company_name}` }}
                       </span>
                       <!-- v-if company_data present -->
-                      <div v-show="invoiceDetials.meta.company_name">
+                      <div v-show="QuotationDetials.meta.company_name">
                         <br />
                         <span>
-                          {{ `${invoiceDetials.meta.address1}` }}
+                          {{ `${QuotationDetials.meta.address1}` }}
                         </span>
                         <br />
                         <span>
-                          {{ `${invoiceDetials.meta.address2}` }}
+                          {{ `${QuotationDetials.meta.address2}` }}
                         </span>
                       </div>
-                      <div v-show="invoiceDetials.meta.city">
+                      <div v-show="QuotationDetials.meta.city">
                         <span>
                           {{
-                            `${invoiceDetials.meta.city} - ${invoiceDetials.meta.pincode}`
+                            `${QuotationDetials.meta.city} - ${QuotationDetials.meta.pincode}`
                           }}
                         </span>
                         <br />
                         <span>
                           {{
-                            `${invoiceDetials.meta.state} ${invoiceDetials.meta.country}`
+                            `${QuotationDetials.meta.state} ${QuotationDetials.meta.country}`
                           }}
                         </span>
                         <br />
                       </div>
                       <br />
+                      <!-- firstname as a flag -->
                       <a
+                        v-show="QuotationDetials.meta.first_name"
                         target="blank"
-                        v-bind:href="`/users/edit/${invoiceDetials.customer_id}`"
+                        v-bind:href="`/users/edit/${QuotationDetials.customer_id}`"
                       >
                         <span class="fs-5"> Edit</span>
                         <!-- <i
@@ -181,6 +185,7 @@
                     <br />
                   </div>
                 </div>
+
                 <!--begin::Table wrapper-->
                 <div class="table-responsive mb-10">
                   <!--begin::Table-->
@@ -202,9 +207,9 @@
                     <!--begin::Table body-->
                     <tbody>
                       <CustomSelect
-                        v-bind:tasks="invoiceDetials.items"
+                        v-bind:tasks="QuotationDetials.items"
                         v-on:removeitem="RemoveItem($event)"
-                        v-on:getval="invoiceDetialsAddFunc($event)"
+                        v-on:getval="QuotationDetialsAddFunc($event)"
                         v-on:UpdateTotal="UpdateTotal($event)"
                       />
                     </tbody>
@@ -226,7 +231,7 @@
                         <th colspan="1" class="fs-4 ps-0">Total</th>
                         <th colspan="1" class="text-end fs-4 text-nowrap">
                           ₹<span data-kt-element="grand-total">{{
-                            invoiceDetials.total.toFixed(2)
+                            QuotationDetials.total.toFixed(2)
                           }}</span>
                         </th>
                       </tr>
@@ -243,7 +248,7 @@
                     name="notes"
                     class="form-control form-control-solid"
                     rows="3"
-                    v-model="invoiceDetials.notes"
+                    v-model="QuotationDetials.notes"
                     placeholder="Thanks for your business"
                   ></textarea>
                 </div>
@@ -262,7 +267,7 @@
         <div
           class="card"
           data-kt-sticky="true"
-          data-kt-sticky-name="invoice"
+          data-kt-sticky-name="Quotation"
           data-kt-sticky-offset="{default: false, lg: '100px'}"
           data-kt-sticky-top="150px"
           data-kt-sticky-animation="false"
@@ -274,15 +279,19 @@
           <div class="card-body p-10">
             <!--begin::Input group-->
             <div class="mb-10">
-              <h2>Invoice</h2>
+              <h2>Quotation</h2>
               <br />
               <div class="row gx-10">
-                <el-select v-model="invoiceDetials.status" filterable>
+                <el-select
+                  v-model="QuotationDetials.status"
+                  filterable
+                  :disabled="disabledselect"
+                >
                   <el-option value=" " label="Please Select Status..." key=" "
                     >Please Select Status...</el-option
                   >
                   <el-option
-                    v-for="item in InvoiceStatusArray"
+                    v-for="item in QuotationStatusArray"
                     :key="item.id"
                     :label="`${item.name}`"
                     :value="item.id"
@@ -291,7 +300,7 @@
               </div>
               <br />
               <div class="items">
-                <p v-for="item in invoiceDetials.items" :key="item.id">
+                <p v-for="item in QuotationDetials.items" :key="item.id">
                   <span
                     class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
                     >+ {{ item.name }}</span
@@ -305,14 +314,14 @@
                 <h6
                   class="text-start fs-4 text-nowrap badge badge-light flex-shrink-0 align-self-center py-3 px-4 fs-7"
                 >
-                  {{ GetInvoiceStatus(parseInt(invoiceDetials.status)) }}
+                  {{ GetQuotationStatus(parseInt(QuotationDetials.status)) }}
                 </h6>
               </div>
               <div>
                 <h3 class="text-end fs-4 text-nowrap">Total</h3>
                 <h3 class="text-end fs-4 text-nowrap">
                   ₹<span data-kt-element="grand-total">{{
-                    invoiceDetials.total.toFixed(2)
+                    QuotationDetials.total.toFixed(2)
                   }}</span>
                 </h3>
               </div>
@@ -324,28 +333,20 @@
             <!--begin::Actions-->
             <div class="mb-0">
               <!--begin::Row-->
-              <div class="row mb-5">
-                <!--begin::Col-->
-                <div class="col">
-                  <span
-                    class="btn btn-light btn-light-danger w-100"
-                    v-on:click="deleteInvoice"
-                    >Delete</span
-                  >
-                </div>
-                <!--end::Col-->
-
-                <!--begin::Col-->
-                <div class="col">
-                  <span
-                    class="btn btn-light btn-light-primary w-100"
-                    v-on:click="submit"
-                    >Update</span
-                  >
-                </div>
-                <!--end::Col-->
-              </div>
               <!--end::Row-->
+              <span
+                v-on:click="submit"
+                type="submit"
+                href="#"
+                class="btn btn-primary w-100"
+                id="kt_Quotation_submit_button"
+              >
+                <i class="ki-duotone ki-triangle fs-3"
+                  ><span class="path1"></span><span class="path2"></span
+                  ><span class="path3"></span
+                ></i>
+                Add Quotation
+              </span>
             </div>
             <!--end::Actions-->
           </div>
@@ -362,22 +363,16 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
-import {
-  getCustomers,
-  updateInvoice,
-  getInvoice,
-  deleteinvoice,
-  getUser,
-} from "@/stores/api";
+import { getCustomers, addQuotation, getUser } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
-import CustomSelect from "./CustomComponents/CustomInvoiceItems.vue";
+import CustomSelect from "./CustomComponents/CustomQuotationItems.vue";
 import moment from "moment";
+import { useRouter } from "vue-router";
 import { formatPrice } from "@/core/config/DataFormatter";
 import {
-  InvoiceStatusArray,
-  GetInvoiceStatus,
-} from "@/core/config/InvoiceStatusConfig";
-import { useRouter, useRoute } from "vue-router";
+  QuotationStatusArray,
+  GetQuotationStatus,
+} from "@/core/config/QuotationStatusConfig";
 
 interface itemsArr {
   id: string;
@@ -398,8 +393,8 @@ interface Meta {
   country: string;
 }
 
-interface invoiceDetials {
-  invoice_no: string;
+interface QuotationDetials {
+  quotation_no: string;
   customer_id: string;
   items: Array<itemsArr>;
   date: string;
@@ -414,23 +409,20 @@ interface invoiceDetials {
 }
 
 export default defineComponent({
-  name: "company-edit",
+  name: "company-add",
   components: {
     CustomSelect,
   },
   setup() {
     const auth = useAuthStore();
-    const loading = ref(false);
+    const disabledselect = ref(true);
     const Total = ref(0);
-    const route = useRoute();
-    const router = useRouter();
-
-    const invoiceId = route.params.id;
+    const route = useRouter();
 
     const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
 
-    const invoiceDetials = ref<invoiceDetials>({
-      invoice_no: "21****",
+    const QuotationDetials = ref<QuotationDetials>({
+      quotation_no: "21****",
       customer_id: " ",
       items: [],
       date: "",
@@ -454,19 +446,46 @@ export default defineComponent({
       updated_by: auth.getUserId(),
     });
 
+    onMounted(async () => {
+      Customers.value.pop();
+      await GetCustomers();
+    });
+
     const GetUserData = async (id) => {
-      const response = await getUser(id);
-      console.log(response);
-      invoiceDetials.value.meta = response.meta;
+      if (id != " ") {
+        const response = await getUser(id);
+        QuotationDetials.value.meta = response.meta;
+        disabledselect.value = false;
+      } else {
+        QuotationDetials.value.meta = {
+          company_name: "",
+          first_name: "",
+          last_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          state: "",
+          pincode: "",
+          country: "",
+        };
+      }
     };
 
-    // on add model data push to the sub-json vlaue invoiceDetials
-    const invoiceDetialsAddFunc = (data) => {
+    const addNewItem = () => {
+      QuotationDetials.value.items.push({
+        id: "",
+        name: "",
+        price: "",
+        description: "",
+      });
+    };
+    // on add model data push to the sub-json vlaue QuotationDetials
+    const QuotationDetialsAddFunc = (data) => {
       // selects id not same don't push;
-      // console.log(invoiceDetials.value);
+      // console.log(QuotationDetials.value);
       console.log(data);
-      console.log(invoiceDetials.value);
-      invoiceDetials.value.items.forEach((ele) => {
+      console.log(QuotationDetials.value);
+      QuotationDetials.value.items.forEach((ele) => {
         console.log(ele);
         if (ele.id == data.id) {
           ele["name"] = data.name;
@@ -474,22 +493,6 @@ export default defineComponent({
           ele["price"] = formatPrice(data.price);
         }
       });
-      calPrice();
-    };
-
-    const addNewItem = () => {
-      // selects id not same don't push;
-      invoiceDetials.value.items.push({
-        id: "",
-        name: "",
-        price: "",
-        description: "",
-      });
-    };
-
-    const RemoveItem = (index) => {
-      console.log(index);
-      removeObjectWithId(invoiceDetials.value.items, index);
       calPrice();
     };
 
@@ -503,16 +506,22 @@ export default defineComponent({
       return arr;
     };
 
+    const RemoveItem = (index) => {
+      console.log(index);
+      removeObjectWithId(QuotationDetials.value.items, index);
+      calPrice();
+    };
+
     const UpdateTotal = (data) => {
       console.log(data);
       calPrice();
     };
 
     const calPrice = () => {
-      const prices = invoiceDetials.value.items.map((ele: any) =>
+      const prices = QuotationDetials.value.items.map((ele: any) =>
         Number(ele.price.substring(1))
       );
-      invoiceDetials.value.total = prices.reduce((acc, curr) => acc + curr);
+      QuotationDetials.value.total = prices.reduce((acc, curr) => acc + curr);
     };
 
     const GetCustomers = async () => {
@@ -526,57 +535,21 @@ export default defineComponent({
       );
     };
 
-    onMounted(async () => {
-      Customers.value.pop();
-      await GetCustomers();
-
-      const response = await getInvoice(invoiceId);
-      console.log(response);
-
-      invoiceDetials.value = {
-        invoice_no: response.invoice_no,
-        customer_id: response.customer_id,
-        items: JSON.parse(response.items),
-        date: response.date,
-        duedate: response.duedate,
-        status: response.status,
-        notes: response.notes,
-        total: response.total,
-        meta: {
-          company_name: "",
-          first_name: "",
-          last_name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          state: "",
-          pincode: "",
-          country: "",
-        },
-        is_active: response.is_active,
-        created_by: auth.getUserId(),
-        updated_by: auth.getUserId(),
-      };
-
-      const respons = await getUser(response.customer_id);
-      invoiceDetials.value.meta = respons.meta;
-    });
-
     // number formating remove
     const submit = async () => {
-      loading.value = true;
+      disabledselect.value = true;
       console.warn("Nice");
-      // console.log(invoiceDetials.value);
-      invoiceDetials.value.date = moment(
-        invoiceDetials.value.date
+      // console.log(QuotationDetials.value);
+      QuotationDetials.value.date = moment(QuotationDetials.value.date).format(
+        "YYYY-MM-DD HH:mm:ss"
+      );
+      QuotationDetials.value.duedate = moment(
+        QuotationDetials.value.duedate
       ).format("YYYY-MM-DD HH:mm:ss");
-      invoiceDetials.value.duedate = moment(
-        invoiceDetials.value.duedate
-      ).format("YYYY-MM-DD HH:mm:ss");
-      // console.log(invoiceDetials.value);
+      // console.log(QuotationDetials.value);
       try {
         // Call your API here with the form values
-        const response = await updateInvoice(invoiceDetials.value, invoiceId);
+        const response = await addQuotation(QuotationDetials.value);
         // console.log(response.error);
         if (!response.error) {
           // Handle successful API response
@@ -597,25 +570,8 @@ export default defineComponent({
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
-        loading.value = false;
+        disabledselect.value = false;
       }
-    };
-
-    const deleteInvoice = () => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover from this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "red",
-        confirmButtonText: "Yes, I am sure!",
-      }).then((result: { [x: string]: any }) => {
-        if (result["isConfirmed"]) {
-          // Put your function here
-          deleteinvoice(invoiceId);
-          router.push({ name: "invoices-list" });
-        }
-      });
     };
 
     const showSuccessAlert = (title, message) => {
@@ -629,7 +585,9 @@ export default defineComponent({
         customClass: {
           confirmButton: "btn btn-primary",
         },
-      }).then(() => {});
+      }).then(() => {
+        clear();
+      });
     };
 
     const showErrorAlert = (title, message) => {
@@ -675,22 +633,49 @@ export default defineComponent({
       return null;
     };
 
+    const clear = () => {
+      QuotationDetials.value = {
+        quotation_no: "******",
+        customer_id: " ",
+        items: [],
+        date: "",
+        duedate: "",
+        status: "",
+        notes: "",
+        total: 0,
+        meta: {
+          company_name: "",
+          first_name: "",
+          last_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          state: "",
+          pincode: "",
+          country: "",
+        },
+        is_active: 1,
+        created_by: auth.getUserId(),
+        updated_by: auth.getUserId(),
+      };
+      route.push({ name: "quotation-list" });
+    };
+
     return {
-      invoiceDetials,
+      QuotationDetials,
       Customers,
       getAssetPath,
       submit,
-      loading,
+      disabledselect,
       shortcuts,
       disabledDate,
       RemoveItem,
       GetUserData,
       UpdateTotal,
       addNewItem,
-      InvoiceStatusArray,
-      invoiceDetialsAddFunc,
-      GetInvoiceStatus,
-      deleteInvoice,
+      QuotationStatusArray,
+      QuotationDetialsAddFunc,
+      GetQuotationStatus,
       Total,
     };
   },
@@ -701,8 +686,9 @@ export default defineComponent({
 .el-input__inner {
   font-weight: 500;
 }
+
 .el-input__wrapper {
-  height: 3.1rem;
+  height: 3rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);
   border-color: var(--bs-gray-100);

@@ -14,7 +14,7 @@
             v-model="search"
             @input="searchItems()"
             class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search invoices"
+            placeholder="Search quotations"
           />
         </div>
         <!--end::Search-->
@@ -101,67 +101,58 @@
         checkbox-label="id"
       >
         <!-- img data -->
-        <template v-slot:id="{ row: invoices }">
+
+        <template v-slot:id="{ row: quotations }">
           <span class="text-gray-600 text-hover-primary mb-1">
-            {{ invoices.id }}
+            {{ quotations.id }}
           </span>
         </template>
-        <template v-slot:invoice_no="{ row: invoices }">
+        <template v-slot:quotation_no="{ row: quotations }">
           <span class="text-gray-600 text-hover-primary mb-1">
-            {{ invoices.invoice_no }}
+            {{ quotations.quotation_no }}
           </span>
         </template>
-        <template v-slot:customer_name="{ row: invoices }">
+        <template v-slot:customer_name="{ row: quotations }">
           <span class="text-gray-600 text-hover-primary mb-1">
-            {{ invoices.customer_name }}
+            {{ quotations.customer_name }}
           </span>
         </template>
         <!-- defualt data -->
-        <template v-slot:company="{ row: invoices }">
-          {{ invoices.company }}
+        <template v-slot:company="{ row: quotations }">
+          {{ quotations.company }}
         </template>
-        <template v-slot:date="{ row: invoices }">
-          {{ invoices.date }}
+        <template v-slot:date="{ row: quotations }">
+          {{ quotations.date }}
         </template>
-        <template v-slot:duedate="{ row: invoices }">
-          {{ invoices.duedate }}
+        <template v-slot:duedate="{ row: quotations }">
+          {{ quotations.duedate }}
         </template>
         <template v-slot:status="{ row: quotations }">
           <!-- depending on status badge change -->
           <span
+            v-if="quotations.status == 3"
+            class="badge py-3 px-4 fs-7 badge-light-success"
+            >{{ GetQuotationStatus(quotations.status) }}</span
+          >
+          <span
             v-if="quotations.status == 1"
-            class="badge py-3 px-4 fs-7 badge-light"
-            >{{ GetInvoiceStatus(quotations.status) }}</span
+            class="badge py-3 px-4 fs-7 badge-light-danger"
+            >{{ GetQuotationStatus(quotations.status) }}</span
           >
           <span
             v-if="quotations.status == 2"
-            class="badge py-3 px-4 fs-7 badge-light bg-info-subtle"
-            >{{ GetInvoiceStatus(quotations.status) }}</span
-          >
-          <span
-            v-if="quotations.status == 3"
-            class="badge py-3 px-4 fs-7 badge-light-danger"
-            >{{ GetInvoiceStatus(quotations.status) }}</span
-          >
-          <span
-            v-if="quotations.status == 4"
             class="badge py-3 px-4 fs-7 badge-light-warning"
-            >{{ GetInvoiceStatus(quotations.status) }}</span
-          >
-          <span
-            v-if="quotations.status == 5"
-            class="badge py-3 px-4 fs-7 badge-light-success"
-            >{{ GetInvoiceStatus(quotations.status) }}</span
+            >{{ GetQuotationStatus(quotations.status) }}</span
           >
         </template>
-        <template v-slot:total="{ row: invoices }">
-          {{ formatPrice(invoices.total) }}
+        <template v-slot:total="{ row: quotations }">
+          {{ formatPrice(quotations.total) }}
         </template>
-        <template v-slot:actions="{ row: invoices }">
+        <template v-slot:actions="{ row: quotations }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span class="menu-link px-3">
-              <router-link :to="`./edit/${invoices.id}`">
+              <router-link :to="`./edit/${quotations.id}`">
                 <i
                   class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
                 ></i>
@@ -169,13 +160,13 @@
             </span>
             <span class="menu-link px-3">
               <i
-                @click="deleteInvoice(invoices.id, false)"
+                @click="deleteInvoice(quotations.id, false)"
                 class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
             <span class="menu-link px-3">
               <i
-                @click="dupInvoice(invoices.id)"
+                @click="dupQuotation(quotations.id)"
                 class="las la-copy text-gray-600 text-hover-warning mb-1 fs-2"
               ></i>
             </span>
@@ -193,22 +184,22 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import type { IInvoices } from "@/core/model/invoices";
+import type { IQuotations } from "@/core/model/quotation";
 import {
-  getInvoiceList,
-  deleteinvoice,
-  getInvoice,
-  addInvoice,
+  getQuotationList,
+  deletequotation,
+  getQuotation,
+  addQuotation,
 } from "@/stores/api";
 import arraySort from "array-sort";
-import { formatPrice } from "@/core/config/DataFormatter";
-import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
-import { GetInvoiceStatus } from "@/core/config/InvoiceStatusConfig";
+import { formatPrice } from "@/core/config/DataFormatter";
+import { GetQuotationStatus } from "@/core/config/QuotationStatusConfig";
+import moment from "moment";
 import Swal from "sweetalert2";
 
 export default defineComponent({
-  name: "invoices-listing",
+  name: "quotations-listing",
   components: {
     Datatable,
   },
@@ -221,8 +212,8 @@ export default defineComponent({
         columnWidth: 35,
       },
       {
-        columnName: "Invoice Id",
-        columnLabel: "invoice_no",
+        columnName: "Quotation No",
+        columnLabel: "quotation_no",
         sortEnabled: true,
         columnWidth: 35,
       },
@@ -283,7 +274,7 @@ export default defineComponent({
       country: string;
     }
 
-    interface invoiceDetails {
+    interface quotationDetails {
       quotation_no: string;
       invoice_no: string;
       customer_id: string;
@@ -301,7 +292,7 @@ export default defineComponent({
 
     const auth = useAuthStore();
 
-    const invoiceDetail = ref<invoiceDetails>({
+    const quotationDetail = ref<quotationDetails>({
       quotation_no: "21****",
       customer_id: " ",
       invoice_no: "",
@@ -329,37 +320,37 @@ export default defineComponent({
 
     const selectedIds = ref<Array<number>>([]);
 
-    const tableData = ref<Array<IInvoices>>([]);
+    const tableData = ref<Array<IQuotations>>([]);
 
-    const initInvoices = ref<Array<IInvoices>>([]);
+    const initquotations = ref<Array<IQuotations>>([]);
 
-    async function invoice_listing(): Promise<void> {
+    async function quotation_listing(): Promise<void> {
       try {
-        const response = await getInvoiceList();
+        const response = await getQuotationList();
         console.log(response);
         tableData.value = response.result.data.map(
           ({
             created_at,
-            date,
-            duedate,
+            invoice_date,
+            invoice_duedate,
             total,
             customer_name,
             status,
             id,
-            invoice_no,
+            quotation_no,
           }) => ({
             status: status,
             id: id,
-            invoice_no: invoice_no,
+            quotation_no: quotation_no,
             customer_name:
               customer_name[0].first_name + " " + customer_name[0].last_name,
             created_at: moment(created_at).format("DD/MM/YYYY"),
-            date: moment(date).format("DD/MM/YYYY"),
-            duedate: moment(duedate).format("DD/MM/YYYY"),
+            date: moment(invoice_date).format("DD/MM/YYYY"),
+            duedate: moment(invoice_duedate).format("DD/MM/YYYY"),
             total: total,
           })
         );
-        initInvoices.value.splice(
+        initquotations.value.splice(
           0,
           tableData.value.length,
           ...tableData.value
@@ -372,7 +363,7 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      await invoice_listing();
+      await quotation_listing();
     });
 
     const deleteFewInvoice = () => {
@@ -409,7 +400,7 @@ export default defineComponent({
             }).then((result: { [x: string]: any }) => {
               if (result["isConfirmed"]) {
                 // Put your function here
-                deleteinvoice(id);
+                deletequotation(id);
                 tableData.value.splice(i, 1);
               }
             });
@@ -419,7 +410,7 @@ export default defineComponent({
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
             // Put your function here
-            deleteinvoice(id);
+            deletequotation(id);
             tableData.value.splice(i, 1);
           }
         }
@@ -428,9 +419,14 @@ export default defineComponent({
 
     const search = ref<string>("");
     const searchItems = () => {
-      tableData.value.splice(0, tableData.value.length, ...initInvoices.value);
+      console.log(search.value);
+      tableData.value.splice(
+        0,
+        tableData.value.length,
+        ...initquotations.value
+      );
       if (search.value !== "") {
-        let results: Array<IInvoices> = [];
+        let results: Array<IQuotations> = [];
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
             results.push(tableData.value[j]);
@@ -441,6 +437,7 @@ export default defineComponent({
     };
 
     const searchingFunc = (obj: any, value: string): boolean => {
+      console.log(obj);
       for (let key in obj) {
         if (!Number.isInteger(obj[key]) && !(typeof obj[key] === "object")) {
           if (obj[key].indexOf(value) != -1) {
@@ -461,7 +458,7 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-    const dupInvoice = (id) => {
+    const dupQuotation = (id) => {
       Swal.fire({
         title: "Are you sure?",
         text: "Clone the Quotation !",
@@ -472,17 +469,17 @@ export default defineComponent({
         cancelButtonText: "No, cancel it!",
       }).then(async (result: { [x: string]: any }) => {
         if (result["isConfirmed"]) {
-          const response = await getInvoice(id);
+          const response = await getQuotation(id);
           // update date
-          invoiceDetail.value.date = moment(invoiceDetail.value.date).format(
-            "YYYY-MM-DD HH:mm:ss"
-          );
-          invoiceDetail.value.duedate = moment(
-            invoiceDetail.value.duedate
+          quotationDetail.value.date = moment(
+            quotationDetail.value.date
           ).format("YYYY-MM-DD HH:mm:ss");
-          invoiceDetail.value = {
+          quotationDetail.value.duedate = moment(
+            quotationDetail.value.duedate
+          ).format("YYYY-MM-DD HH:mm:ss");
+          quotationDetail.value = {
             quotation_no: "000000",
-            invoice_no: "000000",
+            invoice_no: "",
             customer_id: response.customer_id,
             items: JSON.parse(response.items),
             date: response.date,
@@ -506,15 +503,16 @@ export default defineComponent({
             updated_by: auth.getUserId(),
           };
           // add
-          const respons = await addInvoice(invoiceDetail.value);
+          const respons = await addQuotation(quotationDetail.value);
           // console.log(response.error);
           if (!respons.error) {
             // list fetch update
-            await invoice_listing();
+            await quotation_listing();
           }
         }
       });
     };
+
     return {
       tableData,
       tableHeader,
@@ -527,8 +525,8 @@ export default defineComponent({
       onItemSelect,
       getAssetPath,
       formatPrice,
-      GetInvoiceStatus,
-      dupInvoice,
+      GetQuotationStatus,
+      dupQuotation,
     };
   },
 });

@@ -10,6 +10,7 @@ const USER_URL = "users";
 const CUSTOMERS_URL = "customers";
 const PRICELIST_URL = "pricelist";
 const INVOICE_URL = "invoice";
+const QUOTATION_URL = "quotation";
 
 // COMPANIES
 
@@ -172,6 +173,73 @@ export async function getPriceList() {
     }
 }
 
+
+// QUOTATION
+// get listing
+export async function getQuotationList() {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(QUOTATION_URL);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// QUOTATION
+// get listing
+export async function deletequotation(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(QUOTATION_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get comapany
+export async function getQuotation(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(QUOTATION_URL, data);
+        //console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function addQuotation(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(QUOTATION_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get comapany
+export async function updateQuotation(data: any, id) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.put(QUOTATION_URL + "/" + id, data);
+        //console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 // INVOICES
 // getlists
 export async function getInvoiceList() {
@@ -235,3 +303,4 @@ export async function deleteinvoice(data) {
         return { error: errors };
     }
 }
+

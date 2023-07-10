@@ -1,8 +1,5 @@
 // get API Data From /permissions and map for usage
 // store in local storage for reference
-
-import { number } from "yup";
-
 const permissions = {
     1: "Create Company",
     2: "Update Company",

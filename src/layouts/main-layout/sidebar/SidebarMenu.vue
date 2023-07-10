@@ -321,13 +321,12 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import AdminMenuConfig from "@/core/config/AdminMenuConfig";
 import CompanyAdminMenuConfig from "@/core/config/CompanyAdminMenuConfig";
 import { sidebarMenuIcons } from "@/core/helpers/config";
 import { useI18n } from "vue-i18n";
-import { useAuthStore } from "@/stores/auth";
 import { Identifier } from "@/core/config/WhichUserConfig";
 
 export default defineComponent({

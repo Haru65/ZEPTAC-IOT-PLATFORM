@@ -3,7 +3,7 @@
     <Widget1 className="h-md-100" description="Active Projects" bgColor="#F1416C"
       :bgImage="getAssetPath('media/patterns/vector-1.png')" />
   </div>
-  <br>
+  <br />
   <div>
     <Widget10 className="h-md-100" />
   </div>

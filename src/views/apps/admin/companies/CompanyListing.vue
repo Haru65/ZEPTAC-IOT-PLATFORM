@@ -272,7 +272,7 @@ export default defineComponent({
     const deleteFewCompany = () => {
       Swal.fire({
         title: "Are you sure?",
-        text: "You will not be able to recover this imaginary file!",
+        text: "You will not be able to recover from this !",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "red",
@@ -295,7 +295,7 @@ export default defineComponent({
           if (tableData.value[i].id === id) {
             Swal.fire({
               title: "Are you sure?",
-              text: "You will not be able to recover this imaginary file!",
+              text: "You will not be able to recover from this !",
               icon: "warning",
               showCancelButton: true,
               confirmButtonColor: "red",

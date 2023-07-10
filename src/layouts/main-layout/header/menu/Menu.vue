@@ -80,10 +80,7 @@
           <!--begin:Menu item-->
           <div class="menu-item">
             <!--begin:Menu link-->
-            <a
-              class="menu-link"
-              href="#"
-            >
+            <a class="menu-link" href="#">
               <span class="menu-icon">
                 <KTIcon icon-name="code" icon-class="fs-3" />
               </span>
@@ -106,15 +103,12 @@
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent } from "vue";
-import KTMenuPages from "@/layouts/main-layout/header/menu/MenuPages.vue";
 import { version } from "@/core/helpers/documentation";
 import { headerMenuDisplay } from "@/core/helpers/config";
 
 export default defineComponent({
   name: "header-menu",
-  components: {
-    KTMenuPages,
-  },
+  components: {},
   setup() {
     return {
       version,
