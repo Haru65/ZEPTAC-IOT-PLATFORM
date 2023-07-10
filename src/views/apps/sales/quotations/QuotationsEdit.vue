@@ -53,7 +53,7 @@
                   data-bs-original-title="Enter invoice number"
                   data-kt-initialized="1"
                 >
-                  <span class="fs-2 fw-bold text-gray-800">Invoice #</span>
+                  <span class="fs-2 fw-bold text-gray-800">Quotation #</span>
                   <input
                     type="text"
                     maxlength="6"
@@ -275,7 +275,7 @@
           <div class="card-body p-10">
             <!--begin::Input group-->
             <div class="mb-10">
-              <h2>Invoice</h2>
+              <h2>Quotation</h2>
               <br />
               <div class="row gx-10" v-if="invoiceDetials.status != 3">
                 <el-select
