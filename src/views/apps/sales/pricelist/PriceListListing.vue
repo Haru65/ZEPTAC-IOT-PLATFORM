@@ -57,11 +57,7 @@
             <span class="me-2">{{ selectedIds.length }}</span
             >Selected
           </div>
-          <button
-            type="button"
-            class="btn btn-danger"
-            @click="deleteFewCustomers()"
-          >
+          <button type="button" class="btn btn-danger" @click="deleteFewItem()">
             Delete Selected
           </button>
         </div>
@@ -78,6 +74,7 @@
         :enable-items-per-page-dropdown="true"
         :checkbox-enabled="true"
         checkbox-label="id"
+        :loading="loading"
       >
         <!-- img data -->
         <template v-slot:name="{ row: pricelist }">
@@ -99,14 +96,15 @@
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span class="menu-link px-3">
-              <router-link to="./edit/"></router-link>
-              <i
-                class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-              ></i>
+              <router-link :to="`./edit/${pricelist.id}`">
+                <i
+                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                ></i>
+              </router-link>
             </span>
-            <span>
+            <span class="menu-link px-3">
               <i
-                @click="deleteItem(pricelist.id)"
+                @click="deleteItem(pricelist.id, false)"
                 class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
@@ -130,8 +128,9 @@ import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { IPriceList } from "@/core/model/pricelist";
 import { formatPrice } from "@/core/config/DataFormatter";
 import arraySort from "array-sort";
-import { getPriceList } from "@/stores/api";
+import { getPriceList, deletePriceListItem } from "@/stores/api";
 import moment from "moment";
+import Swal from "sweetalert2";
 
 export default defineComponent({
   name: "pricelist-listing",
@@ -150,7 +149,7 @@ export default defineComponent({
         columnName: "Description",
         columnLabel: "description",
         sortEnabled: true,
-        columnWidth: 105,
+        columnWidth: 80,
       },
       {
         columnName: "Price",
@@ -175,6 +174,7 @@ export default defineComponent({
     const selectedIds = ref<Array<number>>([]);
     const tableData = ref<Array<IPriceList>>([]);
     const initCustomers = ref<Array<IPriceList>>([]);
+    const loading = ref(true);
 
     // functions
     // get users function
@@ -197,6 +197,9 @@ export default defineComponent({
         console.error(error);
       } finally {
         //console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 200);
       }
     }
 
@@ -204,17 +207,53 @@ export default defineComponent({
       await pricelist_listing();
     });
 
-    const deleteFewCustomers = () => {
-      selectedIds.value.forEach((item) => {
-        deleteItem(item);
+    const deleteFewItem = () => {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover from this !",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "red",
+        confirmButtonText: "Yes, I am sure!",
+        cancelButtonText: "No, cancel it!",
+      }).then((result: { [x: string]: any }) => {
+        if (result["isConfirmed"]) {
+          // Put your function here
+          selectedIds.value.forEach((item) => {
+            deleteItem(item, true);
+          });
+          selectedIds.value.length = 0;
+        }
       });
-      selectedIds.value.length = 0;
     };
 
-    const deleteItem = (id: number) => {
-      for (let i = 0; i < tableData.value.length; i++) {
-        if (tableData.value[i].id === id) {
-          tableData.value.splice(i, 1);
+    const deleteItem = (id: number, mul: boolean) => {
+      if (!mul) {
+        for (let i = 0; i < tableData.value.length; i++) {
+          if (tableData.value[i].id === id) {
+            Swal.fire({
+              title: "Are you sure?",
+              text: "You will not be able to recover from this !",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "red",
+              confirmButtonText: "Yes, I am sure!",
+            }).then((result: { [x: string]: any }) => {
+              if (result["isConfirmed"]) {
+                // Put your function here
+                deletePriceListItem(id);
+                tableData.value.splice(i, 1);
+              }
+            });
+          }
+        }
+      } else {
+        for (let i = 0; i < tableData.value.length; i++) {
+          if (tableData.value[i].id === id) {
+            // Put your function here
+            deletePriceListItem(id);
+            tableData.value.splice(i, 1);
+          }
         }
       }
     };
@@ -254,20 +293,19 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-
-
     return {
       tableData,
       tableHeader,
       deleteItem,
+      deleteFewItem,
       search,
       searchItems,
       selectedIds,
-      deleteFewCustomers,
       sort,
       onItemSelect,
       getAssetPath,
       formatPrice,
+      loading,
     };
   },
 });

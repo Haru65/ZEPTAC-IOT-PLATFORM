@@ -22,4 +22,7 @@ const GetQuotationStatus = (id: number) => {
     }
 };
 
+// fix for add and edit view
+QuotationStatusArray.splice(2, 1);
+
 export { QuotationStatus, QuotationStatusArray, GetQuotationStatus };

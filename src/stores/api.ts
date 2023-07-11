@@ -11,6 +11,7 @@ const CUSTOMERS_URL = "customers";
 const PRICELIST_URL = "pricelist";
 const INVOICE_URL = "invoice";
 const QUOTATION_URL = "quotation";
+const LEADS_URL = 'leads';
 
 // COMPANIES
 
@@ -158,6 +159,19 @@ export async function getCustomers() {
     }
 }
 
+// LEADS
+// getlisting
+export async function getLeadsList() {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(LEADS_URL);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
 
 // PRICELISTS
 // getlists
@@ -174,6 +188,55 @@ export async function getPriceList() {
 }
 
 
+export async function addPriceList(data: object) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(PRICELIST_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getPriceListItem(data: string) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.get(PRICELIST_URL, data);
+        return response.data.result[0];
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function updatePriceListItem(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(PRICELIST_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete
+export async function deletePriceListItem(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(PRICELIST_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 // QUOTATION
 // get listing
 export async function getQuotationList() {
@@ -188,8 +251,8 @@ export async function getQuotationList() {
     }
 }
 
-// QUOTATION
-// get listing
+
+// delete
 export async function deletequotation(data: any) {
     try {
         //console.log(data)

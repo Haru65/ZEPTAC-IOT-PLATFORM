@@ -99,6 +99,7 @@
         :enable-items-per-page-dropdown="true"
         :checkbox-enabled="true"
         checkbox-label="id"
+        :loading="loading"
       >
         <!-- img data -->
         <template v-slot:id="{ row: invoices }">
@@ -135,7 +136,7 @@
           >
           <span
             v-if="quotations.status == 2"
-            class="badge py-3 px-4 fs-7 badge-light bg-info-subtle"
+            class="badge py-3 px-4 fs-7 badge-light bg-light-subtle"
             >{{ GetInvoiceStatus(quotations.status) }}</span
           >
           <span
@@ -284,8 +285,8 @@ export default defineComponent({
     }
 
     interface invoiceDetails {
-      quotation_no: string;
       invoice_no: string;
+      quotation_id: string;
       customer_id: string;
       items: Array<itemsArr>;
       date: string;
@@ -302,8 +303,8 @@ export default defineComponent({
     const auth = useAuthStore();
 
     const invoiceDetail = ref<invoiceDetails>({
-      quotation_no: "21****",
       customer_id: " ",
+      quotation_id: " ",
       invoice_no: "",
       items: [],
       date: "",
@@ -332,6 +333,8 @@ export default defineComponent({
     const tableData = ref<Array<IInvoices>>([]);
 
     const initInvoices = ref<Array<IInvoices>>([]);
+
+    const loading = ref(true);
 
     async function invoice_listing(): Promise<void> {
       try {
@@ -368,6 +371,9 @@ export default defineComponent({
         console.error(error);
       } finally {
         //console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 100);
       }
     }
 
@@ -474,6 +480,7 @@ export default defineComponent({
         if (result["isConfirmed"]) {
           const response = await getInvoice(id);
           // update date
+          console.log(response)
           invoiceDetail.value.date = moment(invoiceDetail.value.date).format(
             "YYYY-MM-DD HH:mm:ss"
           );
@@ -481,7 +488,7 @@ export default defineComponent({
             invoiceDetail.value.duedate
           ).format("YYYY-MM-DD HH:mm:ss");
           invoiceDetail.value = {
-            quotation_no: "000000",
+            quotation_id: "",
             invoice_no: "000000",
             customer_id: response.customer_id,
             items: JSON.parse(response.items),
@@ -529,6 +536,7 @@ export default defineComponent({
       formatPrice,
       GetInvoiceStatus,
       dupInvoice,
+      loading,
     };
   },
 });

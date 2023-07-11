@@ -104,6 +104,7 @@
         :enable-items-per-page-dropdown="true"
         :checkbox-enabled="true"
         checkbox-label="id"
+        :loading="loading"
       >
         <!-- img data -->
         <template v-slot:name="{ row: leads }">
@@ -127,10 +128,10 @@
           {{ leads.role }}
         </template>
         <template v-slot:company_name="{ row: leads }">
-          {{ leads.company_name }}
+          {{ leads.meta.company_name }}
         </template>
-        <template v-slot:date="{ row: leads }">
-          {{ leads.date }}
+        <template v-slot:created_at="{ row: leads }">
+          {{ leads.created_at }}
         </template>
         <template v-slot:actions="{ row: leads }">
           <!--begin::Menu Flex-->
@@ -166,8 +167,10 @@ import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
 import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
 import type { ILeads } from "@/core/model/leads";
-import leads from "@/core/model/leads";
 import arraySort from "array-sort";
+import { getLeadsList } from "@/stores/api";
+import { get_role } from "@/core/config/PermissionsRolesConfig";
+import moment from "moment";
 
 export default defineComponent({
   name: "leads-listing",
@@ -204,7 +207,7 @@ export default defineComponent({
       },
       {
         columnName: "Created Date",
-        columnLabel: "date",
+        columnLabel: "created_at",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -216,12 +219,35 @@ export default defineComponent({
       },
     ]);
     const selectedIds = ref<Array<number>>([]);
+    const loading = ref(true);
+    const tableData = ref<Array<ILeads>>([]);
+    const initleads = ref<Array<ILeads>>([]);
 
-    const tableData = ref<Array<ILeads>>(leads);
-    const initCustomers = ref<Array<ILeads>>([]);
+    async function leads_listing(): Promise<void> {
+      try {
+        const response = await getLeadsList();
+        console.log(response);
+        tableData.value = response.result.data.map(
+          ({ created_at, role_id, first_name, last_name, ...rest }) => ({
+            ...rest,
+            name: first_name + " " + last_name,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+            role_id: get_role(role_id),
+          })
+        );
+        initleads.value.splice(0, tableData.value.length, ...tableData.value);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        //console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 100);
+      }
+    }
 
-    onMounted(() => {
-      initCustomers.value.splice(0, tableData.value.length, ...tableData.value);
+    onMounted(async () => {
+      await leads_listing();
     });
 
     const deleteFewCustomers = () => {
@@ -241,7 +267,7 @@ export default defineComponent({
 
     const search = ref<string>("");
     const searchItems = () => {
-      tableData.value.splice(0, tableData.value.length, ...initCustomers.value);
+      tableData.value.splice(0, tableData.value.length, ...initleads.value);
       if (search.value !== "") {
         let results: Array<ILeads> = [];
         for (let j = 0; j < tableData.value.length; j++) {
@@ -285,6 +311,7 @@ export default defineComponent({
       sort,
       onItemSelect,
       getAssetPath,
+      loading,
     };
   },
 });

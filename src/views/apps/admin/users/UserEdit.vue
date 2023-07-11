@@ -70,7 +70,7 @@
                     type="file"
                     name="avatar"
                     accept=".png, .jpg, .jpeg"
-                    @change="updateImage"
+                    @change="updateImage($event)"
                   />
                   <input type="hidden" name="avatar_update" />
                   <!--end::Inputs-->
@@ -543,7 +543,7 @@ export default defineComponent({
       profileDetails.value.avatar = "/media/avatars/blank.png";
     };
 
-    const updateImage = (e: { target: { files: any[] } }) => {
+    const updateImage = (e: any) => {
       const file = e.target.files[0];
       console.log(URL.createObjectURL(file));
       profileDetails.value.avatar = URL.createObjectURL(file);

@@ -27,7 +27,7 @@
         v-on:input="UpdateEvent"
         type="text"
         name="price"
-        class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+        class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 min-w-150px"
         placeholder="$ 0.00"
         v-model="task.price"
       />

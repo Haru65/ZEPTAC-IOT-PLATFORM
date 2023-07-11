@@ -101,9 +101,9 @@
           </div>
           <div class="modal-footer flex-center">
             <!--begin::Button-->
-            <button type="reset" class="btn btn-lg btn-danger w-25">
-              Discard
-            </button>
+            <span @click="deleteItem" class="btn btn-lg btn-danger w-25">
+              Delete
+            </span>
             <!--end::Button-->
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
             <!--begin::Button-->
@@ -112,7 +112,7 @@
               class="btn btn-lg btn-primary w-25"
               @click="submit()"
             >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
+              <span v-if="!loading" class="indicator-label"> Update</span>
               <span v-if="loading" class="indicator-progress">
                 Please wait...
                 <span
@@ -133,15 +133,16 @@
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
-import { countries } from "@/core/model/countries";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { addPriceList } from "@/stores/api";
+import {
+  updatePriceListItem,
+  getPriceListItem,
+  deletePriceListItem,
+} from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
-import packages from "@/core/config/PackagesConfig";
-import { limit } from "@/core/config/WhichUserConfig";
 import { useAuthStore } from "@/stores/auth";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 
 interface itemDetails {
   name: string;
@@ -161,13 +162,13 @@ export default defineComponent({
   setup() {
     const updateEmailButton = ref<HTMLElement | null>(null);
     const updatePasswordButton = ref<HTMLElement | null>(null);
-
+    const router = useRouter();
+    const route = useRoute();
+    const itemId = route.params.id;
     const loading = ref(false);
     const auth = useAuthStore();
     const emailFormDisplay = ref(false);
     const passwordFormDisplay = ref(false);
-    const router = useRouter();
-    const state = ref([""]);
 
     const itemDetailsValidator = Yup.object().shape({
       name: Yup.string().required().label("Product Name"),
@@ -183,22 +184,29 @@ export default defineComponent({
       updated_by: auth.getUserId(),
     });
 
-    onMounted(() => {});
+    onMounted(async () => {
+      const response = await getPriceListItem(itemId.toString());
+      console.log(response);
+      itemDetails.value = {
+        name: response.name,
+        description: response.description,
+        price: response.price,
+        created_by: response.created_by,
+        updated_by: response.updated_by,
+      };
+    });
 
     const submit = async () => {
       loading.value = true;
       console.warn("Nice");
       try {
         // Call your API here with the form values
-        const response = await addPriceList(itemDetails.value);
+        const response = await updatePriceListItem(itemId, itemDetails.value);
         console.log(response.error);
         if (!response.error) {
           // Handle successful API response
           console.log("API response:", response);
-          showSuccessAlert("Success", "Item has been successfully inserted!");
-
-          clear();
-          router.push({ name: "price-list" });
+          showSuccessAlert("Success", "Item has been successfully updated!");
         } else {
           // Handle API error response
           const errorData = response.error;
@@ -213,6 +221,23 @@ export default defineComponent({
       } finally {
         loading.value = false;
       }
+    };
+
+    const deleteItem = () => {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover from this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "red",
+        confirmButtonText: "Yes, I am sure!",
+      }).then((result: { [x: string]: any }) => {
+        if (result["isConfirmed"]) {
+          // Put your function here
+          deletePriceListItem(itemId);
+          router.push({ name: "price-list" });
+        }
+      });
     };
 
     const showSuccessAlert = (title, message) => {
@@ -255,11 +280,8 @@ export default defineComponent({
       updatePasswordButton,
       getAssetPath,
       submit,
-      countries,
-      loading,
-      state,
-      packages,
-      limit,
+    loading,
+      deleteItem,
     };
   },
 });

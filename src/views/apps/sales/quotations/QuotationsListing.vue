@@ -98,6 +98,7 @@
         :header="tableHeader"
         :enable-items-per-page-dropdown="true"
         :checkbox-enabled="true"
+        :loading="loading"
         checkbox-label="id"
       >
         <!-- img data -->
@@ -290,6 +291,7 @@ export default defineComponent({
       updated_by: string;
     }
 
+    const loading = ref(true);
     const auth = useAuthStore();
 
     const quotationDetail = ref<quotationDetails>({
@@ -359,6 +361,9 @@ export default defineComponent({
         console.error(error);
       } finally {
         //console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 100);
       }
     }
 
@@ -527,6 +532,7 @@ export default defineComponent({
       formatPrice,
       GetQuotationStatus,
       dupQuotation,
+      loading,
     };
   },
 });

@@ -1,10 +1,10 @@
 <template>
-  <div style="width: 99%" class="p-12 rounded">
+  <div style="width: 99%" class="sm:p-4 md:p-8 lg:p-12 rounded">
     <!--begin::Modal dialog-->
     <div class="d-flex flex-column flex-lg-row">
-      <div class="flex-lg-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
-        <div class="card">
-          <div class="card-body p-12">
+      <div class="flex-xl-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
+        <div class="card w-20">
+          <div class="card-body sm:p-2 lg:p-12">
             <!--begin::Form-->
             <form id="kt_Quotation_form" novalidate>
               <!--begin::Wrapper-->
@@ -262,7 +262,7 @@
         </div>
       </div>
 
-      <div class="flex-lg-auto min-w-lg-500px">
+      <div class="flex-lg-auto min-w-lg-300px">
         <!--begin::Card-->
         <div
           class="card"
@@ -272,11 +272,11 @@
           data-kt-sticky-top="150px"
           data-kt-sticky-animation="false"
           data-kt-sticky-zindex="95"
-          data-kt-sticky-width="500px"
+          data-kt-sticky-width="300px"
           data-kt-sticky-enabled="true"
         >
           <!--begin::Card body-->
-          <div class="card-body p-10">
+          <div class="card-body">
             <!--begin::Input group-->
             <div class="mb-10">
               <h2>Quotation</h2>

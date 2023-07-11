@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 99%" class="p-12 rounded">
+  <div style="width: 99%" class="sm:p-4 md:p-8 lg:p-12 rounded">
     <!--begin::Modal dialog-->
     <div class="d-flex flex-column flex-lg-row">
       <div class="flex-lg-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
@@ -59,6 +59,7 @@
                     class="form-control form-control-flush fw-bold text-muted fs-3 w-125px"
                     v-model="invoiceDetials.invoice_no"
                     placehoder="..."
+                    maxlength="6"
                   />
                 </div>
                 <!--end::Input group-->
@@ -257,7 +258,7 @@
         </div>
       </div>
 
-      <div class="flex-lg-auto min-w-lg-500px">
+      <div class="flex-lg-auto min-w-lg-300px">
         <!--begin::Card-->
         <div
           class="card"
