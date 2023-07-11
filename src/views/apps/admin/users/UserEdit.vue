@@ -25,7 +25,6 @@
         id="kt_account_profile_details_form"
         class="form"
         novalidate
-        @submit="onsubmit()"
         :validation-schema="profileDetailsValidator"
       >
         <!--begin::Card body-->
@@ -351,12 +350,7 @@ import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import { rolesArray } from "@/core/config/PermissionsRolesConfig";
-import {
-  getCompanies,
-  getUser,
-  deleteUser,
-  updateUser,
-} from "@/stores/api";
+import { getCompanies, getUser, deleteUser, updateUser } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";

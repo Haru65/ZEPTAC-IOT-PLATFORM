@@ -539,9 +539,9 @@ export default defineComponent({
       disabledselect.value = true;
       console.warn("Nice");
       // console.log(invoiceDetials.value);
-      invoiceDetials.value.date = moment(
-        invoiceDetials.value.date
-      ).format("YYYY-MM-DD HH:mm:ss");
+      invoiceDetials.value.date = moment(invoiceDetials.value.date).format(
+        "YYYY-MM-DD HH:mm:ss"
+      );
       invoiceDetials.value.duedate = moment(
         invoiceDetials.value.duedate
       ).format("YYYY-MM-DD HH:mm:ss");
