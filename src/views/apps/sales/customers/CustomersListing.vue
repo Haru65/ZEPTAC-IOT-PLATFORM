@@ -108,9 +108,14 @@
       >
         <!-- img data -->
         <template v-slot:name="{ row: customer }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ customer.name }}
-          </span>
+          <div class="d-flex justify-content-start align-items-center">
+            <!-- <img :src="user.name" class="w-45px rounded-circle" alt="" /> -->
+            <span style="margin-left: 5.5%">
+              <span class="text-gray-600 text-hover-primary mb-1">
+                {{ customer.first_name + " " + customer.last_name }}
+              </span>
+            </span>
+          </div>
         </template>
         <!-- defualt data -->
         <template v-slot:email="{ row: customer }">
@@ -124,14 +129,11 @@
         <template v-slot:mobile="{ row: customer }">
           {{ customer.mobile }}
         </template>
-        <template v-slot:role="{ row: customer }">
-          {{ customer.role }}
-        </template>
         <template v-slot:company="{ row: customer }">
-          {{ customer.company }}
+          {{ customer.meta.company_name }}
         </template>
         <template v-slot:date="{ row: customer }">
-          {{ customer.date }}
+          {{ customer.created_at }}
         </template>
         <template v-slot:actions="{ row: customer }">
           <!--begin::Menu Flex-->
@@ -168,7 +170,6 @@ import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.v
 import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
 import type { ICustomers } from "@/core/model/customers";
 import arraySort from "array-sort";
-import { formatPrice } from "@/core/config/DataFormatter";
 import ApiService from "@/core/services/ApiService";
 import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
@@ -227,7 +228,7 @@ export default defineComponent({
       try {
         ApiService.setHeader();
         const response = await ApiService.get("/customers");
-        //console.log(response);
+        console.log(response);
         tableData.value = response.data.result.data.map(
           ({ created_at, role_id, ...rest }) => ({
             ...rest,

@@ -1,9 +1,5 @@
 /* eslint-disable prettier/prettier */
 // all apis for CRUD options
-
-
-
-
 import ApiService from "@/core/services/ApiService";
 const COMPANY_URL = "company";
 const USER_URL = "users";
@@ -159,6 +155,21 @@ export async function getCustomers() {
     }
 }
 
+// CUSTOMERS
+// 
+export async function addCustomer(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        console.log(data);
+        const response = await ApiService.post(CUSTOMERS_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 // LEADS
 // getlisting
 export async function getLeadsList() {
@@ -166,6 +177,19 @@ export async function getLeadsList() {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.listingget(LEADS_URL);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function addLead(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        console.log(data);
+        const response = await ApiService.post(LEADS_URL, data);
         return response.data;
     } catch (errors) {
         console.error(errors);

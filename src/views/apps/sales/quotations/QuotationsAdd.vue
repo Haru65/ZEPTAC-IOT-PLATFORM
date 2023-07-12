@@ -519,8 +519,9 @@ export default defineComponent({
 
     const calPrice = () => {
       const prices = QuotationDetials.value.items.map((ele: any) =>
-        Number(ele.price.substring(1))
+        Number(ele.price.replaceAll(",", "").substring(1))
       );
+      // console.log(prices);
       QuotationDetials.value.total = prices.reduce((acc, curr) => acc + curr);
     };
 

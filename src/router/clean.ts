@@ -127,8 +127,8 @@ const routes: Array<RouteRecordRaw> = [
         name: "leads-add",
         component: () => import("@/views/apps/sales/leads/LeadsAdd.vue"),
         meta: {
-          pageTitle: "Leads List",
-          breadcrumbs: ["Leads List"],
+          pageTitle: "Leads Add",
+          breadcrumbs: ["Leads Add"],
         },
       },
       {
@@ -139,6 +139,16 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Customers List",
           breadcrumbs: ["Customers List"],
+        },
+      },
+      {
+        path: "/customers/add",
+        name: "customers-add",
+        component: () =>
+          import("@/views/apps/sales/customers/CustomersAdd.vue"),
+        meta: {
+          pageTitle: "Customers Add",
+          breadcrumbs: ["Customers Add"],
         },
       },
       {

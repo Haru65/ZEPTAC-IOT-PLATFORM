@@ -258,7 +258,7 @@
         </div>
       </div>
 
-      <div class="flex-lg-auto min-w-lg-300px" id="invoice">
+      <div class="flex-lg-auto min-w-lg-300px" ref="invoice">
         <!--begin::Card-->
         <div
           class="card"
@@ -363,7 +363,6 @@
                 <span
                   v-show="invoiceDetials.status != 3"
                   v-on:click="SendInvoice"
-                  type="submit"
                   href="#"
                   class="btn btn-primary w-100"
                   id="kt_invoice_submit_button"
@@ -373,6 +372,18 @@
                     ><span class="path3"></span
                   ></i>
                   Convert to Invoice
+                </span>
+                <span
+                  v-on:click="generatePdf(invoiceDetials.quotation_no)"
+                  href="#"
+                  class="btn btn-primary w-100"
+                  id="kt_invoice_submit_button"
+                >
+                  <i class="ki-duotone ki-triangle fs-3"
+                    ><span class="path1"></span><span class="path2"></span
+                    ><span class="path3"></span
+                  ></i>
+                  Genrate Pdf
                 </span>
               </div>
               <!--end::Actions-->
@@ -409,6 +420,8 @@ import {
   GetQuotationStatus,
 } from "@/core/config/QuotationStatusConfig";
 import { useRouter, useRoute } from "vue-router";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 interface itemsArr {
   id: string;
@@ -459,7 +472,7 @@ export default defineComponent({
     const router = useRouter();
 
     const quotationid = route.params.id;
-
+    const invoice = ref(null);
     const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
 
     const invoiceDetials = ref<quotationDetials>({
@@ -769,6 +782,99 @@ export default defineComponent({
       });
     };
 
+    const generatePdf = (pdfName: string) => {
+      pdfName += "_" + quotationid + "_quotation";
+      const columns = [
+        { title: "Id", dataKey: "id" },
+        { title: "Name", dataKey: "name" },
+        { title: "Price", dataKey: "price" },
+      ];
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "in",
+        format: "letter",
+      });
+      // text is placed using x, y coordinates
+      doc
+        .setFontSize(16)
+        .text(
+          "# quotation-invoice " + invoiceDetials.value.quotation_no,
+          0.5,
+          1.0
+        );
+      // create a line under heading
+      doc.setLineWidth(0.01).line(0.5, 1.1, 8.0, 1.1);
+
+      // Using autoTable plugin
+      const invoice_items = invoiceDetials.value.items.map(
+        ({ price, ...rest }) => ({
+          ...rest,
+          price: "Rs " + price.substring(1),
+        })
+      );
+      doc
+        .setFont("helvetica")
+        .setFontSize(8)
+        .text(
+          new Date().toDateString(),
+          doc.internal.pageSize.width - 0.5,
+          1.5,
+          {
+            align: "right",
+            maxWidth: 7.5,
+          }
+        );
+      doc
+        .setFont("helvetica")
+        .setFontSize(8)
+        .text(
+          `
+        To ${invoiceDetials.value.meta.first_name} ${invoiceDetials.value.meta.last_name}
+        ${invoiceDetials.value.meta.company_name},
+        ${invoiceDetials.value.meta.address1}
+        ${invoiceDetials.value.meta.address2}
+        ${invoiceDetials.value.meta.city},${invoiceDetials.value.meta.pincode}
+        ${invoiceDetials.value.meta.state},${invoiceDetials.value.meta.country}
+        `,
+          0.25,
+          1.5,
+          {
+            align: "left",
+            maxWidth: 7.5,
+          }
+        );
+      // fixed by autotable
+      doc.autoTable({
+        columns,
+        startY: 3,
+        body: invoice_items,
+        margin: { left: 0.5, top: 1.25 },
+        align: {
+          header: "center",
+          body: "right",
+        },
+      });
+      // Using array of sentences
+      doc
+        .setFont("helvetica")
+        .setFontSize(12)
+        .text(
+          "Total: Rs " + invoiceDetials.value.total,
+          doc.internal.pageSize.width - 0.5,
+          doc.internal.pageSize.height - 1.5,
+          {
+            align: "right",
+            maxWidth: 7.5,
+          }
+        );
+      // Creating footer and saving file
+      doc
+        .setFont("times")
+        .setFontSize(11)
+        .setTextColor(0, 0, 255)
+        .text("Zeptac.co", 0.5, doc.internal.pageSize.height - 0.5)
+        .save(`${pdfName}.pdf`);
+    };
     // date
 
     const shortcuts = [
@@ -817,6 +923,8 @@ export default defineComponent({
       SendInvoice,
       Total,
       status,
+      generatePdf,
+      invoice,
     };
   },
 });
@@ -848,5 +956,13 @@ export default defineComponent({
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   display: none;
+}
+
+.bg-black {
+  background-color: #1e2028 !important;
+}
+
+.bg-white {
+  background-color: #fafbf6 !important;
 }
 </style>

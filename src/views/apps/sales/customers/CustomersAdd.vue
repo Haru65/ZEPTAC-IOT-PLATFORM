@@ -210,7 +210,7 @@ import { defineComponent, onMounted, ref } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
-import { addLead, getCompanies } from "@/stores/api";
+import { addCustomer, getCompanies } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
@@ -237,7 +237,6 @@ export default defineComponent({
   },
   setup() {
     const auth = useAuthStore();
-
     const router = useRouter();
     let limit = ref(500);
     const loading = ref(false);
@@ -277,7 +276,7 @@ export default defineComponent({
       email: "",
       phone: "",
       company_name: "",
-      roles: "8",
+      roles: "7",
       password: "decodedemo",
       created_by: auth.getUserId(),
       updated_by: auth.getUserId(),
@@ -289,7 +288,7 @@ export default defineComponent({
       console.warn("Nice");
       try {
         // Call your API here with the form values
-        const response = await addLead(profileDetails.value);
+        const response = await addCustomer(profileDetails.value);
         console.log(response.error);
         if (!response.error) {
           // Handle successful API response
@@ -312,7 +311,7 @@ export default defineComponent({
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
         loading.value = false;
-        router.push({ name: "leads-list" });
+        router.push({ name: "customers-list" });
       }
     };
 
