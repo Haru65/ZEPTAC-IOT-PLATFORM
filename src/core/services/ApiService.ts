@@ -32,6 +32,8 @@ class ApiService {
     ] = `Bearer ${JwtService.getToken()}`;
     ApiService.vueInstance.axios.defaults.headers.common["Accept"] =
       "application/json";
+    ApiService.vueInstance.axios.defaults.headers.common["Content-Type"] =
+      "multipart/form-data";
   }
 
   /**

@@ -21,12 +21,12 @@
     <!--begin::Content-->
     <div id="kt_account_profile_details" class="collapse show">
       <!--begin::Form-->
-      <VForm
+      <form
         id="kt_account_profile_details_form"
         class="form"
         novalidate
-        @submit="onsubmit()"
         :validation-schema="profileDetailsValidator"
+        enctype="multipart/form-data"
       >
         <!--begin::Card body-->
         <div class="card-body border-top p-9">
@@ -51,10 +51,11 @@
                 }"
               >
                 <!--begin::Preview existing avatar-->
-                <div
+                <img
+                  :src="profileDetails.disp_avatar"
                   class="image-input-wrapper w-125px h-125px"
-                  :style="`background-image: url(${profileDetails.avatar})`"
-                ></div>
+                  alt="profile"
+                />
                 <!--end::Preview existing avatar-->
 
                 <!--begin::Label-->
@@ -258,17 +259,17 @@
 
             <!--begin::Col-->
             <div class="col-lg-8 fv-row">
-              <Field
-                as="select"
-                name="role"
-                class="form-select form-select-solid form-select-lg"
-                v-model="profileDetails.roles"
-              >
-                <option value="0">Please Select Role...</option>
-                <option v-for="ele in rolesArray" :key="ele.id" :value="ele.id">
-                  {{ ele.name }}
-                </option>
-              </Field>
+              <el-select v-model="profileDetails.roles" filterable>
+                <el-option value="0" label="Please Select Role..." key="0"
+                  >Please Select Role...</el-option
+                >
+                <el-option
+                  v-for="item in rolesArray"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                />
+              </el-select>
               <div class="fv-plugins-message-container">
                 <div class="fv-help-block">
                   <ErrorMessage name="role" />
@@ -291,7 +292,7 @@
             <div class="col-lg-8 fv-row">
               <el-select v-model="profileDetails.company_id" filterable>
                 <el-option value="0" label="Please Select Company..." key="0"
-                  >Please Select Role...</el-option
+                  >Please Select Company...</el-option
                 >
                 <el-option
                   v-for="item in Companies"
@@ -317,7 +318,8 @@
           <!--end::Button-->
           &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
           <!--begin::Button-->
-          <button
+          <span
+            @click="onsubmit()"
             :data-kt-indicator="loading ? 'on' : null"
             class="btn btn-lg btn-primary w-25"
             type="submit"
@@ -329,11 +331,11 @@
                 class="spinner-border spinner-border-sm align-middle ms-2"
               ></span>
             </span>
-          </button>
+          </span>
           <!--end::Button-->
         </div>
         <!--end::Input group-->
-      </VForm>
+      </form>
       <!--end::Form-->
     </div>
     <!--end::Content-->
@@ -344,7 +346,7 @@
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
-import { ErrorMessage, Field, Form as VForm } from "vee-validate";
+import { ErrorMessage, Field } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import { rolesArray } from "@/core/config/PermissionsRolesConfig";
@@ -352,9 +354,11 @@ import { addUser, getCompanies } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
+import { useRouter } from "vue-router";
 
 interface ProfileDetails {
-  avatar: string;
+  disp_avatar: string;
+  image: any;
   first_name: string;
   last_name: string;
   email: string;
@@ -371,7 +375,6 @@ export default defineComponent({
   components: {
     ErrorMessage,
     Field,
-    VForm,
   },
   setup() {
     const auth = useAuthStore();
@@ -384,6 +387,7 @@ export default defineComponent({
     const updatePasswordButton = ref<HTMLElement | null>(null);
 
     let limit = ref(500);
+    const router = useRouter();
     const loading = ref(false);
     const Companies = ref([{ id: "", company_name: "" }]);
 
@@ -416,7 +420,8 @@ export default defineComponent({
     });
 
     const profileDetails = ref<ProfileDetails>({
-      avatar: getAssetPath("media/avatars/blank.png"),
+      disp_avatar: getAssetPath("media/avatars/blank.png"),
+      image: getAssetPath("media/avatars/blank.png"),
       first_name: "",
       last_name: "",
       email: "",
@@ -433,14 +438,26 @@ export default defineComponent({
       console.log(profileDetails.value);
       console.warn("Nice");
       try {
+        // form multipart form post
         // Call your API here with the form values
-        const response = await addUser(profileDetails.value);
+        const form = new FormData();
+        form.append("first_name", profileDetails.value.first_name);
+        form.append("last_name", profileDetails.value.last_name);
+        form.append("email", profileDetails.value.email);
+        form.append("phone", profileDetails.value.phone);
+        form.append("password", profileDetails.value.password);
+        form.append("roles", profileDetails.value.roles);
+        form.append("company_id", profileDetails.value.company_id);
+        form.append("created_by", profileDetails.value.created_by);
+        form.append("updated_by", profileDetails.value.updated_by);
+        form.append("image", profileDetails.value.image);
+
+        const response = await addUser(form);
         console.log(response.error);
         if (!response.error) {
           // Handle successful API response
           console.log("API response:", response);
           showSuccessAlert("Success", "User have been successfully inserted!");
-          clear();
         } else {
           // Handle API error response
           const errorData = response.error;
@@ -454,6 +471,7 @@ export default defineComponent({
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
         loading.value = false;
+        router.push({ name: "users-list" });
       }
     };
 
@@ -485,20 +503,22 @@ export default defineComponent({
       });
     };
 
+    // remove file or update
     const removeImage = () => {
-      profileDetails.value.avatar = "/media/avatars/blank.png";
+      profileDetails.value.disp_avatar = getAssetPath(
+        "media/avatars/blank.png"
+      );
     };
 
     const updateImage = (e: any) => {
-      const file = e.target.files[0];
-      console.log(URL.createObjectURL(file));
-      profileDetails.value.avatar = URL.createObjectURL(file);
-      return true;
+      profileDetails.value.disp_avatar = URL.createObjectURL(e.target.files[0]);
+      profileDetails.value.image = e.target.files[0];
     };
 
     const clear = () => {
       profileDetails.value = {
-        avatar: getAssetPath("media/avatars/blank.png"),
+        disp_avatar: getAssetPath("media/avatars/blank.png"),
+        image: getAssetPath("media/avatars/blank.png"),
         first_name: "",
         last_name: "",
         email: "",

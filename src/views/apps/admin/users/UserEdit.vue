@@ -50,10 +50,15 @@
                 }"
               >
                 <!--begin::Preview existing avatar-->
-                <div
+                <!-- <div
                   class="image-input-wrapper w-125px h-125px"
                   :style="`background-image: url(${profileDetails.avatar})`"
-                ></div>
+                ></div> -->
+                <img
+                  :src="profileDetails.avatar"
+                  class="image-input-wrapper w-125px h-125px"
+                  alt="profile"
+                />
                 <!--end::Preview existing avatar-->
 
                 <!--begin::Label-->
@@ -357,7 +362,7 @@ import { useAuthStore } from "@/stores/auth";
 import moment from "moment";
 
 interface ProfileDetails {
-  avatar: string;
+  avatar: any;
   first_name: string;
   last_name: string;
   email: string;
@@ -405,12 +410,16 @@ export default defineComponent({
       console.log(Companies);
     };
 
+    // get image as base64 and convert to img form larvel
     const loadUser = async () => {
       ApiService.setHeader();
       const response = await getUser(userId);
       console.log(response);
       profileDetails.value = {
-        avatar: getAssetPath("media/avatars/blank.png"),
+        avatar:
+          response.meta.profile_pic_data != ""
+            ? "data: image/png;base64," + response.meta.profile_pic_data
+            : getAssetPath("media/avatars/blank.png"),
         first_name: response.first_name,
         last_name: response.last_name,
         email: response.email,

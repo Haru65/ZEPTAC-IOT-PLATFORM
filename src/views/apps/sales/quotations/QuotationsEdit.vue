@@ -6,7 +6,7 @@
         <div class="card w-20">
           <div class="card-body p-12">
             <!--begin::Form-->
-            <form id="kt_invoice_form" novalidate>
+            <form id="kt_invoice_form" novalidate :loading="loading">
               <!--begin::Wrapper-->
               <div
                 class="d-flex gap-5 flex-column align-items-start flex-xxl-row"
@@ -275,7 +275,15 @@
           <div class="card-body">
             <!--begin::Input group-->
             <div class="mb-10">
-              <h2>Quotation</h2>
+              <div class="d-flex flex-lg-row justify-content-between">
+                <h2>Quotation</h2>
+                <span
+                  class="cursor-pointer"
+                  v-on:click="generatePdf(invoiceDetials.quotation_no)"
+                >
+                  <i class="fa fa-file-pdf" style="font-size: 1.6rem"></i>
+                </span>
+              </div>
               <br />
               <div class="row gx-10" v-if="invoiceDetials.status != 3">
                 <el-select
@@ -359,12 +367,12 @@
               <!--end::Row-->
               <div class="mb-0">
                 <!--begin::Row-->
-                <!--end::Row-->
+
                 <span
-                  v-show="invoiceDetials.status != 3"
+                  v-if="invoiceDetials.status != 3"
                   v-on:click="SendInvoice"
                   href="#"
-                  class="btn btn-primary w-100"
+                  class="btn btn-primary w-100 mb-3"
                   id="kt_invoice_submit_button"
                 >
                   <i class="ki-duotone ki-triangle fs-3"
@@ -373,18 +381,7 @@
                   ></i>
                   Convert to Invoice
                 </span>
-                <span
-                  v-on:click="generatePdf(invoiceDetials.quotation_no)"
-                  href="#"
-                  class="btn btn-primary w-100"
-                  id="kt_invoice_submit_button"
-                >
-                  <i class="ki-duotone ki-triangle fs-3"
-                    ><span class="path1"></span><span class="path2"></span
-                    ><span class="path3"></span
-                  ></i>
-                  Genrate Pdf
-                </span>
+                <!--end::Row-->
               </div>
               <!--end::Actions-->
             </div>
@@ -420,8 +417,7 @@ import {
   GetQuotationStatus,
 } from "@/core/config/QuotationStatusConfig";
 import { useRouter, useRoute } from "vue-router";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
+import { InvoiceGen } from "@/core/config/InvoiceGenerator";
 
 interface itemsArr {
   id: string;
@@ -465,7 +461,7 @@ export default defineComponent({
   },
   setup() {
     const auth = useAuthStore();
-    const loading = ref(false);
+    const loading = ref(true);
     const Total = ref(0);
     const status = ref(false);
     const route = useRoute();
@@ -783,97 +779,7 @@ export default defineComponent({
     };
 
     const generatePdf = (pdfName: string) => {
-      pdfName += "_" + quotationid + "_quotation";
-      const columns = [
-        { title: "Id", dataKey: "id" },
-        { title: "Name", dataKey: "name" },
-        { title: "Price", dataKey: "price" },
-      ];
-      const doc = new jsPDF({
-        orientation: "portrait",
-        unit: "in",
-        format: "letter",
-      });
-      // text is placed using x, y coordinates
-      doc
-        .setFontSize(16)
-        .text(
-          "# quotation-invoice " + invoiceDetials.value.quotation_no,
-          0.5,
-          1.0
-        );
-      // create a line under heading
-      doc.setLineWidth(0.01).line(0.5, 1.1, 8.0, 1.1);
-
-      // Using autoTable plugin
-      const invoice_items = invoiceDetials.value.items.map(
-        ({ price, ...rest }) => ({
-          ...rest,
-          price: "Rs " + price.substring(1),
-        })
-      );
-      doc
-        .setFont("helvetica")
-        .setFontSize(8)
-        .text(
-          new Date().toDateString(),
-          doc.internal.pageSize.width - 0.5,
-          1.5,
-          {
-            align: "right",
-            maxWidth: 7.5,
-          }
-        );
-      doc
-        .setFont("helvetica")
-        .setFontSize(8)
-        .text(
-          `
-        To ${invoiceDetials.value.meta.first_name} ${invoiceDetials.value.meta.last_name}
-        ${invoiceDetials.value.meta.company_name},
-        ${invoiceDetials.value.meta.address1}
-        ${invoiceDetials.value.meta.address2}
-        ${invoiceDetials.value.meta.city},${invoiceDetials.value.meta.pincode}
-        ${invoiceDetials.value.meta.state},${invoiceDetials.value.meta.country}
-        `,
-          0.25,
-          1.5,
-          {
-            align: "left",
-            maxWidth: 7.5,
-          }
-        );
-      // fixed by autotable
-      doc.autoTable({
-        columns,
-        startY: 3,
-        body: invoice_items,
-        margin: { left: 0.5, top: 1.25 },
-        align: {
-          header: "center",
-          body: "right",
-        },
-      });
-      // Using array of sentences
-      doc
-        .setFont("helvetica")
-        .setFontSize(12)
-        .text(
-          "Total: Rs " + invoiceDetials.value.total,
-          doc.internal.pageSize.width - 0.5,
-          doc.internal.pageSize.height - 1.5,
-          {
-            align: "right",
-            maxWidth: 7.5,
-          }
-        );
-      // Creating footer and saving file
-      doc
-        .setFont("times")
-        .setFontSize(11)
-        .setTextColor(0, 0, 255)
-        .text("Zeptac.co", 0.5, doc.internal.pageSize.height - 0.5)
-        .save(`${pdfName}.pdf`);
+      InvoiceGen(quotationid.toString(), pdfName, invoiceDetials);
     };
     // date
 
