@@ -250,6 +250,40 @@
           </div>
 
           <!--begin::Input group-->
+          <!--begin::Input group-->
+
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span class="required">Confirm Password</span>
+
+              <i
+                class="fas fa-exclamation-circle ms-1 fs-7"
+                data-bs-toggle="tooltip"
+                title="Phone number must be active"
+              ></i>
+            </label>
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="password"
+                name="password"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Password"
+                v-model="profileDetails.confpassword"
+              />
+              <div class="fv-plugins-message-container">
+                <div class="fv-help-block">
+                  <ErrorMessage name="password" />
+                </div>
+              </div>
+            </div>
+            <!--end::Col-->
+          </div>
+
+          <!--begin::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label required fw-semobold fs-6"
@@ -355,6 +389,7 @@ import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
+import { CUSTOM_FORM } from "@/core/config/FormCustomConfig";
 
 interface ProfileDetails {
   disp_avatar: string;
@@ -364,6 +399,7 @@ interface ProfileDetails {
   email: string;
   phone: string;
   password: string;
+  confpassword: string;
   roles: string;
   company_id: string;
   created_by: string;
@@ -427,6 +463,7 @@ export default defineComponent({
       email: "",
       phone: "",
       password: "",
+      confpassword: "",
       roles: "0",
       company_id: "0",
       created_by: auth.getUserId(),
@@ -440,18 +477,9 @@ export default defineComponent({
       try {
         // form multipart form post
         // Call your API here with the form values
-        const form = new FormData();
-        form.append("first_name", profileDetails.value.first_name);
-        form.append("last_name", profileDetails.value.last_name);
-        form.append("email", profileDetails.value.email);
-        form.append("phone", profileDetails.value.phone);
-        form.append("password", profileDetails.value.password);
-        form.append("roles", profileDetails.value.roles);
-        form.append("company_id", profileDetails.value.company_id);
-        form.append("created_by", profileDetails.value.created_by);
-        form.append("updated_by", profileDetails.value.updated_by);
-        form.append("image", profileDetails.value.image);
-
+        // CUSTOMS
+        const form = CUSTOM_FORM(profileDetails);
+        // push form
         const response = await addUser(form);
         console.log(response.error);
         if (!response.error) {
@@ -524,6 +552,7 @@ export default defineComponent({
         email: "",
         phone: "",
         password: "",
+        confpassword: "",
         roles: "0",
         company_id: "0",
         created_by: auth.getUserId(),

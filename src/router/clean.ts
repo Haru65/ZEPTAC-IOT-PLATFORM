@@ -1,13 +1,11 @@
 import {
   createRouter,
   createWebHistory,
-  createMemoryHistory,
   type RouteRecordRaw,
 } from "vue-router";
 import {
   getCompany,
   getInvoice,
-  getPriceList,
   getPriceListItem,
   getQuotation,
 } from "@/stores/api";
