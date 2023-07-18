@@ -41,7 +41,7 @@
           <button
             type="button"
             class="btn btn-light-warning me-3"
-            @click="onpageChange()"
+            @click="more"
           >
             {{ total }} More Results
           </button>
@@ -85,7 +85,6 @@
         :checkbox-enabled="true"
         :itemsPerPageDropdownEnabled="true"
         :items-per-page="25"
-        @page-change="more"
         checkbox-label="id"
         :loading="loading"
       >
@@ -192,7 +191,7 @@ export default defineComponent({
     const loading = ref(true);
     // staring from 2
     let page = ref(1);
-    let limit = ref(50);
+    let limit = ref(20);
     const selectedIds = ref<Array<number>>([]);
     const tableData = ref<Array<ICompany>>([]);
     const initCompanies = ref<Array<ICompany>>([]);
@@ -216,13 +215,11 @@ export default defineComponent({
           .splice(
             tableData.value.length,
             0,
-            ...tableData.value.filter((value, index, self) => {
-              return self.indexOf(value) === index;
-            })
+            ...tableData.value.filter(
+              (value, index, self) => self.indexOf(value) === index
+            )
           )
-          .filter((value, index, self) => {
-            return self.indexOf(value) === index;
-          });
+          .filter((value, index, self) => self.indexOf(value) === index);
       }
       page.value = page.value + 1;
       total.value = total.value - response.result.data.data.length;
@@ -241,9 +238,10 @@ export default defineComponent({
         ApiService.setHeader();
         const response = await getCompanies(`page=${page.value}`);
         page.value = page.value + 1;
-        //console.log(response.result.total_count);
+        console.log(response.result.total_count);
         // first 20 displayed
-        total.value = response.result.total_count - limit.value;
+        total.value =
+          response.result.total_count - response.result.data.data.length;
         tableData.value = response.result.data.data.map(
           ({ created_at, ...rest }) => ({
             ...rest,

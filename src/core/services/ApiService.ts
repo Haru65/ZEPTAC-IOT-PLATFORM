@@ -32,8 +32,21 @@ class ApiService {
     ] = `Bearer ${JwtService.getToken()}`;
     ApiService.vueInstance.axios.defaults.headers.common["Accept"] =
       "application/json";
-    ApiService.vueInstance.axios.defaults.headers.common["Content-Type"] =
+  }
+  public static imgsetHeader(): void {
+    ApiService.vueInstance.axios.defaults.headers.common[
+      "Authorization"
+    ] = `Bearer ${JwtService.getToken()}`;
+    ApiService.vueInstance.axios.defaults.headers.common["Accept"] =
       "multipart/form-data";
+  }
+
+  public static patchsetHeader(): void {
+    ApiService.vueInstance.axios.defaults.headers.common[
+      "Authorization"
+    ] = `Bearer ${JwtService.getToken()}`;
+    ApiService.vueInstance.axios.defaults.headers.common["Accept"] =
+      "application/x-www-form-urlencoded";
   }
 
   /**

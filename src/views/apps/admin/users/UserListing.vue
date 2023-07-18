@@ -237,18 +237,20 @@ export default defineComponent({
       try {
         const response = await getUsers();
         console.log(response);
-        tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-            role_id: get_role(role_id),
-          })
-        );
-        initCustomers.value.splice(
-          0,
-          tableData.value.length,
-          ...tableData.value
-        );
+        if (response.result.data.length != 0) {
+          tableData.value = response.result.data.map(
+            ({ created_at, role_id, ...rest }) => ({
+              ...rest,
+              created_at: moment(created_at).format("MMMM Do YYYY"),
+              role_id: get_role(role_id),
+            })
+          );
+          initCustomers.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

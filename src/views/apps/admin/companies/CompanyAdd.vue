@@ -12,7 +12,7 @@
           :validation-schema="companyDetailsValidator"
         >
           <!--begin::Card body-->
-          <div class="card-body border-top p-9">
+          <div class="card-body p-9">
             <!--begin::Input group-->
             <div class="row mb-6">
               <!--begin::Label-->
@@ -176,38 +176,40 @@
                   <div class="row">
                     <!--begin::Col-->
                     <div class="col-lg-6 fv-row">
-                      <Field
-                        as="select"
-                        name="role"
-                        class="form-select form-select-solid form-select-lg"
-                        v-model="companyDetails.country"
-                      >
-                        <option value="">Select Country ..</option>
-                        <option
-                          v-for="ele in countries"
-                          :key="ele.name"
-                          :value="ele.name"
+                      <el-select v-model="companyDetails.country" filterable>
+                        <el-option
+                          value="0"
+                          label="Please Select Package..."
+                          key="0"
+                          >Please Select Role...</el-option
                         >
-                          {{ ele.name }}
-                        </option>
-                      </Field>
+                        <el-option
+                          v-for="item in countries"
+                          :key="item.name"
+                          :label="item.name"
+                          :value="item.name"
+                        />
+                      </el-select>
                     </div>
                     <!--end::Col-->
 
                     <!--begin::Col-->
                     <div v-if="state.length" class="col-lg-6 fv-row">
                       <div>
-                        <Field
-                          as="select"
-                          name="state"
-                          class="form-select form-select-solid form-select-lg"
-                          v-model="companyDetails.state"
-                        >
-                          <option value="">Select State ...</option>
-                          <option v-for="ele in state" :key="ele" :value="ele">
-                            {{ ele }}
-                          </option>
-                        </Field>
+                        <el-select v-model="companyDetails.state" filterable>
+                          <el-option
+                            value="0"
+                            label="Please Select Package..."
+                            key="0"
+                            >Please Select Role...</el-option
+                          >
+                          <el-option
+                            v-for="item in state"
+                            :key="item"
+                            :label="item"
+                            :value="item"
+                          />
+                        </el-select>
                       </div>
                     </div>
 
@@ -332,37 +334,43 @@
                   <div class="row">
                     <!--begin::Col-->
                     <div class="col-lg-6 fv-row">
-                      <Field
-                        as="select"
-                        name="user_limit"
-                        class="form-select form-select-solid form-select-lg"
-                        v-model="companyDetails.user_limit"
-                      >
-                        <option v-for="ele in limit" :key="ele" :value="ele">
-                          {{ ele }}
-                        </option>
-                      </Field>
+                      <el-select v-model="companyDetails.user_limit" filterable>
+                        <el-option
+                          value="0"
+                          label="Please Select Package..."
+                          key="0"
+                          >Please Select Role...</el-option
+                        >
+                        <el-option
+                          v-for="item in limit"
+                          :key="item"
+                          :label="item"
+                          :value="item"
+                        />
+                      </el-select>
                     </div>
                     <!--end::Col-->
 
                     <!--begin::Col-->
                     <div class="col-lg-6 fv-row">
                       <div>
-                        <Field
-                          as="select"
-                          name="package"
-                          class="form-select form-select-solid form-select-lg"
+                        <el-select
                           v-model="companyDetails.selected_package"
+                          filterable
                         >
-                          <option value="">Select a Package ...</option>
-                          <option
-                            v-for="ele in packages"
-                            :key="ele"
-                            :value="ele"
+                          <el-option
+                            value="0"
+                            label="Please Select Package..."
+                            key="0"
+                            >Please Select Role...</el-option
                           >
-                            {{ ele }}
-                          </option>
-                        </Field>
+                          <el-option
+                            v-for="item in packages"
+                            :key="item"
+                            :label="item"
+                            :value="item"
+                          />
+                        </el-select>
                       </div>
                     </div>
                     <!--end::Col-->
@@ -451,7 +459,7 @@ export default defineComponent({
     const state = ref([""]);
 
     const companyDetailsValidator = Yup.object().shape({
-      company_name: Yup.string().required().label("Compnay Name"),
+      company_name: Yup.string().required().label("Company Name"),
       company_address: Yup.string().required().label("Company Address"),
       contact_person: Yup.string().required().label("Contact Person"),
       contact: Yup.string().required().label("Contact"),
@@ -576,7 +584,7 @@ export default defineComponent({
         selected_package: " ",
       };
     };
-    
+
     return {
       companyDetails,
       emailFormDisplay,
@@ -595,3 +603,27 @@ export default defineComponent({
   },
 });
 </script>
+<style>
+.el-input__inner {
+  font-weight: 500;
+}
+
+.el-input__wrapper {
+  color: red !important;
+  height: 3.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--bs-gray-100);
+  border-color: var(--bs-gray-100);
+  color: var(--bs-gray-700);
+  transition: color 0.2s ease;
+  appearance: none;
+  line-height: 1.5;
+  border: none !important;
+  padding-top: 0.825rem;
+  padding-bottom: 0.825rem;
+  padding-left: 1.5rem;
+  font-size: 1.15rem;
+  border-radius: 0.625rem;
+  box-shadow: none !important;
+}
+</style>

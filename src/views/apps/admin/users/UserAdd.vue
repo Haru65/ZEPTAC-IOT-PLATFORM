@@ -21,7 +21,7 @@
     <!--begin::Content-->
     <div id="kt_account_profile_details" class="collapse show">
       <!--begin::Form-->
-      <form
+      <Vform
         id="kt_account_profile_details_form"
         class="form"
         novalidate
@@ -269,14 +269,14 @@
             <div class="col-lg-8 fv-row">
               <Field
                 type="password"
-                name="password"
+                name="confpassword"
                 class="form-control form-control-lg form-control-solid"
-                placeholder="Password"
+                placeholder="Confirm Password"
                 v-model="profileDetails.confpassword"
               />
               <div class="fv-plugins-message-container">
                 <div class="fv-help-block">
-                  <ErrorMessage name="password" />
+                  <ErrorMessage name="confpassword" />
                 </div>
               </div>
             </div>
@@ -293,7 +293,7 @@
 
             <!--begin::Col-->
             <div class="col-lg-8 fv-row">
-              <el-select v-model="profileDetails.roles" filterable>
+              <el-select v-model="profileDetails.role_id" filterable>
                 <el-option value="0" label="Please Select Role..." key="0"
                   >Please Select Role...</el-option
                 >
@@ -343,8 +343,318 @@
             </div>
             <!--end::Col-->
           </div>
+          <!-- extra fields -->
           <!--end::Input group-->
-          <!--begin::Col-->
+          <div class="separator my-10"></div>
+
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span class="required">Address 1</span>
+
+              <i
+                class="fas fa-exclamation-circle ms-1 fs-7"
+                data-bs-toggle="tooltip"
+                title="Address Required"
+              ></i>
+            </label>
+            <!--begin::Col-->
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="textarea"
+                name="address1"
+                as="textarea"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Address"
+                v-model="profileDetails.address1"
+              />
+              <div class="fv-plugins-message-container">
+                <div class="fv-help-block">
+                  <ErrorMessage name="address1" />
+                </div>
+              </div>
+            </div>
+            <!--end::Col-->
+          </div>
+
+          <!-- address 2 -->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span class="required">Address 2</span>
+
+              <i
+                class="fas fa-exclamation-circle ms-1 fs-7"
+                data-bs-toggle="tooltip"
+                title="Address Required"
+              ></i>
+            </label>
+            <!--begin::Col-->
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="textarea"
+                name="address2"
+                as="textarea"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Address"
+                v-model="profileDetails.address2"
+              />
+              <div class="fv-plugins-message-container">
+                <div class="fv-help-block">
+                  <ErrorMessage name="address2" />
+                </div>
+              </div>
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >Country</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8">
+              <!--begin::Row-->
+              <div class="row">
+                <!--begin::Col-->
+                <div class="col-lg fv-row">
+                  <el-select v-model="profileDetails.country" filterable>
+                    <el-option value="0" label="Please Select Role..." key="0"
+                      >Please Select Role...</el-option
+                    >
+                    <el-option
+                      v-for="item in countries"
+                      :key="item.name"
+                      :label="item.name"
+                      :value="item.name"
+                    />
+                  </el-select>
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >State</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8">
+              <!--begin::Row-->
+              <div class="row">
+                <!--begin::Col-->
+                <!--begin::Col-->
+                <div v-if="state.length" class="col-lg fv-row">
+                  <div>
+                    <el-select v-model="profileDetails.state" filterable>
+                      <el-option
+                        value="0"
+                        label="Please Select Package..."
+                        key="0"
+                        >Please Select Role...</el-option
+                      >
+                      <el-option
+                        v-for="item in state"
+                        :key="item"
+                        :label="item"
+                        :value="item"
+                      />
+                    </el-select>
+                  </div>
+                </div>
+
+                <div v-if="!state.length" class="col-lg fv-row">
+                  <div>
+                    <Field
+                      type="text"
+                      name="state"
+                      class="form-control form-control-lg form-control-solid"
+                      placeholder="Please Type State."
+                      v-model="profileDetails.state"
+                    />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="state" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!--end::Col-->
+                <!--end::Col-->
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >Pincode</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg">
+              <!--begin::Row-->
+              <div class="row">
+                <!--begin::Col-->
+                <div class="col-lg fv-row">
+                  <Field
+                    type="text"
+                    name="pincode"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Please Type Pincode."
+                    v-model="profileDetails.pincode"
+                  />
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >DOB</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg">
+              <!--begin::Row-->
+              <div class="row">
+                <!--begin::Col-->
+                <div class="col-lg fv-row">
+                  <el-date-picker
+                    v-model="profileDetails.dob"
+                    type="date"
+                    placeholder="DOB"
+                  />
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--  -->
+          <!--end::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >Gender</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg">
+              <!--begin::Row-->
+              <div class="row">
+                <div class="col-lg fv-row">
+                  <div>
+                    <el-select v-model="profileDetails.gender" filterable>
+                      <el-option
+                        value="0"
+                        label="Please Select Gender..."
+                        key="0"
+                        >Please Select Gender...</el-option
+                      >
+                      <el-option label="Male" value="male" />
+                      <el-option label="Female" value="female" />
+                      <el-option label="Other" value="other" />
+                    </el-select>
+                  </div>
+                </div>
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--  -->
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >Adhar</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8">
+              <!--begin::Row-->
+              <div class="row">
+                <!--begin::Col-->
+                <div class="col-lg fv-row">
+                  <Field
+                    type="text"
+                    name="adhar"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Adhar No."
+                    v-model="profileDetails.adhar"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="adhar" />
+                    </div>
+                  </div>
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >Pan</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8">
+              <!--begin::Row-->
+              <div class="row">
+                <!--begin::Col-->
+                <div class="col-lg fv-row">
+                  <div>
+                    <Field
+                      type="text"
+                      name="pan"
+                      class="form-control form-control-lg form-control-solid"
+                      placeholder="Pan No."
+                      v-model="profileDetails.pan"
+                    />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="pan" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
         </div>
         <div class="modal-footer flex-center">
           <!--begin::Button-->
@@ -369,7 +679,7 @@
           <!--end::Button-->
         </div>
         <!--end::Input group-->
-      </form>
+      </Vform>
       <!--end::Form-->
     </div>
     <!--end::Content-->
@@ -379,28 +689,38 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
-import { ErrorMessage, Field } from "vee-validate";
+import { defineComponent, onMounted, ref, watch } from "vue";
+import { ErrorMessage, Field, Form as Vform } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import { rolesArray } from "@/core/config/PermissionsRolesConfig";
 import { addUser, getCompanies } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
+import { countries, INstates } from "@/core/model/countries";
 import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
-import { CUSTOM_FORM } from "@/core/config/FormCustomConfig";
 
 interface ProfileDetails {
   disp_avatar: string;
-  image: any;
+  image: string;
   first_name: string;
   last_name: string;
   email: string;
   phone: string;
   password: string;
   confpassword: string;
-  roles: string;
+  role_id: string;
+  address1: string;
+  address2: string;
+  country: string;
+  state: string;
+  pincode: string;
+  city: string;
+  dob: string;
+  gender: string;
+  adhar: string;
+  pan: string;
   company_id: string;
   created_by: string;
   updated_by: string;
@@ -411,6 +731,7 @@ export default defineComponent({
   components: {
     ErrorMessage,
     Field,
+    Vform,
   },
   setup() {
     const auth = useAuthStore();
@@ -426,6 +747,7 @@ export default defineComponent({
     const router = useRouter();
     const loading = ref(false);
     const Companies = ref([{ id: "", company_name: "" }]);
+    const state = ref([""]);
 
     const getdropcomp = async () => {
       ApiService.setHeader();
@@ -440,6 +762,7 @@ export default defineComponent({
     };
 
     onMounted(async () => {
+      state.value.pop();
       Companies.value.pop();
       await getdropcomp();
     });
@@ -453,22 +776,56 @@ export default defineComponent({
       email: Yup.string().required().email().label("Email"),
       phone: Yup.string().required().label("Phone"),
       password: Yup.string().required().label("Password"),
+      confpassword: Yup.string().required().label("Confirm Password"),
+      pincode: Yup.string().required().label("Pincode"),
+      address1: Yup.string().required().label("Address"),
+      address2: Yup.string().required().label("Address"),
+      adhar: Yup.string().required().label("Adhar No"),
+      pan: Yup.string().required().label("Pan No"),
     });
 
     const profileDetails = ref<ProfileDetails>({
       disp_avatar: getAssetPath("media/avatars/blank.png"),
-      image: getAssetPath("media/avatars/blank.png"),
+      image: "",
       first_name: "",
       last_name: "",
       email: "",
       phone: "",
       password: "",
       confpassword: "",
-      roles: "0",
+      role_id: "0",
+      address1: "",
+      address2: "",
+      country: "",
+      state: "",
+      city: "",
+      pincode: "",
+      dob: "",
+      gender: "",
+      adhar: "",
+      pan: "",
       company_id: "0",
       created_by: auth.getUserId(),
       updated_by: auth.getUserId(),
     });
+
+    watch(
+      () => profileDetails.value.country,
+      (newVal) => {
+        while (state.value.length) {
+          state.value.pop();
+        }
+        if (newVal === "India") {
+          profileDetails.value.state = "";
+          INstates.forEach((ele) => {
+            state.value.push(ele.name);
+          });
+          //console.log(state);
+        } else {
+          profileDetails.value.state = "";
+        }
+      }
+    );
 
     const onsubmit = async () => {
       loading.value = true;
@@ -478,14 +835,15 @@ export default defineComponent({
         // form multipart form post
         // Call your API here with the form values
         // CUSTOMS
-        const form = CUSTOM_FORM(profileDetails);
+        // const form = await CUSTOM_FORM(profileDetails);
         // push form
-        const response = await addUser(form);
+        const response = await addUser(profileDetails.value);
         console.log(response.error);
         if (!response.error) {
           // Handle successful API response
           console.log("API response:", response);
           showSuccessAlert("Success", "User have been successfully inserted!");
+          router.push({ name: "users-list" });
         } else {
           // Handle API error response
           const errorData = response.error;
@@ -499,7 +857,6 @@ export default defineComponent({
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
         loading.value = false;
-        router.push({ name: "users-list" });
       }
     };
 
@@ -540,20 +897,42 @@ export default defineComponent({
 
     const updateImage = (e: any) => {
       profileDetails.value.disp_avatar = URL.createObjectURL(e.target.files[0]);
-      profileDetails.value.image = e.target.files[0];
+      let image = e.target.files[0] ? e.target.files : null;
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        // reader works Warninig
+        profileDetails.value.image = reader.result
+          .replace("data:", "")
+          .replace(/^.+,/, "");
+
+        // alert(imageBase64Stringsep);
+        console.log(profileDetails.value.image);
+      };
+      reader.readAsDataURL(image);
     };
 
     const clear = () => {
       profileDetails.value = {
         disp_avatar: getAssetPath("media/avatars/blank.png"),
-        image: getAssetPath("media/avatars/blank.png"),
+        image: "",
         first_name: "",
         last_name: "",
         email: "",
         phone: "",
         password: "",
         confpassword: "",
-        roles: "0",
+        role_id: "0",
+        address1: "",
+        address2: "",
+        state: "",
+        city: " ",
+        country: "",
+        pincode: "",
+        dob: "",
+        gender: "",
+        adhar: "",
+        pan: "",
         company_id: "0",
         created_by: auth.getUserId(),
         updated_by: auth.getUserId(),
@@ -580,6 +959,8 @@ export default defineComponent({
       onsubmit,
       loading,
       clear,
+      state,
+      countries,
     };
   },
 });

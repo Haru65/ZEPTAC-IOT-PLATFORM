@@ -273,6 +273,7 @@
           data-kt-sticky-animation="false"
           data-kt-sticky-zindex="95"
           data-kt-sticky-width="300px"
+          data-kt-sticky-min-height="400px"
           data-kt-sticky-enabled="true"
         >
           <!--begin::Card body-->
@@ -521,8 +522,8 @@ export default defineComponent({
       const prices = QuotationDetials.value.items.map((ele: any) =>
         Number(ele.price.replaceAll(",", "").substring(1))
       );
-      // console.log(prices);
-      QuotationDetials.value.total = prices.reduce((acc, curr) => acc + curr);
+      QuotationDetials.value.total =
+        prices.length != 0 ? prices.reduce((acc, curr) => acc + curr) : 0.0;
     };
 
     const GetCustomers = async () => {
