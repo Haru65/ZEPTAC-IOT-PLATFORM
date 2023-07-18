@@ -451,7 +451,7 @@ export default defineComponent({
     const state = ref([""]);
 
     const companyDetailsValidator = Yup.object().shape({
-      company_name: Yup.string().required().label("Compnay Name"),
+      company_name: Yup.string().required().label("Company Name"),
       company_address: Yup.string().required().label("Company Address"),
       contact_person: Yup.string().required().label("Contact Person"),
       contact: Yup.string().required().label("Contact"),

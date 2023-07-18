@@ -32,7 +32,7 @@
                     <!--begin::Datepicker-->
                     <div class="block">
                       <el-date-picker
-                        v-model="invoiceDetials.date"
+                        v-model="quotationDetail.date"
                         type="date"
                         placeholder="Pick a day"
                         :shortcuts="shortcuts"
@@ -58,7 +58,7 @@
                     type="text"
                     maxlength="6"
                     class="form-control form-control-flush fw-bold text-muted fs-3 w-125px"
-                    v-model="invoiceDetials.quotation_no"
+                    v-model="quotationDetail.quotation_no"
                     placehoder="..."
                   />
                 </div>
@@ -85,7 +85,7 @@
                     <!--begin::Datepicker-->
                     <div class="block">
                       <el-date-picker
-                        v-model="invoiceDetials.duedate"
+                        v-model="quotationDetail.duedate"
                         type="date"
                         placeholder="Pick a day"
                         :shortcuts="shortcuts"
@@ -110,9 +110,9 @@
                 <!--begin::Row-->
                 <div class="row gx-10">
                   <el-select
-                    v-model="invoiceDetials.customer_id"
+                    v-model="quotationDetail.customer_id"
                     filterable
-                    v-on:change="GetUserData(invoiceDetials.customer_id)"
+                    v-on:change="GetUserData(quotationDetail.customer_id)"
                   >
                     <el-option
                       value=" "
@@ -132,38 +132,38 @@
                 <div class="mt-2 pt-4">
                   <h6 class="fw-bold mt-5">Billing Address:</h6>
                   <div class="mt-2">
-                    <div class="mb-1" v-show="invoiceDetials.meta">
+                    <div class="mb-1" v-show="quotationDetail.meta">
                       <br />
                       <span>
                         {{
-                          `${invoiceDetials.meta.first_name} ${invoiceDetials.meta.last_name}`
+                          `${quotationDetail.meta.first_name} ${quotationDetail.meta.last_name}`
                         }}
                       </span>
                       <br />
-                      <span v-show="invoiceDetials.meta.company_name">
-                        {{ `${invoiceDetials.meta.company_name}` }}
+                      <span v-show="quotationDetail.meta.company_name">
+                        {{ `${quotationDetail.meta.company_name}` }}
                       </span>
                       <!-- v-if company_data present -->
-                      <div v-show="invoiceDetials.meta.company_name">
+                      <div v-show="quotationDetail.meta.company_name">
                         <br />
                         <span>
-                          {{ `${invoiceDetials.meta.address1}` }}
+                          {{ `${quotationDetail.meta.address1}` }}
                         </span>
                         <br />
                         <span>
-                          {{ `${invoiceDetials.meta.address2}` }}
+                          {{ `${quotationDetail.meta.address2}` }}
                         </span>
                       </div>
-                      <div v-show="invoiceDetials.meta.city">
+                      <div v-show="quotationDetail.meta.city">
                         <span>
                           {{
-                            `${invoiceDetials.meta.city} - ${invoiceDetials.meta.pincode}`
+                            `${quotationDetail.meta.city} - ${quotationDetail.meta.pincode}`
                           }}
                         </span>
                         <br />
                         <span>
                           {{
-                            `${invoiceDetials.meta.state} ${invoiceDetials.meta.country}`
+                            `${quotationDetail.meta.state} ${quotationDetail.meta.country}`
                           }}
                         </span>
                         <br />
@@ -171,7 +171,7 @@
                       <br />
                       <a
                         target="blank"
-                        v-bind:href="`/users/edit/${invoiceDetials.customer_id}`"
+                        v-bind:href="`/users/edit/${quotationDetail.customer_id}`"
                       >
                         <span class="fs-5"> Edit</span>
                         <!-- <i
@@ -203,9 +203,9 @@
                     <!--begin::Table body-->
                     <tbody>
                       <CustomSelect
-                        v-bind:tasks="invoiceDetials.items"
+                        v-bind:tasks="quotationDetail.items"
                         v-on:removeitem="RemoveItem($event)"
-                        v-on:getval="invoiceDetialsAddFunc($event)"
+                        v-on:getval="quotationDetailAddFunc($event)"
                         v-on:UpdateTotal="UpdateTotal($event)"
                       />
                     </tbody>
@@ -227,7 +227,7 @@
                         <th colspan="1" class="fs-4 ps-0">Total</th>
                         <th colspan="1" class="text-end fs-4 text-nowrap">
                           ₹<span data-kt-element="grand-total">{{
-                            invoiceDetials.total.toFixed(2)
+                            quotationDetail.total.toFixed(2)
                           }}</span>
                         </th>
                       </tr>
@@ -244,7 +244,7 @@
                     name="notes"
                     class="form-control form-control-solid"
                     rows="3"
-                    v-model="invoiceDetials.notes"
+                    v-model="quotationDetail.notes"
                     placeholder="Thanks for your business"
                   ></textarea>
                 </div>
@@ -279,15 +279,15 @@
                 <h2>Quotation</h2>
                 <span
                   class="cursor-pointer"
-                  v-on:click="generatePdf(invoiceDetials.quotation_no)"
+                  v-on:click="generatePdf(quotationDetail.quotation_no)"
                 >
                   <i class="fa fa-file-pdf" style="font-size: 1.6rem"></i>
                 </span>
               </div>
               <br />
-              <div class="row gx-10" v-if="invoiceDetials.status != 3">
+              <div class="row gx-10" v-if="quotationDetail.status != 3">
                 <el-select
-                  v-model="invoiceDetials.status"
+                  v-model="quotationDetail.status"
                   filterable
                   :disabled="status"
                 >
@@ -306,12 +306,12 @@
                 <h3
                   class="text-start fs-4 text-nowrap badge badge-light-success flex-shrink-0 align-self-center py-3 px-4 fs-7"
                 >
-                  {{ GetQuotationStatus(invoiceDetials.status) }}
+                  {{ GetQuotationStatus(quotationDetail.status) }}
                 </h3>
               </div>
               <br />
               <div class="items">
-                <p v-for="item in invoiceDetials.items" :key="item.id">
+                <p v-for="item in quotationDetail.items" :key="item.id">
                   <span
                     class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
                     >+ {{ item.name }}</span
@@ -321,18 +321,18 @@
             </div>
             <!--end::Input group-->
             <div class="total">
-              <div v-show="invoiceDetials.status != 3">
+              <div v-show="quotationDetail.status != 3">
                 <h6
                   class="text-start fs-4 text-nowrap badge badge-light flex-shrink-0 align-self-center py-3 px-4 fs-7"
                 >
-                  {{ GetQuotationStatus(invoiceDetials.status) }}
+                  {{ GetQuotationStatus(quotationDetail.status) }}
                 </h6>
               </div>
               <div>
                 <h3 class="text-end fs-4 text-nowrap">Total</h3>
                 <h3 class="text-end fs-4 text-nowrap">
                   ₹<span data-kt-element="grand-total">{{
-                    invoiceDetials.total.toFixed(2)
+                    quotationDetail.total.toFixed(2)
                   }}</span>
                 </h3>
               </div>
@@ -369,7 +369,7 @@
                 <!--begin::Row-->
 
                 <span
-                  v-if="invoiceDetials.status != 3"
+                  v-if="quotationDetail.status != 3"
                   v-on:click="SendInvoice"
                   href="#"
                   class="btn btn-primary w-100 mb-3"
@@ -471,7 +471,7 @@ export default defineComponent({
     const invoice = ref(null);
     const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
 
-    const invoiceDetials = ref<quotationDetials>({
+    const quotationDetail = ref<quotationDetials>({
       quotation_no: "21****",
       customer_id: " ",
       invoice_no: "",
@@ -500,16 +500,16 @@ export default defineComponent({
     const GetUserData = async (id) => {
       const response = await getUser(id);
       console.log(response);
-      invoiceDetials.value.meta = response.meta;
+      quotationDetail.value.meta = response.meta;
     };
 
-    // on add model data push to the sub-json vlaue invoiceDetials
-    const invoiceDetialsAddFunc = (data) => {
+    // on add model data push to the sub-json vlaue quotationDetail
+    const quotationDetailAddFunc = (data) => {
       // selects id not same don't push;
-      // console.log(invoiceDetials.value);
+      // console.log(quotationDetail.value);
       console.log(data);
-      console.log(invoiceDetials.value);
-      invoiceDetials.value.items.forEach((ele) => {
+      console.log(quotationDetail.value);
+      quotationDetail.value.items.forEach((ele) => {
         console.log(ele);
         if (ele.id == data.id) {
           ele["name"] = data.name;
@@ -522,7 +522,7 @@ export default defineComponent({
 
     const addNewItem = () => {
       // selects id not same don't push;
-      invoiceDetials.value.items.push({
+      quotationDetail.value.items.push({
         id: "",
         name: "",
         price: "",
@@ -532,7 +532,7 @@ export default defineComponent({
 
     const RemoveItem = (index) => {
       console.log(index);
-      removeObjectWithId(invoiceDetials.value.items, index);
+      removeObjectWithId(quotationDetail.value.items, index);
       calPrice();
     };
 
@@ -552,10 +552,10 @@ export default defineComponent({
     };
 
     const calPrice = () => {
-      const prices = invoiceDetials.value.items.map((ele: any) =>
+      const prices = quotationDetail.value.items.map((ele: any) =>
         Number(ele.price.substring(1))
       );
-      invoiceDetials.value.total = prices.reduce((acc, curr) => acc + curr);
+      quotationDetail.value.total = prices.reduce((acc, curr) => acc + curr);
     };
 
     const GetCustomers = async () => {
@@ -582,7 +582,7 @@ export default defineComponent({
         status.value = true;
       }
 
-      invoiceDetials.value = {
+      quotationDetail.value = {
         quotation_no: response.quotation_no,
         invoice_no: "",
         customer_id: response.customer_id,
@@ -609,24 +609,24 @@ export default defineComponent({
       };
 
       const respons = await getUser(response.customer_id);
-      invoiceDetials.value.meta = respons.meta;
+      quotationDetail.value.meta = respons.meta;
     });
 
     // number formating remove
     const submit = async () => {
       console.warn("Nice");
-      // console.log(invoiceDetials.value);
-      invoiceDetials.value.date = moment(invoiceDetials.value.date).format(
+      // console.log(quotationDetail.value);
+      quotationDetail.value.date = moment(quotationDetail.value.date).format(
         "YYYY-MM-DD HH:mm:ss"
       );
-      invoiceDetials.value.duedate = moment(
-        invoiceDetials.value.duedate
+      quotationDetail.value.duedate = moment(
+        quotationDetail.value.duedate
       ).format("YYYY-MM-DD HH:mm:ss");
-      // console.log(invoiceDetials.value);
+      // console.log(quotationDetail.value);
       try {
         // Call your API here with the form values
         const response = await updateQuotation(
-          invoiceDetials.value,
+          quotationDetail.value,
           quotationid
         );
         // console.log(response.error);
@@ -656,7 +656,7 @@ export default defineComponent({
     // number formating remove
     const SendInvoice = async () => {
       console.warn("Nice");
-      // console.log(invoiceDetials.value);
+      // console.log(quotationDetail.value);
       Swal.fire({
         title: "Are you sure?",
         text: "Send Quotation to Invoice!",
@@ -666,23 +666,23 @@ export default defineComponent({
         confirmButtonText: "Yes, I am sure!",
       }).then(async (result: { [x: string]: any }) => {
         if (result["isConfirmed"]) {
-          let invoice_no = invoiceDetials.value.quotation_no;
-          invoiceDetials.value.invoice_no = invoice_no;
+          let invoice_no = quotationDetail.value.quotation_no;
+          quotationDetail.value.invoice_no = invoice_no;
 
-          // invoiceDetials.value.quotation_no = quotationid.toString();
-          invoiceDetials.value.date = moment(invoiceDetials.value.date).format(
+          // quotationDetail.value.quotation_no = quotationid.toString();
+          quotationDetail.value.date = moment(quotationDetail.value.date).format(
             "YYYY-MM-DD HH:mm:ss"
           );
-          invoiceDetials.value.duedate = moment(
-            invoiceDetials.value.duedate
+          quotationDetail.value.duedate = moment(
+            quotationDetail.value.duedate
           ).format("YYYY-MM-DD HH:mm:ss");
-          // console.log(invoiceDetials.value);
+          // console.log(quotationDetail.value);
           try {
             // update the invoice
             // converted to invoice
-            invoiceDetials.value.status = 3;
+            quotationDetail.value.status = 3;
             const res = await updateQuotation(
-              invoiceDetials.value,
+              quotationDetail.value,
               quotationid
             );
             // Call your API here with the form values
@@ -700,9 +700,9 @@ export default defineComponent({
             // sending to
             // set to invoice
             // draf status
-            invoiceDetials.value.quotation_no = quotationid.toString();
-            invoiceDetials.value.status = 1;
-            const response = await addInvoice(invoiceDetials.value);
+            quotationDetail.value.quotation_no = quotationid.toString();
+            quotationDetail.value.status = 1;
+            const response = await addInvoice(quotationDetail.value);
             // console.log(response.error);
             if (!response.error) {
               // Handle successful API response
@@ -779,7 +779,7 @@ export default defineComponent({
     };
 
     const generatePdf = (pdfName: string) => {
-      InvoiceGen(quotationid.toString(), pdfName, invoiceDetials);
+      InvoiceGen(quotationid.toString(), pdfName, quotationDetail);
     };
     // date
 
@@ -811,7 +811,7 @@ export default defineComponent({
     };
 
     return {
-      invoiceDetials,
+      quotationDetail,
       Customers,
       getAssetPath,
       submit,
@@ -823,7 +823,7 @@ export default defineComponent({
       UpdateTotal,
       addNewItem,
       QuotationStatusArray,
-      invoiceDetialsAddFunc,
+      quotationDetailAddFunc,
       GetQuotationStatus,
       deleteQuotation,
       SendInvoice,
