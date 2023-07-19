@@ -552,10 +552,18 @@ export default defineComponent({
     };
 
     const calPrice = () => {
+<<<<<<< HEAD
       const prices = quotationDetail.value.items.map((ele: any) =>
         Number(ele.price.substring(1))
       );
       quotationDetail.value.total = prices.reduce((acc, curr) => acc + curr);
+=======
+      const prices = invoiceDetials.value.items.map((ele: any) =>
+         Number(ele.price.replaceAll(",", "").substring(1))
+      );
+      invoiceDetials.value.total =
+        prices.length != 0 ? prices.reduce((acc, curr) => acc + curr) : 0.0;
+>>>>>>> d5898579f3cc9fa91bb7a26dedd874cd40f03dc3
     };
 
     const GetCustomers = async () => {

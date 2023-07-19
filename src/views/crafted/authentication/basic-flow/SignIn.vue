@@ -129,7 +129,7 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 
 export default defineComponent({
-  name: "login",
+  name: "login-page",
   components: {
     Field,
     VForm,

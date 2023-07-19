@@ -131,9 +131,10 @@ export async function getUser(data: any) {
 // update company
 export async function updateUser(data: any, id: any) {
     try {
-        ApiService.setHeader();
+        ApiService.patchsetHeader();
+        console.log(data);
         const response = await ApiService.put(USER_URL + "/" + id, data);
-        //console.log(response)
+        console.log(response)
         return response.data.result;
     } catch (errors) {
         console.error(errors);
