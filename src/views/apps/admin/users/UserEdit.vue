@@ -53,7 +53,7 @@
                 <!--begin::Preview existing avatar-->
                 <img
                   :src="profileDetails.disp_avatar"
-                  class="image-input-wrapper w-125px h-125px"
+                  class="image-input-wrapper"
                   alt="profile"
                 />
                 <!--end::Preview existing avatar-->
@@ -94,7 +94,14 @@
               <!--end::Image input-->
 
               <!--begin::Hint-->
-              <div class="form-text">Allowed file types: png, jpg, jpeg.</div>
+              <div class="form-text">
+                Allowed file types: png, jpg, jpeg. <br />
+                Note : Max Upload limit 1 MB.
+                <br />
+                <span class="text-danger" v-if="file_size"
+                  >File Size Exceeded</span
+                >
+              </div>
               <!--end::Hint-->
             </div>
             <!--end::Col-->
@@ -218,8 +225,7 @@
 
           <!--begin::Input group-->
 
-          <div class="row mb-6">
-            <!--begin::Label-->
+          <!-- <div class="row mb-6">
             <label class="col-lg-4 col-form-label fw-semobold fs-6">
               <span class="required">Password</span>
 
@@ -229,9 +235,6 @@
                 title="Phone number must be active"
               ></i>
             </label>
-            <!--end::Label-->
-
-            <!--begin::Col-->
             <div class="col-lg-8 fv-row">
               <Field
                 type="password"
@@ -246,14 +249,12 @@
                 </div>
               </div>
             </div>
-            <!--end::Col-->
-          </div>
+          </div> -->
 
           <!--begin::Input group-->
           <!--begin::Input group-->
 
-          <div class="row mb-6">
-            <!--begin::Label-->
+          <!-- <div class="row mb-6">
             <label class="col-lg-4 col-form-label fw-semobold fs-6">
               <span class="required">Confirm Password</span>
 
@@ -263,9 +264,7 @@
                 title="Phone number must be active"
               ></i>
             </label>
-            <!--end::Label-->
 
-            <!--begin::Col-->
             <div class="col-lg-8 fv-row">
               <Field
                 type="password"
@@ -280,8 +279,7 @@
                 </div>
               </div>
             </div>
-            <!--end::Col-->
-          </div>
+          </div> -->
 
           <!--begin::Input group-->
           <div class="row mb-6">
@@ -668,7 +666,7 @@
             class="btn btn-lg btn-primary w-25"
             type="submit"
           >
-            <span v-if="!loading" class="indicator-label"> Submit </span>
+            <span v-if="!loading" class="indicator-label"> Update </span>
             <span v-if="loading" class="indicator-progress">
               Please wait...
               <span
@@ -704,7 +702,7 @@ import { useRouter, useRoute } from "vue-router";
 interface ProfileDetails {
   id: string;
   disp_avatar: string;
-  image: string;
+  image: string | null;
   first_name: string;
   last_name: string;
   email: string;
@@ -744,7 +742,7 @@ export default defineComponent({
     const submitButton5 = ref<HTMLElement | null>(null);
     const updateEmailButton = ref<HTMLElement | null>(null);
     const updatePasswordButton = ref<HTMLElement | null>(null);
-
+    const file_size = ref(false);
     let limit = ref(500);
     const router = useRouter();
     const route = useRoute();
@@ -876,13 +874,14 @@ export default defineComponent({
       try {
         // form multipart form post
         // push form
+        console.log(profileDetails.value);
         const response = await updateUser(profileDetails.value, userId);
         console.log(response.error);
         if (!response.error) {
           // Handle successful API response
           console.log("API response:", response);
           showSuccessAlert("Success", "User have been successfully inserted!");
-          router.push({ name: "users-list" });
+          // router.push({ name: "users-list" });
         } else {
           // Handle API error response
           const errorData = response.error;
@@ -935,8 +934,45 @@ export default defineComponent({
     };
 
     const updateImage = (e: any) => {
-      profileDetails.value.disp_avatar = URL.createObjectURL(e.target.files[0]);
-      profileDetails.value.image = e.target.files[0];
+      const file = e.target.files[0];
+
+      if (!file) {
+        console.error("Error: No file selected.");
+        return;
+      }
+
+      const fileSize = file.size;
+      const fileMb = fileSize / 1024 ** 2;
+      console.log(fileMb);
+
+      if (fileMb <= 1) {
+        file_size.value = false;
+        profileDetails.value.disp_avatar = URL.createObjectURL(file);
+        const reader = new FileReader();
+
+        reader.onload = function () {
+          try {
+            const base64Data = reader.result
+              ?.toString()
+              .replace(/^data:image\/\w+;base64,/, "");
+            if (base64Data) {
+              profileDetails.value.image = base64Data;
+              console.log(profileDetails.value.image);
+            } else {
+              console.error("Error: Failed to read the image data.");
+            }
+          } catch (e) {
+            console.error("Error:", e);
+          }
+        };
+
+        reader.readAsDataURL(file);
+      } else {
+        file_size.value = true;
+        profileDetails.value.disp_avatar = getAssetPath(
+          "media/avatars/blank.png"
+        );
+      }
     };
 
     const clear = () => {
@@ -955,7 +991,7 @@ export default defineComponent({
         address1: "",
         address2: "",
         states: "",
-        city: " ",
+        city: "",
         country: "",
         pincode: "",
         dob: "",
@@ -989,6 +1025,7 @@ export default defineComponent({
       loading,
       clear,
       state,
+      file_size,
       countries,
     };
   },

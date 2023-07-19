@@ -22,7 +22,7 @@ export const saveUser = (user: string): void => {
 };
 
 // get id for CRUD operations
-export const UserId = (): string | null => {
+export const User = (): string | null => {
   return window.localStorage.getItem(USER);
 };
 
@@ -43,5 +43,5 @@ export default {
   destroyToken,
   saveUser,
   destroyUser,
-  UserId,
+  User,
 };

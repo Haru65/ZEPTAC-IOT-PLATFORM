@@ -173,6 +173,316 @@
             <!--end::Col-->
           </div>
           <!--end::Input group-->
+          <!--end::Input group-->
+          <div class="separator my-10"></div>
+
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span class="required">Address 1</span>
+
+              <i
+                class="fas fa-exclamation-circle ms-1 fs-7"
+                data-bs-toggle="tooltip"
+                title="Address Required"
+              ></i>
+            </label>
+            <!--begin::Col-->
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="textarea"
+                name="address1"
+                as="textarea"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Address"
+                v-model="profileDetails.address1"
+              />
+              <div class="fv-plugins-message-container">
+                <div class="fv-help-block">
+                  <ErrorMessage name="address1" />
+                </div>
+              </div>
+            </div>
+            <!--end::Col-->
+          </div>
+
+          <!-- address 2 -->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span class="required">Address 2</span>
+
+              <i
+                class="fas fa-exclamation-circle ms-1 fs-7"
+                data-bs-toggle="tooltip"
+                title="Address Required"
+              ></i>
+            </label>
+            <!--begin::Col-->
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="textarea"
+                name="address2"
+                as="textarea"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Address"
+                v-model="profileDetails.address2"
+              />
+              <div class="fv-plugins-message-container">
+                <div class="fv-help-block">
+                  <ErrorMessage name="address2" />
+                </div>
+              </div>
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >Country</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8">
+              <!--begin::Row-->
+              <div class="row">
+                <!--begin::Col-->
+                <div class="col-lg fv-row">
+                  <el-select v-model="profileDetails.country" filterable>
+                    <el-option value="0" label="Please Select Role..." key="0"
+                      >Please Select Role...</el-option
+                    >
+                    <el-option
+                      v-for="item in countries"
+                      :key="item.name"
+                      :label="item.name"
+                      :value="item.name"
+                    />
+                  </el-select>
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >State</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8">
+              <!--begin::Row-->
+              <div class="row">
+                <!--begin::Col-->
+                <!--begin::Col-->
+                <div v-if="state.length" class="col-lg fv-row">
+                  <div>
+                    <el-select v-model="profileDetails.states" filterable>
+                      <el-option
+                        value="0"
+                        label="Please Select Package..."
+                        key="0"
+                        >Please Select Role...</el-option
+                      >
+                      <el-option
+                        v-for="item in state"
+                        :key="item"
+                        :label="item"
+                        :value="item"
+                      />
+                    </el-select>
+                  </div>
+                </div>
+
+                <div v-if="!state.length" class="col-lg fv-row">
+                  <div>
+                    <Field
+                      type="text"
+                      name="state"
+                      class="form-control form-control-lg form-control-solid"
+                      placeholder="Please Type State."
+                      v-model="profileDetails.states"
+                    />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="state" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!--end::Col-->
+                <!--end::Col-->
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >Pincode</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg">
+              <!--begin::Row-->
+              <div class="row">
+                <!--begin::Col-->
+                <div class="col-lg fv-row">
+                  <Field
+                    type="text"
+                    name="pincode"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Please Type Pincode."
+                    v-model="profileDetails.pincode"
+                  />
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >DOB</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg">
+              <!--begin::Row-->
+              <div class="row">
+                <!--begin::Col-->
+                <div class="col-lg fv-row">
+                  <el-date-picker
+                    v-model="profileDetails.dob"
+                    type="date"
+                    placeholder="DOB"
+                  />
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--  -->
+          <!--end::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >Gender</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg">
+              <!--begin::Row-->
+              <div class="row">
+                <div class="col-lg fv-row">
+                  <div>
+                    <el-select v-model="profileDetails.gender" filterable>
+                      <el-option
+                        value="0"
+                        label="Please Select Gender..."
+                        key="0"
+                        >Please Select Gender...</el-option
+                      >
+                      <el-option label="Male" value="male" />
+                      <el-option label="Female" value="female" />
+                      <el-option label="Other" value="other" />
+                    </el-select>
+                  </div>
+                </div>
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--  -->
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >Adhar</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8">
+              <!--begin::Row-->
+              <div class="row">
+                <!--begin::Col-->
+                <div class="col-lg fv-row">
+                  <Field
+                    type="text"
+                    name="adhar"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Adhar No."
+                    v-model="profileDetails.adhar"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="adhar" />
+                    </div>
+                  </div>
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >Pan</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8">
+              <!--begin::Row-->
+              <div class="row">
+                <!--begin::Col-->
+                <div class="col-lg fv-row">
+                  <div>
+                    <Field
+                      type="text"
+                      name="pan"
+                      class="form-control form-control-lg form-control-solid"
+                      placeholder="Pan No."
+                      v-model="profileDetails.pan"
+                    />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="pan" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
         </div>
         <div class="modal-footer flex-center">
           <!--begin::Button-->
@@ -206,7 +516,7 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
@@ -215,14 +525,28 @@ import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
+import { countries, INstates } from "@/core/model/countries";
+import { rolesArray } from "@/core/config/PermissionsRolesConfig";
 
 interface ProfileDetails {
   first_name: string;
   last_name: string;
   email: string;
   phone: string;
-  roles: string;
   password: string;
+  confpassword: string;
+  role_id: string;
+  address1: string;
+  address2: string;
+  country: string;
+  states: string;
+  pincode: string;
+  city: string;
+  dob: string;
+  gender: string;
+  adhar: string;
+  pan: string;
+  company_id: string;
   company_name: string;
   created_by: string;
   updated_by: string;
@@ -241,7 +565,7 @@ export default defineComponent({
     let limit = ref(500);
     const loading = ref(false);
     const Companies = ref([{ id: "", company_name: "" }]);
-
+    const state = ref([""]);
     const getdropcomp = async () => {
       ApiService.setHeader();
       const response = await getCompanies(`limit=${limit.value}`);
@@ -255,6 +579,7 @@ export default defineComponent({
     };
 
     onMounted(async () => {
+      state.value.pop();
       Companies.value.pop();
       await getdropcomp();
     });
@@ -275,9 +600,21 @@ export default defineComponent({
       last_name: "",
       email: "",
       phone: "",
-      company_name: "",
-      roles: "7",
       password: "decodedemo",
+      confpassword: "",
+      role_id: "7",
+      address1: "",
+      address2: "",
+      country: "",
+      states: "",
+      city: "",
+      pincode: "",
+      dob: "",
+      gender: "",
+      adhar: "",
+      pan: "",
+      company_id: auth.getUserCompanyId(),
+      company_name: "",
       created_by: auth.getUserId(),
       updated_by: auth.getUserId(),
     });
@@ -343,14 +680,44 @@ export default defineComponent({
       });
     };
 
+    watch(
+      () => profileDetails.value.country,
+      (newVal) => {
+        while (state.value.length) {
+          state.value.pop();
+        }
+        if (newVal === "India") {
+          profileDetails.value.states = "";
+          INstates.forEach((ele) => {
+            state.value.push(ele.name);
+          });
+          //console.log(state);
+        } else {
+          profileDetails.value.states = "";
+        }
+      }
+    );
+
     const clear = () => {
       profileDetails.value = {
-        first_name: " ",
-        last_name: " ",
-        email: " ",
-        phone: " ",
-        roles: "8",
+        first_name: "",
+        last_name: "",
+        email: "",
+        phone: "",
         password: "decodedemo",
+        confpassword: "",
+        role_id: "7",
+        address1: "",
+        address2: "",
+        country: "",
+        states: "",
+        city: "",
+        pincode: "",
+        dob: "",
+        gender: "",
+        adhar: "",
+        pan: "",
+        company_id: "",
         company_name: "",
         created_by: auth.getUserId(),
         updated_by: auth.getUserId(),
@@ -366,6 +733,8 @@ export default defineComponent({
       onsubmit,
       loading,
       clear,
+      countries,
+      state,
     };
   },
 });

@@ -53,7 +53,7 @@
                 <!--begin::Preview existing avatar-->
                 <img
                   :src="profileDetails.disp_avatar"
-                  class="image-input-wrapper w-125px h-125px"
+                  class="image-input-wrapper"
                   alt="profile"
                 />
                 <!--end::Preview existing avatar-->
@@ -74,7 +74,7 @@
                     accept=".png, .jpg, .jpeg"
                     @change="updateImage($event)"
                   />
-                  <input type="hidden" name="avatar_update" />
+                  <input max-size="1000" type="hidden" name="avatar_update" />
                   <!--end::Inputs-->
                 </label>
                 <!--end::Label-->
@@ -94,7 +94,14 @@
               <!--end::Image input-->
 
               <!--begin::Hint-->
-              <div class="form-text">Allowed file types: png, jpg, jpeg.</div>
+              <div class="form-text">
+                Allowed file types: png, jpg, jpeg. <br />
+                Note : Max Upload limit 1 MB.
+                <br />
+                <span class="text-danger" v-if="file_size"
+                  >File Size Exceeded</span
+                >
+              </div>
               <!--end::Hint-->
             </div>
             <!--end::Col-->
@@ -458,7 +465,7 @@
                 <!--begin::Col-->
                 <div v-if="state.length" class="col-lg fv-row">
                   <div>
-                    <el-select v-model="profileDetails.state" filterable>
+                    <el-select v-model="profileDetails.states" filterable>
                       <el-option
                         value="0"
                         label="Please Select Package..."
@@ -482,7 +489,7 @@
                       name="state"
                       class="form-control form-control-lg form-control-solid"
                       placeholder="Please Type State."
-                      v-model="profileDetails.state"
+                      v-model="profileDetails.states"
                     />
                     <div class="fv-plugins-message-container">
                       <div class="fv-help-block">
@@ -700,6 +707,7 @@ import { countries, INstates } from "@/core/model/countries";
 import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
+import { blank64 } from "./blanl";
 
 interface ProfileDetails {
   disp_avatar: string;
@@ -714,7 +722,7 @@ interface ProfileDetails {
   address1: string;
   address2: string;
   country: string;
-  state: string;
+  states: string;
   pincode: string;
   city: string;
   dob: string;
@@ -748,7 +756,7 @@ export default defineComponent({
     const loading = ref(false);
     const Companies = ref([{ id: "", company_name: "" }]);
     const state = ref([""]);
-
+    const file_size = ref(false);
     const getdropcomp = async () => {
       ApiService.setHeader();
       const response = await getCompanies(`limit=${limit.value}`);
@@ -785,7 +793,7 @@ export default defineComponent({
     });
 
     const profileDetails = ref<ProfileDetails>({
-      disp_avatar: getAssetPath("media/avatars/blank.png"),
+      disp_avatar: "data: image/png;base64," + blank64,
       image: "",
       first_name: "",
       last_name: "",
@@ -797,7 +805,7 @@ export default defineComponent({
       address1: "",
       address2: "",
       country: "",
-      state: "",
+      states: "",
       city: "",
       pincode: "",
       dob: "",
@@ -816,13 +824,13 @@ export default defineComponent({
           state.value.pop();
         }
         if (newVal === "India") {
-          profileDetails.value.state = "";
+          profileDetails.value.states = "";
           INstates.forEach((ele) => {
             state.value.push(ele.name);
           });
           //console.log(state);
         } else {
-          profileDetails.value.state = "";
+          profileDetails.value.states = "";
         }
       }
     );
@@ -896,20 +904,45 @@ export default defineComponent({
     };
 
     const updateImage = (e: any) => {
-      profileDetails.value.disp_avatar = URL.createObjectURL(e.target.files[0]);
-      let image = e.target.files[0] ? e.target.files : null;
+      const file = e.target.files[0];
 
-      const reader = new FileReader();
-      reader.onload = function () {
-        // reader works Warninig
-        profileDetails.value.image = reader.result
-          .replace("data:", "")
-          .replace(/^.+,/, "");
+      if (!file) {
+        console.error("Error: No file selected.");
+        return;
+      }
 
-        // alert(imageBase64Stringsep);
-        console.log(profileDetails.value.image);
-      };
-      reader.readAsDataURL(image);
+      const fileSize = file.size;
+      const fileMb = fileSize / 1024 ** 2;
+      console.log(fileMb);
+
+      if (fileMb <= 1) {
+        file_size.value = false;
+        profileDetails.value.disp_avatar = URL.createObjectURL(file);
+        const reader = new FileReader();
+
+        reader.onload = function () {
+          try {
+            const base64Data = reader.result
+              ?.toString()
+              .replace(/^data:image\/\w+;base64,/, "");
+            if (base64Data) {
+              profileDetails.value.image = base64Data;
+              console.log(profileDetails.value.image);
+            } else {
+              console.error("Error: Failed to read the image data.");
+            }
+          } catch (e) {
+            console.error("Error:", e);
+          }
+        };
+
+        reader.readAsDataURL(file);
+      } else {
+        file_size.value = true;
+        profileDetails.value.disp_avatar = getAssetPath(
+          "media/avatars/blank.png"
+        );
+      }
     };
 
     const clear = () => {
@@ -925,7 +958,7 @@ export default defineComponent({
         role_id: "0",
         address1: "",
         address2: "",
-        state: "",
+        states: "",
         city: " ",
         country: "",
         pincode: "",
@@ -961,6 +994,7 @@ export default defineComponent({
       clear,
       state,
       countries,
+      file_size,
     };
   },
 });

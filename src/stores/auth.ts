@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import ApiService from "@/core/services/ApiService";
-import JwtService, { UserId } from "@/core/services/JwtService";
+import JwtService, { User } from "@/core/services/JwtService";
 
 export interface User {
   name: string;
@@ -46,8 +46,13 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   function getUserId() {
-    const data = JSON.parse(UserId() || "");
+    const data = JSON.parse(User() || "");
     return data.id;
+  }
+
+  function getUserCompanyId() {
+    const data = JSON.parse(User() || "");
+    return data.company_id;
   }
 
   function purgeAuth() {
@@ -130,5 +135,6 @@ export const useAuthStore = defineStore("auth", () => {
     purgeAuth,
     get_auth,
     getUserId,
+    getUserCompanyId,
   };
 });

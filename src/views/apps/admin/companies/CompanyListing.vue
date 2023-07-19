@@ -205,30 +205,31 @@ export default defineComponent({
         `page=${page.value}&limit=${limit.value}`
       );
       if (total.value > 0) {
-        tableData.value.push(
+        tableData.value.splice(
+          tableData.value.length,
+          0,
           ...response.result.data.data.map(({ created_at, ...rest }) => ({
             ...rest,
             created_at: moment(created_at).format("MMMM Do YYYY"),
           }))
         );
-        initCompanies.value
-          .splice(
-            tableData.value.length,
-            0,
-            ...tableData.value.filter(
-              (value, index, self) => self.indexOf(value) === index
-            )
+        initCompanies.value = initCompanies.value.splice(
+          tableData.value.length,
+          0,
+          ...tableData.value.filter(
+            (value, index, self) => self.indexOf(value) === index
           )
-          .filter((value, index, self) => self.indexOf(value) === index);
+        );
       }
       page.value = page.value + 1;
       total.value = total.value - response.result.data.data.length;
     };
+    console.log(initCompanies.value);
 
     const onpageChange = async () => {
       if (total.value > 0) {
         await more();
-        total.value -= limit.value;
+        // total.value -= limit.value;
       }
     };
 
