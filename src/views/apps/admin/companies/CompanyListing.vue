@@ -163,7 +163,7 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
-        columnName: "Compnay Email",
+        columnName: "Company Email",
         columnLabel: "email",
         sortEnabled: true,
         columnWidth: 230,
@@ -211,7 +211,7 @@ export default defineComponent({
             created_at: moment(created_at).format("MMMM Do YYYY"),
           }))
         );
-        initCompanies.value
+        initCompanies.value = initCompanies.value
           .splice(
             tableData.value.length,
             0,
@@ -228,7 +228,6 @@ export default defineComponent({
     const onpageChange = async () => {
       if (total.value > 0) {
         await more();
-        total.value -= limit.value;
       }
     };
 

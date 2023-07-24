@@ -199,6 +199,7 @@
                         class="border-bottom fs-7 fw-bold text-gray-700 text-uppercase"
                       >
                         <th class="min-w-300px w-475px">Item</th>
+                        <th class="min-w-300px w-475px">Item Price</th>
                         <th class="min-w-75px w-75px text-end">Action</th>
                       </tr>
                     </thead>
@@ -484,8 +485,8 @@ export default defineComponent({
     const QuotationDetialsAddFunc = (data) => {
       // selects id not same don't push;
       // console.log(QuotationDetials.value);
-      console.log(data);
-      console.log(QuotationDetials.value);
+      // console.log(data);
+      // console.log(QuotationDetials.value);
       QuotationDetials.value.items.forEach((ele) => {
         console.log(ele);
         if (ele.id == data.id) {
