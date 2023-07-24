@@ -163,7 +163,7 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
-        columnName: "Compnay Email",
+        columnName: "Company Email",
         columnLabel: "email",
         sortEnabled: true,
         columnWidth: 230,
