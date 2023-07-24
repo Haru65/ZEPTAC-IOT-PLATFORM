@@ -155,7 +155,7 @@
                           {{ `${QuotationDetials.meta.address2}` }}
                         </span>
                       </div>
-                      <div v-show="QuotationDetials.meta.city">
+                      <div v-show="QuotationDetials.meta.country">
                         <span>
                           {{
                             `${QuotationDetials.meta.city} - ${QuotationDetials.meta.pincode}`
@@ -164,7 +164,7 @@
                         <br />
                         <span>
                           {{
-                            `${QuotationDetials.meta.state} ${QuotationDetials.meta.country}`
+                            `${QuotationDetials.meta.states} ${QuotationDetials.meta.country}`
                           }}
                         </span>
                         <br />
@@ -174,7 +174,7 @@
                       <a
                         v-show="QuotationDetials.meta.first_name"
                         target="blank"
-                        v-bind:href="`/users/edit/${QuotationDetials.customer_id}`"
+                        v-bind:href="`/customers/edit/${QuotationDetials.customer_id}`"
                       >
                         <span class="fs-5"> Edit</span>
                         <!-- <i
@@ -390,7 +390,7 @@ interface Meta {
   address1: string;
   address2: string;
   city: string;
-  state: string;
+  states: string;
   pincode: string;
   country: string;
 }
@@ -438,7 +438,7 @@ export default defineComponent({
         address1: "",
         address2: "",
         city: "",
-        state: "",
+        states: "",
         pincode: "",
         country: "",
       },
@@ -466,7 +466,7 @@ export default defineComponent({
           address1: "",
           address2: "",
           city: "",
-          state: "",
+          states: "",
           pincode: "",
           country: "",
         };
@@ -653,7 +653,7 @@ export default defineComponent({
           address1: "",
           address2: "",
           city: "",
-          state: "",
+          states: "",
           pincode: "",
           country: "",
         },

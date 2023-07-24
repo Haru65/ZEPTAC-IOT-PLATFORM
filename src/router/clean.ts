@@ -5,6 +5,7 @@ import {
 } from "vue-router";
 import {
   getCompany,
+  getCustomer,
   getInvoice,
   getPriceListItem,
   getQuotation,
@@ -147,6 +148,32 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Customers Add",
           breadcrumbs: ["Customers Add"],
+        },
+      },
+      {
+        path: "/customers/edit/:id",
+        name: "customers-edit",
+        component: () =>
+          import("@/views/apps/sales/customers/CustomersEdit.vue"),
+        beforeEnter: async (to, from, next) => {
+          const customerId = to.params.id;
+          //console.log(companyId);
+          try {
+            const response = await getCustomer(customerId);
+            console.log(response);
+            if (response.error) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        meta: {
+          pageTitle: "Customers Edit",
+          breadcrumbs: ["Customers Edit"],
         },
       },
       {

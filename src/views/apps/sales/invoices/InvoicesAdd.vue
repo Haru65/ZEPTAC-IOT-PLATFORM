@@ -164,7 +164,7 @@
                         <br />
                         <span>
                           {{
-                            `${invoiceDetials.meta.state} ${invoiceDetials.meta.country}`
+                            `${invoiceDetials.meta.states} ${invoiceDetials.meta.country}`
                           }}
                         </span>
                         <br />
@@ -388,7 +388,7 @@ interface Meta {
   address1: string;
   address2: string;
   city: string;
-  state: string;
+  states: string;
   pincode: string;
   country: string;
 }
@@ -436,7 +436,7 @@ export default defineComponent({
         address1: "",
         address2: "",
         city: "",
-        state: "",
+        states: "",
         pincode: "",
         country: "",
       },
@@ -464,7 +464,7 @@ export default defineComponent({
           address1: "",
           address2: "",
           city: "",
-          state: "",
+          states: "",
           pincode: "",
           country: "",
         };
@@ -519,7 +519,7 @@ export default defineComponent({
 
     const calPrice = () => {
       const prices = invoiceDetials.value.items.map((ele: any) =>
-        Number(ele.price.substring(1))
+        Number(ele.price.replaceAll(",", "").substring(1))
       );
       invoiceDetials.value.total =
         prices.length != 0 ? prices.reduce((acc, curr) => acc + curr) : 0.0;
@@ -651,7 +651,7 @@ export default defineComponent({
           address1: "",
           address2: "",
           city: "",
-          state: "",
+          states: "",
           pincode: "",
           country: "",
         },

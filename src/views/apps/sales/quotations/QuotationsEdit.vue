@@ -154,7 +154,7 @@
                           {{ `${quotationDetail.meta.address2}` }}
                         </span>
                       </div>
-                      <div v-show="quotationDetail.meta.city">
+                      <div v-show="quotationDetail.meta.country">
                         <span>
                           {{
                             `${quotationDetail.meta.city} - ${quotationDetail.meta.pincode}`
@@ -163,7 +163,7 @@
                         <br />
                         <span>
                           {{
-                            `${quotationDetail.meta.state} ${quotationDetail.meta.country}`
+                            `${quotationDetail.meta.states} ${quotationDetail.meta.country}`
                           }}
                         </span>
                         <br />
@@ -171,7 +171,7 @@
                       <br />
                       <a
                         target="blank"
-                        v-bind:href="`/users/edit/${quotationDetail.customer_id}`"
+                        v-bind:href="`/customers/edit/${quotationDetail.customer_id}`"
                       >
                         <span class="fs-5"> Edit</span>
                         <!-- <i
@@ -314,6 +314,7 @@
               <div class="items">
                 <p v-for="item in quotationDetail.items" :key="item.id">
                   <span
+                    v-if="item.id != ``"
                     class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
                     >+ {{ item.name }}</span
                   >
@@ -423,7 +424,7 @@ import { InvoiceGen } from "@/core/config/InvoiceGenerator";
 interface itemsArr {
   id: string;
   price: string;
-  description: string;
+  desc: string;
   name: string;
 }
 
@@ -434,7 +435,7 @@ interface Meta {
   address1: string;
   address2: string;
   city: string;
-  state: string;
+  states: string;
   pincode: string;
   country: string;
 }
@@ -488,7 +489,7 @@ export default defineComponent({
         address1: "",
         address2: "",
         city: "",
-        state: "",
+        states: "",
         pincode: "",
         country: "",
       },
@@ -522,17 +523,19 @@ export default defineComponent({
     };
 
     const addNewItem = () => {
+      //
+      console.log(quotationDetail.value.items);
       // selects id not same don't push;
       quotationDetail.value.items.push({
         id: "",
         name: "",
         price: "",
-        description: "",
+        desc: "",
       });
+      calPrice();
     };
 
     const RemoveItem = (index) => {
-      console.log(index);
       removeObjectWithId(quotationDetail.value.items, index);
       calPrice();
     };
@@ -553,8 +556,11 @@ export default defineComponent({
     };
 
     const calPrice = () => {
+      // filter non-redunadant
+      // update val
+      console.log(quotationDetail.value.items);
       const prices = quotationDetail.value.items.map((ele: any) =>
-         Number(ele.price.replaceAll(",", "").substring(1))
+        Number(ele.price.replaceAll(",", "").substring(1))
       );
       quotationDetail.value.total =
         prices.length != 0 ? prices.reduce((acc, curr) => acc + curr) : 0.0;
@@ -601,7 +607,7 @@ export default defineComponent({
           address1: "",
           address2: "",
           city: "",
-          state: "",
+          states: "",
           pincode: "",
           country: "",
         },
@@ -614,10 +620,18 @@ export default defineComponent({
       quotationDetail.value.meta = respons.meta;
     });
 
+    const removeNulls = () => {
+      quotationDetail.value.items = quotationDetail.value.items.filter(
+        (ele: any) => ele.id !== ""
+      );
+    };
+
     // number formating remove
     const submit = async () => {
       console.warn("Nice");
-      // console.log(quotationDetail.value);
+      removeNulls();
+      calPrice();
+      console.log(quotationDetail.value.items);
       quotationDetail.value.date = moment(quotationDetail.value.date).format(
         "YYYY-MM-DD HH:mm:ss"
       );
@@ -672,9 +686,9 @@ export default defineComponent({
           quotationDetail.value.invoice_no = invoice_no;
 
           // quotationDetail.value.quotation_no = quotationid.toString();
-          quotationDetail.value.date = moment(quotationDetail.value.date).format(
-            "YYYY-MM-DD HH:mm:ss"
-          );
+          quotationDetail.value.date = moment(
+            quotationDetail.value.date
+          ).format("YYYY-MM-DD HH:mm:ss");
           quotationDetail.value.duedate = moment(
             quotationDetail.value.duedate
           ).format("YYYY-MM-DD HH:mm:ss");
@@ -781,6 +795,7 @@ export default defineComponent({
     };
 
     const generatePdf = (pdfName: string) => {
+      removeNulls();
       InvoiceGen(quotationid.toString(), pdfName, quotationDetail);
     };
     // date

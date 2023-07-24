@@ -171,6 +171,43 @@ export async function addCustomer(data: any) {
     }
 }
 
+export async function getCustomer(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(CUSTOMERS_URL, data);
+        //console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function updateCustomer(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(CUSTOMERS_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete
+export async function deletecustomer(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(CUSTOMERS_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 // LEADS
 // getlisting
 export async function getLeadsList() {

@@ -355,6 +355,7 @@
             <!--end::Col-->
           </div>
           <!--end::Input group-->
+          <!--end::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label required fw-semobold fs-6"
@@ -523,7 +524,7 @@
             class="btn btn-lg btn-primary w-25"
             type="submit"
           >
-            <span v-if="!loading" class="indicator-label"> Submit </span>
+            <span v-if="!loading" class="indicator-label"> Update </span>
             <span v-if="loading" class="indicator-progress">
               Please wait...
               <span
@@ -548,13 +549,12 @@ import { defineComponent, onMounted, ref, watch } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
-import { addCustomer, getCompanies } from "@/stores/api";
+import { updateCustomer, getCompanies, getCustomer } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { countries, INstates } from "@/core/model/countries";
-import { rolesArray } from "@/core/config/PermissionsRolesConfig";
 
 interface ProfileDetails {
   first_name: string;
@@ -589,11 +589,13 @@ export default defineComponent({
   },
   setup() {
     const auth = useAuthStore();
-    const router = useRouter();
+    const router = useRoute();
+    const route = useRouter();
     let limit = ref(500);
     const loading = ref(false);
     const Companies = ref([{ id: "", company_name: "" }]);
     const state = ref([""]);
+    const customerId = router.params.id;
     const getdropcomp = async () => {
       ApiService.setHeader();
       const response = await getCompanies(`limit=${limit.value}`);
@@ -610,6 +612,31 @@ export default defineComponent({
       state.value.pop();
       Companies.value.pop();
       await getdropcomp();
+      // add customer details
+      const res = await getCustomer(customerId);
+      profileDetails.value = {
+        first_name: res.first_name,
+        last_name: res.last_name,
+        email: res.email,
+        phone: res.mobile,
+        password: "",
+        confpassword: "",
+        role_id: res.role_id,
+        address1: res.meta.address1,
+        address2: res.meta.address2,
+        country: res.meta.country,
+        states: res.meta.states,
+        city: res.meta.city,
+        pincode: res.meta.pincode,
+        dob: res.meta.dob,
+        gender: res.meta.gender,
+        adhar: res.meta.adhar,
+        pan: res.meta.pan,
+        company_id: auth.getUserCompanyId(),
+        company_name: res.meta.company_name,
+        created_by: auth.getUserId(),
+        updated_by: auth.getUserId(),
+      };
     });
 
     const emailFormDisplay = ref(false);
@@ -628,7 +655,7 @@ export default defineComponent({
       last_name: "",
       email: "",
       phone: "",
-      password: "decodedemo",
+      password: "",
       confpassword: "",
       role_id: "7",
       address1: "",
@@ -653,7 +680,7 @@ export default defineComponent({
       console.warn("Nice");
       try {
         // Call your API here with the form values
-        const response = await addCustomer(profileDetails.value);
+        const response = await updateCustomer(customerId, profileDetails.value);
         console.log(response.error);
         if (!response.error) {
           // Handle successful API response
@@ -676,7 +703,7 @@ export default defineComponent({
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
         loading.value = false;
-        router.push({ name: "customers-list" });
+        route.push({ name: "customers-list" });
       }
     };
 
@@ -715,13 +742,12 @@ export default defineComponent({
           state.value.pop();
         }
         if (newVal === "India") {
-          profileDetails.value.states = "";
           INstates.forEach((ele) => {
             state.value.push(ele.name);
           });
           //console.log(state);
         } else {
-          profileDetails.value.states = "";
+          // profileDetails.value.states = "";
         }
       }
     );

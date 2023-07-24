@@ -707,7 +707,7 @@ import { countries, INstates } from "@/core/model/countries";
 import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
-import { blank64 } from "./blanl";
+import { blank64 } from "./blank";
 
 interface ProfileDetails {
   disp_avatar: string;
@@ -1022,3 +1022,4 @@ export default defineComponent({
   box-shadow: none !important;
 }
 </style>
+./blank
