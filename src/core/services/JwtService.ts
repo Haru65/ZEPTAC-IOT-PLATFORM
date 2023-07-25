@@ -17,7 +17,7 @@ export const getToken = (): string | null => {
 function setCookie(cname, cvalue) {
   const d = new Date();
   // 1 day timeout
-  d.setTime(d.getTime() + cvalue * 1 * 60 * 60 * 1000);
+  d.setTime(d.getTime() + cvalue * 24 * 60 * 60 * 1000);
   cvalue = d.toUTCString();
   document.cookie = cname + "=" + cvalue + ";" + ";path=/";
 }

@@ -25,7 +25,6 @@ app.use(createPinia());
 app.use(router);
 app.use(ElementPlus);
 
-
 ApiService.init(app);
 initApexCharts(app);
 initInlineSvg(app);

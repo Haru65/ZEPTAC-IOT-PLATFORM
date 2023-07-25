@@ -235,6 +235,43 @@ export async function addLead(data: any) {
     }
 }
 
+export async function getLead(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(LEADS_URL, data);
+        //console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function updateLead(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(LEADS_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete
+export async function deleteLead(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(LEADS_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 // PRICELISTS
 // getlists
 export async function getPriceList() {

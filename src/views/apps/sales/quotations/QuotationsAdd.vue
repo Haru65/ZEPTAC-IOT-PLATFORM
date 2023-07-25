@@ -306,6 +306,7 @@
               <div class="items">
                 <p v-for="item in QuotationDetials.items" :key="item.id">
                   <span
+                    v-if="item.id != ''"
                     class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
                     >+ {{ item.name }}</span
                   >
@@ -518,6 +519,7 @@ export default defineComponent({
 
     const UpdateTotal = (data) => {
       console.log(data);
+      removeNulls();
       calPrice();
     };
 
@@ -540,9 +542,17 @@ export default defineComponent({
       );
     };
 
+
+    const removeNulls = () => {
+      QuotationDetials.value.items = QuotationDetials.value.items.filter(
+        (ele: any) => ele.id !== ""
+      );
+    };
+
     // number formating remove
     const submit = async () => {
       disabledselect.value = true;
+      removeNulls();
       console.warn("Nice");
       // console.log(QuotationDetials.value);
       QuotationDetials.value.date = moment(QuotationDetials.value.date).format(
