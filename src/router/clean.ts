@@ -12,7 +12,11 @@ import {
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
-
+import {
+  checkCookie,
+  getCookie,
+  deleteCookie,
+} from "@/core/services/JwtService";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
@@ -435,9 +439,11 @@ router.beforeEach((to, from, next) => {
 
   // before page access check if page requires authentication
   if (to.meta.middleware == "auth") {
-    if (authStore.isAuthenticated !== null) {
+    if (authStore.isAuthenticated !== null && checkCookie()) {
       next();
     } else {
+      deleteCookie("Auth");
+      authStore.purgeAuth();
       next({ name: "login" });
     }
   } else {

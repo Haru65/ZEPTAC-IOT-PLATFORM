@@ -5,12 +5,13 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getAssetPath } from "../helpers/assets";
 
-const InvoiceGen = (
-    quotationid: string,
+const Gen = (
+    type: string,
+    id: string,
     pdfName: string,
     invoiceDetials: any
 ) => {
-    pdfName += "_" + quotationid + "_quotation";
+    pdfName += "_" + id + type == 'q' ? "_quotation" : "_invoice";
     const columns = [
         { title: "Id", dataKey: "id" },
         { title: "Item Name", dataKey: "name" },
@@ -145,4 +146,4 @@ const InvoiceGen = (
     doc.save(`${pdfName}.pdf`);
 };
 
-export { InvoiceGen }
+export { Gen }

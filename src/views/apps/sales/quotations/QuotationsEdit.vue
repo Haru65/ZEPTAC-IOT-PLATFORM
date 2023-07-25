@@ -419,7 +419,7 @@ import {
   GetQuotationStatus,
 } from "@/core/config/QuotationStatusConfig";
 import { useRouter, useRoute } from "vue-router";
-import { InvoiceGen } from "@/core/config/InvoiceGenerator";
+import { Gen } from "@/core/config/PdfGenerator";
 
 interface itemsArr {
   id: string;
@@ -796,7 +796,7 @@ export default defineComponent({
 
     const generatePdf = (pdfName: string) => {
       removeNulls();
-      InvoiceGen(quotationid.toString(), pdfName, quotationDetail);
+      Gen("q", quotationid.toString(), pdfName, quotationDetail);
     };
     // date
 
@@ -889,3 +889,4 @@ input::-webkit-inner-spin-button {
   background-color: #fafbf6 !important;
 }
 </style>
+@/core/config/PdfGenerator
