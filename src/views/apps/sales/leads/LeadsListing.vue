@@ -40,15 +40,10 @@
           </button>
           <!--end::Export-->
           <!--begin::Add customer-->
-          <button
-            type="button"
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#kt_modal_add_customer"
-          >
+          <router-link to="./add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Leads
-          </button>
+            Add Lead
+          </router-link>
           <!--end::Add customer-->
         </div>
         <!--end::Toolbar-->
@@ -137,13 +132,15 @@
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span class="menu-link px-3">
-              <i
-                class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-              ></i>
+              <router-link :to="`./edit/${leads.id}`">
+                <i
+                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                ></i>
+              </router-link>
             </span>
             <span>
               <i
-                @click="deleteCustomer(leads.id)"
+                @click="deleteCustomer(leads.id, false)"
                 class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
@@ -154,9 +151,6 @@
       </Datatable>
     </div>
   </div>
-
-  <ExportCustomerModal></ExportCustomerModal>
-  <AddCustomerModal></AddCustomerModal>
 </template>
 
 <script lang="ts">
@@ -164,20 +158,17 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
-import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
 import type { ILeads } from "@/core/model/leads";
 import arraySort from "array-sort";
-import { getLeadsList } from "@/stores/api";
+import { deleteLead, getLeadsList } from "@/stores/api";
 import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
+import Swal from "sweetalert2";
 
 export default defineComponent({
   name: "leads-listing",
   components: {
     Datatable,
-    ExportCustomerModal,
-    AddCustomerModal,
   },
   setup() {
     const tableHeader = ref([
@@ -251,16 +242,52 @@ export default defineComponent({
     });
 
     const deleteFewCustomers = () => {
-      selectedIds.value.forEach((item) => {
-        deleteCustomer(item);
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover from this !",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "red",
+        confirmButtonText: "Yes, I am sure!",
+        cancelButtonText: "No, cancel it!",
+      }).then((result: { [x: string]: any }) => {
+        if (result["isConfirmed"]) {
+          // Put your function here
+          selectedIds.value.forEach((item) => {
+            deleteCustomer(item, true);
+          });
+          selectedIds.value.length = 0;
+        }
       });
-      selectedIds.value.length = 0;
     };
 
-    const deleteCustomer = (id: number) => {
-      for (let i = 0; i < tableData.value.length; i++) {
-        if (tableData.value[i].id === id) {
-          tableData.value.splice(i, 1);
+    const deleteCustomer = (id: number, mul: boolean) => {
+      if (!mul) {
+        for (let i = 0; i < tableData.value.length; i++) {
+          if (tableData.value[i].id === id) {
+            Swal.fire({
+              title: "Are you sure?",
+              text: "You will not be able to recover from this !",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "red",
+              confirmButtonText: "Yes, I am sure!",
+            }).then((result: { [x: string]: any }) => {
+              if (result["isConfirmed"]) {
+                // Put your function here
+                deleteLead(id);
+                tableData.value.splice(i, 1);
+              }
+            });
+          }
+        }
+      } else {
+        for (let i = 0; i < tableData.value.length; i++) {
+          if (tableData.value[i].id === id) {
+            // Put your function here
+            deleteLead(id);
+            tableData.value.splice(i, 1);
+          }
         }
       }
     };

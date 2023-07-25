@@ -316,7 +316,7 @@
               <div class="items">
                 <p v-for="item in quotationDetail.items" :key="item.id">
                   <span
-                    v-if="item.id != ``"
+                    v-if="item.id != ''"
                     class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
                     >+ {{ item.name }}</span
                   >
