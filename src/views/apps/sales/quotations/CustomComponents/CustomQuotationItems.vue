@@ -2,10 +2,10 @@
   <tr v-for="task in tasks" :key="task.id">
     <td class="pt-8 w-50 text-end text-nowrap" style="min-width: 20rem">
       <!-- {{task.id}} -->
-      <el-select v-model="task.id" filterable @change="handleSelectedChange">
-        <el-option value="0" label="Please Select Item..." key="0"
+      <el-select v-model="task.id" filterable @change="handleSelectedChange" placeholder="Please Select Item...">
+        <!-- <el-option value="0" label="Please Select Item..." key="0"
           >Please Select Item...</el-option
-        >
+        > -->
         <el-option
           v-for="ele in items"
           :key="ele.id"
