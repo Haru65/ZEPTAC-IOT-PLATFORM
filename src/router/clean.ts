@@ -7,12 +7,17 @@ import {
   getCompany,
   getCustomer,
   getInvoice,
+  getLead,
   getPriceListItem,
   getQuotation,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
-
+import {
+  checkCookie,
+  getCookie,
+  deleteCookie,
+} from "@/core/services/JwtService";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
@@ -128,6 +133,31 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Leads Add",
           breadcrumbs: ["Leads Add"],
+        },
+      },
+      {
+        path: "/leads/edit/:id",
+        name: "leads-edit",
+        component: () => import("@/views/apps/sales/leads/LeadsEdit.vue"),
+        beforeEnter: async (to, from, next) => {
+          const LeadId = to.params.id;
+          //console.log(companyId);
+          try {
+            const response = await getLead(LeadId);
+            console.log(response);
+            if (response.error) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        meta: {
+          pageTitle: "Customers Edit",
+          breadcrumbs: ["Customers Edit"],
         },
       },
       {
@@ -435,9 +465,11 @@ router.beforeEach((to, from, next) => {
 
   // before page access check if page requires authentication
   if (to.meta.middleware == "auth") {
-    if (authStore.isAuthenticated !== null) {
+    if (authStore.isAuthenticated !== null && checkCookie()) {
       next();
     } else {
+      deleteCookie("Auth");
+      authStore.purgeAuth();
       next({ name: "login" });
     }
   } else {

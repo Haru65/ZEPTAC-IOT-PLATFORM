@@ -113,13 +113,14 @@
                     v-model="invoiceDetials.customer_id"
                     filterable
                     v-on:change="GetUserData(invoiceDetials.customer_id)"
+                    placeholder="Please Select Customer..."
                   >
-                    <el-option
+                    <!-- <el-option
                       value=" "
                       label="Please Select Customer..."
                       key=" "
                       >Please Select Customer...</el-option
-                    >
+                    > -->
                     <el-option
                       v-for="item in Customers"
                       :key="item.id"
@@ -276,12 +277,18 @@
             <!--begin::Input group-->
             <div class="mb-10">
               <h2>Invoice</h2>
+              <span
+                  class="cursor-pointer"
+                  v-on:click="generatePdf(invoiceDetials.invoice_no)"
+                >
+                  <i class="fa fa-file-pdf" style="font-size: 1.6rem"></i>
+                </span>
               <br />
               <div class="row gx-10">
-                <el-select v-model="invoiceDetials.status" filterable>
-                  <el-option value=" " label="Please Select Status..." key=" "
+                <el-select v-model="invoiceDetials.status" filterable placeholder="Please Select Status...">
+                  <!-- <el-option value=" " label="Please Select Status..." key=" "
                     >Please Select Status...</el-option
-                  >
+                  > -->
                   <el-option
                     v-for="item in InvoiceStatusArray"
                     :key="item.id"
@@ -379,6 +386,7 @@ import {
   GetInvoiceStatus,
 } from "@/core/config/InvoiceStatusConfig";
 import { useRouter, useRoute } from "vue-router";
+import { Gen } from "@/core/config/PdfGenerator";
 
 interface itemsArr {
   id: string;
@@ -648,6 +656,17 @@ export default defineComponent({
       });
     };
 
+    const removeNulls = () => {
+      invoiceDetials.value.items = invoiceDetials.value.items.filter(
+        (ele: any) => ele.id !== ""
+      );
+    };
+
+    const generatePdf =  async (pdfName: string) => {
+      removeNulls();
+      await Gen("invoice", invoiceId.toString(), pdfName, invoiceDetials);
+    };
+
     // date
 
     const shortcuts = [
@@ -694,6 +713,7 @@ export default defineComponent({
       GetInvoiceStatus,
       deleteInvoice,
       Total,
+      generatePdf,
     };
   },
 });

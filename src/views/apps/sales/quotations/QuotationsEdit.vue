@@ -316,7 +316,7 @@
               <div class="items">
                 <p v-for="item in quotationDetail.items" :key="item.id">
                   <span
-                    v-if="item.id != ``"
+                    v-if="item.id != ''"
                     class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
                     >+ {{ item.name }}</span
                   >
@@ -421,7 +421,7 @@ import {
   GetQuotationStatus,
 } from "@/core/config/QuotationStatusConfig";
 import { useRouter, useRoute } from "vue-router";
-import { InvoiceGen } from "@/core/config/InvoiceGenerator";
+import { Gen } from "@/core/config/PdfGenerator";
 
 interface itemsArr {
   id: string;
@@ -796,9 +796,9 @@ export default defineComponent({
       });
     };
 
-    const generatePdf = (pdfName: string) => {
+    const generatePdf = async (pdfName: string) => {
       removeNulls();
-      InvoiceGen(quotationid.toString(), pdfName, quotationDetail);
+      await Gen("quotation", quotationid.toString(), pdfName, quotationDetail);
     };
     // date
 
@@ -891,3 +891,4 @@ input::-webkit-inner-spin-button {
   background-color: #fafbf6 !important;
 }
 </style>
+@/core/config/PdfGenerator

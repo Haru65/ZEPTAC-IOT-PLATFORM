@@ -113,13 +113,14 @@
                     v-model="invoiceDetials.customer_id"
                     filterable
                     v-on:change="GetUserData(invoiceDetials.customer_id)"
+                    placeholder="Please Select Customer..."
                   >
-                    <el-option
+                    <!-- <el-option
                       value=" "
                       label="Please Select Customer..."
                       key=" "
                       >Please Select Customer...</el-option
-                    >
+                    > -->
                     <el-option
                       v-for="item in Customers"
                       :key="item.id"
@@ -286,10 +287,11 @@
                   v-model="invoiceDetials.status"
                   filterable
                   :disabled="disabledselect"
+                  placeholder="Please Select Status..."
                 >
-                  <el-option value=" " label="Please Select Status..." key=" "
+                  <!-- <el-option value=" " label="Please Select Status..." key=" "
                     >Please Select Status...</el-option
-                  >
+                  > -->
                   <el-option
                     v-for="item in InvoiceStatusArray"
                     :key="item.id"
