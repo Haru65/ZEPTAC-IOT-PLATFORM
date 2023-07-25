@@ -796,9 +796,9 @@ export default defineComponent({
       });
     };
 
-    const generatePdf = (pdfName: string) => {
+    const generatePdf = async (pdfName: string) => {
       removeNulls();
-      Gen("q", quotationid.toString(), pdfName, quotationDetail);
+      await Gen("quotation", quotationid.toString(), pdfName, quotationDetail);
     };
     // date
 

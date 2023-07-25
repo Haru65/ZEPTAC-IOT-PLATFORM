@@ -5,13 +5,13 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getAssetPath } from "../helpers/assets";
 
-const Gen = (
-    type: string,
+const Gen = async (
+    pdftype: string,
     id: string,
     pdfName: string,
     invoiceDetials: any
 ) => {
-    pdfName += "_" + id + type == 'q' ? "_quotation" : "_invoice";
+    pdfName += "_" + id + (pdftype == "quotation" ? "_quotation" : "_invoice");
     const columns = [
         { title: "Id", dataKey: "id" },
         { title: "Item Name", dataKey: "name" },
@@ -28,7 +28,7 @@ const Gen = (
         .setFontSize(16)
         .setTextColor(0, 0, 0)
         .setFont('helvetica', "bold")
-        .text("Quotation", doc.internal.pageSize.width / 2, 0.5, {
+        .text(pdftype == "quotation" ? "Quotation" : "Invoice", doc.internal.pageSize.width / 2, 0.5, {
             align: "center",
         });
 
@@ -40,19 +40,19 @@ const Gen = (
     // Quotation number
     doc
         .setFontSize(10)
-        .text("Quotation# : " + invoiceDetials.value.quotation_no, doc.internal.pageSize.width - 2.8, 0.8);
+        .text((pdftype == "quotation" ? "Quotation" : "Invoice") + "# : " + (pdftype == "quotation" ?  invoiceDetials.value.quotation_no : invoiceDetials.value.invoice_no), doc.internal.pageSize.width - 2.8, 0.8);
 
     // Quotation Creation Date
     const creationDate = new Date(invoiceDetials.value.date).toDateString();
     doc
         .setFontSize(10)
-        .text("Quotation Date : " + creationDate, doc.internal.pageSize.width - 2.8, 1.0);
+        .text((pdftype == "quotation" ? "Quotation" : "Invoice") + " Date : " + creationDate, doc.internal.pageSize.width - 2.8, 1.0);
 
     // Quotation Due Date
     const dueDateText = new Date(invoiceDetials.value.duedate).toDateString();
     doc
         .setFontSize(10)
-        .text("Due Date : " + dueDateText, doc.internal.pageSize.width - 2.8, 1.2);
+        .text( (pdftype == "quotation" ? "Quotation" : "Invoice") + " Due Date : " + dueDateText, doc.internal.pageSize.width - 2.8, 1.2);
 
     // create a line under heading
     doc.setLineWidth(0.01).line(0.5, 1.5, 7.75, 1.5);
