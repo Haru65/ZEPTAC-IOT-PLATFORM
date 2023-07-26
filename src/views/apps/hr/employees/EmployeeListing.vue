@@ -109,10 +109,19 @@
         <!-- img data -->
         <template v-slot:profile="{ row: employee }">
           <div class="d-flex justify-content-start align-items-center">
-            <img :src="employee.profile" class="w-45px rounded-circle" alt="" />
+            <img
+              :src="
+                `data: image/png;base64,` +
+                (employee.meta.profile_pic_data
+                  ? employee.meta.profile_pic_data
+                  : blank64)
+              "
+              class="w-45px rounded-circle"
+              :alt="`data: image/png;base64,`"
+            />
             <span style="margin-left: 5.5%">
               <span class="text-gray-600 text-hover-primary mb-1">
-                {{ employee.name }}
+                {{ employee.first_name + " " + employee.last_name }}
               </span>
             </span>
           </div>
@@ -133,7 +142,7 @@
           {{ employee.role_id }}
         </template>
         <template v-slot:company_name="{ row: employee }">
-          {{ employee.company_name }}
+          {{ employee.company_name[0].company_name }}
         </template>
         <template v-slot:date="{ row: employee }">
           {{ employee.date }}
@@ -177,6 +186,8 @@ import { formatPrice } from "@/core/config/DataFormatter";
 import ApiService from "@/core/services/ApiService";
 import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
+import employee from "@/core/model/employee";
+import { blank64 } from "../../admin/users/blank";
 
 export default defineComponent({
   name: "employee-listing",
@@ -238,6 +249,7 @@ export default defineComponent({
       try {
         ApiService.setHeader();
         const response = await ApiService.get("/employee");
+        console.log(response.data.result.data);
         tableData.value = response.data.result.data.map(
           ({ created_at, role_id, ...rest }) => ({
             ...rest,
@@ -330,6 +342,7 @@ export default defineComponent({
       onItemSelect,
       getAssetPath,
       loading,
+      blank64,
     };
   },
 });

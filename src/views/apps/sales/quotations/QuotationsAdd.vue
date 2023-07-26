@@ -452,6 +452,8 @@ export default defineComponent({
     });
 
     onMounted(async () => {
+      // todo: quotation check if pres get last incr 1
+
       Customers.value.pop();
       await GetCustomers();
     });

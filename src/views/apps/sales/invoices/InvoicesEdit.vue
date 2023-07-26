@@ -269,7 +269,7 @@
           data-kt-sticky-top="150px"
           data-kt-sticky-animation="false"
           data-kt-sticky-zindex="95"
-          data-kt-sticky-width="500px"
+          data-kt-sticky-width="300px"
           data-kt-sticky-enabled="true"
         >
           <!--begin::Card body-->
@@ -277,8 +277,8 @@
             <!--begin::Input group-->
             <div class="mb-10">
               <div class="d-flex flex-lg-row justify-content-between">
-              <h2>Invoice</h2>
-              <span
+                <h2>Invoice</h2>
+                <span
                   class="cursor-pointer"
                   v-on:click="generatePdf(invoiceDetials.invoice_no)"
                 >
@@ -287,7 +287,11 @@
               </div>
               <br />
               <div class="row gx-10">
-                <el-select v-model="invoiceDetials.status" filterable placeholder="Please Select Status...">
+                <el-select
+                  v-model="invoiceDetials.status"
+                  filterable
+                  placeholder="Please Select Status..."
+                >
                   <!-- <el-option value=" " label="Please Select Status..." key=" "
                     >Please Select Status...</el-option
                   > -->
@@ -301,12 +305,13 @@
               </div>
               <br />
               <div class="items">
-                <p v-for="item in invoiceDetials.items" :key="item.id">
-                  <span
-                    class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                    >+ {{ item.name }}</span
-                  >
-                </p>
+              <p v-for="item in invoiceDetials.items" :key="item.id">
+                    <span
+                      v-if="item.id != ''"
+                      class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
+                      >+ {{ item.name }}</span
+                    >
+                  </p>
               </div>
             </div>
             <!--end::Input group-->
@@ -521,7 +526,7 @@ export default defineComponent({
 
     const calPrice = () => {
       const prices = invoiceDetials.value.items.map((ele: any) =>
-         Number(ele.price.replaceAll(",", "").substring(1))
+        Number(ele.price.replaceAll(",", "").substring(1))
       );
       invoiceDetials.value.total =
         prices.length != 0 ? prices.reduce((acc, curr) => acc + curr) : 0.0;
@@ -576,12 +581,13 @@ export default defineComponent({
 
     // number formating remove
     const submit = async () => {
+      removeNulls();
       loading.value = true;
       console.warn("Nice");
       // console.log(invoiceDetials.value);
-      invoiceDetials.value.date = moment(
-        invoiceDetials.value.date
-      ).format("YYYY-MM-DD HH:mm:ss");
+      invoiceDetials.value.date = moment(invoiceDetials.value.date).format(
+        "YYYY-MM-DD HH:mm:ss"
+      );
       invoiceDetials.value.duedate = moment(
         invoiceDetials.value.duedate
       ).format("YYYY-MM-DD HH:mm:ss");
@@ -664,7 +670,7 @@ export default defineComponent({
       );
     };
 
-    const generatePdf =  async (pdfName: string) => {
+    const generatePdf = async (pdfName: string) => {
       removeNulls();
       await Gen("invoice", invoiceId.toString(), pdfName, invoiceDetials);
     };

@@ -313,7 +313,7 @@
           <!--end::Input group-->
 
           <!--begin::Input group-->
-          <div class="row mb-6">
+          <div class="row mb-6" v-if="identifier == 'admin'">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label required fw-semobold fs-6"
               >Company</label
@@ -698,6 +698,7 @@ import { countries, INstates } from "@/core/model/countries";
 import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter, useRoute } from "vue-router";
+import { Identifier } from "@/core/config/WhichUserConfig";
 
 interface ProfileDetails {
   id: string;
@@ -735,6 +736,7 @@ export default defineComponent({
   },
   setup() {
     const auth = useAuthStore();
+    const identifier = Identifier;
     const submitButton1 = ref<HTMLElement | null>(null);
     const submitButton2 = ref<HTMLElement | null>(null);
     const submitButton3 = ref<HTMLElement | null>(null);
@@ -782,17 +784,18 @@ export default defineComponent({
         confpassword: " ",
         role_id: response.role_id,
         roles: response.roles,
-        address1: response.meta.address1,
-        address2: response.meta.address2,
-        country: response.meta.country,
-        states: response.meta.states,
-        city: response.meta.city,
-        pincode: response.meta.pincode,
-        dob: response.meta.dob,
-        gender: response.meta.gender,
-        adhar: response.meta.adhar,
-        pan: response.meta.pan,
-        company_id: response.company_id,
+        //  ? optional fields check for data
+        address1: response.meta.address1 ? response.meta.address1 : "",
+        address2: response.meta.address2 ? response.meta.address2 : "",
+        country: response.meta.country ? response.meta.country : "",
+        states: response.meta.states ? response.meta.states : "",
+        city: response.meta.city ? response.meta.city : "",
+        pincode: response.meta.pincode ? response.meta.pincode : "",
+        dob: response.meta.dob ? response.meta.dob : "",
+        gender: response.meta.gender ? response.meta.gender : "",
+        adhar: response.meta.adhar ? response.meta.adhar : "",
+        pan: response.meta.pan ? response.meta.pan : "",
+        company_id: response.company_id ? response.company_id : "",
         created_by: auth.getUserId(),
         updated_by: auth.getUserId(),
       };
@@ -1027,6 +1030,7 @@ export default defineComponent({
       state,
       file_size,
       countries,
+      identifier,
     };
   },
 });

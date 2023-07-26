@@ -8,7 +8,7 @@ export interface MenuItem {
   sub?: Array<MenuItem>;
 }
 
-const AdminMenuConfig: Array<MenuItem> = [
+const CompanyAdminMenuConfig: Array<MenuItem> = [
   {
     pages: [
       {
@@ -16,6 +16,28 @@ const AdminMenuConfig: Array<MenuItem> = [
         route: "/dashboard",
         keenthemesIcon: "element-1",
         bootstrapIcon: "bi-app-indicator",
+      },
+    ],
+  },
+  {
+    heading: "Admin",
+    route: "/company",
+    pages: [
+      {
+        sectionTitle: "Users",
+        route: "/users",
+        keenthemesIcon: "profile-user",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add User",
+            route: "/users/add",
+          },
+          {
+            heading: "List Users",
+            route: "/users/list",
+          },
+        ],
       },
     ],
   },
@@ -44,6 +66,92 @@ const AdminMenuConfig: Array<MenuItem> = [
         route: "/trainings",
         keenthemesIcon: "educare",
         bootstrapIcon: "bi-archive",
+      },
+    ],
+  },
+  {
+    heading: "Sales",
+    route: "/sales",
+    pages: [
+      {
+        sectionTitle: "Leads",
+        route: "/sales/leads",
+        keenthemesIcon: "people",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add Leads",
+            route: "/leads/add",
+          },
+          {
+            heading: "List Leads",
+            route: "/leads/list",
+          },
+        ],
+      },
+      {
+        sectionTitle: "Customers",
+        route: "/customers",
+        keenthemesIcon: "user-edit",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add Customers",
+            route: "/customers/add",
+          },
+          {
+            heading: "List Customers",
+            route: "/customers/list",
+          },
+        ],
+      },
+      {
+        sectionTitle: "Price List Items",
+        route: "/pricelist",
+        keenthemesIcon: "bill",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add Items",
+            route: "/pricelist/add",
+          },
+          {
+            heading: "List Items",
+            route: "/pricelist/list",
+          },
+        ],
+      },
+      {
+        sectionTitle: "Quotations",
+        route: "/quotations",
+        keenthemesIcon: "note-2",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add Quotations",
+            route: "/quotations/add",
+          },
+          {
+            heading: "List Quotations",
+            route: "/quotations/list",
+          },
+        ],
+      },
+      {
+        sectionTitle: "Invoices",
+        route: "/invoices",
+        keenthemesIcon: "message-programming",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add Invoices",
+            route: "/invoices/add",
+          },
+          {
+            heading: "List Invoices",
+            route: "/invoices/list",
+          },
+        ],
       },
     ],
   },
@@ -125,4 +233,4 @@ const AdminMenuConfig: Array<MenuItem> = [
   },
 ];
 
-export default AdminMenuConfig;
+export default CompanyAdminMenuConfig;

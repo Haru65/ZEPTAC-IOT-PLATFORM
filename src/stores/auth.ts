@@ -50,9 +50,14 @@ export const useAuthStore = defineStore("auth", () => {
     return data.id;
   }
 
+  function getRoleId() {
+    const data = JSON.parse(User() || "");
+    return data.role_id.toString();
+  }
+
   function getUserCompanyId() {
     const data = JSON.parse(User() || "");
-    return data.company_id;
+    return data.company_id.toString();
   }
 
   function purgeAuth() {
@@ -136,5 +141,6 @@ export const useAuthStore = defineStore("auth", () => {
     get_auth,
     getUserId,
     getUserCompanyId,
+    getRoleId,
   };
 });

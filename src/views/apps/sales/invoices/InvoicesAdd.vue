@@ -304,6 +304,7 @@
               <div class="items">
                 <p v-for="item in invoiceDetials.items" :key="item.id">
                   <span
+                    v-if="item.id != ''"
                     class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
                     >+ {{ item.name }}</span
                   >
@@ -519,7 +520,14 @@ export default defineComponent({
       calPrice();
     };
 
+    const removeNulls = () => {
+      invoiceDetials.value.items = invoiceDetials.value.items.filter(
+        (ele: any) => ele.id !== ""
+      );
+    };
+
     const calPrice = () => {
+      removeNulls();
       const prices = invoiceDetials.value.items.map((ele: any) =>
         Number(ele.price.replaceAll(",", "").substring(1))
       );
@@ -540,6 +548,7 @@ export default defineComponent({
 
     // number formating remove
     const submit = async () => {
+      removeNulls();
       disabledselect.value = true;
       console.warn("Nice");
       // console.log(invoiceDetials.value);
