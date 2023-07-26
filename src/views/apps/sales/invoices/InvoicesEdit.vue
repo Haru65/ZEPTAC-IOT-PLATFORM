@@ -276,6 +276,7 @@
           <div class="card-body p-10">
             <!--begin::Input group-->
             <div class="mb-10">
+              <div class="d-flex flex-lg-row justify-content-between">
               <h2>Invoice</h2>
               <span
                   class="cursor-pointer"
@@ -283,6 +284,7 @@
                 >
                   <i class="fa fa-file-pdf" style="font-size: 1.6rem"></i>
                 </span>
+              </div>
               <br />
               <div class="row gx-10">
                 <el-select v-model="invoiceDetials.status" filterable placeholder="Please Select Status...">
