@@ -40,7 +40,7 @@
           </button>
           <!--end::Export-->
           <!--begin::Add customer-->
-          <button
+          <!-- <button
             type="button"
             class="btn btn-primary"
             data-bs-toggle="modal"
@@ -48,7 +48,7 @@
           >
             <KTIcon icon-name="plus" icon-class="fs-2" />
             Add Employee
-          </button>
+          </button> -->
           <!--end::Add customer-->
         </div>
         <!--end::Toolbar-->
@@ -173,10 +173,10 @@ import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.v
 import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
 import type { IEmployee } from "@/core/model/employee";
 import arraySort from "array-sort";
-import { formatPrice } from "@/core/config/DataFormatter";
 import ApiService from "@/core/services/ApiService";
 import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
+import Swal from "sweetalert2";
 
 export default defineComponent({
   name: "employee-listing",

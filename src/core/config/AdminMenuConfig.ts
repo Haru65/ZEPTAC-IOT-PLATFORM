@@ -57,82 +57,6 @@ const AdminMenuConfig: Array<MenuItem> = [
       },
     ],
   },
-  // {
-  //   heading: "apps",
-  //   route: "/apps",
-  //   pages: [
-  //     {
-  //       sectionTitle: "customers",
-  //       route: "/customers",
-  //       keenthemesIcon: "abstract-38",
-  //       bootstrapIcon: "bi-printer",
-  //       sub: [
-  //         {
-  //           heading: "gettingStarted",
-  //           route: "/apps/customers/getting-started",
-  //         },
-  //         {
-  //           heading: "customersListing",
-  //           route: "/apps/customers/customers-listing",
-  //         },
-  //         {
-  //           heading: "customerDetails",
-  //           route: "/apps/customers/customer-details",
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       sectionTitle: "subscriptions",
-  //       route: "/subscriptions",
-  //       keenthemesIcon: "basket",
-  //       bootstrapIcon: "bi-cart",
-  //       sub: [
-  //         {
-  //           heading: "getStarted",
-  //           route: "/apps/subscriptions/getting-started",
-  //         },
-  //         {
-  //           heading: "subscriptionList",
-  //           route: "/apps/subscriptions/subscription-list",
-  //         },
-  //         {
-  //           heading: "addSubscription",
-  //           route: "/apps/subscriptions/add-subscription",
-  //         },
-  //         {
-  //           heading: "viewSubscription",
-  //           route: "/apps/subscriptions/view-subscription",
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       heading: "calendarApp",
-  //       route: "/apps/calendar",
-  //       keenthemesIcon: "calendar-8",
-  //       bootstrapIcon: "bi-calendar3-event",
-  //     },
-  //     {
-  //       sectionTitle: "chat",
-  //       route: "/chat",
-  //       keenthemesIcon: "message-text-2",
-  //       bootstrapIcon: "bi-chat-left",
-  //       sub: [
-  //         {
-  //           heading: "privateChat",
-  //           route: "/apps/chat/private-chat",
-  //         },
-  //         {
-  //           heading: "groupChat",
-  //           route: "/apps/chat/group-chat",
-  //         },
-  //         {
-  //           heading: "drawerChat",
-  //           route: "/apps/chat/drawer-chat",
-  //         },
-  //       ],
-  //     },
-  //   ],
-  // },
   {
     heading: "HR",
     route: "/hr",
@@ -143,10 +67,6 @@ const AdminMenuConfig: Array<MenuItem> = [
         keenthemesIcon: "office-bag",
         bootstrapIcon: "bi-archive",
         sub: [
-          {
-            heading: "Add Employee",
-            route: "employee/add",
-          },
           {
             heading: "List Employees",
             route: "/employee/list",
@@ -194,6 +114,22 @@ const AdminMenuConfig: Array<MenuItem> = [
           {
             heading: "List Customers",
             route: "/customers/list",
+          },
+        ],
+      },
+      {
+        sectionTitle: "Clients",
+        route: "/clients",
+        keenthemesIcon: "user-edit",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add Clients",
+            route: "/clients/add",
+          },
+          {
+            heading: "List Clients",
+            route: "/clients/list",
           },
         ],
       },

@@ -42,7 +42,7 @@
           <!--begin::Add customer-->
           <router-link to="./add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Customer
+            Add Client
           </router-link>
           <!--end::Add customer-->
         </div>
@@ -60,7 +60,7 @@
           <button
             type="button"
             class="btn btn-danger"
-            @click="deleteFewCustomers()"
+            @click="deleteFewClients()"
           >
             Delete Selected
           </button>
@@ -142,7 +142,7 @@
             </span>
             <span>
               <i
-                @click="deleteCustomer(customer.id,false)"
+                @click="deleteclient(customer.id,false)"
                 class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
@@ -160,13 +160,13 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import type { ICustomers } from "@/core/model/customers";
+import type { IClients } from "@/core/model/clients";
 import arraySort from "array-sort";
 import ApiService from "@/core/services/ApiService";
 import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
 import Swal from "sweetalert2";
-import { deletecustomer } from "@/stores/api";
+import { deleteClient, getClients } from "@/stores/api";
 export default defineComponent({
   name: "customers-listing",
   components: {
@@ -215,19 +215,19 @@ export default defineComponent({
 
     // functions
     // get users function
-    async function customer_listing(): Promise<void> {
+    async function client_listing(): Promise<void> {
       try {
         ApiService.setHeader();
-        const response = await ApiService.get("/customers");
+        const response = await getClients();
         console.log(response);
-        tableData.value = response.data.result.data.map(
+        tableData.value = response.result.data.map(
           ({ created_at, role_id, ...rest }) => ({
             ...rest,
             created_at: moment(created_at).format("MMMM Do YYYY"),
             role_id: get_role(role_id),
           })
         );
-        initCustomers.value.splice(
+        initClients.value.splice(
           0,
           tableData.value.length,
           ...tableData.value
@@ -240,17 +240,17 @@ export default defineComponent({
     }
     
     const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<ICustomers>>([]);
-    const initCustomers = ref<Array<ICustomers>>([]);
+    const tableData = ref<Array<IClients>>([]);
+    const initClients = ref<Array<IClients>>([]);
 
     onMounted(async () => {
-      await customer_listing();
+      await client_listing();
       setTimeout(() => {
         loading.value = false;
       }, 250);
     });
 
-    const deleteFewCustomers = () => {
+    const deleteFewClients = () => {
       Swal.fire({
         title: "Are you sure?",
         text: "You will not be able to recover from this !",
@@ -263,14 +263,14 @@ export default defineComponent({
         if (result["isConfirmed"]) {
           // Put your function here
           selectedIds.value.forEach((item) => {
-            deleteCustomer(item, true);
+            deleteclient(item, true);
           });
           selectedIds.value.length = 0;
         }
       });
     };
 
-    const deleteCustomer = (id: number, mul: boolean) => {
+    const deleteclient = (id: number, mul: boolean) => {
       if (!mul) {
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
@@ -284,7 +284,7 @@ export default defineComponent({
             }).then((result: { [x: string]: any }) => {
               if (result["isConfirmed"]) {
                 // Put your function here
-                deletecustomer(id);
+                deleteClient(id);
                 tableData.value.splice(i, 1);
               }
             });
@@ -294,7 +294,7 @@ export default defineComponent({
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
             // Put your function here
-            deletecustomer(id);
+            deleteClient(id);
             tableData.value.splice(i, 1);
           }
         }
@@ -303,9 +303,9 @@ export default defineComponent({
 
     const search = ref<string>("");
     const searchItems = () => {
-      tableData.value.splice(0, tableData.value.length, ...initCustomers.value);
+      tableData.value.splice(0, tableData.value.length, ...initClients.value);
       if (search.value !== "") {
-        let results: Array<ICustomers> = [];
+        let results: Array<IClients> = [];
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
             results.push(tableData.value[j]);
@@ -339,11 +339,11 @@ export default defineComponent({
     return {
       tableData,
       tableHeader,
-      deleteCustomer,
+      deleteclient,
       search,
       searchItems,
       selectedIds,
-      deleteFewCustomers,
+      deleteFewClients,
       sort,
       onItemSelect,
       getAssetPath,

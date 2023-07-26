@@ -156,10 +156,12 @@ const routes: Array<RouteRecordRaw> = [
           }
         },
         meta: {
-          pageTitle: "Customers Edit",
-          breadcrumbs: ["Customers Edit"],
+          pageTitle: "Leads Edit",
+          breadcrumbs: ["Leads Edit"],
         },
       },
+
+      // customers front-end routes
       {
         path: "/customers/list",
         name: "customers-list",
@@ -206,6 +208,56 @@ const routes: Array<RouteRecordRaw> = [
           breadcrumbs: ["Customers Edit"],
         },
       },
+
+      // Clients front-end routes
+      {
+        path: "/clients/list",
+        name: "clients-list",
+        component: () =>
+          import("@/views/apps/sales/clients/ClientsListing.vue"),
+        meta: {
+          pageTitle: "Clients List",
+          breadcrumbs: ["Clients List"],
+        },
+      },
+      {
+        path: "/clients/add",
+        name: "clients-add",
+        component: () =>
+          import("@/views/apps/sales/clients/ClientsAdd.vue"),
+        meta: {
+          pageTitle: "Clients Add",
+          breadcrumbs: ["Clients Add"],
+        },
+      },
+      {
+        path: "/clients/edit/:id",
+        name: "clients-edit",
+        component: () =>
+          import("@/views/apps/sales/clients/ClientsEdit.vue"),
+        beforeEnter: async (to, from, next) => {
+          const customerId = to.params.id;
+          //console.log(companyId);
+          try {
+            const response = await getCustomer(customerId);
+            console.log(response);
+            if (response.error) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        meta: {
+          pageTitle: "Clients Edit",
+          breadcrumbs: ["Clients Edit"],
+        },
+      },
+
+      // PriceList front-end routes
       {
         path: "/pricelist/list",
         name: "price-list",

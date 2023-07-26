@@ -549,7 +549,7 @@ import { defineComponent, onMounted, ref, watch } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
-import { updateCustomer, getCompanies, getCustomer } from "@/stores/api";
+import { updateClient, getClients, getClient } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
@@ -598,9 +598,10 @@ export default defineComponent({
     const customerId = router.params.id;
     const getdropcomp = async () => {
       ApiService.setHeader();
-      const response = await getCompanies(`limit=${limit.value}`);
+      const response = await getClients(`limit=${limit.value}`);
+      
       Companies.value.push(
-        ...response.result.data.data.map(({ created_at, ...rest }) => ({
+        ...response.result.data.map(({ created_at, ...rest }) => ({
           ...rest,
           created_at: moment(created_at).format("MMMM Do YYYY"),
         }))
@@ -612,8 +613,9 @@ export default defineComponent({
       state.value.pop();
       Companies.value.pop();
       await getdropcomp();
-      // add customer details
-      const res = await getCustomer(customerId);
+      // add client details
+      const res = await getClient(customerId);
+      console.log(res);
       profileDetails.value = {
         first_name: res.first_name,
         last_name: res.last_name,
@@ -657,7 +659,7 @@ export default defineComponent({
       phone: "",
       password: "",
       confpassword: "",
-      role_id: "7",
+      role_id: "9",
       address1: "",
       address2: "",
       country: "",
@@ -680,12 +682,12 @@ export default defineComponent({
       console.warn("Nice");
       try {
         // Call your API here with the form values
-        const response = await updateCustomer(customerId, profileDetails.value);
+        const response = await updateClient(profileDetails.value, customerId);
         console.log(response.error);
         if (!response.error) {
           // Handle successful API response
           console.log("API response:", response);
-          showSuccessAlert("Success", "Customer Information successfully Updated!");
+          showSuccessAlert("Success", "Client Information successfully Updated!");
           clear();
         } else {
           // Handle API error response
@@ -703,7 +705,7 @@ export default defineComponent({
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
         loading.value = false;
-        route.push({ name: "customers-list" });
+        route.push({ name: "clients-list" });
       }
     };
 
@@ -760,7 +762,7 @@ export default defineComponent({
         phone: "",
         password: "decodedemo",
         confpassword: "",
-        role_id: "7",
+        role_id: "9",
         address1: "",
         address2: "",
         country: "",

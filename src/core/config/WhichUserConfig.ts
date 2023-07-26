@@ -23,6 +23,10 @@ const Identifier = computed(() => {
             return "commercialex";
         case "7":
             return "customer";
+        case "8":
+            return "Lead";
+        case "7":
+            return "Client";
         default:
             return false;
     }

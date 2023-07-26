@@ -8,6 +8,7 @@ const PRICELIST_URL = "pricelist";
 const INVOICE_URL = "invoice";
 const QUOTATION_URL = "quotation";
 const LEADS_URL = 'leads';
+const CLIENTS_URL = "clients";
 
 // COMPANIES
 
@@ -155,6 +156,77 @@ export async function getCustomers() {
         return { error: errors };
     }
 }
+
+
+// CLIENTS APIs
+// get all clients
+export async function getClients(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(CLIENTS_URL);
+        console.log(response.data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// Add a client -- ADMIN
+export async function addClient(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.post(CLIENTS_URL, data);
+        return response.data.message;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// Delete A Client
+export async function deleteClient(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.delete(CLIENTS_URL + "/" + data);
+        return response.data.message;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// Get A client
+export async function getClient(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(CLIENTS_URL, data);
+        //console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// Update A Client
+export async function updateClient(data: any, id: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.put(CLIENTS_URL + "/" + id, data);
+        //console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// end of clients api
+
+
+
 
 // CUSTOMERS
 // 
