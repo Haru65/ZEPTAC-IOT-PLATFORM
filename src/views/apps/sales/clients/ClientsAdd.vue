@@ -637,6 +637,7 @@ export default defineComponent({
   },
   setup() {
     const auth = useAuthStore();
+    const User = auth.GetUser();
     const router = useRouter();
     const disabledselect = ref(true);
     let limit = ref(500);
