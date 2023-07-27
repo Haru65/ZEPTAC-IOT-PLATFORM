@@ -1,9 +1,17 @@
 /* eslint-disable prettier/prettier */
+// * This file is used to generate invoice pdf
 
-// This file is used to generate invoice pdf
 import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+import autoTable from "jspdf-autotable"; // ! depretaited import
 import { getAssetPath } from "../helpers/assets";
+
+/**
+ * Gen Method to print invoice or quotation reciept
+ * @param pdftype string
+ * @param id  string
+ * @param pdfName  string
+ * @param invoiceDetials obj | any
+ */
 
 const Gen = async (
     pdftype: string,
@@ -40,7 +48,7 @@ const Gen = async (
     // Quotation number
     doc
         .setFontSize(10)
-        .text((pdftype == "quotation" ? "Quotation" : "Invoice") + "# : " + (pdftype == "quotation" ?  invoiceDetials.value.quotation_no : invoiceDetials.value.invoice_no), doc.internal.pageSize.width - 2.8, 0.8);
+        .text((pdftype == "quotation" ? "Quotation" : "Invoice") + "# : " + (pdftype == "quotation" ? invoiceDetials.value.quotation_no : invoiceDetials.value.invoice_no), doc.internal.pageSize.width - 2.8, 0.8);
 
     // Quotation Creation Date
     const creationDate = new Date(invoiceDetials.value.date).toDateString();
@@ -52,7 +60,7 @@ const Gen = async (
     const dueDateText = new Date(invoiceDetials.value.duedate).toDateString();
     doc
         .setFontSize(10)
-        .text( (pdftype == "quotation" ? "Quotation" : "Invoice") + " Due Date : " + dueDateText, doc.internal.pageSize.width - 2.8, 1.2);
+        .text((pdftype == "quotation" ? "Quotation" : "Invoice") + " Due Date : " + dueDateText, doc.internal.pageSize.width - 2.8, 1.2);
 
     // create a line under heading
     doc.setLineWidth(0.01).line(0.5, 1.5, 7.75, 1.5);

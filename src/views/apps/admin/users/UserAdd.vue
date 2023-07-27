@@ -322,7 +322,7 @@
           <!--end::Input group-->
 
           <!--begin::Input group-->
-          <div class="row mb-6">
+          <div class="row mb-6" v-if="identifier == 'admin'">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label required fw-semobold fs-6"
               >Company</label
@@ -705,6 +705,7 @@ import { addUser, getCompanies } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import { countries, INstates } from "@/core/model/countries";
 import moment from "moment";
+import { Identifier } from "@/core/config/WhichUserConfig";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import { blank64 } from "./blank";
@@ -742,6 +743,7 @@ export default defineComponent({
     Vform,
   },
   setup() {
+    const identifier = Identifier;
     const auth = useAuthStore();
     const submitButton1 = ref<HTMLElement | null>(null);
     const submitButton2 = ref<HTMLElement | null>(null);
@@ -836,6 +838,14 @@ export default defineComponent({
     );
 
     const onsubmit = async () => {
+      // * company identification for companyid based on localstorage login
+
+      // disp_image
+      profileDetails.value.disp_avatar =
+        profileDetails.value.disp_avatar.replace(
+          /^data:image\/\w+;base64,/,
+          ""
+        );
       loading.value = true;
       console.log(profileDetails.value);
       console.warn("Nice");
@@ -845,6 +855,10 @@ export default defineComponent({
         // CUSTOMS
         // const form = await CUSTOM_FORM(profileDetails);
         // push form
+        console.log(auth.getRoleId().toString())
+        if (auth.getRoleId() == "2") {
+          profileDetails.value.company_id = auth.getUserCompanyId();
+        }
         const response = await addUser(profileDetails.value);
         console.log(response.error);
         if (!response.error) {
@@ -995,6 +1009,7 @@ export default defineComponent({
       state,
       countries,
       file_size,
+      identifier,
     };
   },
 });

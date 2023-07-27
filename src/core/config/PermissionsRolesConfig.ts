@@ -1,5 +1,5 @@
-// get API Data From /permissions and map for usage
-// store in local storage for reference
+// * get API Data From /permissions and map for usage
+// * store in local storage for reference
 const permissions = {
     1: "Create Company",
     2: "Update Company",
@@ -23,6 +23,8 @@ const roles = {
     5: "Service Enginner",
     6: "Commercial Executive",
     7: "Customer",
+    8: "Lead",
+    9: "Client",
 };
 
 const rolesArray = Object.keys(roles).map((id) => ({
@@ -32,10 +34,10 @@ const rolesArray = Object.keys(roles).map((id) => ({
 
 const get_role = (id: number) => {
     if (id in roles) {
-        // Return the value of the key
+        // ? Return the value of the key
         return roles[id];
     } else {
-        // Return null if the key doesn't exist
+        // ? Return null if the key doesn't exist
         return "Invalid";
     }
 };
