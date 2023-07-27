@@ -674,7 +674,7 @@ export default defineComponent({
         console.log(profileDetails.value);
 
       }
-    };
+    }
 
 
     const emailFormDisplay = ref(false);
@@ -710,8 +710,12 @@ export default defineComponent({
       company_name: "",
       created_by: User.id,
       updated_by: User.id,
+      customer_id: "",
+      customer_fisrt_name: "",
+      customer_last_name: "",
     });
 
+    const onsubmit = async () => {
       try {
         // Call your API here with the form values
         const response = await addClient(profileDetails.value);
@@ -829,7 +833,7 @@ export default defineComponent({
       Customers,
     };
   },
-});
+);
 </script>
 <style>
 .el-input__inner {
