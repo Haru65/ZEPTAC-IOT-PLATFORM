@@ -141,6 +141,29 @@
             <!--end::Col-->
           </div>
           <!--end::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >Customer Name</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <el-select v-model="profileDetails.customer_id" filterable>
+                <!-- <el-option value="0" label="Please Select Customer..." key="0"
+                  >Please Select Customer...</el-option
+                > -->
+                <el-option
+                  v-for="item in Customers"
+                  :key="item.id"
+                  :label="`${item.first_name} ${item.last_name}`"
+                  :value="item.id"
+                />
+              </el-select>
+            </div>
+            <!--end::Col-->
+          </div>
           <!--begin::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
@@ -549,12 +572,24 @@ import { defineComponent, onMounted, ref, watch } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
-import { updateClient, getClients, getClient } from "@/stores/api";
+import {
+  updateClient,
+  getCustomers,
+  getCustomer,
+  getLead,
+  getClient,
+} from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
 import { useRoute, useRouter } from "vue-router";
 import { countries, INstates } from "@/core/model/countries";
+
+interface CustomerData {
+  customer_id: string;
+  first_name: string;
+  last_name: string;
+}
 
 interface ProfileDetails {
   first_name: string;
@@ -578,6 +613,9 @@ interface ProfileDetails {
   company_name: string;
   created_by: string;
   updated_by: string;
+  customer_id: number;
+  customer_fisrt_name: string;
+  customer_last_name: string;
 }
 
 export default defineComponent({
@@ -589,59 +627,51 @@ export default defineComponent({
   },
   setup() {
     const auth = useAuthStore();
-    const router = useRoute();
-    const route = useRouter();
+    const User = auth.GetUser();
+    const router = useRouter();
+    const route = useRoute();
+    const disabledselect = ref(true);
     let limit = ref(500);
     const loading = ref(false);
-    const Companies = ref([{ id: "", company_name: "" }]);
+    const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
     const state = ref([""]);
-    const customerId = router.params.id;
-    const User = auth.GetUser();
+    const LeadId = route.params.id;
 
-    const getdropcomp = async () => {
+    onMounted(async () => {
+      const response = await getClient(LeadId);
+      console.log(response);
+      profileDetails.value.first_name = response.first_name;
+      profileDetails.value.last_name = response.last_name;
+      profileDetails.value.company_name = response.meta.company_name;
+      profileDetails.value.customer_id = parseInt(response.meta.customer_id);
+
+      state.value.pop();
+      Customers.value.pop();
+      await GetCustomers();
+    });
+
+    const GetCustomers = async () => {
       ApiService.setHeader();
-      const response = await getClients(`limit=${limit.value}`);
-      
-      Companies.value.push(
+      const response = await getCustomers();
+      Customers.value.push(
         ...response.result.data.map(({ created_at, ...rest }) => ({
           ...rest,
           created_at: moment(created_at).format("MMMM Do YYYY"),
         }))
       );
-      console.log(Companies);
     };
 
-    onMounted(async () => {
-      state.value.pop();
-      Companies.value.pop();
-      await getdropcomp();
-      // add client details
-      const res = await getClient(customerId);
-      console.log(res);
-      profileDetails.value = {
-        first_name: res.first_name,
-        last_name: res.last_name,
-        email: res.email,
-        phone: res.mobile,
-        password: "",
-        confpassword: "",
-        role_id: res.role_id,
-        address1: res.meta.address1,
-        address2: res.meta.address2,
-        country: res.meta.country,
-        states: res.meta.states,
-        city: res.meta.city,
-        pincode: res.meta.pincode,
-        dob: res.meta.dob,
-        gender: res.meta.gender,
-        adhar: res.meta.adhar,
-        pan: res.meta.pan,
-        company_id: User.company_id,
-        company_name: res.meta.company_name,
-        created_by: User.id,
-        updated_by: User.id,
-      };
-    });
+    const GetCustomerData = async (id) => {
+      if (id != " ") {
+        const response = await getCustomer(id);
+        console.log(response);
+        profileDetails.value.customer_id = response.id;
+        profileDetails.value.customer_fisrt_name = response.first_name;
+        profileDetails.value.customer_last_name = response.last_name;
+        disabledselect.value = false;
+        console.log(profileDetails.value);
+      }
+    };
 
     const emailFormDisplay = ref(false);
     const passwordFormDisplay = ref(false);
@@ -654,12 +684,17 @@ export default defineComponent({
       company_name: Yup.string().required().label("Company Name"),
     });
 
+    const customer = ref<CustomerData>({
+      customer_id: "",
+      first_name: "",
+      last_name: "",
+    });
     const profileDetails = ref<ProfileDetails>({
       first_name: "",
       last_name: "",
       email: "",
       phone: "",
-      password: "",
+      password: "decodedemo",
       confpassword: "",
       role_id: "9",
       address1: "",
@@ -676,20 +711,20 @@ export default defineComponent({
       company_name: "",
       created_by: User.id,
       updated_by: User.id,
+      customer_id: 0,
+      customer_fisrt_name: "",
+      customer_last_name: "",
     });
 
     const onsubmit = async () => {
-      loading.value = true;
-      console.log(profileDetails.value);
-      console.warn("Nice");
       try {
         // Call your API here with the form values
-        const response = await updateClient(profileDetails.value, customerId);
+        const response = await updateClient(profileDetails.value, LeadId);
         console.log(response.error);
         if (!response.error) {
           // Handle successful API response
           console.log("API response:", response);
-          showSuccessAlert("Success", "Client Information successfully Updated!");
+          showSuccessAlert("Success", "User have been successfully inserted!");
           clear();
         } else {
           // Handle API error response
@@ -707,7 +742,7 @@ export default defineComponent({
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
         loading.value = false;
-        route.push({ name: "clients-list" });
+        router.push({ name: "clients-list" });
       }
     };
 
@@ -746,12 +781,13 @@ export default defineComponent({
           state.value.pop();
         }
         if (newVal === "India") {
+          profileDetails.value.states = "";
           INstates.forEach((ele) => {
             state.value.push(ele.name);
           });
           //console.log(state);
         } else {
-          // profileDetails.value.states = "";
+          profileDetails.value.states = "";
         }
       }
     );
@@ -779,11 +815,15 @@ export default defineComponent({
         company_name: "",
         created_by: User.id,
         updated_by: User.id,
+        customer_id: 0,
+        customer_fisrt_name: "",
+        customer_last_name: "",
       };
     };
 
     return {
       profileDetails,
+      customer,
       emailFormDisplay,
       passwordFormDisplay,
       profileDetailsValidator,
@@ -793,10 +833,13 @@ export default defineComponent({
       clear,
       countries,
       state,
+      GetCustomerData,
+      Customers,
     };
   },
 });
 </script>
+
 <style>
 .el-input__inner {
   font-weight: 500;

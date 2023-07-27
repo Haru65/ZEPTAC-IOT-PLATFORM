@@ -313,7 +313,7 @@
           <!--end::Input group-->
 
           <!--begin::Input group-->
-          <div class="row mb-6" v-if="identifier == 'admin'">
+          <div class="row mb-6" v-if="identifier == 'Admin'">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label required fw-semobold fs-6"
               >Company</label

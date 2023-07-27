@@ -142,33 +142,19 @@
           </div>
           <!--end::Input group-->
 
-
-
           <div class="row mb-6">
-                <!--begin::Label-->
-                <label class="col-lg-4 col-form-label fw-semobold fs-6">
-                <span class="required">Customer Name</span>
-                <i
-                class="fas fa-exclamation-circle ms-1 fs-7"
-                data-bs-toggle="tooltip"
-                title="Phone number must be active"
-                ></i>
-              </label>
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >Customer Name</label
+            >
             <!--end::Label-->
-            
+
+            <!--begin::Col-->
             <div class="col-lg-8 fv-row">
-              <el-select
-                v-model="customer.customer_id"
-                filterable
-                v-on:change="GetCustomerData(customer.customer_id)"
-                placeholder="Please Select Customer..."
-              >
-                <!-- <el-option
-                  value=" "
-                  label="Please Select Customer..."
-                  key=" "
+              <el-select v-model="profileDetails.customer_id" filterable>
+                <el-option value="0" label="Please Select Customer..." key="0"
                   >Please Select Customer...</el-option
-                > -->
+                >
                 <el-option
                   v-for="item in Customers"
                   :key="item.id"
@@ -177,8 +163,8 @@
                 />
               </el-select>
             </div>
+            <!--end::Col-->
           </div>
-
 
           <!--begin::Input group-->
           <div class="row mb-6">
@@ -291,7 +277,11 @@
               <div class="row">
                 <!--begin::Col-->
                 <div class="col-lg fv-row">
-                  <el-select v-model="profileDetails.country" filterable placeholder="Please Select Country..">
+                  <el-select
+                    v-model="profileDetails.country"
+                    filterable
+                    label="Please Select Country.."
+                  >
                     <!-- <el-option value="0" label="Please Select Role..." key="0"
                       >Please Select Country...</el-option
                     > -->
@@ -587,13 +577,12 @@ import { defineComponent, onMounted, ref, watch } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
-import { addClient, getClients, getClient, getCustomers, getCustomer } from "@/stores/api";
+import { addClient, getCustomers, getCustomer } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import { countries, INstates } from "@/core/model/countries";
-
 
 interface CustomerData {
   customer_id: string;
@@ -662,20 +651,17 @@ export default defineComponent({
       );
     };
 
-
     const GetCustomerData = async (id) => {
       if (id != " ") {
         const response = await getCustomer(id);
-        console.log(response)
+        console.log(response);
         profileDetails.value.customer_id = response.id;
         profileDetails.value.customer_fisrt_name = response.first_name;
         profileDetails.value.customer_last_name = response.last_name;
         disabledselect.value = false;
         console.log(profileDetails.value);
-
       }
-    }
-
+    };
 
     const emailFormDisplay = ref(false);
     const passwordFormDisplay = ref(false);
@@ -691,8 +677,8 @@ export default defineComponent({
     const customer = ref<CustomerData>({
       customer_id: "",
       first_name: "",
-      last_name: ""
-    })
+      last_name: "",
+    });
     const profileDetails = ref<ProfileDetails>({
       first_name: "",
       last_name: "",
@@ -715,7 +701,7 @@ export default defineComponent({
       company_name: "",
       created_by: User.id,
       updated_by: User.id,
-      customer_id: "",
+      customer_id: "0",
       customer_fisrt_name: "",
       customer_last_name: "",
     });
@@ -843,10 +829,12 @@ export default defineComponent({
   },
 });
 </script>
+
 <style>
 .el-input__inner {
   font-weight: 500;
 }
+
 .el-input__wrapper {
   color: red !important;
   height: 3.5rem;
