@@ -10,23 +10,23 @@ const limit = Array.from({ length: Limit }, (_, index) => index + 1);
 const Identifier = computed(() => {
     switch (auth.get_auth()?.toString()) {
         case "1":
-            return "admin";
+            return "Admin";
         case "2":
-            return "companyadmin";
+            return "Company-Admin";
         case "3":
-            return "salesperson";
+            return "Sales-Person";
         case "4":
-            return "siteincharge";
+            return "Site-Incharge";
         case "5":
-            return "siteincharge";
+            return "Service-Enginner";
         case "6":
-            return "commercialex";
+            return "Commercial-Executive";
         case "7":
-            return "customer";
+            return "Customer";
         case "8":
-            return "lead";
+            return "Lead";
         case "9":
-            return "client";
+            return "Client";
         default:
             return false;
     }

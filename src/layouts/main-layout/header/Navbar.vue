@@ -97,7 +97,10 @@
         data-kt-menu-attach="parent"
         data-kt-menu-placement="bottom-end"
       >
-        <img :src="getAssetPath('media/avatars/300-1.jpg')" alt="user" />
+        <img
+          :src="`data: image/png;base64,` + User.meta.profile_pic_data"
+          alt="user"
+        />
       </div>
       <KTUserMenu />
       <!--end::Menu wrapper-->
@@ -131,6 +134,7 @@ import KTUserMenu from "@/layouts/main-layout/menus/UserAccountMenu.vue";
 import KTThemeModeSwitcher from "@/layouts/main-layout/theme-mode/ThemeModeSwitcher.vue";
 import { ThemeModeComponent } from "@/assets/ts/layout";
 import { useThemeStore } from "@/stores/theme";
+import { useAuthStore } from "@/stores/auth";
 
 export default defineComponent({
   name: "header-navbar",
@@ -142,8 +146,9 @@ export default defineComponent({
     KTThemeModeSwitcher,
   },
   setup() {
+    const auth = useAuthStore();
     const store = useThemeStore();
-
+    const User = auth.GetUser();
     const themeMode = computed(() => {
       if (store.mode === "system") {
         return ThemeModeComponent.getSystemMode();
@@ -154,6 +159,7 @@ export default defineComponent({
     return {
       themeMode,
       getAssetPath,
+      User,
     };
   },
 });

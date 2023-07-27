@@ -5,6 +5,7 @@ const QuotationStatus = {
     1: "Draft",
     2: "Sent",
     3: "Converted to Invoice",
+    4: "Approved",
 };
 
 const QuotationStatusArray = Object.keys(QuotationStatus).map((id) => ({

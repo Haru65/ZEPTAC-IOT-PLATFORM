@@ -6,24 +6,35 @@
   >
     <!--begin::Menu item-->
     <div class="menu-item px-3">
-      <div class="menu-content d-flex align-items-center px-3">
+      <div class="menu-content d-flex align-items-top px-3">
         <!--begin::Avatar-->
         <div class="symbol symbol-50px me-5">
-          <img alt="Logo" :src="getAssetPath('media/avatars/300-1.jpg')" />
+          <img
+            alt="Logo"
+            :src="`data: image/png;base64,` + User.meta.profile_pic_data"
+          />
         </div>
         <!--end::Avatar-->
 
         <!--begin::Username-->
         <div class="d-flex flex-column">
           <div class="fw-bold d-flex align-items-center fs-5">
-            Max Smith
-            <span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2"
-              >Pro</span
+            {{ User.first_name + " " + User.last_name }}
+            <span
+              class="badge badge-light-success fw-bold fs-8 px-1 py-1 ms-2"
+              >{{ User.role }}</span
             >
           </div>
-          <a href="#" class="fw-semobold text-muted text-hover-primary fs-7"
-            >max@kt.com</a
-          >
+          <span class="fw-semobold fs-7">
+            {{ User.company_details.company_name }} <br />
+            {{ Identifier }}
+            <br />
+            <a
+              :href="`mailto:` + User.email"
+              class="fw-semobold text-muted text-hover-primary fs-7"
+              >{{ User.email }}</a
+            >
+          </span>
         </div>
         <!--end::Username-->
       </div>
@@ -303,6 +314,7 @@ import { computed, defineComponent } from "vue";
 import { useI18n } from "vue-i18n";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
+import { Identifier } from "@/core/config/WhichUserConfig";
 
 export default defineComponent({
   name: "kt-user-menu",
@@ -311,6 +323,7 @@ export default defineComponent({
     const router = useRouter();
     const i18n = useI18n();
     const store = useAuthStore();
+    const User = store.GetUser();
 
     i18n.locale.value = localStorage.getItem("lang")
       ? (localStorage.getItem("lang") as string)
@@ -364,6 +377,8 @@ export default defineComponent({
       currentLangugeLocale,
       countries,
       getAssetPath,
+      User,
+      Identifier,
     };
   },
 });

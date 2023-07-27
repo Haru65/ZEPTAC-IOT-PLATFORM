@@ -747,11 +747,13 @@ export default defineComponent({
     const file_size = ref(false);
     let limit = ref(500);
     const router = useRouter();
+    const User = auth.GetUser();
     const route = useRoute();
     const loading = ref(false);
     const Companies = ref([{ id: "", company_name: "" }]);
     const state = ref([""]);
     const userId = route.params.id;
+
     const getdropcomp = async () => {
       ApiService.setHeader();
       const response = await getCompanies(`limit=${limit.value}`);
@@ -796,8 +798,8 @@ export default defineComponent({
         adhar: response.meta.adhar ? response.meta.adhar : "",
         pan: response.meta.pan ? response.meta.pan : "",
         company_id: response.company_id ? response.company_id : "",
-        created_by: auth.getUserId(),
-        updated_by: auth.getUserId(),
+        created_by: User.id,
+        updated_by: User.id,
       };
     };
 
@@ -848,8 +850,8 @@ export default defineComponent({
       adhar: "",
       pan: "",
       company_id: "0",
-      created_by: auth.getUserId(),
-      updated_by: auth.getUserId(),
+      created_by: User.id,
+      updated_by: User.id,
     });
 
     watch(
@@ -1002,8 +1004,8 @@ export default defineComponent({
         adhar: "",
         pan: "",
         company_id: "0",
-        created_by: auth.getUserId(),
-        updated_by: auth.getUserId(),
+        created_by: User.id,
+        updated_by: User.id
       };
     };
 

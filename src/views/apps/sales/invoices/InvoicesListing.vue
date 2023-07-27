@@ -324,8 +324,8 @@ export default defineComponent({
       },
       total: 0,
       is_active: 1,
-      created_by: auth.getUserId(),
-      updated_by: auth.getUserId(),
+      created_by: User.id
+      updated_by: User.id
     });
 
     const selectedIds = ref<Array<number>>([]);
@@ -509,8 +509,8 @@ export default defineComponent({
               country: "",
             },
             is_active: response.is_active,
-            created_by: auth.getUserId(),
-            updated_by: auth.getUserId(),
+            created_by: User.id
+            updated_by: User.id
           };
           // add
           const respons = await addInvoice(invoiceDetail.value);

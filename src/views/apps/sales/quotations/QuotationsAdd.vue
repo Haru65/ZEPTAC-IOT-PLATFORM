@@ -134,38 +134,38 @@
                 <div class="mt-2 pt-4">
                   <h6 class="fw-bold mt-5">Billing Address:</h6>
                   <div class="mt-2">
-                    <div class="mb-1" v-show="QuotationDetials.meta">
+                    <div class="mb-1" v-show="QuotationDetials.customer">
                       <br />
                       <span>
                         {{
-                          `${QuotationDetials.meta.first_name} ${QuotationDetials.meta.last_name}`
+                          `${QuotationDetials.customer.first_name} ${QuotationDetials.customer.last_name}`
                         }}
                       </span>
                       <br />
-                      <span v-show="QuotationDetials.meta.company_name">
-                        {{ `${QuotationDetials.meta.company_name}` }}
+                      <span v-show="QuotationDetials.customer.company_name">
+                        {{ `${QuotationDetials.customer.company_name}` }}
                       </span>
                       <!-- v-if company_data present -->
-                      <div v-show="QuotationDetials.meta.company_name">
+                      <div v-show="QuotationDetials.customer.company_name">
                         <br />
                         <span>
-                          {{ `${QuotationDetials.meta.address1}` }}
+                          {{ `${QuotationDetials.customer.address1}` }}
                         </span>
                         <br />
                         <span>
-                          {{ `${QuotationDetials.meta.address2}` }}
+                          {{ `${QuotationDetials.customer.address2}` }}
                         </span>
                       </div>
-                      <div v-show="QuotationDetials.meta.country">
+                      <div v-show="QuotationDetials.customer.country">
                         <span>
                           {{
-                            `${QuotationDetials.meta.city} - ${QuotationDetials.meta.pincode}`
+                            `${QuotationDetials.customer.city} - ${QuotationDetials.customer.pincode}`
                           }}
                         </span>
                         <br />
                         <span>
                           {{
-                            `${QuotationDetials.meta.states} ${QuotationDetials.meta.country}`
+                            `${QuotationDetials.customer.states} ${QuotationDetials.customer.country}`
                           }}
                         </span>
                         <br />
@@ -173,7 +173,7 @@
                       <br />
                       <!-- firstname as a flag -->
                       <a
-                        v-show="QuotationDetials.meta.first_name"
+                        v-show="QuotationDetials.customer.first_name"
                         target="blank"
                         v-bind:href="`/customers/edit/${QuotationDetials.customer_id}`"
                       >
@@ -387,6 +387,7 @@ interface itemsArr {
 }
 
 interface Meta {
+  id: string;
   first_name: string;
   last_name: string;
   company_name: string;
@@ -407,7 +408,8 @@ interface QuotationDetials {
   status: string;
   notes: string;
   total: number;
-  meta: Meta;
+  customer: Meta;
+  client: Meta;
   is_active: number;
   created_by: string;
   updated_by: string;
@@ -423,7 +425,7 @@ export default defineComponent({
     const disabledselect = ref(true);
     const Total = ref(0);
     const route = useRouter();
-
+    const User = auth.GetUser();
     const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
 
     const QuotationDetials = ref<QuotationDetials>({
@@ -434,7 +436,20 @@ export default defineComponent({
       duedate: "",
       status: "",
       notes: "",
-      meta: {
+      customer: {
+        id:"",
+        company_name: "",
+        first_name: "",
+        last_name: "",
+        address1: "",
+        address2: "",
+        city: "",
+        states: "",
+        pincode: "",
+        country: "",
+      },
+      client: {
+        id: "",
         company_name: "",
         first_name: "",
         last_name: "",
@@ -447,8 +462,8 @@ export default defineComponent({
       },
       total: 0,
       is_active: 1,
-      created_by: auth.getUserId(),
-      updated_by: auth.getUserId(),
+      created_by: User.id,
+      updated_by: User.id,
     });
 
     onMounted(async () => {
@@ -461,10 +476,14 @@ export default defineComponent({
     const GetUserData = async (id) => {
       if (id != " ") {
         const response = await getUser(id);
-        QuotationDetials.value.meta = response.meta;
+        QuotationDetials.value.customer = response.meta;
+        QuotationDetials.value.customer.id = response.id;
         disabledselect.value = false;
+        console.log(response);
+        console.log(QuotationDetials.value);
       } else {
-        QuotationDetials.value.meta = {
+        QuotationDetials.value.customer = {
+          id: "",
           company_name: "",
           first_name: "",
           last_name: "",
@@ -543,7 +562,6 @@ export default defineComponent({
         }))
       );
     };
-
 
     const removeNulls = () => {
       QuotationDetials.value.items = QuotationDetials.value.items.filter(
@@ -660,7 +678,20 @@ export default defineComponent({
         status: "",
         notes: "",
         total: 0,
-        meta: {
+        customer: {
+          id:"",
+          company_name: "",
+          first_name: "",
+          last_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          states: "",
+          pincode: "",
+          country: "",
+        },
+        client: {
+          id:"",
           company_name: "",
           first_name: "",
           last_name: "",
@@ -672,8 +703,8 @@ export default defineComponent({
           country: "",
         },
         is_active: 1,
-        created_by: auth.getUserId(),
-        updated_by: auth.getUserId(),
+        created_by: User.id,
+        updated_by: User.id,
       };
       route.push({ name: "quotation-list" });
     };
