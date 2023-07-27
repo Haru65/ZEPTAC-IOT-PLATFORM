@@ -136,13 +136,13 @@
             <span class="menu-link px-3">
               <router-link :to="`./edit/${customer.id}`">
                 <i
-                class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
                 ></i>
               </router-link>
             </span>
             <span>
               <i
-                @click="deleteclient(customer.id,false)"
+                @click="deleteclient(customer.id, false)"
                 class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
@@ -227,18 +227,14 @@ export default defineComponent({
             role_id: get_role(role_id),
           })
         );
-        initClients.value.splice(
-          0,
-          tableData.value.length,
-          ...tableData.value
-        );
+        initClients.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
       } finally {
         //console.log("done");
       }
     }
-    
+
     const selectedIds = ref<Array<number>>([]);
     const tableData = ref<Array<IClients>>([]);
     const initClients = ref<Array<IClients>>([]);
