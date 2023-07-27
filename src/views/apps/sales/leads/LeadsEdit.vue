@@ -596,6 +596,9 @@ export default defineComponent({
     const Companies = ref([{ id: "", company_name: "" }]);
     const state = ref([""]);
     const LeadId = router.params.id;
+    const User = auth.GetUser();
+
+    
     const getdropcomp = async () => {
       ApiService.setHeader();
       const response = await getCompanies(`limit=${limit.value}`);
@@ -632,10 +635,10 @@ export default defineComponent({
         gender: res.meta.gender,
         adhar: res.meta.adhar,
         pan: res.meta.pan,
-        company_id: auth.getUserCompanyId(),
+        company_id: User.company_id,
         company_name: res.meta.company_name,
-        created_by: auth.getUserId(),
-        updated_by: auth.getUserId(),
+        created_by: User.id,
+        updated_by: User.id
       };
     });
 
@@ -668,10 +671,10 @@ export default defineComponent({
       gender: "",
       adhar: "",
       pan: "",
-      company_id: auth.getUserCompanyId(),
+      company_id: User.company_id,
       company_name: "",
-      created_by: auth.getUserId(),
-      updated_by: auth.getUserId(),
+      created_by: User.id,
+      updated_by: User.id,
     });
 
     const onsubmit = async () => {
@@ -773,8 +776,8 @@ export default defineComponent({
         pan: "",
         company_id: "",
         company_name: "",
-        created_by: auth.getUserId(),
-        updated_by: auth.getUserId(),
+        created_by: User.id,
+        updated_by: User.id,
       };
     };
 

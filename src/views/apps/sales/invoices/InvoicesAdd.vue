@@ -421,7 +421,7 @@ export default defineComponent({
     const disabledselect = ref(true);
     const Total = ref(0);
     const route = useRouter();
-
+    const User = auth.GetUser();
     const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
 
     const invoiceDetials = ref<invoiceDetials>({
@@ -445,8 +445,8 @@ export default defineComponent({
       },
       total: 0,
       is_active: 1,
-      created_by: auth.getUserId(),
-      updated_by: auth.getUserId(),
+      created_by: User.id,
+      updated_by: User.id,
     });
 
     onMounted(async () => {
@@ -667,8 +667,8 @@ export default defineComponent({
           country: "",
         },
         is_active: 1,
-        created_by: auth.getUserId(),
-        updated_by: auth.getUserId(),
+        created_by: User.id,
+        updated_by: User.id,
       };
       route.push({ name: "invoices-list" });
     };

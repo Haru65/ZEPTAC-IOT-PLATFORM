@@ -169,6 +169,7 @@ export default defineComponent({
     const auth = useAuthStore();
     const emailFormDisplay = ref(false);
     const passwordFormDisplay = ref(false);
+    const User = auth.GetUser();
 
     const itemDetailsValidator = Yup.object().shape({
       name: Yup.string().required().label("Product Name"),
@@ -180,8 +181,8 @@ export default defineComponent({
       name: "",
       description: "",
       price: "",
-      created_by: auth.getUserId(),
-      updated_by: auth.getUserId(),
+      created_by: User.id,
+      updated_by: User.id,
     });
 
     onMounted(async () => {

@@ -593,7 +593,6 @@ import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import { countries, INstates } from "@/core/model/countries";
-import { rolesArray } from "@/core/config/PermissionsRolesConfig";
 
 
 interface CustomerData {
@@ -706,26 +705,12 @@ export default defineComponent({
       gender: "",
       adhar: "",
       pan: "",
-      company_id: auth.getUserCompanyId(),
+      company_id: User.company_id,
       company_name: "",
-      created_by: auth.getUserId(),
-      updated_by: auth.getUserId(),
-      customer_id: "",
-      customer_fisrt_name: "",
-      customer_last_name: "",
+      created_by: User.id,
+      updated_by: User.id,
     });
 
-
-    const customer = ref<CustomerData>({
-      customer_id: "",
-      first_name: "",
-      last_name: "",
-    });
-
-    const onsubmit = async () => {
-      loading.value = true;
-      console.log(profileDetails.value);
-      console.warn("Nice");
       try {
         // Call your API here with the form values
         const response = await addClient(profileDetails.value);
@@ -822,11 +807,8 @@ export default defineComponent({
         pan: "",
         company_id: "",
         company_name: "",
-        created_by: auth.getUserId(),
-        updated_by: auth.getUserId(),
-        customer_id: "",
-        customer_fisrt_name: "",
-        customer_last_name: "",
+        created_by: User.id,
+        updated_by: User.id,
       };
     };
 

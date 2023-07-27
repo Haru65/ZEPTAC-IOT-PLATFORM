@@ -752,7 +752,7 @@ export default defineComponent({
     const submitButton5 = ref<HTMLElement | null>(null);
     const updateEmailButton = ref<HTMLElement | null>(null);
     const updatePasswordButton = ref<HTMLElement | null>(null);
-
+    const User = auth.GetUser();
     let limit = ref(500);
     const router = useRouter();
     const loading = ref(false);
@@ -815,8 +815,8 @@ export default defineComponent({
       adhar: "",
       pan: "",
       company_id: "0",
-      created_by: auth.getUserId(),
-      updated_by: auth.getUserId(),
+      created_by: User.id,
+      updated_by: User.id,
     });
 
     watch(
@@ -850,14 +850,14 @@ export default defineComponent({
       console.log(profileDetails.value);
       console.warn("Nice");
       try {
-        // form multipart form post
-        // Call your API here with the form values
-        // CUSTOMS
-        // const form = await CUSTOM_FORM(profileDetails);
-        // push form
-        console.log(auth.getRoleId().toString())
-        if (auth.getRoleId() == "2") {
-          profileDetails.value.company_id = auth.getUserCompanyId();
+        // ? form multipart form post
+        // ? Call your API here with the form values
+        // ? CUSTOMS
+        // ? const form = await CUSTOM_FORM(profileDetails);
+        // ? push form
+        if (User.role_id == "2") {
+          const company_id = User.company_id;
+          profileDetails.value.company_id = company_id;
         }
         const response = await addUser(profileDetails.value);
         console.log(response.error);
@@ -981,8 +981,8 @@ export default defineComponent({
         adhar: "",
         pan: "",
         company_id: "0",
-        created_by: auth.getUserId(),
-        updated_by: auth.getUserId(),
+        created_by: User.id,
+        updated_by: User.id,
       };
     };
 

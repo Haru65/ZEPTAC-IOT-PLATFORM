@@ -107,86 +107,170 @@
 
               <!--begin::Wrapper-->
               <div class="mb-0">
-                <!--begin::Row-->
-                <div class="row gx-10">
-                  <el-select
-                    v-model="QuotationDetials.customer_id"
-                    filterable
-                    v-on:change="GetUserData(QuotationDetials.customer_id)"
-                    placeholder="Please Select Customer..."
-                  >
-                    <!-- <el-option
+                <div class="d-flex flex-grow-1 gap-lg-3 gap-sm-5 gap-5">
+                  <!--begin::Row-->
+                  <div class="w-50">
+                    <div class="row gx-10">
+                      <el-select
+                        v-model="QuotationDetials.customer_id"
+                        filterable
+                        v-on:change="GetUserData(QuotationDetials.customer_id)"
+                        placeholder="Please Select Customer..."
+                      >
+                        <!-- <el-option
                       value=" "
                       label="Please Select Customer..."
                       key=" "
                       >Please Select Customer...</el-option
-                    > -->
-                    <el-option
-                      v-for="item in Customers"
-                      :key="item.id"
-                      :label="`${item.first_name} ${item.last_name}`"
-                      :value="item.id"
-                    />
-                  </el-select>
-                </div>
-                <!--end::Row-->
-
-                <div class="mt-2 pt-4">
-                  <h6 class="fw-bold mt-5">Billing Address:</h6>
-                  <div class="mt-2">
-                    <div class="mb-1" v-show="QuotationDetials.meta">
-                      <br />
-                      <span>
-                        {{
-                          `${QuotationDetials.meta.first_name} ${QuotationDetials.meta.last_name}`
-                        }}
-                      </span>
-                      <br />
-                      <span v-show="QuotationDetials.meta.company_name">
-                        {{ `${QuotationDetials.meta.company_name}` }}
-                      </span>
-                      <!-- v-if company_data present -->
-                      <div v-show="QuotationDetials.meta.company_name">
-                        <br />
-                        <span>
-                          {{ `${QuotationDetials.meta.address1}` }}
-                        </span>
-                        <br />
-                        <span>
-                          {{ `${QuotationDetials.meta.address2}` }}
-                        </span>
-                      </div>
-                      <div v-show="QuotationDetials.meta.country">
-                        <span>
-                          {{
-                            `${QuotationDetials.meta.city} - ${QuotationDetials.meta.pincode}`
-                          }}
-                        </span>
-                        <br />
-                        <span>
-                          {{
-                            `${QuotationDetials.meta.states} ${QuotationDetials.meta.country}`
-                          }}
-                        </span>
-                        <br />
-                      </div>
-                      <br />
-                      <!-- firstname as a flag -->
-                      <a
-                        v-show="QuotationDetials.meta.first_name"
-                        target="blank"
-                        v-bind:href="`/customers/edit/${QuotationDetials.customer_id}`"
-                      >
-                        <span class="fs-5"> Edit</span>
-                        <!-- <i
-                      class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                    ></i> -->
-                      </a>
+                      > -->
+                        <el-option
+                          v-for="item in Customers"
+                          :key="item.id"
+                          :label="`${item.first_name} ${item.last_name}`"
+                          :value="item.id"
+                        />
+                      </el-select>
                     </div>
-                    <br />
+                    <!--end::Row-->
+
+                    <div class="mt-2 pt-4">
+                      <h6 class="fw-bold mt-5">Billing Address:</h6>
+                      <div class="mt-2">
+                        <div class="mb-1" v-show="QuotationDetials.customer">
+                          <br />
+                          <span>
+                            {{
+                              `${QuotationDetials.customer.first_name} ${QuotationDetials.customer.last_name}`
+                            }}
+                          </span>
+                          <br />
+                          <span v-show="QuotationDetials.customer.company_name">
+                            {{ `${QuotationDetials.customer.company_name}` }}
+                          </span>
+                          <!-- v-if company_data present -->
+                          <div v-show="QuotationDetials.customer.company_name">
+                            <br />
+                            <span>
+                              {{ `${QuotationDetials.customer.address1}` }}
+                            </span>
+                            <br />
+                            <span>
+                              {{ `${QuotationDetials.customer.address2}` }}
+                            </span>
+                          </div>
+                          <div v-show="QuotationDetials.customer.country">
+                            <span>
+                              {{
+                                `${QuotationDetials.customer.city} - ${QuotationDetials.customer.pincode}`
+                              }}
+                            </span>
+                            <br />
+                            <span>
+                              {{
+                                `${QuotationDetials.customer.states} ${QuotationDetials.customer.country}`
+                              }}
+                            </span>
+                            <br />
+                          </div>
+                          <br />
+                          <!-- firstname as a flag -->
+                          <a
+                            v-show="QuotationDetials.customer.first_name"
+                            target="blank"
+                            v-bind:href="`/customers/edit/${QuotationDetials.customer_id}`"
+                          >
+                            <span class="fs-5"> Edit</span>
+                            <!-- <i
+                          class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                          ></i> -->
+                          </a>
+                        </div>
+                        <br />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="w-50">
+                    <div class="row gx-10">
+                      <el-select
+                        v-model="QuotationDetials.customer_id"
+                        filterable
+                        v-on:change="GetUserData(QuotationDetials.customer_id)"
+                        placeholder="Please Select Customer..."
+                      >
+                        <!-- <el-option
+                      value=" "
+                      label="Please Select Customer..."
+                      key=" "
+                      >Please Select Customer...</el-option
+                      > -->
+                        <el-option
+                          v-for="item in Customers"
+                          :key="item.id"
+                          :label="`${item.first_name} ${item.last_name}`"
+                          :value="item.id"
+                        />
+                      </el-select>
+                    </div>
+                    <!--end::Row-->
+
+                    <div class="mt-2 pt-4">
+                      <h6 class="fw-bold mt-5">Billing Address:</h6>
+                      <div class="mt-2">
+                        <div class="mb-1" v-show="QuotationDetials.customer">
+                          <br />
+                          <span>
+                            {{
+                              `${QuotationDetials.customer.first_name} ${QuotationDetials.customer.last_name}`
+                            }}
+                          </span>
+                          <br />
+                          <span v-show="QuotationDetials.customer.company_name">
+                            {{ `${QuotationDetials.customer.company_name}` }}
+                          </span>
+                          <!-- v-if company_data present -->
+                          <div v-show="QuotationDetials.customer.company_name">
+                            <br />
+                            <span>
+                              {{ `${QuotationDetials.customer.address1}` }}
+                            </span>
+                            <br />
+                            <span>
+                              {{ `${QuotationDetials.customer.address2}` }}
+                            </span>
+                          </div>
+                          <div v-show="QuotationDetials.customer.country">
+                            <span>
+                              {{
+                                `${QuotationDetials.customer.city} - ${QuotationDetials.customer.pincode}`
+                              }}
+                            </span>
+                            <br />
+                            <span>
+                              {{
+                                `${QuotationDetials.customer.states} ${QuotationDetials.customer.country}`
+                              }}
+                            </span>
+                            <br />
+                          </div>
+                          <br />
+                          <!-- firstname as a flag -->
+                          <a
+                            v-show="QuotationDetials.customer.first_name"
+                            target="blank"
+                            v-bind:href="`/customers/edit/${QuotationDetials.customer_id}`"
+                          >
+                            <span class="fs-5"> Edit</span>
+                            <!-- <i
+                          class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                          ></i> -->
+                          </a>
+                        </div>
+                        <br />
+                      </div>
+                    </div>
                   </div>
                 </div>
-
                 <!--begin::Table wrapper-->
                 <div class="table-responsive mb-10">
                   <!--begin::Table-->
@@ -387,6 +471,7 @@ interface itemsArr {
 }
 
 interface Meta {
+  id: string;
   first_name: string;
   last_name: string;
   company_name: string;
@@ -407,7 +492,8 @@ interface QuotationDetials {
   status: string;
   notes: string;
   total: number;
-  meta: Meta;
+  customer: Meta;
+  client: Meta;
   is_active: number;
   created_by: string;
   updated_by: string;
@@ -423,7 +509,7 @@ export default defineComponent({
     const disabledselect = ref(true);
     const Total = ref(0);
     const route = useRouter();
-
+    const User = auth.GetUser();
     const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
 
     const QuotationDetials = ref<QuotationDetials>({
@@ -434,7 +520,20 @@ export default defineComponent({
       duedate: "",
       status: "",
       notes: "",
-      meta: {
+      customer: {
+        id: "",
+        company_name: "",
+        first_name: "",
+        last_name: "",
+        address1: "",
+        address2: "",
+        city: "",
+        states: "",
+        pincode: "",
+        country: "",
+      },
+      client: {
+        id: "",
         company_name: "",
         first_name: "",
         last_name: "",
@@ -447,8 +546,8 @@ export default defineComponent({
       },
       total: 0,
       is_active: 1,
-      created_by: auth.getUserId(),
-      updated_by: auth.getUserId(),
+      created_by: User.id,
+      updated_by: User.id,
     });
 
     onMounted(async () => {
@@ -461,10 +560,16 @@ export default defineComponent({
     const GetUserData = async (id) => {
       if (id != " ") {
         const response = await getUser(id);
-        QuotationDetials.value.meta = response.meta;
+        QuotationDetials.value.customer = response.meta;
+        QuotationDetials.value.customer.id = response.id;
         disabledselect.value = false;
+        /* *
+         TODO : get customer_id and from meta get client ids get customer_id and from meta get client ids and put into Ref object
+         ? Problem of getting clients;
+        */
       } else {
-        QuotationDetials.value.meta = {
+        QuotationDetials.value.customer = {
+          id: "",
           company_name: "",
           first_name: "",
           last_name: "",
@@ -543,7 +648,6 @@ export default defineComponent({
         }))
       );
     };
-
 
     const removeNulls = () => {
       QuotationDetials.value.items = QuotationDetials.value.items.filter(
@@ -660,7 +764,20 @@ export default defineComponent({
         status: "",
         notes: "",
         total: 0,
-        meta: {
+        customer: {
+          id: "",
+          company_name: "",
+          first_name: "",
+          last_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          states: "",
+          pincode: "",
+          country: "",
+        },
+        client: {
+          id: "",
           company_name: "",
           first_name: "",
           last_name: "",
@@ -672,8 +789,8 @@ export default defineComponent({
           country: "",
         },
         is_active: 1,
-        created_by: auth.getUserId(),
-        updated_by: auth.getUserId(),
+        created_by: User.id,
+        updated_by: User.id,
       };
       route.push({ name: "quotation-list" });
     };

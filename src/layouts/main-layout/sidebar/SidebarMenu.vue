@@ -2,7 +2,7 @@
   <!--begin::sidebar menu-->
   <div
     class="app-sidebar-menu overflow-hidden flex-column-fluid"
-    v-if="sidebarIdentifier === 'admin'"
+    v-if="sidebarIdentifier === 'Admin'"
   >
     <!--begin::Menu wrapper-->
     <div
@@ -161,7 +161,7 @@
   <!--begin::sidebar menu-->
   <div
     class="app-sidebar-menu overflow-hidden flex-column-fluid"
-    v-if="sidebarIdentifier === 'companyadmin'"
+    v-if="sidebarIdentifier === 'Company-Admin'"
   >
     <!--begin::Menu wrapper-->
     <div

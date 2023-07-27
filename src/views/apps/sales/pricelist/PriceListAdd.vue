@@ -168,6 +168,7 @@ export default defineComponent({
     const passwordFormDisplay = ref(false);
     const router = useRouter();
     const state = ref([""]);
+    const User = auth.GetUser();
 
     const itemDetailsValidator = Yup.object().shape({
       name: Yup.string().required().label("Product Name"),
@@ -179,8 +180,8 @@ export default defineComponent({
       name: "",
       description: "",
       price: "",
-      created_by: auth.getUserId(),
-      updated_by: auth.getUserId(),
+      created_by: User.id,
+      updated_by: User.id,
     });
 
     onMounted(() => {});

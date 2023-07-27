@@ -440,7 +440,7 @@ export default defineComponent({
     const Total = ref(0);
     const route = useRoute();
     const router = useRouter();
-
+    const User = auth.GetUser();
     const invoiceId = route.params.id;
 
     const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
@@ -466,8 +466,8 @@ export default defineComponent({
       },
       total: 0,
       is_active: 1,
-      created_by: auth.getUserId(),
-      updated_by: auth.getUserId(),
+      created_by: User.id,
+      updated_by: User.id,
     });
 
     const GetUserData = async (id) => {
@@ -571,8 +571,8 @@ export default defineComponent({
           country: "",
         },
         is_active: response.is_active,
-        created_by: auth.getUserId(),
-        updated_by: auth.getUserId(),
+        created_by: User.id,
+        updated_by: User.id,
       };
 
       const respons = await getUser(response.customer_id);
