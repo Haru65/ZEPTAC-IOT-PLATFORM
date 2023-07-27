@@ -7,7 +7,7 @@
         <div class="d-flex align-items-center position-relative my-1">
           <KTIcon
             icon-name="magnifier"
-            icon-class="fs-1 position-absolute ms-6"
+            icon-class="fs-1 position-absoluted
           />
           <input
             type="text"

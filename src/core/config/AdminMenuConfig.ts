@@ -68,10 +68,6 @@ const AdminMenuConfig: Array<MenuItem> = [
         bootstrapIcon: "bi-archive",
         sub: [
           {
-            heading: "Add Employee",
-            route: "employee/add",
-          },
-          {
             heading: "List Employees",
             route: "/employee/list",
           },
@@ -118,6 +114,22 @@ const AdminMenuConfig: Array<MenuItem> = [
           {
             heading: "List Customers",
             route: "/customers/list",
+          },
+        ],
+      },
+      {
+        sectionTitle: "Clients",
+        route: "/clients",
+        keenthemesIcon: "user-edit",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add Clients",
+            route: "/clients/add",
+          },
+          {
+            heading: "List Clients",
+            route: "/clients/list",
           },
         ],
       },
