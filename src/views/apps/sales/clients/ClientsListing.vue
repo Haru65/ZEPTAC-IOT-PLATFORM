@@ -218,7 +218,7 @@ export default defineComponent({
     async function client_listing(): Promise<void> {
       try {
         ApiService.setHeader();
-        const response = await getClients();
+        const response = await getClients(`?limit=20`);
         console.log(response);
         tableData.value = response.result.data.map(
           ({ created_at, role_id, ...rest }) => ({

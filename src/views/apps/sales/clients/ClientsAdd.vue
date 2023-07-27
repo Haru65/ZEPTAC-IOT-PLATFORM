@@ -141,6 +141,45 @@
             <!--end::Col-->
           </div>
           <!--end::Input group-->
+
+
+
+          <div class="row mb-6">
+                <!--begin::Label-->
+                <label class="col-lg-4 col-form-label fw-semobold fs-6">
+                <span class="required">Customer Name</span>
+                <i
+                class="fas fa-exclamation-circle ms-1 fs-7"
+                data-bs-toggle="tooltip"
+                title="Phone number must be active"
+                ></i>
+              </label>
+            <!--end::Label-->
+            
+            <div class="col-lg-8 fv-row">
+              <el-select
+                v-model="customer.customer_id"
+                filterable
+                v-on:change="GetCustomerData(customer.customer_id)"
+                placeholder="Please Select Customer..."
+              >
+                <!-- <el-option
+                  value=" "
+                  label="Please Select Customer..."
+                  key=" "
+                  >Please Select Customer...</el-option
+                > -->
+                <el-option
+                  v-for="item in Customers"
+                  :key="item.id"
+                  :label="`${item.first_name} ${item.last_name}`"
+                  :value="item.id"
+                />
+              </el-select>
+            </div>
+          </div>
+
+
           <!--begin::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
@@ -252,10 +291,10 @@
               <div class="row">
                 <!--begin::Col-->
                 <div class="col-lg fv-row">
-                  <el-select v-model="profileDetails.country" filterable>
-                    <el-option value="0" label="Please Select Role..." key="0"
-                      >Please Select Role...</el-option
-                    >
+                  <el-select v-model="profileDetails.country" filterable placeholder="Please Select Country..">
+                    <!-- <el-option value="0" label="Please Select Role..." key="0"
+                      >Please Select Country...</el-option
+                    > -->
                     <el-option
                       v-for="item in countries"
                       :key="item.name"
@@ -548,13 +587,20 @@ import { defineComponent, onMounted, ref, watch } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
-import { addClient, getClients } from "@/stores/api";
+import { addClient, getClients, getClient, getCustomers, getCustomer } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import { countries, INstates } from "@/core/model/countries";
 import { rolesArray } from "@/core/config/PermissionsRolesConfig";
+
+
+interface CustomerData {
+  customer_id: string;
+  first_name: string;
+  last_name: string;
+}
 
 interface ProfileDetails {
   first_name: string;
@@ -578,6 +624,9 @@ interface ProfileDetails {
   company_name: string;
   created_by: string;
   updated_by: string;
+  customer_id: string;
+  customer_fisrt_name: string;
+  customer_last_name: string;
 }
 
 export default defineComponent({
@@ -590,27 +639,43 @@ export default defineComponent({
   setup() {
     const auth = useAuthStore();
     const router = useRouter();
+    const disabledselect = ref(true);
     let limit = ref(500);
     const loading = ref(false);
-    const Companies = ref([{ id: "", company_name: "" }]);
+    const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
     const state = ref([""]);
-    const getdropcomp = async () => {
+
+    onMounted(async () => {
+      state.value.pop();
+      Customers.value.pop();
+      await GetCustomers();
+    });
+
+    const GetCustomers = async () => {
       ApiService.setHeader();
-      const response = await getClients(`limit=${limit.value}`);
-      Companies.value.push(
-        ...response.result.data.data.map(({ created_at, ...rest }) => ({
+      const response = await getCustomers();
+      Customers.value.push(
+        ...response.result.data.map(({ created_at, ...rest }) => ({
           ...rest,
           created_at: moment(created_at).format("MMMM Do YYYY"),
         }))
       );
-      console.log(Companies);
     };
 
-    onMounted(async () => {
-      state.value.pop();
-      Companies.value.pop();
-      await getdropcomp();
-    });
+
+    const GetCustomerData = async (id) => {
+      if (id != " ") {
+        const response = await getCustomer(id);
+        console.log(response)
+        profileDetails.value.customer_id = response.id;
+        profileDetails.value.customer_fisrt_name = response.first_name;
+        profileDetails.value.customer_last_name = response.last_name;
+        disabledselect.value = false;
+        console.log(profileDetails.value);
+
+      }
+    };
+
 
     const emailFormDisplay = ref(false);
     const passwordFormDisplay = ref(false);
@@ -645,6 +710,16 @@ export default defineComponent({
       company_name: "",
       created_by: auth.getUserId(),
       updated_by: auth.getUserId(),
+      customer_id: "",
+      customer_fisrt_name: "",
+      customer_last_name: "",
+    });
+
+
+    const customer = ref<CustomerData>({
+      customer_id: "",
+      first_name: "",
+      last_name: "",
     });
 
     const onsubmit = async () => {
@@ -749,11 +824,15 @@ export default defineComponent({
         company_name: "",
         created_by: auth.getUserId(),
         updated_by: auth.getUserId(),
+        customer_id: "",
+        customer_fisrt_name: "",
+        customer_last_name: "",
       };
     };
 
     return {
       profileDetails,
+      customer,
       emailFormDisplay,
       passwordFormDisplay,
       profileDetailsValidator,
@@ -763,6 +842,8 @@ export default defineComponent({
       clear,
       countries,
       state,
+      GetCustomerData,
+      Customers,
     };
   },
 });
