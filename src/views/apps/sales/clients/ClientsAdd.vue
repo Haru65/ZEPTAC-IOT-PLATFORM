@@ -688,6 +688,11 @@ export default defineComponent({
       company_name: Yup.string().required().label("Company Name"),
     });
 
+    const customer = ref<CustomerData>({
+      customer_id: "",
+      first_name: "",
+      last_name: ""
+    })
     const profileDetails = ref<ProfileDetails>({
       first_name: "",
       last_name: "",
@@ -814,6 +819,9 @@ export default defineComponent({
         company_name: "",
         created_by: User.id,
         updated_by: User.id,
+        customer_id: "",
+        customer_fisrt_name: "",
+        customer_last_name: "",
       };
     };
 
@@ -833,7 +841,7 @@ export default defineComponent({
       Customers,
     };
   },
-);
+});
 </script>
 <style>
 .el-input__inner {
