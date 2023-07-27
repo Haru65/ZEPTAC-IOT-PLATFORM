@@ -301,7 +301,7 @@ export default defineComponent({
     }
 
     const auth = useAuthStore();
-
+    const User = auth.GetUser();
     const invoiceDetail = ref<invoiceDetails>({
       customer_id: " ",
       quotation_id: " ",
@@ -324,8 +324,8 @@ export default defineComponent({
       },
       total: 0,
       is_active: 1,
-      created_by: User.id
-      updated_by: User.id
+      created_by: User.id,
+      updated_by: User.id,
     });
 
     const selectedIds = ref<Array<number>>([]);
@@ -509,8 +509,8 @@ export default defineComponent({
               country: "",
             },
             is_active: response.is_active,
-            created_by: User.id
-            updated_by: User.id
+            created_by: User.id,
+            updated_by: User.id,
           };
           // add
           const respons = await addInvoice(invoiceDetail.value);
