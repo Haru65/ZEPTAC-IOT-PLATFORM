@@ -234,7 +234,7 @@ const routes: Array<RouteRecordRaw> = [
         path: "/clients/edit/:id",
         name: "clients-edit",
         component: () =>
-          import("@/views/apps/sales/clients/ClientsEdit.vue"),
+          import("@/views/apps/sales/clients/ClientsEdit2.vue"),
         beforeEnter: async (to, from, next) => {
           const customerId = to.params.id;
           //console.log(companyId);

@@ -197,6 +197,7 @@
                         filterable
                         v-on:change="GetUserData(QuotationDetials.customer_id)"
                         placeholder="Please Select Customer..."
+                        disabled="disabled"
                       >
                         <!-- <el-option
                       value=" "
