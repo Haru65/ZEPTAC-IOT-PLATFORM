@@ -497,7 +497,7 @@ export default defineComponent({
       },
       total: 0,
       is_active: 1,
-      created_by: User.id
+      created_by: User.id,
       updated_by: User.id
     });
 
@@ -614,7 +614,7 @@ export default defineComponent({
           country: "",
         },
         is_active: response.is_active,
-        created_by: User.id
+        created_by: User.id,
         updated_by: User.id
       };
 
