@@ -56,10 +56,10 @@
                   <span class="fs-2 fw-bold text-gray-800">Quotation #</span>
                   <input
                     type="text"
-                    class="form-control form-control-flush fw-bold text-muted fs-3 w-125px"
-                    maxlength="6"
+                    class="form-control form-control-flush fw-bold text-muted fs-3 w-auto"
                     v-model="QuotationDetials.quotation_no"
                     placehoder="..."
+                    disabled="true"
                   />
                 </div>
                 <!--end::Input group-->
@@ -457,6 +457,7 @@ import {
   getUser,
   getClient,
   GetCustomerClients,
+  GetIncrQuotationId,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import CustomSelect from "./CustomComponents/CustomQuotationItems.vue";
@@ -562,11 +563,27 @@ export default defineComponent({
 
     onMounted(async () => {
       // todo: quotation check if pres get last incr 1
-
+      const res = await GetIncrQuotationId(User.company_id);
+      IncrQuotation(res);
+      // * basic fetch
       Customers.value.pop();
       Clients.value.pop();
       await GetCustomers();
     });
+
+    const IncrQuotation = (data: any) => {
+      console.log(data.result);
+      const latestquotation_no = data.result.split("_");
+      if (parseInt(latestquotation_no[1]) == 0) {
+        // ? if no record
+        QuotationDetials.value.quotation_no =
+          latestquotation_no[0] + "_" + latestquotation_no[1].toString();
+      } else {
+        // ? if record exisit inc 1
+        QuotationDetials.value.quotation_no =
+          latestquotation_no[0] + "_" + (1 + +latestquotation_no[1]).toString();
+      }
+    };
 
     const GetClients = async (id: string) => {
       // ? empty clients

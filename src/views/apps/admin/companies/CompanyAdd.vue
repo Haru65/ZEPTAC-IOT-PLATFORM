@@ -16,46 +16,49 @@
             <div class="row mb-6">
               <!--begin::Label-->
               <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                >Company Name</label>
+                >Company Name</label
+              >
               <!--end::Label-->
 
               <!--begin::Col-->
               <div class="col-lg-8 fv-row">
                 <Field
-                      type="text"
-                      name="company_name"
-                      class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
-                      placeholder="Company name"
-                      v-model="companyDetails.company_name"
-                    />
-                    <div class="fv-plugins-message-container">
-                      <div class="fv-help-block">
-                        <ErrorMessage name="company_name" />
-                      </div>
-                    </div>
+                  type="text"
+                  name="company_name"
+                  class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                  placeholder="Company name"
+                  v-model="companyDetails.company_name"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="company_name" />
+                  </div>
+                </div>
               </div>
             </div>
 
             <div class="row mb-6">
               <!--begin::Label-->
               <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                >Company Address</label>
+                >Company Address</label
+              >
               <!--end::Label-->
 
               <!--begin::Col-->
               <div class="col-lg-8 fv-row">
                 <Field
-                      type="text"
-                      name="company_address"
-                      class="form-control form-control-lg form-control-solid"
-                      placeholder="Company address"
-                      v-model="companyDetails.address"
-                    />
-                    <div class="fv-plugins-message-container">
-                      <div class="fv-help-block">
-                        <ErrorMessage name="company_address" />
-                      </div>
-                    </div>
+                  type="text"
+                  as="textarea"
+                  name="company_address"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Company address"
+                  v-model="companyDetails.address"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="company_address" />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -169,8 +172,12 @@
                   <!--begin::Row-->
                   <div class="row">
                     <!--begin::Col-->
-                    <div class="col-lg-6 fv-row">
-                      <el-select v-model="companyDetails.country" filterable placeholder="Select Country">
+                    <div class="col-lg-6 fv-row p-2">
+                      <el-select
+                        v-model="companyDetails.country"
+                        filterable
+                        placeholder="Select Country"
+                      >
                         <el-option
                           v-for="item in countries"
                           :key="item.name"
@@ -182,9 +189,13 @@
                     <!--end::Col-->
 
                     <!--begin::Col-->
-                    <div v-if="state.length" class="col-lg-6 fv-row">
+                    <div v-if="state.length" class="col-lg-6 fv-row p-2">
                       <div>
-                        <el-select v-model="companyDetails.state" filterable placeholder="Select State">
+                        <el-select
+                          v-model="companyDetails.state"
+                          filterable
+                          placeholder="Select State"
+                        >
                           <el-option
                             v-for="item in state"
                             :key="item"
@@ -195,7 +206,7 @@
                       </div>
                     </div>
 
-                    <div v-if="!state.length" class="col-lg-6 fv-row">
+                    <div v-if="!state.length" class="col-lg-6 fv-row p-2">
                       <div>
                         <Field
                           type="tel"
@@ -231,7 +242,7 @@
                   <!--begin::Row-->
                   <div class="row">
                     <!--begin::Col-->
-                    <div class="col-lg-6 fv-row">
+                    <div class="col-lg-6 fv-row p-2">
                       <Field
                         type="text"
                         name="city"
@@ -248,7 +259,7 @@
                     <!--end::Col-->
 
                     <!--begin::Col-->
-                    <div class="col-lg-6 fv-row">
+                    <div class="col-lg-6 fv-row p-2">
                       <Field
                         type="text"
                         name="pincode"
@@ -315,8 +326,12 @@
                   <!--begin::Row-->
                   <div class="row">
                     <!--begin::Col-->
-                    <div class="col-lg-6 fv-row">
-                      <el-select v-model="companyDetails.user_limit" filterable placeholder="select User Limit">
+                    <div class="col-lg-6 fv-row p-2">
+                      <el-select
+                        v-model="companyDetails.user_limit"
+                        filterable
+                        placeholder="select User Limit"
+                      >
                         <el-option
                           v-for="item in limit"
                           :key="item"
@@ -328,7 +343,7 @@
                     <!--end::Col-->
 
                     <!--begin::Col-->
-                    <div class="col-lg-6 fv-row">
+                    <div class="col-lg-6 fv-row p-2">
                       <div>
                         <el-select
                           v-model="companyDetails.selected_package"
@@ -342,6 +357,92 @@
                             :value="item"
                           />
                         </el-select>
+                      </div>
+                    </div>
+                    <!--end::Col-->
+                  </div>
+                  <!--end::Row-->
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Input group-->
+              <!--begin::Input group-->
+              <div class="row mb-6">
+                <!--begin::Label-->
+                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                  >Quotation No & Prefix</label
+                >
+                <!--end::Label-->
+
+                <!--begin::Col-->
+                <div class="col-lg-8">
+                  <!--begin::Row-->
+                  <div class="row">
+                    <!--begin::Col-->
+                    <div class="col-lg-6 fv-row p-2">
+                      <Field
+                        type="text"
+                        name="quotation_prefix"
+                        class="form-control form-control-lg form-control-solid"
+                        placeholder="Enter Quotation Prefix"
+                        v-model="companyDetails.quotation_prefix"
+                      />
+                    </div>
+                    <!--end::Col-->
+
+                    <!--begin::Col-->
+                    <div class="col-lg-6 fv-row p-2">
+                      <div>
+                        <Field
+                          type="text"
+                          name="quotation_no"
+                          class="form-control form-control-lg form-control-solid"
+                          placeholder="Enter Quotation No"
+                          v-model="companyDetails.quotation_no"
+                        />
+                      </div>
+                    </div>
+                    <!--end::Col-->
+                  </div>
+                  <!--end::Row-->
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Input group-->
+              <!--begin::Input group-->
+              <div class="row mb-6">
+                <!--begin::Label-->
+                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                  >Invoice No & Prefix</label
+                >
+                <!--end::Label-->
+
+                <!--begin::Col-->
+                <div class="col-lg-8">
+                  <!--begin::Row-->
+                  <div class="row">
+                    <!--begin::Col-->
+                    <div class="col-lg-6 fv-row p-2">
+                      <Field
+                        type="text"
+                        name="invoice_prefix"
+                        class="form-control form-control-lg form-control-solid"
+                        placeholder="Enter Invoice Prefix"
+                        v-model="companyDetails.invoice_prefix"
+                      />
+                    </div>
+                    <!--end::Col-->
+
+                    <!--begin::Col-->
+                    <div class="col-lg-6 fv-row p-2">
+                      <div>
+                        <Field
+                          type="text"
+                          name="invoice_no"
+                          class="form-control form-control-lg form-control-solid"
+                          placeholder="Enter Inovice No"
+                          v-model="companyDetails.invoice_no"
+                        />
                       </div>
                     </div>
                     <!--end::Col-->
@@ -395,6 +496,7 @@ import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import packages from "@/core/config/PackagesConfig";
 import { limit } from "@/core/config/WhichUserConfig";
+import { useRouter } from "vue-router";
 
 interface companyDetails {
   company_name: string;
@@ -409,6 +511,10 @@ interface companyDetails {
   gst_details: string;
   user_limit: number;
   selected_package: string;
+  quotation_no: string;
+  quotation_prefix: string;
+  invoice_no: string;
+  invoice_prefix: string;
 }
 
 export default defineComponent({
@@ -421,12 +527,10 @@ export default defineComponent({
   setup() {
     const updateEmailButton = ref<HTMLElement | null>(null);
     const updatePasswordButton = ref<HTMLElement | null>(null);
-
+    const route = useRouter();
     const loading = ref(false);
-
     const emailFormDisplay = ref(false);
     const passwordFormDisplay = ref(false);
-
     const state = ref([""]);
 
     const companyDetailsValidator = Yup.object().shape({
@@ -455,6 +559,10 @@ export default defineComponent({
       gst_details: "",
       user_limit: 1,
       selected_package: "",
+      quotation_no: "",
+      quotation_prefix: "",
+      invoice_no: "",
+      invoice_prefix: "",
     });
 
     onMounted(() => {
@@ -493,8 +601,7 @@ export default defineComponent({
             "Success",
             "Company details have been successfully inserted!"
           );
-
-          clear();
+          route.push({ name: "company-list" });
         } else {
           // Handle API error response
           const errorData = response.error;
@@ -537,23 +644,6 @@ export default defineComponent({
           confirmButton: "btn btn-primary",
         },
       });
-    };
-
-    const clear = () => {
-      companyDetails.value = {
-        company_name: "...",
-        address: "...",
-        contact_person: "...",
-        mobile_number: "...",
-        email: "...",
-        country: "",
-        state: "",
-        pincode: "...",
-        city: "...",
-        gst_details: "..",
-        user_limit: 1,
-        selected_package: " ",
-      };
     };
 
     return {
