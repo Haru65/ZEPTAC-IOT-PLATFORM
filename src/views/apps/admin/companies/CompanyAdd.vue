@@ -13,21 +13,15 @@
         >
           <!--begin::Card body-->
           <div class="card-body p-9">
-            <!--begin::Input group-->
             <div class="row mb-6">
               <!--begin::Label-->
               <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                >Company Name & company_Address</label
-              >
+                >Company Name</label>
               <!--end::Label-->
 
               <!--begin::Col-->
-              <div class="col-lg-8">
-                <!--begin::Row-->
-                <div class="row">
-                  <!--begin::Col-->
-                  <div class="col-lg-6 fv-row">
-                    <Field
+              <div class="col-lg-8 fv-row">
+                <Field
                       type="text"
                       name="company_name"
                       class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
@@ -39,16 +33,22 @@
                         <ErrorMessage name="company_name" />
                       </div>
                     </div>
-                  </div>
-                  <!--end::Col-->
+              </div>
+            </div>
 
-                  <!--begin::Col-->
-                  <div class="col-lg-6 fv-row">
-                    <Field
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >Company Address</label>
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8 fv-row">
+                <Field
                       type="text"
                       name="company_address"
                       class="form-control form-control-lg form-control-solid"
-                      placeholder="Company company_address"
+                      placeholder="Company address"
                       v-model="companyDetails.address"
                     />
                     <div class="fv-plugins-message-container">
@@ -56,14 +56,8 @@
                         <ErrorMessage name="company_address" />
                       </div>
                     </div>
-                  </div>
-                  <!--end::Col-->
-                </div>
-                <!--end::Row-->
               </div>
-              <!--end::Col-->
             </div>
-            <!--end::Input group-->
 
             <!--begin::Input group-->
             <div class="row mb-6">
@@ -79,7 +73,7 @@
                   type="text"
                   name="contact_person"
                   class="form-control form-control-lg form-control-solid"
-                  placeholder="Contact Person"
+                  placeholder="Contact Person Name"
                   v-model="companyDetails.contact_person"
                 />
                 <div class="fv-plugins-message-container">
@@ -138,7 +132,7 @@
                   <i
                     class="fas fa-exclamation-circle ms-1 fs-7"
                     data-bs-toggle="tooltip"
-                    title="Phone number must be active"
+                    title="Email must be unique"
                   ></i>
                 </label>
                 <!--end::Label-->
@@ -176,13 +170,7 @@
                   <div class="row">
                     <!--begin::Col-->
                     <div class="col-lg-6 fv-row">
-                      <el-select v-model="companyDetails.country" filterable>
-                        <el-option
-                          value="0"
-                          label="Please Select Package..."
-                          key="0"
-                          >Please Select Role...</el-option
-                        >
+                      <el-select v-model="companyDetails.country" filterable placeholder="Select Country">
                         <el-option
                           v-for="item in countries"
                           :key="item.name"
@@ -196,13 +184,7 @@
                     <!--begin::Col-->
                     <div v-if="state.length" class="col-lg-6 fv-row">
                       <div>
-                        <el-select v-model="companyDetails.state" filterable>
-                          <el-option
-                            value="0"
-                            label="Please Select Package..."
-                            key="0"
-                            >Please Select Role...</el-option
-                          >
+                        <el-select v-model="companyDetails.state" filterable placeholder="Select State">
                           <el-option
                             v-for="item in state"
                             :key="item"
@@ -219,7 +201,7 @@
                           type="tel"
                           name="state"
                           class="form-control form-control-lg form-control-solid"
-                          placeholder="Please Type State."
+                          placeholder="Enter State Name"
                           v-model="companyDetails.state"
                         />
                         <div class="fv-plugins-message-container">
@@ -254,7 +236,7 @@
                         type="text"
                         name="city"
                         class="form-control form-control-lg form-control-solid"
-                        placeholder="City"
+                        placeholder="Enter City Name"
                         v-model="companyDetails.city"
                       />
                       <div class="fv-plugins-message-container">
@@ -271,7 +253,7 @@
                         type="text"
                         name="pincode"
                         class="form-control form-control-lg form-control-solid"
-                        placeholder="Pincode"
+                        placeholder="Enter Pincode"
                         v-model="companyDetails.pincode"
                       />
                       <div class="fv-plugins-message-container">
@@ -292,7 +274,7 @@
               <div class="row mb-3">
                 <!--begin::Label-->
                 <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                  >GST Detials</label
+                  >GST Details</label
                 >
                 <!--end::Label-->
                 <!--begin::Col-->
@@ -334,13 +316,7 @@
                   <div class="row">
                     <!--begin::Col-->
                     <div class="col-lg-6 fv-row">
-                      <el-select v-model="companyDetails.user_limit" filterable>
-                        <el-option
-                          value="0"
-                          label="Please Select Package..."
-                          key="0"
-                          >Please Select Role...</el-option
-                        >
+                      <el-select v-model="companyDetails.user_limit" filterable placeholder="select User Limit">
                         <el-option
                           v-for="item in limit"
                           :key="item"
@@ -357,13 +333,8 @@
                         <el-select
                           v-model="companyDetails.selected_package"
                           filterable
+                          placeholder="Select a Package..."
                         >
-                          <el-option
-                            value="0"
-                            label="Please Select Package..."
-                            key="0"
-                            >Please Select Role...</el-option
-                          >
                           <el-option
                             v-for="item in packages"
                             :key="item"

@@ -17,49 +17,51 @@
             <div class="row mb-6">
               <!--begin::Label-->
               <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                >Company Name & company_Address</label
+                >Company Name</label
               >
               <!--end::Label-->
 
               <!--begin::Col-->
-              <div class="col-lg-8">
-                <!--begin::Row-->
-                <div class="row">
-                  <!--begin::Col-->
-                  <div class="col-lg-6 fv-row">
-                    <Field
-                      type="text"
-                      name="company_name"
-                      class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
-                      placeholder="Company name"
-                      v-model="companyDetails.company_name"
-                    />
-                    <div class="fv-plugins-message-container">
-                      <div class="fv-help-block">
-                        <ErrorMessage name="company_name" />
-                      </div>
-                    </div>
+              <div class="col-lg-8 fv-row">
+                <Field
+                  type="text"
+                  name="company_name"
+                  class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
+                  placeholder="Company name"
+                  v-model="companyDetails.company_name"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="company_name" />
                   </div>
-                  <!--end::Col-->
-
-                  <!--begin::Col-->
-                  <div class="col-lg-6 fv-row">
-                    <Field
-                      type="text"
-                      name="company_address"
-                      class="form-control form-control-lg form-control-solid"
-                      placeholder="Company company_address"
-                      v-model="companyDetails.address"
-                    />
-                    <div class="fv-plugins-message-container">
-                      <div class="fv-help-block">
-                        <ErrorMessage name="company_address" />
-                      </div>
-                    </div>
-                  </div>
-                  <!--end::Col-->
                 </div>
-                <!--end::Row-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >Company Address</label
+              >
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8 fv-row">
+                <Field
+                  type="text"
+                  name="company_address"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Company company_address"
+                  v-model="companyDetails.address"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="company_address" />
+                  </div>
+                </div>
               </div>
               <!--end::Col-->
             </div>
@@ -79,7 +81,7 @@
                   type="text"
                   name="contact_person"
                   class="form-control form-control-lg form-control-solid"
-                  placeholder="Contact Person"
+                  placeholder="Contact Person Name"
                   v-model="companyDetails.contact_person"
                 />
                 <div class="fv-plugins-message-container">
@@ -138,7 +140,7 @@
                   <i
                     class="fas fa-exclamation-circle ms-1 fs-7"
                     data-bs-toggle="tooltip"
-                    title="Phone number must be active"
+                    title="Email must be unique"
                   ></i>
                 </label>
                 <!--end::Label-->
@@ -217,7 +219,7 @@
                           type="text"
                           name="state"
                           class="form-control form-control-lg form-control-solid"
-                          placeholder="Please Type State."
+                          placeholder="Enter State Name"
                           v-model="companyDetails.state"
                         />
                         <div class="fv-plugins-message-container">
@@ -252,7 +254,7 @@
                         type="text"
                         name="city"
                         class="form-control form-control-lg form-control-solid"
-                        placeholder="City"
+                        placeholder="Enter City Name"
                         v-model="companyDetails.city"
                       />
                       <div class="fv-plugins-message-container">
@@ -269,7 +271,7 @@
                         type="text"
                         name="pincode"
                         class="form-control form-control-lg form-control-solid"
-                        placeholder="Pincode"
+                        placeholder="Enter Pincode"
                         v-model="companyDetails.pincode"
                       />
                       <div class="fv-plugins-message-container">
@@ -290,7 +292,7 @@
               <div class="row mb-3">
                 <!--begin::Label-->
                 <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                  >GST Detials</label
+                  >GST Details</label
                 >
                 <!--end::Label-->
                 <!--begin::Col-->
@@ -337,6 +339,7 @@
                         name="user_limit"
                         class="form-select form-select-solid form-select-lg"
                         v-model="companyDetails.user_limit"
+                        placeholder="Select User Limit"
                       >
                         <option v-for="ele in limit" :key="ele" :value="ele">
                           {{ ele }}
@@ -353,8 +356,8 @@
                           name="package"
                           class="form-select form-select-solid form-select-lg"
                           v-model="companyDetails.selected_package"
+                          placeholder="Select a Package ..."
                         >
-                          <option value="">Select a Package ...</option>
                           <option
                             v-for="ele in packages"
                             :key="ele"
@@ -376,7 +379,10 @@
           </div>
           <div class="modal-footer flex-center">
             <!--begin::Button-->
-            <button @click="deletecompany_()" class="btn btn-lg btn-danger w-25">
+            <button
+              @click="deletecompany_()"
+              class="btn btn-lg btn-danger w-25"
+            >
               Discard
             </button>
             <!--end::Button-->

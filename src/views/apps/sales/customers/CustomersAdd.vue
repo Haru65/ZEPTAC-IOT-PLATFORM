@@ -252,10 +252,10 @@
               <div class="row">
                 <!--begin::Col-->
                 <div class="col-lg fv-row">
-                  <el-select v-model="profileDetails.country" filterable>
-                    <el-option value="0" label="Please Select Role..." key="0"
+                  <el-select v-model="profileDetails.country" filterable placeholder="Please Select County...">
+                    <!-- <el-option value="0" label="Please Select Role..." key="0"
                       >Please Select Role...</el-option
-                    >
+                    > -->
                     <el-option
                       v-for="item in countries"
                       :key="item.name"
