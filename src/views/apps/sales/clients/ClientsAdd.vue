@@ -613,7 +613,7 @@ interface ProfileDetails {
   created_by: string;
   updated_by: string;
   customer_id: string;
-  customer_fisrt_name: string;
+  customer_first_name: string;
   customer_last_name: string;
 }
 
@@ -651,17 +651,6 @@ export default defineComponent({
       );
     };
 
-    const GetCustomerData = async (id) => {
-      if (id != " ") {
-        const response = await getCustomer(id);
-        console.log(response);
-        profileDetails.value.customer_id = response.id;
-        profileDetails.value.customer_fisrt_name = response.first_name;
-        profileDetails.value.customer_last_name = response.last_name;
-        disabledselect.value = false;
-        console.log(profileDetails.value);
-      }
-    };
 
     const emailFormDisplay = ref(false);
     const passwordFormDisplay = ref(false);
@@ -702,7 +691,7 @@ export default defineComponent({
       created_by: User.id,
       updated_by: User.id,
       customer_id: "0",
-      customer_fisrt_name: "",
+      customer_first_name: "",
       customer_last_name: "",
     });
 
@@ -715,6 +704,7 @@ export default defineComponent({
           // Handle successful API response
           console.log("API response:", response);
           showSuccessAlert("Success", "User have been successfully inserted!");
+          router.push({ name: "clients-list" });
           clear();
         } else {
           // Handle API error response
@@ -732,7 +722,6 @@ export default defineComponent({
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
         loading.value = false;
-        router.push({ name: "clients-list" });
       }
     };
 
@@ -806,7 +795,7 @@ export default defineComponent({
         created_by: User.id,
         updated_by: User.id,
         customer_id: "",
-        customer_fisrt_name: "",
+        customer_first_name: "",
         customer_last_name: "",
       };
     };
@@ -823,7 +812,6 @@ export default defineComponent({
       clear,
       countries,
       state,
-      GetCustomerData,
       Customers,
     };
   },

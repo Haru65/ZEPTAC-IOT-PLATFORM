@@ -570,6 +570,7 @@ export default defineComponent({
             "Success",
             "Company details have been successfully inserted!"
           );
+          route.push({ name: "invoice-list" });
         } else {
           // Handle API error response
           const errorData = response.error;

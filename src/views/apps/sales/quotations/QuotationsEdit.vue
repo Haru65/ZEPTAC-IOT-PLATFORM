@@ -2,11 +2,11 @@
   <div style="width: 99%" class="sm:p-4 md:p-8 lg:p-12 rounded">
     <!--begin::Modal dialog-->
     <div class="d-flex flex-column flex-lg-row">
-      <div class="flex-lg-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
+      <div class="flex-xl-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
         <div class="card w-20">
-          <div class="card-body p-12">
+          <div class="card-body sm:p-2 lg:p-12">
             <!--begin::Form-->
-            <form id="kt_invoice_form" novalidate :loading="loading">
+            <form id="kt_Quotation_form" novalidate>
               <!--begin::Wrapper-->
               <div
                 class="d-flex gap-5 flex-column align-items-start flex-xxl-row"
@@ -16,7 +16,7 @@
                   class="d-flex align-items-center flex-equal fw-row me-4 order-2"
                   data-bs-toggle="tooltip"
                   data-bs-trigger="hover"
-                  data-bs-original-title="Specify invoice date"
+                  data-bs-original-title="Specify Quotation date"
                   data-kt-initialized="1"
                 >
                   <!--begin::Date-->
@@ -32,11 +32,11 @@
                     <!--begin::Datepicker-->
                     <div class="block">
                       <el-date-picker
-                        v-model="quotationDetail.date"
+                        v-model="QuotationDetials.date"
                         type="date"
                         placeholder="Pick a day"
                         :shortcuts="shortcuts"
-                        :disabledmin-w-lg-500px-date="disabledDate"
+                        :disabled-date="disabledDate"
                       />
                     </div>
                     <!--end::Datepicker-->
@@ -50,15 +50,15 @@
                   class="d-flex flex-center flex-equal fw-row text-nowrap order-1 order-xxl-2 me-4"
                   data-bs-toggle="tooltip"
                   data-bs-trigger="hover"
-                  data-bs-original-title="Enter invoice number"
+                  data-bs-original-title="Enter Quotation number"
                   data-kt-initialized="1"
                 >
                   <span class="fs-2 fw-bold text-gray-800">Quotation #</span>
                   <input
                     type="text"
-                    maxlength="6"
                     class="form-control form-control-flush fw-bold text-muted fs-3 w-125px"
-                    v-model="quotationDetail.quotation_no"
+                    maxlength="6"
+                    v-model="QuotationDetials.quotation_no"
                     placehoder="..."
                   />
                 </div>
@@ -69,7 +69,7 @@
                   class="d-flex align-items-center justify-content-end flex-equal order-3 fw-row"
                   data-bs-toggle="tooltip"
                   data-bs-trigger="hover"
-                  data-bs-original-title="Specify invoice due date"
+                  data-bs-original-title="Specify Quotation due date"
                   data-kt-initialized="1"
                 >
                   <!--begin::Date-->
@@ -85,7 +85,7 @@
                     <!--begin::Datepicker-->
                     <div class="block">
                       <el-date-picker
-                        v-model="quotationDetail.duedate"
+                        v-model="QuotationDetials.duedate"
                         type="date"
                         placeholder="Pick a day"
                         :shortcuts="shortcuts"
@@ -107,80 +107,163 @@
 
               <!--begin::Wrapper-->
               <div class="mb-0">
-                <!--begin::Row-->
-                <div class="row gx-10">
-                  <el-select
-                    v-model="quotationDetail.customer_id"
-                    filterable
-                    v-on:change="GetUserData(quotationDetail.customer_id)"
-                    placeholder="Please Select Customer..."
-                  >
-                    <!-- <el-option
+                <div class="d-flex flex-grow-1 gap-lg-3 gap-sm-5 gap-5">
+                  <!--begin::Row-->
+                  <div class="w-50">
+                    <div class="row gx-10">
+                      <el-select
+                        v-model="QuotationDetials.customer_id"
+                        filterable
+                        v-on:change="GetUserData(QuotationDetials.customer_id)"
+                        placeholder="Please Select Customer..."
+                      >
+                        <el-option
+                          v-for="item in Customers"
+                          :key="item.id"
+                          :label="`${item.first_name} ${item.last_name}`"
+                          :value="item.id"
+                        />
+                      </el-select>
+                    </div>
+                    <!--end::Row-->
+
+                    <div class="mt-2 pt-4">
+                      <h6 class="fw-bold mt-5">Billing Address:</h6>
+                      <div class="mt-2">
+                        <div class="mb-1" v-show="QuotationDetials.customer">
+                          <br />
+                          <span>
+                            {{
+                              `${QuotationDetials.customer.first_name} ${QuotationDetials.customer.last_name}`
+                            }}
+                          </span>
+                          <br />
+                          <span v-show="QuotationDetials.customer.company_name">
+                            {{ `${QuotationDetials.customer.company_name}` }}
+                          </span>
+                          <!-- v-if company_data present -->
+                          <div v-show="QuotationDetials.customer.company_name">
+                            <br />
+                            <span>
+                              {{ `${QuotationDetials.customer.address1}` }}
+                            </span>
+                            <br />
+                            <span>
+                              {{ `${QuotationDetials.customer.address2}` }}
+                            </span>
+                          </div>
+                          <div v-show="QuotationDetials.customer.country">
+                            <span>
+                              {{
+                                `${QuotationDetials.customer.city} - ${QuotationDetials.customer.pincode}`
+                              }}
+                            </span>
+                            <br />
+                            <span>
+                              {{
+                                `${QuotationDetials.customer.states} ${QuotationDetials.customer.country}`
+                              }}
+                            </span>
+                            <br />
+                          </div>
+                          <br />
+                          <!-- firstname as a flag -->
+                          <a
+                            v-show="QuotationDetials.customer.first_name"
+                            target="blank"
+                            v-bind:href="`/customers/edit/${QuotationDetials.customer_id}`"
+                          >
+                            <span class="fs-5"> Edit</span>
+                            <!-- <i
+                          class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                          ></i> -->
+                          </a>
+                        </div>
+                        <br />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="w-50">
+                    <div class="row gx-10">
+                      <el-select
+                        v-model="QuotationDetials.client.id"
+                        filterable
+                        :disabled="clientSelect"
+                        v-on:change="GetClientData(QuotationDetials.client.id)"
+                        aria-label="Please Select Client..."
+                      >
+                        <!-- <el-option
                       value=" "
                       label="Please Select Customer..."
                       key=" "
                       >Please Select Customer...</el-option
-                    > -->
-                    <el-option
-                      v-for="item in Customers"
-                      :key="item.id"
-                      :label="`${item.first_name} ${item.last_name}`"
-                      :value="item.id"
-                    />
-                  </el-select>
-                </div>
-                <!--end::Row-->
-                <div class="mt-2 pt-4">
-                  <h6 class="fw-bold mt-5">Billing Address:</h6>
-                  <div class="mt-2">
-                    <div class="mb-1" v-show="quotationDetail.meta">
-                      <br />
-                      <span>
-                        {{
-                          `${quotationDetail.meta.first_name} ${quotationDetail.meta.last_name}`
-                        }}
-                      </span>
-                      <br />
-                      <span v-show="quotationDetail.meta.company_name">
-                        {{ `${quotationDetail.meta.company_name}` }}
-                      </span>
-                      <!-- v-if company_data present -->
-                      <div v-show="quotationDetail.meta.company_name">
-                        <br />
-                        <span>
-                          {{ `${quotationDetail.meta.address1}` }}
-                        </span>
-                        <br />
-                        <span>
-                          {{ `${quotationDetail.meta.address2}` }}
-                        </span>
-                      </div>
-                      <div v-show="quotationDetail.meta.country">
-                        <span>
-                          {{
-                            `${quotationDetail.meta.city} - ${quotationDetail.meta.pincode}`
-                          }}
-                        </span>
-                        <br />
-                        <span>
-                          {{
-                            `${quotationDetail.meta.states} ${quotationDetail.meta.country}`
-                          }}
-                        </span>
-                        <br />
-                      </div>
-                      <br />
-                      <a
-                        target="blank"
-                        v-bind:href="`/customers/edit/${quotationDetail.customer_id}`"
-                      >
-                        <span class="fs-5"> Edit</span>
-                        <!-- <i
-                      class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                    ></i> -->
-                      </a>
+                      > -->
+                        <el-option
+                          v-for="item in Clients"
+                          :key="item.client_data.id"
+                          :label="`${item.client_data.first_name} ${item.client_data.last_name}`"
+                          :value="item.client_data.id"
+                        />
+                      </el-select>
                     </div>
-                    <br />
+                    <!--end::Row-->
+
+                    <div class="mt-2 pt-4">
+                      <h6 class="fw-bold mt-5">Billing Address:</h6>
+                      <div class="mt-2">
+                        <div class="mb-1" v-show="QuotationDetials.client">
+                          <br />
+                          <span>
+                            {{
+                              `${QuotationDetials.client.first_name} ${QuotationDetials.client.last_name}`
+                            }}
+                          </span>
+                          <br />
+                          <span v-show="QuotationDetials.client.company_name">
+                            {{ `${QuotationDetials.client.company_name}` }}
+                          </span>
+                          <!-- v-if company_data present -->
+                          <div v-show="QuotationDetials.client.company_name">
+                            <br />
+                            <span>
+                              {{ `${QuotationDetials.client.address1}` }}
+                            </span>
+                            <br />
+                            <span>
+                              {{ `${QuotationDetials.client.address2}` }}
+                            </span>
+                          </div>
+                          <div v-show="QuotationDetials.client.country">
+                            <span>
+                              {{
+                                `${QuotationDetials.client.city} - ${QuotationDetials.client.pincode}`
+                              }}
+                            </span>
+                            <br />
+                            <span>
+                              {{
+                                `${QuotationDetials.client.states} ${QuotationDetials.client.country}`
+                              }}
+                            </span>
+                            <br />
+                          </div>
+                          <br />
+                          <!-- firstname as a flag -->
+                          <a
+                            v-show="QuotationDetials.client.first_name"
+                            target="blank"
+                            v-bind:href="`/clients/edit/${QuotationDetials.customer_id}`"
+                          >
+                            <span class="fs-5"> Edit</span>
+                            <!-- <i
+                          class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                          ></i> -->
+                          </a>
+                        </div>
+                        <br />
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <!--begin::Table wrapper-->
@@ -205,9 +288,9 @@
                     <!--begin::Table body-->
                     <tbody>
                       <CustomSelect
-                        v-bind:tasks="quotationDetail.items"
+                        v-bind:tasks="QuotationDetials.items"
                         v-on:removeitem="RemoveItem($event)"
-                        v-on:getval="quotationDetailAddFunc($event)"
+                        v-on:getval="QuotationDetialsAddFunc($event)"
                         v-on:UpdateTotal="UpdateTotal($event)"
                       />
                     </tbody>
@@ -229,7 +312,7 @@
                         <th colspan="1" class="fs-4 ps-0">Total</th>
                         <th colspan="1" class="text-end fs-4 text-nowrap">
                           ₹<span data-kt-element="grand-total">{{
-                            quotationDetail.total.toFixed(2)
+                            QuotationDetials.total.toFixed(2)
                           }}</span>
                         </th>
                       </tr>
@@ -246,7 +329,7 @@
                     name="notes"
                     class="form-control form-control-solid"
                     rows="3"
-                    v-model="quotationDetail.notes"
+                    v-model="QuotationDetials.notes"
                     placeholder="Thanks for your business"
                   ></textarea>
                 </div>
@@ -260,38 +343,31 @@
         </div>
       </div>
 
-      <div class="flex-lg-auto min-w-lg-300px" ref="invoice">
+      <div class="flex-lg-auto min-w-lg-300px">
         <!--begin::Card-->
         <div
           class="card"
           data-kt-sticky="true"
-          data-kt-sticky-name="invoice"
+          data-kt-sticky-name="Quotation"
           data-kt-sticky-offset="{default: false, lg: '100px'}"
           data-kt-sticky-top="150px"
           data-kt-sticky-animation="false"
           data-kt-sticky-zindex="95"
           data-kt-sticky-width="300px"
+          data-kt-sticky-min-height="400px"
           data-kt-sticky-enabled="true"
         >
           <!--begin::Card body-->
           <div class="card-body">
             <!--begin::Input group-->
             <div class="mb-10">
-              <div class="d-flex flex-lg-row justify-content-between">
-                <h2>Quotation</h2>
-                <span
-                  class="cursor-pointer"
-                  v-on:click="generatePdf(quotationDetail.quotation_no)"
-                >
-                  <i class="fa fa-file-pdf" style="font-size: 1.6rem"></i>
-                </span>
-              </div>
+              <h2>Quotation</h2>
               <br />
-              <div class="row gx-10" v-if="quotationDetail.status != 3">
+              <div class="row gx-10">
                 <el-select
-                  v-model="quotationDetail.status"
+                  v-model="QuotationDetials.status"
                   filterable
-                  :disabled="status"
+                  :disabled="disabledselect"
                   placeholder="Please Select Status..."
                 >
                   <!-- <el-option value=" " label="Please Select Status..." key=" "
@@ -305,16 +381,9 @@
                   />
                 </el-select>
               </div>
-              <div v-else>
-                <h3
-                  class="text-start fs-4 text-nowrap badge badge-light-success flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                >
-                  {{ GetQuotationStatus(quotationDetail.status) }}
-                </h3>
-              </div>
               <br />
               <div class="items">
-                <p v-for="item in quotationDetail.items" :key="item.id">
+                <p v-for="item in QuotationDetials.items" :key="item.id">
                   <span
                     v-if="item.id != ''"
                     class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
@@ -325,18 +394,18 @@
             </div>
             <!--end::Input group-->
             <div class="total">
-              <div v-show="quotationDetail.status != 3">
+              <div>
                 <h6
                   class="text-start fs-4 text-nowrap badge badge-light flex-shrink-0 align-self-center py-3 px-4 fs-7"
                 >
-                  {{ GetQuotationStatus(quotationDetail.status) }}
+                  {{ GetQuotationStatus(parseInt(QuotationDetials.status)) }}
                 </h6>
               </div>
               <div>
                 <h3 class="text-end fs-4 text-nowrap">Total</h3>
                 <h3 class="text-end fs-4 text-nowrap">
                   ₹<span data-kt-element="grand-total">{{
-                    quotationDetail.total.toFixed(2)
+                    QuotationDetials.total.toFixed(2)
                   }}</span>
                 </h3>
               </div>
@@ -346,18 +415,11 @@
             <!--end::Separator-->
 
             <!--begin::Actions-->
+            <!--begin::Row-->
+            <!--end::Row-->
             <div class="mb-0">
               <!--begin::Row-->
               <div class="row mb-5">
-                <!--begin::Col-->
-                <div class="col">
-                  <span
-                    class="btn btn-light btn-light-primary w-100"
-                    v-on:click="submit"
-                    >Update</span
-                  >
-                </div>
-                <!--end::Col-->
                 <!--begin::Col-->
                 <div class="col">
                   <span
@@ -367,27 +429,18 @@
                   >
                 </div>
                 <!--end::Col-->
+
+                <!--begin::Col-->
+                <div class="col">
+                  <span
+                    class="btn btn-light btn-light-primary w-100"
+                    v-on:click="submit"
+                    >Update</span
+                  >
+                </div>
+                <!--end::Col-->
               </div>
               <!--end::Row-->
-              <div class="mb-0">
-                <!--begin::Row-->
-
-                <span
-                  v-if="quotationDetail.status != 3"
-                  v-on:click="SendInvoice"
-                  href="#"
-                  class="btn btn-primary w-100 mb-3"
-                  id="kt_invoice_submit_button"
-                >
-                  <i class="ki-duotone ki-triangle fs-3"
-                    ><span class="path1"></span><span class="path2"></span
-                    ><span class="path3"></span
-                  ></i>
-                  Convert to Invoice
-                </span>
-                <!--end::Row-->
-              </div>
-              <!--end::Actions-->
             </div>
             <!--end::Actions-->
           </div>
@@ -406,31 +459,32 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import {
   getCustomers,
-  getUser,
-  getQuotation,
   updateQuotation,
-  addInvoice,
+  getUser,
+  getClient,
+  GetCustomerClients,
+  getQuotation,
   deletequotation,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import CustomSelect from "./CustomComponents/CustomQuotationItems.vue";
 import moment from "moment";
+import { useRouter, useRoute } from "vue-router";
 import { formatPrice } from "@/core/config/DataFormatter";
 import {
   QuotationStatusArray,
   GetQuotationStatus,
 } from "@/core/config/QuotationStatusConfig";
-import { useRouter, useRoute } from "vue-router";
-import { Gen } from "@/core/config/PdfGenerator";
 
 interface itemsArr {
   id: string;
   price: string;
-  desc: string;
+  description: string;
   name: string;
 }
 
 interface Meta {
+  id: string;
   first_name: string;
   last_name: string;
   company_name: string;
@@ -442,49 +496,63 @@ interface Meta {
   country: string;
 }
 
-interface quotationDetials {
+interface QuotationDetials {
   quotation_no: string;
-  invoice_no: string;
   customer_id: string;
   items: Array<itemsArr>;
   date: string;
   duedate: string;
-  status: number;
+  status: string;
   notes: string;
   total: number;
-  meta: Meta;
+  customer: Meta;
+  client: Meta;
   is_active: number;
+  company_id: string;
   created_by: string;
   updated_by: string;
 }
 
 export default defineComponent({
-  name: "company-edit",
+  name: "company-add",
   components: {
     CustomSelect,
   },
   setup() {
     const auth = useAuthStore();
-    const loading = ref(true);
+    const disabledselect = ref(true);
+    const clientSelect = ref(true);
     const Total = ref(0);
-    const status = ref(false);
-    const route = useRoute();
-    const router = useRouter();
-
-    const quotationid = route.params.id;
-    const invoice = ref(null);
+    const route = useRouter();
+    const router = useRoute();
+    const User = auth.GetUser();
+    const QuotationId = router.params.id;
     const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
-
-    const quotationDetail = ref<quotationDetials>({
+    const Clients = ref([
+      { id: "", client_data: { id: "", first_name: "", last_name: "" } },
+    ]);
+    const QuotationDetials = ref<QuotationDetials>({
       quotation_no: "21****",
       customer_id: " ",
-      invoice_no: "",
       items: [],
       date: "",
       duedate: "",
-      status: 0,
+      status: "",
       notes: "",
-      meta: {
+      customer: {
+        id: "",
+        company_name: "",
+        first_name: "",
+        last_name: "",
+        address1: "",
+        address2: "",
+        city: "",
+        states: "",
+        pincode: "",
+        country: "",
+      },
+      client: {
+        id: "",
         company_name: "",
         first_name: "",
         last_name: "",
@@ -497,23 +565,147 @@ export default defineComponent({
       },
       total: 0,
       is_active: 1,
-      created_by: User.id
-      updated_by: User.id
+      company_id: User.company_id,
+      created_by: User.id,
+      updated_by: User.id,
     });
 
-    const GetUserData = async (id) => {
-      const response = await getUser(id);
+    onMounted(async () => {
+      // todo: quotation check if pres get last incr 1
+
+      Customers.value.pop();
+      Clients.value.pop();
+      await GetCustomers();
+
+      //? get the quotaion details from id
+      const response = await getQuotation(QuotationId);
       console.log(response);
-      quotationDetail.value.meta = response.meta;
+      QuotationDetials.value.quotation_no = response.quotation_no;
+      QuotationDetials.value.date = response.date;
+      QuotationDetials.value.duedate = response.duedate;
+      QuotationDetials.value.items = JSON.parse(response.items);
+      QuotationDetials.value.status = response.status;
+      QuotationDetials.value.total = parseFloat(response.total);
+      QuotationDetials.value.notes = response.notes;
+      // Customer
+      QuotationDetials.value.customer_id = response.customer_id;
+      GetUserData(QuotationDetials.value.customer_id);
+      // Client
+      QuotationDetials.value.client.id = response.client_id;
+      GetClientData(QuotationDetials.value.client.id);
+    });
+
+        const GetClients = async (id: string) => {
+      // ? empty clients
+      console.log(Clients.value);
+      Clients.value.length = 0;
+
+      // * empty clents data
+      QuotationDetials.value.client.id = "";
+      QuotationDetials.value.client.company_name = "";
+      QuotationDetials.value.client.address1 = "";
+      QuotationDetials.value.client.address2 = "";
+      QuotationDetials.value.client.city = "";
+      QuotationDetials.value.client.pincode = "";
+      QuotationDetials.value.client.states = "";
+      QuotationDetials.value.client.country = "";
+      QuotationDetials.value.client.first_name = "";
+      QuotationDetials.value.client.last_name = "";
+
+      ApiService.setHeader();
+      const response = await GetCustomerClients(id);
+      console.log(response);
+      Clients.value.push(
+        ...response.result.map(({ created_at, ...rest }) => ({
+          ...rest,
+          created_at: moment(created_at).format("MMMM Do YYYY"),
+        }))
+      );
+      console.log(Clients.value);
     };
 
-    // on add model data push to the sub-json vlaue quotationDetail
-    const quotationDetailAddFunc = (data) => {
+    const GetUserData = async (id) => {
+      if (id != " ") {
+        const customer_id = id;
+        const response = await getUser(customer_id);
+        console.log(response);
+        QuotationDetials.value.customer = response.meta;
+        QuotationDetials.value.customer.id = response.id;
+        clientSelect.value = false;
+        /* *
+         TODO : get customer_id and from meta get client ids get customer_id and from meta get client ids and put into Ref object
+         ? Problem of getting clients;
+        */
+        GetClients(customer_id);
+      } else {
+        QuotationDetials.value.customer = {
+          id: "",
+          company_name: "",
+          first_name: "",
+          last_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          states: "",
+          pincode: "",
+          country: "",
+        };
+      }
+    };
+
+    const GetClientData = async (id) => {
+      if (id != " ") {
+        const customer_id = id;
+        const response = await getClient(customer_id);
+        console.log(response);
+
+        // ? set client details
+        QuotationDetials.value.client.id = response.id;
+        QuotationDetials.value.client.address1 = response.meta.address1;
+        QuotationDetials.value.client.company_name = response.meta.company_name;
+        QuotationDetials.value.client.address2 = response.meta.address2;
+        QuotationDetials.value.client.city = response.meta.city;
+        QuotationDetials.value.client.pincode = response.meta.pincode;
+        QuotationDetials.value.client.states = response.meta.states;
+        QuotationDetials.value.client.country = response.meta.country;
+        QuotationDetials.value.client.first_name = response.first_name;
+        QuotationDetials.value.client.last_name = response.last_name;
+        disabledselect.value = false;
+        /* *
+         TODO : get customer_id and from meta get client ids get customer_id and from meta get client ids and put into Ref object
+         ? Problem of getting clients;
+        */
+      } else {
+        QuotationDetials.value.customer = {
+          id: "",
+          company_name: "",
+          first_name: "",
+          last_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          states: "",
+          pincode: "",
+          country: "",
+        };
+      }
+    };
+
+    const addNewItem = () => {
+      QuotationDetials.value.items.push({
+        id: "",
+        name: "",
+        price: "",
+        description: "",
+      });
+    };
+    // on add model data push to the sub-json vlaue QuotationDetials
+    const QuotationDetialsAddFunc = (data) => {
       // selects id not same don't push;
-      // console.log(quotationDetail.value);
-      console.log(data);
-      console.log(quotationDetail.value);
-      quotationDetail.value.items.forEach((ele) => {
+      // console.log(QuotationDetials.value);
+      // console.log(data);
+      // console.log(QuotationDetials.value);
+      QuotationDetials.value.items.forEach((ele) => {
         console.log(ele);
         if (ele.id == data.id) {
           ele["name"] = data.name;
@@ -521,24 +713,6 @@ export default defineComponent({
           ele["price"] = formatPrice(data.price);
         }
       });
-      calPrice();
-    };
-
-    const addNewItem = () => {
-      //
-      console.log(quotationDetail.value.items);
-      // selects id not same don't push;
-      quotationDetail.value.items.push({
-        id: "",
-        name: "",
-        price: "",
-        desc: "",
-      });
-      calPrice();
-    };
-
-    const RemoveItem = (index) => {
-      removeObjectWithId(quotationDetail.value.items, index);
       calPrice();
     };
 
@@ -552,19 +726,23 @@ export default defineComponent({
       return arr;
     };
 
+    const RemoveItem = (index) => {
+      console.log(index);
+      removeObjectWithId(QuotationDetials.value.items, index);
+      calPrice();
+    };
+
     const UpdateTotal = (data) => {
       console.log(data);
+      removeNulls();
       calPrice();
     };
 
     const calPrice = () => {
-      // filter non-redunadant
-      // update val
-      console.log(quotationDetail.value.items);
-      const prices = quotationDetail.value.items.map((ele: any) =>
+      const prices = QuotationDetials.value.items.map((ele: any) =>
         Number(ele.price.replaceAll(",", "").substring(1))
       );
-      quotationDetail.value.total =
+      QuotationDetials.value.total =
         prices.length != 0 ? prices.reduce((acc, curr) => acc + curr) : 0.0;
     };
 
@@ -579,73 +757,29 @@ export default defineComponent({
       );
     };
 
-    onMounted(async () => {
-      Customers.value.pop();
-
-      await GetCustomers();
-
-      const response = await getQuotation(quotationid);
-      console.log(response);
-
-      // check if dropdown set no
-      if (response.status == 3) {
-        status.value = true;
-      }
-
-      quotationDetail.value = {
-        quotation_no: response.quotation_no,
-        invoice_no: "",
-        customer_id: response.customer_id,
-        items: JSON.parse(response.items),
-        date: response.date,
-        duedate: response.duedate,
-        status: response.status,
-        notes: response.notes,
-        total: response.total,
-        meta: {
-          company_name: "",
-          first_name: "",
-          last_name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          states: "",
-          pincode: "",
-          country: "",
-        },
-        is_active: response.is_active,
-        created_by: User.id
-        updated_by: User.id
-      };
-
-      const respons = await getUser(response.customer_id);
-      quotationDetail.value.meta = respons.meta;
-    });
-
     const removeNulls = () => {
-      quotationDetail.value.items = quotationDetail.value.items.filter(
+      QuotationDetials.value.items = QuotationDetials.value.items.filter(
         (ele: any) => ele.id !== ""
       );
     };
 
     // number formating remove
     const submit = async () => {
-      console.warn("Nice");
+      disabledselect.value = true;
       removeNulls();
-      calPrice();
-      console.log(quotationDetail.value.items);
-      quotationDetail.value.date = moment(quotationDetail.value.date).format(
+      console.log(QuotationDetials.value);
+      QuotationDetials.value.date = moment(QuotationDetials.value.date).format(
         "YYYY-MM-DD HH:mm:ss"
       );
-      quotationDetail.value.duedate = moment(
-        quotationDetail.value.duedate
+      QuotationDetials.value.duedate = moment(
+        QuotationDetials.value.duedate
       ).format("YYYY-MM-DD HH:mm:ss");
-      // console.log(quotationDetail.value);
+      // console.log(QuotationDetials.value);
       try {
         // Call your API here with the form values
         const response = await updateQuotation(
-          quotationDetail.value,
-          quotationid
+          QuotationDetials.value,
+          QuotationId
         );
         // console.log(response.error);
         if (!response.error) {
@@ -667,86 +801,8 @@ export default defineComponent({
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
-        loading.value = false;
+        disabledselect.value = false;
       }
-    };
-
-    // number formating remove
-    const SendInvoice = async () => {
-      console.warn("Nice");
-      // console.log(quotationDetail.value);
-      Swal.fire({
-        title: "Are you sure?",
-        text: "Send Quotation to Invoice!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#009ef7",
-        confirmButtonText: "Yes, I am sure!",
-      }).then(async (result: { [x: string]: any }) => {
-        if (result["isConfirmed"]) {
-          let invoice_no = quotationDetail.value.quotation_no;
-          quotationDetail.value.invoice_no = invoice_no;
-
-          // quotationDetail.value.quotation_no = quotationid.toString();
-          quotationDetail.value.date = moment(
-            quotationDetail.value.date
-          ).format("YYYY-MM-DD HH:mm:ss");
-          quotationDetail.value.duedate = moment(
-            quotationDetail.value.duedate
-          ).format("YYYY-MM-DD HH:mm:ss");
-          // console.log(quotationDetail.value);
-          try {
-            // update the invoice
-            // converted to invoice
-            quotationDetail.value.status = 3;
-            const res = await updateQuotation(
-              quotationDetail.value,
-              quotationid
-            );
-            // Call your API here with the form values
-            if (res.error) {
-              // Handle successful API response
-              const errorData = res.error;
-              // console.log("API error:", errorData);
-              console.log("API error:", errorData.response.data.errors);
-              showErrorAlert(
-                "Warning",
-                "Please Fill the Form Fields Correctly"
-              );
-            }
-
-            // sending to
-            // set to invoice
-            // draf status
-            quotationDetail.value.quotation_no = quotationid.toString();
-            quotationDetail.value.status = 1;
-            const response = await addInvoice(quotationDetail.value);
-            // console.log(response.error);
-            if (!response.error) {
-              // Handle successful API response
-              // console.log("API response:", response);
-              showSuccessAlert(
-                "Success",
-                "Quotation Successfully Converted to Invoice"
-              );
-              router.push({ name: "quotation-list" });
-            } else {
-              // Handle API error response
-              const errorData = response.error;
-              // console.log("API error:", errorData);
-              console.log("API error:", errorData.response.data.errors);
-              showErrorAlert(
-                "Warning",
-                "Invoice Already Exist For this Quotation"
-              );
-            }
-          } catch (error) {
-            // Handle any other errors during API call
-            console.error("API call error:", error);
-            showErrorAlert("Error", "An error occurred during the API call.");
-          }
-        }
-      });
     };
 
     const deleteQuotation = () => {
@@ -760,8 +816,8 @@ export default defineComponent({
       }).then((result: { [x: string]: any }) => {
         if (result["isConfirmed"]) {
           // Put your function here
-          deletequotation(quotationid);
-          router.push({ name: "quotation-list" });
+          deletequotation(QuotationId);
+          route.push({ name: "quotation-list" });
         }
       });
     };
@@ -778,7 +834,7 @@ export default defineComponent({
           confirmButton: "btn btn-primary",
         },
       }).then(() => {
-        console.log("done");
+        console.log('Done');
       });
     };
 
@@ -796,10 +852,6 @@ export default defineComponent({
       });
     };
 
-    const generatePdf = async (pdfName: string) => {
-      removeNulls();
-      await Gen("quotation", quotationid.toString(), pdfName, quotationDetail);
-    };
     // date
 
     const shortcuts = [
@@ -829,27 +881,27 @@ export default defineComponent({
       return null;
     };
 
+
     return {
-      quotationDetail,
+      Clients,
+      QuotationDetials,
       Customers,
       getAssetPath,
       submit,
-      loading,
+      deleteQuotation,
+      disabledselect,
+      clientSelect,
       shortcuts,
       disabledDate,
       RemoveItem,
       GetUserData,
+      GetClientData,
       UpdateTotal,
       addNewItem,
       QuotationStatusArray,
-      quotationDetailAddFunc,
+      QuotationDetialsAddFunc,
       GetQuotationStatus,
-      deleteQuotation,
-      SendInvoice,
       Total,
-      status,
-      generatePdf,
-      invoice,
     };
   },
 });
@@ -861,7 +913,7 @@ export default defineComponent({
 }
 
 .el-input__wrapper {
-  height: 3.1rem;
+  height: 3rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);
   border-color: var(--bs-gray-100);
@@ -882,13 +934,4 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   display: none;
 }
-
-.bg-black {
-  background-color: #1e2028 !important;
-}
-
-.bg-white {
-  background-color: #fafbf6 !important;
-}
 </style>
-@/core/config/PdfGenerator

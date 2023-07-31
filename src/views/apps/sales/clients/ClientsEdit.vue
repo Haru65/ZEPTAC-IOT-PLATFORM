@@ -644,6 +644,19 @@ export default defineComponent({
       profileDetails.value.last_name = response.last_name;
       profileDetails.value.company_name = response.meta.company_name;
       profileDetails.value.customer_id = parseInt(response.meta.customer_id);
+      profileDetails.value.email = response.email;
+      profileDetails.value.phone = response.mobile;
+      // meta
+      profileDetails.value.address1 = response.meta.address1 ? response.meta.address1 : "";
+      profileDetails.value.address2 = response.meta.address2 ? response.meta.address2 : "";
+      profileDetails.value.country = response.meta.country;
+      profileDetails.value.states = response.meta.states;
+      profileDetails.value.city = response.meta.city;
+      profileDetails.value.pincode = response.meta.pincode;
+      profileDetails.value.gender = response.meta.gender;
+      profileDetails.value.dob = response.meta.dob;
+      profileDetails.value.adhar = response.meta.adhar;
+      profileDetails.value.pan = response.meta.pan;
 
       state.value.pop();
       Customers.value.pop();
@@ -659,18 +672,6 @@ export default defineComponent({
           created_at: moment(created_at).format("MMMM Do YYYY"),
         }))
       );
-    };
-
-    const GetCustomerData = async (id) => {
-      if (id != " ") {
-        const response = await getCustomer(id);
-        console.log(response);
-        profileDetails.value.customer_id = response.id;
-        profileDetails.value.customer_fisrt_name = response.first_name;
-        profileDetails.value.customer_last_name = response.last_name;
-        disabledselect.value = false;
-        console.log(profileDetails.value);
-      }
     };
 
     const emailFormDisplay = ref(false);
@@ -781,13 +782,12 @@ export default defineComponent({
           state.value.pop();
         }
         if (newVal === "India") {
-          profileDetails.value.states = "";
           INstates.forEach((ele) => {
             state.value.push(ele.name);
           });
           //console.log(state);
         } else {
-          profileDetails.value.states = "";
+          // profileDetails.value.states = "";
         }
       }
     );
@@ -833,7 +833,6 @@ export default defineComponent({
       clear,
       countries,
       state,
-      GetCustomerData,
       Customers,
     };
   },

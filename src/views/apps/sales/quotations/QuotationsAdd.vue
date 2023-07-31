@@ -117,12 +117,6 @@
                         v-on:change="GetUserData(QuotationDetials.customer_id)"
                         placeholder="Please Select Customer..."
                       >
-                        <!-- <el-option
-                      value=" "
-                      label="Please Select Customer..."
-                      key=" "
-                      >Please Select Customer...</el-option
-                      > -->
                         <el-option
                           v-for="item in Customers"
                           :key="item.id"
@@ -193,10 +187,11 @@
                   <div class="w-50">
                     <div class="row gx-10">
                       <el-select
-                        v-model="QuotationDetials.customer_id"
+                        v-model="QuotationDetials.client.id"
                         filterable
-                        v-on:change="GetUserData(QuotationDetials.customer_id)"
-                        placeholder="Please Select Customer..."
+                        :disabled="clientSelect"
+                        v-on:change="GetClientData(QuotationDetials.client.id)"
+                        aria-label="Please Select Client..."
                       >
                         <!-- <el-option
                       value=" "
@@ -205,10 +200,10 @@
                       >Please Select Customer...</el-option
                       > -->
                         <el-option
-                          v-for="item in Customers"
-                          :key="item.id"
-                          :label="`${item.first_name} ${item.last_name}`"
-                          :value="item.id"
+                          v-for="item in Clients"
+                          :key="item.client_data.id"
+                          :label="`${item.client_data.first_name} ${item.client_data.last_name}`"
+                          :value="item.client_data.id"
                         />
                       </el-select>
                     </div>
@@ -217,38 +212,38 @@
                     <div class="mt-2 pt-4">
                       <h6 class="fw-bold mt-5">Billing Address:</h6>
                       <div class="mt-2">
-                        <div class="mb-1" v-show="QuotationDetials.customer">
+                        <div class="mb-1" v-show="QuotationDetials.client">
                           <br />
                           <span>
                             {{
-                              `${QuotationDetials.customer.first_name} ${QuotationDetials.customer.last_name}`
+                              `${QuotationDetials.client.first_name} ${QuotationDetials.client.last_name}`
                             }}
                           </span>
                           <br />
-                          <span v-show="QuotationDetials.customer.company_name">
-                            {{ `${QuotationDetials.customer.company_name}` }}
+                          <span v-show="QuotationDetials.client.company_name">
+                            {{ `${QuotationDetials.client.company_name}` }}
                           </span>
                           <!-- v-if company_data present -->
-                          <div v-show="QuotationDetials.customer.company_name">
+                          <div v-show="QuotationDetials.client.company_name">
                             <br />
                             <span>
-                              {{ `${QuotationDetials.customer.address1}` }}
+                              {{ `${QuotationDetials.client.address1}` }}
                             </span>
                             <br />
                             <span>
-                              {{ `${QuotationDetials.customer.address2}` }}
+                              {{ `${QuotationDetials.client.address2}` }}
                             </span>
                           </div>
-                          <div v-show="QuotationDetials.customer.country">
+                          <div v-show="QuotationDetials.client.country">
                             <span>
                               {{
-                                `${QuotationDetials.customer.city} - ${QuotationDetials.customer.pincode}`
+                                `${QuotationDetials.client.city} - ${QuotationDetials.client.pincode}`
                               }}
                             </span>
                             <br />
                             <span>
                               {{
-                                `${QuotationDetials.customer.states} ${QuotationDetials.customer.country}`
+                                `${QuotationDetials.client.states} ${QuotationDetials.client.country}`
                               }}
                             </span>
                             <br />
@@ -256,9 +251,9 @@
                           <br />
                           <!-- firstname as a flag -->
                           <a
-                            v-show="QuotationDetials.customer.first_name"
+                            v-show="QuotationDetials.client.first_name"
                             target="blank"
-                            v-bind:href="`/customers/edit/${QuotationDetials.customer_id}`"
+                            v-bind:href="`/clients/edit/${QuotationDetials.customer_id}`"
                           >
                             <span class="fs-5"> Edit</span>
                             <!-- <i
@@ -452,7 +447,13 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
-import { getCustomers, addQuotation, getUser } from "@/stores/api";
+import {
+  getCustomers,
+  addQuotation,
+  getUser,
+  getClient,
+  GetCustomerClients,
+} from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import CustomSelect from "./CustomComponents/CustomQuotationItems.vue";
 import moment from "moment";
@@ -495,6 +496,7 @@ interface QuotationDetials {
   customer: Meta;
   client: Meta;
   is_active: number;
+  company_id: string;
   created_by: string;
   updated_by: string;
 }
@@ -507,11 +509,14 @@ export default defineComponent({
   setup() {
     const auth = useAuthStore();
     const disabledselect = ref(true);
+    const clientSelect = ref(true);
     const Total = ref(0);
     const route = useRouter();
     const User = auth.GetUser();
     const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
-
+    const Clients = ref([
+      { id: "", client_data: { id: "", first_name: "", last_name: "" } },
+    ]);
     const QuotationDetials = ref<QuotationDetials>({
       quotation_no: "21****",
       customer_id: " ",
@@ -546,6 +551,7 @@ export default defineComponent({
       },
       total: 0,
       is_active: 1,
+      company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
     });
@@ -554,14 +560,82 @@ export default defineComponent({
       // todo: quotation check if pres get last incr 1
 
       Customers.value.pop();
+      Clients.value.pop();
       await GetCustomers();
     });
 
+    const GetClients = async (id: string) => {
+      // ? empty clients
+      console.log(Clients.value);
+      Clients.value.length = 0;
+
+      // * empty clents data
+      QuotationDetials.value.client.id = "";
+      QuotationDetials.value.client.company_name = "";
+      QuotationDetials.value.client.address1 = "";
+      QuotationDetials.value.client.address2 = "";
+      QuotationDetials.value.client.city = "";
+      QuotationDetials.value.client.pincode = "";
+      QuotationDetials.value.client.states = "";
+      QuotationDetials.value.client.country = "";
+      QuotationDetials.value.client.first_name = "";
+      QuotationDetials.value.client.last_name = "";
+
+      ApiService.setHeader();
+      const response = await GetCustomerClients(id);
+      console.log(response);
+      Clients.value.push(
+        ...response.result.map(({ created_at, ...rest }) => ({
+          ...rest,
+          created_at: moment(created_at).format("MMMM Do YYYY"),
+        }))
+      );
+      console.log(Clients.value);
+    };
+
     const GetUserData = async (id) => {
       if (id != " ") {
-        const response = await getUser(id);
+        const customer_id = id;
+        const response = await getUser(customer_id);
+        console.log(response);
         QuotationDetials.value.customer = response.meta;
         QuotationDetials.value.customer.id = response.id;
+        clientSelect.value = false;
+        /* *
+         TODO : get customer_id and from meta get client ids get customer_id and from meta get client ids and put into Ref object
+         ? Problem of getting clients;
+        */
+        GetClients(customer_id);
+      } else {
+        QuotationDetials.value.customer = {
+          id: "",
+          company_name: "",
+          first_name: "",
+          last_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          states: "",
+          pincode: "",
+          country: "",
+        };
+      }
+    };
+
+    const GetClientData = async (id) => {
+      if (id != " ") {
+        const customer_id = id;
+        const response = await getClient(customer_id);
+        console.log(response);
+        QuotationDetials.value.client.address1 = response.meta.address1;
+        QuotationDetials.value.client.company_name = response.meta.company_name;
+        QuotationDetials.value.client.address2 = response.meta.address2;
+        QuotationDetials.value.client.city = response.meta.city;
+        QuotationDetials.value.client.pincode = response.meta.pincode;
+        QuotationDetials.value.client.states = response.meta.states;
+        QuotationDetials.value.client.country = response.meta.country;
+        QuotationDetials.value.client.first_name = response.first_name;
+        QuotationDetials.value.client.last_name = response.last_name;
         disabledselect.value = false;
         /* *
          TODO : get customer_id and from meta get client ids get customer_id and from meta get client ids and put into Ref object
@@ -659,8 +733,7 @@ export default defineComponent({
     const submit = async () => {
       disabledselect.value = true;
       removeNulls();
-      console.warn("Nice");
-      // console.log(QuotationDetials.value);
+      console.log(QuotationDetials.value);
       QuotationDetials.value.date = moment(QuotationDetials.value.date).format(
         "YYYY-MM-DD HH:mm:ss"
       );
@@ -679,6 +752,7 @@ export default defineComponent({
             "Success",
             "Company details have been successfully inserted!"
           );
+          route.push({ name: "quotation-list" });
         } else {
           // Handle API error response
           const errorData = response.error;
@@ -791,20 +865,24 @@ export default defineComponent({
         is_active: 1,
         created_by: User.id,
         updated_by: User.id,
+        company_id: User.company_id,
       };
       route.push({ name: "quotation-list" });
     };
 
     return {
+      Clients,
       QuotationDetials,
       Customers,
       getAssetPath,
       submit,
       disabledselect,
+      clientSelect,
       shortcuts,
       disabledDate,
       RemoveItem,
       GetUserData,
+      GetClientData,
       UpdateTotal,
       addNewItem,
       QuotationStatusArray,

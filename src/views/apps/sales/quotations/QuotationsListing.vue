@@ -141,6 +141,11 @@
             >{{ GetQuotationStatus(quotations.status) }}</span
           >
           <span
+            v-if="quotations.status == 4"
+            class="badge py-3 px-4 fs-7 badge-light-success"
+            >{{ GetQuotationStatus(quotations.status) }}</span
+          >
+          <span
             v-if="quotations.status == 2"
             class="badge py-3 px-4 fs-7 badge-light-warning"
             >{{ GetQuotationStatus(quotations.status) }}</span
@@ -264,29 +269,31 @@ export default defineComponent({
     }
 
     interface Meta {
+      id: string;
       first_name: string;
       last_name: string;
       company_name: string;
       address1: string;
       address2: string;
       city: string;
-      state: string;
+      states: string;
       pincode: string;
       country: string;
     }
 
     interface quotationDetails {
       quotation_no: string;
-      invoice_no: string;
       customer_id: string;
       items: Array<itemsArr>;
       date: string;
       duedate: string;
-      status: number;
+      status: string;
       notes: string;
       total: number;
-      meta: Meta;
+      customer: Meta;
+      client: Meta;
       is_active: number;
+      company_id: string;
       created_by: string;
       updated_by: string;
     }
@@ -297,25 +304,38 @@ export default defineComponent({
     const quotationDetail = ref<quotationDetails>({
       quotation_no: "21****",
       customer_id: " ",
-      invoice_no: "",
       items: [],
       date: "",
       duedate: "",
-      status: 0,
+      status: "",
       notes: "",
-      meta: {
+      customer: {
+        id: "",
         company_name: "",
         first_name: "",
         last_name: "",
         address1: "",
         address2: "",
         city: "",
-        state: "",
+        states: "",
+        pincode: "",
+        country: "",
+      },
+      client: {
+        id: "",
+        company_name: "",
+        first_name: "",
+        last_name: "",
+        address1: "",
+        address2: "",
+        city: "",
+        states: "",
         pincode: "",
         country: "",
       },
       total: 0,
       is_active: 1,
+      company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
     });
@@ -484,28 +504,41 @@ export default defineComponent({
           ).format("YYYY-MM-DD HH:mm:ss");
           quotationDetail.value = {
             quotation_no: "000000",
-            invoice_no: "",
             customer_id: response.customer_id,
             items: JSON.parse(response.items),
             date: response.date,
             duedate: response.duedate,
-            status: 1,
+            status: "1",
             notes: response.notes,
             total: response.total,
-            meta: {
-              company_name: "",
+            customer: {
+              id: response.customer_id,
               first_name: "",
               last_name: "",
+              company_name: "",
               address1: "",
               address2: "",
               city: "",
-              state: "",
+              states: "",
+              pincode: "",
+              country: "",
+            },
+            client: {
+              id: response.client_id,
+              first_name: "",
+              last_name: "",
+              company_name: "",
+              address1: "",
+              address2: "",
+              city: "",
+              states: "",
               pincode: "",
               country: "",
             },
             is_active: response.is_active,
             created_by: User.id,
             updated_by: User.id,
+            company_id: User.company_id,
           };
           // add
           const respons = await addQuotation(quotationDetail.value);

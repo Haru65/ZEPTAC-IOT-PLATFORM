@@ -660,6 +660,7 @@ export default defineComponent({
           // Handle successful API response
           console.log("API response:", response);
           showSuccessAlert("Success", "User have been successfully inserted!");
+          router.push({ name: "customers-list" });
           clear();
         } else {
           // Handle API error response
@@ -677,7 +678,6 @@ export default defineComponent({
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
         loading.value = false;
-        router.push({ name: "customers-list" });
       }
     };
 
