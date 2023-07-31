@@ -615,6 +615,7 @@ export default defineComponent({
       await getdropcomp();
       // add customer details
       const res = await getCustomer(customerId);
+      console.log(res);
       profileDetails.value = {
         first_name: res.first_name,
         last_name: res.last_name,

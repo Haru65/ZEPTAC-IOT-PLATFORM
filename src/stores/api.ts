@@ -409,6 +409,21 @@ export async function deletePriceListItem(data: any) {
 }
 
 // QUOTATION
+
+// custom
+export async function GetCustomerClients(data: any) {
+    try {
+        //console.log(data)
+        const id = { "customerid": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('/get_customer_clients', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 // get listing
 export async function getQuotationList() {
     try {
