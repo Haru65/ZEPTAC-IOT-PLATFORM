@@ -56,7 +56,7 @@
                   <span class="fs-2 fw-bold text-gray-800">Quotation #</span>
                   <input
                     type="text"
-                    class="form-control form-control-flush fw-bold text-muted fs-3 w-125px"
+                    class="form-control form-control-flush fw-bold text-muted fs-3 w-auto"
                     maxlength="6"
                     v-model="QuotationDetials.quotation_no"
                     placehoder="..."
@@ -361,7 +361,15 @@
           <div class="card-body">
             <!--begin::Input group-->
             <div class="mb-10">
-              <h2>Quotation</h2>
+              <div class="d-flex flex-lg-row justify-content-between">
+                <h2>Quotation</h2>
+                <span
+                  class="cursor-pointer"
+                  v-on:click="generatePdf(QuotationDetials.quotation_no)"
+                >
+                  <i class="fa fa-file-pdf" style="font-size: 1.6rem"></i>
+                </span>
+              </div>
               <br />
               <div class="row gx-10">
                 <el-select
@@ -471,6 +479,7 @@ import CustomSelect from "./CustomComponents/CustomQuotationItems.vue";
 import moment from "moment";
 import { useRouter, useRoute } from "vue-router";
 import { formatPrice } from "@/core/config/DataFormatter";
+import { Gen } from "@/core/config/PdfGenerator";
 import {
   QuotationStatusArray,
   GetQuotationStatus,
@@ -763,6 +772,12 @@ export default defineComponent({
       );
     };
 
+    const generatePdf = async (pdfName: string) => {
+      removeNulls();
+      console.log(QuotationDetials.value);
+      await Gen("quotation", QuotationId.toString(), pdfName, QuotationDetials);
+    };
+
     // number formating remove
     const submit = async () => {
       disabledselect.value = true;
@@ -901,6 +916,7 @@ export default defineComponent({
       QuotationDetialsAddFunc,
       GetQuotationStatus,
       Total,
+      generatePdf,
     };
   },
 });

@@ -48,18 +48,21 @@ const Gen = async (
     // Quotation number
     doc
         .setFontSize(10)
+        .setFont('helvetica', "normal")
         .text((pdftype == "quotation" ? "Quotation" : "Invoice") + "# : " + (pdftype == "quotation" ? invoiceDetials.value.quotation_no : invoiceDetials.value.invoice_no), doc.internal.pageSize.width - 2.8, 0.8);
 
     // Quotation Creation Date
     const creationDate = new Date(invoiceDetials.value.date).toDateString();
     doc
         .setFontSize(10)
+        .setFont('helvetica', "normal")
         .text((pdftype == "quotation" ? "Quotation" : "Invoice") + " Date : " + creationDate, doc.internal.pageSize.width - 2.8, 1.0);
 
     // Quotation Due Date
     const dueDateText = new Date(invoiceDetials.value.duedate).toDateString();
     doc
         .setFontSize(10)
+        .setFont('helvetica', "normal")
         .text((pdftype == "quotation" ? "Quotation" : "Invoice") + " Due Date : " + dueDateText, doc.internal.pageSize.width - 2.8, 1.2);
 
     // create a line under heading
@@ -68,15 +71,16 @@ const Gen = async (
     // Billing Address
     doc
         .setFontSize(9)
+        .setFont('helvetica', "normal")
         .text(
             `
-        To
-        ${invoiceDetials.value.meta.first_name} ${invoiceDetials.value.meta.last_name}
-        ${invoiceDetials.value.meta.company_name},
-        ${invoiceDetials.value.meta.address1 ? invoiceDetials.value.meta.address1 : ""}
-        ${invoiceDetials.value.meta.address2 ? invoiceDetials.value.meta.address2 : ""}
-        ${invoiceDetials.value.meta.city ? invoiceDetials.value.meta.city : ""},${invoiceDetials.value.meta.city ? invoiceDetials.value.meta.city : ""}
-        ${invoiceDetials.value.meta.states ? invoiceDetials.value.meta.states : ""},${invoiceDetials.value.meta.country ? invoiceDetials.value.meta.country : ""}
+        To,
+        ${invoiceDetials.value.client.first_name} ${invoiceDetials.value.client.last_name}
+        ${invoiceDetials.value.client.company_name},
+        ${invoiceDetials.value.client.address1 ? invoiceDetials.value.client.address1 : ""}
+        ${invoiceDetials.value.client.address2 ? invoiceDetials.value.client.address2 : ""}
+        ${invoiceDetials.value.client.city ? invoiceDetials.value.client.city : ""},${invoiceDetials.value.client.city ? invoiceDetials.value.client.city : ""}
+        ${invoiceDetials.value.client.states ? invoiceDetials.value.client.states : ""},${invoiceDetials.value.client.country ? invoiceDetials.value.client.country : ""}
         `,
             0.25,
             1.7,

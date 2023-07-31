@@ -575,8 +575,6 @@ import * as Yup from "yup";
 import {
   updateClient,
   getCustomers,
-  getCustomer,
-  getLead,
   getClient,
 } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
@@ -647,8 +645,12 @@ export default defineComponent({
       profileDetails.value.email = response.email;
       profileDetails.value.phone = response.mobile;
       // meta
-      profileDetails.value.address1 = response.meta.address1 ? response.meta.address1 : "";
-      profileDetails.value.address2 = response.meta.address2 ? response.meta.address2 : "";
+      profileDetails.value.address1 = response.meta.address1
+        ? response.meta.address1
+        : "";
+      profileDetails.value.address2 = response.meta.address2
+        ? response.meta.address2
+        : "";
       profileDetails.value.country = response.meta.country;
       profileDetails.value.states = response.meta.states;
       profileDetails.value.city = response.meta.city;

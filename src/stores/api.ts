@@ -424,6 +424,19 @@ export async function GetCustomerClients(data: any) {
     }
 }
 
+export async function GetIncrQuotationId(data: any) {
+    try {
+        //console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('/get_latest_quotation', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 // get listing
 export async function getQuotationList() {
     try {

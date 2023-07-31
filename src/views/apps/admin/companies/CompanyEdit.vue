@@ -178,45 +178,43 @@
                   <div class="row">
                     <!--begin::Col-->
                     <div class="col-lg-6 fv-row">
-                      <Field
-                        as="select"
-                        name="role"
-                        class="form-select form-select-solid form-select-lg"
+                      <el-select
                         v-model="companyDetails.country"
+                        filterable
+                        placeholder="Select Country"
                       >
-                        <option value="">Select Country ..</option>
-                        <option
-                          v-for="ele in countries"
-                          :key="ele.name"
-                          :value="ele.name"
-                        >
-                          {{ ele.name }}
-                        </option>
-                      </Field>
+                        <el-option
+                          v-for="item in countries"
+                          :key="item.name"
+                          :label="item.name"
+                          :value="item.name"
+                        />
+                      </el-select>
                     </div>
                     <!--end::Col-->
 
                     <!--begin::Col-->
                     <div v-if="state.length" class="col-lg-6 fv-row">
                       <div>
-                        <Field
-                          as="select"
-                          name="state"
-                          class="form-select form-select-solid form-select-lg"
+                        <el-select
                           v-model="companyDetails.state"
+                          filterable
+                          placeholder="Select State"
                         >
-                          <option value="">Select State ...</option>
-                          <option v-for="ele in state" :key="ele" :value="ele">
-                            {{ ele }}
-                          </option>
-                        </Field>
+                          <el-option
+                            v-for="item in state"
+                            :key="item"
+                            :label="item"
+                            :value="item"
+                          />
+                        </el-select>
                       </div>
                     </div>
 
                     <div v-if="!state.length" class="col-lg-6 fv-row">
                       <div>
                         <Field
-                          type="text"
+                          type="tel"
                           name="state"
                           class="form-control form-control-lg form-control-solid"
                           placeholder="Enter State Name"
@@ -333,18 +331,67 @@
                   <!--begin::Row-->
                   <div class="row">
                     <!--begin::Col-->
+                    <div class="col-lg-6 fv-row p-2">
+                      <el-select
+                        v-model="companyDetails.user_limit"
+                        filterable
+                        placeholder="select User Limit"
+                      >
+                        <el-option
+                          v-for="item in limit"
+                          :key="item"
+                          :label="item"
+                          :value="item"
+                        />
+                      </el-select>
+                    </div>
+                    <!--end::Col-->
+
+                    <!--begin::Col-->
+                    <div class="col-lg-6 fv-row p-2">
+                      <div>
+                        <el-select
+                          v-model="companyDetails.selected_package"
+                          filterable
+                          placeholder="Select a Package..."
+                        >
+                          <el-option
+                            v-for="item in packages"
+                            :key="item"
+                            :label="item"
+                            :value="item"
+                          />
+                        </el-select>
+                      </div>
+                    </div>
+                    <!--end::Col-->
+                  </div>
+                  <!--end::Row-->
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Input group-->
+              <!--begin::Input group-->
+              <div class="row mb-6">
+                <!--begin::Label-->
+                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                  >Quotation No & Prefix</label
+                >
+                <!--end::Label-->
+
+                <!--begin::Col-->
+                <div class="col-lg-8">
+                  <!--begin::Row-->
+                  <div class="row">
+                    <!--begin::Col-->
                     <div class="col-lg-6 fv-row">
                       <Field
-                        as="select"
-                        name="user_limit"
-                        class="form-select form-select-solid form-select-lg"
-                        v-model="companyDetails.user_limit"
-                        placeholder="Select User Limit"
-                      >
-                        <option v-for="ele in limit" :key="ele" :value="ele">
-                          {{ ele }}
-                        </option>
-                      </Field>
+                        type="text"
+                        name="quotation_prefix"
+                        class="form-control form-control-lg form-control-solid"
+                        placeholder="Enter Quotation Prefix"
+                        v-model="companyDetails.quotation_prefix"
+                      />
                     </div>
                     <!--end::Col-->
 
@@ -352,20 +399,55 @@
                     <div class="col-lg-6 fv-row">
                       <div>
                         <Field
-                          as="select"
-                          name="package"
-                          class="form-select form-select-solid form-select-lg"
-                          v-model="companyDetails.selected_package"
-                          placeholder="Select a Package ..."
-                        >
-                          <option
-                            v-for="ele in packages"
-                            :key="ele"
-                            :value="ele"
-                          >
-                            {{ ele }}
-                          </option>
-                        </Field>
+                          type="text"
+                          name="quotation_no"
+                          class="form-control form-control-lg form-control-solid"
+                          placeholder="Enter Quotation No"
+                          v-model="companyDetails.quotation_no"
+                        />
+                      </div>
+                    </div>
+                    <!--end::Col-->
+                  </div>
+                  <!--end::Row-->
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Input group-->
+              <!--begin::Input group-->
+              <div class="row mb-6">
+                <!--begin::Label-->
+                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                  >Invoice No & Prefix</label
+                >
+                <!--end::Label-->
+
+                <!--begin::Col-->
+                <div class="col-lg-8">
+                  <!--begin::Row-->
+                  <div class="row">
+                    <!--begin::Col-->
+                    <div class="col-lg-6 fv-row">
+                      <Field
+                        type="text"
+                        name="invoice_prefix"
+                        class="form-control form-control-lg form-control-solid"
+                        placeholder="Enter Invoice Prefix"
+                        v-model="companyDetails.invoice_prefix"
+                      />
+                    </div>
+                    <!--end::Col-->
+
+                    <!--begin::Col-->
+                    <div class="col-lg-6 fv-row">
+                      <div>
+                        <Field
+                          type="text"
+                          name="invoice_no"
+                          class="form-control form-control-lg form-control-solid"
+                          placeholder="Enter invoice No"
+                          v-model="companyDetails.invoice_no"
+                        />
                       </div>
                     </div>
                     <!--end::Col-->
@@ -437,6 +519,10 @@ interface companyDetails {
   gst_details: string;
   user_limit: number;
   selected_package: string;
+  quotation_no: string;
+  quotation_prefix: string;
+  invoice_no: string;
+  invoice_prefix: string;
 }
 
 export default defineComponent({
@@ -486,12 +572,15 @@ export default defineComponent({
       gst_details: "",
       user_limit: 1,
       selected_package: "",
+      quotation_no: "",
+      quotation_prefix: "",
+      invoice_no: "",
+      invoice_prefix: "",
     });
 
     onMounted(async () => {
       const response = await getCompany(CompanyId);
       console.log(CompanyId);
-      console.log(response);
       companyDetails.value = {
         company_name: response.company_name,
         address: response.address,
@@ -505,6 +594,10 @@ export default defineComponent({
         gst_details: response.gst_details,
         user_limit: response.user_limit,
         selected_package: response.selected_package,
+        quotation_prefix: response.quoatation_no_prefix,
+        quotation_no: response.initial_quotation_no,
+        invoice_prefix: response.initial_no_prefix,
+        invoice_no: response.initial_invoice_no,
       };
     }),
       watch(
@@ -518,7 +611,7 @@ export default defineComponent({
               state.value.push(ele.name);
             });
           } else {
-            companyDetails.value.state = "Please Write Country Name";
+            companyDetails.value.state = "";
           }
         }
       );
@@ -628,3 +721,27 @@ export default defineComponent({
   },
 });
 </script>
+<style>
+.el-input__inner {
+  font-weight: 500;
+}
+
+.el-input__wrapper {
+  color: red !important;
+  height: 3.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--bs-gray-100);
+  border-color: var(--bs-gray-100);
+  color: var(--bs-gray-700);
+  transition: color 0.2s ease;
+  appearance: none;
+  line-height: 1.5;
+  border: none !important;
+  padding-top: 0.825rem;
+  padding-bottom: 0.825rem;
+  padding-left: 1.5rem;
+  font-size: 1.15rem;
+  border-radius: 0.625rem;
+  box-shadow: none !important;
+}
+</style>
