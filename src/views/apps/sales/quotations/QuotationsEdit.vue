@@ -595,7 +595,7 @@ export default defineComponent({
       GetClientData(QuotationDetials.value.client.id);
     });
 
-        const GetClients = async (id: string) => {
+    const GetClients = async (id: string) => {
       // ? empty clients
       console.log(Clients.value);
       Clients.value.length = 0;
@@ -834,7 +834,7 @@ export default defineComponent({
           confirmButton: "btn btn-primary",
         },
       }).then(() => {
-        console.log('Done');
+        console.log("Done");
       });
     };
 
@@ -880,7 +880,6 @@ export default defineComponent({
     const disabledDate = (time: Date) => {
       return null;
     };
-
 
     return {
       Clients,
