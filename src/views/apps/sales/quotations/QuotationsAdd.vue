@@ -197,14 +197,13 @@
                         filterable
                         :disabled="clientSelect"
                         v-on:change="GetClientData(QuotationDetials.client.id)"
-                        aria-label="Please Select Client..."
                       >
-                        <!-- <el-option
-                      value=" "
-                      label="Please Select Customer..."
-                      key=" "
-                      >Please Select Customer...</el-option
-                      > -->
+                        <el-option
+                      value=""
+                      label="Please Select Client..."
+                      key=""
+                      >Please Select Client...</el-option
+                      >
                         <el-option
                           v-for="item in Clients"
                           :key="item.client_data.id"
@@ -216,7 +215,7 @@
                     <!--end::Row-->
 
                     <div class="mt-2 pt-4">
-                      <h6 class="fw-bold mt-5">Billing Address:</h6>
+                      <h6 class="fw-bold mt-5">Site Address:</h6>
                       <div class="mt-2">
                         <div class="mb-1" v-show="QuotationDetials.client">
                           <br />

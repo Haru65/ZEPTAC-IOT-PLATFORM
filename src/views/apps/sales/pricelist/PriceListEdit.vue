@@ -27,7 +27,7 @@
                   type="text"
                   name="name"
                   class="form-control form-control-lg form-control-solid"
-                  placeholder="Product Name"
+                  placeholder="Enter Product Name"
                   v-model="itemDetails.name"
                 />
                 <div class="fv-plugins-message-container">
@@ -57,7 +57,7 @@
                     name="description"
                     rows="10"
                     class="form-control form-control-lg form-control-solid"
-                    placeholder="Description"
+                    placeholder="Description of product..."
                     v-model="itemDetails.description"
                   />
                   <div class="fv-plugins-message-container">

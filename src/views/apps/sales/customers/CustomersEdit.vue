@@ -146,12 +146,6 @@
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6">
               <span class="required">Company Name</span>
-
-              <i
-                class="fas fa-exclamation-circle ms-1 fs-7"
-                data-bs-toggle="tooltip"
-                title="Phone number must be active"
-              ></i>
             </label>
             <!--end::Label-->
 
@@ -179,7 +173,7 @@
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6">
-              <span class="required">Address 1</span>
+              <span>Address 1</span>
 
               <i
                 class="fas fa-exclamation-circle ms-1 fs-7"
@@ -195,7 +189,7 @@
                 name="address1"
                 as="textarea"
                 class="form-control form-control-lg form-control-solid"
-                placeholder="Address"
+                placeholder="eg. plot no, apartment name"
                 v-model="profileDetails.address1"
               />
               <div class="fv-plugins-message-container">
@@ -211,7 +205,7 @@
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6">
-              <span class="required">Address 2</span>
+              <span>Address 2</span>
 
               <i
                 class="fas fa-exclamation-circle ms-1 fs-7"
@@ -227,7 +221,7 @@
                 name="address2"
                 as="textarea"
                 class="form-control form-control-lg form-control-solid"
-                placeholder="Address"
+                placeholder="eg. street name, road name, area name"
                 v-model="profileDetails.address2"
               />
               <div class="fv-plugins-message-container">
@@ -241,7 +235,7 @@
           <!--begin::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
-            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+            <label class="col-lg-4 col-form-label fw-semobold fs-6"
               >Country</label
             >
             <!--end::Label-->
@@ -252,10 +246,7 @@
               <div class="row">
                 <!--begin::Col-->
                 <div class="col-lg fv-row">
-                  <el-select v-model="profileDetails.country" filterable>
-                    <el-option value="0" label="Please Select Role..." key="0"
-                      >Please Select Role...</el-option
-                    >
+                  <el-select v-model="profileDetails.country" filterable placeholder="Select Your Country...">
                     <el-option
                       v-for="item in countries"
                       :key="item.name"
@@ -274,7 +265,7 @@
           <!--begin::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
-            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+            <label class="col-lg-4 col-form-label fw-semobold fs-6"
               >State</label
             >
             <!--end::Label-->
@@ -287,13 +278,7 @@
                 <!--begin::Col-->
                 <div v-if="state.length" class="col-lg fv-row">
                   <div>
-                    <el-select v-model="profileDetails.states" filterable>
-                      <el-option
-                        value="0"
-                        label="Please Select Package..."
-                        key="0"
-                        >Please Select Role...</el-option
-                      >
+                    <el-select v-model="profileDetails.states" filterable placeholder="Select Your State...">
                       <el-option
                         v-for="item in state"
                         :key="item"
@@ -310,7 +295,7 @@
                       type="text"
                       name="state"
                       class="form-control form-control-lg form-control-solid"
-                      placeholder="Please Type State."
+                      placeholder="Enter State Name"
                       v-model="profileDetails.states"
                     />
                     <div class="fv-plugins-message-container">
@@ -329,7 +314,7 @@
           </div>
           <div class="row mb-6">
             <!--begin::Label-->
-            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+            <label class="col-lg-4 col-form-label fw-semobold fs-6"
               >Pincode</label
             >
             <!--end::Label-->
@@ -344,7 +329,7 @@
                     type="text"
                     name="pincode"
                     class="form-control form-control-lg form-control-solid"
-                    placeholder="Please Type Pincode."
+                    placeholder="Enter Pincode"
                     v-model="profileDetails.pincode"
                   />
                 </div>
@@ -358,7 +343,7 @@
           <!--end::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
-            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+            <label class="col-lg-4 col-form-label fw-semobold fs-6"
               >City</label
             >
             <!--end::Label-->
@@ -373,7 +358,7 @@
                     type="text"
                     name="city"
                     class="form-control form-control-lg form-control-solid"
-                    placeholder="Please Type City."
+                    placeholder="Enter City Name"
                     v-model="profileDetails.city"
                   />
                 </div>
@@ -386,8 +371,8 @@
           <!--end::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
-            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-              >DOB</label
+            <label class="col-lg-4 col-form-label fw-semobold fs-6"
+              >Date of Birth</label
             >
             <!--end::Label-->
 
@@ -400,7 +385,7 @@
                   <el-date-picker
                     v-model="profileDetails.dob"
                     type="date"
-                    placeholder="DOB"
+                    placeholder="select Date of Birth"
                   />
                 </div>
                 <!--end::Col-->
@@ -413,7 +398,7 @@
           <!--end::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
-            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+            <label class="col-lg-4 col-form-label fw-semobold fs-6"
               >Gender</label
             >
             <!--end::Label-->
@@ -424,13 +409,7 @@
               <div class="row">
                 <div class="col-lg fv-row">
                   <div>
-                    <el-select v-model="profileDetails.gender" filterable>
-                      <el-option
-                        value="0"
-                        label="Please Select Gender..."
-                        key="0"
-                        >Please Select Gender...</el-option
-                      >
+                    <el-select v-model="profileDetails.gender" filterable placeholder="Select Your Gender...">
                       <el-option label="Male" value="male" />
                       <el-option label="Female" value="female" />
                       <el-option label="Other" value="other" />
@@ -446,8 +425,8 @@
           <!--begin::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
-            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-              >Adhar</label
+            <label class="col-lg-4 col-form-label fw-semobold fs-6"
+              >Aadhar Card</label
             >
             <!--end::Label-->
 
@@ -461,7 +440,7 @@
                     type="text"
                     name="adhar"
                     class="form-control form-control-lg form-control-solid"
-                    placeholder="Adhar No."
+                    placeholder="Enter Aadhar Number"
                     v-model="profileDetails.adhar"
                   />
                   <div class="fv-plugins-message-container">
@@ -480,8 +459,8 @@
           <!--begin::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
-            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-              >Pan</label
+            <label class="col-lg-4 col-form-label fw-semobold fs-6"
+              >Pan Card</label
             >
             <!--end::Label-->
 
@@ -496,7 +475,7 @@
                       type="text"
                       name="pan"
                       class="form-control form-control-lg form-control-solid"
-                      placeholder="Pan No."
+                      placeholder="Enter Pan Number"
                       v-model="profileDetails.pan"
                     />
                     <div class="fv-plugins-message-container">
