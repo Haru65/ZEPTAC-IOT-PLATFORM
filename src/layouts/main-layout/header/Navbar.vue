@@ -98,6 +98,7 @@
         data-kt-menu-placement="bottom-end"
       >
         <img
+          class="rounded-circle"
           :src="`data: image/png;base64,` + User.meta.profile_pic_data"
           alt="user"
         />

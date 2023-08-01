@@ -42,8 +42,8 @@ const Gen = async (
 
     // Company Logo Img
     const img = new Image()
-    img.src = getAssetPath('media/patterns/sample.png')
-    doc.addImage(img, 'JPEG', 0.5, 0.6, 1, 0.8);
+    img.src = getAssetPath('media/patterns/zeptac.png')
+    doc.addImage(img, 'JPEG', 0.5, 0.5, 0.5, 0.5);
 
     // Quotation number
     doc
@@ -75,6 +75,28 @@ const Gen = async (
         .text(
             `
         To,
+        ${invoiceDetials.value.customer.first_name} ${invoiceDetials.value.customer.last_name}
+        ${invoiceDetials.value.customer.company_name},
+        ${invoiceDetials.value.customer.address1 ? invoiceDetials.value.customer.address1 : ""}
+        ${invoiceDetials.value.customer.address2 ? invoiceDetials.value.customer.address2 : ""}
+        ${invoiceDetials.value.customer.city ? invoiceDetials.value.customer.city : ""},${invoiceDetials.value.customer.city ? invoiceDetials.value.customer.city : ""}
+        ${invoiceDetials.value.customer.states ? invoiceDetials.value.customer.states : ""},${invoiceDetials.value.customer.country ? invoiceDetials.value.customer.country : ""}
+        `,
+            0.25,
+            1.7,
+            {
+                align: "left",
+                maxWidth: 7.5,
+            }
+        );
+
+    // Billing Address
+    doc
+        .setFontSize(9)
+        .setFont('helvetica', "normal")
+        .text(
+            `
+        To,
         ${invoiceDetials.value.client.first_name} ${invoiceDetials.value.client.last_name}
         ${invoiceDetials.value.client.company_name},
         ${invoiceDetials.value.client.address1 ? invoiceDetials.value.client.address1 : ""}
@@ -82,7 +104,7 @@ const Gen = async (
         ${invoiceDetials.value.client.city ? invoiceDetials.value.client.city : ""},${invoiceDetials.value.client.city ? invoiceDetials.value.client.city : ""}
         ${invoiceDetials.value.client.states ? invoiceDetials.value.client.states : ""},${invoiceDetials.value.client.country ? invoiceDetials.value.client.country : ""}
         `,
-            0.25,
+            doc.internal.pageSize.width - 2.8,
             1.7,
             {
                 align: "left",

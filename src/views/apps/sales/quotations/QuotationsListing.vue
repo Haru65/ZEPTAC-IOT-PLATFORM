@@ -196,6 +196,7 @@ import {
   deletequotation,
   getQuotation,
   addQuotation,
+  GetIncrQuotationId,
 } from "@/stores/api";
 import arraySort from "array-sort";
 import { useAuthStore } from "@/stores/auth";
@@ -483,7 +484,16 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-    const dupQuotation = (id) => {
+    const dupQuotation = async (id) => {
+      // ? incr quotation no
+      const res = await GetIncrQuotationId(User.company_id);
+      let latestquotation_no = res.result.split("_");
+      latestquotation_no =
+        latestquotation_no[0] +
+        "_" +
+        (parseInt(latestquotation_no[1]) + 1).toString();
+
+      // * option
       Swal.fire({
         title: "Are you sure?",
         text: "Clone the Quotation !",
@@ -503,7 +513,7 @@ export default defineComponent({
             quotationDetail.value.duedate
           ).format("YYYY-MM-DD HH:mm:ss");
           quotationDetail.value = {
-            quotation_no: "000000",
+            quotation_no: latestquotation_no,
             customer_id: response.customer_id,
             items: JSON.parse(response.items),
             date: response.date,

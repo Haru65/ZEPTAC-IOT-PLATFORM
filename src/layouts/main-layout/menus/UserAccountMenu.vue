@@ -10,6 +10,7 @@
         <!--begin::Avatar-->
         <div class="symbol symbol-50px me-5">
           <img
+            class="rounded-circle"
             alt="Logo"
             :src="`data: image/png;base64,` + User.meta.profile_pic_data"
           />

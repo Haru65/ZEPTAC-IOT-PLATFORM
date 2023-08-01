@@ -116,8 +116,8 @@
                   ? employee.meta.profile_pic_data
                   : blank64)
               "
-              class="w-45px rounded-circle"
-              :alt="`data: image/png;base64,`"
+              class="w-40px rounded-circle"
+              :alt="`data: image/png;base64,` + blank64"
             />
             <span style="margin-left: 5.5%">
               <span class="text-gray-600 text-hover-primary mb-1">
@@ -145,7 +145,7 @@
           {{ employee.company_name[0].company_name }}
         </template>
         <template v-slot:date="{ row: employee }">
-          {{ employee.date }}
+          {{ employee.created_at }}
         </template>
         <template v-slot:actions="{ row: employee }">
           <!--begin::Menu Flex-->
