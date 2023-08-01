@@ -503,6 +503,21 @@ export async function updateQuotation(data: any, id) {
 }
 
 // INVOICES
+
+// custom
+export async function GetIncrInvoiceId(data: any) {
+    try {
+        //console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('/get_latest_invoice', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 // getlists
 export async function getInvoiceList() {
     try {

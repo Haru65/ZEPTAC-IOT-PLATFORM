@@ -2,11 +2,11 @@
   <div style="width: 99%" class="sm:p-4 md:p-8 lg:p-12 rounded">
     <!--begin::Modal dialog-->
     <div class="d-flex flex-column flex-lg-row">
-      <div class="flex-lg-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
-        <div class="card">
-          <div class="card-body p-12">
+      <div class="flex-xl-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
+        <div class="card w-20">
+          <div class="card-body sm:p-2 lg:p-12">
             <!--begin::Form-->
-            <form id="kt_invoice_form" novalidate>
+            <form id="kt_Quotation_form" novalidate>
               <!--begin::Wrapper-->
               <div
                 class="d-flex gap-5 flex-column align-items-start flex-xxl-row"
@@ -16,7 +16,7 @@
                   class="d-flex align-items-center flex-equal fw-row me-4 order-2"
                   data-bs-toggle="tooltip"
                   data-bs-trigger="hover"
-                  data-bs-original-title="Specify invoice date"
+                  data-bs-original-title="Specify Quotation date"
                   data-kt-initialized="1"
                 >
                   <!--begin::Date-->
@@ -32,7 +32,7 @@
                     <!--begin::Datepicker-->
                     <div class="block">
                       <el-date-picker
-                        v-model="invoiceDetials.date"
+                        v-model="InvoiceDetails.date"
                         type="date"
                         placeholder="Pick a day"
                         :shortcuts="shortcuts"
@@ -50,16 +50,16 @@
                   class="d-flex flex-center flex-equal fw-row text-nowrap order-1 order-xxl-2 me-4"
                   data-bs-toggle="tooltip"
                   data-bs-trigger="hover"
-                  data-bs-original-title="Enter invoice number"
+                  data-bs-original-title="Enter Quotation number"
                   data-kt-initialized="1"
                 >
-                  <span class="fs-2 fw-bold text-gray-800">Invoice #</span>
+                  <span class="fs-2 fw-bold text-gray-800">Quotation #</span>
                   <input
                     type="text"
-                    class="form-control form-control-flush fw-bold text-muted fs-3 w-125px"
-                    v-model="invoiceDetials.invoice_no"
-                    placehoder="..."
+                    class="form-control form-control-flush fw-bold text-muted fs-3 w-auto"
                     maxlength="6"
+                    v-model="InvoiceDetails.invoice_no"
+                    placehoder="..."
                   />
                 </div>
                 <!--end::Input group-->
@@ -69,7 +69,7 @@
                   class="d-flex align-items-center justify-content-end flex-equal order-3 fw-row"
                   data-bs-toggle="tooltip"
                   data-bs-trigger="hover"
-                  data-bs-original-title="Specify invoice due date"
+                  data-bs-original-title="Specify Quotation due date"
                   data-kt-initialized="1"
                 >
                   <!--begin::Date-->
@@ -85,7 +85,7 @@
                     <!--begin::Datepicker-->
                     <div class="block">
                       <el-date-picker
-                        v-model="invoiceDetials.duedate"
+                        v-model="InvoiceDetails.duedate"
                         type="date"
                         placeholder="Pick a day"
                         :shortcuts="shortcuts"
@@ -107,80 +107,156 @@
 
               <!--begin::Wrapper-->
               <div class="mb-0">
-                <!--begin::Row-->
-                <div class="row gx-10">
-                  <el-select
-                    v-model="invoiceDetials.customer_id"
-                    filterable
-                    v-on:change="GetUserData(invoiceDetials.customer_id)"
-                    placeholder="Please Select Customer..."
-                  >
-                    <!-- <el-option
-                      value=" "
-                      label="Please Select Customer..."
-                      key=" "
-                      >Please Select Customer...</el-option
-                    > -->
-                    <el-option
-                      v-for="item in Customers"
-                      :key="item.id"
-                      :label="`${item.first_name} ${item.last_name}`"
-                      :value="item.id"
-                    />
-                  </el-select>
-                </div>
-                <!--end::Row-->
-                <div class="mt-2 pt-4">
-                  <h6 class="fw-bold mt-5">Billing Address:</h6>
-                  <div class="mt-2">
-                    <div class="mb-1" v-show="invoiceDetials.meta">
-                      <br />
-                      <span>
-                        {{
-                          `${invoiceDetials.meta.first_name} ${invoiceDetials.meta.last_name}`
-                        }}
-                      </span>
-                      <br />
-                      <span v-show="invoiceDetials.meta.company_name">
-                        {{ `${invoiceDetials.meta.company_name}` }}
-                      </span>
-                      <!-- v-if company_data present -->
-                      <div v-show="invoiceDetials.meta.company_name">
-                        <br />
-                        <span>
-                          {{ `${invoiceDetials.meta.address1}` }}
-                        </span>
-                        <br />
-                        <span>
-                          {{ `${invoiceDetials.meta.address2}` }}
-                        </span>
-                      </div>
-                      <div v-show="invoiceDetials.meta.city">
-                        <span>
-                          {{
-                            `${invoiceDetials.meta.city} - ${invoiceDetials.meta.pincode}`
-                          }}
-                        </span>
-                        <br />
-                        <span>
-                          {{
-                            `${invoiceDetials.meta.states} ${invoiceDetials.meta.country}`
-                          }}
-                        </span>
-                        <br />
-                      </div>
-                      <br />
-                      <a
-                        target="blank"
-                        v-bind:href="`/users/edit/${invoiceDetials.customer_id}`"
+                <div class="d-flex flex-grow-1 gap-lg-3 gap-sm-5 gap-5">
+                  <!--begin::Row-->
+                  <div class="w-50">
+                    <div class="row gx-10">
+                      <el-select
+                        v-model="InvoiceDetails.customer_id"
+                        filterable
+                        v-on:change="GetUserData(InvoiceDetails.customer_id)"
+                        placeholder="Please Select Customer..."
                       >
-                        <span class="fs-5"> Edit</span>
-                        <!-- <i
-                      class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                    ></i> -->
-                      </a>
+                        <el-option
+                          v-for="item in Customers"
+                          :key="item.id"
+                          :label="`${item.first_name} ${item.last_name}`"
+                          :value="item.id"
+                        />
+                      </el-select>
                     </div>
-                    <br />
+                    <!--end::Row-->
+
+                    <div class="mt-2 pt-4">
+                      <h6 class="fw-bold mt-5">Billing Address:</h6>
+                      <div class="mt-2">
+                        <div class="mb-1" v-show="InvoiceDetails.customer">
+                          <br />
+                          <span>
+                            {{
+                              `${InvoiceDetails.customer.first_name} ${InvoiceDetails.customer.last_name}`
+                            }}
+                          </span>
+                          <br />
+                          <span v-show="InvoiceDetails.customer.company_name">
+                            {{ `${InvoiceDetails.customer.company_name}` }}
+                          </span>
+                          <!-- v-if company_data present -->
+                          <div v-show="InvoiceDetails.customer.company_name">
+                            <br />
+                            <span>
+                              {{ `${InvoiceDetails.customer.address1}` }}
+                            </span>
+                            <br />
+                            <span>
+                              {{ `${InvoiceDetails.customer.address2}` }}
+                            </span>
+                          </div>
+                          <div v-show="InvoiceDetails.customer.country">
+                            <span>
+                              {{
+                                `${InvoiceDetails.customer.city} - ${InvoiceDetails.customer.pincode}`
+                              }}
+                            </span>
+                            <br />
+                            <span>
+                              {{
+                                `${InvoiceDetails.customer.states} ${InvoiceDetails.customer.country}`
+                              }}
+                            </span>
+                            <br />
+                          </div>
+                          <br />
+                          <!-- firstname as a flag -->
+                          <a
+                            v-show="InvoiceDetails.customer.first_name"
+                            target="blank"
+                            v-bind:href="`/customers/edit/${InvoiceDetails.customer_id}`"
+                          >
+                            <span class="fs-5"> Edit</span>
+                            <!-- <i
+                          class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                          ></i> -->
+                          </a>
+                        </div>
+                        <br />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="w-50">
+                    <div class="row gx-10">
+                      <el-select
+                        v-model="InvoiceDetails.client.id"
+                        filterable
+                        :disabled="clientSelect"
+                        v-on:change="GetClientData(InvoiceDetails.client.id)"
+                      >
+                        <el-option
+                          v-for="item in Clients"
+                          :key="item.client_data.id"
+                          :label="`${item.client_data.first_name} ${item.client_data.last_name}`"
+                          :value="item.client_data.id"
+                        />
+                      </el-select>
+                    </div>
+                    <!--end::Row-->
+
+                    <div class="mt-2 pt-4">
+                      <h6 class="fw-bold mt-5">Site Address:</h6>
+                      <div class="mt-2">
+                        <div class="mb-1" v-show="InvoiceDetails.client">
+                          <br />
+                          <span>
+                            {{
+                              `${InvoiceDetails.client.first_name} ${InvoiceDetails.client.last_name}`
+                            }}
+                          </span>
+                          <br />
+                          <span v-show="InvoiceDetails.client.company_name">
+                            {{ `${InvoiceDetails.client.company_name}` }}
+                          </span>
+                          <!-- v-if company_data present -->
+                          <div v-show="InvoiceDetails.client.company_name">
+                            <br />
+                            <span>
+                              {{ `${InvoiceDetails.client.address1}` }}
+                            </span>
+                            <br />
+                            <span>
+                              {{ `${InvoiceDetails.client.address2}` }}
+                            </span>
+                          </div>
+                          <div v-show="InvoiceDetails.client.country">
+                            <span>
+                              {{
+                                `${InvoiceDetails.client.city} - ${InvoiceDetails.client.pincode}`
+                              }}
+                            </span>
+                            <br />
+                            <span>
+                              {{
+                                `${InvoiceDetails.client.states} ${InvoiceDetails.client.country}`
+                              }}
+                            </span>
+                            <br />
+                          </div>
+                          <br />
+                          <!-- firstname as a flag -->
+                          <a
+                            v-show="InvoiceDetails.client.first_name"
+                            target="blank"
+                            v-bind:href="`/clients/edit/${InvoiceDetails.customer_id}`"
+                          >
+                            <span class="fs-5"> Edit</span>
+                            <!-- <i
+                          class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                          ></i> -->
+                          </a>
+                        </div>
+                        <br />
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <!--begin::Table wrapper-->
@@ -196,6 +272,7 @@
                         class="border-bottom fs-7 fw-bold text-gray-700 text-uppercase"
                       >
                         <th class="min-w-300px w-475px">Item</th>
+                        <th class="min-w-300px w-475px">Item Price</th>
                         <th class="min-w-75px w-75px text-end">Action</th>
                       </tr>
                     </thead>
@@ -204,9 +281,9 @@
                     <!--begin::Table body-->
                     <tbody>
                       <CustomSelect
-                        v-bind:tasks="invoiceDetials.items"
+                        v-bind:tasks="InvoiceDetails.items"
                         v-on:removeitem="RemoveItem($event)"
-                        v-on:getval="invoiceDetialsAddFunc($event)"
+                        v-on:getval="InvoiceDetailsAddFunc($event)"
                         v-on:UpdateTotal="UpdateTotal($event)"
                       />
                     </tbody>
@@ -228,7 +305,7 @@
                         <th colspan="1" class="fs-4 ps-0">Total</th>
                         <th colspan="1" class="text-end fs-4 text-nowrap">
                           ₹<span data-kt-element="grand-total">{{
-                            invoiceDetials.total.toFixed(2)
+                            InvoiceDetails.total.toFixed(2)
                           }}</span>
                         </th>
                       </tr>
@@ -245,7 +322,7 @@
                     name="notes"
                     class="form-control form-control-solid"
                     rows="3"
-                    v-model="invoiceDetials.notes"
+                    v-model="InvoiceDetails.notes"
                     placeholder="Thanks for your business"
                   ></textarea>
                 </div>
@@ -264,23 +341,24 @@
         <div
           class="card"
           data-kt-sticky="true"
-          data-kt-sticky-name="invoice"
+          data-kt-sticky-name="Quotation"
           data-kt-sticky-offset="{default: false, lg: '100px'}"
           data-kt-sticky-top="150px"
           data-kt-sticky-animation="false"
           data-kt-sticky-zindex="95"
           data-kt-sticky-width="300px"
+          data-kt-sticky-min-height="400px"
           data-kt-sticky-enabled="true"
         >
           <!--begin::Card body-->
-          <div class="card-body p-10">
+          <div class="card-body">
             <!--begin::Input group-->
             <div class="mb-10">
               <div class="d-flex flex-lg-row justify-content-between">
-                <h2>Invoice</h2>
+                <h2>Quotation</h2>
                 <span
                   class="cursor-pointer"
-                  v-on:click="generatePdf(invoiceDetials.invoice_no)"
+                  v-on:click="generatePdf(InvoiceDetails.invoice_no)"
                 >
                   <i class="fa fa-file-pdf" style="font-size: 1.6rem"></i>
                 </span>
@@ -288,8 +366,9 @@
               <br />
               <div class="row gx-10">
                 <el-select
-                  v-model="invoiceDetials.status"
+                  v-model="InvoiceDetails.status"
                   filterable
+                  :disabled="disabledselect"
                   placeholder="Please Select Status..."
                 >
                   <!-- <el-option value=" " label="Please Select Status..." key=" "
@@ -305,13 +384,13 @@
               </div>
               <br />
               <div class="items">
-              <p v-for="item in invoiceDetials.items" :key="item.id">
-                    <span
-                      v-if="item.id != ''"
-                      class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                      >+ {{ item.name }}</span
-                    >
-                  </p>
+                <p v-for="item in InvoiceDetails.items" :key="item.id">
+                  <span
+                    v-if="item.id != ''"
+                    class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
+                    >+ {{ item.name }}</span
+                  >
+                </p>
               </div>
             </div>
             <!--end::Input group-->
@@ -320,14 +399,14 @@
                 <h6
                   class="text-start fs-4 text-nowrap badge badge-light flex-shrink-0 align-self-center py-3 px-4 fs-7"
                 >
-                  {{ GetInvoiceStatus(parseInt(invoiceDetials.status)) }}
+                  {{ GetInvoiceStatus(parseInt(InvoiceDetails.status)) }}
                 </h6>
               </div>
               <div>
                 <h3 class="text-end fs-4 text-nowrap">Total</h3>
                 <h3 class="text-end fs-4 text-nowrap">
                   ₹<span data-kt-element="grand-total">{{
-                    invoiceDetials.total.toFixed(2)
+                    InvoiceDetails.total.toFixed(2)
                   }}</span>
                 </h3>
               </div>
@@ -337,6 +416,8 @@
             <!--end::Separator-->
 
             <!--begin::Actions-->
+            <!--begin::Row-->
+            <!--end::Row-->
             <div class="mb-0">
               <!--begin::Row-->
               <div class="row mb-5">
@@ -344,7 +425,7 @@
                 <div class="col">
                   <span
                     class="btn btn-light btn-light-danger w-100"
-                    v-on:click="deleteInvoice"
+                    v-on:click="deleteQuotation"
                     >Delete</span
                   >
                 </div>
@@ -379,21 +460,25 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import {
   getCustomers,
-  updateInvoice,
-  getInvoice,
-  deleteinvoice,
+  updateQuotation,
   getUser,
+  getClient,
+  GetCustomerClients,
+  getInvoice,
+  deletequotation,
+updateInvoice,
+deleteinvoice,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import CustomSelect from "./CustomComponents/CustomInvoiceItems.vue";
 import moment from "moment";
+import { useRouter, useRoute } from "vue-router";
 import { formatPrice } from "@/core/config/DataFormatter";
+import { Gen } from "@/core/config/PdfGenerator";
 import {
   InvoiceStatusArray,
   GetInvoiceStatus,
 } from "@/core/config/InvoiceStatusConfig";
-import { useRouter, useRoute } from "vue-router";
-import { Gen } from "@/core/config/PdfGenerator";
 
 interface itemsArr {
   id: string;
@@ -403,6 +488,7 @@ interface itemsArr {
 }
 
 interface Meta {
+  id: string;
   first_name: string;
   last_name: string;
   company_name: string;
@@ -414,7 +500,7 @@ interface Meta {
   country: string;
 }
 
-interface invoiceDetials {
+interface InvoiceDetails {
   invoice_no: string;
   customer_id: string;
   items: Array<itemsArr>;
@@ -423,29 +509,33 @@ interface invoiceDetials {
   status: string;
   notes: string;
   total: number;
-  meta: Meta;
+  customer: Meta;
+  client: Meta;
   is_active: number;
+  company_id: string;
   created_by: string;
   updated_by: string;
 }
 
 export default defineComponent({
-  name: "company-edit",
+  name: "company-add",
   components: {
     CustomSelect,
   },
   setup() {
     const auth = useAuthStore();
-    const loading = ref(false);
+    const disabledselect = ref(true);
+    const clientSelect = ref(true);
     const Total = ref(0);
-    const route = useRoute();
-    const router = useRouter();
+    const route = useRouter();
+    const router = useRoute();
     const User = auth.GetUser();
-    const invoiceId = route.params.id;
-
+    const InvoiceId = router.params.id;
     const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
-
-    const invoiceDetials = ref<invoiceDetials>({
+    const Clients = ref([
+      { id: "", client_data: { id: "", first_name: "", last_name: "" } },
+    ]);
+    const InvoiceDetails = ref<InvoiceDetails>({
       invoice_no: "21****",
       customer_id: " ",
       items: [],
@@ -453,7 +543,20 @@ export default defineComponent({
       duedate: "",
       status: "",
       notes: "",
-      meta: {
+      customer: {
+        id: "",
+        company_name: "",
+        first_name: "",
+        last_name: "",
+        address1: "",
+        address2: "",
+        city: "",
+        states: "",
+        pincode: "",
+        country: "",
+      },
+      client: {
+        id: "",
         company_name: "",
         first_name: "",
         last_name: "",
@@ -466,23 +569,147 @@ export default defineComponent({
       },
       total: 0,
       is_active: 1,
+      company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
     });
 
-    const GetUserData = async (id) => {
-      const response = await getUser(id);
+    onMounted(async () => {
+      // todo: quotation check if pres get last incr 1
+
+      Customers.value.pop();
+      Clients.value.pop();
+      await GetCustomers();
+
+      //? get the quotaion details from id
+      const response = await getInvoice(InvoiceId);
       console.log(response);
-      invoiceDetials.value.meta = response.meta;
+      InvoiceDetails.value.invoice_no = response.invoice_no;
+      InvoiceDetails.value.date = response.date;
+      InvoiceDetails.value.duedate = response.duedate;
+      InvoiceDetails.value.items = JSON.parse(response.items);
+      InvoiceDetails.value.status = response.status;
+      InvoiceDetails.value.total = parseFloat(response.total);
+      InvoiceDetails.value.notes = response.notes;
+      // Customer
+      InvoiceDetails.value.customer_id = response.customer_id;
+      GetUserData(InvoiceDetails.value.customer_id);
+      // Client
+      InvoiceDetails.value.client.id = response.client_id;
+      GetClientData(InvoiceDetails.value.client.id);
+    });
+
+    const GetClients = async (id: string) => {
+      // ? empty clients
+      console.log(Clients.value);
+      Clients.value.length = 0;
+
+      // * empty clents data
+      InvoiceDetails.value.client.id = "";
+      InvoiceDetails.value.client.company_name = "";
+      InvoiceDetails.value.client.address1 = "";
+      InvoiceDetails.value.client.address2 = "";
+      InvoiceDetails.value.client.city = "";
+      InvoiceDetails.value.client.pincode = "";
+      InvoiceDetails.value.client.states = "";
+      InvoiceDetails.value.client.country = "";
+      InvoiceDetails.value.client.first_name = "";
+      InvoiceDetails.value.client.last_name = "";
+
+      ApiService.setHeader();
+      const response = await GetCustomerClients(id);
+      console.log(response);
+      Clients.value.push(
+        ...response.result.map(({ created_at, ...rest }) => ({
+          ...rest,
+          created_at: moment(created_at).format("MMMM Do YYYY"),
+        }))
+      );
+      console.log(Clients.value);
     };
 
-    // on add model data push to the sub-json vlaue invoiceDetials
-    const invoiceDetialsAddFunc = (data) => {
+    const GetUserData = async (id) => {
+      if (id != " ") {
+        const customer_id = id;
+        const response = await getUser(customer_id);
+        console.log(response);
+        InvoiceDetails.value.customer = response.meta;
+        InvoiceDetails.value.customer.id = response.id;
+        clientSelect.value = false;
+        /* *
+         TODO : get customer_id and from meta get client ids get customer_id and from meta get client ids and put into Ref object
+         ? Problem of getting clients;
+        */
+        GetClients(customer_id);
+      } else {
+        InvoiceDetails.value.customer = {
+          id: "",
+          company_name: "",
+          first_name: "",
+          last_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          states: "",
+          pincode: "",
+          country: "",
+        };
+      }
+    };
+
+    const GetClientData = async (id) => {
+      if (id != " ") {
+        const customer_id = id;
+        const response = await getClient(customer_id);
+        console.log(response);
+
+        // ? set client details
+        InvoiceDetails.value.client.id = response.id;
+        InvoiceDetails.value.client.address1 = response.meta.address1;
+        InvoiceDetails.value.client.company_name = response.meta.company_name;
+        InvoiceDetails.value.client.address2 = response.meta.address2;
+        InvoiceDetails.value.client.city = response.meta.city;
+        InvoiceDetails.value.client.pincode = response.meta.pincode;
+        InvoiceDetails.value.client.states = response.meta.states;
+        InvoiceDetails.value.client.country = response.meta.country;
+        InvoiceDetails.value.client.first_name = response.first_name;
+        InvoiceDetails.value.client.last_name = response.last_name;
+        disabledselect.value = false;
+        /* *
+         TODO : get customer_id and from meta get client ids get customer_id and from meta get client ids and put into Ref object
+         ? Problem of getting clients;
+        */
+      } else {
+        InvoiceDetails.value.customer = {
+          id: "",
+          company_name: "",
+          first_name: "",
+          last_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          states: "",
+          pincode: "",
+          country: "",
+        };
+      }
+    };
+
+    const addNewItem = () => {
+      InvoiceDetails.value.items.push({
+        id: "",
+        name: "",
+        price: "",
+        description: "",
+      });
+    };
+    // on add model data push to the sub-json vlaue InvoiceDetails
+    const InvoiceDetailsAddFunc = (data) => {
       // selects id not same don't push;
-      // console.log(invoiceDetials.value);
-      console.log(data);
-      console.log(invoiceDetials.value);
-      invoiceDetials.value.items.forEach((ele) => {
+      // console.log(InvoiceDetails.value);
+      // console.log(data);
+      // console.log(InvoiceDetails.value);
+      InvoiceDetails.value.items.forEach((ele) => {
         console.log(ele);
         if (ele.id == data.id) {
           ele["name"] = data.name;
@@ -490,22 +717,6 @@ export default defineComponent({
           ele["price"] = formatPrice(data.price);
         }
       });
-      calPrice();
-    };
-
-    const addNewItem = () => {
-      // selects id not same don't push;
-      invoiceDetials.value.items.push({
-        id: "",
-        name: "",
-        price: "",
-        description: "",
-      });
-    };
-
-    const RemoveItem = (index) => {
-      console.log(index);
-      removeObjectWithId(invoiceDetials.value.items, index);
       calPrice();
     };
 
@@ -519,16 +730,23 @@ export default defineComponent({
       return arr;
     };
 
+    const RemoveItem = (index) => {
+      console.log(index);
+      removeObjectWithId(InvoiceDetails.value.items, index);
+      calPrice();
+    };
+
     const UpdateTotal = (data) => {
       console.log(data);
+      removeNulls();
       calPrice();
     };
 
     const calPrice = () => {
-      const prices = invoiceDetials.value.items.map((ele: any) =>
+      const prices = InvoiceDetails.value.items.map((ele: any) =>
         Number(ele.price.replaceAll(",", "").substring(1))
       );
-      invoiceDetials.value.total =
+      InvoiceDetails.value.total =
         prices.length != 0 ? prices.reduce((acc, curr) => acc + curr) : 0.0;
     };
 
@@ -543,58 +761,33 @@ export default defineComponent({
       );
     };
 
-    onMounted(async () => {
-      Customers.value.pop();
-      await GetCustomers();
+    const removeNulls = () => {
+      InvoiceDetails.value.items = InvoiceDetails.value.items.filter(
+        (ele: any) => ele.id !== ""
+      );
+    };
 
-      const response = await getInvoice(invoiceId);
-      console.log(response);
-
-      invoiceDetials.value = {
-        invoice_no: response.invoice_no,
-        customer_id: response.customer_id,
-        items: JSON.parse(response.items),
-        date: response.date,
-        duedate: response.duedate,
-        status: response.status,
-        notes: response.notes,
-        total: response.total,
-        meta: {
-          company_name: "",
-          first_name: "",
-          last_name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          states: "",
-          pincode: "",
-          country: "",
-        },
-        is_active: response.is_active,
-        created_by: User.id,
-        updated_by: User.id,
-      };
-
-      const respons = await getUser(response.customer_id);
-      invoiceDetials.value.meta = respons.meta;
-    });
+    const generatePdf = async (pdfName: string) => {
+      removeNulls();
+      console.log(InvoiceDetails.value);
+      await Gen("invoice", InvoiceId.toString(), pdfName, InvoiceDetails);
+    };
 
     // number formating remove
     const submit = async () => {
+      disabledselect.value = true;
       removeNulls();
-      loading.value = true;
-      console.warn("Nice");
-      // console.log(invoiceDetials.value);
-      invoiceDetials.value.date = moment(invoiceDetials.value.date).format(
+      console.log(InvoiceDetails.value);
+      InvoiceDetails.value.date = moment(InvoiceDetails.value.date).format(
         "YYYY-MM-DD HH:mm:ss"
       );
-      invoiceDetials.value.duedate = moment(
-        invoiceDetials.value.duedate
+      InvoiceDetails.value.duedate = moment(
+        InvoiceDetails.value.duedate
       ).format("YYYY-MM-DD HH:mm:ss");
-      // console.log(invoiceDetials.value);
+      // console.log(InvoiceDetails.value);
       try {
         // Call your API here with the form values
-        const response = await updateInvoice(invoiceDetials.value, invoiceId);
+        const response = await updateInvoice(InvoiceDetails.value, InvoiceId);
         // console.log(response.error);
         if (!response.error) {
           // Handle successful API response
@@ -615,11 +808,11 @@ export default defineComponent({
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
-        loading.value = false;
+        disabledselect.value = false;
       }
     };
 
-    const deleteInvoice = () => {
+    const deleteQuotation = () => {
       Swal.fire({
         title: "Are you sure?",
         text: "You will not be able to recover from this!",
@@ -630,8 +823,8 @@ export default defineComponent({
       }).then((result: { [x: string]: any }) => {
         if (result["isConfirmed"]) {
           // Put your function here
-          deleteinvoice(invoiceId);
-          router.push({ name: "invoices-list" });
+          deleteinvoice(InvoiceId);
+          route.push({ name: "invoices-list" });
         }
       });
     };
@@ -647,7 +840,9 @@ export default defineComponent({
         customClass: {
           confirmButton: "btn btn-primary",
         },
-      }).then(() => {});
+      }).then(() => {
+        console.log("Done");
+      });
     };
 
     const showErrorAlert = (title, message) => {
@@ -662,17 +857,6 @@ export default defineComponent({
           confirmButton: "btn btn-primary",
         },
       });
-    };
-
-    const removeNulls = () => {
-      invoiceDetials.value.items = invoiceDetials.value.items.filter(
-        (ele: any) => ele.id !== ""
-      );
-    };
-
-    const generatePdf = async (pdfName: string) => {
-      removeNulls();
-      await Gen("invoice", invoiceId.toString(), pdfName, invoiceDetials);
     };
 
     // date
@@ -705,21 +889,24 @@ export default defineComponent({
     };
 
     return {
-      invoiceDetials,
+      Clients,
+      InvoiceDetails,
       Customers,
       getAssetPath,
       submit,
-      loading,
+      deleteQuotation,
+      disabledselect,
+      clientSelect,
       shortcuts,
       disabledDate,
       RemoveItem,
       GetUserData,
+      GetClientData,
       UpdateTotal,
       addNewItem,
       InvoiceStatusArray,
-      invoiceDetialsAddFunc,
+      InvoiceDetailsAddFunc,
       GetInvoiceStatus,
-      deleteInvoice,
       Total,
       generatePdf,
     };
@@ -731,8 +918,9 @@ export default defineComponent({
 .el-input__inner {
   font-weight: 500;
 }
+
 .el-input__wrapper {
-  height: 3.1rem;
+  height: 3rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);
   border-color: var(--bs-gray-100);

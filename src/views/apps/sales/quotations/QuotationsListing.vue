@@ -546,9 +546,9 @@ export default defineComponent({
               country: "",
             },
             is_active: response.is_active,
+            company_id: User.company_id,
             created_by: User.id,
             updated_by: User.id,
-            company_id: User.company_id,
           };
           // add
           const respons = await addQuotation(quotationDetail.value);

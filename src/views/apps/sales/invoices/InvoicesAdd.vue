@@ -57,7 +57,7 @@
                   <input
                     type="text"
                     class="form-control form-control-flush fw-bold text-muted fs-3 w-auto"
-                    v-model="InvoiceDetails.quotation_no"
+                    v-model="InvoiceDetails.invoice_no"
                     placehoder="..."
                     disabled="true"
                   />
@@ -435,7 +435,7 @@
                   ><span class="path1"></span><span class="path2"></span
                   ><span class="path3"></span
                 ></i>
-                Add Quotation
+                Add Invoice
               </span>
             </div>
             <!--end::Actions-->
@@ -455,11 +455,11 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import {
   getCustomers,
-  addQuotation,
+  addInvoice,
   getUser,
   getClient,
   GetCustomerClients,
-  GetIncrQuotationId,
+  GetIncrInvoiceId,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import CustomSelect from "./CustomComponents/CustomInvoiceItems.vue";
@@ -492,7 +492,7 @@ interface Meta {
 }
 
 interface InvoiceDetails {
-  quotation_no: string;
+  invoice_no: string;
   customer_id: string;
   items: Array<itemsArr>;
   date: string;
@@ -525,7 +525,7 @@ export default defineComponent({
       { id: "", client_data: { id: "", first_name: "", last_name: "" } },
     ]);
     const InvoiceDetails = ref<InvoiceDetails>({
-      quotation_no: "21****",
+      invoice_no: "21****",
       customer_id: " ",
       items: [],
       date: "",
@@ -565,25 +565,25 @@ export default defineComponent({
 
     onMounted(async () => {
       // todo: quotation check if pres get last incr 1
-      const res = await GetIncrQuotationId(User.company_id);
-      IncrQuotation(res);
+      const res = await GetIncrInvoiceId(User.company_id);
+      IncrInvoice(res);
       // * basic fetch
       Customers.value.pop();
       Clients.value.pop();
       await GetCustomers();
     });
 
-    const IncrQuotation = (data: any) => {
+    const IncrInvoice = (data: any) => {
       console.log(data.result);
-      const latestquotation_no = data.result.split("_");
-      if (parseInt(latestquotation_no[1]) == 0) {
+      const latestInvoice_no = data.result.split("_");
+      if (parseInt(latestInvoice_no[1]) == 0) {
         // ? if no record
-        InvoiceDetails.value.quotation_no =
-          latestquotation_no[0] + "_" + latestquotation_no[1].toString();
+        InvoiceDetails.value.invoice_no =
+          latestInvoice_no[0] + "_" + latestInvoice_no[1].toString();
       } else {
         // ? if record exisit inc 1
-        InvoiceDetails.value.quotation_no =
-          latestquotation_no[0] + "_" + (1 + +latestquotation_no[1]).toString();
+        InvoiceDetails.value.invoice_no =
+          latestInvoice_no[0] + "_" + (1 + +latestInvoice_no[1]).toString();
       }
     };
 
@@ -766,7 +766,7 @@ export default defineComponent({
       // console.log(InvoiceDetails.value);
       try {
         // Call your API here with the form values
-        const response = await addQuotation(InvoiceDetails.value);
+        const response = await addInvoice(InvoiceDetails.value);
         // console.log(response.error);
         if (!response.error) {
           // Handle successful API response
@@ -775,7 +775,7 @@ export default defineComponent({
             "Success",
             "Company details have been successfully inserted!"
           );
-          route.push({ name: "quotation-list" });
+          route.push({ name: "invoices-list" });
         } else {
           // Handle API error response
           const errorData = response.error;
@@ -804,7 +804,7 @@ export default defineComponent({
           confirmButton: "btn btn-primary",
         },
       }).then(() => {
-        clear();
+        console.log("done");
       });
     };
 
@@ -851,47 +851,46 @@ export default defineComponent({
       return null;
     };
 
-    const clear = () => {
-      InvoiceDetails.value = {
-        quotation_no: "******",
-        customer_id: " ",
-        items: [],
-        date: "",
-        duedate: "",
-        status: "",
-        notes: "",
-        total: 0,
-        customer: {
-          id: "",
-          company_name: "",
-          first_name: "",
-          last_name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          states: "",
-          pincode: "",
-          country: "",
-        },
-        client: {
-          id: "",
-          company_name: "",
-          first_name: "",
-          last_name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          states: "",
-          pincode: "",
-          country: "",
-        },
-        is_active: 1,
-        created_by: User.id,
-        updated_by: User.id,
-        company_id: User.company_id,
-      };
-      route.push({ name: "quotation-list" });
-    };
+    // const clear = () => {
+    //   InvoiceDetails.value = {
+    //     invoice_no: "",
+    //     customer_id: " ",
+    //     items: [],
+    //     date: "",
+    //     duedate: "",
+    //     status: "",
+    //     notes: "",
+    //     total: 0,
+    //     customer: {
+    //       id: "",
+    //       company_name: "",
+    //       first_name: "",
+    //       last_name: "",
+    //       address1: "",
+    //       address2: "",
+    //       city: "",
+    //       states: "",
+    //       pincode: "",
+    //       country: "",
+    //     },
+    //     client: {
+    //       id: "",
+    //       company_name: "",
+    //       first_name: "",
+    //       last_name: "",
+    //       address1: "",
+    //       address2: "",
+    //       city: "",
+    //       states: "",
+    //       pincode: "",
+    //       country: "",
+    //     },
+    //     is_active: 1,
+    //     created_by: User.id,
+    //     updated_by: User.id,
+    //     company_id: User.company_id,
+    //   };
+    // };
 
     return {
       Clients,

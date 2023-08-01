@@ -104,7 +104,7 @@ const Gen = async (
         ${invoiceDetials.value.client.city ? invoiceDetials.value.client.city : ""},${invoiceDetials.value.client.city ? invoiceDetials.value.client.city : ""}
         ${invoiceDetials.value.client.states ? invoiceDetials.value.client.states : ""},${invoiceDetials.value.client.country ? invoiceDetials.value.client.country : ""}
         `,
-            doc.internal.pageSize.width - 2.8,
+            doc.internal.pageSize.width - 3.0,
             1.7,
             {
                 align: "left",

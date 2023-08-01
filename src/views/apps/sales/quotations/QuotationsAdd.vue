@@ -199,11 +199,11 @@
                         v-on:change="GetClientData(QuotationDetials.client.id)"
                       >
                         <el-option
-                      value=""
-                      label="Please Select Client..."
-                      key=""
-                      >Please Select Client...</el-option
-                      >
+                          value=""
+                          label="Please Select Client..."
+                          key=""
+                          >Please Select Client...</el-option
+                        >
                         <el-option
                           v-for="item in Clients"
                           :key="item.client_data.id"

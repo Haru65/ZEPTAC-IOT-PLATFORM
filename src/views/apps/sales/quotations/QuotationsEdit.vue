@@ -364,7 +364,10 @@
                 </span>
               </div>
               <br />
-              <div class="row gx-10">
+              <div
+                class="row gx-10"
+                v-if="parseInt(QuotationDetials.status) != 3"
+              >
                 <el-select
                   v-model="QuotationDetials.status"
                   filterable
@@ -381,6 +384,13 @@
                     :value="item.id"
                   />
                 </el-select>
+              </div>
+              <div v-else>
+                <h6
+                  class="text-start fs-4 text-nowrap badge badge-light flex-shrink-0 align-self-center py-3 px-4 fs-7"
+                >
+                  {{ GetQuotationStatus(parseInt(QuotationDetials.status)) }}
+                </h6>
               </div>
               <br />
               <div class="items">
@@ -419,7 +429,6 @@
             <!--begin::Row-->
             <!--end::Row-->
             <div class="mb-0">
-              <!--begin::Row-->
               <div class="row mb-5">
                 <!--begin::Col-->
                 <div class="col">
@@ -444,6 +453,23 @@
               <!--end::Row-->
             </div>
             <!--end::Actions-->
+            <div class="mb-0">
+              <!--begin::Row-->
+              <span
+                v-if="parseInt(QuotationDetials.status) != 3"
+                v-on:click="SendInvoice"
+                href="#"
+                class="btn btn-primary w-100 mb-3"
+                id="kt_invoice_submit_button"
+              >
+                <i class="ki-duotone ki-triangle fs-3"
+                  ><span class="path1"></span><span class="path2"></span
+                  ><span class="path3"></span
+                ></i>
+                Convert to Invoice
+              </span>
+              <!--end::Row-->
+            </div>
           </div>
           <!--end::Card body-->
         </div>
@@ -461,11 +487,13 @@ import ApiService from "@/core/services/ApiService";
 import {
   getCustomers,
   updateQuotation,
+  addInvoice,
   getUser,
   getClient,
   GetCustomerClients,
   getQuotation,
   deletequotation,
+  GetIncrInvoiceId,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import CustomSelect from "./CustomComponents/CustomQuotationItems.vue";
@@ -500,6 +528,7 @@ interface Meta {
 
 interface QuotationDetials {
   quotation_no: string;
+  invoice_no: string;
   customer_id: string;
   items: Array<itemsArr>;
   date: string;
@@ -534,7 +563,8 @@ export default defineComponent({
       { id: "", client_data: { id: "", first_name: "", last_name: "" } },
     ]);
     const QuotationDetials = ref<QuotationDetials>({
-      quotation_no: "21****",
+      quotation_no: "",
+      invoice_no: "",
       customer_id: " ",
       items: [],
       date: "",
@@ -885,6 +915,95 @@ export default defineComponent({
       },
     ];
 
+    // * Send Inovoice
+
+    const SendInvoice = async () => {
+      console.warn("Nice");
+      // console.log(quotationDetail.value);
+      Swal.fire({
+        title: "Are you sure?",
+        text: "Send Quotation to Invoice!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#009ef7",
+        confirmButtonText: "Yes, I am sure!",
+      }).then(async (result: { [x: string]: any }) => {
+        if (result["isConfirmed"]) {
+          let invoice_no = QuotationDetials.value.quotation_no;
+          QuotationDetials.value.invoice_no = invoice_no;
+
+          // QuotationDetials.value.quotation_no = quotationid.toString();
+          QuotationDetials.value.date = moment(
+            QuotationDetials.value.date
+          ).format("YYYY-MM-DD HH:mm:ss");
+          QuotationDetials.value.duedate = moment(
+            QuotationDetials.value.duedate
+          ).format("YYYY-MM-DD HH:mm:ss");
+          // console.log(QuotationDetials.value);
+          try {
+            // update the invoice
+            // converted to invoice
+            QuotationDetials.value.status = "3";
+            const res = await updateQuotation(
+              QuotationDetials.value,
+              QuotationId
+            );
+            // Call your API here with the form values
+            if (res.error) {
+              // Handle successful API response
+              const errorData = res.error;
+              // console.log("API error:", errorData);
+              console.log("API error:", errorData.response.data.errors);
+              showErrorAlert(
+                "Warning",
+                "Please Fill the Form Fields Correctly"
+              );
+            }
+
+            // sending to
+            // set to invoice
+            // draf status
+
+            // * inrc invoice count
+            const ress = await GetIncrInvoiceId(User.company_id);
+            let latestinvoice_no = ress.result.split("_");
+            latestinvoice_no =
+              latestinvoice_no[0] +
+              "_" +
+              (parseInt(latestinvoice_no[1]) + 1).toString();
+
+            QuotationDetials.value.invoice_no = latestinvoice_no;
+            QuotationDetials.value.quotation_no = QuotationId.toString();
+            QuotationDetials.value.status = "1";
+            const response = await addInvoice(QuotationDetials.value);
+            // console.log(response.error);
+            if (!response.error) {
+              // Handle successful API response
+              // console.log("API response:", response);
+              showSuccessAlert(
+                "Success",
+                "Quotation Successfully Converted to Invoice"
+              );
+              route.push({ name: "quotation-list" });
+            } else {
+              // Handle API error response
+              const errorData = response.error;
+              // console.log("API error:", errorData);
+              console.log("API error:", errorData.response.data.errors);
+              showErrorAlert(
+                "Warning",
+                "Invoice Already Exist For this Quotation"
+              );
+            }
+          } catch (error) {
+            // Handle any other errors during API call
+            console.error("API call error:", error);
+            showErrorAlert("Error", "An error occurred during the API call.");
+          }
+        }
+      });
+    };
+
     const disabledDate = (time: Date) => {
       return null;
     };
@@ -910,6 +1029,7 @@ export default defineComponent({
       GetQuotationStatus,
       Total,
       generatePdf,
+      SendInvoice,
     };
   },
 });
