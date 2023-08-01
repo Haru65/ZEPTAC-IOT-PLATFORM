@@ -119,7 +119,6 @@
                         placeholder="Please Select Customer"
                         filterable
                         v-on:change="GetUserData(QuotationDetials.customer_id)"
-                        placeholder="Please Select Customer..."
                       >
                         <el-option
                           v-for="item in Customers"
