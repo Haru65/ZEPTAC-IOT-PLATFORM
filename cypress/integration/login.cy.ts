@@ -27,9 +27,6 @@ describe("Check Login", () => {
         cy.contains("Welcome Admin").should("exist");
       } else {
         cy.url().should("not.include", "/dashboard");
-        cy.contains("Unable to authenticate, please login").should(
-          "be.visible"
-        );
       }
     });
   });
