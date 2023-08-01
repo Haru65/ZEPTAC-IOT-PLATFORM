@@ -300,7 +300,11 @@
 
             <!--begin::Col-->
             <div class="col-lg-8 fv-row">
-              <el-select v-model="profileDetails.role_id" filterable placeholder="Please Select Role...">
+              <el-select
+                v-model="profileDetails.role_id"
+                filterable
+                placeholder="Please Select Role..."
+              >
                 <el-option
                   v-for="item in rolesArray"
                   :key="item.id"
@@ -328,7 +332,18 @@
 
             <!--begin::Col-->
             <div class="col-lg-8 fv-row">
-              <el-select v-model="profileDetails.company_id" filterable placeholder="Please Select Company...">
+              <el-select
+                v-model="profileDetails.company_id"
+                filterable
+                placeholder="Please Select Company..."
+              >
+                <el-option
+                  disabled="disabled"
+                  value=""
+                  label="Please Select Company..."
+                >
+                  Please Select Company
+                </el-option>
                 <el-option
                   v-for="item in Companies"
                   :key="item.id"
@@ -412,7 +427,11 @@
               <div class="row">
                 <!--begin::Col-->
                 <div class="col-lg fv-row">
-                  <el-select v-model="profileDetails.country" filterable placeholder="Select your Country...">
+                  <el-select
+                    v-model="profileDetails.country"
+                    filterable
+                    placeholder="Select your Country..."
+                  >
                     <el-option
                       v-for="item in countries"
                       :key="item.name"
@@ -444,7 +463,11 @@
                 <!--begin::Col-->
                 <div v-if="state.length" class="col-lg fv-row">
                   <div>
-                    <el-select v-model="profileDetails.states" filterable placeholder="Select Your State...">
+                    <el-select
+                      v-model="profileDetails.states"
+                      filterable
+                      placeholder="Select Your State..."
+                    >
                       <el-option
                         v-for="item in state"
                         :key="item"
@@ -546,7 +569,11 @@
               <div class="row">
                 <div class="col-lg fv-row">
                   <div>
-                    <el-select v-model="profileDetails.gender" filterable placeholder="Select Your Gender...">
+                    <el-select
+                      v-model="profileDetails.gender"
+                      filterable
+                      placeholder="Select Your Gender..."
+                    >
                       <el-option label="Male" value="male" />
                       <el-option label="Female" value="female" />
                       <el-option label="Other" value="other" />

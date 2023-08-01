@@ -110,17 +110,16 @@
                 <div class="d-flex flex-grow-1 gap-lg-3 gap-sm-5 gap-5">
                   <!--begin::Row-->
                   <div class="w-50">
-                    <div class="row gx-10">
+                    <div class="py-3">
+                      <h6 class="fs-6">Customer :</h6>
+                    </div>
+                    <div id="customer " class="row gx-10">
                       <el-select
                         v-model="QuotationDetials.customer_id"
+                        placeholder="Please Select Customer"
                         filterable
                         v-on:change="GetUserData(QuotationDetials.customer_id)"
-                      >
-                      <el-option
-                      value=""
-                      label="Please Select Customer..."
-                      key=""
-                      >Please Select Customer...</el-option
+                        placeholder="Please Select Customer..."
                       >
                         <el-option
                           v-for="item in Customers"
@@ -191,6 +190,9 @@
 
                   <div class="w-50">
                     <div class="row gx-10">
+                      <div class="py-3">
+                        <h6 class="fs-6">Client :</h6>
+                      </div>
                       <el-select
                         v-model="QuotationDetials.client.id"
                         filterable
@@ -676,6 +678,7 @@ export default defineComponent({
           country: "",
         };
       }
+      console.log(QuotationDetials.value);
     };
 
     const addNewItem = () => {
@@ -921,7 +924,7 @@ export default defineComponent({
 }
 
 .el-input__wrapper {
-  height: 3rem;
+  height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);
   border-color: var(--bs-gray-100);
@@ -936,10 +939,5 @@ export default defineComponent({
   font-size: 1.15rem;
   border-radius: 0.625rem;
   box-shadow: none !important;
-}
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  display: none;
 }
 </style>
