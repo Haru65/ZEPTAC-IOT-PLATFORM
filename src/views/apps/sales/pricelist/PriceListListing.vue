@@ -67,13 +67,14 @@
     </div>
     <div class="card-body pt-0">
       <Datatable
+        checkbox-label="id"
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
         :header="tableHeader"
-        :enable-items-per-page-dropdown="true"
         :checkbox-enabled="true"
-        checkbox-label="id"
+        :items-per-page="limit"
+        :items-per-page-dropdown-enabled="false"
         :loading="loading"
       >
         <!-- img data -->
@@ -113,6 +114,38 @@
           <!--end::Menu-->
         </template>
       </Datatable>
+      <div class="d-flex justify-content-between p-2">
+        <div>
+          <el-select
+            class="w-100px rounded-2"
+            v-model="limit"
+            filterable
+            @change="PageLimitPoiner(limit)"
+          >
+            <el-option
+              v-for="item in Limits"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
+          </el-select>
+        </div>
+        <ul class="pagination">
+          <li class="paginate_button page-item" style="cursor: auto">
+            <span @click="PrevPage" class="paginate_button page-link"
+              ><i class="ki-duotone ki-left fs-2"><!--v-if--></i></span
+            >
+          </li>
+          <li class="paginate_button disabled">
+            <span class="paginate_button page-link"> Page - {{ page }} </span>
+          </li>
+          <li class="paginate_button page-item" style="cursor: pointer">
+            <span @click="NextPage" class="paginate_button page-link"
+              ><i class="ki-duotone ki-right fs-2"><!--v-if--></i></span
+            >
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 
@@ -128,7 +161,11 @@ import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { IPriceList } from "@/core/model/pricelist";
 import { formatPrice } from "@/core/config/DataFormatter";
 import arraySort from "array-sort";
-import { getPriceList, deletePriceListItem } from "@/stores/api";
+import {
+  getPriceList,
+  deletePriceListItem,
+  PriceListSearch,
+} from "@/stores/api";
 import moment from "moment";
 import Swal from "sweetalert2";
 
@@ -171,16 +208,113 @@ export default defineComponent({
       },
     ]);
 
+    const loading = ref(true);
+
+    // staring from 2
+    let page = ref(1);
+    let limit = ref(50);
+    // limit 10
+    const more = ref(false);
+
     const selectedIds = ref<Array<number>>([]);
     const tableData = ref<Array<IPriceList>>([]);
-    const initCustomers = ref<Array<IPriceList>>([]);
-    const loading = ref(true);
+    const initvalues = ref<Array<IPriceList>>([]);
+    const total = ref(0);
+    // functions
+    const Limits = ref({
+      1: 10,
+      2: 25,
+      3: 50,
+    });
+    // more
+    const PagePointer = async (page) => {
+      // ? Truncate the tableData
+      //console.log(limit.value);
+      loading.value = true;
+      try {
+        while (tableData.value.length != 0) tableData.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
+
+        const response = await getPriceList(
+          `page=${page}&limit=${limit.value}`
+        );
+        //console.log(response.result.total_count);
+        // first 20 displayed
+        total.value = response.result.total_count;
+        more.value = response.result.data.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(
+          ({ created_at, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("DD/MM/YYYY"),
+          })
+        );
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        ////console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
+      }
+    };
+
+    const PageLimitPoiner = async (limit) => {
+      // ? Truncate the tableData
+      page.value = 1;
+      //console.log(page.value, limit);
+      loading.value = true;
+      try {
+        while (tableData.value.length != 0) tableData.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
+
+        const response = await getPriceList(
+          `page=${page.value}&limit=${limit}`
+        );
+        //console.log(response.result.total_count);
+        // first 20 displayed
+        total.value = response.result.total_count;
+        more.value = response.result.data.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(
+          ({ created_at, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("DD/MM/YYYY"),
+          })
+        );
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        ////console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
+      }
+    };
+
+    //console.log(initvalues.value);
+
+    const NextPage = () => {
+      if (more.value != false) {
+        page.value = page.value + 1;
+        PagePointer(page.value);
+      }
+    };
+
+    const PrevPage = () => {
+      if (page.value > 1) {
+        page.value = page.value - 1;
+        PagePointer(page.value);
+      }
+    };
 
     // functions
     // get users function
     async function pricelist_listing(): Promise<void> {
       try {
-        const response = await getPriceList();
+        const response = await getPriceList(
+          `page=${page.value}&limit=${limit.value}`
+        );
         console.log(response);
         tableData.value = response.result.data.map(
           ({ created_at, ...rest }) => ({
@@ -188,11 +322,7 @@ export default defineComponent({
             created_at: moment(created_at).format("DD/MM/YYYY"),
           })
         );
-        initCustomers.value.splice(
-          0,
-          tableData.value.length,
-          ...tableData.value
-        );
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
       } finally {
@@ -259,8 +389,9 @@ export default defineComponent({
     };
 
     const search = ref<string>("");
+    let debounceTimer;
     const searchItems = () => {
-      tableData.value.splice(0, tableData.value.length, ...initCustomers.value);
+      tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value !== "") {
         let results: Array<IPriceList> = [];
         for (let j = 0; j < tableData.value.length; j++) {
@@ -269,8 +400,41 @@ export default defineComponent({
           }
         }
         tableData.value.splice(0, tableData.value.length, ...results);
+
+        if (tableData.value.length == 0) {
+          loading.value = true;
+          clearTimeout(debounceTimer); // Clear any existing debounce timer
+          debounceTimer = setTimeout(async () => {
+            await SearchMore();
+          }, 1000);
+        }
       }
     };
+
+    async function SearchMore() {
+      // Your API call logic here
+      try {
+        const response = await PriceListSearch(search.value);
+        //console.log(response.result.total_count);
+        // first 20 displayed
+        total.value = response.result.total_count;
+        more.value = response.result.data.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(
+          ({ created_at, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("DD/MM/YYYY"),
+          })
+        );
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        //console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
+      }
+    }
 
     const searchingFunc = (obj: any, value: string): boolean => {
       for (let key in obj) {
@@ -306,6 +470,13 @@ export default defineComponent({
       getAssetPath,
       formatPrice,
       loading,
+      NextPage,
+      PrevPage,
+      total,
+      page,
+      limit,
+      PageLimitPoiner,
+      Limits,
     };
   },
 });

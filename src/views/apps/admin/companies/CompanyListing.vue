@@ -118,13 +118,12 @@
           <!--end::Menu-->
         </template>
       </Datatable>
-      <div class="d-flex justify-content-between">
+      <div class="d-flex justify-content-between p-2">
         <div>
           <el-select
             class="w-100px rounded-2"
             v-model="limit"
             filterable
-            placeholder="Select Your State..."
             @change="PageLimitPoiner(limit)"
           >
             <el-option
@@ -206,16 +205,18 @@ export default defineComponent({
       },
     ]);
 
+
+
+    const selectedIds = ref<Array<number>>([]);
+    const tableData = ref<Array<ICompany>>([]);
+    const initvalues = ref<Array<ICompany>>([]);
+
     const loading = ref(true);
     // staring from 2
     let page = ref(1);
     let limit = ref(50);
     // limit 10
     const more = ref(false);
-
-    const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<ICompany>>([]);
-    const initCompanies = ref<Array<ICompany>>([]);
     const total = ref(0);
     // functions
     const Limits = ref({
@@ -230,7 +231,7 @@ export default defineComponent({
       loading.value = true;
       try {
         while (tableData.value.length != 0) tableData.value.pop();
-        while (initCompanies.value.length != 0) initCompanies.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
 
         ApiService.setHeader();
         const response = await getCompanies(
@@ -246,11 +247,7 @@ export default defineComponent({
             created_at: moment(created_at).format("MMMM Do YYYY"),
           })
         );
-        initCompanies.value.splice(
-          0,
-          tableData.value.length,
-          ...tableData.value
-        );
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
       } finally {
@@ -268,7 +265,7 @@ export default defineComponent({
       loading.value = true;
       try {
         while (tableData.value.length != 0) tableData.value.pop();
-        while (initCompanies.value.length != 0) initCompanies.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
 
         ApiService.setHeader();
         const response = await getCompanies(
@@ -284,11 +281,7 @@ export default defineComponent({
             created_at: moment(created_at).format("MMMM Do YYYY"),
           })
         );
-        initCompanies.value.splice(
-          0,
-          tableData.value.length,
-          ...tableData.value
-        );
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
       } finally {
@@ -299,7 +292,7 @@ export default defineComponent({
       }
     };
 
-    //console.log(initCompanies.value);
+    //console.log(initvalues.value);
 
     const NextPage = () => {
       if (more.value != false) {
@@ -332,11 +325,7 @@ export default defineComponent({
             created_at: moment(created_at).format("MMMM Do YYYY"),
           })
         );
-        initCompanies.value.splice(
-          0,
-          tableData.value.length,
-          ...tableData.value
-        );
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
       } finally {
@@ -410,7 +399,7 @@ export default defineComponent({
     // ? debounce timer
     let debounceTimer;
     const searchItems = () => {
-      tableData.value.splice(0, tableData.value.length, ...initCompanies.value);
+      tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value !== "") {
         let results: Array<ICompany> = [];
         // if Search
@@ -420,8 +409,6 @@ export default defineComponent({
           }
         }
         tableData.value.splice(0, tableData.value.length, ...results);
-        console.log(tableData.value.length);
-
         if (tableData.value.length == 0) {
           loading.value = true;
           clearTimeout(debounceTimer); // Clear any existing debounce timer
@@ -447,11 +434,7 @@ export default defineComponent({
             created_at: moment(created_at).format("MMMM Do YYYY"),
           })
         );
-        initCompanies.value.splice(
-          0,
-          tableData.value.length,
-          ...tableData.value
-        );
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
       } finally {
@@ -463,7 +446,7 @@ export default defineComponent({
     }
 
     const searchingFunc = (obj: any, value: string): boolean => {
-      //console.log(initCompanies.value);
+      //console.log(initvalues.value);
       for (let key in obj) {
         if (!Number.isInteger(obj[key]) && !(typeof obj[key] === "object")) {
           if (obj[key].indexOf(value) != -1) {
