@@ -358,7 +358,6 @@ export default defineComponent({
         console.log(response);
         tableData.value = response.result.data.map(
           ({
-            created_at,
             invoice_date,
             invoice_duedate,
             total,
@@ -372,7 +371,6 @@ export default defineComponent({
             invoice_no: invoice_no,
             customer_name:
               customer_name[0].first_name + " " + customer_name[0].last_name,
-            created_at: moment(created_at).format("DD/MM/YYYY"),
             date: moment(invoice_date).format("DD/MM/YYYY"),
             duedate: moment(invoice_duedate).format("DD/MM/YYYY"),
             total: total,

@@ -13,6 +13,23 @@ const CLIENTS_URL = "clients";
 // COMPANIES
 
 // gell all comapnies
+export async function CompaniesSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('company_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
 export async function getCompanies(data: any) {
     try {
         //console.log(data)
