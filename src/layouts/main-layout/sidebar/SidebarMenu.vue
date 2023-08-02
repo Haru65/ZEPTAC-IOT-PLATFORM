@@ -356,8 +356,6 @@ export default defineComponent({
       return route.path.indexOf(match) !== -1;
     };
 
-
-
     return {
       hasActiveChildren,
       AdminMenuConfig,

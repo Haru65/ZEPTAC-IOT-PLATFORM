@@ -38,13 +38,6 @@
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
           </button>
-          <button
-            type="button"
-            class="btn btn-light-warning me-3"
-            @click="more"
-          >
-            {{ total }} More Results
-          </button>
           <!--end::Export-->
           <!--begin::Add customer-->
           <router-link to="./add" class="btn btn-primary">
@@ -77,15 +70,14 @@
     </div>
     <div class="card-body pt-0">
       <Datatable
+        checkbox-label="id"
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
         :header="tableHeader"
-        :enable-items-per-page-dropdown="true"
         :checkbox-enabled="true"
-        :itemsPerPageDropdownEnabled="true"
-        :items-per-page="25"
-        checkbox-label="id"
+        :items-per-page="limit"
+        :items-per-page-dropdown-enabled="false"
         :loading="loading"
       >
         <template v-slot:company_name="{ row: company }">
@@ -126,11 +118,40 @@
           <!--end::Menu-->
         </template>
       </Datatable>
+      <div class="d-flex justify-content-between p-2">
+        <div>
+          <el-select
+            class="w-100px rounded-2"
+            v-model="limit"
+            filterable
+            @change="PageLimitPoiner(limit)"
+          >
+            <el-option
+              v-for="item in Limits"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
+          </el-select>
+        </div>
+        <ul class="pagination">
+          <li class="paginate_button page-item" style="cursor: auto">
+            <span @click="PrevPage" class="paginate_button page-link"
+              ><i class="ki-duotone ki-left fs-2"><!--v-if--></i></span
+            >
+          </li>
+          <li class="paginate_button disabled">
+            <span class="paginate_button page-link"> Page - {{ page }} </span>
+          </li>
+          <li class="paginate_button page-item" style="cursor: pointer">
+            <span @click="NextPage" class="paginate_button page-link"
+              ><i class="ki-duotone ki-right fs-2"><!--v-if--></i></span
+            >
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
-
-  <ExportCustomerModal></ExportCustomerModal>
-  <AddCustomerModal></AddCustomerModal>
 </template>
 
 <script lang="ts">
@@ -138,21 +159,17 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
-import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
 import type { ICompany } from "@/core/model/company";
 import arraySort from "array-sort";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { deletecompany, getCompanies } from "@/stores/api";
+import { deletecompany, getCompanies, CompaniesSearch } from "@/stores/api";
 
 export default defineComponent({
   name: "company-listing",
   components: {
     Datatable,
-    ExportCustomerModal,
-    AddCustomerModal,
   },
   setup() {
     const tableHeader = ref([
@@ -188,48 +205,106 @@ export default defineComponent({
       },
     ]);
 
+
+
+    const selectedIds = ref<Array<number>>([]);
+    const tableData = ref<Array<ICompany>>([]);
+    const initvalues = ref<Array<ICompany>>([]);
+
     const loading = ref(true);
     // staring from 2
     let page = ref(1);
-    let limit = ref(20);
-    const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<ICompany>>([]);
-    const initCompanies = ref<Array<ICompany>>([]);
+    let limit = ref(50);
+    // limit 10
+    const more = ref(false);
     const total = ref(0);
     // functions
-
+    const Limits = ref({
+      1: 10,
+      2: 25,
+      3: 50,
+    });
     // more
-    const more = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(
-        `page=${page.value}&limit=${limit.value}`
-      );
-      if (total.value > 0) {
-        tableData.value.splice(
-          tableData.value.length,
-          0,
-          ...response.result.data.data.map(({ created_at, ...rest }) => ({
+    const PagePointer = async (page) => {
+      // ? Truncate the tableData
+      //console.log(limit.value);
+      loading.value = true;
+      try {
+        while (tableData.value.length != 0) tableData.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
+
+        ApiService.setHeader();
+        const response = await getCompanies(
+          `page=${page}&limit=${limit.value}`
+        );
+        //console.log(response.result.total_count);
+        // first 20 displayed
+        total.value = response.result.total_count;
+        more.value = response.result.data.next_page_url != null ? true : false;
+        tableData.value = response.result.data.data.map(
+          ({ created_at, ...rest }) => ({
             ...rest,
             created_at: moment(created_at).format("MMMM Do YYYY"),
-          }))
+          })
         );
-        initCompanies.value = initCompanies.value.splice(
-          tableData.value.length,
-          0,
-          ...tableData.value.filter(
-            (value, index, self) => self.indexOf(value) === index
-          )
-        );
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        ////console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
       }
-      page.value = page.value + 1;
-      total.value = total.value - response.result.data.data.length;
     };
-    console.log(initCompanies.value);
 
-    const onpageChange = async () => {
-      if (total.value > 0) {
-        await more();
-        // total.value -= limit.value;
+    const PageLimitPoiner = async (limit) => {
+      // ? Truncate the tableData
+      page.value = 1;
+      //console.log(page.value, limit);
+      loading.value = true;
+      try {
+        while (tableData.value.length != 0) tableData.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
+
+        ApiService.setHeader();
+        const response = await getCompanies(
+          `page=${page.value}&limit=${limit}`
+        );
+        //console.log(response.result.total_count);
+        // first 20 displayed
+        total.value = response.result.total_count;
+        more.value = response.result.data.next_page_url != null ? true : false;
+        tableData.value = response.result.data.data.map(
+          ({ created_at, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+          })
+        );
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        ////console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
+      }
+    };
+
+    //console.log(initvalues.value);
+
+    const NextPage = () => {
+      if (more.value != false) {
+        page.value = page.value + 1;
+        PagePointer(page.value);
+      }
+    };
+
+    const PrevPage = () => {
+      if (page.value > 1) {
+        page.value = page.value - 1;
+        PagePointer(page.value);
       }
     };
 
@@ -237,27 +312,27 @@ export default defineComponent({
     const company_listing = async () => {
       try {
         ApiService.setHeader();
-        const response = await getCompanies(`page=${page.value}`);
-        page.value = page.value + 1;
-        console.log(response.result.total_count);
+        const response = await getCompanies(
+          `page=${page.value}&limit=${limit.value}`
+        );
+        //console.log(response.result.total_count);
         // first 20 displayed
-        total.value =
-          response.result.total_count - response.result.data.data.length;
+        total.value = response.result.total_count;
+        more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.data.map(
           ({ created_at, ...rest }) => ({
             ...rest,
             created_at: moment(created_at).format("MMMM Do YYYY"),
           })
         );
-        initCompanies.value.splice(
-          0,
-          tableData.value.length,
-          ...tableData.value
-        );
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
       } finally {
-        //console.log("done");
+        ////console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
       }
     };
 
@@ -320,20 +395,58 @@ export default defineComponent({
     };
 
     const search = ref<string>("");
+
+    // ? debounce timer
+    let debounceTimer;
     const searchItems = () => {
-      tableData.value.splice(0, tableData.value.length, ...initCompanies.value);
+      tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value !== "") {
         let results: Array<ICompany> = [];
+        // if Search
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
             results.push(tableData.value[j]);
           }
         }
         tableData.value.splice(0, tableData.value.length, ...results);
+        if (tableData.value.length == 0) {
+          loading.value = true;
+          clearTimeout(debounceTimer); // Clear any existing debounce timer
+          debounceTimer = setTimeout(async () => {
+            await SearchMore();
+          }, 1000);
+        }
       }
     };
 
+    async function SearchMore() {
+      // Your API call logic here
+      try {
+        ApiService.setHeader();
+        const response = await CompaniesSearch(search.value);
+        //console.log(response.result.total_count);
+        // first 20 displayed
+        total.value = response.result.total_count;
+        more.value = response.result.data.next_page_url != null ? true : false;
+        tableData.value = response.result.data.data.map(
+          ({ created_at, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+          })
+        );
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        //console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
+      }
+    }
+
     const searchingFunc = (obj: any, value: string): boolean => {
+      //console.log(initvalues.value);
       for (let key in obj) {
         if (!Number.isInteger(obj[key]) && !(typeof obj[key] === "object")) {
           if (obj[key].indexOf(value) != -1) {
@@ -366,35 +479,14 @@ export default defineComponent({
       onItemSelect,
       getAssetPath,
       loading,
-      onpageChange,
+      NextPage,
+      PrevPage,
       total,
-      more,
+      page,
+      limit,
+      PageLimitPoiner,
+      Limits,
     };
   },
 });
 </script>
-
-<style>
-.el-input__inner {
-  font-weight: 500;
-}
-
-.el-input__wrapper {
-  color: red !important;
-  height: 3.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--bs-gray-100);
-  border-color: var(--bs-gray-100);
-  color: var(--bs-gray-700);
-  transition: color 0.2s ease;
-  appearance: none;
-  line-height: 1.5;
-  border: none !important;
-  padding-top: 0.825rem;
-  padding-bottom: 0.825rem;
-  padding-left: 1.5rem;
-  font-size: 1.15rem;
-  border-radius: 0.625rem;
-  box-shadow: none !important;
-}
-</style>

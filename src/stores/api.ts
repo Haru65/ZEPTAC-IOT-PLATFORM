@@ -9,12 +9,28 @@ const INVOICE_URL = "invoice";
 const QUOTATION_URL = "quotation";
 const LEADS_URL = 'leads';
 const CLIENTS_URL = "clients";
-const INSTRUMENTS_URL = "instruments";
-const RGP_URL = "returnablegatepass";
+const EMPLOYEE_URL = "employee";
 
 // COMPANIES
 
 // gell all comapnies
+export async function CompaniesSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('company_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
 export async function getCompanies(data: any) {
     try {
         //console.log(data)
@@ -77,12 +93,60 @@ export async function updateCompany(data: any, id: any) {
     }
 }
 
-// USER
-export async function getUsers() {
+
+// EMPLOYEES
+
+export async function EmployeeSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('employee_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getEmployees(data) {
     try {
         //console.log(data)
         ApiService.setHeader();
-        const response = await ApiService.listingget(USER_URL);
+        const response = await ApiService.listingget(EMPLOYEE_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
+// USER
+
+export async function UserSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('user_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getUsers(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(USER_URL, data);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -146,21 +210,27 @@ export async function updateUser(data: any, id: any) {
 }
 
 // CUSTOMERS
-// get customers
-export async function getCustomers() {
+
+
+
+// CLIENTS APIs
+
+// search
+
+export async function ClientSearch(search: any) {
     try {
         //console.log(data)
+        const data = {
+            search: search
+        }
         ApiService.setHeader();
-        const response = await ApiService.get(CUSTOMERS_URL);
+        const response = await ApiService.post('customer_search', data);
         return response.data;
     } catch (errors) {
         console.error(errors);
         return { error: errors };
     }
 }
-
-
-// CLIENTS APIs
 // get all clients
 export async function getClients(data: any) {
     try {
@@ -232,6 +302,37 @@ export async function updateClient(data: any, id: any) {
 
 // CUSTOMERS
 // 
+// search Customets
+
+export async function CustomerSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('customer_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// get customers
+
+export async function getCustomers(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(CUSTOMERS_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
 export async function addCustomer(data: any) {
     try {
         //console.log(data)
@@ -283,12 +384,29 @@ export async function deletecustomer(data: any) {
 }
 
 // LEADS
+
+// gell all comapnies
+export async function LeadsSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('leads_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 // getlisting
-export async function getLeadsList() {
+export async function getLeadsList(data) {
     try {
         //console.log(data)
         ApiService.setHeader();
-        const response = await ApiService.listingget(LEADS_URL);
+        const response = await ApiService.listingget(LEADS_URL, data);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -347,12 +465,28 @@ export async function deleteLead(data: any) {
 }
 
 // PRICELISTS
+
+// gell all comapnies
+export async function PriceListSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('leads_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
 // getlists
-export async function getPriceList() {
+export async function getPriceList(data: any) {
     try {
         //console.log(data)
         ApiService.setHeader();
-        const response = await ApiService.listingget(PRICELIST_URL);
+        const response = await ApiService.listingget(PRICELIST_URL, data);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -440,11 +574,11 @@ export async function GetIncrQuotationId(data: any) {
 }
 
 // get listing
-export async function getQuotationList() {
+export async function getQuotationList(data: any) {
     try {
         //console.log(data)
         ApiService.setHeader();
-        const response = await ApiService.listingget(QUOTATION_URL);
+        const response = await ApiService.listingget(QUOTATION_URL, data);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -521,11 +655,27 @@ export async function GetIncrInvoiceId(data: any) {
 }
 
 // getlists
-export async function getInvoiceList() {
+
+export async function InvoiceSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('invoice_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getInvoiceList(data) {
     try {
         //console.log(data)
         ApiService.setHeader();
-        const response = await ApiService.listingget(INVOICE_URL);
+        const response = await ApiService.listingget(INVOICE_URL, data);
         return response.data;
     } catch (errors) {
         console.error(errors);
