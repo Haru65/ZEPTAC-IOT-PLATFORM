@@ -10,6 +10,8 @@ import {
   getLead,
   getPriceListItem,
   getQuotation,
+  getInstrument,
+  getRGatePass,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
@@ -394,8 +396,110 @@ const routes: Array<RouteRecordRaw> = [
           breadcrumbs: ["Invoice Edit"],
         },
       },
+
+
+      // Instruments Front End Routes
+      {
+        path: "modules/instruments/list",
+        name: "instrument-list",
+        component: () =>
+          import("@/views/apps/modules/instruments/InstrumentsListing.vue"),
+        meta: {
+          pageTitle: "Instrument List",
+          breadcrumbs: ["Instrument List"],
+        },
+      },
+      {
+        path: "/modules/instruments/add",
+        name: "instrument-add",
+        component: () =>
+          import("@/views/apps/modules/instruments/InstrumentsAdd.vue"),
+        meta: {
+          pageTitle: "Instrument Add",
+          breadcrumbs: ["Instrument Add"],
+        },
+      },
+      {
+        path: "modules/instruments/edit/:id",
+        name: "instrument-edit",
+        beforeEnter: async (to, from, next) => {
+          const instrumentItemId = to.params.id;
+          //console.log(companyId);
+          try {
+            const response = await getInstrument(instrumentItemId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/modules/instruments/InstrumentsEdit.vue"),
+        meta: {
+          pageTitle: "Instrument Edit",
+          breadcrumbs: ["Instrument Edit"],
+        },
+      },
+      
+
+
+      // Validation Service All Front End Routes
+      {
+        path: "modules/validation/returnablegatepasses",
+        name: "rgp",
+        component: () =>
+          import("@/views/apps/modules/services/rgp/RGatePassListing.vue"),
+        meta: {
+          pageTitle: "Returnable-Gate-Pass List",
+          breadcrumbs: ["Returnable-Gate-Pass List"],
+        },
+      },
+      {
+        path: "/modules/validation/returnablegatepasses/add",
+        name: "rgp-add",
+        component: () =>
+          import("@/views/apps/modules/services/rgp/RGatePassAdd.vue"),
+        meta: {
+          pageTitle: "Returnable-Gate-Pass Add",
+          breadcrumbs: ["Returnable-Gate-Pass Add"],
+        },
+      },
+      {
+        path: "/modules/validation/returnablegatepasses/add/:id",
+        name: "rgp-edit",
+        beforeEnter: async (to, from, next) => {
+          const rgpID = to.params.id;
+          //console.log(companyId);
+          try {
+            const response = await getRGatePass(rgpID.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/modules/services/rgp/RGatePassEdit.vue"),
+        meta: {
+          pageTitle: "Returnable-Gate-Pass Edit",
+          breadcrumbs: ["Returnable-Gate-Pass Edit"],
+        },
+      },
+
     ],
   },
+
+
   {
     path: "/",
     component: () => import("@/layouts/AuthLayout.vue"),

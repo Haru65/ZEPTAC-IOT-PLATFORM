@@ -9,6 +9,8 @@ const INVOICE_URL = "invoice";
 const QUOTATION_URL = "quotation";
 const LEADS_URL = 'leads';
 const CLIENTS_URL = "clients";
+const INSTRUMENTS_URL = "instruments";
+const RGP_URL = "returnablegatepass";
 
 // COMPANIES
 
@@ -581,3 +583,135 @@ export async function deleteinvoice(data) {
     }
 }
 
+
+// INSTRUMENTS
+
+// getlists
+export async function getAllInstrument() {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(INSTRUMENTS_URL);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+export async function addInstrument(data: object) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(INSTRUMENTS_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getInstrument(data: string) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.get(INSTRUMENTS_URL, data);
+        return response.data.result[0];
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function updateInstrument(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(INSTRUMENTS_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete
+export async function deleteInstrument(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(INSTRUMENTS_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
+// RETURNABLE GATE PASS
+
+// getlists
+export async function getAllRGatePass() {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(RGP_URL);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+export async function addRGatePass(data: object) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(RGP_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getRGatePass(data: string) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.get(RGP_URL, data);
+        return response.data.result[0];
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function updateRGatePass(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(RGP_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete
+export async function deleteRGatePass(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(RGP_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}

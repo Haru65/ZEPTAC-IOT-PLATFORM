@@ -17,7 +17,34 @@
             <div class="row mb-6">
               <!--begin::Label-->
               <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                >Product Name</label
+                >Instrument Model No.</label
+              >
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8 fv-row">
+                <Field
+                  type="text"
+                  name="model_no"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Enter Instrument Model"
+                  v-model="itemDetails.model_no"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="model_no" />
+                  </div>
+                </div>
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >Instrument Name</label
               >
               <!--end::Label-->
 
@@ -27,7 +54,7 @@
                   type="text"
                   name="name"
                   class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Product Name"
+                  placeholder="Enter Instrument Name"
                   v-model="itemDetails.name"
                 />
                 <div class="fv-plugins-message-container">
@@ -43,7 +70,7 @@
             <div class="row mb-3">
               <!--begin::Label-->
               <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                >Product Detials</label
+                >Instrument Detials</label
               >
               <!--end::Label-->
               <!--begin::Col-->
@@ -57,7 +84,7 @@
                     name="description"
                     rows="10"
                     class="form-control form-control-lg form-control-solid"
-                    placeholder="Description of product..."
+                    placeholder="Description of instrument..."
                     v-model="itemDetails.description"
                   />
                   <div class="fv-plugins-message-container">
@@ -76,7 +103,7 @@
             <div class="row mb-6">
               <!--begin::Label-->
               <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                >Product Price</label
+                >Instrument Quantity</label
               >
               <!--end::Label-->
 
@@ -84,14 +111,14 @@
               <div class="col-lg-8 fv-row">
                 <Field
                   type="text"
-                  name="price"
+                  name="quantity"
                   class="form-control form-control-lg form-control-solid"
-                  placeholder="₹0.00"
-                  v-model="itemDetails.price"
+                  placeholder="Enter a quantity"
+                  v-model="itemDetails.quantity"
                 />
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
-                    <ErrorMessage name="price" />
+                    <ErrorMessage name="quantity" />
                   </div>
                 </div>
               </div>
@@ -101,9 +128,9 @@
           </div>
           <div class="modal-footer flex-center">
             <!--begin::Button-->
-            <button type="reset" class="btn btn-lg btn-danger w-25">
-              Discard
-            </button>
+            <span @click="deleteItem" class="btn btn-lg btn-danger w-25">
+              Delete
+            </span>
             <!--end::Button-->
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
             <!--begin::Button-->
@@ -112,7 +139,7 @@
               class="btn btn-lg btn-primary w-25"
               @click="submit()"
             >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
+              <span v-if="!loading" class="indicator-label"> Update</span>
               <span v-if="loading" class="indicator-progress">
                 Please wait...
                 <span
@@ -129,71 +156,86 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
+    
+    <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { addPriceList } from "@/stores/api";
+import {
+  updateInstrument,
+  getInstrument,
+  deleteInstrument,
+} from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
-import packages from "@/core/config/PackagesConfig";
-import { limit } from "@/core/config/WhichUserConfig";
 import { useAuthStore } from "@/stores/auth";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 
 interface itemDetails {
   name: string;
   description: string;
-  price: string;
+  quantity: string;
+  model_no: string;
   created_by: number;
   updated_by: number;
 }
 
 export default defineComponent({
-  name: "company-add",
+  name: "instrument-edit",
   components: {
     ErrorMessage,
     Field,
     VForm,
   },
   setup() {
-
+    const router = useRouter();
+    const route = useRoute();
+    const itemId = route.params.id;
     const loading = ref(false);
     const auth = useAuthStore();
-    const router = useRouter();
     const User = auth.GetUser();
 
     const itemDetailsValidator = Yup.object().shape({
-      name: Yup.string().required().label("Product Name"),
-      description: Yup.string().required().label("Description"),
-      price: Yup.string().required().label("Price"),
+      name: Yup.string().required().label("Instrument Name"),
+      description: Yup.string().required().label("Instrument Description"),
+      quantity: Yup.string().required().label("Quantity"),
+      model_no: Yup.string().required().label("Model No."),
     });
 
     const itemDetails = ref<itemDetails>({
       name: "",
       description: "",
-      price: "",
+      quantity: "",
+      model_no: "",
       created_by: User.id,
       updated_by: User.id,
     });
 
-    onMounted(() => {});
+    onMounted(async () => {
+      const response = await getInstrument(itemId.toString());
+      console.log(response);
+      itemDetails.value = {
+        name: response.name,
+        description: response.description,
+        quantity: response.quantity,
+        model_no: response.model_no,
+        created_by: response.created_by,
+        updated_by: response.updated_by,
+      };
+    });
 
     const submit = async () => {
       loading.value = true;
       console.warn("Nice");
       try {
         // Call your API here with the form values
-        const response = await addPriceList(itemDetails.value);
+        const response = await updateInstrument(itemId, itemDetails.value);
         console.log(response.error);
         if (!response.error) {
           // Handle successful API response
           console.log("API response:", response);
-          showSuccessAlert("Success", "Item has been successfully inserted!");
-
-          clear();
-          router.push({ name: "price-list" });
+          showSuccessAlert("Success", "Instrument has been successfully updated!");
+          router.push({ name: "instrument-list" });
         } else {
           // Handle API error response
           const errorData = response.error;
@@ -208,6 +250,23 @@ export default defineComponent({
       } finally {
         loading.value = false;
       }
+    };
+
+    const deleteItem = () => {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover from this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "red",
+        confirmButtonText: "Yes, I am sure!",
+      }).then((result: { [x: string]: any }) => {
+        if (result["isConfirmed"]) {
+          // Put your function here
+          deleteInstrument(itemId);
+          router.push({ name: "instrument-list" });
+        }
+      });
     };
 
     const showSuccessAlert = (title, message) => {
@@ -241,15 +300,15 @@ export default defineComponent({
     const clear = () => {
       console.log("clear");
     };
+
     return {
       itemDetails,
       itemDetailsValidator,
       getAssetPath,
       submit,
       loading,
-      packages,
-      limit,
     };
   },
 });
 </script>
+    

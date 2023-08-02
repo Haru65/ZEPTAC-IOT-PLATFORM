@@ -160,15 +160,11 @@ export default defineComponent({
     VForm,
   },
   setup() {
-    const updateEmailButton = ref<HTMLElement | null>(null);
-    const updatePasswordButton = ref<HTMLElement | null>(null);
     const router = useRouter();
     const route = useRoute();
     const itemId = route.params.id;
     const loading = ref(false);
     const auth = useAuthStore();
-    const emailFormDisplay = ref(false);
-    const passwordFormDisplay = ref(false);
     const User = auth.GetUser();
 
     const itemDetailsValidator = Yup.object().shape({
@@ -208,6 +204,7 @@ export default defineComponent({
           // Handle successful API response
           console.log("API response:", response);
           showSuccessAlert("Success", "Item has been successfully updated!");
+          router.push({ name: "price-list" });
         } else {
           // Handle API error response
           const errorData = response.error;
@@ -274,14 +271,10 @@ export default defineComponent({
     };
     return {
       itemDetails,
-      emailFormDisplay,
-      passwordFormDisplay,
       itemDetailsValidator,
-      updateEmailButton,
-      updatePasswordButton,
       getAssetPath,
       submit,
-    loading,
+      loading,
       deleteItem,
     };
   },

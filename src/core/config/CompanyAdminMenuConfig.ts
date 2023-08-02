@@ -20,52 +20,82 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
     ],
   },
   {
-    heading: "Admin",
-    route: "/company",
+    heading: "Modules",
+    route: "/modules",
     pages: [
       {
-        sectionTitle: "Users",
-        route: "/users",
-        keenthemesIcon: "profile-user",
+        sectionTitle: "CleanRoom",
+        route: "/modules/cleanroom",
+        keenthemesIcon: "element-plus",
         bootstrapIcon: "bi-archive",
         sub: [
           {
-            heading: "Add User",
-            route: "/users/add",
+            sectionTitle: "Validation Report",
+            route: "/modules/validationreport",
+            sub: [
+              {
+                heading: "Report List",
+                route: "/modules/validationreport/list",
+              },
+            ],
           },
           {
-            heading: "List Users",
-            route: "/users/list",
+            sectionTitle: "Instruments",
+            route: "/modules/instruments",
+            keenthemesIcon: "office-bag",
+            bootstrapIcon: "bi-archive",
+            sub: [
+              {
+                heading: "Add Instruments",
+                route: "/modules/instruments/add",
+              },
+              {
+                heading: "List Instruments",
+                route: "/modules/instruments/list",
+              },
+            ],
+          },
+          {
+            sectionTitle: "Validation Service",
+            route: "/modules/validation",
+            keenthemesIcon: "office-bag",
+            bootstrapIcon: "bi-archive",
+            sub: [
+              {
+                heading: "Returnable Gate Pass",
+                route: "/modules/validation/returnablegatepasses",
+              },
+              {
+                heading: "Daily Worksheet",
+                route: "/modules/validation/dailyworksheet",
+              },
+              {
+                heading: "Task Allocation",
+                route: "/modules/validation/taskallocation",
+              },
+              {
+                heading: "Expense Sheet",
+                route: "/modules/validation/expensesheet",
+              },
+            ],
+          },
+          {
+            sectionTitle: "External Audit",
+            route: "/modules/externalaudit",
+            keenthemesIcon: "office-bag",
+            bootstrapIcon: "bi-archive",
+            sub: [
+              {
+                heading: "Validation Procedure",
+                route: "/modules/externalaudit/validation",
+              },
+              {
+                heading: "Quality Procedure",
+                route: "/modules/externalaudit/quality",
+              },
+            ],
           },
         ],
-      },
-    ],
-  },
-  {
-    heading: "HR",
-    route: "/hr",
-    pages: [
-      {
-        sectionTitle: "Employees",
-        route: "/employee",
-        keenthemesIcon: "office-bag",
-        bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Add Employee",
-            route: "employee/add",
-          },
-          {
-            heading: "List Employees",
-            route: "/employee/list",
-          },
-        ],
-      },
-      {
-        heading: "Trainings",
-        route: "/trainings",
-        keenthemesIcon: "educare",
-        bootstrapIcon: "bi-archive",
       },
     ],
   },
@@ -156,76 +186,50 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
     ],
   },
   {
-    heading: "Modules",
-    route: "/modules",
+    heading: "HR",
+    route: "/hr",
     pages: [
       {
-        sectionTitle: "CleanRoom",
-        route: "/modules/cleanroom",
-        keenthemesIcon: "element-plus",
+        sectionTitle: "Employees",
+        route: "/employee",
+        keenthemesIcon: "office-bag",
         bootstrapIcon: "bi-archive",
         sub: [
           {
-            sectionTitle: "Validation Report",
-            route: "/modules/validationreport",
-            sub: [
-              {
-                heading: "Report List",
-                route: "/modules/validationreport/list",
-              },
-            ],
+            heading: "Add Employee",
+            route: "employee/add",
           },
           {
-            sectionTitle: "Instruments",
-            route: "/modules/instruments",
-            keenthemesIcon: "office-bag",
-            bootstrapIcon: "bi-archive",
-            sub: [
-              {
-                heading: "Add Instruments",
-                route: "/modules/instruments/add",
-              },
-              {
-                heading: "List Instruments",
-                route: "/modules/instruments/list",
-              },
-            ],
+            heading: "List Employees",
+            route: "/employee/list",
+          },
+        ],
+      },
+      {
+        heading: "Trainings",
+        route: "/trainings",
+        keenthemesIcon: "educare",
+        bootstrapIcon: "bi-archive",
+      },
+    ],
+  },
+  {
+    heading: "Admin",
+    route: "/company",
+    pages: [
+      {
+        sectionTitle: "Users",
+        route: "/users",
+        keenthemesIcon: "profile-user",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add User",
+            route: "/users/add",
           },
           {
-            sectionTitle: "Validation Service",
-            route: "/moudules/validation",
-            keenthemesIcon: "office-bag",
-            bootstrapIcon: "bi-archive",
-            sub: [
-              {
-                heading: "Daily Worksheet",
-                route: "/moudules/validation/dailyworksheet",
-              },
-              {
-                heading: "Task Allocation",
-                route: "/moudules/validation/taskallocation",
-              },
-              {
-                heading: "Expense Sheet",
-                route: "/moudules/validation/expensesheet",
-              },
-            ],
-          },
-          {
-            sectionTitle: "External Audit",
-            route: "/modules/externalaudit",
-            keenthemesIcon: "office-bag",
-            bootstrapIcon: "bi-archive",
-            sub: [
-              {
-                heading: "Validation Procedure",
-                route: "/modules/externalaudit/validation",
-              },
-              {
-                heading: "Quality Procedure",
-                route: "/modules/externalaudit/quality",
-              },
-            ],
+            heading: "List Users",
+            route: "/users/list",
           },
         ],
       },
