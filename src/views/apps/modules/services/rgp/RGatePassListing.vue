@@ -392,9 +392,9 @@
               quotation_no: quotation_no,
               customer_name:
                 customer_name[0].first_name + " " + customer_name[0].last_name,
-              created_at: moment(created_at).format("DD/MM/YYYY"),
-              date: moment(invoice_date).format("DD/MM/YYYY"),
-              duedate: moment(invoice_duedate).format("DD/MM/YYYY"),
+              created_at: moment(created_at).format("LL"),
+              date: moment(invoice_date).format("LL"),
+              duedate: moment(invoice_duedate).format("LL"),
               total: total,
             })
           );

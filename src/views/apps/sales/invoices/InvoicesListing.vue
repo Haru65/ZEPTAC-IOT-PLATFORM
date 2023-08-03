@@ -423,8 +423,8 @@ export default defineComponent({
             invoice_no: invoice_no,
             customer_name:
               customer_name[0].first_name + " " + customer_name[0].last_name,
-            date: moment(invoice_date).format("DD/MM/YYYY"),
-            duedate: moment(invoice_duedate).format("DD/MM/YYYY"),
+            date: moment(invoice_date).format("LL"),
+            duedate: moment(invoice_duedate).format("LL"),
             total: total,
           })
         );
@@ -470,8 +470,8 @@ export default defineComponent({
             invoice_no: invoice_no,
             customer_name:
               customer_name[0].first_name + " " + customer_name[0].last_name,
-            date: moment(invoice_date).format("DD/MM/YYYY"),
-            duedate: moment(invoice_duedate).format("DD/MM/YYYY"),
+            date: moment(invoice_date).format("LL"),
+            duedate: moment(invoice_duedate).format("LL"),
             total: total,
           })
         );
@@ -508,7 +508,7 @@ export default defineComponent({
 
     const initvalues = ref<Array<IInvoices>>([]);
 
-    async function quotation_listing(): Promise<void> {
+    async function invoice_listing(): Promise<void> {
       try {
         const response = await getInvoiceList(
           `page=${page.value}&limit=${limit.value}`
@@ -528,8 +528,8 @@ export default defineComponent({
             invoice_no: invoice_no,
             customer_name:
               customer_name[0].first_name + " " + customer_name[0].last_name,
-            date: moment(invoice_date).format("DD/MM/YYYY"),
-            duedate: moment(invoice_duedate).format("DD/MM/YYYY"),
+            date: moment(invoice_date).format("LL"),
+            duedate: moment(invoice_duedate).format("LL"),
             total: total,
           })
         );
@@ -545,7 +545,7 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      await quotation_listing();
+      await invoice_listing();
     });
 
     const deleteFewInvoice = () => {
@@ -603,7 +603,7 @@ export default defineComponent({
     // ? debounce timer
     let debounceTimer;
 
-    const searchItems = () => {
+    const searchItems = async () => {
       console.log(search.value);
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value !== "") {
@@ -621,6 +621,11 @@ export default defineComponent({
             await SearchMore();
           }, 1000);
         }
+      } else {
+        page.value = 1;
+        while (tableData.value.length != 0) tableData.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
+        await invoice_listing();
       }
     };
 
@@ -647,8 +652,8 @@ export default defineComponent({
             invoice_no: invoice_no,
             customer_name:
               customer_name[0].first_name + " " + customer_name[0].last_name,
-            date: moment(invoice_date).format("DD/MM/YYYY"),
-            duedate: moment(invoice_duedate).format("DD/MM/YYYY"),
+            date: moment(invoice_date).format("LL"),
+            duedate: moment(invoice_duedate).format("LL"),
             total: total,
           })
         );
@@ -760,7 +765,7 @@ export default defineComponent({
           // console.log(response.error);
           if (!respons.error) {
             // list fetch update
-            await quotation_listing();
+            await invoice_listing();
           }
         }
       });

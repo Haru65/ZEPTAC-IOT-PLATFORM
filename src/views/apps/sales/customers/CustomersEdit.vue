@@ -246,7 +246,11 @@
               <div class="row">
                 <!--begin::Col-->
                 <div class="col-lg fv-row">
-                  <el-select v-model="profileDetails.country" filterable placeholder="Select Your Country...">
+                  <el-select
+                    v-model="profileDetails.country"
+                    filterable
+                    placeholder="Select Your Country..."
+                  >
                     <el-option
                       v-for="item in countries"
                       :key="item.name"
@@ -278,7 +282,11 @@
                 <!--begin::Col-->
                 <div v-if="state.length" class="col-lg fv-row">
                   <div>
-                    <el-select v-model="profileDetails.states" filterable placeholder="Select Your State...">
+                    <el-select
+                      v-model="profileDetails.states"
+                      filterable
+                      placeholder="Select Your State..."
+                    >
                       <el-option
                         v-for="item in state"
                         :key="item"
@@ -343,9 +351,7 @@
           <!--end::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >City</label
-            >
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">City</label>
             <!--end::Label-->
 
             <!--begin::Col-->
@@ -409,7 +415,11 @@
               <div class="row">
                 <div class="col-lg fv-row">
                   <div>
-                    <el-select v-model="profileDetails.gender" filterable placeholder="Select Your Gender...">
+                    <el-select
+                      v-model="profileDetails.gender"
+                      filterable
+                      placeholder="Select Your Gender..."
+                    >
                       <el-option label="Male" value="male" />
                       <el-option label="Female" value="female" />
                       <el-option label="Other" value="other" />
@@ -553,9 +563,7 @@ interface ProfileDetails {
   gender: string;
   adhar: string;
   pan: string;
-  company_id: string;
   company_name: string;
-  created_by: string;
   updated_by: string;
 }
 
@@ -613,9 +621,7 @@ export default defineComponent({
         gender: res.meta.gender,
         adhar: res.meta.adhar,
         pan: res.meta.pan,
-        company_id: User.company_id,
         company_name: res.meta.company_name,
-        created_by: User.id,
         updated_by: User.id,
       };
     });
@@ -649,9 +655,7 @@ export default defineComponent({
       gender: "",
       adhar: "",
       pan: "",
-      company_id: User.company_id,
       company_name: "",
-      created_by: User.id,
       updated_by: User.id,
     });
 
@@ -666,7 +670,10 @@ export default defineComponent({
         if (!response.error) {
           // Handle successful API response
           console.log("API response:", response);
-          showSuccessAlert("Success", "Customer Information successfully Updated!");
+          showSuccessAlert(
+            "Success",
+            "Customer Information successfully Updated!"
+          );
           clear();
         } else {
           // Handle API error response
@@ -752,9 +759,7 @@ export default defineComponent({
         gender: "",
         adhar: "",
         pan: "",
-        company_id: "",
         company_name: "",
-        created_by: User.id,
         updated_by: User.id,
       };
     };

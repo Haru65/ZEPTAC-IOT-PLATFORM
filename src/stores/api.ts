@@ -10,7 +10,8 @@ const QUOTATION_URL = "quotation";
 const LEADS_URL = 'leads';
 const CLIENTS_URL = "clients";
 const EMPLOYEE_URL = "employee";
-
+const INSTRUMENTS_URL = "insturments";
+const RGP_URL = "rgp"
 // COMPANIES
 
 // gell all comapnies
@@ -144,7 +145,7 @@ export async function UserSearch(search: any) {
 
 export async function getUsers(data) {
     try {
-        //console.log(data)
+        // console.log(data)
         ApiService.setHeader();
         const response = await ApiService.listingget(USER_URL, data);
         return response.data;
@@ -545,6 +546,22 @@ export async function deletePriceListItem(data: any) {
 }
 
 // QUOTATION
+// gell all comapnies
+export async function QuotationSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('quotation_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 
 // custom
 export async function GetCustomerClients(data: any) {

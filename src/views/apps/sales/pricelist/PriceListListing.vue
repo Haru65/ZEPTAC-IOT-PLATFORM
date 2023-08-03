@@ -245,7 +245,7 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({ created_at, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("DD/MM/YYYY"),
+            created_at: moment(created_at).format("LL"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -278,7 +278,7 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({ created_at, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("DD/MM/YYYY"),
+            created_at: moment(created_at).format("LL"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -319,7 +319,7 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({ created_at, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("DD/MM/YYYY"),
+            created_at: moment(created_at).format("LL"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -422,7 +422,7 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({ created_at, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("DD/MM/YYYY"),
+            created_at: moment(created_at).format("LL"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);

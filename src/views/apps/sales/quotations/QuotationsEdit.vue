@@ -539,8 +539,6 @@ interface QuotationDetials {
   customer: Meta;
   client: Meta;
   is_active: number;
-  company_id: string;
-  created_by: string;
   updated_by: string;
 }
 
@@ -597,8 +595,6 @@ export default defineComponent({
       },
       total: 0,
       is_active: 1,
-      company_id: User.company_id,
-      created_by: User.id,
       updated_by: User.id,
     });
 
@@ -780,7 +776,7 @@ export default defineComponent({
 
     const GetCustomers = async () => {
       ApiService.setHeader();
-      const response = await getCustomers();
+      const response = await getCustomers(``);
       Customers.value.push(
         ...response.result.data.map(({ created_at, ...rest }) => ({
           ...rest,
