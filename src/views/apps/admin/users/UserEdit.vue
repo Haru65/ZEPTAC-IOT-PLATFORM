@@ -628,7 +628,6 @@ interface ProfileDetails {
   adhar: string;
   pan: string;
   company_id: string;
-  created_by: string;
   updated_by: string;
 }
 
@@ -651,7 +650,6 @@ export default defineComponent({
     const updatePasswordButton = ref<HTMLElement | null>(null);
     const file_size = ref(false);
     let limit = ref(500);
-    const router = useRouter();
     const User = auth.GetUser();
     const route = useRoute();
     const loading = ref(false);
@@ -703,7 +701,6 @@ export default defineComponent({
         adhar: response.meta.adhar ? response.meta.adhar : "",
         pan: response.meta.pan ? response.meta.pan : "",
         company_id: response.company_id ? response.company_id : "",
-        created_by: User.id,
         updated_by: User.id,
       };
     };
@@ -755,7 +752,6 @@ export default defineComponent({
       adhar: "",
       pan: "",
       company_id: "",
-      created_by: User.id,
       updated_by: User.id,
     });
 
@@ -909,7 +905,6 @@ export default defineComponent({
         adhar: "",
         pan: "",
         company_id: "",
-        created_by: User.id,
         updated_by: User.id
       };
     };

@@ -229,6 +229,7 @@ import {
   deletequotation,
   getQuotation,
   addQuotation,
+  QuotationSearch,
   GetIncrQuotationId,
 } from "@/stores/api";
 import arraySort from "array-sort";
@@ -425,9 +426,9 @@ export default defineComponent({
             quotation_no: quotation_no,
             customer_name:
               customer_name[0].first_name + " " + customer_name[0].last_name,
-            created_at: moment(created_at).format("DD/MM/YYYY"),
-            date: moment(invoice_date).format("DD/MM/YYYY"),
-            duedate: moment(invoice_duedate).format("DD/MM/YYYY"),
+            created_at: moment(created_at).format("LL"),
+            date: moment(invoice_date).format("LL"),
+            duedate: moment(invoice_duedate).format("LL"),
             total: total,
           })
         );
@@ -474,9 +475,9 @@ export default defineComponent({
             quotation_no: quotation_no,
             customer_name:
               customer_name[0].first_name + " " + customer_name[0].last_name,
-            created_at: moment(created_at).format("DD/MM/YYYY"),
-            date: moment(invoice_date).format("DD/MM/YYYY"),
-            duedate: moment(invoice_duedate).format("DD/MM/YYYY"),
+            created_at: moment(created_at).format("LL"),
+            date: moment(invoice_date).format("LL"),
+            duedate: moment(invoice_duedate).format("LL"),
             total: total,
           })
         );
@@ -534,9 +535,9 @@ export default defineComponent({
             quotation_no: quotation_no,
             customer_name:
               customer_name[0].first_name + " " + customer_name[0].last_name,
-            created_at: moment(created_at).format("DD/MM/YYYY"),
-            date: moment(invoice_date).format("DD/MM/YYYY"),
-            duedate: moment(invoice_duedate).format("DD/MM/YYYY"),
+            created_at: moment(created_at).format("LL"),
+            date: moment(invoice_date).format("LL"),
+            duedate: moment(invoice_duedate).format("LL"),
             total: total,
           })
         );
@@ -551,9 +552,6 @@ export default defineComponent({
       }
     }
 
-    onMounted(async () => {
-      await quotation_listing();
-    });
 
     const deleteFewInvoice = () => {
       Swal.fire({
@@ -607,7 +605,10 @@ export default defineComponent({
     };
 
     const search = ref<string>("");
-    const searchItems = () => {
+    // ? debounce timer
+    let debounceTimer;
+
+    const searchItems = async () => {
       console.log(search.value);
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value !== "") {
@@ -618,14 +619,72 @@ export default defineComponent({
           }
         }
         tableData.value.splice(0, tableData.value.length, ...results);
+        if (tableData.value.length == 0) {
+          loading.value = true;
+          clearTimeout(debounceTimer); // Clear any existing debounce timer
+          debounceTimer = setTimeout(async () => {
+            await SearchMore();
+          }, 1000);
+        }
+      } else {
+        loading.value = true;
+        page.value = 1;
+        while (tableData.value.length != 0) tableData.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
+        await quotation_listing();
       }
     };
+
+    async function SearchMore() {
+      // Your API call logic here
+      try {
+        const response = await QuotationSearch(search.value);
+        //console.log(response.result.total_count);
+        // first 20 displayed
+        total.value = response.result.total_count;
+        more.value = response.result.data.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(
+          ({
+            created_at,
+            invoice_date,
+            invoice_duedate,
+            total,
+            customer_name,
+            status,
+            id,
+            quotation_no,
+          }) => ({
+            status: status,
+            id: id,
+            quotation_no: quotation_no,
+            customer_name:
+              customer_name[0].first_name + " " + customer_name[0].last_name,
+            created_at: moment(created_at).format("LL"),
+            date: moment(invoice_date).format("LL"),
+            duedate: moment(invoice_duedate).format("LL"),
+            total: total,
+          })
+        );
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        //console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
+      }
+    }
 
     const searchingFunc = (obj: any, value: string): boolean => {
       console.log(obj);
       for (let key in obj) {
-        if (!Number.isInteger(obj[key]) && !(typeof obj[key] === "object")) {
-          if (obj[key].indexOf(value) != -1) {
+        if (
+          !Number.isInteger(obj[key]) &&
+          !(typeof obj[key] === "object") &&
+          typeof obj[key] === "string" // Add type check here
+        ) {
+          if (obj[key].indexOf(value) !== -1) {
             return true;
           }
         }

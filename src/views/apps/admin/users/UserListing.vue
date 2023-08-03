@@ -257,37 +257,6 @@ export default defineComponent({
       },
     ]);
 
-    // functions
-    // get users function
-    async function users_listing(): Promise<void> {
-      try {
-        const response = await getUsers(`
-        page=${page.value}&limit=${limit.value}`);
-        console.log(response);
-        if (response.result.data.length != 0) {
-          tableData.value = response.result.data.map(
-            ({ created_at, role_id, ...rest }) => ({
-              ...rest,
-              created_at: moment(created_at).format("MMMM Do YYYY"),
-              role_id: get_role(role_id),
-            })
-          );
-          initvalues.value.splice(
-            0,
-            tableData.value.length,
-            ...tableData.value
-          );
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        //console.log("done");
-        setTimeout(() => {
-          loading.value = false;
-        }, 250);
-      }
-    }
-
     // staring from 2
     let page = ref(1);
     let limit = ref(50);
@@ -305,6 +274,34 @@ export default defineComponent({
       3: 50,
     });
     // more
+    // functions
+    // get users function
+    async function users_listing(): Promise<void> {
+      try {
+        const response = await getUsers(
+          `page=${page.value}&limit=${limit.value}`
+        );
+        console.log(response);
+        total.value = response.result.total_count;
+        more.value = response.result.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(
+          ({ created_at, role_id, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+            role_id: get_role(role_id),
+          })
+        );
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        //console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
+      }
+    }
+
     const PagePointer = async (page) => {
       // ? Truncate the tableData
       //console.log(limit.value);
@@ -317,14 +314,14 @@ export default defineComponent({
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-            ({ created_at, role_id, ...rest }) => ({
-              ...rest,
-              created_at: moment(created_at).format("MMMM Do YYYY"),
-              role_id: get_role(role_id),
-            })
-          );
+          ({ created_at, role_id, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+            role_id: get_role(role_id),
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -349,14 +346,14 @@ export default defineComponent({
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-            ({ created_at, role_id, ...rest }) => ({
-              ...rest,
-              created_at: moment(created_at).format("MMMM Do YYYY"),
-              role_id: get_role(role_id),
-            })
-          );
+          ({ created_at, role_id, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+            role_id: get_role(role_id),
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -371,6 +368,7 @@ export default defineComponent({
     //console.log(initvalues.value);
 
     const NextPage = () => {
+      console.log(more.value);
       if (more.value != false) {
         page.value = page.value + 1;
         PagePointer(page.value);
@@ -383,7 +381,7 @@ export default defineComponent({
         PagePointer(page.value);
       }
     };
-    
+
     onMounted(async () => {
       //console.log("done");
       await users_listing();
@@ -443,7 +441,7 @@ export default defineComponent({
 
     const search = ref<string>("");
     let debounceTimer;
-    const searchItems = () => {
+    const searchItems = async () => {
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value !== "") {
         let results: Array<IUser> = [];
@@ -461,6 +459,11 @@ export default defineComponent({
             await SearchMore();
           }, 1000);
         }
+      } else {
+        page.value = 1;
+        while (tableData.value.length != 0) tableData.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
+        await users_listing();
       }
     };
 
@@ -473,12 +476,12 @@ export default defineComponent({
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-            ({ created_at, role_id, ...rest }) => ({
-              ...rest,
-              created_at: moment(created_at).format("MMMM Do YYYY"),
-              role_id: get_role(role_id),
-            })
-          );
+          ({ created_at, role_id, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+            role_id: get_role(role_id),
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);

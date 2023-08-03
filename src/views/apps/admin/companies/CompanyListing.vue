@@ -205,8 +205,6 @@ export default defineComponent({
       },
     ]);
 
-
-
     const selectedIds = ref<Array<number>>([]);
     const tableData = ref<Array<ICompany>>([]);
     const initvalues = ref<Array<ICompany>>([]);
@@ -398,7 +396,7 @@ export default defineComponent({
 
     // ? debounce timer
     let debounceTimer;
-    const searchItems = () => {
+    const searchItems = async () => {
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value !== "") {
         let results: Array<ICompany> = [];
@@ -416,6 +414,11 @@ export default defineComponent({
             await SearchMore();
           }, 1000);
         }
+      } else {
+        page.value = 1;
+        while (tableData.value.length != 0) tableData.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
+        await company_listing();
       }
     };
 

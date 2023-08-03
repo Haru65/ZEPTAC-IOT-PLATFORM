@@ -92,15 +92,15 @@
     </div>
     <div class="card-body pt-0">
       <Datatable
-            checkbox-label="id"
-            @on-sort="sort"
-            @on-items-select="onItemSelect"
-            :data="tableData"
-            :header="tableHeader"
-            :checkbox-enabled="true"
-            :items-per-page="limit"
-            :items-per-page-dropdown-enabled="false"
-            :loading="loading"
+        checkbox-label="id"
+        @on-sort="sort"
+        @on-items-select="onItemSelect"
+        :data="tableData"
+        :header="tableHeader"
+        :checkbox-enabled="true"
+        :items-per-page="limit"
+        :items-per-page-dropdown-enabled="false"
+        :loading="loading"
       >
         <!-- img data -->
         <template v-slot:name="{ row: customer }">
