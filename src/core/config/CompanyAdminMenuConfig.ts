@@ -47,11 +47,11 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
             sub: [
               {
                 heading: "Add Instruments",
-                route: "/modules/instruments/add",
+                route: "/instruments/add",
               },
               {
                 heading: "List Instruments",
-                route: "/modules/instruments/list",
+                route: "/instruments/list",
               },
             ],
           },
@@ -63,7 +63,7 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
             sub: [
               {
                 heading: "Returnable Gate Pass",
-                route: "/modules/validation/returnablegatepasses",
+                route: "/returnablegatepasses",
               },
               {
                 heading: "Daily Worksheet",

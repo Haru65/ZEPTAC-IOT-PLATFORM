@@ -47,11 +47,11 @@ const AdminMenuConfig: Array<MenuItem> = [
             sub: [
               {
                 heading: "Add Instruments",
-                route: "/modules/instruments/add",
+                route: "/instruments/add",
               },
               {
                 heading: "List Instruments",
-                route: "/modules/instruments/list",
+                route: "/instruments/list",
               },
             ],
           },
@@ -61,10 +61,14 @@ const AdminMenuConfig: Array<MenuItem> = [
             keenthemesIcon: "office-bag",
             bootstrapIcon: "bi-archive",
             sub: [
+
+              //
               {
                 heading: "Returnable Gate Pass",
-                route: "modules/validation/returnablegatepasses",
+                route: "/returnablegatepasses",
               },
+              //
+
               {
                 heading: "Daily Worksheet",
                 route: "/modules/validation/dailyworksheet",

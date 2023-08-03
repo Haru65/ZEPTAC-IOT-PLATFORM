@@ -10,6 +10,8 @@ const QUOTATION_URL = "quotation";
 const LEADS_URL = 'leads';
 const CLIENTS_URL = "clients";
 const EMPLOYEE_URL = "employee";
+const INSTRUMENTS_URL = "instruments";
+const RGP_URL = "returnablegatepass";
 
 // COMPANIES
 
@@ -737,11 +739,11 @@ export async function deleteinvoice(data) {
 // INSTRUMENTS
 
 // getlists
-export async function getAllInstrument() {
+export async function getAllInstrument(data) {
     try {
         //console.log(data)
         ApiService.setHeader();
-        const response = await ApiService.listingget(INSTRUMENTS_URL);
+        const response = await ApiService.listingget(INSTRUMENTS_URL, data);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -749,8 +751,22 @@ export async function getAllInstrument() {
     }
 }
 
+export async function InstrumentSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('instrument_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
 
-export async function addInstrument(data: object) {
+export async function addInstrument(data: any) {
     try {
         //console.log(data)
         ApiService.setHeader();
@@ -762,7 +778,7 @@ export async function addInstrument(data: object) {
     }
 }
 
-export async function getInstrument(data: string) {
+export async function getInstrument(data: any) {
     try {
         //console.log(data)
         ApiService.setHeader();

@@ -400,7 +400,7 @@ const routes: Array<RouteRecordRaw> = [
 
       // Instruments Front End Routes
       {
-        path: "modules/instruments/list",
+        path: "/instruments/list",
         name: "instrument-list",
         component: () =>
           import("@/views/apps/modules/instruments/InstrumentsListing.vue"),
@@ -410,7 +410,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/modules/instruments/add",
+        path: "/instruments/add",
         name: "instrument-add",
         component: () =>
           import("@/views/apps/modules/instruments/InstrumentsAdd.vue"),
@@ -420,7 +420,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "modules/instruments/edit/:id",
+        path: "/instruments/edit/:id",
         name: "instrument-edit",
         beforeEnter: async (to, from, next) => {
           const instrumentItemId = to.params.id;
@@ -450,7 +450,7 @@ const routes: Array<RouteRecordRaw> = [
 
       // Validation Service All Front End Routes
       {
-        path: "modules/validation/returnablegatepasses",
+        path: "/returnablegatepasses",
         name: "rgp",
         component: () =>
           import("@/views/apps/modules/services/rgp/RGatePassListing.vue"),
@@ -460,7 +460,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/modules/validation/returnablegatepasses/add",
+        path: "/returnablegatepasses/add",
         name: "rgp-add",
         component: () =>
           import("@/views/apps/modules/services/rgp/RGatePassAdd.vue"),
@@ -470,7 +470,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/modules/validation/returnablegatepasses/add/:id",
+        path: "/returnablegatepasses/edit/:id",
         name: "rgp-edit",
         beforeEnter: async (to, from, next) => {
           const rgpID = to.params.id;
