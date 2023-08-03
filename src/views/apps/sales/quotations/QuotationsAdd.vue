@@ -523,6 +523,7 @@ export default defineComponent({
     const Clients = ref([
       { id: "", client_data: { id: "", first_name: "", last_name: "" } },
     ]);
+
     const QuotationDetials = ref<QuotationDetials>({
       quotation_no: "21****",
       customer_id: " ",
@@ -737,7 +738,7 @@ export default defineComponent({
 
     const GetCustomers = async () => {
       ApiService.setHeader();
-      const response = await getCustomers();
+      const response = await getCustomers(``);
       Customers.value.push(
         ...response.result.data.map(({ created_at, ...rest }) => ({
           ...rest,
