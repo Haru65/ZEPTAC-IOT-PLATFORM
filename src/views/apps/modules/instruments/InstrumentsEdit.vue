@@ -13,47 +13,55 @@
         >
           <!--begin::Card body-->
           <div class="card-body border-top p-9">
-          <!--begin::Input group-->
-          <div class="row mb-6" v-if="identifier == 'Admin'">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-              >Company</label
-            >
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8 fv-row">
-              <el-select v-model="itemDetails.company_id" filterable  placeholder="Please Select Company...">
-                <el-option
-                  v-for="item in Companies"
-                  :key="item.id"
-                  :label="item.company_name"
-                  :value="item.id"
-                />
-              </el-select>
-              <div class="fv-plugins-message-container">
-                <div class="fv-help-block">
-                  <ErrorMessage name="company" />
-                </div>
-              </div>
-            </div>
-            <!--end::Col-->
-          </div>
-          <!-- extra fields -->
-            <div class="row mb-6">
+            <!--begin::Input group-->
+            <div class="row mb-6" v-if="identifier == 'Admin'">
               <!--begin::Label-->
-              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                >Instrument Model No.</label
+              <label class="col-lg-2 col-form-label required fw-semobold fs-6"
+                >Company</label
               >
               <!--end::Label-->
 
               <!--begin::Col-->
-              <div class="col-lg-8 fv-row">
+              <div class="col-lg-10 fv-row">
+                <el-select
+                  v-model="itemDetails.company_id"
+                  filterable
+                  placeholder="Please Select Company..."
+                >
+                  <el-option
+                    disabled="disabled"
+                    value=""
+                    label="Please Select Company..."
+                  >
+                    Please Select Company
+                  </el-option>
+                  <el-option
+                    v-for="item in Companies"
+                    :key="item.id"
+                    :label="item.company_name"
+                    :value="item.id"
+                  />
+                </el-select>
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="company" />
+                  </div>
+                </div>
+              </div>
+              <!--end::Col-->
+            </div>
+
+            <!-- extra fields -->
+            <div class="row mb-6">
+              <div class="form-group col-md-6">
+                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                  >Model No.</label
+                >
                 <Field
                   type="text"
                   name="model_no"
                   class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Instrument Model"
+                  placeholder="Enter Instrument Model No."
                   v-model="itemDetails.model_no"
                 />
                 <div class="fv-plugins-message-container">
@@ -62,25 +70,38 @@
                   </div>
                 </div>
               </div>
-              <!--end::Col-->
+              <div class="form-group col-md-6">
+                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                  >Serial No.</label
+                >
+                <Field
+                  type="text"
+                  name="serial_no"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Enter Instrument Serial No."
+                  v-model="itemDetails.serial_no"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="serial_no" />
+                  </div>
+                </div>
+              </div>
             </div>
             <!--end::Input group-->
 
-            <!--begin::Input group-->
+            <!-- extra fields -->
             <div class="row mb-6">
-              <!--begin::Label-->
-              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                >Instrument Name</label
-              >
-              <!--end::Label-->
-
-              <!--begin::Col-->
-              <div class="col-lg-8 fv-row">
+              <div class="form-group col-md-6">
+                <label
+                  class="col-lg-4 col-form-label required fw-semobold fs-6 text-nowrap"
+                  >Instument Name</label
+                >
                 <Field
                   type="text"
                   name="name"
                   class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Instrument Name"
+                  placeholder="Enter Instrument Model"
                   v-model="itemDetails.name"
                 />
                 <div class="fv-plugins-message-container">
@@ -89,28 +110,40 @@
                   </div>
                 </div>
               </div>
-              <!--end::Col-->
+
+              <div class="form-group col-md-6">
+                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                  >Make</label
+                >
+                <Field
+                  type="text"
+                  name="make"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Instrument made by... "
+                  v-model="itemDetails.make"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="make" />
+                  </div>
+                </div>
+              </div>
             </div>
             <!--end::Input group-->
-            <!--begin::Input group-->
-            <div class="row mb-3">
-              <!--begin::Label-->
-              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                >Instrument Detials</label
+
+            <!-- extra fields -->
+            <div class="row mb-6">
+              <div class="form-group col-md-12">
+                <label class="col-lg-4 col-form-label required fw-semobold fs-6 text-nowrap"
+                >Instrument Description</label
               >
-              <!--end::Label-->
-              <!--begin::Col-->
-              <div class="col-lg-8">
-                <!--begin::Row-->
-                <!--begin::Col-->
-                <div class="col-lg fv-row">
-                  <Field
+              <Field
                     type="text"
                     as="textarea"
                     name="description"
-                    rows="10"
+                    rows="3"
                     class="form-control form-control-lg form-control-solid"
-                    placeholder="Description of instrument..."
+                    placeholder="Description of the instrument..."
                     v-model="itemDetails.description"
                   />
                   <div class="fv-plugins-message-container">
@@ -118,37 +151,7 @@
                       <ErrorMessage name="description" />
                     </div>
                   </div>
-                </div>
-                <!--end::Col-->
-                <!--end::Row-->
               </div>
-              <!--end::Col-->
-            </div>
-            <!--end::Input group-->
-            <!--begin::Input group-->
-            <div class="row mb-6">
-              <!--begin::Label-->
-              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                >Instrument Quantity</label
-              >
-              <!--end::Label-->
-
-              <!--begin::Col-->
-              <div class="col-lg-8 fv-row">
-                <Field
-                  type="text"
-                  name="quantity"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter a quantity"
-                  v-model="itemDetails.quantity"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="quantity" />
-                  </div>
-                </div>
-              </div>
-              <!--end::Col-->
             </div>
             <!--end::Input group-->
           </div>
@@ -182,7 +185,11 @@
     </div>
   </div>
 </template>
-    
+
+
+
+
+
     <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
@@ -204,8 +211,10 @@ import { Identifier } from "@/core/config/WhichUserConfig";
 interface itemDetails {
   name: string;
   description: string;
-  quantity: string;
+  availability: string;
   model_no: string;
+  serial_no: string;
+  make: string;
   company_id: string;
   created_by: number;
   updated_by: number;
@@ -232,8 +241,9 @@ export default defineComponent({
     const itemDetailsValidator = Yup.object().shape({
       name: Yup.string().required().label("Instrument Name"),
       description: Yup.string().required().label("Instrument Description"),
-      quantity: Yup.string().required().label("Quantity"),
       model_no: Yup.string().required().label("Model No."),
+      serial_no: Yup.string().required().label("Serial No."),
+      make: Yup.string().required().label("Made by"),
     });
 
     const getdropcomp = async () => {
@@ -250,8 +260,10 @@ export default defineComponent({
     const itemDetails = ref<itemDetails>({
       name: "",
       description: "",
-      quantity: "",
+      availability: "1",
       model_no: "",
+      serial_no: "",
+      make: "",
       company_id: "",
       created_by: User.id,
       updated_by: User.id,
@@ -264,8 +276,10 @@ export default defineComponent({
       itemDetails.value = {
         name: response.name,
         description: response.description,
-        quantity: response.quantity,
+        availability: response.availability,
         model_no: response.model_no,
+        serial_no: response.serial_no,
+        make: response.make,
         company_id: response.company_id ? response.company_id : "",
         created_by: response.created_by,
         updated_by: response.updated_by,

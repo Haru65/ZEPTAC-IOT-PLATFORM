@@ -452,6 +452,49 @@
                 <!--end::Col-->
               </div>
               <!--end::Input group-->
+              <!--begin::Input group-->
+              <div class="row mb-6">
+                <!--begin::Label-->
+                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                  >RGP No & Prefix</label
+                >
+                <!--end::Label-->
+
+                <!--begin::Col-->
+                <div class="col-lg-8">
+                  <!--begin::Row-->
+                  <div class="row">
+                    <!--begin::Col-->
+                    <div class="col-lg-6 fv-row p-2">
+                      <Field
+                        type="text"
+                        name="rgp_prefix"
+                        class="form-control form-control-lg form-control-solid"
+                        placeholder="Enter RGP Prefix"
+                        v-model="companyDetails.rgp_prefix"
+                      />
+                    </div>
+                    <!--end::Col-->
+
+                    <!--begin::Col-->
+                    <div class="col-lg-6 fv-row p-2">
+                      <div>
+                        <Field
+                          type="text"
+                          name="rgp_no"
+                          class="form-control form-control-lg form-control-solid"
+                          placeholder="Enter RGP No"
+                          v-model="companyDetails.rgp_no"
+                        />
+                      </div>
+                    </div>
+                    <!--end::Col-->
+                  </div>
+                  <!--end::Row-->
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Input group-->
             </div>
           </div>
           <div class="modal-footer flex-center">
@@ -515,6 +558,8 @@ interface companyDetails {
   quotation_prefix: string;
   invoice_no: string;
   invoice_prefix: string;
+  rgp_no: string;
+  rgp_prefix: string;
 }
 
 export default defineComponent({
@@ -563,6 +608,8 @@ export default defineComponent({
       quotation_prefix: "",
       invoice_no: "",
       invoice_prefix: "",
+      rgp_no: "",
+      rgp_prefix: "",
     });
 
     onMounted(() => {

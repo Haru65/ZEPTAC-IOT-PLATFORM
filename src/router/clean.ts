@@ -451,7 +451,7 @@ const routes: Array<RouteRecordRaw> = [
       // Validation Service All Front End Routes
       {
         path: "/returnablegatepasses",
-        name: "rgp",
+        name: "rgp-list",
         component: () =>
           import("@/views/apps/modules/services/rgp/RGatePassListing.vue"),
         meta: {

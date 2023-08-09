@@ -11,7 +11,7 @@ const LEADS_URL = 'leads';
 const CLIENTS_URL = "clients";
 const EMPLOYEE_URL = "employee";
 const INSTRUMENTS_URL = "instruments";
-const RGP_URL = "returnablegatepass";
+const RGP_URL = "returnablegatepasses";
 
 // COMPANIES
 
@@ -562,6 +562,21 @@ export async function GetCustomerClients(data: any) {
     }
 }
 
+export async function QuotationSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('quotation_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 export async function GetIncrQuotationId(data: any) {
     try {
         //console.log(data)
@@ -819,12 +834,78 @@ export async function deleteInstrument(data: any) {
 
 // RETURNABLE GATE PASS
 
+
+// custom
+export async function GetAppovedQuotationsList(data: any) {
+    try {
+        // console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('get_approved_quotations', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getEngineers(data: any) {
+    try {
+        //console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('get_service_engineers', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getInstruments(data: any) {
+    try {
+        //console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('get_instruments', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getSiteAddress(data: any){
+    try {
+        ApiService.setHeader();
+        const id = {"id" : data};
+        const response = await ApiService.post('get_site_address', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function GetIncrReturnableGatePassId(data: any) {
+    try {
+        //console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('get_latest_returnablegatepass', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 // getlists
-export async function getAllRGatePass() {
+export async function getAllRGatePass(data) {
     try {
         //console.log(data)
         ApiService.setHeader();
-        const response = await ApiService.listingget(RGP_URL);
+        const response = await ApiService.listingget(RGP_URL, data);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -838,6 +919,18 @@ export async function addRGatePass(data: object) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.post(RGP_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function UpdateStatus(data: object) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post('update_status', data);
         return response.data;
     } catch (errors) {
         console.error(errors);

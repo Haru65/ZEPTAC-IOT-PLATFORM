@@ -1,13 +1,13 @@
 <template>
   <div style="width: 99%" class="sm:p-4 md:p-8 lg:p-12 rounded">
     <!--begin::Modal dialog-->
-    <div class="d-flex flex-column flex-lg-row">
+    <div class="d-flex flex-column">
       <div class="flex-xl-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
         <div class="card w-20">
           <div class="card-body sm:p-2 lg:p-12">
-            <!--begin::Form-->
-            <form id="kt_Quotation_form" novalidate>
-              <!--begin::Wrapper-->
+            <!--end::Form-->
+
+            <VForm form id="kt_Quotation_form" novalidate>
               <div
                 class="d-flex gap-5 flex-column align-items-start flex-xxl-row"
               >
@@ -32,7 +32,7 @@
                     <!--begin::Datepicker-->
                     <div class="block">
                       <el-date-picker
-                        v-model="QuotationDetials.date"
+                        v-model="rgpDetails.date"
                         type="date"
                         placeholder="Pick a day"
                         :shortcuts="shortcuts"
@@ -50,14 +50,15 @@
                   class="d-flex flex-center flex-equal fw-row text-nowrap order-1 order-xxl-2 me-4"
                   data-bs-toggle="tooltip"
                   data-bs-trigger="hover"
-                  data-bs-original-title="Enter Quotation number"
+                  data-bs-original-title="Enter RGP number"
                   data-kt-initialized="1"
                 >
-                  <span class="fs-2 fw-bold text-gray-800">Quotation #</span>
+                  <span class="fs-2 fw-bold text-gray-800">Gate Pass #</span>
+
                   <input
                     type="text"
                     class="form-control form-control-flush fw-bold text-muted fs-3 w-auto"
-                    v-model="QuotationDetials.quotation_no"
+                    v-model="rgpDetails.rgp_no"
                     placehoder="..."
                     disabled="true"
                   />
@@ -85,7 +86,7 @@
                     <!--begin::Datepicker-->
                     <div class="block">
                       <el-date-picker
-                        v-model="QuotationDetials.duedate"
+                        v-model="rgpDetails.duedate"
                         type="date"
                         placeholder="Pick a day"
                         :shortcuts="shortcuts"
@@ -102,346 +103,303 @@
               <!--end::Top-->
 
               <!--begin::Separator-->
-              <div class="separator separator-dashed my-10"></div>
+              <div class="my-10"></div>
               <!--end::Separator-->
 
-              <!--begin::Wrapper-->
-              <div class="mb-0">
-                <div class="d-flex flex-grow-1 gap-lg-3 gap-sm-5 gap-5">
-                  <!--begin::Row-->
-                  <div class="w-50">
-                    <div class="py-3">
-                      <h6 class="fs-6">Customer :</h6>
-                    </div>
-                    <div id="customer " class="row gx-10">
-                      <el-select
-                        v-model="QuotationDetials.customer_id"
-                        placeholder="Please Select Customer"
-                        filterable
-                        v-on:change="GetUserData(QuotationDetials.customer_id)"
-                      >
-                        <el-option
-                          v-for="item in Customers"
-                          :key="item.id"
-                          :label="`${item.first_name} ${item.last_name}`"
-                          :value="item.id"
-                        />
-                      </el-select>
-                    </div>
-                    <!--end::Row-->
+              <!--begin::Card body-->
+              <div class="card-body border-top border-bottom p-9">
+                <div class="row mb-6">
+                  <!--begin::Label-->
+                  <label
+                    class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
+                    >Quotations
+                  </label>
+                  <!--end::Label-->
 
-                    <div class="mt-2 pt-4">
-                      <h6 class="fw-bold mt-5">Billing Address:</h6>
-                      <div class="mt-2">
-                        <div class="mb-1" v-show="QuotationDetials.customer">
-                          <br />
-                          <span>
-                            {{
-                              `${QuotationDetials.customer.first_name} ${QuotationDetials.customer.last_name}`
-                            }}
-                          </span>
-                          <br />
-                          <span v-show="QuotationDetials.customer.company_name">
-                            {{ `${QuotationDetials.customer.company_name}` }}
-                          </span>
-                          <!-- v-if company_data present -->
-                          <div v-show="QuotationDetials.customer.company_name">
-                            <br />
-                            <span>
-                              {{ `${QuotationDetials.customer.address1}` }}
-                            </span>
-                            <br />
-                            <span>
-                              {{ `${QuotationDetials.customer.address2}` }}
-                            </span>
-                          </div>
-                          <div v-show="QuotationDetials.customer.country">
-                            <span>
-                              {{
-                                `${QuotationDetials.customer.city} - ${QuotationDetials.customer.pincode}`
-                              }}
-                            </span>
-                            <br />
-                            <span>
-                              {{
-                                `${QuotationDetials.customer.states} ${QuotationDetials.customer.country}`
-                              }}
-                            </span>
-                            <br />
-                          </div>
-                          <br />
-                          <!-- firstname as a flag -->
-                          <a
-                            v-show="QuotationDetials.customer.first_name"
-                            target="blank"
-                            v-bind:href="`/customers/edit/${QuotationDetials.customer_id}`"
-                          >
-                            <span class="fs-5"> Edit</span>
-                            <!-- <i
-                          class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                          ></i> -->
-                          </a>
-                        </div>
-                        <br />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="w-50">
-                    <div class="row gx-10">
-                      <div class="py-3">
-                        <h6 class="fs-6">Client :</h6>
-                      </div>
-                      <el-select
-                        v-model="QuotationDetials.client.id"
-                        filterable
-                        :disabled="clientSelect"
-                        v-on:change="GetClientData(QuotationDetials.client.id)"
-                      >
-                        <el-option
-                          value=""
-                          label="Please Select Client..."
-                          key=""
-                          >Please Select Client...</el-option
+                  <div class="col-lg">
+                    <!--begin::Row-->
+                    <div class="col-lg fv-row">
+                      <div>
+                        <el-select
+                          v-model="rgpDetails.quotation_id"
+                          filterable
+                          placeholder="Please Select Quotation..."
+                          v-on:change="GetSiteAddress(rgpDetails.quotation_id)"
                         >
-                        <el-option
-                          v-for="item in Clients"
-                          :key="item.client_data.id"
-                          :label="`${item.client_data.first_name} ${item.client_data.last_name}`"
-                          :value="item.client_data.id"
-                        />
-                      </el-select>
+                          <el-option
+                            value=""
+                            disabled="disabled"
+                            label="Please Select Quotation..."
+                            key=""
+                          >
+                            Please Select Quotation...</el-option
+                          >
+                          <el-option
+                            v-for="item in Quotations"
+                            :key="item.id"
+                            :value="item.id"
+                            :label="`( ${item.quotation_no} )  [ ${item.customer_data.first_name} ${item.customer_data.last_name} ]  /  [ ${item.client_data.first_name} ${item.client_data.last_name} ]`"
+                          />
+                        </el-select>
+                      </div>
                     </div>
                     <!--end::Row-->
+                  </div>
+                </div>
 
-                    <div class="mt-2 pt-4">
-                      <h6 class="fw-bold mt-5">Site Address:</h6>
-                      <div class="mt-2">
-                        <div class="mb-1" v-show="QuotationDetials.client">
-                          <br />
-                          <span>
-                            {{
-                              `${QuotationDetials.client.first_name} ${QuotationDetials.client.last_name}`
-                            }}
-                          </span>
-                          <br />
-                          <span v-show="QuotationDetials.client.company_name">
-                            {{ `${QuotationDetials.client.company_name}` }}
-                          </span>
-                          <!-- v-if company_data present -->
-                          <div v-show="QuotationDetials.client.company_name">
-                            <br />
-                            <span>
-                              {{ `${QuotationDetials.client.address1}` }}
-                            </span>
-                            <br />
-                            <span>
-                              {{ `${QuotationDetials.client.address2}` }}
-                            </span>
-                          </div>
-                          <div v-show="QuotationDetials.client.country">
-                            <span>
-                              {{
-                                `${QuotationDetials.client.city} - ${QuotationDetials.client.pincode}`
-                              }}
-                            </span>
-                            <br />
-                            <span>
-                              {{
-                                `${QuotationDetials.client.states} ${QuotationDetials.client.country}`
-                              }}
-                            </span>
-                            <br />
-                          </div>
-                          <br />
-                          <!-- firstname as a flag -->
-                          <a
-                            v-show="QuotationDetials.client.first_name"
-                            target="blank"
-                            v-bind:href="`/clients/edit/${QuotationDetials.customer_id}`"
-                          >
-                            <span class="fs-5"> Edit</span>
-                            <!-- <i
-                          class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                          ></i> -->
-                          </a>
-                        </div>
-                        <br />
+                <div class="row mb-6" v-if="rgpDetails.quotation_id">
+                  <!--begin::Label-->
+                  <label
+                    class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
+                    >Site Address
+                  </label>
+                  <!--end::Label-->
+
+                  <div class="col-lg">
+                    <!--begin::Row-->
+                    <div class="col-lg fv-row">
+                      <div class="form-control form-control-solid">
+                        <span class="fs-5 fw-bold text-gray-700">
+                          {{ SiteAddress.address1 }} {{ SiteAddress.address2 }}
+                          {{ SiteAddress.city }} - {{ SiteAddress.pincode }}
+                          {{ SiteAddress.states }} {{ SiteAddress.country }}
+                        </span>
                       </div>
+                    </div>
+                    <!--end::Row-->
+                  </div>
+                </div>
+              </div>
+
+              <div class="card card-flush pt-3 mb-4 mb-lg-6">
+                <!--begin::Card header-->
+                <div class="card-header">
+                  <!--begin::Card title-->
+                  <div class="card-title">
+                    <h2 class="fw-bold text-nowrap">Available Engineers</h2>
+                  </div>
+                  <!--begin::Card title-->
+
+                  <div class="card-toolbar" v-if="rgpDetails.engineers.length">
+                    <div
+                      class="btn btn-light-primary"
+                      :v-model="rgpDetails.engineers"
+                    >
+                      {{ rgpDetails.engineers.length }} Engineer Selected
                     </div>
                   </div>
                 </div>
-                <!--begin::Table wrapper-->
-                <div class="table-responsive mb-10">
-                  <!--begin::Table-->
-                  <table
-                    class="table g-5 gs-0 mb-0 fw-bold text-gray-700"
-                    data-kt-element="Selects"
-                  >
-                    <!--begin::Table head-->
-                    <thead>
-                      <tr
-                        class="border-bottom fs-7 fw-bold text-gray-700 text-uppercase"
-                      >
-                        <th class="min-w-300px w-475px">Item</th>
-                        <th class="min-w-300px w-475px">Item Price</th>
-                        <th class="min-w-75px w-75px text-end">Action</th>
-                      </tr>
-                    </thead>
-                    <!--end::Table head-->
+                <!--end::Card header-->
 
-                    <!--begin::Table body-->
-                    <tbody>
-                      <CustomSelect
-                        v-bind:tasks="QuotationDetials.items"
-                        v-on:removeitem="RemoveItem($event)"
-                        v-on:getval="QuotationDetialsAddFunc($event)"
-                        v-on:UpdateTotal="UpdateTotal($event)"
-                      />
-                    </tbody>
-                    <!--end::Table body-->
+                <!--begin::Card body-->
+                <div class="card-body pt-0">
+                  <!--begin::Table wrapper-->
+                  <div class="table-responsive">
+                    <!--begin::Table-->
+                    <table
+                      class="table align-middle table-row-dashed fs-6 fw-semobold gy-4"
+                      id="kt_subscription_products_table"
+                    >
+                      <!--begin::Table head-->
+                      <thead>
+                        <tr
+                          class="text-start text-muted fw-bold fs-7 text-uppercase gs-0"
+                        >
+                          <th
+                            class="min-w-30px fs-5 fw-bold text-gray-700 text-nowrap"
+                          >
+                            Sr.No
+                          </th>
+                          <th
+                            class="min-w-300px fs-5 fw-bold text-gray-700 text-wrap"
+                          >
+                            Name
+                          </th>
+                          <th
+                            class="min-w-70px text-center fs-5 fw-bold text-gray-700 text-nowrap"
+                          >
+                            Select
+                          </th>
+                        </tr>
+                      </thead>
+                      <!--end::Table head-->
 
-                    <!--begin::Table foot-->
-                    <tfoot>
-                      <tr
-                        class="border-top border-top-dashed align-top fs-6 fw-bold text-gray-700"
-                      >
-                        <th class="text-primary">
-                          <span class="btn btn-primary" @click="addNewItem()">
-                            <KTIcon icon-name="plus" icon-class="fs-2" />
-                            Add item
-                          </span>
-                        </th>
-                      </tr>
-                      <tr class="align-top fw-bold text-gray-700">
-                        <th colspan="1" class="fs-4 ps-0">Total</th>
-                        <th colspan="1" class="text-end fs-4 text-nowrap">
-                          ₹<span data-kt-element="grand-total">{{
-                            QuotationDetials.total.toFixed(2)
-                          }}</span>
-                        </th>
-                      </tr>
-                    </tfoot>
-                    <!--end::Table foot-->
-                  </table>
+                      <!--begin::Table body-->
+                      <tbody class="text-gray-600">
+                        <tr
+                          class="odd"
+                          v-for="(item, index) in AvailableEngineers"
+                          :key="item.id"
+                        >
+                          <td class="fs-3 fw-bold">{{ index + 1 }}</td>
+                          <td class="fs-3 fw-bold text-wrap">
+                            {{ item.first_name }} {{ item.last_name }}
+                          </td>
+                          <td class="text-center">
+                            <!--begin::Delete-->
+
+                            <input
+                              class="form-check-input border border-dark"
+                              type="checkbox"
+                              :key="item.id"
+                              :value="item.id"
+                              @click="checkboxToggle"
+                            />
+                            <!--end::Delete-->
+                          </td>
+                        </tr>
+                      </tbody>
+                      <!--end::Table body-->
+                    </table>
+                    <!--end::Table-->
+                  </div>
+                  <!--end::Table wrapper-->
                 </div>
-                <div class="mb-0">
-                  <label class="form-label fs-6 fw-bold text-gray-700"
-                    >Notes</label
-                  >
-
-                  <textarea
-                    name="notes"
-                    class="form-control form-control-solid"
-                    rows="3"
-                    v-model="QuotationDetials.notes"
-                    placeholder="Thanks for your business"
-                  ></textarea>
-                </div>
-                <!--end::Notes-->
+                <!--end::Card body-->
               </div>
-              <br />
-              <br />
-            </form>
-            <!--end::Form-->
+
+              <div class="card card-flush pt-3 mb-5 mb-lg-10 border-top">
+                <!--begin::Card header-->
+                <div class="card-header">
+                  <!--begin::Card title-->
+                  <div class="card-title">
+                    <h2 class="fw-bold text-nowrap">Available Instruments</h2>
+                  </div>
+                  <!--begin::Card title-->
+
+                  <div
+                    class="card-toolbar"
+                    v-if="rgpDetails.instruments.length"
+                  >
+                    <div
+                      class="btn btn-light-primary"
+                      :v-model="rgpDetails.instruments"
+                    >
+                      {{ rgpDetails.instruments.length }} Instrument Selected
+                    </div>
+                  </div>
+                </div>
+                <!--end::Card header-->
+
+                <!--begin::Card body-->
+                <div class="card-body pt-0">
+                  <!--begin::Table wrapper-->
+                  <div class="table-responsive">
+                    <!--begin::Table-->
+                    <table
+                      class="table align-middle table-row-dashed fs-6 fw-semobold gy-4"
+                      id="kt_subscription_products_table"
+                    >
+                      <!--begin::Table head-->
+                      <thead>
+                        <tr
+                          class="text-start text-muted fw-bold fs-7 text-uppercase gs-0"
+                        >
+                          <th
+                            class="min-w-30px fs-5 fw-bold text-gray-700 text-nowrap"
+                          >
+                            Sr.No
+                          </th>
+                          <th
+                            class="min-w-200px fs-5 fw-bold text-gray-700 text-nowrap"
+                          >
+                            Instrument
+                          </th>
+                          <th
+                            class="min-w-100px fs-5 fw-bold text-gray-700 text-nowrap"
+                          >
+                            Made By
+                          </th>
+                          <th
+                            class="min-w-100px fs-5 fw-bold text-gray-700 text-nowrap"
+                          >
+                            Model No.
+                          </th>
+                          <th
+                            class="min-w-100px fs-5 fw-bold text-gray-700 text-nowrap"
+                          >
+                            Serial No.
+                          </th>
+                          <th
+                            class="min-w-30px fs-5 fw-bold text-center text-gray-700 text-nowrap"
+                          >
+                            Select
+                          </th>
+                        </tr>
+                      </thead>
+                      <!--end::Table head-->
+
+                      <!--begin::Table body-->
+                      <tbody class="text-gray-600">
+                        <tr
+                          v-for="(instrument, index) in AvailableInstruments"
+                          :key="instrument.id"
+                        >
+                          <td class="fs-3 fw-bold">
+                            {{ index + 1 }}
+                          </td>
+                          <td class="fs-3 fw-bold text-wrap">
+                            {{ instrument.name }}
+                          </td>
+                          <td class="fs-3 fw-bold text-nowrap">
+                            {{ instrument.make }}
+                          </td>
+                          <td class="fs-3 fw-bold text-nowrap">
+                            {{ instrument.model_no }}
+                          </td>
+                          <td class="fs-3 fw-bold text-nowrap">
+                            {{ instrument.serial_no }}
+                          </td>
+                          <td class="text-center">
+                            <!--begin::Delete-->
+
+                            <input
+                              class="form-check-input border border-dark"
+                              type="checkbox"
+                              :key="instrument.id"
+                              :value="instrument.id"
+                              @click="checkboxToggleForInstruments"
+                            />
+                            <!--end::Delete-->
+                          </td>
+                        </tr>
+                      </tbody>
+                      <!--end::Table body-->
+                    </table>
+                    <!--end::Table-->
+                  </div>
+                  <!--end::Table wrapper-->
+                </div>
+                <!--end::Card body-->
+              </div>
+
+              <div class="modal-footer flex-center">
+                <!--begin::Button-->
+                <button type="reset" class="btn btn-lg btn-danger w-25">
+                  Clear
+                </button>
+                <!--end::Button-->
+                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                <!--begin::Button-->
+                <span
+                  @click="onsubmit()"
+                  :data-kt-indicator="loading ? 'on' : null"
+                  class="btn btn-lg btn-primary w-25"
+                  type="submit"
+                >
+                  <span v-if="!loading" class="indicator-label"> Submit </span>
+                  <span v-if="loading" class="indicator-progress">
+                    Please wait...
+                    <span
+                      class="spinner-border spinner-border-sm align-middle ms-2"
+                    ></span>
+                  </span>
+                </span>
+                <!--end::Button-->
+              </div>
+            </VForm>
           </div>
         </div>
-      </div>
-
-      <div class="flex-lg-auto min-w-lg-300px">
-        <!--begin::Card-->
-        <div
-          class="card"
-          data-kt-sticky="true"
-          data-kt-sticky-name="Quotation"
-          data-kt-sticky-offset="{default: false, lg: '100px'}"
-          data-kt-sticky-top="150px"
-          data-kt-sticky-animation="false"
-          data-kt-sticky-zindex="95"
-          data-kt-sticky-width="300px"
-          data-kt-sticky-min-height="400px"
-          data-kt-sticky-enabled="true"
-        >
-          <!--begin::Card body-->
-          <div class="card-body">
-            <!--begin::Input group-->
-            <div class="mb-10">
-              <h2>Quotation</h2>
-              <br />
-              <div class="row gx-10">
-                <el-select
-                  v-model="QuotationDetials.status"
-                  filterable
-                  :disabled="disabledselect"
-                  placeholder="Please Select Status..."
-                >
-                  <!-- <el-option value=" " label="Please Select Status..." key=" "
-                    >Please Select Status...</el-option
-                  > -->
-                  <el-option
-                    v-for="item in QuotationStatusArray"
-                    :key="item.id"
-                    :label="`${item.name}`"
-                    :value="item.id"
-                  />
-                </el-select>
-              </div>
-              <br />
-              <div class="items">
-                <p v-for="item in QuotationDetials.items" :key="item.id">
-                  <span
-                    v-if="item.id != ''"
-                    class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                    >+ {{ item.name }}</span
-                  >
-                </p>
-              </div>
-            </div>
-            <!--end::Input group-->
-            <div class="total">
-              <div>
-                <h6
-                  class="text-start fs-4 text-nowrap badge badge-light flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                >
-                  {{ GetQuotationStatus(parseInt(QuotationDetials.status)) }}
-                </h6>
-              </div>
-              <div>
-                <h3 class="text-end fs-4 text-nowrap">Total</h3>
-                <h3 class="text-end fs-4 text-nowrap">
-                  ₹<span data-kt-element="grand-total">{{
-                    QuotationDetials.total.toFixed(2)
-                  }}</span>
-                </h3>
-              </div>
-            </div>
-            <!--begin::Separator-->
-            <div class="separator separator-dashed mb-8"></div>
-            <!--end::Separator-->
-
-            <!--begin::Actions-->
-            <div class="mb-0">
-              <!--begin::Row-->
-              <!--end::Row-->
-              <span
-                v-on:click="submit"
-                type="submit"
-                href="#"
-                class="btn btn-primary w-100"
-                id="kt_Quotation_submit_button"
-              >
-                <i class="ki-duotone ki-triangle fs-3"
-                  ><span class="path1"></span><span class="path2"></span
-                  ><span class="path3"></span
-                ></i>
-                Add Quotation
-              </span>
-            </div>
-            <!--end::Actions-->
-          </div>
-          <!--end::Card body-->
-        </div>
-        <!--end::Card-->
       </div>
     </div>
   </div>
@@ -453,374 +411,301 @@ import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import {
-  getCustomers,
-  addQuotation,
-  getUser,
-  getClient,
-  GetCustomerClients,
-  GetIncrQuotationId,
+  GetAppovedQuotationsList,
+  GetIncrReturnableGatePassId,
+  getEngineers,
+  getSiteAddress,
+  getInstruments,
+  addRGatePass,
+  UpdateStatus
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
-import CustomSelect from "./CustomComponents/CustomQuotationItems.vue"
+import CustomSelect from "./CustomComponents/CustomQuotationItems.vue";
 import moment from "moment";
+import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import { useRouter } from "vue-router";
-import { formatPrice } from "@/core/config/DataFormatter";
-import {
-  QuotationStatusArray,
-  GetQuotationStatus,
-} from "@/core/config/QuotationStatusConfig";
 
-interface itemsArr {
-  id: string;
-  price: string;
-  description: string;
-  name: string;
-}
+// ${item.customer_name[0].first_name} ${item.customer_name[0].last_name}  ${item.client_name[0].first_name} ${item.client_name[0].last_name}
 
-interface Meta {
+interface Engineer {
   id: string;
   first_name: string;
   last_name: string;
-  company_name: string;
-  address1: string;
-  address2: string;
-  city: string;
-  states: string;
-  pincode: string;
-  country: string;
 }
 
-interface QuotationDetials {
-  quotation_no: string;
-  customer_id: string;
-  items: Array<itemsArr>;
+interface Instrument {
+  id: string;
+  name: string;
+  model_no: string;
+  serial_no: string;
+  make: string;
+}
+
+interface RGP {
+  rgp_no: string;
+  quotation_id: string;
+  company_id: string;
   date: string;
   duedate: string;
-  status: string;
-  notes: string;
-  total: number;
-  customer: Meta;
-  client: Meta;
-  is_active: number;
-  company_id: string;
+  engineers: Array<Engineer>;
+  instruments: Array<Instrument>;
   created_by: string;
   updated_by: string;
+  is_active: 1;
 }
 
-// interface Engineer{
-//   id: string;
-//   availability: string;
-// }
-
-// interface rgpDetails {
-//   rgp_no: string;
-//   customer_id:string;
-//   company_id:string;
-//   engineers: Array<itemsArr>;
-//   quotation_no: string;
-//   date: string;
-//   duedate: string;
-//   status: string;
-//   notes: string;
-//   total: number;
-//   customer: Meta;
-//   client: Meta;
-//   is_active: number;
-//   company_id: string;
-//   created_by: string;
-//   updated_by: string;
-// }
-
-// interface itemsArr {
-//   id: string;
-//   price: string;
-//   description: string;
-//   name: string;
-// }
-
-
 export default defineComponent({
-  name: "company-add",
+  name: "rgp-add",
   components: {
     CustomSelect,
+    ErrorMessage,
+    Field,
+    VForm,
   },
   setup() {
     const auth = useAuthStore();
-    const disabledselect = ref(true);
-    const clientSelect = ref(true);
-    const Total = ref(0);
     const route = useRouter();
     const User = auth.GetUser();
-    const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
-    const Clients = ref([
-      { id: "", client_data: { id: "", first_name: "", last_name: "" } },
+
+    const loading = ref(false);
+
+    const AvailableEngineers = ref([{ id: "", first_name: "", last_name: "" }]);
+
+    const AvailableInstruments = ref([
+      { id: "", name: "", model_no: "", serial_no: "", make: "" },
     ]);
-    const QuotationDetials = ref<QuotationDetials>({
-      quotation_no: "21****",
-      customer_id: " ",
-      items: [],
+
+    async function engineer_listing(): Promise<void> {
+      try {
+        const company_id = auth.GetUser().company_id;
+        const response = await getEngineers(company_id);
+        // console.log(response.result);
+        AvailableEngineers.value = response.result.map(({ ...rest }) => ({
+          ...rest,
+        }));
+      } catch (error) {
+        console.error(error);
+      } finally {
+        //console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
+      }
+    }
+
+    async function instrument_listing(): Promise<void> {
+      try {
+        const company_id = auth.GetUser().company_id;
+        const response = await getInstruments(company_id);
+        // console.log(response.result);
+        AvailableInstruments.value = response.result.map(({ ...rest}) => ({
+          ...rest,
+        }));
+      } catch (error) {
+        console.error(error);
+      } finally {
+        //console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
+      }
+    }
+
+    const Quotations = ref([
+      {
+        id: "",
+        client_id: "",
+        customer_id: "",
+        quotation_no: "",
+        customer_data: {
+          first_name: "",
+          last_name: "",
+        },
+        client_data: {
+          first_name: "",
+          last_name: "",
+        },
+      },
+    ]);
+
+    const SiteAddress = ref({
+      address1: "",
+      address2: "",
+      city: "",
+      states: "",
+      pincode: "",
+      country: "",
+    });
+
+    const rgpDetails = ref<RGP>({
+      rgp_no: "",
       date: "",
       duedate: "",
-      status: "",
-      notes: "",
-      customer: {
-        id: "",
-        company_name: "",
-        first_name: "",
-        last_name: "",
-        address1: "",
-        address2: "",
-        city: "",
-        states: "",
-        pincode: "",
-        country: "",
-      },
-      client: {
-        id: "",
-        company_name: "",
-        first_name: "",
-        last_name: "",
-        address1: "",
-        address2: "",
-        city: "",
-        states: "",
-        pincode: "",
-        country: "",
-      },
-      total: 0,
-      is_active: 1,
+      engineers: [],
+      instruments: [],
+      quotation_id: "",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
+      is_active: 1,
     });
 
     onMounted(async () => {
-      // todo: quotation check if pres get last incr 1
-      const res = await GetIncrQuotationId(User.company_id);
-      IncrQuotation(res);
-      // * basic fetch
-      Customers.value.pop();
-      Clients.value.pop();
-      await GetCustomers();
+      const res = await GetIncrReturnableGatePassId(User.company_id);
+
+      console.log(res);
+
+      IncrRGP(res);
+
+      Quotations.value.pop();
+      AvailableEngineers.value.pop();
+      AvailableInstruments.value.pop();
+      await GetApprovedQuotations();
+      await engineer_listing();
+      await instrument_listing();
     });
 
-    const IncrQuotation = (data: any) => {
-      console.log(data.result);
-      const latestquotation_no = data.result.split("_");
-      if (parseInt(latestquotation_no[1]) == 0) {
+    const IncrRGP = (data: any) => {
+      const latest_rgp_no = data.result.split("_");
+      if (parseInt(latest_rgp_no[1]) == 0) {
         // ? if no record
-        QuotationDetials.value.quotation_no =
-          latestquotation_no[0] + "_" + latestquotation_no[1].toString();
+        rgpDetails.value.rgp_no =
+          latest_rgp_no[0] + "_" + latest_rgp_no[1].toString();
       } else {
         // ? if record exisit inc 1
-        QuotationDetials.value.quotation_no =
-          latestquotation_no[0] + "_" + (1 + +latestquotation_no[1]).toString();
+        rgpDetails.value.rgp_no =
+          latest_rgp_no[0] + "_" + (1 + +latest_rgp_no[1]).toString();
       }
     };
 
-    const GetClients = async (id: string) => {
-      // ? empty clients
-      console.log(Clients.value);
-      Clients.value.length = 0;
+    const checkboxToggle = (e) => {
+      if (e.target.checked) {
+        const selectedId = e.target.value;
+        const selectedEngineer = AvailableEngineers.value.find(
+          (engineer) => engineer.id == selectedId
+        );
 
-      // * empty clents data
-      QuotationDetials.value.client.id = "";
-      QuotationDetials.value.client.company_name = "";
-      QuotationDetials.value.client.address1 = "";
-      QuotationDetials.value.client.address2 = "";
-      QuotationDetials.value.client.city = "";
-      QuotationDetials.value.client.pincode = "";
-      QuotationDetials.value.client.states = "";
-      QuotationDetials.value.client.country = "";
-      QuotationDetials.value.client.first_name = "";
-      QuotationDetials.value.client.last_name = "";
-
-      ApiService.setHeader();
-      const response = await GetCustomerClients(id);
-      console.log(response);
-      Clients.value.push(
-        ...response.result.map(({ created_at, ...rest }) => ({
-          ...rest,
-          created_at: moment(created_at).format("MMMM Do YYYY"),
-        }))
-      );
-      console.log(Clients.value);
-    };
-
-    const GetUserData = async (id) => {
-      if (id != " ") {
-        const customer_id = id;
-        const response = await getUser(customer_id);
-        console.log(response);
-        QuotationDetials.value.customer = response.meta;
-        QuotationDetials.value.customer.id = response.id;
-        clientSelect.value = false;
-        /* *
-         TODO : get customer_id and from meta get client ids get customer_id and from meta get client ids and put into Ref object
-         ? Problem of getting clients;
-        */
-        GetClients(customer_id);
-      } else {
-        QuotationDetials.value.customer = {
-          id: "",
-          company_name: "",
-          first_name: "",
-          last_name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          states: "",
-          pincode: "",
-          country: "",
-        };
-      }
-    };
-
-    const GetClientData = async (id) => {
-      if (id != " ") {
-        const customer_id = id;
-        const response = await getClient(customer_id);
-        console.log(response);
-        QuotationDetials.value.client.address1 = response.meta.address1;
-        QuotationDetials.value.client.company_name = response.meta.company_name;
-        QuotationDetials.value.client.address2 = response.meta.address2;
-        QuotationDetials.value.client.city = response.meta.city;
-        QuotationDetials.value.client.pincode = response.meta.pincode;
-        QuotationDetials.value.client.states = response.meta.states;
-        QuotationDetials.value.client.country = response.meta.country;
-        QuotationDetials.value.client.first_name = response.first_name;
-        QuotationDetials.value.client.last_name = response.last_name;
-        disabledselect.value = false;
-        /* *
-         TODO : get customer_id and from meta get client ids get customer_id and from meta get client ids and put into Ref object
-         ? Problem of getting clients;
-        */
-      } else {
-        QuotationDetials.value.customer = {
-          id: "",
-          company_name: "",
-          first_name: "",
-          last_name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          states: "",
-          pincode: "",
-          country: "",
-        };
-      }
-      console.log(QuotationDetials.value);
-    };
-
-    const addNewItem = () => {
-      QuotationDetials.value.items.push({
-        id: "",
-        name: "",
-        price: "",
-        description: "",
-      });
-    };
-    // on add model data push to the sub-json vlaue QuotationDetials
-    const QuotationDetialsAddFunc = (data) => {
-      // selects id not same don't push;
-      // console.log(QuotationDetials.value);
-      // console.log(data);
-      // console.log(QuotationDetials.value);
-      QuotationDetials.value.items.forEach((ele) => {
-        console.log(ele);
-        if (ele.id == data.id) {
-          ele["name"] = data.name;
-          ele["desc"] = data.description;
-          ele["price"] = formatPrice(data.price);
+        if (selectedEngineer) {
+          rgpDetails.value.engineers.push({
+            id: selectedId,
+            first_name: selectedEngineer.first_name,
+            last_name: selectedEngineer.last_name,
+          });
         }
-      });
-      calPrice();
-    };
-
-    const removeObjectWithId = (arr, id) => {
-      const objWithIdIndex = arr.findIndex((obj) => obj.id === id);
-
-      if (objWithIdIndex > -1) {
-        arr.splice(objWithIdIndex, 1);
+      } else {
+        rgpDetails.value.engineers = rgpDetails.value.engineers.filter(
+          (id) => id.id !== e.target.value
+        );
       }
 
-      return arr;
+      console.log(rgpDetails.value.engineers);
     };
 
-    const RemoveItem = (index) => {
-      console.log(index);
-      removeObjectWithId(QuotationDetials.value.items, index);
-      calPrice();
+    const checkboxToggleForInstruments = (e) => {
+      console.log(e);
+      if (e.target.checked) {
+        const selectedId = e.target.value;
+        const selectedInstruments = AvailableInstruments.value.find(
+          (instrument) => instrument.id == selectedId
+        );
+
+        if (selectedInstruments) {
+          rgpDetails.value.instruments.push({
+            id: selectedId,
+            name: selectedInstruments.name,
+            model_no: selectedInstruments.model_no,
+            serial_no: selectedInstruments.serial_no,
+            make: selectedInstruments.make,
+          });
+        }
+      } else {
+        rgpDetails.value.instruments = rgpDetails.value.instruments.filter(
+          (id) => id.id !== e.target.value
+        );
+      }
+
+      console.log(rgpDetails.value.instruments);
     };
 
-    const UpdateTotal = (data) => {
-      console.log(data);
-      removeNulls();
-      calPrice();
+    const GetSiteAddress = async (data: any) => {
+      if (data != " ") {
+        ApiService.setHeader();
+        const id = data;
+        const response = await getSiteAddress(id);
+        // console.log(response);
+
+        SiteAddress.value.address1 = response.result.address1;
+        SiteAddress.value.address2 = response.result.address2;
+        SiteAddress.value.city = response.result.city;
+        SiteAddress.value.states = response.result.states;
+        SiteAddress.value.pincode = response.result.pincode;
+        SiteAddress.value.country = response.result.country;
+      } else {
+        SiteAddress.value.address1 = "";
+        SiteAddress.value.address2 = "";
+        SiteAddress.value.city = "";
+        SiteAddress.value.states = "";
+        SiteAddress.value.pincode = "";
+        SiteAddress.value.country = "";
+      }
     };
 
-    const calPrice = () => {
-      const prices = QuotationDetials.value.items.map((ele: any) =>
-        Number(ele.price.replaceAll(",", "").substring(1))
-      );
-      QuotationDetials.value.total =
-        prices.length != 0 ? prices.reduce((acc, curr) => acc + curr) : 0.0;
-    };
-
-    const GetCustomers = async () => {
+    const GetApprovedQuotations = async () => {
       ApiService.setHeader();
-      const response = await getCustomers(``);
-      Customers.value.push(
-        ...response.result.data.map(({ created_at, ...rest }) => ({
+
+      const company_ID = auth.GetUser().company_id;
+      const response = await GetAppovedQuotationsList(company_ID);
+
+      Quotations.value.push(
+        ...response.result.map(({ ...rest }) => ({
           ...rest,
-          created_at: moment(created_at).format("MMMM Do YYYY"),
         }))
       );
     };
 
-    const removeNulls = () => {
-      QuotationDetials.value.items = QuotationDetials.value.items.filter(
-        (ele: any) => ele.id !== ""
-      );
-    };
-
-    // number formating remove
-    const submit = async () => {
-      disabledselect.value = true;
-      removeNulls();
-      console.log(QuotationDetials.value);
-      QuotationDetials.value.date = moment(QuotationDetials.value.date).format(
+    const onsubmit = async () => {
+      console.log(rgpDetails.value);
+      rgpDetails.value.date = moment(rgpDetails.value.date).format(
         "YYYY-MM-DD HH:mm:ss"
       );
-      QuotationDetials.value.duedate = moment(
-        QuotationDetials.value.duedate
-      ).format("YYYY-MM-DD HH:mm:ss");
-      // console.log(QuotationDetials.value);
+      rgpDetails.value.duedate = moment(rgpDetails.value.duedate).format(
+        "YYYY-MM-DD HH:mm:ss"
+      );
+
       try {
-        // Call your API here with the form values
-        const response = await addQuotation(QuotationDetials.value);
-        // console.log(response.error);
-        if (!response.error) {
-          // Handle successful API response
-          // console.log("API response:", response);
-          showSuccessAlert(
-            "Success",
-            "Company details have been successfully inserted!"
-          );
-          route.push({ name: "quotation-list" });
-        } else {
-          // Handle API error response
-          const errorData = response.error;
-          // console.log("API error:", errorData);
-          console.log("API error:", errorData.response.data.errors);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+        const res = await GetIncrReturnableGatePassId(User.company_id);
+        // console.log(res);
+        if (rgpDetails.value.rgp_no !== res.result) {
+          const response = await addRGatePass(rgpDetails.value);
+
+          if (!response.error) {
+
+            // change the availability of engineers and instruments
+            const statusUpdate = await UpdateStatus(rgpDetails.value);
+
+            if(!statusUpdate.error){
+
+            showSuccessAlert(
+              "Success",
+              "Returnable Gate pass details have been successfully inserted!"
+            );
+            route.push({ name: "rgp-list" });
+            }
+          }else {
+            // Handle API error response
+            const errorData = response.error;
+            // console.log("API error:", errorData);
+            console.log("API error:", errorData.response.data.errors);
+            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          }
+        }else {
+          showErrorAlert("Warning", "Bad Luck! RGP Details Already Exists");
+          route.push({ name: "rgp-add" });
         }
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
-      } finally {
-        disabledselect.value = false;
       }
     };
 
@@ -835,8 +720,6 @@ export default defineComponent({
         customClass: {
           confirmButton: "btn btn-primary",
         },
-      }).then(() => {
-        clear();
       });
     };
 
@@ -853,8 +736,6 @@ export default defineComponent({
         },
       });
     };
-
-    // date
 
     const shortcuts = [
       {
@@ -883,67 +764,24 @@ export default defineComponent({
       return null;
     };
 
-    const clear = () => {
-      QuotationDetials.value = {
-        quotation_no: "******",
-        customer_id: " ",
-        items: [],
-        date: "",
-        duedate: "",
-        status: "",
-        notes: "",
-        total: 0,
-        customer: {
-          id: "",
-          company_name: "",
-          first_name: "",
-          last_name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          states: "",
-          pincode: "",
-          country: "",
-        },
-        client: {
-          id: "",
-          company_name: "",
-          first_name: "",
-          last_name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          states: "",
-          pincode: "",
-          country: "",
-        },
-        is_active: 1,
-        created_by: User.id,
-        updated_by: User.id,
-        company_id: User.company_id,
-      };
-      route.push({ name: "quotation-list" });
-    };
-
     return {
-      Clients,
-      QuotationDetials,
-      Customers,
+      Quotations,
+      rgpDetails,
       getAssetPath,
-      submit,
-      disabledselect,
-      clientSelect,
+      GetApprovedQuotations,
+      SiteAddress,
+      GetSiteAddress,
+      engineer_listing,
+      instrument_listing,
+      AvailableEngineers,
+      AvailableInstruments,
+      loading,
+      onsubmit,
       shortcuts,
+      checkboxToggle,
+      checkboxToggleForInstruments,
       disabledDate,
-      RemoveItem,
-      GetUserData,
-      GetClientData,
-      UpdateTotal,
-      addNewItem,
-      QuotationStatusArray,
-      QuotationDetialsAddFunc,
-      GetQuotationStatus,
-      Total,
+      IncrRGP,
     };
   },
 });

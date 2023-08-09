@@ -14,7 +14,7 @@
               v-model="search"
               @input="searchItems()"
               class="form-control form-control-solid w-250px ps-15"
-              placeholder="Search quotations"
+              placeholder="Search Gate Pass"
             />
           </div>
           <!--end::Search-->
@@ -104,62 +104,39 @@
         >
           <!-- img data -->
   
-          <template v-slot:id="{ row: quotations }">
+          <template v-slot:id="{ row: rgps }">
             <span class="text-gray-600 text-hover-primary mb-1">
-              {{ quotations.id }}
+              {{ rgps.id }}
             </span>
           </template>
-          <template v-slot:quotation_no="{ row: quotations }">
+          <template v-slot:rgp_no="{ row: rgps }">
             <span class="text-gray-600 text-hover-primary mb-1">
-              {{ quotations.quotation_no }}
+              {{ rgps.rgp_no }}
             </span>
           </template>
-          <template v-slot:customer_name="{ row: quotations }">
+          <template v-slot:quotation_id="{ row: rgps }">
             <span class="text-gray-600 text-hover-primary mb-1">
-              {{ quotations.customer_name }}
+              {{ rgps.quotation_id }}
             </span>
           </template>
           <!-- defualt data -->
-          <template v-slot:company="{ row: quotations }">
-            {{ quotations.company }}
+          <template v-slot:engineers="{ row: rgps }">
+            {{ rgps.engineers }}
           </template>
-          <template v-slot:date="{ row: quotations }">
-            {{ quotations.date }}
+          <template v-slot:instruments="{ row: rgps }">
+            {{ rgps.instruments }}
           </template>
-          <template v-slot:duedate="{ row: quotations }">
-            {{ quotations.duedate }}
+          <template v-slot:date="{ row: rgps }">
+            {{ rgps.date }}
           </template>
-          <template v-slot:status="{ row: quotations }">
-            <!-- depending on status badge change -->
-            <span
-              v-if="quotations.status == 3"
-              class="badge py-3 px-4 fs-7 badge-light-success"
-              >{{ GetQuotationStatus(quotations.status) }}</span
-            >
-            <span
-              v-if="quotations.status == 1"
-              class="badge py-3 px-4 fs-7 badge-light-danger"
-              >{{ GetQuotationStatus(quotations.status) }}</span
-            >
-            <span
-              v-if="quotations.status == 4"
-              class="badge py-3 px-4 fs-7 badge-light-success"
-              >{{ GetQuotationStatus(quotations.status) }}</span
-            >
-            <span
-              v-if="quotations.status == 2"
-              class="badge py-3 px-4 fs-7 badge-light-warning"
-              >{{ GetQuotationStatus(quotations.status) }}</span
-            >
+          <template v-slot:duedate="{ row: rgps }">
+            {{ rgps.duedate }}
           </template>
-          <template v-slot:total="{ row: quotations }">
-            {{ formatPrice(quotations.total) }}
-          </template>
-          <template v-slot:actions="{ row: quotations }">
+          <template v-slot:actions="{ row: rgps }">
             <!--begin::Menu Flex-->
             <div class="d-flex flex-lg-row">
               <span class="menu-link px-3">
-                <router-link :to="`./edit/${quotations.id}`">
+                <router-link :to="`./edit/${rgps.id}`">
                   <i
                     class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
                   ></i>
@@ -167,14 +144,8 @@
               </span>
               <span class="menu-link px-3">
                 <i
-                  @click="deleteInvoice(quotations.id, false)"
+                  @click="deleteInvoice(rgps.id, false)"
                   class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
-                ></i>
-              </span>
-              <span class="menu-link px-3">
-                <i
-                  @click="dupQuotation(quotations.id)"
-                  class="las la-copy text-gray-600 text-hover-warning mb-1 fs-2"
                 ></i>
               </span>
             </div>
@@ -223,13 +194,10 @@
   import { defineComponent, onMounted, ref } from "vue";
   import Datatable from "@/components/kt-datatable/KTDataTable.vue";
   import type { Sort } from "@/components/kt-datatable//table-partials/models";
-  import type { IQuotations } from "@/core/model/quotation";
+  import type { IRGP } from "@/core/model/rgps";
   import {
-    getQuotationList,
-    deletequotation,
-    getQuotation,
-    addQuotation,
-    GetIncrQuotationId,
+    getAllRGatePass,
+    deleteRGatePass
   } from "@/stores/api";
   import arraySort from "array-sort";
   import { useAuthStore } from "@/stores/auth";
@@ -239,7 +207,7 @@
   import Swal from "sweetalert2";
   
   export default defineComponent({
-    name: "quotations-listing",
+    name: "rgp_listing",
     components: {
       Datatable,
     },
@@ -252,38 +220,38 @@
           columnWidth: 35,
         },
         {
-          columnName: "Quotation No",
-          columnLabel: "quotation_no",
+          columnName: "RGP No.",
+          columnLabel: "rgp_no",
           sortEnabled: true,
-          columnWidth: 35,
+          columnWidth: 75,
         },
         {
-          columnName: "Customer Name",
-          columnLabel: "customer_name",
+          columnName: "Quotation Id.",
+          columnLabel: "quotation_id",
           sortEnabled: true,
-          columnWidth: 175,
+          columnWidth: 75,
         },
         {
-          columnName: "Invoice Date",
+          columnName: "Engineers",
+          columnLabel: "engineers",
+          sortEnabled: true,
+          columnWidth: 45,
+        },
+        {
+          columnName: "Instruments",
+          columnLabel: "instruments",
+          sortEnabled: true,
+          columnWidth: 45,
+        },
+        {
+          columnName: "RGP Date",
           columnLabel: "date",
           sortEnabled: true,
           columnWidth: 175,
         },
         {
-          columnName: "Invoice Due Date",
+          columnName: "RGP Due Date",
           columnLabel: "duedate",
-          sortEnabled: true,
-          columnWidth: 175,
-        },
-        {
-          columnName: "Status",
-          columnLabel: "status",
-          sortEnabled: true,
-          columnWidth: 75,
-        },
-        {
-          columnName: "Total",
-          columnLabel: "total",
           sortEnabled: true,
           columnWidth: 175,
         },
@@ -295,62 +263,33 @@
         },
       ]);
   
-      interface itemsArr {
-        id: string;
-        price: string;
-        description: string;
-        name: string;
-      }
-  
-      interface Meta {
-        id: string;
-        first_name: string;
-        last_name: string;
-        company_name: string;
-        address1: string;
-        address2: string;
-        city: string;
-        states: string;
-        pincode: string;
-        country: string;
-      }
-  
-      interface quotationDetails {
-        quotation_no: string;
-        customer_id: string;
-        items: Array<itemsArr>;
-        date: string;
-        duedate: string;
-        status: string;
-        notes: string;
-        total: number;
-        customer: Meta;
-        client: Meta;
-        is_active: number;
-        company_id: string;
-        created_by: string;
-        updated_by: string;
-      }
+  interface Engineer {
+  id: string;
+  first_name: string;
+  last_name: string;
+}
 
+interface Instrument {
+  id: string;
+  name: string;
+  model_no: string;
+  serial_no: string;
+  make: string;
+}
 
-      // // RGP Interface
-      // interface returnableGatePassDetails {
-      //   quotation_no: string;
-      //   customer_id: string;
-      //   instruments: Array<itemsArr>;
-      //   date: string;
-      //   duedate: string;
-      //   status: string;
-      //   notes: string;
-      //   total: number;
-      //   customer: Meta;
-      //   client: Meta;
-      //   is_active: number;
-      //   company_id: string;
-      //   created_by: string;
-      //   engineer_name:
-      //   updated_by: string;
-      // }
+interface RGP {
+  rgp_no: string;
+  quotation_id: string;
+  company_id: string;
+  date: string;
+  duedate: string;
+  engineers: string;
+  instruments: string;
+  created_by: string;
+  updated_by: string;
+  is_active: 1;
+}
+
   
       const loading = ref(true);
       const auth = useAuthStore();
@@ -360,50 +299,23 @@
       // RGP Ref
       // const returnableGatePassDetails = ref<>
 
-      const quotationDetail = ref<quotationDetails>({
-        quotation_no: "21****",
-        customer_id: " ",
-        items: [],
-        date: "",
-        duedate: "",
-        status: "",
-        notes: "",
-        customer: {
-          id: "",
-          company_name: "",
-          first_name: "",
-          last_name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          states: "",
-          pincode: "",
-          country: "",
-        },
-        client: {
-          id: "",
-          company_name: "",
-          first_name: "",
-          last_name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          states: "",
-          pincode: "",
-          country: "",
-        },
-        total: 0,
-        is_active: 1,
-        company_id: User.company_id,
-        created_by: User.id,
-        updated_by: User.id,
-      });
-  
+    const rgpDetails = ref<RGP>({
+      rgp_no: "",
+      date: "",
+      duedate: "",
+      engineers: "",
+      instruments: "",
+      quotation_id: "",
+      company_id: User.company_id,
+      created_by: User.id,
+      updated_by: User.id,
+      is_active: 1,
+    });
       const selectedIds = ref<Array<number>>([]);
   
-      const tableData = ref<Array<IQuotations>>([]);
+      const tableData = ref<Array<IRGP>>([]);
   
-      const initvalues = ref<Array<IQuotations>>([]);
+      const initvalues = ref<Array<IRGP>>([]);
       
        // staring from 2
     let page = ref(1);
@@ -427,7 +339,7 @@
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getQuotationList(
+        const response = await getAllRGatePass(
           `page=${page.value}&limit=${limit.value}`
         );
         //console.log(response.result.total_count);
@@ -436,24 +348,21 @@
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
-            created_at,
-            invoice_date,
-            invoice_duedate,
-            total,
-            customer_name,
-            status,
             id,
-            quotation_no,
+            rgp_no,
+            quotation_id,
+            engineers,
+            instruments,
+            date,
+            duedate,
           }) => ({
-            status: status,
             id: id,
-            quotation_no: quotation_no,
-            customer_name:
-              customer_name[0].first_name + " " + customer_name[0].last_name,
-            created_at: moment(created_at).format("DD/MM/YYYY"),
-            date: moment(invoice_date).format("DD/MM/YYYY"),
-            duedate: moment(invoice_duedate).format("DD/MM/YYYY"),
-            total: total,
+            rgp_no: rgp_no,
+            quotation_id: quotation_id,
+            engineers: JSON.parse(engineers).length,
+            instruments: JSON.parse(instruments).length,
+            date: moment(date).format("DD/MM/YYYY"),
+            duedate: moment(duedate).format("DD/MM/YYYY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -476,7 +385,7 @@
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getQuotationList(
+        const response = await getAllRGatePass(
           `page=${page.value}&limit=${limit.value}`
         );
         //console.log(response.result.total_count);
@@ -485,24 +394,21 @@
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
-            created_at,
-            invoice_date,
-            invoice_duedate,
-            total,
-            customer_name,
-            status,
             id,
-            quotation_no,
+            rgp_no,
+            quotation_id,
+            engineers,
+            instruments,
+            date,
+            duedate,
           }) => ({
-            status: status,
             id: id,
-            quotation_no: quotation_no,
-            customer_name:
-              customer_name[0].first_name + " " + customer_name[0].last_name,
-            created_at: moment(created_at).format("DD/MM/YYYY"),
-            date: moment(invoice_date).format("DD/MM/YYYY"),
-            duedate: moment(invoice_duedate).format("DD/MM/YYYY"),
-            total: total,
+            rgp_no: rgp_no,
+            quotation_id: quotation_id,
+            engineers: JSON.parse(engineers).length,
+            instruments: JSON.parse(instruments).length,
+            date: moment(date).format("DD/MM/YYYY"),
+            duedate: moment(duedate).format("DD/MM/YYYY")
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -532,32 +438,31 @@
       }
     };
   
-      async function quotation_listing(): Promise<void> {
+      async function rgp_listing(): Promise<void> {
         try {
-          const response = await getQuotationList( `page=${page.value}&limit=${limit.value}`); 
+          const response = await getAllRGatePass(
+          `page=${page.value}&limit=${limit.value}`
+        );
           console.log(response);
           tableData.value = response.result.data.map(
-            ({
-              created_at,
-              invoice_date,
-              invoice_duedate,
-              total,
-              customer_name,
-              status,
-              id,
-              quotation_no,
-            }) => ({
-              status: status,
-              id: id,
-              quotation_no: quotation_no,
-              customer_name:
-                customer_name[0].first_name + " " + customer_name[0].last_name,
-              created_at: moment(created_at).format("LL"),
-              date: moment(invoice_date).format("LL"),
-              duedate: moment(invoice_duedate).format("LL"),
-              total: total,
-            })
-          );
+          ({
+            id,
+            rgp_no,
+            quotation_id,
+            engineers,
+            instruments,
+            date,
+            duedate,
+          }) => ({
+            id: id,
+            rgp_no: rgp_no,
+            quotation_id: quotation_id,
+            engineers: JSON.parse(engineers).length,
+            instruments: JSON.parse(instruments).length,
+            date: moment(date).format("LL"),
+              duedate: moment(duedate).format("LL"),
+          })
+        );
           initvalues.value.splice(
             0,
             tableData.value.length,
@@ -574,7 +479,7 @@
       }
   
       onMounted(async () => {
-        await quotation_listing();
+        await rgp_listing();
       });
   
       const deleteFewInvoice = () => {
@@ -611,7 +516,7 @@
               }).then((result: { [x: string]: any }) => {
                 if (result["isConfirmed"]) {
                   // Put your function here
-                  deletequotation(id);
+                  deleteRGatePass(id);
                   tableData.value.splice(i, 1);
                 }
               });
@@ -621,7 +526,7 @@
           for (let i = 0; i < tableData.value.length; i++) {
             if (tableData.value[i].id === id) {
               // Put your function here
-              deletequotation(id);
+              deleteRGatePass(id);
               tableData.value.splice(i, 1);
             }
           }
@@ -637,7 +542,7 @@
           ...initvalues.value
         );
         if (search.value !== "") {
-          let results: Array<IQuotations> = [];
+          let results: Array<IRGP> = [];
           for (let j = 0; j < tableData.value.length; j++) {
             if (searchingFunc(tableData.value[j], search.value)) {
               results.push(tableData.value[j]);
@@ -669,83 +574,6 @@
         selectedIds.value = selectedItems;
       };
   
-      const dupQuotation = async (id) => {
-        // ? incr quotation no
-        const res = await GetIncrQuotationId(User.company_id);
-        let latestquotation_no = res.result.split("_");
-        latestquotation_no =
-          latestquotation_no[0] +
-          "_" +
-          (parseInt(latestquotation_no[1]) + 1).toString();
-  
-        // * option
-        Swal.fire({
-          title: "Are you sure?",
-          text: "Clone the Quotation !",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "red",
-          confirmButtonText: "Yes, I am sure!",
-          cancelButtonText: "No, cancel it!",
-        }).then(async (result: { [x: string]: any }) => {
-          if (result["isConfirmed"]) {
-            const response = await getQuotation(id);
-            // update date
-            quotationDetail.value.date = moment(
-              quotationDetail.value.date
-            ).format("YYYY-MM-DD HH:mm:ss");
-            quotationDetail.value.duedate = moment(
-              quotationDetail.value.duedate
-            ).format("YYYY-MM-DD HH:mm:ss");
-            quotationDetail.value = {
-              quotation_no: latestquotation_no,
-              customer_id: response.customer_id,
-              items: JSON.parse(response.items),
-              date: response.date,
-              duedate: response.duedate,
-              status: "1",
-              notes: response.notes,
-              total: response.total,
-              customer: {
-                id: response.customer_id,
-                first_name: "",
-                last_name: "",
-                company_name: "",
-                address1: "",
-                address2: "",
-                city: "",
-                states: "",
-                pincode: "",
-                country: "",
-              },
-              client: {
-                id: response.client_id,
-                first_name: "",
-                last_name: "",
-                company_name: "",
-                address1: "",
-                address2: "",
-                city: "",
-                states: "",
-                pincode: "",
-                country: "",
-              },
-              is_active: response.is_active,
-              company_id: User.company_id,
-              created_by: User.id,
-              updated_by: User.id,
-            };
-            // add
-            const respons = await addQuotation(quotationDetail.value);
-            // console.log(response.error);
-            if (!respons.error) {
-              // list fetch update
-              await quotation_listing();
-            }
-          }
-        });
-      };
-  
       return {
         tableData,
         tableHeader,
@@ -758,8 +586,6 @@
         onItemSelect,
         getAssetPath,
         formatPrice,
-        GetQuotationStatus,
-        dupQuotation,
         loading,
         NextPage,
       PrevPage,
