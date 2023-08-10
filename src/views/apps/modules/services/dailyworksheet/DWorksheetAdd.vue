@@ -112,7 +112,7 @@
                   <!--begin::Label-->
                   <label
                     class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
-                    >Quotations
+                    >Select Service Engineer
                   </label>
                   <!--end::Label-->
 
@@ -553,8 +553,10 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-
       const res = await GetIncrReturnableGatePassId(User.company_id);
+
+      console.log(res);
+
       IncrRGP(res);
 
       Quotations.value.pop();

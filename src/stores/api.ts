@@ -974,3 +974,18 @@ export async function deleteRGatePass(data: any) {
         return { error: errors };
     }
 }
+
+
+// DAILY WORKSHEET
+
+export async function getDailyWorksheet(data: string) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.get(RGP_URL, data);
+        return response.data.result[0];
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}

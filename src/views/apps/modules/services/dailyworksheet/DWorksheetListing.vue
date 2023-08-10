@@ -40,9 +40,9 @@
             </button>
             <!--end::Export-->
             <!--begin::Add customer-->
-            <router-link to="./returnablegatepasses/add" class="btn btn-primary">
+            <router-link to="./dailyworksheets/add" class="btn btn-primary">
               <KTIcon icon-name="plus" icon-class="fs-2" />
-              Add RGP
+              Add Daily Worksheet
             </router-link>
             <!--end::Add customer-->
           </div>
