@@ -564,7 +564,6 @@ export async function QuotationSearch(search: any) {
     }
 }
 
-
 // custom
 export async function GetCustomerClients(data: any) {
     try {
@@ -572,21 +571,6 @@ export async function GetCustomerClients(data: any) {
         const id = { "customerid": data };
         ApiService.setHeader();
         const response = await ApiService.post('/get_customer_clients', id);
-        return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
-    }
-}
-
-export async function QuotationSearch(search: any) {
-    try {
-        //console.log(data)
-        const data = {
-            search: search
-        }
-        ApiService.setHeader();
-        const response = await ApiService.post('quotation_search', data);
         return response.data;
     } catch (errors) {
         console.error(errors);
