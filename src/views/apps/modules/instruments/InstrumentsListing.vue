@@ -104,26 +104,23 @@
         <!-- img data -->
 
         <template v-slot:id="{ row: instruments }">
-          <span class="text-gray-600 text-hover-primary mb-1">
             {{ instruments.id }}
-          </span>
         </template>
         <template v-slot:model_no="{ row: instruments }">
-          <span class="text-gray-600 text-hover-primary mb-1">
             {{ instruments.model_no }}
-          </span>
+        </template>
+        <template v-slot:serial_no="{ row: instruments }">
+            {{ instruments.serial_no }}
         </template>
         <template v-slot:name="{ row: instruments }">
-          <span class="text-gray-600 text-hover-primary mb-1">
             {{ instruments.name }}
-          </span>
         </template>
         <!-- defualt data -->
-        <template v-slot:description="{ row: instruments }">
-          {{ instruments.description }}
+        <template v-slot:make="{ row: instruments }">
+          {{ instruments.make }}
         </template>
-        <template v-slot:quantity="{ row: instruments }">
-          {{ instruments.quantity }}
+        <template v-slot:availability="{ row: instruments }">
+          {{ instruments.availability }}
         </template>
         <template v-slot:created_at="{ row: instruments }">
           {{ instruments.created_at }}
@@ -219,7 +216,13 @@ export default defineComponent({
         columnName: "Model No",
         columnLabel: "model_no",
         sortEnabled: true,
-        columnWidth: 35,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Serial No",
+        columnLabel: "serial_no",
+        sortEnabled: true,
+        columnWidth: 75,
       },
       {
         columnName: "Instrument Name",
@@ -228,22 +231,22 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
-        columnName: "Description",
-        columnLabel: "description",
+        columnName: "Make",
+        columnLabel: "make",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
-        columnName: "Quantity",
-        columnLabel: "quantity",
+        columnName: "Availability",
+        columnLabel: "availability",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 75,
       },
       {
         columnName: "Created At",
         columnLabel: "created_at",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 75,
       },
       {
         columnName: "Actions",
@@ -256,9 +259,11 @@ export default defineComponent({
     interface itemDetails {
       id: string;
       model_no: string;
+      serial_no: string;
+      make: string;
       name: string;
       description: string;
-      quantity: string;
+      availability: string;
       created_at: string;
     }
 
@@ -282,9 +287,11 @@ export default defineComponent({
     const itemDetails = ref<itemDetails>({
       id: "",
       model_no:"",
+      serial_no:"",
+      make:"",
       name: "",
       description: "",
-      quantity: "",
+      availability: "",
       created_at: "",
     });
 
@@ -307,16 +314,18 @@ export default defineComponent({
           ({
             id,
             model_no,
+            serial_no,
             name,
-            description,
-            quantity,
+            make,
+            availability,
             created_at
           }) => ({
             id: id,
             model_no: model_no,
+            serial_no: serial_no,
             name: name,
-            description: description,
-            quantity: quantity,
+            make: make,
+            availability: availability,
             created_at: moment(created_at).format("DD/MM/YYYY"),
           })
         );
@@ -351,16 +360,18 @@ export default defineComponent({
           ({
             id,
             model_no,
+            serial_no,
             name,
-            description,
-            quantity,
+            make,
+            availability,
             created_at
           }) => ({
             id: id,
             model_no: model_no,
+            serial_no: serial_no,
             name: name,
-            description: description,
-            quantity: quantity,
+            make: make,
+            availability: availability,
             created_at: moment(created_at).format("DD/MM/YYYY"),
           })
         );
@@ -406,16 +417,18 @@ export default defineComponent({
           ({
             id,
             model_no,
+            serial_no,
             name,
-            description,
-            quantity,
+            make,
+            availability,
             created_at
           }) => ({
             id: id,
             model_no: model_no,
+            serial_no: serial_no,
             name: name,
-            description: description,
-            quantity: quantity,
+            make: make,
+            availability: availability,
             created_at: moment(created_at).format("llll"),
           })
         );
@@ -522,16 +535,18 @@ export default defineComponent({
           ({
             id,
             model_no,
+            serial_no,
             name,
-            description,
-            quantity,
+            make,
+            availability,
             created_at
           }) => ({
             id: id,
             model_no: model_no,
+            serial_no: serial_no,
             name: name,
-            description: description,
-            quantity: quantity,
+            make: make,
+            availability: availability,
             created_at: moment(created_at).format("DD/MM/YYYY"),
           })
         );

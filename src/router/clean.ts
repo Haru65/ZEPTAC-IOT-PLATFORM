@@ -12,6 +12,7 @@ import {
   getQuotation,
   getInstrument,
   getRGatePass,
+  getDailyWorksheet,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
@@ -449,9 +450,11 @@ const routes: Array<RouteRecordRaw> = [
 
 
       // Validation Service All Front End Routes
+
+      //RGP Routes
       {
         path: "/returnablegatepasses",
-        name: "rgp",
+        name: "rgp-list",
         component: () =>
           import("@/views/apps/modules/services/rgp/RGatePassListing.vue"),
         meta: {
@@ -490,6 +493,54 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () =>
           import("@/views/apps/modules/services/rgp/RGatePassEdit.vue"),
+        meta: {
+          pageTitle: "Returnable-Gate-Pass Edit",
+          breadcrumbs: ["Returnable-Gate-Pass Edit"],
+        },
+      },
+
+      // Daily Work Sheet Routes
+      {
+        path: "/dailyworksheets",
+        name: "dailyworksheet-list",
+        component: () =>
+          import("@/views/apps/modules/services/dailyworksheet/DWorksheetListing.vue"),
+        meta: {
+          pageTitle: "Daily Worksheet List",
+          breadcrumbs: ["Daily Worksheet List"],
+        },
+      },
+      {
+        path: "/dailyworksheets/add",
+        name: "dailyworksheet-add",
+        component: () =>
+          import("@/views/apps/modules/services/dailyworksheet/DWorksheetAdd.vue"),
+        meta: {
+          pageTitle: "Daily Worksheet Add",
+          breadcrumbs: ["Daily Worksheet Add"],
+        },
+      },
+      {
+        path: "/dailyworksheets/edit/:id",
+        name: "dailyworksheet-edit",
+        beforeEnter: async (to, from, next) => {
+          const worksheetID = to.params.id;
+          //console.log(companyId);
+          try {
+            const response = await getDailyWorksheet(worksheetID.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/modules/services/dailyworksheet/DWorksheetEdit.vue"),
         meta: {
           pageTitle: "Returnable-Gate-Pass Edit",
           breadcrumbs: ["Returnable-Gate-Pass Edit"],
