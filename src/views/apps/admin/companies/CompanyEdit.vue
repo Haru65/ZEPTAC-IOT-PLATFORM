@@ -657,8 +657,6 @@ export default defineComponent({
             INstates.forEach((ele) => {
               state.value.push(ele.name);
             });
-          } else {
-            companyDetails.value.state = "";
           }
         }
       );
