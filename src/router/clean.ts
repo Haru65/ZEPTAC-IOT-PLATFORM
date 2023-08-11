@@ -492,7 +492,7 @@ const routes: Array<RouteRecordRaw> = [
           }
         },
         component: () =>
-          import("@/views/apps/modules/services/rgp/RGatePassEdit.vue"),
+          import("@/views/apps/modules/services/rgp/backup/RGatePassEdit.vue"),
         meta: {
           pageTitle: "Returnable-Gate-Pass Edit",
           breadcrumbs: ["Returnable-Gate-Pass Edit"],

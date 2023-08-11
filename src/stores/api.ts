@@ -989,3 +989,16 @@ export async function getDailyWorksheet(data: string) {
         return { error: errors };
     }
 }
+
+export async function getOnGoingRGP(data: any) {
+    try {
+        // console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('get_ongoing_rgps', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
