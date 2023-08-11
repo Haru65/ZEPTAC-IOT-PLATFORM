@@ -3,6 +3,15 @@
   <div class="card">
     <!--begin::Card body-->
     <div class="card-body">
+      <div
+        class="d-flex flex-center fw-row text-nowrap order-1 order-xxl-2 me-4"
+        data-bs-toggle="tooltip"
+        data-bs-trigger="hover"
+        data-bs-original-title="Enter RGP number"
+        data-kt-initialized="1"
+      >
+        <span class="fs-2 fw-bold text-gray-800" >Gate Pass # {{ rgpDetails.rgp_no }}</span>
+      </div>
       <!--begin::Stepper-->
       <div
         class="stepper stepper-links d-flex flex-column"
@@ -52,7 +61,9 @@
         >
           <!--begin::Step 1-->
           <div class="current" data-kt-stepper-element="content">
-            <Step1></Step1>
+            <Step1 v-bind:quotations="Quotations"
+            
+            ></Step1>
           </div>
           <!--end::Step 1-->
 
@@ -148,6 +159,38 @@ import Step3 from "@/components/wizard/steps/Step3.vue";
 import Step4 from "@/components/wizard/steps/Step4.vue";
 import Step5 from "@/components/wizard/steps/Step5.vue";
 
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import { GetAppovedQuotationsList, GetIncrReturnableGatePassId } from "@/stores/api";
+import ApiService from "@/core/services/ApiService";
+
+interface Engineer {
+  id: string;
+  first_name: string;
+  last_name: string;
+}
+
+interface Instrument {
+  id: string;
+  name: string;
+  model_no: string;
+  serial_no: string;
+  make: string;
+}
+
+interface RGP {
+  rgp_no: string;
+  quotation_id: string;
+  company_id: string;
+  date: string;
+  duedate: string;
+  engineers: Array<Engineer>;
+  instruments: Array<Instrument>;
+  created_by: string;
+  updated_by: string;
+  is_active: 1;
+}
+
 interface IStep1 {
   accountType?: string;
 }
@@ -191,6 +234,66 @@ export default defineComponent({
     const horizontalWizardRef = ref<HTMLElement | null>(null);
     const currentStepIndex = ref(0);
 
+    const auth = useAuthStore();
+    const route = useRouter();
+    const User = auth.GetUser();
+
+    const rgpDetails = ref<RGP>({
+      rgp_no: "",
+      date: "",
+      duedate: "",
+      engineers: [],
+      instruments: [],
+      quotation_id: "",
+      company_id: User.company_id,
+      created_by: User.id,
+      updated_by: User.id,
+      is_active: 1,
+    });
+
+
+    const Quotations = ref([
+      {
+        id: "",
+        client_id: "",
+        customer_id: "",
+        quotation_no: "",
+        customer_data: {
+          first_name: "",
+          last_name: "",
+        },
+        client_data: {
+          first_name: "",
+          last_name: "",
+        },
+      },
+    ]);
+    // onMounted(async () => {
+
+    // const res = await GetIncrReturnableGatePassId(User.company_id);
+    // IncrRGP(res);
+
+    // // Quotations.value.pop();
+    // // AvailableEngineers.value.pop();
+    // // AvailableInstruments.value.pop();
+    // // await GetApprovedQuotations();
+    // // await engineer_listing();
+    // // await instrument_listing();
+    // });
+
+    const IncrRGP = (data: any) => {
+    const latest_rgp_no = data.result.split("_");
+    if (parseInt(latest_rgp_no[1]) == 0) {
+      // ? if no record
+      rgpDetails.value.rgp_no =
+        latest_rgp_no[0] + "_" + latest_rgp_no[1].toString();
+    } else {
+      // ? if record exisit inc 1
+      rgpDetails.value.rgp_no =
+        latest_rgp_no[0] + "_" + (1 + +latest_rgp_no[1]).toString();
+    }
+    };
+
     const formData = ref<CreateAccount>({
       accountType: "personal",
       accountTeamSize: "50+",
@@ -209,7 +312,29 @@ export default defineComponent({
       saveCard: "1",
     });
 
-    onMounted(() => {
+    const GetApprovedQuotations = async () => {
+      ApiService.setHeader();
+
+      const company_ID = auth.GetUser().company_id;
+      const response = await GetAppovedQuotationsList(company_ID);
+
+      Quotations.value.push(
+        ...response.result.map(({ ...rest }) => ({
+          ...rest,
+        }))
+      );
+    };
+
+    onMounted(async () => {
+      const res = await GetIncrReturnableGatePassId(User.company_id);
+    IncrRGP(res);
+
+    Quotations.value.pop();
+    // AvailableEngineers.value.pop();
+    // AvailableInstruments.value.pop();
+    await GetApprovedQuotations();
+    // await engineer_listing();
+    // await instrument_listing();
       _stepperObj.value = StepperComponent.createInsance(
         horizontalWizardRef.value as HTMLElement
       );
@@ -217,7 +342,8 @@ export default defineComponent({
 
     const createAccountSchema = [
       Yup.object({
-        accountType: Yup.string().required().label("Account Type"),
+        date: Yup.string().required().label("date"),
+        duedate: Yup.string().required().label("duedate"),
       }),
       Yup.object({
         accountName: Yup.string().required().label("Account Name"),
@@ -308,6 +434,10 @@ export default defineComponent({
       totalSteps,
       currentStepIndex,
       getAssetPath,
+      IncrRGP,
+      rgpDetails,
+      Quotations,
+      GetApprovedQuotations,
     };
   },
 });
