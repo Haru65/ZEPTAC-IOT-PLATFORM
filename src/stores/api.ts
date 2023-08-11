@@ -548,6 +548,23 @@ export async function deletePriceListItem(data: any) {
 
 // QUOTATION
 
+// gell all comapnies
+export async function QuotationSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('quotation_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
 // custom
 export async function GetCustomerClients(data: any) {
     try {
@@ -602,6 +619,7 @@ export async function getQuotationList(data: any) {
         return { error: errors };
     }
 }
+
 
 
 // delete
