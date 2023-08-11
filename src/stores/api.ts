@@ -579,21 +579,6 @@ export async function GetCustomerClients(data: any) {
     }
 }
 
-export async function QuotationSearch(search: any) {
-    try {
-        //console.log(data)
-        const data = {
-            search: search
-        }
-        ApiService.setHeader();
-        const response = await ApiService.post('quotation_search', data);
-        return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
-    }
-}
-
 export async function GetIncrQuotationId(data: any) {
     try {
         //console.log(data)

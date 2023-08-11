@@ -7,7 +7,7 @@
           <div class="card-body sm:p-2 lg:p-12">
             <!--end::Form-->
 
-            <VForm form id="kt_Quotation_form" novalidate>
+            <VForm id="kt_Quotation_form" novalidate>
               <div
                 class="d-flex gap-5 flex-column align-items-start flex-xxl-row"
               >
