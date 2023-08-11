@@ -740,7 +740,7 @@ export default defineComponent({
   font-weight: 500;
 }
 .el-input__wrapper {
-  color: red !important;
+  
   height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

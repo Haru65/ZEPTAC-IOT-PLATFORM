@@ -106,8 +106,9 @@ export default defineComponent({
     ErrorMessage,
   },
   setup() {
+
     onMounted(() => {
-      console.log("STWP 1");
+      console.log("STWP 21");
     });
 
     return {

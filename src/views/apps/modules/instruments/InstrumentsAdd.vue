@@ -254,7 +254,7 @@ export default defineComponent({
       model_no: "",
       serial_no: "",
       make: "",
-      company_id: "",
+      company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
     });
@@ -283,7 +283,6 @@ export default defineComponent({
           router.push({ name: "instrument-list" });
         } else {
           // Handle API error response
-          const errorData = response.error;
           //   console.log("API error:", errorData);
           // console.log("API error:", errorData.response.data.errors);
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
@@ -348,7 +347,7 @@ export default defineComponent({
   font-weight: 500;
 }
 .el-input__wrapper {
-  color: red !important;
+  
   height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

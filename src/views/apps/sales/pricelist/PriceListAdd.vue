@@ -146,6 +146,7 @@ interface itemDetails {
   name: string;
   description: string;
   price: string;
+  company_id: string;
   created_by: number;
   updated_by: number;
 }
@@ -174,6 +175,7 @@ export default defineComponent({
       name: "",
       description: "",
       price: "",
+      company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
     });

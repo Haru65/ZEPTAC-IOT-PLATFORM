@@ -429,7 +429,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getInstrument(instrumentItemId.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.message !== "OK") {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -446,7 +446,7 @@ const routes: Array<RouteRecordRaw> = [
           breadcrumbs: ["Instrument Edit"],
         },
       },
-      
+
 
 
       // Validation Service All Front End Routes

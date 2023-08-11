@@ -143,7 +143,7 @@ import { useForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import Step1 from "./steps/step1.vue";
-import Step2 from "@/components/wizard/steps/Step2.vue";
+import Step2 from "./steps/Step2.vue";
 import Step3 from "@/components/wizard/steps/Step3.vue";
 import Step4 from "@/components/wizard/steps/Step4.vue";
 import Step5 from "@/components/wizard/steps/Step5.vue";
