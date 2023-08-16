@@ -428,7 +428,7 @@ const routes: Array<RouteRecordRaw> = [
           //console.log(companyId);
           try {
             const response = await getInstrument(instrumentItemId.toString());
-            console.log(response);
+            // console.log(response);
             if (response.error || response.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
@@ -446,7 +446,7 @@ const routes: Array<RouteRecordRaw> = [
           breadcrumbs: ["Instrument Edit"],
         },
       },
-      
+
 
 
       // Validation Service All Front End Routes
@@ -492,7 +492,7 @@ const routes: Array<RouteRecordRaw> = [
           }
         },
         component: () =>
-          import("@/views/apps/modules/services/rgp/RGatePassEdit.vue"),
+          import("@/views/apps/modules/services/rgp/backup/RGatePassEdit.vue"),
         meta: {
           pageTitle: "Returnable-Gate-Pass Edit",
           breadcrumbs: ["Returnable-Gate-Pass Edit"],

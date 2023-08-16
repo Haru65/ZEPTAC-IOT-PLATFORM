@@ -126,6 +126,13 @@
                           :label="`${item.first_name} ${item.last_name}`"
                           :value="item.id"
                         />
+                        <el-option
+                          value=""
+                          disabled="disabled"
+                          label="Please Select Customer..."
+                          key=""
+                          >Please Select Customer...</el-option
+                        >
                       </el-select>
                     </div>
                     <!--end::Row-->
@@ -211,6 +218,13 @@
                           :label="`${item.client_data.first_name} ${item.client_data.last_name}`"
                           :value="item.client_data.id"
                         />
+                        <el-option
+                          value=""
+                          disabled="disabled"
+                          label="Please Select Client..."
+                          key=""
+                          >Please Select Client...</el-option
+                        >
                       </el-select>
                     </div>
                     <!--end::Row-->
@@ -376,15 +390,19 @@
                   :disabled="disabledselect"
                   placeholder="Please Select Status..."
                 >
-                  <!-- <el-option value=" " label="Please Select Status..." key=" "
-                    >Please Select Status...</el-option
-                  > -->
                   <el-option
                     v-for="item in InvoiceStatusArray"
                     :key="item.id"
                     :label="`${item.name}`"
                     :value="item.id"
                   />
+                  <el-option
+                    value=""
+                    disabled="disabled"
+                    label="Please Select Status..."
+                    key=""
+                    >Please Select Status...</el-option
+                  >
                 </el-select>
               </div>
               <br />
@@ -526,7 +544,7 @@ export default defineComponent({
     ]);
     const InvoiceDetails = ref<InvoiceDetails>({
       invoice_no: "21****",
-      customer_id: " ",
+      customer_id: "",
       items: [],
       date: "",
       duedate: "",

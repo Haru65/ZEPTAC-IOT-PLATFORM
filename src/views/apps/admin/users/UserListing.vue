@@ -452,7 +452,7 @@ export default defineComponent({
         }
         tableData.value.splice(0, tableData.value.length, ...results);
 
-        if (tableData.value.length == 0) {
+        if (tableData.value.length == 0 && search.value.length != 0) {
           loading.value = true;
           clearTimeout(debounceTimer); // Clear any existing debounce timer
           debounceTimer = setTimeout(async () => {
@@ -538,3 +538,26 @@ export default defineComponent({
   },
 });
 </script>
+<style>
+.el-input__inner {
+  font-weight: 500;
+}
+
+.el-input__wrapper {
+  height: 3.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--bs-gray-100);
+  border-color: var(--bs-gray-100);
+  color: var(--bs-gray-700);
+  transition: color 0.2s ease;
+  appearance: none;
+  line-height: 1.5;
+  border: none !important;
+  padding-top: 0.825rem;
+  padding-bottom: 0.825rem;
+  padding-left: 1.5rem;
+  font-size: 1.15rem;
+  border-radius: 0.625rem;
+  box-shadow: none !important;
+}
+</style>
