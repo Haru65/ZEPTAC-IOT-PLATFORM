@@ -134,23 +134,24 @@
             <!-- extra fields -->
             <div class="row mb-6">
               <div class="form-group col-md-12">
-                <label class="col-lg-4 col-form-label required fw-semobold fs-6 text-nowrap"
-                >Instrument Description</label
-              >
-              <Field
-                    type="text"
-                    as="textarea"
-                    name="description"
-                    rows="3"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Description of the instrument..."
-                    v-model="itemDetails.description"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="description" />
-                    </div>
+                <label
+                  class="col-lg-4 col-form-label required fw-semobold fs-6 text-nowrap"
+                  >Instrument Description</label
+                >
+                <Field
+                  type="text"
+                  as="textarea"
+                  name="description"
+                  rows="3"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Description of the instrument..."
+                  v-model="itemDetails.description"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="description" />
                   </div>
+                </div>
               </div>
             </div>
             <!--end::Input group-->
@@ -186,11 +187,7 @@
   </div>
 </template>
 
-
-
-
-
-    <script lang="ts">
+<script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
@@ -198,7 +195,7 @@ import {
   updateInstrument,
   getInstrument,
   deleteInstrument,
-getCompanies,
+  getCompanies,
 } from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
@@ -264,25 +261,27 @@ export default defineComponent({
       model_no: "",
       serial_no: "",
       make: "",
-      company_id: "",
+      company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
     });
 
     onMounted(async () => {
       Companies.value.pop();
-      const response = await getInstrument(itemId.toString());
+      let response = await getInstrument(itemId.toString());
       console.log(response);
       itemDetails.value = {
-        name: response.name,
-        description: response.description,
-        availability: response.availability,
-        model_no: response.model_no,
-        serial_no: response.serial_no,
-        make: response.make,
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
+        name: response.result.name,
+        description: response.result.description,
+        availability: response.result.availability,
+        model_no: response.result.model_no,
+        serial_no: response.result.serial_no,
+        make: response.result.make,
+        company_id: response.result.company_id
+          ? response.result.company_id
+          : "",
+        created_by: response.result.created_by,
+        updated_by: response.result.updated_by,
       };
       await getdropcomp();
     });
@@ -293,8 +292,8 @@ export default defineComponent({
       try {
         // Call your API here with the form values
         const response = await updateInstrument(itemId, itemDetails.value);
-        console.log(response.error);
-        if (!response.error) {
+        console.log(response.result.error);
+        if (!response.result.error) {
           // Handle successful API response
           console.log("API response:", response);
           showSuccessAlert(
@@ -304,9 +303,9 @@ export default defineComponent({
           router.push({ name: "instrument-list" });
         } else {
           // Handle API error response
-          const errorData = response.error;
+          const errorData = response.result.error;
           console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
+          // console.log("API error:", errorData.response.result.data.errors);
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
         }
       } catch (error) {
@@ -376,18 +375,17 @@ export default defineComponent({
       Companies,
       deleteItem,
       identifier,
-
     };
   },
 });
 </script>
-    
+
 <style>
 .el-input__inner {
   font-weight: 500;
 }
 .el-input__wrapper {
-  color: red !important;
+  
   height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

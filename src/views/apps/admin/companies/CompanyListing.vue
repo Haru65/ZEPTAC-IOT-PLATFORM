@@ -407,7 +407,7 @@ export default defineComponent({
           }
         }
         tableData.value.splice(0, tableData.value.length, ...results);
-        if (tableData.value.length == 0) {
+        if (tableData.value.length == 0 && search.value.length != 0) {
           loading.value = true;
           clearTimeout(debounceTimer); // Clear any existing debounce timer
           debounceTimer = setTimeout(async () => {

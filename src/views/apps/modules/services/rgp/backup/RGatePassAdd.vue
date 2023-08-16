@@ -417,10 +417,9 @@ import {
   getSiteAddress,
   getInstruments,
   addRGatePass,
-  UpdateStatus,
+  UpdateStatus
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
-import CustomSelect from "./CustomComponents/CustomQuotationItems.vue";
 import moment from "moment";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import { useRouter } from "vue-router";
@@ -457,6 +456,8 @@ interface RGP {
 export default defineComponent({
   name: "rgp-add",
   components: {
+    ErrorMessage,
+    Field,
     VForm,
   },
   setup() {
@@ -477,9 +478,11 @@ export default defineComponent({
         const company_id = auth.GetUser().company_id;
         const response = await getEngineers(company_id);
         // console.log(response.result);
-        AvailableEngineers.value = response.result.map(({ ...rest }) => ({
-          ...rest,
-        }));
+        if(response.result){
+          AvailableEngineers.value = response.result.map(({ ...rest }) => ({
+            ...rest,
+          }));
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -495,9 +498,11 @@ export default defineComponent({
         const company_id = auth.GetUser().company_id;
         const response = await getInstruments(company_id);
         // console.log(response.result);
-        AvailableInstruments.value = response.result.map(({ ...rest }) => ({
+        if(response.result){
+          AvailableInstruments.value = response.result.map(({ ...rest}) => ({
           ...rest,
         }));
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -548,10 +553,8 @@ export default defineComponent({
     });
 
     onMounted(async () => {
+
       const res = await GetIncrReturnableGatePassId(User.company_id);
-
-      console.log(res);
-
       IncrRGP(res);
 
       Quotations.value.pop();
@@ -676,24 +679,26 @@ export default defineComponent({
           const response = await addRGatePass(rgpDetails.value);
 
           if (!response.error) {
+
             // change the availability of engineers and instruments
             const statusUpdate = await UpdateStatus(rgpDetails.value);
 
-            if (!statusUpdate.error) {
-              showSuccessAlert(
-                "Success",
-                "Returnable Gate pass details have been successfully inserted!"
-              );
-              route.push({ name: "invoices-list" });
+            if(!statusUpdate.error){
+
+            showSuccessAlert(
+              "Success",
+              "Returnable Gate pass details have been successfully inserted!"
+            );
+            route.push({ name: "rgp-list" });
             }
-          } else {
+          }else {
             // Handle API error response
             const errorData = response.error;
             // console.log("API error:", errorData);
             console.log("API error:", errorData.response.data.errors);
             showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           }
-        } else {
+        }else {
           showErrorAlert("Warning", "Bad Luck! RGP Details Already Exists");
           route.push({ name: "rgp-add" });
         }

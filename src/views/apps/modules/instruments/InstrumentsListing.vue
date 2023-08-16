@@ -104,23 +104,32 @@
         <!-- img data -->
 
         <template v-slot:id="{ row: instruments }">
-            {{ instruments.id }}
+          {{ instruments.id }}
         </template>
         <template v-slot:model_no="{ row: instruments }">
-            {{ instruments.model_no }}
+          {{ instruments.model_no }}
         </template>
         <template v-slot:serial_no="{ row: instruments }">
-            {{ instruments.serial_no }}
+          {{ instruments.serial_no }}
         </template>
         <template v-slot:name="{ row: instruments }">
-            {{ instruments.name }}
+          {{ instruments.name }}
         </template>
         <!-- defualt data -->
         <template v-slot:make="{ row: instruments }">
           {{ instruments.make }}
         </template>
         <template v-slot:availability="{ row: instruments }">
-          {{ instruments.availability }}
+          <span
+            v-if="instruments.availability == 1"
+            class="badge py-3 px-4 fs-7 badge-light-success"
+            >Available</span
+          >
+          <span
+            v-if="instruments.availability == 0"
+            class="badge py-3 px-4 fs-7 badge-light-danger"
+            >Not Available</span
+          >
         </template>
         <template v-slot:created_at="{ row: instruments }">
           {{ instruments.created_at }}
@@ -188,14 +197,11 @@ import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
 import type { IInstrument } from "@/core/model/instruments";
 import {
-
   getAllInstrument,
   deleteInstrument,
-  InstrumentSearch
-
+  InstrumentSearch,
 } from "@/stores/api";
 import arraySort from "array-sort";
-import { useAuthStore } from "@/stores/auth";
 import moment from "moment";
 import Swal from "sweetalert2";
 
@@ -228,19 +234,19 @@ export default defineComponent({
         columnName: "Instrument Name",
         columnLabel: "name",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 75,
       },
       {
         columnName: "Make",
         columnLabel: "make",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 75,
       },
       {
         columnName: "Availability",
         columnLabel: "availability",
         sortEnabled: true,
-        columnWidth: 75,
+        columnWidth: 85,
       },
       {
         columnName: "Created At",
@@ -282,19 +288,6 @@ export default defineComponent({
     // limit 10
     const more = ref(false);
 
-    const auth = useAuthStore();
-    const User = auth.GetUser();
-    const itemDetails = ref<itemDetails>({
-      id: "",
-      model_no:"",
-      serial_no:"",
-      make:"",
-      name: "",
-      description: "",
-      availability: "",
-      created_at: "",
-    });
-
     const PagePointer = async (page) => {
       // ? Truncate the tableData
       //console.log(limit.value);
@@ -309,7 +302,7 @@ export default defineComponent({
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
             id,
@@ -318,7 +311,7 @@ export default defineComponent({
             name,
             make,
             availability,
-            created_at
+            created_at,
           }) => ({
             id: id,
             model_no: model_no,
@@ -326,7 +319,7 @@ export default defineComponent({
             name: name,
             make: make,
             availability: availability,
-            created_at: moment(created_at).format("DD/MM/YYYY"),
+            created_at: moment(created_at).format("MMM Do YY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -355,7 +348,7 @@ export default defineComponent({
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
             id,
@@ -364,7 +357,7 @@ export default defineComponent({
             name,
             make,
             availability,
-            created_at
+            created_at,
           }) => ({
             id: id,
             model_no: model_no,
@@ -372,7 +365,7 @@ export default defineComponent({
             name: name,
             make: make,
             availability: availability,
-            created_at: moment(created_at).format("DD/MM/YYYY"),
+            created_at: moment(created_at).format("MMM Do YY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -389,6 +382,7 @@ export default defineComponent({
     //console.log(initvalues.value);
 
     const NextPage = () => {
+      console.log(more.value);
       if (more.value != false) {
         page.value = page.value + 1;
         PagePointer(page.value);
@@ -421,7 +415,7 @@ export default defineComponent({
             name,
             make,
             availability,
-            created_at
+            created_at,
           }) => ({
             id: id,
             model_no: model_no,
@@ -429,9 +423,11 @@ export default defineComponent({
             name: name,
             make: make,
             availability: availability,
-            created_at: moment(created_at).format("llll"),
+            created_at: moment(created_at).format("MMM Do YY"),
           })
         );
+        total.value = response.result.total_count;
+        more.value = response.result.next_page_url != null ? true : false;
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -505,7 +501,7 @@ export default defineComponent({
     const searchItems = async () => {
       console.log(search.value);
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
-      if (search.value !== "") {
+      if (search.value.length != 0) {
         let results: Array<IInstrument> = [];
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
@@ -513,13 +509,18 @@ export default defineComponent({
           }
         }
         tableData.value.splice(0, tableData.value.length, ...results);
-        if (tableData.value.length == 0) {
+        if (tableData.value.length == 0 && search.value.length != 0) {
           loading.value = true;
           clearTimeout(debounceTimer); // Clear any existing debounce timer
           debounceTimer = setTimeout(async () => {
             await SearchMore();
-          }, 1000);
+          }, 1500);
         }
+      } else {
+        page.value = 1;
+        while (tableData.value.length != 0) tableData.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
+        await instrument_listing();
       }
     };
 
@@ -529,8 +530,6 @@ export default defineComponent({
         const response = await InstrumentSearch(search.value);
         //console.log(response.result.total_count);
         // first 20 displayed
-        total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.data.map(
           ({
             id,
@@ -539,7 +538,7 @@ export default defineComponent({
             name,
             make,
             availability,
-            created_at
+            created_at,
           }) => ({
             id: id,
             model_no: model_no,
@@ -608,3 +607,26 @@ export default defineComponent({
   },
 });
 </script>
+<style>
+.el-input__inner {
+  font-weight: 500;
+}
+
+.el-input__wrapper {
+  height: 3.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--bs-gray-100);
+  border-color: var(--bs-gray-100);
+  color: var(--bs-gray-700);
+  transition: color 0.2s ease;
+  appearance: none;
+  line-height: 1.5;
+  border: none !important;
+  padding-top: 0.825rem;
+  padding-bottom: 0.825rem;
+  padding-left: 1.5rem;
+  font-size: 1.15rem;
+  border-radius: 0.625rem;
+  box-shadow: none !important;
+}
+</style>

@@ -130,377 +130,375 @@
             <!--begin::Input group-->
             <!--end::Input group-->
 
-            <div class="row">
-              <!--begin::Input group-->
-              <div class="row mb-6">
-                <!--begin::Label-->
-                <label class="col-lg-4 col-form-label fw-semobold fs-6">
-                  <span class="required">Email</span>
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label fw-semobold fs-6">
+                <span class="required">Email</span>
 
-                  <i
-                    class="fas fa-exclamation-circle ms-1 fs-7"
-                    data-bs-toggle="tooltip"
-                    title="Email must be unique"
-                  ></i>
-                </label>
-                <!--end::Label-->
+                <i
+                  class="fas fa-exclamation-circle ms-1 fs-7"
+                  data-bs-toggle="tooltip"
+                  title="Email must be unique"
+                ></i>
+              </label>
+              <!--end::Label-->
 
-                <!--begin::Col-->
-                <div class="col-lg-8 fv-row">
-                  <Field
-                    type="text"
-                    name="email"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Email"
-                    v-model="companyDetails.email"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="email" />
-                    </div>
+              <!--begin::Col-->
+              <div class="col-lg-8 fv-row">
+                <Field
+                  type="text"
+                  name="email"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Email"
+                  v-model="companyDetails.email"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="email" />
                   </div>
                 </div>
-                <!--end::Col-->
               </div>
-              <!--end::Input group-->
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
 
-              <!--begin::Input group-->
-              <div class="row mb-6">
-                <!--begin::Label-->
-                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                  >Country & State</label
-                >
-                <!--end::Label-->
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >Country & State</label
+              >
+              <!--end::Label-->
 
-                <!--begin::Col-->
-                <div class="col-lg-8">
-                  <!--begin::Row-->
-                  <div class="row">
-                    <!--begin::Col-->
-                    <div class="col-lg-6 fv-row">
-                      <el-select
-                        v-model="companyDetails.country"
-                        filterable
-                        placeholder="Select Country"
-                      >
-                        <el-option
-                          v-for="item in countries"
-                          :key="item.name"
-                          :label="item.name"
-                          :value="item.name"
-                        />
-                      </el-select>
-                    </div>
-                    <!--end::Col-->
-
-                    <!--begin::Col-->
-                    <div v-if="state.length" class="col-lg-6 fv-row">
-                      <div>
-                        <el-select
-                          v-model="companyDetails.state"
-                          filterable
-                          placeholder="Select State"
-                        >
-                          <el-option
-                            v-for="item in state"
-                            :key="item"
-                            :label="item"
-                            :value="item"
-                          />
-                        </el-select>
-                      </div>
-                    </div>
-
-                    <div v-if="!state.length" class="col-lg-6 fv-row">
-                      <div>
-                        <Field
-                          type="tel"
-                          name="state"
-                          class="form-control form-control-lg form-control-solid"
-                          placeholder="Enter State Name"
-                          v-model="companyDetails.state"
-                        />
-                        <div class="fv-plugins-message-container">
-                          <div class="fv-help-block">
-                            <ErrorMessage name="state" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <!--end::Col-->
-                  </div>
-                  <!--end::Row-->
-                </div>
-                <!--end::Col-->
-              </div>
-              <!--end::Input group-->
-
-              <!--begin::Input group-->
-              <div class="row mb-6">
-                <!--begin::Label-->
-                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                  >City & Pincode</label
-                >
-                <!--end::Label-->
-                <!--begin::Col-->
-                <div class="col-lg-8">
-                  <!--begin::Row-->
-                  <div class="row">
-                    <!--begin::Col-->
-                    <div class="col-lg-6 fv-row">
-                      <Field
-                        type="text"
-                        name="city"
-                        class="form-control form-control-lg form-control-solid"
-                        placeholder="Enter City Name"
-                        v-model="companyDetails.city"
-                      />
-                      <div class="fv-plugins-message-container">
-                        <div class="fv-help-block">
-                          <ErrorMessage name="city" />
-                        </div>
-                      </div>
-                    </div>
-                    <!--end::Col-->
-
-                    <!--begin::Col-->
-                    <div class="col-lg-6 fv-row">
-                      <Field
-                        type="text"
-                        name="pincode"
-                        class="form-control form-control-lg form-control-solid"
-                        placeholder="Enter Pincode"
-                        v-model="companyDetails.pincode"
-                      />
-                      <div class="fv-plugins-message-container">
-                        <div class="fv-help-block">
-                          <ErrorMessage name="pincode" />
-                        </div>
-                      </div>
-                    </div>
-                    <!--end::Col-->
-                  </div>
-                  <!--end::Row-->
-                </div>
-                <!--end::Col-->
-              </div>
-              <!--end::Input group-->
-
-              <!--begin::Input group-->
-              <div class="row mb-3">
-                <!--begin::Label-->
-                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                  >GST Details</label
-                >
-                <!--end::Label-->
-                <!--begin::Col-->
-                <div class="col-lg-8">
-                  <!--begin::Row-->
+              <!--begin::Col-->
+              <div class="col-lg-8">
+                <!--begin::Row-->
+                <div class="row">
                   <!--begin::Col-->
-                  <div class="col-lg fv-row">
-                    <Field
-                      type="text"
-                      as="textarea"
-                      name="gst_details"
-                      class="form-control form-control-lg form-control-solid"
-                      placeholder="GST"
-                      v-model="companyDetails.gst_details"
-                    />
-                    <div class="fv-plugins-message-container">
-                      <div class="fv-help-block">
-                        <ErrorMessage name="gst_details" />
-                      </div>
-                    </div>
+                  <div class="col-lg-6 fv-row">
+                    <el-select
+                      v-model="companyDetails.country"
+                      filterable
+                      placeholder="Select Country"
+                    >
+                      <el-option
+                        v-for="item in countries"
+                        :key="item.name"
+                        :label="item.name"
+                        :value="item.name"
+                      />
+                    </el-select>
                   </div>
                   <!--end::Col-->
-                  <!--end::Row-->
-                </div>
-                <!--end::Col-->
-              </div>
-              <!--end::Input group-->
-              <!--begin::Input group-->
-              <div class="row mb-6">
-                <!--begin::Label-->
-                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                  >User Limit & Package</label
-                >
-                <!--end::Label-->
 
-                <!--begin::Col-->
-                <div class="col-lg-8">
-                  <!--begin::Row-->
-                  <div class="row">
-                    <!--begin::Col-->
-                    <div class="col-lg-6 fv-row p-2">
+                  <!--begin::Col-->
+                  <div v-if="state.length" class="col-lg-6 fv-row">
+                    <div>
                       <el-select
-                        v-model="companyDetails.user_limit"
+                        v-model="companyDetails.state"
                         filterable
-                        placeholder="select User Limit"
+                        placeholder="Select State"
                       >
                         <el-option
-                          v-for="item in limit"
+                          v-for="item in state"
                           :key="item"
                           :label="item"
                           :value="item"
                         />
                       </el-select>
                     </div>
-                    <!--end::Col-->
-
-                    <!--begin::Col-->
-                    <div class="col-lg-6 fv-row p-2">
-                      <div>
-                        <el-select
-                          v-model="companyDetails.selected_package"
-                          filterable
-                          placeholder="Select a Package..."
-                        >
-                          <el-option
-                            v-for="item in packages"
-                            :key="item"
-                            :label="item"
-                            :value="item"
-                          />
-                        </el-select>
-                      </div>
-                    </div>
-                    <!--end::Col-->
                   </div>
-                  <!--end::Row-->
-                </div>
-                <!--end::Col-->
-              </div>
-              <!--end::Input group-->
-              <!--begin::Input group-->
-              <div class="row mb-6">
-                <!--begin::Label-->
-                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                  >Quotation No & Prefix</label
-                >
-                <!--end::Label-->
 
-                <!--begin::Col-->
-                <div class="col-lg-8">
-                  <!--begin::Row-->
-                  <div class="row">
-                    <!--begin::Col-->
-                    <div class="col-lg-6 fv-row">
+                  <div v-if="!state.length" class="col-lg-6 fv-row">
+                    <div>
                       <Field
-                        type="text"
-                        name="quotation_prefix"
+                        type="tel"
+                        name="state"
                         class="form-control form-control-lg form-control-solid"
-                        placeholder="Enter Quotation Prefix"
-                        v-model="companyDetails.quotation_prefix"
+                        placeholder="Enter State Name"
+                        v-model="companyDetails.state"
                       />
-                    </div>
-                    <!--end::Col-->
-
-                    <!--begin::Col-->
-                    <div class="col-lg-6 fv-row">
-                      <div>
-                        <Field
-                          type="text"
-                          name="quotation_no"
-                          class="form-control form-control-lg form-control-solid"
-                          placeholder="Enter Quotation No"
-                          v-model="companyDetails.quotation_no"
-                        />
+                      <div class="fv-plugins-message-container">
+                        <div class="fv-help-block">
+                          <ErrorMessage name="state" />
+                        </div>
                       </div>
                     </div>
-                    <!--end::Col-->
                   </div>
-                  <!--end::Row-->
+                  <!--end::Col-->
                 </div>
-                <!--end::Col-->
+                <!--end::Row-->
               </div>
-              <!--end::Input group-->
-              <!--begin::Input group-->
-              <div class="row mb-6">
-                <!--begin::Label-->
-                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                  >Invoice No & Prefix</label
-                >
-                <!--end::Label-->
-
-                <!--begin::Col-->
-                <div class="col-lg-8">
-                  <!--begin::Row-->
-                  <div class="row">
-                    <!--begin::Col-->
-                    <div class="col-lg-6 fv-row">
-                      <Field
-                        type="text"
-                        name="invoice_prefix"
-                        class="form-control form-control-lg form-control-solid"
-                        placeholder="Enter Invoice Prefix"
-                        v-model="companyDetails.invoice_prefix"
-                      />
-                    </div>
-                    <!--end::Col-->
-
-                    <!--begin::Col-->
-                    <div class="col-lg-6 fv-row">
-                      <div>
-                        <Field
-                          type="text"
-                          name="invoice_no"
-                          class="form-control form-control-lg form-control-solid"
-                          placeholder="Enter invoice No"
-                          v-model="companyDetails.invoice_no"
-                        />
-                      </div>
-                    </div>
-                    <!--end::Col-->
-                  </div>
-                  <!--end::Row-->
-                </div>
-                <!--end::Col-->
-              </div>
-              <!--end::Input group-->
-              <!--begin::Input group-->
-              <div class="row mb-6">
-                <!--begin::Label-->
-                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                  >RGP No & Prefix</label
-                >
-                <!--end::Label-->
-
-                <!--begin::Col-->
-                <div class="col-lg-8">
-                  <!--begin::Row-->
-                  <div class="row">
-                    <!--begin::Col-->
-                    <div class="col-lg-6 fv-row p-2">
-                      <Field
-                        type="text"
-                        name="rgp_prefix"
-                        class="form-control form-control-lg form-control-solid"
-                        placeholder="Enter RGP Prefix"
-                        v-model="companyDetails.rgp_prefix"
-                      />
-                    </div>
-                    <!--end::Col-->
-
-                    <!--begin::Col-->
-                    <div class="col-lg-6 fv-row p-2">
-                      <div>
-                        <Field
-                          type="text"
-                          name="rgp_no"
-                          class="form-control form-control-lg form-control-solid"
-                          placeholder="Enter RGP No"
-                          v-model="companyDetails.rgp_no"
-                        />
-                      </div>
-                    </div>
-                    <!--end::Col-->
-                  </div>
-                  <!--end::Row-->
-                </div>
-                <!--end::Col-->
-              </div>
-              <!--end::Input group-->
+              <!--end::Col-->
             </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >City & Pincode</label
+              >
+              <!--end::Label-->
+              <!--begin::Col-->
+              <div class="col-lg-8">
+                <!--begin::Row-->
+                <div class="row">
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row">
+                    <Field
+                      type="text"
+                      name="city"
+                      class="form-control form-control-lg form-control-solid"
+                      placeholder="Enter City Name"
+                      v-model="companyDetails.city"
+                    />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="city" />
+                      </div>
+                    </div>
+                  </div>
+                  <!--end::Col-->
+
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row">
+                    <Field
+                      type="text"
+                      name="pincode"
+                      class="form-control form-control-lg form-control-solid"
+                      placeholder="Enter Pincode"
+                      v-model="companyDetails.pincode"
+                    />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="pincode" />
+                      </div>
+                    </div>
+                  </div>
+                  <!--end::Col-->
+                </div>
+                <!--end::Row-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <div class="row mb-3">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >GST Details</label
+              >
+              <!--end::Label-->
+              <!--begin::Col-->
+              <div class="col-lg-8">
+                <!--begin::Row-->
+                <!--begin::Col-->
+                <div class="col-lg fv-row">
+                  <Field
+                    type="text"
+                    as="textarea"
+                    name="gst_details"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="GST"
+                    v-model="companyDetails.gst_details"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="gst_details" />
+                    </div>
+                  </div>
+                </div>
+                <!--end::Col-->
+                <!--end::Row-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >User Limit & Package</label
+              >
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8">
+                <!--begin::Row-->
+                <div class="row">
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row p-2">
+                    <el-select
+                      v-model="companyDetails.user_limit"
+                      filterable
+                      placeholder="select User Limit"
+                    >
+                      <el-option
+                        v-for="item in limit"
+                        :key="item"
+                        :label="item"
+                        :value="item"
+                      />
+                    </el-select>
+                  </div>
+                  <!--end::Col-->
+
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row p-2">
+                    <div>
+                      <el-select
+                        v-model="companyDetails.selected_package"
+                        filterable
+                        placeholder="Select a Package..."
+                      >
+                        <el-option
+                          v-for="item in packages"
+                          :key="item"
+                          :label="item"
+                          :value="item"
+                        />
+                      </el-select>
+                    </div>
+                  </div>
+                  <!--end::Col-->
+                </div>
+                <!--end::Row-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >Quotation Prefix & No</label
+              >
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8">
+                <!--begin::Row-->
+                <div class="row">
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row">
+                    <Field
+                      type="text"
+                      name="quotation_prefix"
+                      class="form-control form-control-lg form-control-solid"
+                      placeholder="Enter Quotation Prefix"
+                      v-model="companyDetails.quotation_prefix"
+                    />
+                  </div>
+                  <!--end::Col-->
+
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row">
+                    <div>
+                      <Field
+                        type="text"
+                        name="quotation_no"
+                        class="form-control form-control-lg form-control-solid"
+                        placeholder="Enter Quotation No"
+                        v-model="companyDetails.quotation_no"
+                      />
+                    </div>
+                  </div>
+                  <!--end::Col-->
+                </div>
+                <!--end::Row-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >Invoice Prefix & No</label
+              >
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8">
+                <!--begin::Row-->
+                <div class="row">
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row">
+                    <Field
+                      type="text"
+                      name="invoice_prefix"
+                      class="form-control form-control-lg form-control-solid"
+                      placeholder="Enter Invoice Prefix"
+                      v-model="companyDetails.invoice_prefix"
+                    />
+                  </div>
+                  <!--end::Col-->
+
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row">
+                    <div>
+                      <Field
+                        type="text"
+                        name="invoice_no"
+                        class="form-control form-control-lg form-control-solid"
+                        placeholder="Enter invoice No"
+                        v-model="companyDetails.invoice_no"
+                      />
+                    </div>
+                  </div>
+                  <!--end::Col-->
+                </div>
+                <!--end::Row-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >RGP Prefix & No</label
+              >
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8">
+                <!--begin::Row-->
+                <div class="row">
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row p-2">
+                    <Field
+                      type="text"
+                      name="rgp_prefix"
+                      class="form-control form-control-lg form-control-solid"
+                      placeholder="Enter RGP Prefix"
+                      v-model="companyDetails.rgp_prefix"
+                    />
+                  </div>
+                  <!--end::Col-->
+
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row p-2">
+                    <div>
+                      <Field
+                        type="text"
+                        name="rgp_no"
+                        class="form-control form-control-lg form-control-solid"
+                        placeholder="Enter RGP No"
+                        v-model="companyDetails.rgp_no"
+                      />
+                    </div>
+                  </div>
+                  <!--end::Col-->
+                </div>
+                <!--end::Row-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
           </div>
           <div class="modal-footer flex-center">
             <!--begin::Button-->
@@ -659,8 +657,6 @@ export default defineComponent({
             INstates.forEach((ele) => {
               state.value.push(ele.name);
             });
-          } else {
-            companyDetails.value.state = "";
           }
         }
       );
@@ -776,7 +772,7 @@ export default defineComponent({
 }
 
 .el-input__wrapper {
-  color: red !important;
+  
   height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

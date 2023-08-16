@@ -800,7 +800,7 @@ export async function getInstrument(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.get(INSTRUMENTS_URL, data);
-        return response.data.result[0];
+        return response.data;
     } catch (errors) {
         console.error(errors);
         return { error: errors };
@@ -877,10 +877,10 @@ export async function getInstruments(data: any) {
     }
 }
 
-export async function getSiteAddress(data: any){
+export async function getSiteAddress(data: any) {
     try {
         ApiService.setHeader();
-        const id = {"id" : data};
+        const id = { "id": data };
         const response = await ApiService.post('get_site_address', id);
         return response.data;
     } catch (errors) {
@@ -986,6 +986,19 @@ export async function getDailyWorksheet(data: string) {
         ApiService.setHeader();
         const response = await ApiService.get(RGP_URL, data);
         return response.data.result[0];
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getOnGoingRGP(data: any) {
+    try {
+        // console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('get_ongoing_rgps', id);
+        return response.data;
     } catch (errors) {
         console.error(errors);
         return { error: errors };
