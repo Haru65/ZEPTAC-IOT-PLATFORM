@@ -420,7 +420,7 @@
     UpdateStatus
   } from "@/stores/api";
   import { useAuthStore } from "@/stores/auth";
-  import CustomSelect from "./CustomComponents/CustomQuotationItems.vue";
+  // import CustomSelect from "./CustomComponents/CustomQuotationItems.vue";
   import moment from "moment";
   import { ErrorMessage, Field, Form as VForm } from "vee-validate";
   import { useRouter } from "vue-router";
@@ -457,7 +457,7 @@
   export default defineComponent({
     name: "rgp-add",
     components: {
-      CustomSelect,
+      // CustomSelect,
       ErrorMessage,
       Field,
       VForm,
