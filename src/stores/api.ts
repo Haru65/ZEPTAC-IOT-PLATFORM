@@ -797,10 +797,10 @@ export async function addInstrument(data: any) {
 
 export async function getInstrument(data: any) {
     try {
-        //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.get(INSTRUMENTS_URL, data);
-        return response.data;
+        // console.log(response)
+        return response.data.result;
     } catch (errors) {
         console.error(errors);
         return { error: errors };

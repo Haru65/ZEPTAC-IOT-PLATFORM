@@ -4,115 +4,133 @@
     <!--begin::Heading-->
     <div class="pb-10 pb-lg-15">
       <!--begin::Title-->
-      <h2 class="fw-bold d-flex align-items-center text-dark">
-        Choose A Date
-        <i
-          class="fas fa-exclamation-circle ms-2 fs-7"
-          v-tooltip
-          title="Billing is issued based on your selected account type"
-        ></i>
-      </h2>
+      <h2 class="fw-bold text-dark">Select Engineers</h2>
       <!--end::Title-->
     </div>
     <!--end::Heading-->
 
-    <!--begin::Input group-->
-    <div class="fv-row">
-      <!--begin::Row-->
-      <div class="row">
-        <!--begin::Col-->
-        <div class="col-lg-6">
-          <!--begin::Option-->
-          <Field
-            type="radio"
-            class="btn-check"
-            name="accountType"
-            value="personal"
-            id="kt_create_account_form_account_type_personal"
-          />
-          <label
-            class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center mb-10"
-            for="kt_create_account_form_account_type_personal"
-          >
-            <KTIcon icon-name="address-book" icon-class="fs-3x me-5" />
-
-            <!--begin::Info-->
-            <span class="d-block fw-semobold text-start">
-              <span class="text-dark fw-bold d-block fs-4 mb-2">
-                Personal Account
-              </span>
-              <span class="text-gray-400 fw-semobold fs-6"
-                >If you need more info, please check it out</span
+    <!--begin::Card body-->
+    <div class="card pt-0" v-if="$props.engineers.length > 0" >
+      <!--begin::Table wrapper-->
+      <div class="table-responsive">
+        <!--begin::Table-->
+        <table
+          class="table align-middle table-row-dashed fs-6 fw-semobold gy-4 v-100"
+          id="kt_subscription_products_table"
+        >
+          <!--begin::Table head-->
+          <thead>
+            <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+              <th class="min-w-30px fs-5 fw-bold text-gray-700 text-nowrap">
+                Sr.No
+              </th>
+              <th class="min-w-300px fs-5 fw-bold text-gray-700 text-wrap">
+                Name
+              </th>
+              <th
+                class="min-w-70px text-center fs-5 fw-bold text-gray-700 text-nowrap"
               >
-            </span>
-            <!--end::Info-->
-          </label>
-          <!--end::Option-->
-        </div>
-        <!--end::Col-->
+                Select
+              </th>
+            </tr>
+          </thead>
+          <!--end::Table head-->
 
-        <!--begin::Col-->
-        <div class="col-lg-6">
-          <!--begin::Option-->
-          <Field
-            type="radio"
-            class="btn-check"
-            name="accountType"
-            value="corporate"
-            id="kt_create_account_form_account_type_corporate"
-          />
-          <label
-            class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
-            for="kt_create_account_form_account_type_corporate"
-          >
-            <KTIcon icon-name="briefcase" icon-class="fs-3x me-5" />
+          <!--begin::Table body-->
+          <tbody class="text-gray-600">
+            <tr
+              class="odd"
+              v-for="(item, index) in $props.engineers"
+              :key="item.id"
+            >
+              <td class="fs-3 fw-bold">{{ index + 1 }}</td>
+              <td class="fs-3 fw-bold text-wrap">
+                {{ item.first_name }} {{ item.last_name }}
+              </td>
+              <td class="text-center">
+                <!--begin::Delete-->
 
-            <!--begin::Info-->
-            <span class="d-block fw-semobold text-start">
-              <span class="text-dark fw-bold d-block fs-4 mb-2"
-                >Corporate Account</span
-              >
-              <span class="text-gray-400 fw-semobold fs-6"
-                >Create corporate account to mane users</span
-              >
-            </span>
-            <!--end::Info-->
-          </label>
-          <!--end::Option-->
-        </div>
-        <!--end::Col-->
-
-        <ErrorMessage
-          name="accountType"
-          class="fv-plugins-message-container invalid-feedback"
-        ></ErrorMessage>
+                <input
+                  class="form-check-input border border-dark"
+                  type="checkbox"
+                  :key="item.id"
+                  :value="item.id"
+                  @click="ToggleCheckBoxForEngineers($event)"
+                />
+                <!--end::Delete-->
+              </td>
+            </tr>
+          </tbody>
+          <!--end::Table body-->
+        </table>
+        <!--end::Table-->
       </div>
-      <!--end::Row-->
+      <!--end::Table wrapper-->
     </div>
-    <!--end::Input group-->
+    <!--end::Card body-->
+
+    <div v-else>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" aria-labelledby="home-tab">
+          <div class="shadow-lg p-5 mb-7 fs-4 rounded">
+            <p>
+              Sorry! No engineers are available at this moment.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
   <!--end::Wrapper-->
 </template>
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import { ErrorMessage, Field } from "vee-validate";
 
 export default defineComponent({
-  name: "step-1",
+  name: "step-2",
   components: {
     Field,
     ErrorMessage,
   },
-  setup() {
-
-    onMounted(() => {
-      console.log("STWP 21");
+  props: ["engineers"],
+  setup(props, { emit }) {
+    const step2Data = ref({
+      engineers: [],
     });
+
+    const ToggleCheckBoxForEngineers = async (e) => {
+
+      const selectedId = e.target.value;
+
+      const selectedEngineer = props.engineers.find(
+        (engineer) => engineer.id == selectedId
+      );
+
+      if (e.target.checked) {
+        step2Data.value.engineers.push({
+          id: selectedId,
+          first_name: selectedEngineer.first_name,
+          last_name: selectedEngineer.last_name,
+        });
+      } else {
+        step2Data.value.engineers = step2Data.value.engineers.filter(
+          (engineer) => engineer.id != selectedId
+        );
+      }
+
+      await emit('set-engineers',step2Data.value.engineers);
+
+    };
 
     return {
       getAssetPath,
+      step2Data,
+      engineers: props.engineers,
+      ToggleCheckBoxForEngineers,
     };
   },
 });

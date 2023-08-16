@@ -148,6 +148,8 @@ interface itemDetails {
   name: string;
   description: string;
   price: string;
+  company_id: string;
+  created_by: number;
   updated_by: number;
 }
 
@@ -176,6 +178,8 @@ export default defineComponent({
       name: "",
       description: "",
       price: "",
+      company_id: User.company_id,
+      created_by: User.id,
       updated_by: User.id,
     });
 
@@ -186,6 +190,8 @@ export default defineComponent({
         name: response.name,
         description: response.description,
         price: response.price,
+        company_id: response.company_id,
+        created_by: response.created_by,
         updated_by: response.updated_by,
       };
     });

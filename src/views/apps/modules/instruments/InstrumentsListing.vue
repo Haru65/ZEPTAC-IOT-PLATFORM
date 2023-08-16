@@ -147,7 +147,7 @@
             <span class="menu-link px-3">
               <i
                 @click="deleteInvoice(instruments.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
+                class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
           </div>
@@ -222,13 +222,13 @@ export default defineComponent({
         columnName: "Model No",
         columnLabel: "model_no",
         sortEnabled: true,
-        columnWidth: 75,
+        columnWidth: 80,
       },
       {
         columnName: "Serial No",
         columnLabel: "serial_no",
         sortEnabled: true,
-        columnWidth: 75,
+        columnWidth: 80,
       },
       {
         columnName: "Instrument Name",
@@ -240,13 +240,13 @@ export default defineComponent({
         columnName: "Make",
         columnLabel: "make",
         sortEnabled: true,
-        columnWidth: 75,
+        columnWidth: 125,
       },
       {
         columnName: "Availability",
         columnLabel: "availability",
         sortEnabled: true,
-        columnWidth: 85,
+        columnWidth: 80,
       },
       {
         columnName: "Created At",
