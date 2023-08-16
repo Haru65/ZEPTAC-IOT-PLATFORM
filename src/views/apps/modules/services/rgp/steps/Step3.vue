@@ -10,7 +10,7 @@
     <!--end::Heading-->
 
     <!--begin::Card body-->
-    <div class="card pt-0">
+    <div class="card pt-0" v-if="$props.instruments.length > 0">
       <!--begin::Table wrapper-->
       <div class="table-responsive">
         <!--begin::Table-->
@@ -87,6 +87,18 @@
       <!--end::Table wrapper-->
     </div>
     <!--end::Card body-->
+
+    <div v-else>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" aria-labelledby="home-tab">
+          <div class="shadow-lg p-5 mb-7 fs-4 rounded">
+            <p>
+              Sorry! No Instruments are available at this moment.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <!--end::Wrapper-->
 </template>
@@ -113,7 +125,7 @@ export default defineComponent({
       const selectedId = e.target.value;
 
       const selectedInstruments = props.instruments.find(
-        (engineer) => engineer.id == selectedId
+        (instrument) => instrument.id == selectedId
       );
 
       if (e.target.checked) {
@@ -126,7 +138,7 @@ export default defineComponent({
         });
       } else {
         step3Data.value.instruments = step3Data.value.instruments.filter(
-          (engineer) => engineer.id != selectedId
+          (instrument) => instrument.id != selectedId
         );
       }
 

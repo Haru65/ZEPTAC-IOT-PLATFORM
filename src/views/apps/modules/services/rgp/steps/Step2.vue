@@ -10,7 +10,7 @@
     <!--end::Heading-->
 
     <!--begin::Card body-->
-    <div class="card pt-0">
+    <div class="card pt-0" v-if="$props.engineers.length > 0" >
       <!--begin::Table wrapper-->
       <div class="table-responsive">
         <!--begin::Table-->
@@ -68,6 +68,19 @@
       <!--end::Table wrapper-->
     </div>
     <!--end::Card body-->
+
+    <div v-else>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" aria-labelledby="home-tab">
+          <div class="shadow-lg p-5 mb-7 fs-4 rounded">
+            <p>
+              Sorry! No engineers are available at this moment.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
   <!--end::Wrapper-->
 </template>

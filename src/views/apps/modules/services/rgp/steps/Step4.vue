@@ -11,45 +11,128 @@
     </div>
     <!--end::Heading-->
 
-    <div class="border-bottom mb-5 pb-5">
-      <div class="font-weight-bold fs-4 mb-3">
-        <strong> Date and Quotation Details: </strong>
+    <div>
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <button
+            class="nav-link active"
+            data-bs-toggle="tab"
+            type="button"
+            aria-controls="home"
+            aria-selected="true"
+          >
+            <div class="font-weight-bold fs-4 mb-3">
+              <strong> Date and Quotation Details: </strong>
+            </div>
+          </button>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" aria-labelledby="home-tab">
+          <div class="shadow-lg p-5 mb-7 fs-4 rounded">
+            <p>Returnable Gate Pass: {{ $props.summary.rgp_no }}</p>
+            <p>Date: {{  moment($props.summary.date).format("DD-MM-YYYY") }}</p>
+            <p>Due Date: {{ moment($props.summary.duedate).format("DD-MM-YYYY") }}</p>
+            <p>Quotation Number: {{ $props.summary.quotation_no }}</p>
+            <p>Customer Name: {{ $props.summary.customer_name }}</p>
+            <p>Client Name: {{ $props.summary.client_name }}</p>
+            <p>
+              Site Address: {{ $props.summary.site_address.address1 }}
+              {{ $props.summary.site_address.address2 }}
+              {{ $props.summary.site_address.city }}
+              {{ $props.summary.site_address.pincode }}
+              {{ $props.summary.site_address.states }}
+              {{ $props.summary.site_address.country }}
+            </p>
+          </div>
+        </div>
       </div>
-      <div class="line-height-md l">
-        <p>Returnable Gate Pass: {{ $props.summary.rgp_no }}</p>
-        <p>Date: {{ $props.summary.date }}</p>
-        <p>Due Date: {{ $props.summary.duedate }}</p>
-        <p>Quotation Number: {{ $props.summary.quotation_no }}</p>
+    </div>
 
-        <p>Customer Name: {{ $props.summary.customer_name }}</p>
-        <p>Client Name: {{ $props.summary.client_name }}</p>
-        <p>
-          Site Address: {{ $props.summary.site_address.address1 }}
-          {{ $props.summary.site_address.address2 }}
-          {{ $props.summary.site_address.city }}
-          {{ $props.summary.site_address.pincode }}
-          {{ $props.summary.site_address.states }}
-          {{ $props.summary.site_address.country }}
-        </p>
+    <div>
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <button
+            class="nav-link active"
+            data-bs-toggle="tab"
+            type="button"
+            aria-controls="home"
+            aria-selected="true"
+          >
+            <div class="font-weight-bold fs-4 mb-3">
+              <strong> Engineer Details: </strong>
+            </div>
+          </button>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" aria-labelledby="home-tab">
+          <div class="shadow-lg p-5 mb-7 fs-4 rounded">
+
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(engineer,index) in $props.summary.engineers" :key="engineer.id">
+                  <th scope="row">{{ index + 1 }}</th>
+                  <td>{{ engineer.first_name }} {{ engineer.last_name }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="border-bottom mb-5 pb-5">
-      <div class="font-weight-bold fs-4 mb-3">
-        <strong> Engineers Details: </strong>
-      </div>
-      <div class="line-height-md l">
+    <div>
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <button
+            class="nav-link active"
+            data-bs-toggle="tab"
+            type="button"
+            aria-controls="home"
+            aria-selected="true"
+          >
+            <div class="font-weight-bold fs-4 mb-3">
+              <strong> Instrument Details: </strong>
+            </div>
+          </button>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane fade show active" aria-labelledby="home-tab">
+          <div class="shadow-lg p-5 mb-7 fs-4 rounded">
+
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Model</th>
+                  <th scope="col">Serial</th>
+                  <th scope="col">Make By</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(instrument, index) in $props.summary.instruments" :key="instrument.id">
+                  <th scope="row">{{ index + 1 }}</th>
+                  <td>{{ instrument.name }}</td>
+                  <td>{{ instrument.model_no }}</td>
+                  <td>{{ instrument.serial_no }}</td>
+                  <td>{{ instrument.make }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="border-bottom mb-5 pb-5">
-      <div class="font-weight-bold mb-3">Instruments Details:</div>
-      <div class="line-height-md">
-        John Wick <br />
-        Phone: +61412345678 <br />
-        Email: johnwick@reeves.com
-      </div>
-    </div>
   </div>
   <!--end::Wrapper-->
 </template>
@@ -57,6 +140,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import { ErrorMessage, Field } from "vee-validate";
+import moment from "moment";
 
 export default defineComponent({
   name: "step-4",
@@ -69,6 +153,7 @@ export default defineComponent({
   setup(props) {
     return {
       summary: props.summary,
+      moment,
     };
   },
 });

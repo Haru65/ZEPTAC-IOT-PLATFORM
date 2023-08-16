@@ -10,8 +10,8 @@
         data-bs-original-title="Enter RGP number"
         data-kt-initialized="1"
       >
-        <span class="fs-2 fw-bold text-gray-800"
-          >Gate Pass # {{ rgpDetails.rgp_no }}</span
+        <h3 class="fs-2 fw-bold text-gray-800"
+          >Gate Pass # {{ rgpDetails.rgp_no }}</h3
         >
       </div>
       <!--begin::Stepper-->
@@ -68,26 +68,25 @@
 
           <!--begin::Step 2-->
           <div data-kt-stepper-element="content">
-            <Step2 
-            v-bind:engineers="AvailableEngineers"
-            @set-engineers="setEngineers"
+            <Step2
+              v-bind:engineers="AvailableEngineers"
+              @set-engineers="setEngineers"
             ></Step2>
           </div>
           <!--end::Step 2-->
 
           <!--begin::Step 3-->
           <div data-kt-stepper-element="content">
-            <Step3 v-bind:instruments="AvailableInstruments"
-            
-            @set-instruments="setInstruments"></Step3>
+            <Step3
+              v-bind:instruments="AvailableInstruments"
+              @set-instruments="setInstruments"
+            ></Step3>
           </div>
           <!--end::Step 3-->
 
           <!--begin::Step 4-->
           <div data-kt-stepper-element="content">
-            <Step4
-              v-bind:summary="rgpDetails"   
-            ></Step4>
+            <Step4 v-bind:summary="rgpDetails"></Step4>
           </div>
           <!--end::Step 4-->
 
@@ -164,6 +163,8 @@ import { useAuthStore } from "@/stores/auth";
 import {
   GetAppovedQuotationsList,
   GetIncrReturnableGatePassId,
+  UpdateStatus,
+  addRGatePass,
   getEngineers,
 getInstruments,
 } from "@/stores/api";
@@ -233,6 +234,7 @@ export default defineComponent({
       customer_name: "",
       client_name: "",
       quotation_no: "",
+      status: 1,
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -240,15 +242,12 @@ export default defineComponent({
     });
 
     function setDate(date){
-        rgpDetails.value.date = moment(date).format(
-        "YYYY-MM-DD HH:mm:ss"
-      );
+        rgpDetails.value.date = date
+      
     }
 
     function setDueDate(duedate){
-        rgpDetails.value.duedate = moment(duedate).format(
-        "YYYY-MM-DD HH:mm:ss"
-      );
+        rgpDetails.value.duedate = duedate
     }
 
     function setQuotation(e,address, customer_name, client_name, quotation_no){
@@ -266,7 +265,6 @@ export default defineComponent({
 
 
     async function setEngineers(engineers){
-      console.log("-> ",engineers)
       rgpDetails.value.engineers = await engineers
     }
 
@@ -342,20 +340,6 @@ export default defineComponent({
     
 
     const formData = ref<CreateAccount>({
-      date: "",
-      duedate: "",
-      quotation_id: "",
-      businessName: "Portal Inc.",
-      businessDescriptor: "PORTAL",
-      businessType: "1",
-      businessDescription: "",
-      businessEmail: "corp@support.com",
-      nameOnCard: "Max Doe",
-      cardNumber: "4111 1111 1111 1111",
-      cardExpiryMonth: "1",
-      cardExpiryYear: "2",
-      cardCvv: "123",
-      saveCard: "1",
     });
 
     const GetApprovedQuotations = async () => {
@@ -438,8 +422,8 @@ export default defineComponent({
       return createAccountSchema[currentStepIndex.value];
     });
 
-    const { resetForm, handleSubmit } = useForm<IStep2 | IStep3 | IStep4>({
-      validationSchema: currentSchema,
+    const { resetForm, handleSubmit } = useForm<IStep2 | IStep3 | IStep4 >({
+      // validationSchema: currentSchema,
     });
 
     const totalSteps = computed(() => {
@@ -451,21 +435,70 @@ export default defineComponent({
     });
 
     const handleStep = handleSubmit((values) => {
-      console.log("asdasd");
-      resetForm({});
 
-      formData.value = { ...values };
+      // resetForm({});
 
-      currentStepIndex.value++;
+      // formData.value = { ...values };
 
-      if (!_stepperObj.value) {
-        return;
+      if(currentStepIndex.value === 0){
+        if(rgpDetails.value.date && rgpDetails.value.duedate && rgpDetails.value.quotation_id){
+
+          currentStepIndex.value++;
+
+          if (!_stepperObj.value) {
+            return;
+          }
+
+          _stepperObj.value.goNext();
+
+        }
+        else{
+          Swal.fire({
+            icon: "info",
+            title: "Please fill all the required fields",
+          });
+        }
+      }
+      else if(currentStepIndex.value === 1){
+        if(rgpDetails.value.engineers.length > 0){
+          currentStepIndex.value++;
+
+          if (!_stepperObj.value) {
+            return;
+          }
+
+          _stepperObj.value.goNext();
+        }
+        else{
+          Swal.fire({
+            icon: "info",
+            title: "Please select at least one engineer",
+          });
+        }
+      }
+      else if(currentStepIndex.value === 2){
+        if(rgpDetails.value.instruments.length > 0){
+          currentStepIndex.value++;
+
+          if (!_stepperObj.value) {
+            return;
+          }
+
+          _stepperObj.value.goNext();
+        }
+        else{
+          Swal.fire({
+            icon: "info",
+            title: "Please select at least one instrument",
+          });
+        }
       }
 
-      _stepperObj.value.goNext();
+
     });
 
     const previousStep = () => {
+      
       if (!_stepperObj.value) {
         return;
       }
@@ -475,18 +508,78 @@ export default defineComponent({
       _stepperObj.value.goPrev();
     };
 
-    const formSubmit = () => {
+    const formSubmit = async () => {
+
+      console.log(rgpDetails.value);
+      rgpDetails.value.date = moment(rgpDetails.value.date).format(
+        "YYYY-MM-DD HH:mm:ss"
+      );
+      rgpDetails.value.duedate = moment(rgpDetails.value.duedate).format(
+        "YYYY-MM-DD HH:mm:ss"
+      );
+
+      try {
+        const res = await GetIncrReturnableGatePassId(User.company_id);
+        // console.log(res);
+        if (rgpDetails.value.rgp_no !== res.result) {
+          const response = await addRGatePass(rgpDetails.value);
+
+          if (!response.error) {
+
+            // change the availability of engineers and instruments
+            const statusUpdate = await UpdateStatus(rgpDetails.value);
+
+            if(!statusUpdate.error){
+
+            showSuccessAlert(
+              "Success",
+              "Returnable Gate pass details have been successfully inserted!"
+            );
+            route.push({ name: "rgp-list" });
+            }
+          }else {
+            // Handle API error response
+            const errorData = response.error;
+            // console.log("API error:", errorData);
+            console.log("API error:", errorData.response.data.errors);
+            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          }
+        }else {
+          showErrorAlert("Warning", "Bad Luck! RGP Details Already Exists");
+          route.push({ name: "rgp-list" });
+        }
+      } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
+        showErrorAlert("Error", "An error occurred during the API call.");
+      }
+    };
+
+    const showSuccessAlert = (title, message) => {
       Swal.fire({
-        text: "All is cool! Now you submit this form",
+        title,
+        text: message,
         icon: "success",
         buttonsStyling: false,
         confirmButtonText: "Ok, got it!",
         heightAuto: false,
         customClass: {
-          confirmButton: "btn fw-semobold btn-light-primary",
+          confirmButton: "btn btn-primary",
         },
-      }).then(() => {
-        window.location.reload();
+      });
+    };
+
+    const showErrorAlert = (title, message) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "error",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
       });
     };
 
@@ -511,6 +604,8 @@ export default defineComponent({
       setQuotation,
       setEngineers,
       setInstruments,
+      showErrorAlert,
+      showSuccessAlert
     };
   },
 });

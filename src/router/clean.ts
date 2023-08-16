@@ -428,7 +428,7 @@ const routes: Array<RouteRecordRaw> = [
           //console.log(companyId);
           try {
             const response = await getInstrument(instrumentItemId.toString());
-            console.log(response);
+            // console.log(response);
             if (response.error || response.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {

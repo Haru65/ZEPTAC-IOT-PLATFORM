@@ -60,7 +60,7 @@
             <button
               type="button"
               class="btn btn-danger"
-              @click="deleteFewInvoice()"
+              @click="deleteFewRGP()"
             >
               Delete Selected
             </button>
@@ -126,6 +126,18 @@
           <template v-slot:instruments="{ row: rgps }">
             {{ rgps.instruments }}
           </template>
+          <template v-slot:status="{ row: rgps }">
+            <span
+            v-if="rgps.status == 1"
+            class="badge py-3 px-4 fs-7 badge-light-success"
+            >In Process</span
+          >
+          <span
+            v-if="rgps.status == 0"
+            class="badge py-3 px-4 fs-7 badge-light-danger"
+            >Completed</span
+          >
+          </template>
           <template v-slot:date="{ row: rgps }">
             {{ rgps.date }}
           </template>
@@ -136,14 +148,9 @@
             <!--begin::Menu Flex-->
             <div class="d-flex flex-lg-row">
               <span class="menu-link px-3">
-                  <i
-                    class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                  ></i>
-              </span>
-              <span class="menu-link px-3">
                 <i
-                  @click="deleteInvoice(rgps.id, false)"
-                  class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
+                  @click="deleteRGP(rgps.id, false)"
+                  class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
                 ></i>
               </span>
             </div>
@@ -230,28 +237,34 @@
           columnWidth: 75,
         },
         {
-          columnName: "Engineers",
+          columnName: "No. of Engineers",
           columnLabel: "engineers",
           sortEnabled: true,
           columnWidth: 45,
         },
         {
-          columnName: "Instruments",
+          columnName: "No. of Instruments",
           columnLabel: "instruments",
           sortEnabled: true,
           columnWidth: 45,
         },
         {
+          columnName: "Status",
+          columnLabel: "status",
+          sortEnabled: true,
+          columnWidth: 80,
+        },
+        {
           columnName: "RGP Date",
           columnLabel: "date",
           sortEnabled: true,
-          columnWidth: 175,
+          columnWidth: 125,
         },
         {
           columnName: "RGP Due Date",
           columnLabel: "duedate",
           sortEnabled: true,
-          columnWidth: 175,
+          columnWidth: 125,
         },
         {
           columnName: "Actions",
@@ -283,6 +296,7 @@ interface RGP {
   duedate: string;
   engineers: string;
   instruments: string;
+  status: string;
   created_by: string;
   updated_by: string;
   is_active: 1;
@@ -303,6 +317,7 @@ interface RGP {
       duedate: "",
       engineers: "",
       instruments: "",
+      status: "",
       quotation_id: "",
       company_id: User.company_id,
       created_by: User.id,
@@ -351,6 +366,7 @@ interface RGP {
             quotation_id,
             engineers,
             instruments,
+            status,
             date,
             duedate,
           }) => ({
@@ -359,6 +375,7 @@ interface RGP {
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
+            status: status,
             date: moment(date).format("DD/MM/YYYY"),
             duedate: moment(duedate).format("DD/MM/YYYY"),
           })
@@ -397,6 +414,7 @@ interface RGP {
             quotation_id,
             engineers,
             instruments,
+            status,
             date,
             duedate,
           }) => ({
@@ -405,6 +423,7 @@ interface RGP {
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
+            status: status,
             date: moment(date).format("DD/MM/YYYY"),
             duedate: moment(duedate).format("DD/MM/YYYY")
           })
@@ -449,6 +468,7 @@ interface RGP {
             quotation_id,
             engineers,
             instruments,
+            status,
             date,
             duedate,
           }) => ({
@@ -457,6 +477,7 @@ interface RGP {
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
+            status: status,
             date: moment(date).format("LL"),
               duedate: moment(duedate).format("LL"),
           })
@@ -480,7 +501,7 @@ interface RGP {
         await rgp_listing();
       });
   
-      const deleteFewInvoice = () => {
+      const deleteFewRGP = () => {
         Swal.fire({
           title: "Are you sure?",
           text: "You will not be able to recover from this !",
@@ -493,14 +514,14 @@ interface RGP {
           if (result["isConfirmed"]) {
             // Put your function here
             selectedIds.value.forEach((item) => {
-              deleteInvoice(item, true);
+              deleteRGP(item, true);
             });
             selectedIds.value.length = 0;
           }
         });
       };
   
-      const deleteInvoice = (id: number, mul: boolean) => {
+      const deleteRGP = (id: number, mul: boolean) => {
         if (!mul) {
           for (let i = 0; i < tableData.value.length; i++) {
             if (tableData.value[i].id === id) {
@@ -575,11 +596,11 @@ interface RGP {
       return {
         tableData,
         tableHeader,
-        deleteInvoice,
+        deleteRGP,
         search,
         searchItems,
         selectedIds,
-        deleteFewInvoice,
+        deleteFewRGP,
         sort,
         onItemSelect,
         getAssetPath,

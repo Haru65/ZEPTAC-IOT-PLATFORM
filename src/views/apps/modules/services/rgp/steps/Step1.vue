@@ -27,11 +27,10 @@
                   type="date"
                   name="date"
                   id="date"
-                  v-model="date"
+                  v-model="step1Data.date"
                   @change="dateSelected($event)"
                   placeholder="Pick a day"
                   :shortcuts="shortcuts"
-                  :disabled-date="disabledDate"
                 />
               </div>
             </span>
@@ -56,11 +55,10 @@
                   type="date"
                   name="duedate"
                   id="duedate"
-                  v-model="duedate"
+                  v-model="step1Data.duedate"
                   @change="duedateSelected"
                   placeholder="Pick a day"
                   :shortcuts="shortcuts"
-                  :disabled-date="disabledDate"
                 />
               </div>
             </span>
@@ -163,8 +161,6 @@ export default defineComponent({
   props: ["quotations"],
 
   setup(props, { emit }) {
-    const date = ref("");
-    const duedate = ref("");
 
     const step1Data = ref({
       date: "",
@@ -266,19 +262,13 @@ export default defineComponent({
       },
     ];
 
-    const disabledDate = (time: Date) => {
-      return null;
-    };
 
     return {
       getAssetPath,
-      disabledDate,
       shortcuts,
       dateSelected,
       duedateSelected,
       step1Data,
-      date,
-      duedate,
       setSiteAddress,
       quotations: props.quotations,
       GetSiteAddress,

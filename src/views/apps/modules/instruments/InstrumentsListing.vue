@@ -120,7 +120,16 @@
           {{ instruments.make }}
         </template>
         <template v-slot:availability="{ row: instruments }">
-          {{ instruments.availability }}
+          <span
+            v-if="instruments.availability == 1"
+            class="badge py-3 px-4 fs-7 badge-light-success"
+            >Available</span
+          >
+          <span
+            v-if="instruments.availability == 0"
+            class="badge py-3 px-4 fs-7 badge-light-danger"
+            >Not Available</span
+          >
         </template>
         <template v-slot:created_at="{ row: instruments }">
           {{ instruments.created_at }}
@@ -138,7 +147,7 @@
             <span class="menu-link px-3">
               <i
                 @click="deleteInvoice(instruments.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
+                class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
           </div>
@@ -216,13 +225,13 @@ export default defineComponent({
         columnName: "Model No",
         columnLabel: "model_no",
         sortEnabled: true,
-        columnWidth: 75,
+        columnWidth: 80,
       },
       {
         columnName: "Serial No",
         columnLabel: "serial_no",
         sortEnabled: true,
-        columnWidth: 75,
+        columnWidth: 80,
       },
       {
         columnName: "Instrument Name",
@@ -234,13 +243,13 @@ export default defineComponent({
         columnName: "Make",
         columnLabel: "make",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 125,
       },
       {
         columnName: "Availability",
         columnLabel: "availability",
         sortEnabled: true,
-        columnWidth: 75,
+        columnWidth: 80,
       },
       {
         columnName: "Created At",

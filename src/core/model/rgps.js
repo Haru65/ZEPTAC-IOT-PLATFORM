@@ -4,6 +4,7 @@ interface IRGP {
     quotation_id:string;
     engineers:string;
     instruments:string;
+    status:string;
     date: string;
     duedate: string;
 }
