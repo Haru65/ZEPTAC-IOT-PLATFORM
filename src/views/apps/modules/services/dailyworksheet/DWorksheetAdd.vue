@@ -8,7 +8,6 @@
             <!--end::Form-->
 
             <VForm form id="kt_Quotation_form" novalidate>
-
               <!--begin::Card body-->
               <div class="card-body border-top p-9">
                 <!-- extra fields -->
@@ -23,7 +22,7 @@
                         v-model="worksheetDetails.rgp_id"
                         filterable
                         placeholder="Please Select GatePass"
-                        
+                        :onchange="SetDetails(worksheetDetails.rgp_id)"
                       >
                         <el-option
                           value=""
@@ -49,9 +48,10 @@
                     </label>
                     <div>
                       <el-select
-                        v-model="worksheetDetails.rgp_id"
                         filterable
                         placeholder="Select Service Engineer..."
+                        v-model="worksheetDetails.engineer_id"
+                        :disabled="engineerSelect"
                       >
                         <el-option
                           value=""
@@ -62,10 +62,10 @@
                           Select Service Engineer...</el-option
                         >
                         <el-option
-                          v-for="engineer in RGPS"
-                          :key="engineer.engineers.id"
-                          :value="engineer.engineers.id"
-                          :label="`${engineer.engineers.first_name} ${engineer.engineers.last_name}`"
+                          v-for="engineer in ServiceEngineers"
+                          :key="engineer.id"
+                          :value="engineer.id"
+                          :label="`${engineer.first_name} ${engineer.last_name}`"
                         />
                       </el-select>
                     </div>
@@ -73,7 +73,7 @@
                 </div>
                 <!--end::Input group-->
 
-                <div class="row mb-6" v-if="RGPS.id">
+                <div class="row mb-6" v-if="worksheetDetails.rgp_id">
                   <div class="form-group col-md-6 mb-8 mb-sd-8">
                     <label
                       class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
@@ -81,25 +81,130 @@
                     >
                     <div class="form-control form-control-solid">
                       <span class="fs-5 fw-bold text-gray-700">
-                          {{ RGPS.customer_data.first_name }} {{ RGPS.customer_data.last_name }}
-                        </span>
-                      </div>
+                        {{ CustomerData.first_name }}
+                        {{ CustomerData.last_name }}
+                      </span>
+                    </div>
                   </div>
                   <div class="form-group col-md-6 mb-8 mb-sd-8">
                     <label
                       class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
-                      >Serial No.</label
+                      >Site Location</label
                     >
                     <div class="form-control form-control-solid">
-                        <span class="fs-5 fw-bold text-gray-700">
-                          {{ RGPS.site_address.address1 }} {{ RGPS.site_address.address2 }}
-                          {{ RGPS.site_address.city }} - {{ RGPS.site_address.pincode }}
-                          {{ RGPS.site_address.states }} {{ RGPS.site_address.country }}
-                        </span>
-                      </div>
+                      <span class="fs-5 fw-bold text-gray-700">
+                        {{ SiteAddress.address1 }} {{ SiteAddress.address2 }}
+                        {{ SiteAddress.city }} - {{ SiteAddress.pincode }}
+                        {{ SiteAddress.state }} {{ SiteAddress.country }}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
+                <div class="row mb-6">
+                  <div class="form-group col-md-6 mb-8 mb-sd-8">
+                    <label
+                      class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
+                    >
+                      <!--begin::Info-->
+                      <span class="d-block fw-semobold text-start">
+                        <span class="text-dark fw-bold d-block fs-4 mb-2"
+                          >Work Date</span
+                        >
+                        <div class="block">
+                          <el-date-picker
+                            type="date"
+                            name="date"
+                            id="date"
+                            v-model="worksheetDetails.workdate"
+                            placeholder="Pick Work Day"
+                          />
+                        </div>
+                      </span>
+                      <!--end::Info-->
+                    </label>
+                  </div>
+                </div>
+
+                <div class="row mb-6">
+                  <div class="form-group col-md-6 mb-8 mb-sd-8">
+                    <label
+                      class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
+                    >
+                      <!--begin::Info-->
+                      <span class="d-block fw-semobold text-start">
+                        <span class="text-dark fw-bold d-block fs-4 mb-2"
+                          >Work Start Time</span
+                        >
+                        <div class="block">
+                          <el-time-picker
+                            type="time"
+                            name="start"
+                            id="start"
+                            v-model="worksheetDetails.starttime"
+                            placeholder="Pick start time"
+                          />
+                        </div>
+                      </span>
+                      <!--end::Info-->
+                    </label>
+                  </div>
+                  <div class="form-group col-md-6 mb-8 mb-sd-8">
+                    <label
+                      class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
+                    >
+                      <!--begin::Info-->
+                      <span class="d-block fw-semobold text-start">
+                        <span class="text-dark fw-bold d-block fs-4 mb-2"
+                          >Work Finish Time</span
+                        >
+                        <div class="block">
+                          <el-time-picker
+                            type="time"
+                            name="end"
+                            id="end"
+                            v-model="worksheetDetails.endtime"
+                            placeholder="Pick end time"
+                          />
+                        </div>
+                      </span>
+                      <!--end::Info-->
+                    </label>
+                  </div>
+                </div>
+
+                <div class="row mb-6">
+                  <div class="form-group col-md-6 mb-8 mb-sd-8">
+                    <label
+                      class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
+                      >Scope of Work</label
+                    >
+                    <Field
+                        type="textarea"
+                        as="textarea"
+                        name="scope"
+                        rows="4"
+                        class="form-control form-control-lg form-control-solid"
+                        placeholder="Description of the instrument..."
+                        v-model="worksheetDetails.scopeofwork"
+                      />
+                  </div>
+                  <div class="form-group col-md-6 mb-8 mb-sd-8">
+                    <label
+                      class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
+                      >Problem Faced (if any)</label
+                    >
+                    <Field
+                        type="textarea"
+                        as="textarea"
+                        name="problem"
+                        rows="4"
+                        class="form-control form-control-lg form-control-solid"
+                        placeholder="Description of the instrument..."
+                        v-model="worksheetDetails.problem"
+                      />
+                  </div>
+                </div>
               </div>
             </VForm>
           </div>
@@ -112,17 +217,20 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
 import ApiService from "@/core/services/ApiService";
-import {
-  getOnGoingRGP,
-} from "@/stores/api";
+import { getOnGoingRGP } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import { useRouter } from "vue-router";
 
-
 interface worksheet {
   rgp_id: string;
   rgp_no: string;
+  engineer_id: string;
+  scopeofwork: string;
+  problem: string;
+  workdate: string;
+  starttime: string;
+  endtime: string;
 }
 
 export default defineComponent({
@@ -131,95 +239,145 @@ export default defineComponent({
     ErrorMessage,
     Field,
     VForm,
-},
+  },
   setup() {
     const auth = useAuthStore();
     const route = useRouter();
     const User = auth.GetUser();
 
-    const RGPS = ref([{
-      id: "",
+    const engineerSelect = ref(true);
+
+    const RGPS = ref([
+      {
+        id: "",
+        rgp_no: "",
+        quotation_id: "",
+        engineers: [],
+        client_id: "",
+        customer_id: "",
+        site_address: {
+          address1: "",
+          address2: "",
+          country: "",
+          city: "",
+          pincode: "",
+          state: "",
+        },
+        customer_data: {
+          id: "",
+          first_name: "",
+          last_name: "",
+        },
+      },
+    ]);
+
+    const worksheetDetails = ref<worksheet>({
+      rgp_id: "",
       rgp_no: "",
-      quotation_id: "",
-      engineers: [{
+      engineer_id: "",
+      scopeofwork: "",
+      problem: "",
+      workdate: "",
+      starttime: "",
+      endtime: "",
+    });
+
+    const ServiceEngineers = ref([
+      {
         id: "",
         first_name: "",
         last_name: "",
-      }],
-      client_id: "",
-      customer_id: "",
-      site_address: {
-        address1: "",
-        address2: "",
-        country: "",
-        city: "",
-        pincode: "",
-        state: "",
       },
-      customer_data:{
-        id:"",
-        first_name: "",
-        last_name: "",
-      }
+    ]);
 
-    }])
-
-    const worksheetDetails = ref<worksheet>({
-      rgp_id:"",
-      rgp_no: "",
+    const SiteAddress = ref({
+      address1: "",
+      address2: "",
+      country: "",
+      city: "",
+      pincode: "",
+      state: "",
     });
 
-    const selectEngineer = (id) => {
-      
+    const CustomerData = ref({
+      id: "",
+      first_name: "",
+      last_name: "",
+    });
+
+    const SetDetails = async (id) => {
+      try {
+        // finding the rgp
+        const foundRGP = RGPS.value.find((rgp) => rgp.id === id);
+
+        if (foundRGP) {
+          ServiceEngineers.value.pop();
+
+          // setting the rgps engineers
+          const newEngineers = [...foundRGP.engineers];
+          ServiceEngineers.value = newEngineers;
+
+          engineerSelect.value = false;
+
+          // setting the rgps SiteAddress
+          SiteAddress.value = foundRGP.site_address;
+
+          // setting the rgps CustomerData
+          CustomerData.value = foundRGP.customer_data;
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
     };
 
     const fillDetails = (response) => {
       RGPS.value.push(
-      ...response.result.map(result => {
-        return {
-          id: result.id,
-          rgp_no: result.rgp_no,
-          quotation_id: result.quotation_id,
-          engineers: JSON.parse(result.engineers),
-          client_id: result.client_id,
-          customer_id: result.customer_id,
-          site_address: {
-            address1: result.site_address.address1,
-            address2: result.site_address.address2,
-            country: result.site_address.country,
-            city: result.site_address.city,
-            pincode: result.site_address.pincode,
-            state: result.site_address.state,
-          },
-          customer_data: {
-            id: result.customer_data.id,
-            first_name: result.customer_data.first_name,
-            last_name: result.customer_data.last_name,
-          }
-        };
-      }))
-    console.log(RGPS.value)
-
-    }
+        ...response.result.map((result) => {
+          return {
+            id: result.id,
+            rgp_no: result.rgp_no,
+            quotation_id: result.quotation_id,
+            engineers: JSON.parse(result.engineers),
+            client_id: result.client_id,
+            customer_id: result.customer_id,
+            site_address: {
+              address1: result.site_address.address1,
+              address2: result.site_address.address2,
+              country: result.site_address.country,
+              city: result.site_address.city,
+              pincode: result.site_address.pincode,
+              state: result.site_address.state,
+            },
+            customer_data: {
+              id: result.customer_data.id,
+              first_name: result.customer_data.first_name,
+              last_name: result.customer_data.last_name,
+            },
+          };
+        })
+      );
+    };
 
     onMounted(async () => {
-
       // get all the rgp
       const response = await getOnGoingRGP(User.company_id);
-      
+
       RGPS.value.pop();
 
-      if(response){
+      if (response) {
         await fillDetails(response);
       }
-
     });
 
     return {
       RGPS,
       fillDetails,
       worksheetDetails,
-      selectEngineer,
+      SetDetails,
+      ServiceEngineers,
+      CustomerData,
+      SiteAddress,
+      engineerSelect,
     };
   },
 });
