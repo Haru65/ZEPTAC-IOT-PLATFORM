@@ -129,12 +129,12 @@
           <template v-slot:status="{ row: rgps }">
             <span
             v-if="rgps.status == 1"
-            class="badge py-3 px-4 fs-7 badge-light-success"
+            class="badge py-3 px-4 fs-7 badge-light-primary"
             >In Process</span
           >
           <span
             v-if="rgps.status == 0"
-            class="badge py-3 px-4 fs-7 badge-light-danger"
+            class="badge py-3 px-4 fs-7 badge-light-success"
             >Completed</span
           >
           </template>

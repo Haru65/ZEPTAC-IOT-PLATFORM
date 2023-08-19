@@ -74,10 +74,6 @@ const AdminMenuConfig: Array<MenuItem> = [
                 route: "/dailyworksheets",
               },
               {
-                heading: "Task Allocation",
-                route: "/modules/validation/taskallocation",
-              },
-              {
                 heading: "Expense Sheet",
                 route: "/modules/validation/expensesheet",
               },

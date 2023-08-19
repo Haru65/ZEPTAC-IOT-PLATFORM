@@ -472,32 +472,6 @@ const routes: Array<RouteRecordRaw> = [
           breadcrumbs: ["Returnable-Gate-Pass Add"],
         },
       },
-      {
-        path: "/returnablegatepasses/edit/:id",
-        name: "rgp-edit",
-        beforeEnter: async (to, from, next) => {
-          const rgpID = to.params.id;
-          //console.log(companyId);
-          try {
-            const response = await getRGatePass(rgpID.toString());
-            console.log(response);
-            if (response.error || response.is_active == 0) {
-              next("/404"); // Redirect to the fallback route
-            } else {
-              next(); // Continue to the desired route
-            }
-          } catch (error) {
-            console.error(error);
-            next("/404"); // Redirect to the fallback route
-          }
-        },
-        component: () =>
-          import("@/views/apps/modules/services/rgp/backup/RGatePassEdit.vue"),
-        meta: {
-          pageTitle: "Returnable-Gate-Pass Edit",
-          breadcrumbs: ["Returnable-Gate-Pass Edit"],
-        },
-      },
 
       // Daily Work Sheet Routes
       {
