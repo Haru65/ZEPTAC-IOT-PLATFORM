@@ -13,6 +13,7 @@ const EMPLOYEE_URL = "employee";
 const INSTRUMENTS_URL = "instruments";
 const RGP_URL = "returnablegatepasses";
 const DWSHEET_URL = "dailyworksheets";
+const EXPSHEET_URL = "expensesheets";
 
 // COMPANIES
 
@@ -1051,6 +1052,45 @@ export async function WorksheetSearch(search: any) {
         }
         ApiService.setHeader();
         const response = await ApiService.post('worksheet_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// EXPENSE SHEET
+
+export async function addExpenseSheet(data: string) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(EXPSHEET_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getExpenseSheets(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(EXPSHEET_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function deleteExpenseSheet(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(EXPSHEET_URL + "/" + data);
         return response.data;
     } catch (errors) {
         console.error(errors);

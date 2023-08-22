@@ -521,6 +521,54 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
 
+      // Expense Sheet Routes
+      {
+        path: "/expensesheets",
+        name: "expensesheet-list",
+        component: () =>
+          import("@/views/apps/modules/services/expense/ExpenseSheetListing.vue"),
+        meta: {
+          pageTitle: "Expense Sheet List",
+          breadcrumbs: ["Expense Sheet List"],
+        },
+      },
+      {
+        path: "/expensesheets/add",
+        name: "expensesheet-add",
+        component: () =>
+          import("@/views/apps/modules/services/expense/ExpenseSheetAdd.vue"),
+        meta: {
+          pageTitle: "Expense Sheet Add",
+          breadcrumbs: ["Expense Sheet Add"],
+        },
+      },
+      // {
+      //   path: "/expensesheets/edit/:id",
+      //   name: "expensesheet-edit",
+      //   beforeEnter: async (to, from, next) => {
+      //     const worksheetID = to.params.id;
+      //     console.log(companyId);
+      //     try {
+      //       const response = await getExpenseSheet(expenseSheetID.toString());
+      //       console.log(response);
+      //       if (response.error || response.is_active == 0) {
+      //         next("/404"); // Redirect to the fallback route
+      //       } else {
+      //         next(); // Continue to the desired route
+      //       }
+      //     } catch (error) {
+      //       console.error(error);
+      //       next("/404"); // Redirect to the fallback route
+      //     }
+      //   },
+      //   component: () =>
+      //     import("@/views/apps/modules/services/expense/ExpenseSheetEdit.vue"),
+      //   meta: {
+      //     pageTitle: "Returnable-Gate-Pass Edit",
+      //     breadcrumbs: ["Returnable-Gate-Pass Edit"],
+      //   },
+      // },
+
     ],
   },
 

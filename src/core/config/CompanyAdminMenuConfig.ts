@@ -71,7 +71,7 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
               },
               {
                 heading: "Expense Sheet",
-                route: "/modules/validation/expensesheet",
+                route: "/expensesheets",
               },
             ],
           },

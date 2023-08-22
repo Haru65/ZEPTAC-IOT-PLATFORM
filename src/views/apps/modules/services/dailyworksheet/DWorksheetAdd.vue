@@ -23,7 +23,7 @@
                         filterable
                         placeholder="Please Select GatePass"
                         name="rgp_id"
-                        :onchange="SetDetails(worksheetDetails.rgp_id)"
+                        @change="SetDetails(worksheetDetails.rgp_id)"
                       >
                         <el-option
                           value=""
@@ -111,7 +111,7 @@
                         <span class="fs-5 fw-bold text-gray-700">
                           {{ SiteAddress.address1 }} {{ SiteAddress.address2 }}
                           {{ SiteAddress.city }} - {{ SiteAddress.pincode }}
-                          {{ SiteAddress.state }} {{ SiteAddress.country }}
+                          {{ SiteAddress.states }} {{ SiteAddress.country }}
                         </span>
                       </div>
                     </div>
@@ -483,7 +483,7 @@ export default defineComponent({
           country: "",
           city: "",
           pincode: "",
-          state: "",
+          states: "",
         },
         customer_data: {
           id: "",
@@ -539,7 +539,7 @@ export default defineComponent({
       country: "",
       city: "",
       pincode: "",
-      state: "",
+      states: "",
     });
 
     const CustomerData = ref({
@@ -569,7 +569,9 @@ export default defineComponent({
     };
 
     const SetDetails = async (id) => {
-      try {
+
+      if(id){
+        try {
         // Find the rgp
         const foundRGP = RGPS.value.find((rgp) => rgp.id === id);
 
@@ -581,12 +583,15 @@ export default defineComponent({
         // Destructure and assign rgp details
         const { rgp_no, engineers, site_address, customer_data } = foundRGP;
         worksheetDetails.value.rgp_no = rgp_no;
+        worksheetDetails.value.engineer_id = "";
+        ServiceEngineers.value = [];
         ServiceEngineers.value = [...engineers];
         engineerSelect.value = false;
         SiteAddress.value = site_address;
         CustomerData.value = customer_data;
       } catch (error) {
         console.error("An error occurred:", error);
+      }
       }
     };
 
@@ -606,7 +611,7 @@ export default defineComponent({
               country: result.site_address.country,
               city: result.site_address.city,
               pincode: result.site_address.pincode,
-              state: result.site_address.state,
+              states: result.site_address.state,
             },
             customer_data: {
               id: result.customer_data.id,

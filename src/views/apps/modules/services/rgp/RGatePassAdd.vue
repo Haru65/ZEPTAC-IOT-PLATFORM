@@ -259,6 +259,7 @@ export default defineComponent({
       rgpDetails.value.site_address.city = address.city? address.city : ""
       rgpDetails.value.site_address.pincode = address.pincode? address.pincode : ""
       rgpDetails.value.site_address.states = address.states? address.states : ""
+      rgpDetails.value.site_address.country = address.country? address.country : ""
 
     } 
 

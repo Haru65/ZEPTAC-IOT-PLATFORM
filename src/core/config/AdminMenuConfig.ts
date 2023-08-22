@@ -75,7 +75,7 @@ const AdminMenuConfig: Array<MenuItem> = [
               },
               {
                 heading: "Expense Sheet",
-                route: "/modules/validation/expensesheet",
+                route: "/expensesheets",
               },
             ],
           },
