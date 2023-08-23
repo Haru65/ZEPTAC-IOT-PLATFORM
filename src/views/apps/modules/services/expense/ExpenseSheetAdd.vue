@@ -40,23 +40,36 @@
         >
           <!--begin::Step 1-->
           <div class="current" data-kt-stepper-element="content">
-            <Step1 
-            v-bind:ongoingRGPS="RGPS"
-            @rgp-Selected="setRGPDetails"
-            @engineer-Selected="setEngineer"
+            <Step1
+              v-bind:ongoingRGPS="RGPS"
+              @rgp-Selected="setRGPDetails"
+              @engineer-Selected="setEngineer"
             ></Step1>
           </div>
           <!--end::Step 1-->
 
           <!--begin::Step 2-->
           <div data-kt-stepper-element="content">
-            <Step2>afad</Step2>
+            <Step2
+              v-bind:tasks="expenseSheetDetails.expenses"
+              v-bind:total_amount="expenseSheetDetails.total_amount"
+              v-on:removeExpense="RemoveExpense"
+              v-on:setType="setExpenseType"
+              v-on:setAmount="setExpenseAmount"
+              v-on:setDescription="setExpenseDescription"
+              v-on:setImage="setExpenseImage"
+              v-on:setDate="setExpenseDate"
+              v-on:addNewExpenseField="addNewItem"
+              ></Step2
+            >
           </div>
           <!--end::Step 2-->
 
           <!--begin::Step 3-->
           <div data-kt-stepper-element="content">
-            <Step3>adfadfa</Step3>
+            <Step3
+            v-bind:summary="expenseSheetDetails"
+            ></Step3>
           </div>
           <!--end::Step 3-->
 
@@ -114,7 +127,6 @@
 </template>
 
 <script lang="ts">
-
 import { getAssetPath } from "@/core/helpers/assets";
 import { computed, defineComponent, onMounted, ref } from "vue";
 import { StepperComponent } from "@/assets/ts/components";
@@ -128,8 +140,9 @@ import moment from "moment";
 
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-import { getOnGoingRGP } from "@/stores/api";
+import { addExpenseSheet, getOnGoingRGP } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
+import { ExpenseTypes } from "@/core/model/expensetypes";
 
 interface IStep1 {}
 
@@ -161,7 +174,17 @@ export default defineComponent({
       rgp_no: "",
       date: "",
       duedate: "",
-      expenses: [],
+      expenses: [
+        {
+          id: "",
+          date: "",
+          type: "",
+          description: "",
+          amount: "",
+          receipt: "",
+        },
+      ],
+      total_amount: 0,
       engineer_id: "",
       engineer_name: "",
       site_address: {
@@ -183,31 +206,155 @@ export default defineComponent({
       is_active: 1,
     });
 
-    // function setDate(date){
-    //     rgpDetails.value.date = date
+    // Expenses Emits
 
-    // }
-
-    function setEngineer(engineer_id, engineer_name){
-      expenseSheetDetails.value.engineer_id = engineer_id
-      expenseSheetDetails.value.engineer_name = engineer_name
+    async function setExpenseDate(event, index) {
+      console.log(event, index);
+      expenseSheetDetails.value.expenses[index].date = moment(event).format(
+        "YYYY-MM-DD"
+      );
     }
 
-    function setRGPDetails(rgp_id, rgp_no, address, customer_name, date, duedate){
+    async function setExpenseType(typeId, index) {
+      const findExpenseType = (await ExpenseTypes.find(
+        (x) => x.id == typeId
+      )) || { id: "", type: "" };
+      expenseSheetDetails.value.expenses[index].id = typeId;
+      expenseSheetDetails.value.expenses[index].type = findExpenseType.type;
+    }
+
+    async function setExpenseDescription(desc, index) {
+      expenseSheetDetails.value.expenses[index].description = await desc.target
+        .value;
+    }
+
+    async function setExpenseAmount(amount, index) {
+      expenseSheetDetails.value.expenses[index].amount = await amount.target
+        .value;
+      calTotalAmount();
+    }
+
+    const calTotalAmount = () => {
+      const amounts = expenseSheetDetails.value.expenses.map((ele: any) =>
+        Number(ele.amount.replaceAll(",", ""))
+      );
+      expenseSheetDetails.value.total_amount =
+        amounts.length != 0 ? amounts.reduce((acc, curr) => acc + curr) : 0.0;
+    };
+
+    async function setExpenseImage(event, index) {
+      const input = event.target;
+      if (input.files && input.files.length > 0) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          expenseSheetDetails.value.expenses[index].receipt = e.target.result;
+        };
+        expenseSheetDetails.value.expenses[index].receipt = input.files[0];
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    const removeObjectWithId = (arr, id) => {
+      console.log("remove", id);
+
+      if (id !== -1) {
+        arr.splice(id, 1);
+      }
+
+      return arr;
+    };
+
+    const RemoveExpense = (index) => {
+      console.log("from parent", index);
+      expenseSheetDetails.value.expenses = removeObjectWithId(
+        expenseSheetDetails.value.expenses,
+        index
+      );
+      calTotalAmount();
+    };
+
+    function areAllPropertiesNotNull(array) {
+      return array.every((obj) => {
+        return Object.values(obj).every((prop) => prop !== "");
+      });
+    }
+
+    const addNewItem = () => {
+      if (expenseSheetDetails.value.expenses.length == 0) {
+        expenseSheetDetails.value.expenses.push({
+          id: "",
+          date: "",
+          type: "",
+          description: "",
+          amount: "",
+          receipt: "",
+        });
+      } else {
+        const result = areAllPropertiesNotNull(
+          expenseSheetDetails.value.expenses
+        );
+        if (result) {
+          expenseSheetDetails.value.expenses.push({
+            id: "",
+            date: "",
+            type: "",
+            description: "",
+            amount: "",
+            receipt: "",
+          });
+        } else {
+          Swal.fire({
+            icon: "info",
+            title: "Please fill all the details",
+          });
+        }
+      }
+    };
+
+    function setEngineer(engineer_id, engineer_name) {
+      expenseSheetDetails.value.engineer_id = engineer_id;
+      expenseSheetDetails.value.engineer_name = engineer_name;
+    }
+
+    function setRGPDetails(
+      rgp_id,
+      rgp_no,
+      address,
+      customer_name,
+      date,
+      duedate,
+      quotation_id,
+      quotation_no
+    ) {
       expenseSheetDetails.value.engineer_name = "";
       expenseSheetDetails.value.engineer_id = "";
-      expenseSheetDetails.value.rgp_id = rgp_id ? rgp_id : ""
-      expenseSheetDetails.value.rgp_no = rgp_no ? rgp_no : ""
-      expenseSheetDetails.value.site_address.address1 = address.address1 ? address.address1 : ""
-      expenseSheetDetails.value.site_address.address2 = address.address2? address.address2 : ""
-      expenseSheetDetails.value.site_address.city = address.city? address.city : ""
-      expenseSheetDetails.value.site_address.pincode = address.pincode? address.pincode : ""
-      expenseSheetDetails.value.site_address.states = address.states? address.states : ""
-      expenseSheetDetails.value.site_address.country = address.country? address.country : ""
-      expenseSheetDetails.value.customer_name = customer_name ? customer_name : ""
-      expenseSheetDetails.value.date = date
-      expenseSheetDetails.value.duedate = duedate
-
+      expenseSheetDetails.value.rgp_id = rgp_id ? rgp_id : "";
+      expenseSheetDetails.value.rgp_no = rgp_no ? rgp_no : "";
+      expenseSheetDetails.value.site_address.address1 = address.address1
+        ? address.address1
+        : "";
+      expenseSheetDetails.value.site_address.address2 = address.address2
+        ? address.address2
+        : "";
+      expenseSheetDetails.value.site_address.city = address.city
+        ? address.city
+        : "";
+      expenseSheetDetails.value.site_address.pincode = address.pincode
+        ? address.pincode
+        : "";
+      expenseSheetDetails.value.site_address.states = address.states
+        ? address.states
+        : "";
+      expenseSheetDetails.value.site_address.country = address.country
+        ? address.country
+        : "";
+      expenseSheetDetails.value.customer_name = customer_name
+        ? customer_name
+        : "";
+      expenseSheetDetails.value.date = date;
+      expenseSheetDetails.value.duedate = duedate;
+      expenseSheetDetails.value.quotation_no = quotation_no;
+      expenseSheetDetails.value.quotation_id = quotation_id;
     }
 
     const RGPS = ref([
@@ -215,6 +362,7 @@ export default defineComponent({
         id: "",
         rgp_no: "",
         quotation_id: "",
+        quotation_no: "",
         engineers: [],
         client_id: "",
         customer_id: "",
@@ -245,6 +393,7 @@ export default defineComponent({
             id: result.id,
             rgp_no: result.rgp_no,
             quotation_id: result.quotation_id,
+            quotation_no: result.quotation_no,
             engineers: JSON.parse(result.engineers),
             client_id: result.client_id,
             customer_id: result.customer_id,
@@ -331,13 +480,24 @@ export default defineComponent({
         }
       } else if (currentStepIndex.value === 1) {
         if (expenseSheetDetails.value.expenses.length > 0) {
-          currentStepIndex.value++;
+          const result = areAllPropertiesNotNull(
+            expenseSheetDetails.value.expenses
+          );
 
-          if (!_stepperObj.value) {
-            return;
+          if (result) {
+            currentStepIndex.value++;
+
+            if (!_stepperObj.value) {
+              return;
+            }
+
+            _stepperObj.value.goNext();
+          } else {
+            Swal.fire({
+              icon: "info",
+              title: "Please fill all the details",
+            });
           }
-
-          _stepperObj.value.goNext();
         } else {
           Swal.fire({
             icon: "info",
@@ -358,49 +518,33 @@ export default defineComponent({
     };
 
     const formSubmit = async () => {
-      // loading.value = true;
-      // console.log(rgpDetails.value);
-      // rgpDetails.value.date = moment(rgpDetails.value.date).format(
-      //   "YYYY-MM-DD HH:mm:ss"
-      // );
-      // rgpDetails.value.duedate = moment(rgpDetails.value.duedate).format(
-      //   "YYYY-MM-DD HH:mm:ss"
-      // );
-      // try {
-      //   const res = await GetIncrReturnableGatePassId(User.company_id);
-      //   // console.log(res);
-      //   if (rgpDetails.value.rgp_no !== res.result) {
-      //     const response = await addRGatePass(rgpDetails.value);
-      //     if (!response.error) {
-      //       // change the availability of engineers and instruments
-      //       const statusUpdate = await UpdateStatus(rgpDetails.value);
-      //       if(!statusUpdate.error){
-      //       showSuccessAlert(
-      //         "Success",
-      //         "Returnable Gate pass details have been successfully inserted!"
-      //       );
-      //       route.push({ name: "rgp-list" });
-      //       }
-      //     }else {
-      //       // Handle API error response
-      //       const errorData = response.error;
-      //       // console.log("API error:", errorData);
-      //       console.log("API error:", errorData.response.data.errors);
-      //       showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-      //     }
-      //   }else {
-      //     showErrorAlert("Warning", "Bad Luck! RGP Details Already Exists");
-      //     route.push({ name: "rgp-list" });
-      //   }
-      //   loading.value = false;
-      // } catch (error) {
-      //   // Handle any other errors during API call
-      //   console.error("API call error:", error);
-      //   showErrorAlert("Error", "An error occurred during the API call.");
-      // }
-      // finally {
-      //   loading.value = false;
-      // }
+      loading.value = true;
+      try {
+        const response = await addExpenseSheet(expenseSheetDetails.value);
+          if (!response.error) {
+            showSuccessAlert(
+              "Success",
+              "Expense Sheet details have been successfully inserted!"
+            );
+            
+            loading.value = false;
+            route.push({ name: "expensesheet-list" });
+          }else {
+            // Handle API error response
+            const errorData = response.error;
+            // console.log("API error:", errorData);
+            console.log("API error:", errorData.response.data.errors);
+            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            loading.value = false;
+          }
+      } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
+        showErrorAlert("Error", "An error occurred during the API call.");
+      }
+      finally {
+        loading.value = false;
+      }
     };
 
     const showSuccessAlert = (title, message) => {
@@ -449,8 +593,15 @@ export default defineComponent({
       loading,
       setRGPDetails,
       setEngineer,
+      RemoveExpense,
+      addNewItem,
+      setExpenseAmount,
+      setExpenseDescription,
+      setExpenseType,
+      setExpenseDate,
+      setExpenseImage,
+      calTotalAmount,
     };
   },
 });
-
 </script>

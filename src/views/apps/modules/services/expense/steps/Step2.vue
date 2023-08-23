@@ -10,8 +10,8 @@
     <!--end::Heading-->
 
     <!--begin::Card body-->
-    <div class="card pt-0 w-100">
-      <div class="table-responsive w-100 mb-10">
+    <div class="card p-3 w-100">
+      <div class="table-responsive mb-10">
         <!--begin::Table-->
         <table
           class="table g-5 gs-0 mb-0 w-100 fw-bold text-gray-700"
@@ -20,42 +20,155 @@
           <!--begin::Table head-->
           <thead>
             <tr
-              class="border-bottomfs-7 w-100 fw-bold text-gray-700 text-uppercase"
+              class="fs-3 fw-bold text-gray-700 text-uppercase text-center"
             >
-              <th class="">Expense Details</th>
+              <th class="">Your Expenses</th>
             </tr>
           </thead>
           <!--end::Table head-->
 
           <!--begin::Table body-->
           <tbody>
-            <CustomSelect
-              v-bind:tasks="step2Data.expenses"
-              @setAmount="setExpenseAmount"
-              @setDescription="setExpenseDescription"
-              @setType="setExpenseType"
-              @setImage="setExpenseImage"
-              @setDate="setExpenseDate"
-            />
+            <tr
+              v-for="(task, index) in $props.tasks"
+              :key="task.id"
+              class="w-100"
+            >
+              <td class="pt-8 text-nowrap" :id="task.id">
+                <div class="shadow-lg p-5 m-3 fs-4 rounded w-100 border">
+                  <div class="row mb-2">
+                    <div
+                      class="form-group col-lg-4 col-sm-6 col-md-6 mb-2 mb-sd-2"
+                    >
+                      <el-date-picker
+                        type="date"
+                        name="date"
+                        placeholder="Pick a day"
+                        onchange="setTheDate"
+                        class="mb-3 mb-lg-0 min-w-150px"
+                        v-model="task.date"
+                      />
+                    </div>
+
+                    <div
+                      class="form-group col-lg-8 col-sm-6 col-md-6 mb-2 mb-sd-2"
+                    >
+                      <el-select
+                        filterable
+                        v-model="task.id"
+                        @change="setTheType($event, index)"
+                        placeholder="Please Select Expense Type"
+                      >
+                        <el-option
+                          value=""
+                          label="Please Select Item..."
+                          disabled="disabled"
+                          key=""
+                          >Please Select Expense Type</el-option
+                        >
+                        <el-option
+                          v-for="ele in ExpenseTypes"
+                          :key="ele.id"
+                          :label="ele.type"
+                          :value="ele.id"
+                        />
+                      </el-select>
+                    </div>
+                  </div>
+                  <div class="row mb-2">
+                    <div
+                      class="form-group col-lg-4 col-sm-6 col-md-6 mb-2 mb-sd-2"
+                    >
+                      <input
+                        type="text"
+                        name="price"
+                        v-model="task.amount"
+                        @keyup="setTheAmount($event, index)"
+                        class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 min-w-150px"
+                        placeholder="Enter Amount (₹ 0.00)"
+                      />
+                    </div>
+                    <div
+                      class="form-group col-lg-8 col-sm-6 col-md-6 mb-2 mb-sd-2"
+                    >
+                      <input
+                        type="textarea"
+                        v-model="task.description"
+                        @keyup="setTheDescription($event, index)"
+                        name="description"
+                        rows="2"
+                        class="form-control form-control-lg form-control-solid"
+                        placeholder="write more about expense..."
+                      />
+                    </div>
+                  </div>
+                  <div class="row mb-2">
+                    <div class="form-group col-lg-12 mb-2 mb-sd-2">
+                      <input
+                        type="file"
+                        class="form-control form-control-file form-control-lg form-control-solid"
+                        name="receipt"
+                        accept="image/*"
+                        @change="setTheImage($event, index)"
+                      />
+                    </div>
+                  </div>
+                  <div class="row mb-2">
+                    <div class="form-group col-lg-12 mb-2 mb-sd-2">
+                      <div class="border p-2 mt-3">
+                        <template v-if="task.receipt">
+                          <img
+                            :src="task.receipt"
+                            class="rounded mx-auto d-block w-200px h-200px"
+                          />
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row mb-2">
+                    <div
+                      class="form-group d-flex flex-end col-lg-12 mb-2 mb-sd-2"
+                    >
+                      <div>
+                        <span>
+                          <i
+                            @click="removeExpense(index)"
+                            class="bi bi-trash btn btn-light text-gray-700 text-hover-danger mb-1 fs-1"
+                          ></i>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
           </tbody>
           <!--end::Table body-->
-
           <!--begin::Table foot-->
           <tfoot>
             <tr
               class="border-top border-top-dashed align-top fs-6 fw-bold text-gray-700"
             >
               <th class="text-primary">
-                <span class="btn btn-primary" @click="addNewItem()">
-                  <KTIcon icon-name="plus" icon-class="fs-2" />
-                  Add More Expense
-                </span>
-              </th>
-            </tr>
-            <tr class="align-top fw-bold text-gray-700">
-              <th colspan="1" class="fs-4 ps-0">Total</th>
-              <th colspan="1" class="text-end fs-4 text-nowrap">
-                ₹<span data-kt-element="grand-total">{{ 987 }}</span>
+                <div class="row m-2">
+                  <div
+                    class="form-group d-flex justify-content-between col-lg-12 mb-2 mb-sd-2"
+                  >
+                    <div>
+                      <span class="btn btn-primary" @click="addNewItem">
+                        <KTIcon icon-name="plus" icon-class="fs-2" />
+                        Add More Expense
+                      </span>
+                    </div>
+                    <div>
+                      
+                      <h2 class="fw-bold fs-4 text-dark">Total Expense ₹<span class="text-primary" data-kt-element="grand-total">{{
+                        $props.total_amount ? $props.total_amount : "0.0"
+                      }}</span></h2>
+                    </div>
+                  </div>
+                </div>
               </th>
             </tr>
           </tfoot>
@@ -72,16 +185,13 @@
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, ref, onMounted } from "vue";
 import { ErrorMessage, Field } from "vee-validate";
-import CustomSelect from "../CustomComponents/CustomQuotationItems.vue";
 import { ExpenseTypes } from "@/core/model/expensetypes";
-import moment from "moment";
 
 export default defineComponent({
   name: "step-2",
   components: {
     Field,
     ErrorMessage,
-    CustomSelect,
   },
   emit: [
     "setExpenseAmount",
@@ -89,135 +199,59 @@ export default defineComponent({
     "setExpenseType",
     "setExpenseImage",
     "setExpenseDate",
+    "RemoveExpense",
+    "addNewExpenseField",
   ],
-  props: [],
+  props: ["tasks", "total_amount"],
   setup(props, { emit }) {
-    const step2Data = ref({
-      expenses: [
-        {
-          id: "",
-          date: "",
-          type: "",
-          description: "",
-          amount: "",
-          receipt: "",
-          preview: "",
-        },
-      ],
-    });
 
-    async function setExpenseDate(event, index) {
-      if (index && event) {
-        console.log(event, index);
-        step2Data.value.expenses[index].date = moment(event).format(
-          "YYYY-MM-DD HH:mm:ss"
-        );
-      }
+    // Handling Emits
+
+    const image = ref("");
+    const receipt = ref(null);
+
+    async function setTheType(id, index) {
+      await emit("setType", id, index);
     }
 
-    async function setExpenseType(typeId, index) {
-      if (index && typeId) {
-        const findExpenseType = (await ExpenseTypes.find(
-          (x) => x.id == typeId
-        )) || { id: "", type: "" };
-        step2Data.value.expenses[index].id = typeId;
-        step2Data.value.expenses[index].type = findExpenseType.type;
-      }
+    async function setTheDate(id, index) {
+      await emit("setDate", id, index);
     }
 
-    async function setExpenseDescription(desc, index) {
-      if (index && desc) {
-        step2Data.value.expenses[index].description = await desc.target.value;
-      }
+    async function setTheAmount(id, index) {
+      await emit("setAmount", id, index);
     }
 
-    async function setExpenseAmount(amount, index) {
-      if (index && amount) {
-        step2Data.value.expenses[index].amount = await amount.target.value;
-      }
+    async function setTheDescription(id, index) {
+      await emit("setDescription", id, index);
     }
 
-    async function setExpenseImage(event, index) {
-        const input = event.target;
-        if (input.files && input.files.length > 0) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            step2Data.value.expenses[index].preview = e.target.result;
-          };
-          step2Data.value.expenses[index].receipt = input.files[0];
-          reader.readAsDataURL(input.files[0]);
-        }
+    async function setTheImage(event, index) {
+      await emit("setImage", event, index);
     }
 
-    // const removeObjectWithId = (arr, id) => {
-    //   const objWithIdIndex = arr.findIndex((obj) => obj.id === id);
-
-    //   if (objWithIdIndex > -1) {
-    //     arr.splice(objWithIdIndex, 1);
-    //   }
-
-    //   return arr;
-    // };
-
-    const RemoveExpense = (index) => {
-      console.log(index);
-      // removeObjectWithId(step2Data.value.expenses, index);
-      // calPrice();
+    const removeExpense = (index) => {
+      console.log("child", index);
+      emit("removeExpense", index);
     };
-    const AddExpense = (index) => {
-      // console.log(index);
-      // removeObjectWithId(QuotationDetials.value.items, index);
-      // calPrice();
-    };
-
-    // const ToggleCheckBoxForEngineers = async (e) => {
-    //   const selectedId = e.target.value;
-
-    //   const selectedEngineer = props.engineers.find(
-    //     (engineer) => engineer.id == selectedId
-    //   );
-
-    //   if (e.target.checked) {
-    //     step2Data.value.engineers.push({
-    //       id: selectedId,
-    //       first_name: selectedEngineer.first_name,
-    //       last_name: selectedEngineer.last_name,
-    //     });
-    //   } else {
-    //     step2Data.value.engineers = step2Data.value.engineers.filter(
-    //       (engineer) => engineer.id != selectedId
-    //     );
-    //   }
-
-    //   await emit("set-engineers", step2Data.value.engineers);
-    // };
 
     const addNewItem = () => {
-      step2Data.value.expenses.push({
-        id: "",
-        date: "",
-        type: "",
-        description: "",
-        amount: "",
-        receipt: "",
-        preview: "",
-      });
+      emit("addNewExpenseField");
     };
 
     return {
       getAssetPath,
-      step2Data,
       addNewItem,
-      RemoveExpense,
-      AddExpense,
-      setExpenseDate,
-      setExpenseAmount,
-      setExpenseDescription,
-      setExpenseImage,
-      setExpenseType,
-
-      // engineers: props.engineers,
-      // ToggleCheckBoxForEngineers,
+      image,
+      removeExpense,
+      setTheType,
+      setTheAmount,
+      setTheDescription,
+      setTheDate,
+      setTheImage,
+      tasks: props.tasks,
+      ExpenseTypes,
+      receipt,
     };
   },
 });

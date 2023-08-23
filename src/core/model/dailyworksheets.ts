@@ -2,8 +2,10 @@ interface IWorksheet {
     id: number;
     rgp_no: string;
     engineer_id:string;
-    work_date:string;
-    work_status:string;
+    first_name:string;
+    last_name:string;
+    total_amount:string;
+    status:string;
 }
   
 export type { IWorksheet };

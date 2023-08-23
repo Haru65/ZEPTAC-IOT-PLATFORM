@@ -248,6 +248,8 @@ export default defineComponent({
       rgp_id: "",
       rgp_no: "",
       engineer_id: "",
+      quotation_id: "",
+      quotation_no: "",
       engineer_name: "",
       date: "",
       duedate: "",
@@ -302,6 +304,8 @@ export default defineComponent({
             engineers,
             site_address,
             customer_data,
+            quotation_id,
+            quotation_no
           } = foundRGP;
           step1Data.value.rgp_no = rgp_no;
           step1Data.value.engineer_id = "";
@@ -311,7 +315,9 @@ export default defineComponent({
           step1Data.value.customer_name = customer_data.first_name + " " + customer_data.last_name;
           step1Data.value.date = date;
           step1Data.value.duedate = duedate;
-          await emit("rgp-Selected", step1Data.value.rgp_id, step1Data.value.rgp_no,  step1Data.value.site_address, step1Data.value.customer_name, step1Data.value.date, step1Data.value.duedate);
+          step1Data.value.quotation_id = quotation_id;
+          step1Data.value.quotation_no = quotation_no;
+          await emit("rgp-Selected", step1Data.value.rgp_id, step1Data.value.rgp_no,  step1Data.value.site_address, step1Data.value.customer_name, step1Data.value.date, step1Data.value.duedate,  step1Data.value.quotation_id,  step1Data.value.quotation_no);
 
         } catch (error) {
           console.error("An error occurred:", error);
