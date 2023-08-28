@@ -109,9 +109,9 @@
               {{ dailyworksheets.rgp_no }}
             </span>
           </template>
-          <template v-slot:engineer_id="{ row: dailyworksheets }">
+          <template v-slot:engineer_name="{ row: dailyworksheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
-              {{ dailyworksheets.engineer_id }}
+                  {{ dailyworksheets.engineer_name.first_name + " " + dailyworksheets.engineer_name.last_name }}
             </span>
           </template>
           <!-- defualt data -->
@@ -206,8 +206,8 @@ export default defineComponent({
         columnWidth: 155,
       },
       {
-        columnName: "Engineer Id",
-        columnLabel: "engineer_id",
+        columnName: "Engineer Name",
+        columnLabel: "engineer_name",
         sortEnabled: true,
         columnWidth: 175,
       },

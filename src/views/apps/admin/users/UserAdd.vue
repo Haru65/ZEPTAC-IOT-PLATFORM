@@ -528,6 +528,33 @@
             </div>
             <!--end::Col-->
           </div>
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6"
+              >City</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg">
+              <!--begin::Row-->
+              <div class="row">
+                <!--begin::Col-->
+                <div class="col-lg fv-row">
+                  <Field
+                    type="text"
+                    name="city"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Enter City"
+                    v-model="profileDetails.city"
+                  />
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
           <!--end::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
