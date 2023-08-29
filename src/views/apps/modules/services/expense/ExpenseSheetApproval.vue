@@ -29,28 +29,6 @@
             class="d-flex justify-content-end"
             data-kt-customer-table-toolbar="base"
           >
-
-          <router-link to="/expensesheets/approval" class="btn btn-primary">
-              <KTIcon icon-name="plus" icon-class="fs-2" />
-              Expense Approval
-            </router-link>
-            <!--begin::Export-->
-            <button
-              type="button"
-              class="btn btn-light-primary me-3"
-              data-bs-toggle="modal"
-              data-bs-target="#kt_customers_export_modal"
-            >
-              <KTIcon icon-name="exit-up" icon-class="fs-2" />
-              Export
-            </button>
-            <!--end::Export-->
-            <!--begin::Add customer-->
-            <router-link to="/expensesheets/add" class="btn btn-primary">
-              <KTIcon icon-name="plus" icon-class="fs-2" />
-              Add Expense Sheet
-            </router-link>
-            <!--end::Add customer-->
           </div>
           <!--end::Toolbar-->
           <!--begin::Group actions-->
@@ -143,7 +121,7 @@
             <!--begin::Menu Flex-->
             <div class="d-flex flex-lg-row">
               <span class="menu-link px-3">
-                <router-link :to="`./edit/${expensesheets.id}`">
+                <router-link :to="`/expensesheets/edit/${expensesheets.id}`">
                   <i
                     class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
                   ></i>
@@ -204,7 +182,7 @@ import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { IExpenseSheet } from "@/core/model/expensesheets";
 import arraySort from "array-sort";
 import moment from "moment";
-import { deleteExpenseSheet, getExpenseSheets, ExpenseSheetSearch } from "@/stores/api";
+import { deleteExpenseSheet, getPendingExpenseSheets, ExpenseSheetSearch } from "@/stores/api";
 import Swal from "sweetalert2";
 import { formatPrice } from "@/core/config/DataFormatter";
 
@@ -269,7 +247,7 @@ export default defineComponent({
     // get users function
     async function expensesheets_listing(): Promise<void> {
       try {
-        const response = await getExpenseSheets(
+        const response = await getPendingExpenseSheets(
           `page=${page.value}&limit=${limit.value}`
         );
         console.log(response);
@@ -299,7 +277,7 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getExpenseSheets(`page=${page}&limit=${limit.value}`);
+        const response = await getPendingExpenseSheets(`page=${page}&limit=${limit.value}`);
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
@@ -329,7 +307,7 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getExpenseSheets(`page=${page.value}&limit=${limit}`);
+        const response = await getPendingExpenseSheets(`page=${page.value}&limit=${limit}`);
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;

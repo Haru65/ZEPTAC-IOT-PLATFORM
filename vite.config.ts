@@ -10,6 +10,7 @@ export default defineConfig({
     alias: {
       "vue-i18n": "vue-i18n/dist/vue-i18n.cjs.js",
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+      'vue-easy-lightbox$': 'vue-easy-lightbox/dist/external-css/vue-easy-lightbox.esm.min.js',
     },
   },
   base: "/",

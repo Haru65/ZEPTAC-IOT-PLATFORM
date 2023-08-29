@@ -1086,6 +1086,18 @@ export async function getExpenseSheets(data) {
     }
 }
 
+export async function getPendingExpenseSheets(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(EXPSHEET_URL + "/approval", data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 export async function deleteExpenseSheet(data: any) {
     try {
         //console.log(data)
@@ -1106,6 +1118,21 @@ export async function ExpenseSheetSearch(search: any) {
         }
         ApiService.setHeader();
         const response = await ApiService.post('expensesheet_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getExpenseSheet(id: any) {
+    try {
+        ApiService.setHeader();
+        const data = {
+            id : id,
+        }
+        const response = await ApiService.post("get_expense_sheet", data);
+        // console.log(response)
         return response.data;
     } catch (errors) {
         console.error(errors);
