@@ -955,17 +955,18 @@ export async function getRGatePass(data: string) {
     }
 }
 
-// export async function updateRGatePass(id: any, data: any) {
-//     try {
-//         //console.log(data)
-//         ApiService.setHeader();
-//         const response = await ApiService.put(RGP_URL + "/" + id, data);
-//         return response.data;
-//     } catch (errors) {
-//         console.error(errors);
-//         return { error: errors };
-//     }
-// }
+export async function getRGPInfo(data: any) {
+    try {
+        //console.log(data)
+        const id = { "id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post("get_information_of_rgp",id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
 
 // delete
 export async function deleteRGatePass(data: any) {

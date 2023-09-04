@@ -13,6 +13,83 @@
         >
           <!--begin::Card body-->
           <div class="card-body border-top p-9">
+
+            <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6"
+              >Company Logo</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8">
+              <!--begin::Image input-->
+              <div
+                class="image-input image-input-outline"
+                data-kt-image-input="true"
+                :style="{
+                  backgroundImage: `url(${getAssetPath(
+                    'media/avatars/blank.png'
+                  )})`,
+                }"
+              >
+                <!--begin::Preview existing avatar-->
+                <img
+                  :src="companyDetails.disp_avatar"
+                  class="image-input-wrapper"
+                  alt="company logo"
+                />
+                <!--end::Preview existing avatar-->
+
+                <!--begin::Label-->
+                <label
+                  class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
+                  data-kt-image-input-action="change"
+                  data-bs-toggle="tooltip"
+                  title="Change profile image"
+                >
+                  <i class="bi bi-pencil-fill fs-7"></i>
+
+                  <!--begin::Inputs-->
+                  <input
+                    type="file"
+                    name="avatar"
+                    accept=".png, .jpg, .jpeg"
+                    @change="updateImage($event)"
+                  />
+                  <input max-size="1000" type="hidden" name="avatar_update" />
+                  <!--end::Inputs-->
+                </label>
+                <!--end::Label-->
+
+                <!--begin::Remove-->
+                <span
+                  class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
+                  data-kt-image-input-action="remove"
+                  data-bs-toggle="tooltip"
+                  @click="removeImage()"
+                  title="Remove image"
+                >
+                  <i class="bi bi-x fs-2"></i>
+                </span>
+                <!--end::Remove-->
+              </div>
+              <!--end::Image input-->
+
+              <!--begin::Hint-->
+              <div class="form-text">
+                Allowed file types: png, jpg, jpeg. <br />
+                Note : Max Upload limit 1 MB.
+                <br />
+                <span class="text-danger" v-if="file_size"
+                  >File Size Exceeded</span
+                >
+              </div>
+              <!--end::Hint-->
+            </div>
+            <!--end::Col-->
+          </div>
+
             <!--begin::Input group-->
             <div class="row mb-6">
               <!--begin::Label-->
@@ -550,6 +627,9 @@ import { useRoute, useRouter } from "vue-router";
 import { limit } from "@/core/config/WhichUserConfig";
 
 interface companyDetails {
+  
+  disp_avatar: string;
+  image: string | null;
   company_name: string;
   address: string;
   contact_person: string;
@@ -605,6 +685,8 @@ export default defineComponent({
     });
 
     const companyDetails = ref<companyDetails>({
+      disp_avatar: getAssetPath("media/avatars/blank.png"),
+      image: "",
       company_name: "",
       address: "",
       contact_person: "",
@@ -629,6 +711,11 @@ export default defineComponent({
       const response = await getCompany(CompanyId);
       console.log(CompanyId);
       companyDetails.value = {
+        disp_avatar:
+          response.meta.company_logo != ""
+            ? "data: image/png;base64," + response.meta.company_logo
+            : getAssetPath("media/avatars/blank.png"),
+        image: "",
         company_name: response.company_name,
         address: response.address,
         contact_person: response.contact_person,

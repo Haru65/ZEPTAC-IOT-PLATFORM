@@ -27,7 +27,11 @@
 
           <!--begin::Table body-->
           <tbody>
-            <tr v-for="(task,index) in $props.tasks" :key="task.id" class="w-100">
+            <tr
+              v-for="(task, index) in $props.tasks"
+              :key="task.id"
+              class="w-100"
+            >
               <td class="pt-8 text-nowrap" :id="task.id">
                 <div class="shadow-lg p-5 m-3 fs-4 rounded w-100 border">
                   <div class="row mb-2">
@@ -142,7 +146,7 @@
                           <template v-if="task.receipt">
                             <img
                               :src="task.receipt"
-                              class="rounded mx-auto d-block w-200px h-200px"
+                              class="rounded mx-auto d-block w-200px h-200px cursor-pointer"
                               @click="showImg(index)"
                             />
                           </template>
@@ -150,7 +154,12 @@
                       </div>
                     </div>
                   </div>
-                  <vue-easy-lightbox :visible="visibleRef" :imgs="task.receipt" :index="indexRef" @hide="onHide"></vue-easy-lightbox>
+                  <vue-easy-lightbox
+                    :visible="task.visible"
+                    :imgs="task.receipt"
+                    :index="index"
+                    @hide="onHide(index)"
+                  ></vue-easy-lightbox>
                 </div>
               </td>
             </tr>
@@ -187,6 +196,62 @@
       </div>
     </div>
     <!--end::Card body-->
+
+    <div class="card p-3 w-100">
+      <div class="row mb-6">
+        <div class="form-group btn-group col-md-6 mb-8 mb-sd-8">
+          <label
+            class="btn btn-outline btn-outline-dashed btn-outline-default p-5 d-flex align-items-center"
+          >
+            <span class="d-block fw-semobold text-start">
+              <div class="text-dark fw-bold d-block fs-4 mb-2"
+                >Select the Expense Status</div
+              >
+              <input
+                type="radio"
+                class="btn-check"
+                name="status"
+                id="1"
+                v-on:change="SetStatus($event)"
+                v-model="$props.status"
+                value="1"
+                disabled
+                autocomplete="off"
+              />
+              <label class="btn btn-outline-primary" for="1">Pending</label>
+
+              <input
+                type="radio"
+                class="btn-check"
+                name="status"
+                id="2"
+                v-model="$props.status"
+                v-on:change="SetStatus($event)"
+                value="2"
+                autocomplete="off"
+              />
+              <label class="btn btn-outline-danger" for="2">Reject</label>
+
+              <input
+                type="radio"
+                class="btn-check"
+                name="status"
+                id="3"
+                v-model="$props.status"
+                v-on:change="SetStatus($event)"
+                value="3"
+                autocomplete="off"
+              />
+              <label class="btn btn-outline-success" for="3">Approve</label>
+            </span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+
+    
+
   </div>
   <!--end::Wrapper-->
 </template>
@@ -198,7 +263,7 @@ import { ErrorMessage, Field } from "vee-validate";
 import { ExpenseTypes } from "@/core/model/expensetypes";
 import { formatPrice } from "@/core/config/DataFormatter";
 
-import VueEasyLightbox from 'vue-easy-lightbox';
+import VueEasyLightbox from "vue-easy-lightbox";
 
 export default defineComponent({
   name: "step-2",
@@ -207,27 +272,33 @@ export default defineComponent({
     ErrorMessage,
     VueEasyLightbox,
   },
-  props: ["tasks", "total_amount"],
+  props: ["tasks", "total_amount", "status"],
+  emit: ["showImage", "HideImage", "changeStatus"],
   setup(props, { emit }) {
     // Handling Emits
-    const visibleRef = ref(false)
-          const indexRef = ref(0)
-          const showImg = (index) => {
-            indexRef.value = index
-            visibleRef.value = true
-          }
-          const onHide = () => visibleRef.value = false
+    const showImg = (index) => {
+      console.log(index);
+      emit("showImage", index);
+    };
 
-          // TODO : Emit for specific Receipt
+    const onHide = (index) => {
+      console.log(index);
+      emit("HideImage", index);
+    };
+
+    const SetStatus = (e) => {
+      emit("changeStatus", e.target.value);
+    };
+
     return {
       getAssetPath,
       tasks: props.tasks,
+      status: props.status,
       ExpenseTypes,
       formatPrice,
-      visibleRef,
-            indexRef,
-            showImg,
-            onHide
+      showImg,
+      SetStatus,
+      onHide,
     };
   },
 });

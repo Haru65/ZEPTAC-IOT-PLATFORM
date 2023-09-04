@@ -141,14 +141,7 @@
           </template>
           <template v-slot:actions="{ row: expensesheets }">
             <!--begin::Menu Flex-->
-            <div class="d-flex flex-lg-row">
-              <span class="menu-link px-3">
-                <router-link :to="`./edit/${expensesheets.id}`">
-                  <i
-                    class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                  ></i>
-                </router-link>
-              </span>
+            <div class="text-gray-600 text-hover-primary mb-1">
               <span>
                 <i
                   @click="deleteSheets(expensesheets.id, false)"
@@ -220,7 +213,7 @@ export default defineComponent({
         columnName: "RGP No.",
         columnLabel: "rgp_no",
         sortEnabled: true,
-        columnWidth: 155,
+        columnWidth: 125,
       },
       {
         columnName: "Engineer Name",
@@ -232,19 +225,19 @@ export default defineComponent({
         columnName: "Total Expense",
         columnLabel: "total_amount",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 125,
       },
       {
         columnName: "Status",
         columnLabel: "status",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 100,
       },
       {
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
-        columnWidth: 75,
+        columnWidth: 70,
       },
     ]);
 

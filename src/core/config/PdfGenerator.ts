@@ -74,7 +74,7 @@ const Gen = async (
         .setFont('helvetica', "normal")
         .text(
             `
-        To,
+        BIlling Address,
         ${invoiceDetials.value.customer.first_name} ${invoiceDetials.value.customer.last_name}
         ${invoiceDetials.value.customer.company_name},
         ${invoiceDetials.value.customer.address1 ? invoiceDetials.value.customer.address1 : ""}
@@ -96,7 +96,7 @@ const Gen = async (
         .setFont('helvetica', "normal")
         .text(
             `
-        To,
+        Site Address,
         ${invoiceDetials.value.client.first_name} ${invoiceDetials.value.client.last_name}
         ${invoiceDetials.value.client.company_name},
         ${invoiceDetials.value.client.address1 ? invoiceDetials.value.client.address1 : ""}

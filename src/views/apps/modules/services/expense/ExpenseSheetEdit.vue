@@ -22,7 +22,6 @@
             <h3 class="stepper-title">Expenses</h3>
           </div>
           <!--end::Step 2-->
-
         </div>
         <!--end::Nav-->
 
@@ -35,9 +34,7 @@
         >
           <!--begin::Step 1-->
           <div class="current" data-kt-stepper-element="content">
-            <Step1
-              v-bind:details="expenseSheetDetails"
-            ></Step1>
+            <Step1 v-bind:details="expenseSheetDetails"></Step1>
           </div>
           <!--end::Step 1-->
 
@@ -46,8 +43,11 @@
             <Step2
               v-bind:tasks="expenseSheetDetails.expenses"
               v-bind:total_amount="expenseSheetDetails.total_amount"
-              ></Step2
-            >
+              v-bind:status="expenseSheetDetails.status"
+              v-on:showImage="showTheImage"
+              v-on:HideImage="HideTheImage"
+              v-on:changeStatus="setStatus"
+            ></Step2>
           </div>
           <!--end::Step 2-->
 
@@ -113,14 +113,12 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import Step1 from "./stepsForEdit/step1.vue";
 import Step2 from "./stepsForEdit/step2.vue";
-import moment from "moment";
 
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-import { getExpenseSheet } from "@/stores/api";
+import { getExpenseSheet, updateExpenseSheet } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import { ExpenseTypes } from "@/core/model/expensetypes";
-
 
 interface IStep1 {}
 
@@ -141,8 +139,9 @@ export default defineComponent({
     const loading = ref(false);
 
     const auth = useAuthStore();
-    const router = useRouter();
     const route = useRoute();
+    const router = useRouter();
+    
     const User = auth.GetUser();
     const itemId = route.params.id;
 
@@ -159,6 +158,8 @@ export default defineComponent({
           description: "",
           amount: "",
           receipt: "",
+          imgData: "",
+          visible: false,
         },
       ],
       total_amount: "",
@@ -179,34 +180,73 @@ export default defineComponent({
 
     const formData = ref<CreateAccount>({});
 
-    const fillDetails = (result) => {
+    const lightBox = ref([]);
 
+    const fillDetails = (result) => {
       expenseSheetDetails.value.id = result.id;
       expenseSheetDetails.value.rgp_no = result.rgpDetails.rgp_no;
       expenseSheetDetails.value.date = result.rgpDetails.date;
       expenseSheetDetails.value.duedate = result.rgpDetails.duedate;
       expenseSheetDetails.value.total_amount = result.total_amount;
       expenseSheetDetails.value.status = result.status;
-      expenseSheetDetails.value.site_address.address1 = result.site_address.address1 ? result.site_address.address1 : "";
-      expenseSheetDetails.value.site_address.address2 = result.site_address.address2 ? result.site_address.address2 : "";
-      expenseSheetDetails.value.site_address.city = result.site_address.city ? result.site_address.city : "";
-      expenseSheetDetails.value.site_address.pincode = result.site_address.pincode ? result.site_address.pincode : "";
-      expenseSheetDetails.value.site_address.states = result.site_address.state ? result.site_address.states : "";
-      expenseSheetDetails.value.site_address.country = result.site_address.country ? result.site_address.country : "";
-      expenseSheetDetails.value.customer_name = result.customer_data.first_name + " " + result.customer_data.last_name;
-      expenseSheetDetails.value.engineer_name = result.service_engineer_data.first_name + " " + result.service_engineer_data.last_name;
+      expenseSheetDetails.value.site_address.address1 = result.site_address
+        .address1
+        ? result.site_address.address1
+        : "";
+      expenseSheetDetails.value.site_address.address2 = result.site_address
+        .address2
+        ? result.site_address.address2
+        : "";
+      expenseSheetDetails.value.site_address.city = result.site_address.city
+        ? result.site_address.city
+        : "";
+      expenseSheetDetails.value.site_address.pincode = result.site_address
+        .pincode
+        ? result.site_address.pincode
+        : "";
+      expenseSheetDetails.value.site_address.states = result.site_address.state
+        ? result.site_address.states
+        : "";
+      expenseSheetDetails.value.site_address.country = result.site_address
+        .country
+        ? result.site_address.country
+        : "";
+      expenseSheetDetails.value.customer_name =
+        result.customer_data.first_name + " " + result.customer_data.last_name;
+      expenseSheetDetails.value.status = result.status;
+      expenseSheetDetails.value.engineer_name =
+        result.service_engineer_data.first_name +
+        " " +
+        result.service_engineer_data.last_name;
 
       expenseSheetDetails.value.expenses = JSON.parse(result.expenses);
 
-      console.log(expenseSheetDetails.value)
-
-
-
-
+      expenseSheetDetails.value.expenses.forEach((expense) => {
+        expense.imgData = ""; // You can set the initial value for imgData here
+        expense.visible = false; // You can set the initial value for visible here
+      });
 
       console.log(expenseSheetDetails.value);
     };
 
+    function showTheImage(index) {
+      expenseSheetDetails.value.expenses[index].visible = true;
+      expenseSheetDetails.value.expenses[index].imgData =
+        expenseSheetDetails.value.expenses[index].receipt;
+
+      console.log(expenseSheetDetails.value);
+      console.log(index);
+    }
+
+    function HideTheImage(index) {
+      console.log(index);
+      expenseSheetDetails.value.expenses[index].visible = false;
+      expenseSheetDetails.value.expenses[index].imgData = "";
+    }
+
+    function setStatus(e) {
+      expenseSheetDetails.value.status = e;
+    }
 
     onMounted(async () => {
       ApiService.setHeader();
@@ -237,50 +277,13 @@ export default defineComponent({
     });
 
     const handleStep = handleSubmit((values) => {
-      // resetForm({});
+      currentStepIndex.value++;
 
-      // formData.value = { ...values };
-
-      if (currentStepIndex.value === 0) {
-        if (true
-        ) {
-          currentStepIndex.value++;
-
-          if (!_stepperObj.value) {
-            return;
-          }
-
-          _stepperObj.value.goNext();
-        } else {
-          Swal.fire({
-            icon: "info",
-            title: "Please fill all the required fields",
-          });
-        }
-      } else if (currentStepIndex.value === 1) {
-        if (expenseSheetDetails.value.expenses.length > 0) {
-
-          if (true) {
-            currentStepIndex.value++;
-
-            if (!_stepperObj.value) {
-              return;
-            }
-
-            _stepperObj.value.goNext();
-          } else {
-            Swal.fire({
-              icon: "info",
-              title: "Please fill all the details",
-            });
-          }
-        } else {
-          Swal.fire({
-            icon: "info",
-            title: "Please fill at least one expense",
-          });
-        }
+      if (!_stepperObj.value) {
+        return;
       }
+
+      _stepperObj.value.goNext();
     });
 
     const previousStep = () => {
@@ -294,33 +297,25 @@ export default defineComponent({
     };
 
     const formSubmit = async () => {
-      // loading.value = true;
-      // try {
-      //   const response = await addExpenseSheet(expenseSheetDetails.value);
-      //     if (!response.error) {
-      //       showSuccessAlert(
-      //         "Success",
-      //         "Expense Sheet details have been successfully inserted!"
-      //       );
-            
-      //       loading.value = false;
-      //       route.push({ name: "expensesheet-list" });
-      //     }else {
-      //       // Handle API error response
-      //       const errorData = response.error;
-      //       // console.log("API error:", errorData);
-      //       console.log("API error:", errorData.response.data.errors);
-      //       showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-      //       loading.value = false;
-      //     }
-      // } catch (error) {
-      //   // Handle any other errors during API call
-      //   console.error("API call error:", error);
-      //   showErrorAlert("Error", "An error occurred during the API call.");
-      // }
-      // finally {
-      //   loading.value = false;
-      // }
+      loading.value = true;
+      try {
+        const response = await updateExpenseSheet(itemId, expenseSheetDetails.value);
+        if (!response.error) {
+          showSuccessAlert(
+            "Success",
+            "Expense Sheet Status have been successfully updated!"
+          );
+
+          loading.value = false;
+          router.push({ name: "expensesheet-approval" });
+        }
+      } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
+        showErrorAlert("Error", "An error occurred during the API call.");
+      } finally {
+        loading.value = false;
+      }
     };
 
     const showSuccessAlert = (title, message) => {
@@ -360,11 +355,12 @@ export default defineComponent({
       currentStepIndex,
       getAssetPath,
       expenseSheetDetails,
-      // setDate,
-      // setDueDate,
+      showTheImage,
+      HideTheImage,
       showErrorAlert,
       showSuccessAlert,
       loading,
+      setStatus,
     };
   },
 });

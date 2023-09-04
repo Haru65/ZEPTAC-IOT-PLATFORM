@@ -13,6 +13,83 @@
         >
           <!--begin::Card body-->
           <div class="card-body p-9">
+
+            <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6"
+              >Company Logo</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8">
+              <!--begin::Image input-->
+              <div
+                class="image-input image-input-outline"
+                data-kt-image-input="true"
+                :style="{
+                  backgroundImage: `url(${getAssetPath(
+                    'media/avatars/blank.png'
+                  )})`,
+                }"
+              >
+                <!--begin::Preview existing avatar-->
+                <img
+                  :src="companyDetails.disp_avatar"
+                  class="image-input-wrapper"
+                  alt="company logo"
+                />
+                <!--end::Preview existing avatar-->
+
+                <!--begin::Label-->
+                <label
+                  class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
+                  data-kt-image-input-action="change"
+                  data-bs-toggle="tooltip"
+                  title="Change profile image"
+                >
+                  <i class="bi bi-pencil-fill fs-7"></i>
+
+                  <!--begin::Inputs-->
+                  <input
+                    type="file"
+                    name="avatar"
+                    accept=".png, .jpg, .jpeg"
+                    @change="updateImage($event)"
+                  />
+                  <input max-size="1000" type="hidden" name="avatar_update" />
+                  <!--end::Inputs-->
+                </label>
+                <!--end::Label-->
+
+                <!--begin::Remove-->
+                <span
+                  class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
+                  data-kt-image-input-action="remove"
+                  data-bs-toggle="tooltip"
+                  @click="removeImage()"
+                  title="Remove image"
+                >
+                  <i class="bi bi-x fs-2"></i>
+                </span>
+                <!--end::Remove-->
+              </div>
+              <!--end::Image input-->
+
+              <!--begin::Hint-->
+              <div class="form-text">
+                Allowed file types: png, jpg, jpeg. <br />
+                Note : Max Upload limit 1 MB.
+                <br />
+                <span class="text-danger" v-if="file_size"
+                  >File Size Exceeded</span
+                >
+              </div>
+              <!--end::Hint-->
+            </div>
+            <!--end::Col-->
+          </div>
+
             <div class="row mb-6">
               <!--begin::Label-->
               <label class="col-lg-4 col-form-label required fw-semobold fs-6"
@@ -541,7 +618,11 @@ import packages from "@/core/config/PackagesConfig";
 import { limit } from "@/core/config/WhichUserConfig";
 import { useRouter } from "vue-router";
 
+import { blank64 } from "./blank";
+
 interface companyDetails {
+  disp_avatar: string;
+  image: string;
   company_name: string;
   address: string;
   contact_person: string;
@@ -577,6 +658,7 @@ export default defineComponent({
     const emailFormDisplay = ref(false);
     const passwordFormDisplay = ref(false);
     const state = ref([""]);
+    const file_size = ref(false);
 
     const companyDetailsValidator = Yup.object().shape({
       company_name: Yup.string().required().label("Company Name"),
@@ -592,6 +674,8 @@ export default defineComponent({
     });
 
     const companyDetails = ref<companyDetails>({
+      disp_avatar: "data: image/png;base64," + blank64,
+      image: "",
       company_name: "",
       address: "",
       contact_person: "",
@@ -635,6 +719,14 @@ export default defineComponent({
     );
 
     const submit = async () => {
+      // * company identification for companyid based on localstorage login
+
+      // disp_image
+      companyDetails.value.disp_avatar =
+      companyDetails.value.disp_avatar.replace(
+          /^data:image\/\w+;base64,/,
+          ""
+        );
       loading.value = true;
       console.warn("Nice");
       try {
@@ -662,6 +754,55 @@ export default defineComponent({
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
         loading.value = false;
+      }
+    };
+
+     // remove file or update
+     const removeImage = () => {
+      companyDetails.value.disp_avatar = getAssetPath(
+        "media/avatars/blank.png"
+      );
+    };
+
+    const updateImage = (e: any) => {
+      const file = e.target.files[0];
+
+      if (!file) {
+        console.error("Error: No file selected.");
+        return;
+      }
+
+      const fileSize = file.size;
+      const fileMb = fileSize / 1024 ** 2;
+      console.log(fileMb);
+
+      if (fileMb <= 1) {
+        file_size.value = false;
+        companyDetails.value.disp_avatar = URL.createObjectURL(file);
+        const reader = new FileReader();
+
+        reader.onload = function () {
+          try {
+            const base64Data = reader.result
+              ?.toString()
+              .replace(/^data:image\/\w+;base64,/, "");
+            if (base64Data) {
+              companyDetails.value.image = base64Data;
+              console.log(companyDetails.value.image);
+            } else {
+              console.error("Error: Failed to read the image data.");
+            }
+          } catch (e) {
+            console.error("Error:", e);
+          }
+        };
+
+        reader.readAsDataURL(file);
+      } else {
+        file_size.value = true;
+        companyDetails.value.disp_avatar = getAssetPath(
+          "media/avatars/blank.png"
+        );
       }
     };
 
@@ -707,6 +848,9 @@ export default defineComponent({
       state,
       packages,
       limit,
+      removeImage,
+      updateImage,
+      file_size,
     };
   },
 });

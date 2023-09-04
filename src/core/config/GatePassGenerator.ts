@@ -1,191 +1,156 @@
-/* eslint-disable prettier/prettier */
 // * This file is used to generate GatePass pdf
 
 import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable"; // ! depretaited import
+import autoTable from "jspdf-autotable";
 import { getAssetPath } from "../helpers/assets";
 
-/**
- * Gen Method to print invoice or quotation reciept
- * @param pdftype string
- * @param id  string
- * @param pdfName  string
- * @param invoiceDetials obj | any
- */
+const rgpGen = async (id, pdfName, rgpDetails) => {
+  pdfName += `_${id}_returnable_gate_pass`;
 
-const Gen = async (
-    pdftype: string,
-    id: string,
-    pdfName: string,
-    invoiceDetials: any
-) => {
-    // pdfName += "_" + id + (pdftype == "quotation" ? "_quotation" : "_invoice");
-    pdfName += "_" + id + ("_GatePass");
-    const columns = [
-        { title: "Id", dataKey: "id" },
-        { title: "Item Name", dataKey: "name" },
-        { title: "Price", dataKey: "price" },
-    ];
-    const doc = new jsPDF({
-        orientation: "portrait",
-        unit: "in",
-        format: "a4",
+  const columns = [
+    { title: "Id", dataKey: "id" },
+    { title: "Engineer Name", dataKey: "name" }
+  ];
+
+  const instrumentColumns = [
+    { title: "Model No", dataKey: "model_no" },
+    { title: "Serial No", dataKey: "serial_no" },
+    { title: "Instrument Name", dataKey: "name" },
+    { title: "Make By", dataKey: "make" }
+  ];
+
+
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "in",
+    format: "a4",
+  });
+
+  // Quotation Heading
+  doc
+    .setFontSize(14)
+    .setTextColor(0, 0, 0)
+    .setFont('helvetica', "bold")
+    .text("Returnable Gate Pass", doc.internal.pageSize.width / 2, 0.5, {
+      align: "center",
     });
 
-    // Quotation Heading
-    doc
-        .setFontSize(16)
-        .setTextColor(0, 0, 0)
-        .setFont('helvetica', "bold")
-        .text(pdftype == "quotation" ? "Quotation" : "Invoice", doc.internal.pageSize.width / 2, 0.5, {
-            align: "center",
-        });
+  // Company Logo Img
+  const img = new Image()
+  img.src = getAssetPath('media/patterns/zeptac.png')
+  doc.addImage(img, 'JPEG', 0.5, 0.7, 0.7, 0.7);
 
-    // Company Logo Img
-    const img = new Image()
-    img.src = getAssetPath('media/patterns/zeptac.png')
-    doc.addImage(img, 'JPEG', 0.5, 0.5, 0.5, 0.5);
+  // RGP number
+  doc
+    .setFontSize(10)
+    .setFont('helvetica', "normal")
+    .text("RGP# : " + rgpDetails.value.rgp_no, doc.internal.pageSize.width - 2.8, 0.8);
 
-    // Quotation number
-    doc
-        .setFontSize(10)
-        .setFont('helvetica', "normal")
-        .text((pdftype == "quotation" ? "Quotation" : "Invoice") + "# : " + (pdftype == "quotation" ? invoiceDetials.value.quotation_no : invoiceDetials.value.invoice_no), doc.internal.pageSize.width - 2.8, 0.8);
+  // Quotation Creation Date
+  const creationDate = new Date(rgpDetails.value.date).toDateString();
+  doc
+    .setFontSize(10)
+    .setFont('helvetica', "normal")
+    .text("RGP Date : " + creationDate, doc.internal.pageSize.width - 2.8, 1.0);
 
-    // Quotation Creation Date
-    const creationDate = new Date(invoiceDetials.value.date).toDateString();
-    doc
-        .setFontSize(10)
-        .setFont('helvetica', "normal")
-        .text((pdftype == "quotation" ? "Quotation" : "Invoice") + " Date : " + creationDate, doc.internal.pageSize.width - 2.8, 1.0);
+  // Quotation Due Date
+  const dueDateText = new Date(rgpDetails.value.duedate).toDateString();
+  doc
+    .setFontSize(10)
+    .setFont('helvetica', "normal")
+    .text("RGP Due Date : " + dueDateText, doc.internal.pageSize.width - 2.8, 1.2);
 
-    // Quotation Due Date
-    const dueDateText = new Date(invoiceDetials.value.duedate).toDateString();
-    doc
-        .setFontSize(10)
-        .setFont('helvetica', "normal")
-        .text((pdftype == "quotation" ? "Quotation" : "Invoice") + " Due Date : " + dueDateText, doc.internal.pageSize.width - 2.8, 1.2);
+// Quotation number
+  doc
+  .setFontSize(10)
+  .setFont('helvetica', "normal")
+  .text("Quotation# : " + rgpDetails.value.quotation_no, doc.internal.pageSize.width - 2.8, 1.4);
 
-    // create a line under heading
-    doc.setLineWidth(0.01).line(0.5, 1.5, 7.75, 1.5);
 
-    // Billing Address
-    doc
-        .setFontSize(9)
-        .setFont('helvetica', "normal")
-        .text(
-            `
-        To,
-        ${invoiceDetials.value.customer.first_name} ${invoiceDetials.value.customer.last_name}
-        ${invoiceDetials.value.customer.company_name},
-        ${invoiceDetials.value.customer.address1 ? invoiceDetials.value.customer.address1 : ""}
-        ${invoiceDetials.value.customer.address2 ? invoiceDetials.value.customer.address2 : ""}
-        ${invoiceDetials.value.customer.city ? invoiceDetials.value.customer.city : ""},${invoiceDetials.value.customer.city ? invoiceDetials.value.customer.city : ""}
-        ${invoiceDetials.value.customer.states ? invoiceDetials.value.customer.states : ""},${invoiceDetials.value.customer.country ? invoiceDetials.value.customer.country : ""}
-        `,
-            0.25,
-            1.7,
-            {
-                align: "left",
-                maxWidth: 7.5,
-            }
-        );
+  // create a line under heading
+  doc.setLineWidth(0.01).line(0.5, 1.5, 7.75, 1.5);
 
-    // Billing Address
-    doc
-        .setFontSize(9)
-        .setFont('helvetica', "normal")
-        .text(
-            `
-        To,
-        ${invoiceDetials.value.client.first_name} ${invoiceDetials.value.client.last_name}
-        ${invoiceDetials.value.client.company_name},
-        ${invoiceDetials.value.client.address1 ? invoiceDetials.value.client.address1 : ""}
-        ${invoiceDetials.value.client.address2 ? invoiceDetials.value.client.address2 : ""}
-        ${invoiceDetials.value.client.city ? invoiceDetials.value.client.city : ""},${invoiceDetials.value.client.city ? invoiceDetials.value.client.city : ""}
-        ${invoiceDetials.value.client.states ? invoiceDetials.value.client.states : ""},${invoiceDetials.value.client.country ? invoiceDetials.value.client.country : ""}
-        `,
-            doc.internal.pageSize.width - 3.0,
-            1.7,
-            {
-                align: "left",
-                maxWidth: 7.5,
-            }
-        );
+  // Billing Address - From
+  const customerAddress = rgpDetails.value.customer_address;
+  const customerAddressText = `
+    Billing Address,
+    ${rgpDetails.value.customer_data.first_name} ${rgpDetails.value.customer_data.last_name}
+    ${rgpDetails.value.customer_company.company_name ? rgpDetails.value.customer_company.company_name : ""},
+    ${customerAddress.address1 || ""}
+    ${customerAddress.address2 || ""}
+    ${customerAddress.city || ""} ${customerAddress.pincode || ""}
+    ${customerAddress.states || ""} ${customerAddress.country || ""}
+  `;
+  doc.setFontSize(10).setFont('helvetica', "normal").text(customerAddressText, 0.25, 1.7, {
+    align: "left",
+    maxWidth: 7.5,
+  });
 
-    // Using autoTable plugin
-    const invoice_items = invoiceDetials.value.items.map(
-        ({ name, desc, price, ...rest }) => ({
-            ...rest,
-            price: "Rs " + price.substring(1),
-            name: name + "\n" + desc,
-        })
-    );
+  // Site Address - To
+  const clientAddress = rgpDetails.value.client_address;
+  const clientAddressText = `
+    Site Address,
+    ${rgpDetails.value.client_data.first_name} ${rgpDetails.value.client_data.last_name}
+    ${rgpDetails.value.client_company.company_name ? rgpDetails.value.client_company.company_name : ""},
+    ${clientAddress.address1 || ""}
+    ${clientAddress.address2 || ""}
+    ${clientAddress.city || ""} ${clientAddress.pincode || ""}
+    ${clientAddress.states || ""} ${clientAddress.country || ""}
+  `;
+  doc.setFontSize(10).setFont('helvetica', "normal").text(clientAddressText, doc.internal.pageSize.width - 3.0, 1.7, {
+    align: "left",
+    maxWidth: 7.5,
+  });
 
-    // fixed by autotable
-    console.log(invoice_items);
+  // Using autoTable plugin
+  const service_engineers = rgpDetails.value.engineers.map(({ id, first_name, last_name }) => ({
+    id,
+    name: `${first_name} ${last_name}`
+  }));
 
-    //adding the last row [Total] in the table
-    const body = [...invoice_items,
-    [
-        {
-            content: `Total`, colSpan: 2,
-            styles: {
-                fillColor: [124, 95, 240],
-                textColor: [255, 255, 255],
-                halign: 'right',
-                fontStyle: "bold"
-            }
-        },
-        {
-            content: `Rs. ${invoiceDetials.value.total.toFixed(2)}`,
-            styles: {
-                fillColor: [124, 95, 240],
-                textColor: [255, 255, 255],
-                halign: 'left',
-                fontStyle: "bold"
-            }
-        }
-    ],
-    [{
-        content: `\n\nNotes : ${invoiceDetials.value.notes}`, colSpan: 3,
-        styles: {
-            fillColor: [255, 255, 255],
-            textColor: [0, 0, 0],
-            halign: 'left',
-            maxWidth: 7.5,
-            fontSize: 9
-        }
-    }]
-    ]
+  //adding the last row [Total] in the table
+  const engineerData = [...service_engineers]
 
-    // main Content in the table
-    doc.autoTable({
-        columns,
-        startY: 3,
-        body: body,
-        margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [124, 95, 240] },
-        align: {
-            header: "center",
-            body: "right",
-        },
-    });
+  // main Content in the table
+  doc.autoTable({
+    columns,
+    startY: 3,
+    body: engineerData,
+    margin: { left: 0.5, top: 1.25 },
+    headStyles: { fillColor: [124, 95, 240] },
+    align: {
+      header: "center",
+      body: "right",
+    },
+  });
 
-    // Creating footer and saving file
-    doc
-        .setFontSize(9)
-        .setTextColor(0, 0, 255)
-        .textWithLink("Zeptac.com", 0.5, doc.internal.pageSize.height - 0.5, { url: 'https://zeptac.com' });
 
-    doc.save(`${pdfName}.pdf`);
+  const instrumentData = rgpDetails.value.instruments.map(({ model_no, serial_no, name, make }) => ({
+    model_no,
+    serial_no,
+    name,
+    make,
+  }));
+  
+  doc.autoTable({
+    columns: instrumentColumns,
+    body: instrumentData,
+    startY: doc.autoTable.previous.finalY + 0.2,
+    margin: { left: 0.5 },
+    headStyles: { fillColor: [124, 95, 240] },
+    align: {
+      header: "center",
+      body: "right",
+    },
+  });
+
+  // Creating footer and saving file
+  doc
+    .setFontSize(9)
+    .setTextColor(0, 0, 255)
+    .textWithLink("Zeptac.com", 0.5, doc.internal.pageSize.height - 0.5, { url: 'https://zeptac.com' });
+
+  doc.save(`${pdfName}.pdf`);
 };
 
-export { Gen }
-
-
-// const generatePdf = async (pdfName: string) => {
-//     removeNulls();
-//     console.log(QuotationDetials.value);
-//     await Gen("quotation", QuotationId.toString(), pdfName, QuotationDetials);
-//   };
+export { rgpGen };
