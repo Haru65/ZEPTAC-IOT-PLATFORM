@@ -150,10 +150,10 @@ import { StepperComponent } from "@/assets/ts/components";
 import { useForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
-import Step1 from "./steps/step1.vue";
-import Step2 from "./steps/step2.vue";
-import Step3 from "./steps/step3.vue";
-import Step4 from "./steps/step4.vue";
+import Step1 from "./steps/Step1.vue";
+import Step2 from "./steps/Step2.vue";
+import Step3 from "./steps/Step3.vue";
+import Step4 from "./steps/Step4.vue";
 import moment from "moment";
 
 import { useRouter } from "vue-router";

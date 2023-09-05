@@ -111,8 +111,8 @@ import { StepperComponent } from "@/assets/ts/components";
 import { useForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
-import Step1 from "./stepsForEdit/step1.vue";
-import Step2 from "./stepsForEdit/step2.vue";
+import Step1 from "./stepsForEdit/Step1.vue";
+import Step2 from "./stepsForEdit/Step2.vue";
 
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
