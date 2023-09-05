@@ -12,6 +12,8 @@ const CLIENTS_URL = "clients";
 const EMPLOYEE_URL = "employee";
 const INSTRUMENTS_URL = "instruments";
 const RGP_URL = "returnablegatepasses";
+const DWSHEET_URL = "dailyworksheets";
+const EXPSHEET_URL = "expensesheets";
 
 // COMPANIES
 
@@ -952,11 +954,12 @@ export async function getRGatePass(data: string) {
     }
 }
 
-export async function updateRGatePass(id: any, data: any) {
+export async function getRGPInfo(data: any) {
     try {
         //console.log(data)
+        const id = { "id": data };
         ApiService.setHeader();
-        const response = await ApiService.put(RGP_URL + "/" + id, data);
+        const response = await ApiService.post("get_information_of_rgp",id);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -984,8 +987,44 @@ export async function getDailyWorksheet(data: string) {
     try {
         //console.log(data)
         ApiService.setHeader();
-        const response = await ApiService.get(RGP_URL, data);
-        return response.data.result[0];
+        const response = await ApiService.get(DWSHEET_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function addDailyWorksheet(data: string) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(DWSHEET_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getDailyWorksheets(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(DWSHEET_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function deleteDailyWorksheet(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(DWSHEET_URL + "/" + data);
+        return response.data;
     } catch (errors) {
         console.error(errors);
         return { error: errors };
@@ -998,6 +1037,115 @@ export async function getOnGoingRGP(data: any) {
         const id = { "company_id": data };
         ApiService.setHeader();
         const response = await ApiService.post('get_ongoing_rgps', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function WorksheetSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('worksheet_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// EXPENSE SHEET
+
+export async function addExpenseSheet(data: string) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(EXPSHEET_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getExpenseSheets(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(EXPSHEET_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getPendingExpenseSheets(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(EXPSHEET_URL + "/approval", data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function deleteExpenseSheet(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(EXPSHEET_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function ExpenseSheetSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('expensesheet_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getExpenseSheet(id: any) {
+    try {
+        ApiService.setHeader();
+        const data = {
+            id : id,
+        }
+        const response = await ApiService.post("get_expense_sheet", data);
+        // console.log(response)
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+export async function updateExpenseSheet(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(EXPSHEET_URL + "/" + id, data);
         return response.data;
     } catch (errors) {
         console.error(errors);

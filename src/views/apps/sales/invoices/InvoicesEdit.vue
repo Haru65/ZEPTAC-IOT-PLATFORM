@@ -466,8 +466,8 @@ import {
   GetCustomerClients,
   getInvoice,
   deletequotation,
-updateInvoice,
-deleteinvoice,
+  updateInvoice,
+  deleteinvoice,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import CustomSelect from "./CustomComponents/CustomInvoiceItems.vue";
@@ -511,6 +511,9 @@ interface InvoiceDetails {
   total: number;
   customer: Meta;
   client: Meta;
+  company_details:{
+    company_logo: string;
+  },
   is_active: number;
   company_id: string;
   created_by: string;
@@ -567,6 +570,9 @@ export default defineComponent({
         pincode: "",
         country: "",
       },
+      company_details:{
+        company_logo: getAssetPath("media/avatars/blank.png"),
+      },
       total: 0,
       is_active: 1,
       company_id: User.company_id,
@@ -597,6 +603,11 @@ export default defineComponent({
       // Client
       InvoiceDetails.value.client.id = response.client_id;
       GetClientData(InvoiceDetails.value.client.id);
+      // logo
+      InvoiceDetails.value.company_details.company_logo = response
+        .company_details.company_logo
+        ? "data: image/png;base64," + response.company_details.company_logo
+        : getAssetPath("media/avatars/blank.png");
     });
 
     const GetClients = async (id: string) => {
@@ -752,7 +763,7 @@ export default defineComponent({
 
     const GetCustomers = async () => {
       ApiService.setHeader();
-      const response = await getCustomers();
+      const response = await getCustomers(``);
       Customers.value.push(
         ...response.result.data.map(({ created_at, ...rest }) => ({
           ...rest,

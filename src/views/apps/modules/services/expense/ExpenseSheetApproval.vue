@@ -15,7 +15,7 @@
               v-model="search"
               @input="searchItems()"
               class="form-control form-control-solid w-250px ps-15"
-              placeholder="Find with RGP"
+              placeholder="Search Service Engineer"
             />
           </div>
           <!--end::Search-->
@@ -29,24 +29,6 @@
             class="d-flex justify-content-end"
             data-kt-customer-table-toolbar="base"
           >
-            <!--begin::Export-->
-            <button
-              type="button"
-              class="btn btn-light-primary me-3"
-              data-bs-toggle="modal"
-              data-bs-target="#kt_customers_export_modal"
-            >
-              <KTIcon icon-name="exit-up" icon-class="fs-2" />
-              Export
-            </button>
-            <!--end::Export-->
-            <!--begin::Add customer-->
-            <router-link to="/dailyworksheets/add" class="btn btn-primary">
-              <KTIcon icon-name="plus" icon-class="fs-2" />
-              Add Daily Worksheet
-            </router-link>
-
-            <!--end::Add customer-->
           </div>
           <!--end::Toolbar-->
           <!--begin::Group actions-->
@@ -62,7 +44,7 @@
             <button
               type="button"
               class="btn btn-danger"
-              @click="deleteFewWorksheets()"
+              @click="deleteFewExpenseSheets()"
             >
               Delete Selected
             </button>
@@ -104,38 +86,50 @@
           :items-per-page-dropdown-enabled="false"
           :loading="loading"
         >
-          <template v-slot:rgp_no="{ row: dailyworksheets }">
+          <template v-slot:rgp_no="{ row: expensesheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
-              {{ dailyworksheets.rgp_no }}
+              {{ expensesheets.rgp_no.rgp_no }}
             </span>
           </template>
-          <template v-slot:engineer_name="{ row: dailyworksheets }">
+          <template v-slot:engineer_name="{ row: expensesheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
-                  {{ dailyworksheets.engineer_name.first_name + " " + dailyworksheets.engineer_name.last_name }}
+                  {{ expensesheets.engineer_name.first_name + " " + expensesheets.engineer_name.last_name }}
             </span>
           </template>
           <!-- defualt data -->
-          <template v-slot:work_date="{ row: dailyworksheets }">
-            {{ dailyworksheets.work_date }}
+          <template v-slot:total_amount="{ row: expensesheets }">
+          {{ formatPrice(expensesheets.total_amount) }}
           </template>
-          <template v-slot:work_status="{ row: dailyworksheets }">
+          <template v-slot:status="{ row: expensesheets }">
             <span
-            v-if="dailyworksheets.work_status == 1"
+            v-if="expensesheets.status == 1"
             class="badge py-3 px-4 fs-7 badge-light-primary"
-            >Ongoing</span
+            >Pending</span
           >
           <span
-            v-if="dailyworksheets.work_status == 2"
+            v-if="expensesheets.status == 2"
+            class="badge py-3 px-4 fs-7 badge-light-danger"
+            >Rejected</span
+          >
+          <span
+            v-if="expensesheets.status == 3"
             class="badge py-3 px-4 fs-7 badge-light-success"
-            >Completed</span
+            >Approved</span
           >
           </template>
-          <template v-slot:actions="{ row: dailyworksheets }">
+          <template v-slot:actions="{ row: expensesheets }">
             <!--begin::Menu Flex-->
             <div class="d-flex flex-lg-row">
+              <span class="menu-link px-3">
+                <router-link :to="`/expensesheets/edit/${expensesheets.id}`">
+                  <i
+                    class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                  ></i>
+                </router-link>
+              </span>
               <span>
                 <i
-                  @click="deleteWorksheet(dailyworksheets.id, false)"
+                  @click="deleteSheets(expensesheets.id, false)"
                   class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
                 ></i>
               </span>
@@ -185,14 +179,15 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import type { IWorksheet } from "@/core/model/dailyworksheets";
+import type { IExpenseSheet } from "@/core/model/expensesheets";
 import arraySort from "array-sort";
 import moment from "moment";
-import { deleteDailyWorksheet, getDailyWorksheets, WorksheetSearch } from "@/stores/api";
+import { deleteExpenseSheet, getPendingExpenseSheets, ExpenseSheetSearch } from "@/stores/api";
 import Swal from "sweetalert2";
+import { formatPrice } from "@/core/config/DataFormatter";
 
 export default defineComponent({
-  name: "worksheets_listing",
+  name: "expensesheets_listing",
   components: {
     Datatable,
   },
@@ -212,14 +207,14 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
-        columnName: "Work Date",
-        columnLabel: "work_date",
+        columnName: "Total Expense",
+        columnLabel: "total_amount",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
-        columnName: "Work Status",
-        columnLabel: "work_status",
+        columnName: "Status",
+        columnLabel: "status",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -238,8 +233,8 @@ export default defineComponent({
     const more = ref(false);
 
     const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<IWorksheet>>([]);
-    const initvalues = ref<Array<IWorksheet>>([]);
+    const tableData = ref<Array<IExpenseSheet>>([]);
+    const initvalues = ref<Array<IExpenseSheet>>([]);
     const total = ref(0);
     // functions
     const Limits = ref({
@@ -250,9 +245,9 @@ export default defineComponent({
     // more
     // functions
     // get users function
-    async function worksheets_listing(): Promise<void> {
+    async function expensesheets_listing(): Promise<void> {
       try {
-        const response = await getDailyWorksheets(
+        const response = await getPendingExpenseSheets(
           `page=${page.value}&limit=${limit.value}`
         );
         console.log(response);
@@ -282,7 +277,7 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getDailyWorksheets(`page=${page}&limit=${limit.value}`);
+        const response = await getPendingExpenseSheets(`page=${page}&limit=${limit.value}`);
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
@@ -312,7 +307,7 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getDailyWorksheets(`page=${page.value}&limit=${limit}`);
+        const response = await getPendingExpenseSheets(`page=${page.value}&limit=${limit}`);
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
@@ -352,10 +347,10 @@ export default defineComponent({
 
     onMounted(async () => {
       //console.log("done");
-      await worksheets_listing();
+      await expensesheets_listing();
     });
 
-    const deleteFewWorksheets = () => {
+    const deleteFewExpenseSheets = () => {
       Swal.fire({
         title: "Are you sure?",
         text: "You will not be able to recover from this !",
@@ -368,14 +363,14 @@ export default defineComponent({
         if (result["isConfirmed"]) {
           // Put your function here
           selectedIds.value.forEach((item) => {
-            deleteWorksheet(item, true);
+            deleteSheets(item, true);
           });
           selectedIds.value.length = 0;
         }
       });
     };
 
-    const deleteWorksheet = (id: number, mul: boolean) => {
+    const deleteSheets = (id: number, mul: boolean) => {
       if (!mul) {
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
@@ -390,7 +385,7 @@ export default defineComponent({
             }).then((result: { [x: string]: any }) => {
               if (result["isConfirmed"]) {
                 // Put your function here
-                deleteDailyWorksheet(id);
+                deleteExpenseSheet(id);
                 tableData.value.splice(i, 1);
               }
             });
@@ -400,7 +395,7 @@ export default defineComponent({
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
             // Put your function here
-            deleteDailyWorksheet(id);
+            deleteExpenseSheet(id);
             tableData.value.splice(i, 1);
           }
         }
@@ -412,7 +407,7 @@ export default defineComponent({
     const searchItems = async () => {
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value !== "") {
-        let results: Array<IWorksheet> = [];
+        let results: Array<IExpenseSheet> = [];
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
             results.push(tableData.value[j]);
@@ -431,14 +426,14 @@ export default defineComponent({
         page.value = 1;
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
-        await worksheets_listing();
+        await expensesheets_listing();
       }
     };
 
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await WorksheetSearch(search.value);
+        const response = await ExpenseSheetSearch(search.value);
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
@@ -483,15 +478,15 @@ export default defineComponent({
     return {
       tableData,
       tableHeader,
-      deleteWorksheet,
+      deleteSheets,
       search,
       searchItems,
       selectedIds,
-      deleteFewWorksheets,
+      deleteFewExpenseSheets,
       sort,
       onItemSelect,
       getAssetPath,
-      worksheets_listing,
+      expensesheets_listing,
       loading,
       NextPage,
       PrevPage,
@@ -500,6 +495,7 @@ export default defineComponent({
       limit,
       PageLimitPoiner,
       Limits,
+      formatPrice,
     };
   },
 });

@@ -13,6 +13,7 @@ import {
   getInstrument,
   getRGatePass,
   getDailyWorksheet,
+  getExpenseSheet,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
@@ -472,32 +473,6 @@ const routes: Array<RouteRecordRaw> = [
           breadcrumbs: ["Returnable-Gate-Pass Add"],
         },
       },
-      {
-        path: "/returnablegatepasses/edit/:id",
-        name: "rgp-edit",
-        beforeEnter: async (to, from, next) => {
-          const rgpID = to.params.id;
-          //console.log(companyId);
-          try {
-            const response = await getRGatePass(rgpID.toString());
-            console.log(response);
-            if (response.error || response.is_active == 0) {
-              next("/404"); // Redirect to the fallback route
-            } else {
-              next(); // Continue to the desired route
-            }
-          } catch (error) {
-            console.error(error);
-            next("/404"); // Redirect to the fallback route
-          }
-        },
-        component: () =>
-          import("@/views/apps/modules/services/rgp/backup/RGatePassEdit.vue"),
-        meta: {
-          pageTitle: "Returnable-Gate-Pass Edit",
-          breadcrumbs: ["Returnable-Gate-Pass Edit"],
-        },
-      },
 
       // Daily Work Sheet Routes
       {
@@ -544,6 +519,50 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Returnable-Gate-Pass Edit",
           breadcrumbs: ["Returnable-Gate-Pass Edit"],
+        },
+      },
+
+      // Expense Sheet Routes
+      {
+        path: "/expensesheets",
+        name: "expensesheet-list",
+        component: () =>
+          import("@/views/apps/modules/services/expense/ExpenseSheetListing.vue"),
+        meta: {
+          pageTitle: "Expense Sheet List",
+          breadcrumbs: ["Expense Sheet List"],
+        },
+      },
+      {
+        path: "/expensesheets/add",
+        name: "expensesheet-add",
+        component: () =>
+          import("@/views/apps/modules/services/expense/ExpenseSheetAdd.vue"),
+        meta: {
+          pageTitle: "Expense Sheet Add",
+          breadcrumbs: ["Expense Sheet Add"],
+        },
+      },
+      {
+        path: "/expensesheets/edit/:id",
+        name: "expensesheet-edit",
+        component: () =>
+          import("@/views/apps/modules/services/expense/ExpenseSheetEdit.vue"),
+        meta: {
+          pageTitle: "Returnable-Gate-Pass Edit",
+          breadcrumbs: ["Returnable-Gate-Pass Edit"],
+        },
+      },
+
+      // Expense Sheet Routes
+      {
+        path: "/expensesheets/approval",
+        name: "expensesheet-approval",
+        component: () =>
+          import("@/views/apps/modules/services/expense/ExpenseSheetApproval.vue"),
+        meta: {
+          pageTitle: "Expense Approval",
+          breadcrumbs: ["Expense Approval"],
         },
       },
 

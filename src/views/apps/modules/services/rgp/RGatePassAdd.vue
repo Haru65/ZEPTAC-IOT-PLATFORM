@@ -112,19 +112,17 @@
                 type="button"
                 class="btn btn-lg btn-primary me-3"
                 data-kt-stepper-action="submit"
+                :data-kt-indicator="loading ? 'on' : null"
                 v-if="currentStepIndex === totalSteps - 1"
                 @click="formSubmit()"
               >
-                <span class="indicator-label">
-                  Submit
-                  <KTIcon icon-name="arrow-right" icon-class="fs-3 ms-2 me-0" />
-                </span>
-                <span class="indicator-progress">
-                  Please wait...
-                  <span
-                    class="spinner-border spinner-border-sm align-middle ms-2"
-                  ></span>
-                </span>
+              <span v-if="!loading" class="indicator-label"> Submit </span>
+              <span v-if="loading" class="indicator-progress">
+                Please wait...
+                <span
+                  class="spinner-border spinner-border-sm align-middle ms-2"
+                ></span>
+              </span>
               </button>
 
               <button v-else type="submit" class="btn btn-lg btn-primary">
@@ -211,6 +209,7 @@ export default defineComponent({
     const _stepperObj = ref<StepperComponent | null>(null);
     const horizontalWizardRef = ref<HTMLElement | null>(null);
     const currentStepIndex = ref(0);
+    const loading = ref(false);
 
     const auth = useAuthStore();
     const route = useRouter();
@@ -260,6 +259,7 @@ export default defineComponent({
       rgpDetails.value.site_address.city = address.city? address.city : ""
       rgpDetails.value.site_address.pincode = address.pincode? address.pincode : ""
       rgpDetails.value.site_address.states = address.states? address.states : ""
+      rgpDetails.value.site_address.country = address.country? address.country : ""
 
     } 
 
@@ -510,6 +510,7 @@ export default defineComponent({
 
     const formSubmit = async () => {
 
+      loading.value = true;
       console.log(rgpDetails.value);
       rgpDetails.value.date = moment(rgpDetails.value.date).format(
         "YYYY-MM-DD HH:mm:ss"
@@ -548,10 +549,14 @@ export default defineComponent({
           showErrorAlert("Warning", "Bad Luck! RGP Details Already Exists");
           route.push({ name: "rgp-list" });
         }
+        loading.value = false;
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
+      }
+      finally {
+        loading.value = false;
       }
     };
 
@@ -605,7 +610,8 @@ export default defineComponent({
       setEngineers,
       setInstruments,
       showErrorAlert,
-      showSuccessAlert
+      showSuccessAlert,
+      loading,
     };
   },
 });

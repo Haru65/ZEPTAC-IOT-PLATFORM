@@ -119,7 +119,7 @@
     &.show {
         .menu-link {
             .menu-arrow:after {                
-                backface-visibility: hidden;
+                backface-visibility: visible !important;
                 transition: $menu-accordion-arrow-transition;
             }
         }
