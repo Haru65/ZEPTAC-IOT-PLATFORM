@@ -625,9 +625,10 @@ import * as Yup from "yup";
 import packages from "@/core/config/PackagesConfig";
 import { useRoute, useRouter } from "vue-router";
 import { limit } from "@/core/config/WhichUserConfig";
+const file_size = ref(false);
+
 
 interface companyDetails {
-  
   disp_avatar: string;
   image: string | null;
   company_name: string;
@@ -712,8 +713,8 @@ export default defineComponent({
       console.log(CompanyId);
       companyDetails.value = {
         disp_avatar:
-          response.meta.company_logo != ""
-            ? "data: image/png;base64," + response.meta.company_logo
+          response.company_logo != ""
+            ? "data: image/png;base64," + response.company_logo
             : getAssetPath("media/avatars/blank.png"),
         image: "",
         company_name: response.company_name,
@@ -778,6 +779,55 @@ export default defineComponent({
           });
         }
       });
+    };
+
+        // remove file or update
+        const removeImage = () => {
+          companyDetails.value.disp_avatar = getAssetPath(
+        "media/avatars/blank.png"
+      );
+    };
+
+    const updateImage = (e: any) => {
+      const file = e.target.files[0];
+
+      if (!file) {
+        console.error("Error: No file selected.");
+        return;
+      }
+
+      const fileSize = file.size;
+      const fileMb = fileSize / 1024 ** 2;
+      console.log(fileMb);
+
+      if (fileMb <= 1) {
+        file_size.value = false;
+        companyDetails.value.disp_avatar = URL.createObjectURL(file);
+        const reader = new FileReader();
+
+        reader.onload = function () {
+          try {
+            const base64Data = reader.result
+              ?.toString()
+              .replace(/^data:image\/\w+;base64,/, "");
+            if (base64Data) {
+              companyDetails.value.image = base64Data;
+              console.log(companyDetails.value.image);
+            } else {
+              console.error("Error: Failed to read the image data.");
+            }
+          } catch (e) {
+            console.error("Error:", e);
+          }
+        };
+
+        reader.readAsDataURL(file);
+      } else {
+        file_size.value = true;
+        companyDetails.value.disp_avatar = getAssetPath(
+          "media/avatars/blank.png"
+        );
+      }
     };
 
     const submit = async () => {
@@ -853,6 +903,9 @@ export default defineComponent({
       packages,
       limit,
       deletecompany_,
+      removeImage,
+      updateImage,
+      file_size,
     };
   },
 });

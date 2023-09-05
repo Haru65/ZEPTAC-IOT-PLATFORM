@@ -42,8 +42,8 @@ const Gen = async (
 
     // Company Logo Img
     const img = new Image()
-    img.src = getAssetPath('media/patterns/zeptac.png')
-    doc.addImage(img, 'JPEG', 0.5, 0.5, 0.5, 0.5);
+    img.src = invoiceDetials.value.company_details.company_logo;
+    doc.addImage(img, 'JPEG', 0.5, 0.7, 0.6, 0.6);
 
     // Quotation number
     doc

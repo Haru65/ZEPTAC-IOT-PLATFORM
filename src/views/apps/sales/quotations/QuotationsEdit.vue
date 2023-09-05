@@ -538,6 +538,9 @@ interface QuotationDetials {
   total: number;
   customer: Meta;
   client: Meta;
+  company_details:{
+    company_logo: string;
+  },
   is_active: number;
   updated_by: string;
 }
@@ -593,6 +596,9 @@ export default defineComponent({
         pincode: "",
         country: "",
       },
+      company_details:{
+        company_logo: getAssetPath("media/avatars/blank.png"),
+      },
       total: 0,
       is_active: 1,
       updated_by: User.id,
@@ -621,6 +627,11 @@ export default defineComponent({
       // Client
       QuotationDetials.value.client.id = response.client_id;
       GetClientData(QuotationDetials.value.client.id);
+      // logo
+      QuotationDetials.value.company_details.company_logo = response.company_details.company_logo
+            ? "data: image/png;base64," + response.company_details.company_logo
+            : getAssetPath("media/avatars/blank.png")
+      
     });
 
     const GetClients = async (id: string) => {

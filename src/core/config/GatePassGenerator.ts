@@ -37,7 +37,7 @@ const rgpGen = async (id, pdfName, rgpDetails) => {
 
   // Company Logo Img
   const img = new Image()
-  img.src = getAssetPath('media/patterns/zeptac.png')
+  img.src = rgpDetails.value.company_details.company_logo;
   doc.addImage(img, 'JPEG', 0.5, 0.7, 0.7, 0.7);
 
   // RGP number

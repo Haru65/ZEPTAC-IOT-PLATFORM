@@ -596,32 +596,38 @@ export default defineComponent({
     };
 
     const fillDetails = (response) => {
-      RGPS.value.push(
-        ...response.result.map((result) => {
-          return {
-            id: result.id,
-            rgp_no: result.rgp_no,
-            quotation_id: result.quotation_id,
-            engineers: JSON.parse(result.engineers),
-            client_id: result.client_id,
-            customer_id: result.customer_id,
-            site_address: {
-              address1: result.site_address.address1,
-              address2: result.site_address.address2,
-              country: result.site_address.country,
-              city: result.site_address.city,
-              pincode: result.site_address.pincode,
-              states: result.site_address.state,
-            },
-            customer_data: {
-              id: result.customer_data.id,
-              first_name: result.customer_data.first_name,
-              last_name: result.customer_data.last_name,
-            },
-          };
-        })
-      );
-    };
+  if (Array.isArray(response.result)) {
+    RGPS.value.push(
+      ...response.result.map((result) => {
+        return {
+          id: result.id,
+          rgp_no: result.rgp_no,
+          quotation_id: result.quotation_id,
+          engineers: JSON.parse(result.engineers),
+          client_id: result.client_id,
+          customer_id: result.customer_id,
+          site_address: {
+            address1: result.site_address.address1,
+            address2: result.site_address.address2,
+            country: result.site_address.country,
+            city: result.site_address.city,
+            pincode: result.site_address.pincode,
+            state: result.site_address.state,
+          },
+          customer_data: {
+            id: result.customer_data.id,
+            first_name: result.customer_data.first_name,
+            last_name: result.customer_data.last_name,
+          },
+          // Add other properties like 'date' and 'duedate' here if needed
+        };
+      })
+    );
+  } else {
+    
+  }
+};
+
 
     onMounted(async () => {
       // get all the rgp

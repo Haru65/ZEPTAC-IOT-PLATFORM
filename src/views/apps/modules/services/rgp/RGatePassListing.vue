@@ -535,6 +535,10 @@ export default defineComponent({
         states: "",
         country: ""
       },
+      company_details:{
+        company_name: "",
+        company_logo: getAssetPath("media/avatars/blank.png"),
+      }
     })
 
     const downloadRGP = async (id: any) => {
@@ -553,8 +557,13 @@ export default defineComponent({
       rgpInfo.value.customer_data = res.result.customer_data;
       rgpInfo.value.client_data = res.result.client_data;
       rgpInfo.value.quotation_no = res.result.quotationsDetails.quotation_no;
+      rgpInfo.value.company_details.company_name = res.result.company_details.company_name;
+      rgpInfo.value.company_details.company_logo = res.result.company_details.company_logo
+            ? "data: image/png;base64," + res.result.company_details.company_logo
+            : getAssetPath("media/avatars/blank.png")
       
-      
+      console.log(rgpInfo.value.company_details);
+
       await rgpGen(id, rgpInfo.value.rgp_no, rgpInfo);
 
     }
