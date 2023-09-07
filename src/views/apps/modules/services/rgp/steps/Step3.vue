@@ -108,6 +108,19 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, ref } from "vue";
 import { ErrorMessage, Field } from "vee-validate";
 
+
+interface Instrument {
+  id: string;
+  name: string;
+  model_no: string;
+  serial_no: string;
+  make: string;
+}
+
+interface step3Data {
+  instruments: Array<Instrument>;
+}
+
 export default defineComponent({
   name: "step-3",
   components: {
@@ -116,7 +129,7 @@ export default defineComponent({
   },
   props: ["instruments"],
   setup(props, { emit }) {
-    const step3Data = ref({
+    const step3Data = ref<step3Data>({
       instruments: [],
     });
 

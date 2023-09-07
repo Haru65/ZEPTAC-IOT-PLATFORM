@@ -247,7 +247,9 @@ export default defineComponent({
       if (input.files && input.files.length > 0) {
         const reader = new FileReader();
         reader.onload = (e) => {
-          expenseSheetDetails.value.expenses[index].receipt = e.target.result;
+          if(expenseSheetDetails.value.expenses){
+            expenseSheetDetails.value.expenses[index].receipt = event.target.result;
+          }
         };
         expenseSheetDetails.value.expenses[index].receipt = input.files[0];
         reader.readAsDataURL(input.files[0]);

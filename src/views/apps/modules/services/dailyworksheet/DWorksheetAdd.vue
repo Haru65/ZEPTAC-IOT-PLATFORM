@@ -450,7 +450,7 @@ interface worksheet {
   witnessed_by: string;
   created_by: string;
   updated_by: string;
-  is_active: number;
+  is_active: string;
 }
 
 export default defineComponent({
@@ -510,7 +510,7 @@ export default defineComponent({
       witnessed_by: "",
       created_by: User.id,
       updated_by: User.id,
-      is_active: 1,
+      is_active: "1",
     });
 
     const worksheetDetailsValidator = Yup.object().shape({

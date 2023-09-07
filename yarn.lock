@@ -73,10 +73,10 @@
   resolved "https://registry.npmjs.org/@element-plus/icons-vue/-/icons-vue-2.1.0.tgz"
   integrity sha512-PSBn3elNoanENc1vnCfh+3WA9fimRC7n+fWkf3rE5jvv+aBohNHABC/KAR5KWPecxWxDTVT1ERpRbOMRcOV/vA==
 
-"@esbuild/linux-x64@0.18.20":
+"@esbuild/win32-x64@0.18.20":
   version "0.18.20"
-  resolved "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.18.20.tgz"
-  integrity sha512-UYqiqemphJcNsFEskc73jQ7B9jgwjWrSayxawS6UVFZGWrAAtkzjxSqnoclCXxWtfwLdzU+vTpcNYhpn43uP1w==
+  resolved "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.18.20.tgz"
+  integrity sha512-kTdfRcSiDfQca/y9QIkng02avJ+NCaQvrMejlsB3RRv5sE9rRoeBPISaZpKxHELzRxZyLvNts1P27W3wV+8geQ==
 
 "@eslint-community/eslint-utils@^4.2.0", "@eslint-community/eslint-utils@^4.4.0":
   version "4.4.0"
@@ -251,43 +251,43 @@
   resolved "https://registry.npmjs.org/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@intlify/core-base@9.3.0":
-  version "9.3.0"
-  resolved "https://registry.npmjs.org/@intlify/core-base/-/core-base-9.3.0.tgz"
-  integrity sha512-SRzn8TMnPZ6MY8OFrgouRq4DGaf01SHcJEF6FglYFYvRkgPzziEcQe+v2PD+O5lUp/rJafP4dabm1CmsVAA7rA==
+"@intlify/core-base@9.2.2":
+  version "9.2.2"
+  resolved "https://registry.npmjs.org/@intlify/core-base/-/core-base-9.2.2.tgz"
+  integrity sha512-JjUpQtNfn+joMbrXvpR4hTF8iJQ2sEFzzK3KIESOx+f+uwIjgw20igOyaIdhfsVVBCds8ZM64MoeNSx+PHQMkA==
   dependencies:
-    "@intlify/devtools-if" "9.3.0"
-    "@intlify/message-compiler" "9.3.0"
-    "@intlify/shared" "9.3.0"
-    "@intlify/vue-devtools" "9.3.0"
+    "@intlify/devtools-if" "9.2.2"
+    "@intlify/message-compiler" "9.2.2"
+    "@intlify/shared" "9.2.2"
+    "@intlify/vue-devtools" "9.2.2"
 
-"@intlify/devtools-if@9.3.0":
-  version "9.3.0"
-  resolved "https://registry.npmjs.org/@intlify/devtools-if/-/devtools-if-9.3.0.tgz"
-  integrity sha512-5aKZnqj0Ff4dfwBX2Oo+MheVs00CBnC0RzWK26aT2M4AF0cxdFLOJAs51/eHT01jmzrxSvfBMjdArUWHwgetfg==
+"@intlify/devtools-if@9.2.2":
+  version "9.2.2"
+  resolved "https://registry.npmjs.org/@intlify/devtools-if/-/devtools-if-9.2.2.tgz"
+  integrity sha512-4ttr/FNO29w+kBbU7HZ/U0Lzuh2cRDhP8UlWOtV9ERcjHzuyXVZmjyleESK6eVP60tGC9QtQW9yZE+JeRhDHkg==
   dependencies:
-    "@intlify/shared" "9.3.0"
+    "@intlify/shared" "9.2.2"
 
-"@intlify/message-compiler@9.3.0":
-  version "9.3.0"
-  resolved "https://registry.npmjs.org/@intlify/message-compiler/-/message-compiler-9.3.0.tgz"
-  integrity sha512-D8tSJEhTCSFcCzkThjE4Sbk1tIdvzkYa1FaVIzUtZ8hKPATvokNrOiDw1i/h671m8A80l9Ywq594i/LPTB6EJA==
+"@intlify/message-compiler@9.2.2":
+  version "9.2.2"
+  resolved "https://registry.npmjs.org/@intlify/message-compiler/-/message-compiler-9.2.2.tgz"
+  integrity sha512-IUrQW7byAKN2fMBe8z6sK6riG1pue95e5jfokn8hA5Q3Bqy4MBJ5lJAofUsawQJYHeoPJ7svMDyBaVJ4d0GTtA==
   dependencies:
-    "@intlify/shared" "9.3.0"
-    source-map-js "^1.0.2"
+    "@intlify/shared" "9.2.2"
+    source-map "0.6.1"
 
-"@intlify/shared@9.3.0":
-  version "9.3.0"
-  resolved "https://registry.npmjs.org/@intlify/shared/-/shared-9.3.0.tgz"
-  integrity sha512-MMGRz6zWxtz7rHtxIIdnyb8SYOIaaseN1IvUhAEs9tOW4u77RD4DFp4qgPXesp2Gxo/5QitH9kwSs0jnxGUNEw==
+"@intlify/shared@9.2.2":
+  version "9.2.2"
+  resolved "https://registry.npmjs.org/@intlify/shared/-/shared-9.2.2.tgz"
+  integrity sha512-wRwTpsslgZS5HNyM7uDQYZtxnbI12aGiBZURX3BTR9RFIKKRWpllTsgzHWvj3HKm3Y2Sh5LPC1r0PDCKEhVn9Q==
 
-"@intlify/vue-devtools@9.3.0":
-  version "9.3.0"
-  resolved "https://registry.npmjs.org/@intlify/vue-devtools/-/vue-devtools-9.3.0.tgz"
-  integrity sha512-kEaxIz1VEgsz2q5RhoS+fBGTkXr/4+pxmK9mN14+speVGb82HPRntKBmz0GO18I1JisD4Z0vAva+KCTHGeAqbQ==
+"@intlify/vue-devtools@9.2.2":
+  version "9.2.2"
+  resolved "https://registry.npmjs.org/@intlify/vue-devtools/-/vue-devtools-9.2.2.tgz"
+  integrity sha512-+dUyqyCHWHb/UcvY1MlIpO87munedm3Gn6E9WWYdWrMuYLcoIoOEVDWSS8xSwtlPU+kA+MEQTP6Q1iI/ocusJg==
   dependencies:
-    "@intlify/core-base" "9.3.0"
-    "@intlify/shared" "9.3.0"
+    "@intlify/core-base" "9.2.2"
+    "@intlify/shared" "9.2.2"
 
 "@jridgewell/gen-mapping@^0.3.0":
   version "0.3.3"
@@ -634,7 +634,7 @@
     "@vue/compiler-dom" "3.3.4"
     "@vue/shared" "3.3.4"
 
-"@vue/devtools-api@^6.5.0":
+"@vue/devtools-api@^6.2.1", "@vue/devtools-api@^6.5.0":
   version "6.5.0"
   resolved "https://registry.npmjs.org/@vue/devtools-api/-/devtools-api-6.5.0.tgz"
   integrity sha512-o9KfBeaBmCKl10usN4crU53fYtC1r7jJwdGKjPT24t348rHxgfpZ0xL3Xm/gLUYnc0oTp8LAmrxOeLyu6tbk2Q==
@@ -4126,6 +4126,11 @@ source-map@~0.6.1:
   resolved "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz"
   integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
 
+source-map@0.6.1:
+  version "0.6.1"
+  resolved "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz"
+  integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
+
 sourcemap-codec@^1.4.1:
   version "1.4.8"
   resolved "https://registry.npmjs.org/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz"
@@ -4766,15 +4771,15 @@ vue-eslint-parser@^9.1.1, vue-eslint-parser@^9.3.1:
     lodash "^4.17.21"
     semver "^7.3.6"
 
-vue-i18n@^9.1.8:
-  version "9.3.0"
-  resolved "https://registry.npmjs.org/vue-i18n/-/vue-i18n-9.3.0.tgz"
-  integrity sha512-+2L+ae/e4+fixhjym3lgzGCGQG8wVGlGrDHzjfdgUudheHvbVHu5i6tn6FF+buH75UFA7T5ZO2ZO7zrh6CzuaA==
+vue-i18n@^9.2.2:
+  version "9.2.2"
+  resolved "https://registry.npmjs.org/vue-i18n/-/vue-i18n-9.2.2.tgz"
+  integrity sha512-yswpwtj89rTBhegUAv9Mu37LNznyu3NpyLQmozF3i1hYOhwpG8RjcjIFIIfnu+2MDZJGSZPXaKWvnQA71Yv9TQ==
   dependencies:
-    "@intlify/core-base" "9.3.0"
-    "@intlify/shared" "9.3.0"
-    "@intlify/vue-devtools" "9.3.0"
-    "@vue/devtools-api" "^6.5.0"
+    "@intlify/core-base" "9.2.2"
+    "@intlify/shared" "9.2.2"
+    "@intlify/vue-devtools" "9.2.2"
+    "@vue/devtools-api" "^6.2.1"
 
 vue-image-lightbox@^7.2.0:
   version "7.2.0"

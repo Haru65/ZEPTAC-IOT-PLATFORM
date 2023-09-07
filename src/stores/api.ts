@@ -995,7 +995,7 @@ export async function getDailyWorksheet(data: string) {
     }
 }
 
-export async function addDailyWorksheet(data: string) {
+export async function addDailyWorksheet(data) {
     try {
         //console.log(data)
         ApiService.setHeader();
@@ -1062,7 +1062,7 @@ export async function WorksheetSearch(search: any) {
 
 // EXPENSE SHEET
 
-export async function addExpenseSheet(data: string) {
+export async function addExpenseSheet(data) {
     try {
         //console.log(data)
         ApiService.setHeader();

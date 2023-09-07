@@ -31,15 +31,15 @@ const AdminMenuConfig: Array<MenuItem> = [
         sub: [
           {
             sectionTitle: "Validation Report",
-            route: "/modules/validationreport",
+            route: "/modules/validationreports",
             sub: [
               {
                 heading: "Add Reports",
-                route: "/validationreport/add",
+                route: "/validationreports/add",
               },
               {
                 heading: "List Reports",
-                route: "/validationreport/list",
+                route: "/validationreports/list",
               },
             ],
           },

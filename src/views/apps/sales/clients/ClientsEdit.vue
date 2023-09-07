@@ -634,7 +634,7 @@ export default defineComponent({
 
     const GetCustomers = async () => {
       ApiService.setHeader();
-      const response = await getCustomers();
+      const response = await getCustomers(``);
       Customers.value.push(
         ...response.result.data.map(({ created_at, ...rest }) => ({
           ...rest,

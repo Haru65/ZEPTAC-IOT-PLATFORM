@@ -566,6 +566,54 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
 
+      // Validation Report Routes
+      {
+        path: "/validationreports/list",
+        name: "validationreport-list",
+        component: () =>
+          import("@/views/apps/modules/validationreport/ValidationReportListing.vue"),
+        meta: {
+          pageTitle: "Validation Report List",
+          breadcrumbs: ["Validation Report List"],
+        },
+      },
+      {
+        path: "/validationreports/add",
+        name: "validationreport-add",
+        component: () =>
+          import("@/views/apps/modules/validationreport/ValidationReportAdd.vue"),
+        meta: {
+          pageTitle: "Validation Report Add",
+          breadcrumbs: ["Validation Report Add"],
+        },
+      },
+      {
+        path: "/validationreports/edit/:id",
+        name: "validationreport-edit",
+        // beforeEnter: async (to, from, next) => {
+        //   const worksheetID = to.params.id;
+        //   //console.log(companyId);
+        //   try {
+        //     const response = await getDailyWorksheet(worksheetID.toString());
+        //     console.log(response);
+        //     if (response.error || response.is_active == 0) {
+        //       next("/404"); // Redirect to the fallback route
+        //     } else {
+        //       next(); // Continue to the desired route
+        //     }
+        //   } catch (error) {
+        //     console.error(error);
+        //     next("/404"); // Redirect to the fallback route
+        //   }
+        // },
+        component: () =>
+          import("@/views/apps/modules/validationreport/ValidationReportEdit.vue"),
+        meta: {
+          pageTitle: "Validation Report Edit",
+          breadcrumbs: ["Validation Report Edit"],
+        },
+      },
+
     ],
   },
 

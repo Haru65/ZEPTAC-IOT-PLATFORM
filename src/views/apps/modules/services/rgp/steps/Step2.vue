@@ -90,6 +90,16 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, ref, onMounted } from "vue";
 import { ErrorMessage, Field } from "vee-validate";
 
+interface Engineer {
+  id: string;
+  first_name: string;
+  last_name: string;
+}
+
+interface step2Data {
+  engineers: Array<Engineer>;
+}
+
 export default defineComponent({
   name: "step-2",
   components: {
@@ -98,7 +108,7 @@ export default defineComponent({
   },
   props: ["engineers"],
   setup(props, { emit }) {
-    const step2Data = ref({
+    const step2Data = ref<step2Data>({
       engineers: [],
     });
 
@@ -106,20 +116,16 @@ export default defineComponent({
 
       const selectedId = e.target.value;
 
-      const selectedEngineer = props.engineers.find(
-        (engineer) => engineer.id == selectedId
-      );
+      const selectedEngineer = props.engineers.find( engineer => engineer.id == selectedId );
 
       if (e.target.checked) {
         step2Data.value.engineers.push({
           id: selectedId,
           first_name: selectedEngineer.first_name,
           last_name: selectedEngineer.last_name,
-        });
+      });
       } else {
-        step2Data.value.engineers = step2Data.value.engineers.filter(
-          (engineer) => engineer.id != selectedId
-        );
+        step2Data.value.engineers = step2Data.value.engineers.filter( engineer => engineer.id != selectedId);
       }
 
       await emit('set-engineers',step2Data.value.engineers);
