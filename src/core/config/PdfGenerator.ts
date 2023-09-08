@@ -3,7 +3,6 @@
 
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable"; // ! depretaited import
-import { getAssetPath } from "../helpers/assets";
 
 /**
  * Gen Method to print invoice or quotation reciept
@@ -43,7 +42,7 @@ const Gen = async (
     // Company Logo Img
     const img = new Image()
     img.src = invoiceDetials.value.company_details.company_logo;
-    doc.addImage(img, 'JPEG', 0.5, 0.7, 0.6, 0.6);
+    doc.addImage(img, 'JPEG', 0.5, 0.7, 0.7, 0.7);
 
     // Quotation number
     doc
@@ -147,7 +146,7 @@ const Gen = async (
         }
     ],
     [{
-        content: `\n\nNotes : ${invoiceDetials.value.notes}`, colSpan: 3,
+        content: `\n\nNotes : ${invoiceDetials.value.notes ? invoiceDetials.value.notes : ""}`, colSpan: 3,
         styles: {
             fillColor: [255, 255, 255],
             textColor: [0, 0, 0],
@@ -159,17 +158,21 @@ const Gen = async (
     ]
 
     // main Content in the table
-    doc.autoTable({
+    autoTable(doc, {
         columns,
         startY: 3,
         body: body,
         margin: { left: 0.5, top: 1.25 },
         headStyles: { fillColor: [124, 95, 240] },
-        align: {
-            header: "center",
-            body: "right",
-        },
+        didDrawCell: function (data) {
+            if (data.column.index === 0) {
+                data.cell.styles.halign = 'center';
+            } else {
+                data.cell.styles.halign = 'right';
+            }
+        }
     });
+    
 
     // Creating footer and saving file
     doc

@@ -76,7 +76,7 @@ export default {
     // get options from DB;
     const getSelects = async () => {
       ApiService.setHeader();
-      const response = await getPriceList();
+      const response = await getPriceList(``);
       const data = response.result.data.map(
         ({ id, name, description, price, created_at }) => ({
           id,
