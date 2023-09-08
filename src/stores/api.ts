@@ -1152,3 +1152,19 @@ export async function updateExpenseSheet(id: any, data: any) {
         return { error: errors };
     }
 }
+
+// VALIDATION REPORT
+
+
+export async function getAllRGP(data: any) {
+    try {
+        // console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('get_all_rgps', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}

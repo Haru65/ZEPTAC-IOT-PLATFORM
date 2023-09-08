@@ -571,7 +571,7 @@ export default defineComponent({
         country: "",
       },
       company_details:{
-        company_logo: getAssetPath("media/avatars/blank.png"),
+        company_logo: getAssetPath("media/avatars/default.png"),
       },
       total: 0,
       is_active: 1,
@@ -607,7 +607,7 @@ export default defineComponent({
       InvoiceDetails.value.company_details.company_logo = response
         .company_details.company_logo
         ? "data: image/png;base64," + response.company_details.company_logo
-        : getAssetPath("media/avatars/blank.png");
+        : getAssetPath("media/avatars/default.png");
     });
 
     const GetClients = async (id: string) => {

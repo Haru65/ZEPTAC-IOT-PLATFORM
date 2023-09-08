@@ -612,7 +612,7 @@ export default defineComponent({
             country: result.site_address.country,
             city: result.site_address.city,
             pincode: result.site_address.pincode,
-            state: result.site_address.state,
+            states: result.site_address.states,
           },
           customer_data: {
             id: result.customer_data.id,

@@ -537,7 +537,7 @@ export default defineComponent({
       },
       company_details:{
         company_name: "",
-        company_logo: getAssetPath("media/avatars/blank.png"),
+        company_logo: getAssetPath("media/avatars/default.png"),
       }
     })
 
@@ -560,7 +560,7 @@ export default defineComponent({
       rgpInfo.value.company_details.company_name = res.result.company_details.company_name;
       rgpInfo.value.company_details.company_logo = res.result.company_details.company_logo
             ? "data: image/png;base64," + res.result.company_details.company_logo
-            : getAssetPath("media/avatars/blank.png")
+            : getAssetPath("media/avatars/default.png")
       
       console.log(rgpInfo.value.company_details);
 

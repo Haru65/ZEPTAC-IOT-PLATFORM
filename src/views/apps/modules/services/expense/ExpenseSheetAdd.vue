@@ -60,16 +60,13 @@
               v-on:setImage="setExpenseImage"
               v-on:setDate="setExpenseDate"
               v-on:addNewExpenseField="addNewItem"
-              ></Step2
-            >
+            ></Step2>
           </div>
           <!--end::Step 2-->
 
           <!--begin::Step 3-->
           <div data-kt-stepper-element="content">
-            <Step3
-            v-bind:summary="expenseSheetDetails"
-            ></Step3>
+            <Step3 v-bind:summary="expenseSheetDetails"></Step3>
           </div>
           <!--end::Step 3-->
 
@@ -210,9 +207,8 @@ export default defineComponent({
 
     async function setExpenseDate(event, index) {
       console.log(event, index);
-      expenseSheetDetails.value.expenses[index].date = moment(event).format(
-        "YYYY-MM-DD"
-      );
+      expenseSheetDetails.value.expenses[index].date =
+        moment(event).format("YYYY-MM-DD");
     }
 
     async function setExpenseType(typeId, index) {
@@ -247,8 +243,11 @@ export default defineComponent({
       if (input.files && input.files.length > 0) {
         const reader = new FileReader();
         reader.onload = (e) => {
-          if(expenseSheetDetails.value.expenses){
-            expenseSheetDetails.value.expenses[index].receipt = event.target.result;
+          if (e.target) {
+            const result = e.target.result as string;
+            if (expenseSheetDetails.value.expenses) {
+              expenseSheetDetails.value.expenses[index].receipt = result;
+            }
           }
         };
         expenseSheetDetails.value.expenses[index].receipt = input.files[0];
@@ -523,28 +522,27 @@ export default defineComponent({
       loading.value = true;
       try {
         const response = await addExpenseSheet(expenseSheetDetails.value);
-          if (!response.error) {
-            showSuccessAlert(
-              "Success",
-              "Expense Sheet details have been successfully inserted!"
-            );
-            
-            loading.value = false;
-            route.push({ name: "expensesheet-list" });
-          }else {
-            // Handle API error response
-            const errorData = response.error;
-            // console.log("API error:", errorData);
-            console.log("API error:", errorData.response.data.errors);
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            loading.value = false;
-          }
+        if (!response.error) {
+          showSuccessAlert(
+            "Success",
+            "Expense Sheet details have been successfully inserted!"
+          );
+
+          loading.value = false;
+          route.push({ name: "expensesheet-list" });
+        } else {
+          // Handle API error response
+          const errorData = response.error;
+          // console.log("API error:", errorData);
+          console.log("API error:", errorData.response.data.errors);
+          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          loading.value = false;
+        }
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
-      }
-      finally {
+      } finally {
         loading.value = false;
       }
     };

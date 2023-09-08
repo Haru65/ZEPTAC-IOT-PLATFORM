@@ -29,7 +29,7 @@
                 data-kt-image-input="true"
                 :style="{
                   backgroundImage: `url(${getAssetPath(
-                    'media/avatars/blank.png'
+                    'media/avatars/default.png'
                   )})`,
                 }"
               >
@@ -684,7 +684,7 @@ export default defineComponent({
     });
 
     const companyDetails = ref<companyDetails>({
-      disp_avatar: getAssetPath("media/avatars/blank.png"),
+      disp_avatar: getAssetPath("media/avatars/default.png"),
       image: "",
       company_name: "",
       address: "",
@@ -713,7 +713,7 @@ export default defineComponent({
         disp_avatar:
           response.company_logo != ""
             ? "data: image/png;base64," + response.company_logo
-            : getAssetPath("media/avatars/blank.png"),
+            : getAssetPath("media/avatars/default.png"),
         image: "",
         company_name: response.company_name,
         address: response.address,
@@ -780,7 +780,7 @@ export default defineComponent({
         // remove file or update
         const removeImage = () => {
           companyDetails.value.disp_avatar = getAssetPath(
-        "media/avatars/blank.png"
+        "media/avatars/default.png"
       );
     };
 
@@ -821,7 +821,7 @@ export default defineComponent({
       } else {
         file_size.value = true;
         companyDetails.value.disp_avatar = getAssetPath(
-          "media/avatars/blank.png"
+          "media/avatars/default.png"
         );
       }
     };

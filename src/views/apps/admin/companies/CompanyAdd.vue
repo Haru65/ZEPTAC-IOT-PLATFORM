@@ -29,7 +29,7 @@
                 data-kt-image-input="true"
                 :style="{
                   backgroundImage: `url(${getAssetPath(
-                    'media/avatars/blank.png'
+                    'media/avatars/default.png'
                   )})`,
                 }"
               >
@@ -46,7 +46,7 @@
                   class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
                   data-kt-image-input-action="change"
                   data-bs-toggle="tooltip"
-                  title="Change profile image"
+                  title="Change company Logo"
                 >
                   <i class="bi bi-pencil-fill fs-7"></i>
 
@@ -758,7 +758,7 @@ export default defineComponent({
      // remove file or update
      const removeImage = () => {
       companyDetails.value.disp_avatar = getAssetPath(
-        "media/avatars/blank.png"
+        "media/avatars/default.png"
       );
     };
 
@@ -799,7 +799,7 @@ export default defineComponent({
       } else {
         file_size.value = true;
         companyDetails.value.disp_avatar = getAssetPath(
-          "media/avatars/blank.png"
+          "media/avatars/default.png"
         );
       }
     };
