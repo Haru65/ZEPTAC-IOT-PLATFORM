@@ -60,7 +60,7 @@
           <button
             type="button"
             class="btn btn-danger"
-            @click="deleteFewInvoice()"
+            @click="deleteFewReport()"
           >
             Delete Selected
           </button>
@@ -103,42 +103,89 @@
       >
         <!-- img data -->
 
-        <template v-slot:id="{ row: instruments }">
-          {{ instruments.id }}
+        <template v-slot:id="{ row: validationreports }">
+          {{ validationreports.id }}
         </template>
-        <template v-slot:model_no="{ row: instruments }">
-          {{ instruments.model_no }}
+        <template v-slot:customer_name="{ row: validationreports }">
+          {{
+            validationreports.customer_name.first_name +
+            " " +
+            validationreports.customer_name.last_name
+          }}
         </template>
-        <template v-slot:serial_no="{ row: instruments }">
-          {{ instruments.serial_no }}
+        <template v-slot:site_location="{ row: validationreports }">
+          {{
+            validationreports.site_location.address1 +
+            " " +
+            validationreports.site_location.address2 +
+            " " +
+            validationreports.site_location.city +
+            " " +
+            validationreports.site_location.pincode +
+            " " +
+            validationreports.site_location.states +
+            " " +
+            validationreports.site_location.country
+          }}
         </template>
-        <template v-slot:name="{ row: instruments }">
-          {{ instruments.name }}
+        <template v-slot:test_sizes="{ row: validationreports }">
+          <div>
+            <el-select
+              filterable
+              placeholder="Count of Reports"
+              name="rgp_id"
+            >
+              <el-option
+                value=""
+                disabled="disabled"
+                label="Count of Reports"
+                key=""
+              >
+                Select Test
+              </el-option>
+              <el-option
+                disabled="disabled"
+                v-for="test in ConductedTests"
+                :key="test.id"
+                :value="test.id"
+                :label="`${test.test} (${
+                  Object.values(validationreports.test_sizes)[test.id]
+                })`"
+              />
+            </el-select>
+          </div>
         </template>
-        <!-- defualt data -->
-        <template v-slot:make="{ row: instruments }">
-          {{ instruments.make }}
-        </template>
-        <template v-slot:availability="{ row: instruments }">
+        <template v-slot:report_status="{ row: validationreports }">
           <span
-            v-if="instruments.availability == 1"
-            class="badge py-3 px-4 fs-7 badge-light-success"
-            >Available</span
+            v-if="validationreports.report_status == 1"
+            class="badge py-3 px-4 fs-7 badge-light-primary"
+            >Pending</span
           >
           <span
-            v-if="instruments.availability == 0"
+            v-if="validationreports.report_status == 2"
             class="badge py-3 px-4 fs-7 badge-light-danger"
-            >Not Available</span
+            >Invalid</span
+          >
+          <span
+            v-if="validationreports.report_status == 3"
+            class="badge py-3 px-4 fs-7 badge-light-success"
+            >Validated</span
           >
         </template>
-        <template v-slot:created_at="{ row: instruments }">
-          {{ instruments.created_at }}
+        <template v-slot:created_at="{ row: validationreports }">
+          {{ validationreports.created_at }}
         </template>
-        <template v-slot:actions="{ row: instruments }">
+        <template v-slot:actions="{ row: validationreports }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span class="menu-link px-3">
-              <router-link :to="`./edit/${instruments.id}`">
+              <i
+                @click="downloadReport(validationreports.id)"
+                class="cursor-pointer bi bi-download text-gray-600 text-hover-danger mb-1 fs-2"
+              ></i>
+            </span>
+            <span class="menu-link px-3">
+              <router-link :to="`./edit/${validationreports.id}`">
                 <i
                   class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
                 ></i>
@@ -146,7 +193,7 @@
             </span>
             <span class="menu-link px-3">
               <i
-                @click="deleteInvoice(instruments.id, false)"
+                @click="deleteReport(validationreports.id, false)"
                 class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
@@ -192,21 +239,244 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
-import type { IInstrument } from "@/core/model/instruments";
+import type { IValidationReport } from "@/core/model/validationreports";
 import {
-  getAllInstrument,
-  deleteInstrument,
-  InstrumentSearch,
+  getAllValidationReport,
+  deleteValidationReport,
+  ValidationReportSearch,
+getReportinfo,
 } from "@/stores/api";
 import arraySort from "array-sort";
 import moment from "moment";
 import Swal from "sweetalert2";
+import { ConductedTests } from "@/core/model/conductedtests";
+import { getAssetPath } from "@/core/helpers/assets";
+import { reportGen } from "@/core/config/ReportGenerator";
+
+interface airVelocityTestReport {
+  id: string;
+  test_name: string;
+  test_code: string;
+  report_name: string;
+  instrument_used: {
+    id: string;
+    name: string;
+    model_no: string;
+    serial_no: string;
+    make: string;
+  };
+  area_name: string;
+  ahu_no: string;
+  validation_date: string;
+  due_date: string;
+  room_name: string;
+
+  details: [
+    {
+      supply_code: string;
+
+      velocity_readings: {
+        reading_1: string;
+        reading_2: string;
+        reading_3: string;
+        reading_4: string;
+        reading_5: string;
+      };
+      average_reading: string;
+
+      supply_filter_size: string;
+      cfm: string;
+    }
+  ];
+  room_volume: string;
+  total_cfm: string;
+  acph: string;
+
+  acceptance_criteria: {
+    id: string;
+    certified: string;
+  };
+  test_carried_by: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
+  test_witnessed_by: string;
+}
+
+interface filterIntegrityTestReport {
+  id: string;
+  test_name: string;
+  test_code: string;
+  report_name: string;
+  instrument_used: {
+    id: string;
+    name: string;
+    model_no: string;
+    serial_no: string;
+    make: string;
+  };
+  area_name: string;
+  ahu_no: string;
+  validation_date: string;
+  due_date: string;
+
+  room_name: string;
+
+  details: [
+    {
+      supply_code: string;
+      up_stream_conc: string;
+      leakage: string;
+      test_result_of_pov: string;
+      remark: string;
+    }
+  ];
+
+  acceptance_criteria: {
+    id: string;
+    certified: string;
+  };
+  test_carried_by: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
+  test_witnessed_by: string;
+}
+
+interface particleCountTestReport {
+  id: string;
+  test_name: string;
+  test_code: string;
+  report_name: string;
+  instrument_used: {
+    id: string;
+    name: string;
+    model_no: string;
+    serial_no: string;
+    make: string;
+  };
+  area_name: string;
+  ahu_no: string;
+  validation_date: string;
+  due_date: string;
+
+  room_name: string;
+
+  details: [
+    {
+      location_no: string;
+      particle_readings: {
+        reading_1: string;
+        reading_2: string;
+      };
+      remark: string;
+    }
+  ];
+
+  acceptance_criteria: {
+    id: string;
+    certified: string;
+  };
+  test_carried_by: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
+  test_witnessed_by: string;
+}
+
+interface recoveryTestReport {
+  id: string;
+  test_name: string;
+  test_code: string;
+  report_name: string;
+  instrument_used: {
+    id: string;
+    name: string;
+    model_no: string;
+    serial_no: string;
+    make: string;
+  };
+  area_name: string;
+  ahu_no: string;
+  validation_date: string;
+  due_date: string;
+
+  room_name: string;
+
+  details: [
+    {
+      ahu_condition: string;
+      time: string;
+      particle_readings: {
+        reading_1: string;
+        reading_2: string;
+      };
+      remark: string;
+    }
+  ];
+
+  acceptance_criteria: {
+    id: string;
+    certified: string;
+  };
+  test_carried_by: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
+  test_witnessed_by: string;
+}
+
+interface ValidationReport {
+  id: string;
+  rgp_id: string;
+  company_id: string;
+  customer_name: {
+    first_name: string;
+    last_name: string;
+  };
+  site_location: {
+    address1: string;
+    address2: string;
+    city: string;
+    pincode: string;
+    states: string;
+    country: string;
+  };
+  tests: [
+    {
+      air_velocity_test_reports: Array<airVelocityTestReport>;
+    },
+    {
+      filter_integrity_test_reports: Array<filterIntegrityTestReport>;
+    },
+    {
+      particle_count_test_reports: Array<particleCountTestReport>;
+    },
+    {
+      recovery_test_reports: Array<recoveryTestReport>;
+    }
+  ];
+  report_status: string;
+  created_at: string;
+  updated_at: string;
+  created_by: string;
+  updated_by: string;
+}
+
+interface SelectedTestItem {
+  id: string;
+  selectedTest: string;
+}
 
 export default defineComponent({
-  name: "instrument-listing",
+  name: "validationreport-list",
   components: {
     Datatable,
   },
@@ -219,34 +489,28 @@ export default defineComponent({
         columnWidth: 35,
       },
       {
-        columnName: "Model No",
-        columnLabel: "model_no",
+        columnName: "Customer Name",
+        columnLabel: "customer_name",
         sortEnabled: true,
-        columnWidth: 80,
+        columnWidth: 175,
       },
       {
-        columnName: "Serial No",
-        columnLabel: "serial_no",
+        columnName: "Site Location",
+        columnLabel: "site_location",
         sortEnabled: true,
-        columnWidth: 80,
+        columnWidth: 175,
       },
       {
-        columnName: "Instrument Name",
-        columnLabel: "name",
+        columnName: "Total Tests",
+        columnLabel: "test_sizes",
         sortEnabled: true,
-        columnWidth: 75,
+        columnWidth: 175,
       },
       {
-        columnName: "Make",
-        columnLabel: "make",
+        columnName: "Report Status",
+        columnLabel: "report_status",
         sortEnabled: true,
-        columnWidth: 125,
-      },
-      {
-        columnName: "Availability",
-        columnLabel: "availability",
-        sortEnabled: true,
-        columnWidth: 80,
+        columnWidth: 85,
       },
       {
         columnName: "Created At",
@@ -262,23 +526,49 @@ export default defineComponent({
       },
     ]);
 
-    interface itemDetails {
-      id: string;
-      model_no: string;
-      serial_no: string;
-      make: string;
-      name: string;
-      description: string;
-      availability: string;
-      created_at: string;
-    }
-
     const total = ref(0);
     // functions
     const Limits = ref({
       1: 10,
       2: 25,
       3: 50,
+    });
+
+    const allReports = ref<ValidationReport>({
+      id: "",
+      rgp_id: "",
+      company_id: "",
+      customer_name: {
+        first_name: "",
+        last_name: "",
+      },
+      site_location: {
+        address1: "",
+        address2: "",
+        city: "",
+        pincode: "",
+        states: "",
+        country: "",
+      },
+      tests: [
+        {
+          air_velocity_test_reports: [],
+        },
+        {
+          filter_integrity_test_reports: [],
+        },
+        {
+          particle_count_test_reports: [],
+        },
+        {
+          recovery_test_reports: [],
+        },
+      ],
+      report_status: "",
+      created_at: "",
+      updated_at: "",
+      created_by: "",
+      updated_by: "",
     });
 
     const loading = ref(true);
@@ -296,7 +586,7 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getAllInstrument(
+        const response = await getAllValidationReport(
           `page=${page}&limit=${limit.value}`
         );
         //console.log(response.result.total_count);
@@ -306,20 +596,29 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({
             id,
-            model_no,
-            serial_no,
-            name,
-            make,
-            availability,
+            customer_name,
+            site_location,
+            test_sizes,
+            report_status,
             created_at,
           }) => ({
             id: id,
-            model_no: model_no,
-            serial_no: serial_no,
-            name: name,
-            make: make,
-            availability: availability,
-            created_at: moment(created_at).format("MMM Do YY"),
+            customer_name: {
+              first_name: customer_name.first_name,
+              last_name: customer_name.last_name,
+            },
+            site_location: {
+              address1: site_location.address1 ? site_location.address1 : "",
+              address2: site_location.address2 ? site_location.address2 : "",
+              city: site_location.city ? site_location.city : "",
+              pincode: site_location.pincode ? site_location.pincode : "",
+              states: site_location.states ? site_location.states : "",
+              country: site_location.country ? site_location.country : "",
+            },
+            test_sizes: { ...test_sizes },
+
+            report_status: report_status,
+            created_at: moment(created_at).format("LL"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -342,7 +641,7 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getAllInstrument(
+        const response = await getAllValidationReport(
           `page=${page.value}&limit=${limit}`
         );
         //console.log(response.result.total_count);
@@ -352,20 +651,29 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({
             id,
-            model_no,
-            serial_no,
-            name,
-            make,
-            availability,
+            customer_name,
+            site_location,
+            test_sizes,
+            report_status,
             created_at,
           }) => ({
             id: id,
-            model_no: model_no,
-            serial_no: serial_no,
-            name: name,
-            make: make,
-            availability: availability,
-            created_at: moment(created_at).format("MMM Do YY"),
+            customer_name: {
+              first_name: customer_name.first_name,
+              last_name: customer_name.last_name,
+            },
+            site_location: {
+              address1: site_location.address1 ? site_location.address1 : "",
+              address2: site_location.address2 ? site_location.address2 : "",
+              city: site_location.city ? site_location.city : "",
+              pincode: site_location.pincode ? site_location.pincode : "",
+              states: site_location.states ? site_location.states : "",
+              country: site_location.country ? site_location.country : "",
+            },
+            test_sizes: { ...test_sizes },
+
+            report_status: report_status,
+            created_at: moment(created_at).format("LL"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -398,37 +706,46 @@ export default defineComponent({
 
     const selectedIds = ref<Array<number>>([]);
 
-    const tableData = ref<Array<IInstrument>>([]);
+    const tableData = ref<Array<IValidationReport>>([]);
 
-    const initvalues = ref<Array<IInstrument>>([]);
+    const initvalues = ref<Array<IValidationReport>>([]);
 
-    async function instrument_listing(): Promise<void> {
+    async function report_listing(): Promise<void> {
       try {
-        const response = await getAllInstrument(
+        const response = await getAllValidationReport(
           `page=${page.value}&limit=${limit.value}`
         );
         tableData.value = response.result.data.map(
           ({
             id,
-            model_no,
-            serial_no,
-            name,
-            make,
-            availability,
+            customer_name,
+            site_location,
+            test_sizes,
+            report_status,
             created_at,
           }) => ({
             id: id,
-            model_no: model_no,
-            serial_no: serial_no,
-            name: name,
-            make: make,
-            availability: availability,
-            created_at: moment(created_at).format("MMM Do YY"),
+            customer_name: {
+              first_name: customer_name.first_name,
+              last_name: customer_name.last_name,
+            },
+            site_location: {
+              address1: site_location.address1 ? site_location.address1 : "",
+              address2: site_location.address2 ? site_location.address2 : "",
+              city: site_location.city ? site_location.city : "",
+              pincode: site_location.pincode ? site_location.pincode : "",
+              states: site_location.states ? site_location.states : "",
+              country: site_location.country ? site_location.country : "",
+            },
+            test_sizes: { ...test_sizes },
+            report_status: report_status,
+            created_at: moment(created_at).format("LL"),
           })
         );
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+
       } catch (error) {
         console.error(error);
       } finally {
@@ -440,10 +757,10 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      await instrument_listing();
+      await report_listing();
     });
 
-    const deleteFewInvoice = () => {
+    const deleteFewReport = () => {
       Swal.fire({
         title: "Are you sure?",
         text: "You will not be able to recover from this !",
@@ -456,14 +773,14 @@ export default defineComponent({
         if (result["isConfirmed"]) {
           // Put your function here
           selectedIds.value.forEach((item) => {
-            deleteInvoice(item, true);
+            deleteReport(item, true);
           });
           selectedIds.value.length = 0;
         }
       });
     };
 
-    const deleteInvoice = (id: number, mul: boolean) => {
+    const deleteReport = (id: number, mul: boolean) => {
       if (!mul) {
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
@@ -477,7 +794,7 @@ export default defineComponent({
             }).then((result: { [x: string]: any }) => {
               if (result["isConfirmed"]) {
                 // Put your function here
-                deleteInstrument(id);
+                deleteValidationReport(id);
                 tableData.value.splice(i, 1);
               }
             });
@@ -487,7 +804,7 @@ export default defineComponent({
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
             // Put your function here
-            deleteInstrument(id);
+            deleteValidationReport(id);
             tableData.value.splice(i, 1);
           }
         }
@@ -502,7 +819,7 @@ export default defineComponent({
       console.log(search.value);
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value.length != 0) {
-        let results: Array<IInstrument> = [];
+        let results: Array<IValidationReport> = [];
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
             results.push(tableData.value[j]);
@@ -520,33 +837,41 @@ export default defineComponent({
         page.value = 1;
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
-        await instrument_listing();
+        await report_listing();
       }
     };
 
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await InstrumentSearch(search.value);
+        const response = await ValidationReportSearch(search.value);
         //console.log(response.result.total_count);
         // first 20 displayed
         tableData.value = response.result.data.data.map(
           ({
             id,
-            model_no,
-            serial_no,
-            name,
-            make,
-            availability,
+            customer_name,
+            site_location,
+            test_sizes,
+            report_status,
             created_at,
           }) => ({
             id: id,
-            model_no: model_no,
-            serial_no: serial_no,
-            name: name,
-            make: make,
-            availability: availability,
-            created_at: moment(created_at).format("DD/MM/YYYY"),
+            customer_name: {
+              first_name: customer_name.first_name,
+              last_name: customer_name.last_name,
+            },
+            site_location: {
+              address1: site_location.address1 ? site_location.address1 : "",
+              address2: site_location.address2 ? site_location.address2 : "",
+              city: site_location.city ? site_location.city : "",
+              pincode: site_location.pincode ? site_location.pincode : "",
+              states: site_location.states ? site_location.states : "",
+              country: site_location.country ? site_location.country : "",
+            },
+            test_sizes: { ...test_sizes },
+            report_status: report_status,
+            created_at: moment(created_at).format("LL"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -586,14 +911,77 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
+    const reportInfo = ref({
+      id: "",
+      rgp_id: "",
+      rgp_no: "",
+      tests: [],
+      quotation_no: "",
+      customer_data: {
+        company_id: "",
+        first_name : "",
+        last_name: ""
+      },
+      client_data: {
+        company_id: "",
+        first_name : "",
+        last_name: ""
+      },
+      customer_company:{
+        company_name: ""
+      },
+      client_company:{
+        company_name: ""
+      },
+      client_address:{
+        address1: "",
+        address2: "",
+        city: "",
+        pincode: "",
+        states: "",
+        country: ""
+      },
+      company_details:{
+        company_name: "",
+        company_logo: getAssetPath("media/avatars/default.png"),
+      }
+    })
+
+
+    const downloadReport = async (id: any) => {
+      // get all information of the rgp
+      const res = await getReportinfo(id);
+      reportInfo.value.id = res.result.id;
+      reportInfo.value.rgp_id = res.result.rgp_id;
+      reportInfo.value.rgp_no = res.result.rgp_Details.rgp_no;
+      reportInfo.value.tests = JSON.parse(res.result.tests);
+      reportInfo.value.customer_company.company_name = res.result.customer_company.company_name;
+      reportInfo.value.client_company.company_name = res.result.client_company.company_name;
+      reportInfo.value.client_address = res.result.client_address;
+      reportInfo.value.customer_data = res.result.customer_data;
+      reportInfo.value.client_data = res.result.client_data;
+      reportInfo.value.quotation_no = res.result.quotationsDetails.quotation_no;
+      reportInfo.value.company_details.company_name = res.result.company_details.company_name;
+      reportInfo.value.company_details.company_logo = res.result.company_details.company_logo
+            ? "data: image/png;base64," + res.result.company_details.company_logo
+            : getAssetPath("media/avatars/default.png")
+      
+      console.log(reportInfo.value);
+
+      const reportName =  `${reportInfo.value.quotation_no}_${reportInfo.value.rgp_no}`;
+
+      await reportGen(id, reportName, reportInfo);
+
+    }
+
     return {
       tableData,
       tableHeader,
-      deleteInvoice,
+      deleteReport,
       search,
       searchItems,
       selectedIds,
-      deleteFewInvoice,
+      deleteFewReport,
       sort,
       onItemSelect,
       loading,
@@ -603,6 +991,9 @@ export default defineComponent({
       page,
       Limits,
       PageLimitPoiner,
+      ConductedTests,
+      downloadReport,
+      
     };
   },
 });

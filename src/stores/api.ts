@@ -14,6 +14,7 @@ const INSTRUMENTS_URL = "instruments";
 const RGP_URL = "returnablegatepasses";
 const DWSHEET_URL = "dailyworksheets";
 const EXPSHEET_URL = "expensesheets";
+const VAL_REPORT_URL = "validationreports";
 
 // COMPANIES
 
@@ -980,6 +981,21 @@ export async function deleteRGatePass(data: any) {
     }
 }
 
+export async function gatePassSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('returnablegatepass_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 
 // DAILY WORKSHEET
 
@@ -1162,6 +1178,98 @@ export async function getAllRGP(data: any) {
         const id = { "company_id": data };
         ApiService.setHeader();
         const response = await ApiService.post('get_all_rgps', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function addValidationReport(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(VAL_REPORT_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// getlists
+export async function getAllValidationReport(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(VAL_REPORT_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+export async function getValidationReport(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(VAL_REPORT_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+export async function deleteValidationReport(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(VAL_REPORT_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function ValidationReportSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('validation_report_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+export async function getReportinfo(data: any) {
+    try {
+        //console.log(data)
+        const id = { "id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post("get_information_of_report",id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function updateValidationReport(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(VAL_REPORT_URL + "/" + id, data);
         return response.data;
     } catch (errors) {
         console.error(errors);

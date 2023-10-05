@@ -14,6 +14,7 @@ import {
   getRGatePass,
   getDailyWorksheet,
   getExpenseSheet,
+  getValidationReport,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
@@ -590,22 +591,22 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/validationreports/edit/:id",
         name: "validationreport-edit",
-        // beforeEnter: async (to, from, next) => {
-        //   const worksheetID = to.params.id;
-        //   //console.log(companyId);
-        //   try {
-        //     const response = await getDailyWorksheet(worksheetID.toString());
-        //     console.log(response);
-        //     if (response.error || response.is_active == 0) {
-        //       next("/404"); // Redirect to the fallback route
-        //     } else {
-        //       next(); // Continue to the desired route
-        //     }
-        //   } catch (error) {
-        //     console.error(error);
-        //     next("/404"); // Redirect to the fallback route
-        //   }
-        // },
+        beforeEnter: async (to, from, next) => {
+          const validationReportID = to.params.id;
+          //console.log(companyId);
+          try {
+            const response = await getValidationReport(validationReportID.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
         component: () =>
           import("@/views/apps/modules/validationreport/ValidationReportEdit.vue"),
         meta: {

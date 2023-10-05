@@ -101,7 +101,7 @@
                   type="text"
                   name="name"
                   class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Instrument Model"
+                  placeholder="Enter Instrument Name"
                   v-model="itemDetails.name"
                 />
                 <div class="fv-plugins-message-container">
@@ -257,7 +257,7 @@ export default defineComponent({
     const itemDetails = ref<itemDetails>({
       name: "",
       description: "",
-      availability: "1",
+      availability: "",
       model_no: "",
       serial_no: "",
       make: "",
@@ -271,17 +271,17 @@ export default defineComponent({
       let response = await getInstrument(itemId.toString());
       console.log(response);
       itemDetails.value = {
-        name: response.result.name,
-        description: response.result.description,
-        availability: response.result.availability,
-        model_no: response.result.model_no,
-        serial_no: response.result.serial_no,
-        make: response.result.make,
-        company_id: response.result.company_id
-          ? response.result.company_id
+        name: response.name,
+        description: response.description,
+        availability: response.availability,
+        model_no: response.model_no,
+        serial_no: response.serial_no,
+        make: response.make,
+        company_id: response.company_id
+          ? response.company_id
           : "",
-        created_by: response.result.created_by,
-        updated_by: response.result.updated_by,
+        created_by: response.created_by,
+        updated_by: response.updated_by,
       };
       await getdropcomp();
     });

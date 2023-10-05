@@ -1,337 +1,1442 @@
 <template>
-  <div style="width: 99%" class="bg-body p-12 rounded">
+  <div style="width: 99%" class="sm:p-4 md:p-8 lg:p-12 rounded">
     <!--begin::Modal dialog-->
-    <div class="modal-dialog modal-dialog-centered">
-      <!--begin::Modal content-->
-      <div class="modal-content">
-        <!--begin::Form-->
-        <VForm
-          id="kt_account_profile_details_form"
-          class="form"
-          novalidate
-          :validation-schema="itemDetailsValidator"
-        >
-          <!--begin::Card body-->
-          <div class="card-body border-top p-9">
-            <!--begin::Input group-->
-            <div class="row mb-6" v-if="identifier == 'Admin'">
-              <!--begin::Label-->
-              <label class="col-lg-2 col-form-label required fw-semobold fs-6"
-                >Company</label
-              >
-              <!--end::Label-->
+    <div class="d-flex flex-column">
+      <div class="flex-xl-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
+        <div class="card w-20">
+          <div class="card-body sm:p-2 lg:p-12">
+            <!--end::Form-->
 
-              <!--begin::Col-->
-              <div class="col-lg-10 fv-row">
-                <el-select
-                  v-model="itemDetails.company_id"
-                  filterable
-                  placeholder="Please Select Company..."
+            <VForm :validation-schema="validationReportDetailsValidator">
+              <!--begin::Card body-->
+              <div class="card-body border-top p-2">
+                <!-- extra fields -->
+
+                <!--begin::Card body-->
+                <div class="card p-2 w-100">
+                  <div class="shadow-lg p-2 m-auto fs-4 rounded w-100 border">
+                    <div class="row mb-2">
+                      <div class="form-group col-md-6 mb-8 mb-sd-8">
+                        <label
+                          class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
+                          >Gate Pass</label
+                        >
+                        <Field
+                          type="text"
+                          disabled
+                          v-model="validationReportDetails.rgp_no"
+                          name="rgp_id"
+                          class="form-control form-control-lg form-control-solid"
+                          placeholder="Gate Pass Number"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="row mb-2">
+                      <div class="form-group col-md-6 mb-8 mb-sd-8">
+                        <label
+                          class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
+                          >Customer Name</label
+                        >
+                        <input
+                          type="text"
+                          disabled
+                          :value="`${CustomerData.first_name} ${CustomerData.last_name}`"
+                          class="form-control form-control-lg form-control-solid"
+                          placeholder="Customer Name"
+                        />
+                      </div>
+                      <div class="form-group col-md-6 mb-8 mb-sd-8">
+                        <label
+                          class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
+                          >Customer Address</label
+                        >
+                        <input
+                          type="text"
+                          disabled
+                          :value="`${CustomerAddress.address1} ${CustomerAddress.address2} ${CustomerAddress.city} - ${CustomerAddress.pincode} ${CustomerAddress.states} ${CustomerAddress.country}`"
+                          class="form-control form-control-lg form-control-solid"
+                          placeholder="Customer Address"
+                        />
+                      </div>
+                    </div>
+                    <div class="row mb-2">
+                      <div class="form-group col-md-6 mb-8 mb-sd-8">
+                        <label
+                          class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
+                          >Client Name</label
+                        >
+                        <input
+                          type="text"
+                          disabled
+                          :value="`${ClientData.first_name} ${ClientData.last_name}`"
+                          class="form-control form-control-lg form-control-solid"
+                          placeholder="Client Name"
+                        />
+                      </div>
+                      <div class="form-group col-md-6 mb-8 mb-sd-8">
+                        <label
+                          class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
+                          >Client Address</label
+                        >
+                        <input
+                          type="text"
+                          disabled
+                          :value="`${ClientAddress.address1} ${ClientAddress.address2} ${ClientAddress.city} - ${ClientAddress.pincode} ${ClientAddress.states} ${ClientAddress.country}`"
+                          class="form-control form-control-lg form-control-solid"
+                          placeholder="Client Address"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!--end::Card body-->
+
+                <!--begin::Accordion-->
+                <div
+                  v-if="validationReportDetails.tests"
+                  class="accordion"
+                  id="kt_accordion_1"
                 >
-                  <el-option
-                    disabled="disabled"
-                    value=""
-                    label="Please Select Company..."
+                  <div
+                    class="accordion-item"
+                    v-for="test in ConductedTests"
+                    :key="test.id"
                   >
-                    Please Select Company
-                  </el-option>
-                  <el-option
-                    v-for="item in Companies"
-                    :key="item.id"
-                    :label="item.company_name"
-                    :value="item.id"
-                  />
-                </el-select>
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="company" />
-                  </div>
-                </div>
-              </div>
-              <!--end::Col-->
-            </div>
+                    <h2
+                      class="accordion-header"
+                      :id="'kt_accordion_1_header_' + test.id"
+                    >
+                      <button
+                        class="accordion-button fs-4 fw-semibold"
+                        type="button"
+                        :data-bs-toggle="'collapse'"
+                        :data-bs-target="'#kt_accordion_1_body_' + test.id"
+                        :aria-expanded="test.id === 0 ? 'true' : 'false'"
+                        :aria-controls="'kt_accordion_1_body_' + test.id"
+                      >
+                        {{ test.test }}
+                        <span
+                          class="badge m-3 py-3 px-4 fs-7 badge-light-primary rounded animate__animated animate__pulse animate__infinite"
+                          >{{
+                            Object.values(
+                              validationReportDetails.tests[test.id]
+                            )[0].length
+                              ? Object.values(
+                                  validationReportDetails.tests[test.id]
+                                )[0].length
+                              : "0"
+                          }}</span
+                        >
+                      </button>
+                    </h2>
+                    <div
+                      :id="'kt_accordion_1_body_' + test.id"
+                      class="accordion-collapse collapse"
+                      :class="test.id === 0 ? 'show' : ''"
+                      :aria-labelledby="'kt_accordion_1_header_' + test.id"
+                      data-bs-parent="#kt_accordion_1"
+                    >
+                      <div class="accordion-body">
+                        <div>
+                          <!-- Add content for nested accordion here -->
+                          <div class="table-responsive">
+                            <table
+                              class="table table-rounded table-striped border gy-7 gs-7 text-nowrap"
+                            >
+                              <thead>
+                                <tr
+                                  class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200 text-align-center"
+                                >
+                                  <th class="col-10">TEST REPORTS</th>
+                                  <th>ACTION</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr
+                                  v-for="(report, index) in Object.values(
+                                    validationReportDetails.tests[test.id]
+                                  )[0]"
+                                  :key="index"
+                                >
+                                <td class="align-middle">
+                                    <span
+                                      class="badge py-3 px-4 fs-7 badge-light-primary"
+                                      >{{
+                                        `${report.report_name}_${
+                                          index + 1
+                                        }`
+                                      }}</span
+                                    >
+                                  </td>
+                                  <td>
+                                    <div
+                                      class="btn-group"
+                                      role="group"
+                                      aria-label="View and Delete Buttons"
+                                    >
+                                      <button
+                                        type="button"
+                                        class="btn btn-primary btn-sm"
+                                        data-bs-toggle="modal"
+                                        :data-bs-target="
+                                          '#kt_modal_new_address_' +
+                                          test.id +
+                                          '_' +
+                                          index
+                                        "
+                                      >
+                                        <i class="bi bi-eye"></i> Edit
+                                      </button>
 
-            <!-- extra fields -->
-            <div class="row mb-6">
-              <div class="form-group col-md-6">
-                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                  >Model No.</label
-                >
-                <Field
-                  type="text"
-                  name="model_no"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Instrument Model No."
-                  v-model="itemDetails.model_no"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="model_no" />
-                  </div>
-                </div>
-              </div>
-              <div class="form-group col-md-6">
-                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                  >Serial No.</label
-                >
-                <Field
-                  type="text"
-                  name="serial_no"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Instrument Serial No."
-                  v-model="itemDetails.serial_no"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="serial_no" />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!--end::Input group-->
+                                      <component
+                                        :is="getTestEditComponent(test.id)"
+                                        v-bind:heading="test.test + ' Edit'"
+                                        v-bind:id="test.id"
+                                        v-bind:code="test.code"
+                                        v-bind:rgp_no="validationReportDetails.rgp_no"
+                                        v-bind:reportId="index"
+                                        v-bind:reportData="report"
+                                        v-bind:instruments="
+                                          validationReportDetails.instruments
+                                        "
+                                        v-bind:engineers="
+                                          validationReportDetails.engineers
+                                        "
+                                        :additionalprops="
+                                          getAdditionalProps(test.id)
+                                        "
+                                        @updateReport="updateReportData"
+                                      ></component>
 
-            <!-- extra fields -->
-            <div class="row mb-6">
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-semobold fs-6 text-nowrap"
-                  >Instument Name</label
-                >
-                <Field
-                  type="text"
-                  name="name"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Instrument Model"
-                  v-model="itemDetails.name"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="name" />
-                  </div>
-                </div>
-              </div>
+                                      <button
+                                        type="button"
+                                        class="btn btn-danger btn-sm"
+                                        @click="deleteReport(test.id, index)"
+                                      >
+                                        <i class="bi bi-trash"></i> Delete
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                                <tr
+                                  class="text-center"
+                                  v-if="
+                                    Object.values(
+                                      validationReportDetails.tests[test.id]
+                                    )[0].length === 0
+                                  "
+                                >
+                                  <td
+                                    colspan="2"
+                                    class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200 text-align-center"
+                                  >
+                                    No reports available.
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                        <div class="text-start mt-8">
+                          <button
+                            type="button"
+                            class="btn btn-primary btn-md"
+                            data-bs-toggle="modal"
+                            :data-bs-target="'#kt_modal_new_address_' + test.id"
+                          >
+                            Add a report
+                          </button>
+                        </div>
 
-              <div class="form-group col-md-6">
-                <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                  >Make</label
-                >
-                <Field
-                  type="text"
-                  name="make"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Instrument made by... "
-                  v-model="itemDetails.make"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="make" />
+                        <component
+                          :is="getTestComponent(test.id)"
+                          v-bind:heading="test.test"
+                          v-bind:id="test.id"
+                          v-bind:code="test.code"
+                          v-bind:rgp_no="validationReportDetails.rgp_no"
+                          v-bind:instruments="
+                            validationReportDetails.instruments
+                          "
+                          v-bind:engineers="validationReportDetails.engineers"
+                          :additionalprops="getAdditionalProps(test.id)"
+                          @childDataEmitted="handleTestData"
+                        ></component>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-            <!--end::Input group-->
+                <!--end::Accordion-->
 
-            <!-- extra fields -->
-            <div class="row mb-6">
-              <div class="form-group col-md-12">
-                <label
-                  class="col-lg-4 col-form-label required fw-semobold fs-6 text-nowrap"
-                  >Instrument Description</label
-                >
-                <Field
-                  type="text"
-                  as="textarea"
-                  name="description"
-                  rows="3"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Description of the instrument..."
-                  v-model="itemDetails.description"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="description" />
-                  </div>
+                <div class="modal-footer flex-center mt-6">
+                  <!--begin::Button-->
+                  <button
+                    type="reset"
+                    class="btn btn-lg btn-danger text-nowrap w-30"
+                  >
+                    Discard
+                  </button>
+                  <!--end::Button-->
+                  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                  <!--begin::Button-->
+                  <span
+                    :data-kt-indicator="loading ? 'on' : null"
+                    class="btn btn-lg btn-primary text-nowrap w-30"
+                    @click="onsubmit()"
+                  >
+                    <span v-if="!loading" class="indicator-label">
+                      Submit
+                    </span>
+                    <span v-if="loading" class="indicator-progress">
+                      Please wait...
+                      <span
+                        class="spinner-border spinner-border-sm align-middle ms-2"
+                      ></span>
+                    </span>
+                  </span>
+                  <!--end::Button-->
                 </div>
               </div>
-            </div>
-            <!--end::Input group-->
+            </VForm>
           </div>
-          <div class="modal-footer flex-center">
-            <!--begin::Button-->
-            <span @click="deleteItem" class="btn btn-lg btn-danger w-25">
-              Delete
-            </span>
-            <!--end::Button-->
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-            <!--begin::Button-->
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-25"
-              @click="submit()"
-            >
-              <span v-if="!loading" class="indicator-label"> Update</span>
-              <span v-if="loading" class="indicator-progress">
-                Please wait...
-                <span
-                  class="spinner-border spinner-border-sm align-middle ms-2"
-                ></span>
-              </span>
-            </span>
-            <!--end::Button-->
-          </div>
-          <!--end::Input group-->
-        </VForm>
-        <!--end::Form-->
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
-import Swal from "sweetalert2/dist/sweetalert2.js";
-import {
-  updateInstrument,
-  getInstrument,
-  deleteInstrument,
-  getCompanies,
-} from "@/stores/api";
-import { ErrorMessage, Field, Form as VForm } from "vee-validate";
-import * as Yup from "yup";
-import { useAuthStore } from "@/stores/auth";
-import { useRouter, useRoute } from "vue-router";
 import ApiService from "@/core/services/ApiService";
+import { updateValidationReport, getValidationReport } from "@/stores/api";
+import { useAuthStore } from "@/stores/auth";
+import { ErrorMessage, Field, Form as VForm } from "vee-validate";
+import { useRouter, useRoute } from "vue-router";
+import { ConductedTests } from "@/core/model/conductedtests";
+import Swal from "sweetalert2/dist/sweetalert2.js";
 import moment from "moment";
-import { Identifier } from "@/core/config/WhichUserConfig";
+import * as Yup from "yup";
 
-interface itemDetails {
+import AirVelocityTestModal from "./TestEditCustomComponent/AirVelocityTest/AirVelocityTestModal.vue";
+import AirVelocityTestEditModal from "./TestEditCustomComponent/AirVelocityTest/AirVelocityTestEditModal.vue";
+import FilterIntegrityTestModal from "./TestEditCustomComponent/FilterIntegrityTest/FilterIntegrityTestModal.vue";
+import FilterIntegrityTestEditModal from "./TestEditCustomComponent/FilterIntegrityTest/FilterIntegrityTestEditModal.vue";
+import ParticleCountTestModal from "./TestEditCustomComponent/ParticleCountTest/ParticleCountTestModal.vue";
+import ParticleCountTestEditModal from "./TestEditCustomComponent/ParticleCountTest/ParticleCountTestEditModal.vue";
+import RecoveryTestModal from "./TestEditCustomComponent/RecoveryTest/RecoveryTestModal.vue";
+import RecoveryTestEditModal from "./TestEditCustomComponent/RecoveryTest/RecoveryTestEditModal.vue";
+import DefaultTest from "./TestEditCustomComponent/DefaultTest.vue";
+
+interface Instrument {
+  id: string;
   name: string;
-  description: string;
-  availability: string;
   model_no: string;
   serial_no: string;
   make: string;
+}
+interface Engineer {
+  id: string;
+  first_name: string;
+  last_name: string;
+}
+
+interface airVelocityTestReport {
+  id: string;
+  test_name: string;
+  test_code: string;
+  report_name: string;
+  instrument_used: {
+    id: string;
+    name: string;
+    model_no: string;
+    serial_no: string;
+    make: string;
+  };
+  area_name: string;
+  ahu_no: string;
+  validation_date: string;
+  due_date: string;
+  room_name: string;
+
+  details: [
+    {
+      supply_code: string;
+
+      velocity_readings: {
+        reading_1: string;
+        reading_2: string;
+        reading_3: string;
+        reading_4: string;
+        reading_5: string;
+      };
+      average_reading: string;
+
+      supply_filter_size: string;
+      cfm: string;
+    }
+  ];
+  room_volume: string;
+  total_cfm: string;
+  acph: string;
+
+  acceptance_criteria: {
+    id: string;
+    certified: string;
+  };
+  test_carried_by: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
+  test_witnessed_by: string;
+}
+
+interface filterIntegrityTestReport {
+  id: string;
+  test_name: string;
+  test_code: string;
+  report_name: string;
+  instrument_used: {
+    id: string;
+    name: string;
+    model_no: string;
+    serial_no: string;
+    make: string;
+  };
+  area_name: string;
+  ahu_no: string;
+  validation_date: string;
+  due_date: string;
+
+  room_name: string;
+
+  details: [
+    {
+      supply_code: string;
+      up_stream_conc: string;
+      leakage: string;
+      test_result_of_pov: string;
+      remark: string;
+    }
+  ];
+
+  acceptance_criteria: {
+    id: string;
+    certified: string;
+  };
+  test_carried_by: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
+  test_witnessed_by: string;
+}
+
+interface particleCountTestReport {
+  id: string;
+  test_name: string;
+  test_code: string;
+  report_name: string;
+  instrument_used: {
+    id: string;
+    name: string;
+    model_no: string;
+    serial_no: string;
+    make: string;
+  };
+  area_name: string;
+  ahu_no: string;
+  validation_date: string;
+  due_date: string;
+
+  room_name: string;
+
+  details: [
+    {
+      location_no: string;
+      particle_readings: {
+        reading_1: string;
+        reading_2: string;
+      };
+      remark: string;
+    }
+  ];
+
+  acceptance_criteria: {
+    id: string;
+    certified: string;
+  };
+  test_carried_by: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
+  test_witnessed_by: string;
+}
+
+interface recoveryTestReport {
+  id: string;
+  test_name: string;
+  test_code: string;
+  report_name: string;
+  instrument_used: {
+    id: string;
+    name: string;
+    model_no: string;
+    serial_no: string;
+    make: string;
+  };
+  area_name: string;
+  ahu_no: string;
+  validation_date: string;
+  due_date: string;
+
+  room_name: string;
+
+  details: [
+    {
+      ahu_condition: string;
+      time: string;
+      particle_readings: {
+        reading_1: string;
+        reading_2: string;
+      };
+      remark: string;
+    }
+  ];
+
+  acceptance_criteria: {
+    id: string;
+    certified: string;
+  };
+  test_carried_by: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
+  test_witnessed_by: string;
+}
+
+interface ValidationReport {
+  id: string;
+  rgp_id: string;
+  rgp_no: string;
   company_id: string;
-  created_by: number;
-  updated_by: number;
+  instruments: Array<Instrument>;
+  engineers: Array<Engineer>;
+  tests: [
+    {
+      air_velocity_test_reports: Array<airVelocityTestReport>;
+    },
+    {
+      filter_integrity_test_reports: Array<filterIntegrityTestReport>;
+    },
+    {
+      particle_count_test_reports: Array<particleCountTestReport>;
+    },
+    {
+      recovery_test_reports: Array<recoveryTestReport>;
+    }
+  ];
+  report_status: string;
+  is_active: number;
+  created_by: string;
+  updated_by: string;
 }
 
 export default defineComponent({
-  name: "instrument-edit",
+  name: "validationreport-edit",
   components: {
     ErrorMessage,
     Field,
     VForm,
+    DefaultTest,
+    AirVelocityTestModal,
+    AirVelocityTestEditModal,
+    FilterIntegrityTestModal,
+    FilterIntegrityTestEditModal,
+    ParticleCountTestModal,
+    ParticleCountTestEditModal,
+    RecoveryTestModal,
+    RecoveryTestEditModal,
   },
   setup() {
-    const identifier = Identifier;
-    const loading = ref(false);
     const auth = useAuthStore();
+    const User = auth.GetUser();
     const router = useRouter();
     const route = useRoute();
-    const User = auth.GetUser();
-    const Companies = ref([{ id: "", company_name: "" }]);
-    let limit = ref(500);
+
+    const selectedTests = ref([]);
+    const loading = ref(false);
+
     const itemId = route.params.id;
 
-    const itemDetailsValidator = Yup.object().shape({
-      name: Yup.string().required().label("Instrument Name"),
-      description: Yup.string().required().label("Instrument Description"),
-      model_no: Yup.string().required().label("Model No."),
-      serial_no: Yup.string().required().label("Serial No."),
-      make: Yup.string().required().label("Made by"),
-    });
-
-    const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`limit=${limit.value}`);
-      Companies.value.push(
-        ...response.result.data.data.map(({ created_at, ...rest }) => ({
-          ...rest,
-          created_at: moment(created_at).format("MMMM Do YYYY"),
-        }))
-      );
-    };
-
-    const itemDetails = ref<itemDetails>({
-      name: "",
-      description: "",
-      availability: "1",
-      model_no: "",
-      serial_no: "",
-      make: "",
+    const validationReportDetails = ref<ValidationReport>({
+      id: "",
+      rgp_id: "",
+      rgp_no: "",
       company_id: User.company_id,
+      instruments: [],
+      engineers: [],
+      tests: [
+        {
+          air_velocity_test_reports: [],
+        },
+        {
+          filter_integrity_test_reports: [],
+        },
+        {
+          particle_count_test_reports: [],
+        },
+        {
+          recovery_test_reports: [],
+        },
+      ],
+      report_status: "",
       created_by: User.id,
       updated_by: User.id,
+      is_active: 1,
     });
+
+    const tempData = ref({
+      tests: [
+        {
+          air_velocity_test_reports: [],
+        },
+        {
+          filter_integrity_test_reports: [],
+        },
+        {
+          particle_count_test_reports: [],
+        },
+        {
+          recovery_test_reports: [],
+        },
+      ],
+    });
+
+    const validationReportDetailsValidator = Yup.object().shape({});
+
+    /* ========= ADD FUNCTIONS ========*/
+    // function that adds air velocity data
+    async function addAirVelocityTestData(testId, data) {
+      const {
+        id,
+        test_name,
+        test_code,
+        report_name,
+        instrument_used,
+        area_name,
+        room_name,
+        ahu_no,
+        validation_date,
+        due_date,
+        details,
+        room_volume,
+        total_cfm,
+        acph,
+        acceptance_criteria,
+        test_carried_by,
+        test_witnessed_by,
+      } = data;
+
+      const airVelocityTestReport = {
+        id,
+        test_name,
+        test_code,
+        report_name,
+        instrument_used: {
+          id: instrument_used.id,
+          name: instrument_used.name,
+          model_no: instrument_used.model_no,
+          serial_no: instrument_used.serial_no,
+          make: instrument_used.make,
+        },
+        area_name,
+        ahu_no,
+        validation_date,
+        due_date,
+        room_name,
+        details: details.map((detail) => ({
+          supply_code: detail.supply_code,
+          velocity_readings: {
+            reading_1: detail.velocity_readings.reading_1,
+            reading_2: detail.velocity_readings.reading_2,
+            reading_3: detail.velocity_readings.reading_3,
+            reading_4: detail.velocity_readings.reading_4,
+            reading_5: detail.velocity_readings.reading_5,
+          },
+          average_reading: detail.average_reading,
+          supply_filter_size: detail.supply_filter_size,
+          cfm: detail.cfm,
+        })),
+        room_volume,
+        total_cfm,
+        acph,
+        acceptance_criteria: {
+          id: acceptance_criteria.id,
+          certified: acceptance_criteria.certified,
+        },
+        test_carried_by: {
+          id: test_carried_by.id,
+          first_name: test_carried_by.first_name,
+          last_name: test_carried_by.last_name,
+        },
+        test_witnessed_by,
+      };
+
+      await validationReportDetails.value.tests[0].air_velocity_test_reports.push(
+        airVelocityTestReport
+      );
+    }
+
+    // function that adds Filter Integrity Data
+    async function addFilterIntegrityTestData(testId, data) {
+      const {
+        id,
+        test_name,
+        test_code,
+        report_name,
+        instrument_used,
+        area_name,
+        room_name,
+        ahu_no,
+        validation_date,
+        due_date,
+        details,
+        acceptance_criteria,
+        test_carried_by,
+        test_witnessed_by,
+      } = data;
+
+      const filterIntegrityTestReport = {
+        id,
+        test_name,
+        test_code,
+        report_name,
+        instrument_used: {
+          id: instrument_used.id,
+          name: instrument_used.name,
+          model_no: instrument_used.model_no,
+          serial_no: instrument_used.serial_no,
+          make: instrument_used.make,
+        },
+        area_name,
+        room_name,
+        ahu_no,
+        validation_date,
+        due_date,
+        details: details.map((detail) => ({
+          supply_code: detail.supply_code,
+          up_stream_conc: detail.up_stream_conc,
+          leakage: detail.leakage,
+          test_result_of_pov: detail.test_result_of_pov,
+          remark: detail.remark,
+        })),
+        acceptance_criteria: {
+          id: acceptance_criteria.id,
+          certified: acceptance_criteria.certified,
+        },
+        test_carried_by: {
+          id: test_carried_by.id,
+          first_name: test_carried_by.first_name,
+          last_name: test_carried_by.last_name,
+        },
+        test_witnessed_by,
+      };
+
+      await validationReportDetails.value.tests[1].filter_integrity_test_reports.push(
+        filterIntegrityTestReport
+      );
+    }
+
+    // function that adds Paricle Count Data
+    async function addParticleCountTestData(testId, data) {
+      const {
+        id,
+        test_name,
+        test_code,
+        report_name,
+        instrument_used,
+        area_name,
+        room_name,
+        ahu_no,
+        validation_date,
+        due_date,
+        details,
+        acceptance_criteria,
+        test_carried_by,
+        test_witnessed_by,
+      } = data;
+
+      const particleCountTestReport = {
+        id,
+        test_name,
+        test_code,
+        report_name,
+        instrument_used: {
+          id: instrument_used.id,
+          name: instrument_used.name,
+          model_no: instrument_used.model_no,
+          serial_no: instrument_used.serial_no,
+          make: instrument_used.make,
+        },
+        area_name,
+        room_name,
+        ahu_no,
+        validation_date,
+        due_date,
+        details: details.map((detail) => ({
+          location_no: detail.location_no,
+          particle_readings: {
+            reading_1: detail.particle_readings.reading_1,
+            reading_2: detail.particle_readings.reading_2,
+          },
+          remark: detail.remark,
+        })),
+        acceptance_criteria: {
+          id: acceptance_criteria.id,
+          certified: acceptance_criteria.certified,
+        },
+        test_carried_by: {
+          id: test_carried_by.id,
+          first_name: test_carried_by.first_name,
+          last_name: test_carried_by.last_name,
+        },
+        test_witnessed_by,
+      };
+
+      await validationReportDetails.value.tests[2].particle_count_test_reports.push(
+        particleCountTestReport
+      );
+    }
+
+    // function that adds Recovery Data
+    async function addRecoveryTestData(testId, data) {
+      const {
+        id,
+        test_name,
+        test_code,
+        report_name,
+        instrument_used,
+        area_name,
+        room_name,
+        ahu_no,
+        validation_date,
+        due_date,
+        details,
+        acceptance_criteria,
+        test_carried_by,
+        test_witnessed_by,
+      } = data;
+
+      const recoveryTestReport = {
+        id,
+        test_name,
+        test_code,
+        report_name,
+        instrument_used: {
+          id: instrument_used.id,
+          name: instrument_used.name,
+          model_no: instrument_used.model_no,
+          serial_no: instrument_used.serial_no,
+          make: instrument_used.make,
+        },
+        area_name,
+        room_name,
+        ahu_no,
+        validation_date,
+        due_date,
+        details: details.map((detail) => ({
+          ahu_condition: detail.ahu_condition,
+          time: detail.time,
+          particle_readings: {
+            reading_1: detail.particle_readings.reading_1,
+            reading_2: detail.particle_readings.reading_2,
+          },
+          remark: detail.remark,
+        })),
+        acceptance_criteria: {
+          id: acceptance_criteria.id,
+          certified: acceptance_criteria.certified,
+        },
+        test_carried_by: {
+          id: test_carried_by.id,
+          first_name: test_carried_by.first_name,
+          last_name: test_carried_by.last_name,
+        },
+        test_witnessed_by,
+      };
+
+      await validationReportDetails.value.tests[3].recovery_test_reports.push(
+        recoveryTestReport
+      );
+    }
+
+    // function that handles the testData event for each test
+    function handleTestData(testId, data) {
+      switch (testId) {
+        case 0:
+          addAirVelocityTestData(testId, data);
+          return;
+        case 1:
+          addFilterIntegrityTestData(testId, data);
+          return;
+        case 2:
+          addParticleCountTestData(testId, data);
+          return;
+        case 3:
+          addRecoveryTestData(testId, data);
+          return;
+        default:
+          // edge case
+          console.log("Unknown Test");
+          return;
+      }
+    }
+
+    function getAdditionalProps(testId) {
+      // Define different attributes based on the test
+      switch (testId) {
+        case 0:
+          return {
+            heading: ConductedTests[testId].test,
+            id: testId,
+          };
+        case 1:
+          return {
+            heading: ConductedTests[testId].test,
+            id: testId,
+          };
+        case 2:
+          return {
+            heading: ConductedTests[testId].test,
+            id: testId,
+          };
+        case 3:
+          return {
+            heading: ConductedTests[testId].test,
+            id: testId,
+          };
+        default:
+          // For Unknown Test
+          return {
+            heading: "Unknown Test",
+            id: 99999,
+          };
+      }
+    }
+
+    // Render The Add Custom Modal
+    function getTestComponent(testId) {
+      // Map test IDs to component names
+      switch (testId) {
+        case 0:
+          return "AirVelocityTestModal";
+        case 1:
+          return "FilterIntegrityTestModal";
+        case 2:
+          return "ParticleCountTestModal";
+        case 3:
+          return "RecoveryTestModal";
+        default:
+          // default unknown test
+          return "DefaultTest";
+      }
+    }
+
+    // Render The Edit Custom Modal
+    function getTestEditComponent(testId) {
+      // Map test IDs to component names
+      switch (testId) {
+        case 0:
+          return "AirVelocityTestEditModal";
+        case 1:
+          return "FilterIntegrityTestEditModal";
+        case 2:
+          return "ParticleCountTestEditModal";
+        case 3:
+          return "RecoveryTestEditModal";
+        default:
+          // default unknown test
+          return "DefaultTest";
+      }
+    }
+
+    /* ========= UPDATE FUNCTIONS ========*/
+    // function that update air velocity data
+    async function updateAirVelocityTestData(testId, reportId, data) {
+      const {
+        id,
+        test_name,
+        test_code,
+        report_name,
+        instrument_used,
+        area_name,
+        room_name,
+        ahu_no,
+        validation_date,
+        due_date,
+        details,
+        room_volume,
+        total_cfm,
+        acph,
+        acceptance_criteria,
+        test_carried_by,
+        test_witnessed_by,
+      } = data;
+
+      const airVelocityTestReport = {
+        id,
+        test_name,
+        test_code,
+        report_name,
+        instrument_used: {
+          id: instrument_used.id,
+          name: instrument_used.name,
+          model_no: instrument_used.model_no,
+          serial_no: instrument_used.serial_no,
+          make: instrument_used.make,
+        },
+        area_name,
+        ahu_no,
+        validation_date,
+        due_date,
+        room_name,
+        details: details.map((detail) => ({
+          supply_code: detail.supply_code,
+          velocity_readings: {
+            reading_1: detail.velocity_readings.reading_1,
+            reading_2: detail.velocity_readings.reading_2,
+            reading_3: detail.velocity_readings.reading_3,
+            reading_4: detail.velocity_readings.reading_4,
+            reading_5: detail.velocity_readings.reading_5,
+          },
+          average_reading: detail.average_reading,
+          supply_filter_size: detail.supply_filter_size,
+          cfm: detail.cfm,
+        })),
+        room_volume,
+        total_cfm,
+        acph,
+        acceptance_criteria: {
+          id: acceptance_criteria.id,
+          certified: acceptance_criteria.certified,
+        },
+        test_carried_by: {
+          id: test_carried_by.id,
+          first_name: test_carried_by.first_name,
+          last_name: test_carried_by.last_name,
+        },
+        test_witnessed_by,
+      };
+
+      await validationReportDetails.value.tests[0].air_velocity_test_reports.splice(
+        reportId,
+        1,
+        airVelocityTestReport
+      );
+    }
+
+    // function that update Filter Integrity Data
+    async function updateFilterIntegrityTestData(testId, reportId, data) {
+      const {
+        id,
+        test_name,
+        test_code,
+        report_name,
+        instrument_used,
+        area_name,
+        room_name,
+        ahu_no,
+        validation_date,
+        due_date,
+        details,
+        acceptance_criteria,
+        test_carried_by,
+        test_witnessed_by,
+      } = data;
+
+      const filterIntegrityTestReport = {
+        id,
+        test_name,
+        test_code,
+        report_name,
+        instrument_used: {
+          id: instrument_used.id,
+          name: instrument_used.name,
+          model_no: instrument_used.model_no,
+          serial_no: instrument_used.serial_no,
+          make: instrument_used.make,
+        },
+        area_name,
+        room_name,
+        ahu_no,
+        validation_date,
+        due_date,
+        details: details.map((detail) => ({
+          supply_code: detail.supply_code,
+          up_stream_conc: detail.up_stream_conc,
+          leakage: detail.leakage,
+          test_result_of_pov: detail.test_result_of_pov,
+          remark: detail.remark,
+        })),
+        acceptance_criteria: {
+          id: acceptance_criteria.id,
+          certified: acceptance_criteria.certified,
+        },
+        test_carried_by: {
+          id: test_carried_by.id,
+          first_name: test_carried_by.first_name,
+          last_name: test_carried_by.last_name,
+        },
+        test_witnessed_by,
+      };
+
+      await validationReportDetails.value.tests[1].filter_integrity_test_reports.splice(
+        reportId,
+        1,
+        filterIntegrityTestReport
+      );
+      console.log(validationReportDetails.value);
+    }
+
+    // function that update Paricle Count Data
+    async function updateParticleCountTestData(testId, reportId, data) {
+      const {
+        id,
+        test_name,
+        test_code,
+        report_name,
+        instrument_used,
+        area_name,
+        room_name,
+        ahu_no,
+        validation_date,
+        due_date,
+        details,
+        acceptance_criteria,
+        test_carried_by,
+        test_witnessed_by,
+      } = data;
+
+      const particleCountTestReport = {
+        id,
+        test_name,
+        test_code,
+        report_name,
+        instrument_used: {
+          id: instrument_used.id,
+          name: instrument_used.name,
+          model_no: instrument_used.model_no,
+          serial_no: instrument_used.serial_no,
+          make: instrument_used.make,
+        },
+        area_name,
+        room_name,
+        ahu_no,
+        validation_date,
+        due_date,
+        details: details.map((detail) => ({
+          location_no: detail.location_no,
+          particle_readings: {
+            reading_1: detail.particle_readings.reading_1,
+            reading_2: detail.particle_readings.reading_2,
+          },
+          remark: detail.remark,
+        })),
+        acceptance_criteria: {
+          id: acceptance_criteria.id,
+          certified: acceptance_criteria.certified,
+        },
+        test_carried_by: {
+          id: test_carried_by.id,
+          first_name: test_carried_by.first_name,
+          last_name: test_carried_by.last_name,
+        },
+        test_witnessed_by,
+      };
+
+      await validationReportDetails.value.tests[2].particle_count_test_reports.splice(
+        reportId,
+        1,
+        particleCountTestReport
+      );
+      console.log(validationReportDetails.value);
+    }
+
+    // function that update Recovery Data
+    async function updateRecoveryTestData(testId, reportId, data) {
+      const {
+        id,
+        test_name,
+        test_code,
+        report_name,
+        instrument_used,
+        area_name,
+        room_name,
+        ahu_no,
+        validation_date,
+        due_date,
+        details,
+        acceptance_criteria,
+        test_carried_by,
+        test_witnessed_by,
+      } = data;
+
+      const recoveryTestReport = {
+        id,
+        test_name,
+        test_code,
+        report_name,
+        instrument_used: {
+          id: instrument_used.id,
+          name: instrument_used.name,
+          model_no: instrument_used.model_no,
+          serial_no: instrument_used.serial_no,
+          make: instrument_used.make,
+        },
+        area_name,
+        room_name,
+        ahu_no,
+        validation_date,
+        due_date,
+        details: details.map((detail) => ({
+          ahu_condition: detail.ahu_condition,
+          time: detail.time,
+          particle_readings: {
+            reading_1: detail.particle_readings.reading_1,
+            reading_2: detail.particle_readings.reading_2,
+          },
+          remark: detail.remark,
+        })),
+        acceptance_criteria: {
+          id: acceptance_criteria.id,
+          certified: acceptance_criteria.certified,
+        },
+        test_carried_by: {
+          id: test_carried_by.id,
+          first_name: test_carried_by.first_name,
+          last_name: test_carried_by.last_name,
+        },
+        test_witnessed_by,
+      };
+
+      await validationReportDetails.value.tests[3].recovery_test_reports.splice(
+        reportId,
+        1,
+        recoveryTestReport
+      );
+      console.log(validationReportDetails.value);
+    }
+
+    // function that handles the testData event for each test
+    function updateReportData(testId, reportId, data) {
+      switch (testId) {
+        case 0:
+          updateAirVelocityTestData(testId, reportId, data);
+          return;
+        case 1:
+          updateFilterIntegrityTestData(testId, reportId, data);
+          return;
+        case 2:
+          updateParticleCountTestData(testId, reportId, data);
+          return;
+        case 3:
+          updateRecoveryTestData(testId, reportId, data);
+          return;
+        default:
+          // edge case
+          console.log("Unknown Test");
+          return;
+      }
+    }
+
+    const CustomerAddress = ref({
+      address1: "",
+      address2: "",
+      country: "",
+      city: "",
+      pincode: "",
+      states: "",
+    });
+
+    const ClientAddress = ref({
+      address1: "",
+      address2: "",
+      country: "",
+      city: "",
+      pincode: "",
+      states: "",
+    });
+
+    const CustomerData = ref({
+      id: "",
+      first_name: "",
+      last_name: "",
+    });
+
+    const ClientData = ref({
+      id: "",
+      first_name: "",
+      last_name: "",
+    });
+
+    
+    // fill the details when response is received
+    const fillDetails = async (response) => {
+      validationReportDetails.value.id = response.id;
+      validationReportDetails.value.rgp_id = response.rgp_id;
+      validationReportDetails.value.rgp_no = response.rgp_no;
+
+      const { client_address, customer_address, customer_data, client_data } =
+        response;
+
+      const instruments = await JSON.parse(response.instruments);
+      const engineers = await JSON.parse(response.engineers);
+
+      validationReportDetails.value.instruments = [...instruments];
+      validationReportDetails.value.engineers = [...engineers];
+
+      ClientAddress.value = client_address;
+      CustomerAddress.value = customer_address;
+      CustomerData.value = customer_data;
+      ClientData.value = client_data;
+
+      const AllTests = await JSON.parse(response.tests);
+
+      validationReportDetails.value.tests = { ...AllTests };
+
+      tempData.value.tests = { ...AllTests };
+
+      validationReportDetails.value.company_id = response.company_id;
+      validationReportDetails.value.report_status = response.report_status;
+
+      validationReportDetails.value.created_by = response.created_by;
+      validationReportDetails.value.updated_by = response.updated_by;
+    };
+
+    const removeObjectWithId = (arr, id) => {
+      if (id !== -1) {
+        arr.splice(id, 1);
+      }
+
+      return arr;
+    };
+
+    /* ========= DELETE FUNCTIONS ========*/
+    // function that delete air velocity data
+    async function deleteAirVelocityTestData(testId, index) {
+      //zero represent the testID
+      validationReportDetails.value.tests[0].air_velocity_test_reports = await removeObjectWithId(
+        validationReportDetails.value.tests[0].air_velocity_test_reports,
+        index
+      );
+    }
+    
+    // function that delete filter integrity data
+    async function deleteFilterIntegrityTestData(testId, index) {
+      //zero represent the testID
+      validationReportDetails.value.tests[1].filter_integrity_test_reports = await removeObjectWithId(
+        validationReportDetails.value.tests[1].filter_integrity_test_reports,
+        index
+      );
+    }
+    
+    // function that delete particle count data
+    async function deleteParticleCountTestData(testId, index) {
+      //zero represent the testID
+      validationReportDetails.value.tests[2].particle_count_test_reports = await removeObjectWithId(
+        validationReportDetails.value.tests[2].particle_count_test_reports,
+        index
+      );
+    }
+    
+    // function that delete recovery data
+    async function deleteRecoveryTestData(testId, index) {
+      //zero represent the testID
+      validationReportDetails.value.tests[3].recovery_test_reports = await removeObjectWithId(
+        validationReportDetails.value.tests[3].recovery_test_reports,
+        index
+      );
+    }
+
+    // function that will delete testData
+    function deleteReport(testId, index) {
+      switch (testId) {
+        case 0:
+          deleteAirVelocityTestData(testId, index);
+          return;
+        case 1:
+          deleteFilterIntegrityTestData(testId, index);
+          return;
+        case 2:
+          deleteParticleCountTestData(testId, index);
+          return;
+        case 3:
+          deleteRecoveryTestData(testId, index);
+          return;
+        default:
+          // edge case
+          console.log("Unknown Test");
+          return;
+      }
+    }
 
     onMounted(async () => {
-      Companies.value.pop();
-      let response = await getInstrument(itemId.toString());
+      const response = await getValidationReport(itemId.toString());
+
       console.log(response);
-      itemDetails.value = {
-        name: response.result.name,
-        description: response.result.description,
-        availability: response.result.availability,
-        model_no: response.result.model_no,
-        serial_no: response.result.serial_no,
-        make: response.result.make,
-        company_id: response.result.company_id
-          ? response.result.company_id
-          : "",
-        created_by: response.result.created_by,
-        updated_by: response.result.updated_by,
-      };
-      await getdropcomp();
+
+      if (response) {
+        await fillDetails(response);
+      }
+
+      console.log(validationReportDetails.value);
     });
 
-    const submit = async () => {
+    const onsubmit = async () => {
+      console.log(validationReportDetails.value);
       loading.value = true;
-      console.warn("Nice");
+      const isNull = Object.values(validationReportDetails.value.tests).some(
+        (testReport) => Object.values(testReport)[0].length > 0
+      );
+
+      if (!isNull) {
+        showErrorAlert("Warning", "Please fill at least one test report");
+        loading.value = false;
+        return;
+      }
       try {
         // Call your API here with the form values
-        const response = await updateInstrument(itemId, itemDetails.value);
-        console.log(response.result.error);
-        if (!response.result.error) {
+        const response = await updateValidationReport(
+          itemId,
+          validationReportDetails.value
+        );
+        // console.log(response.error);
+        if (!response.error) {
           // Handle successful API response
-          console.log("API response:", response);
+          //   console.log("API response:", response);
+          loading.value = false;
           showSuccessAlert(
             "Success",
-            "Instrument has been successfully updated!"
+            "Validation Report has been successfully Updated!"
           );
-          router.push({ name: "instrument-list" });
+          // clear();
+          router.push({ name: "validationreport-list" });
         } else {
           // Handle API error response
-          const errorData = response.result.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.result.data.errors);
+          // const errorData = response.error;
+          loading.value = false;
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
         }
       } catch (error) {
         // Handle any other errors during API call
-        console.error("API call error:", error);
+        // console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
         loading.value = false;
       }
-    };
-
-    const deleteItem = () => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover from this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "red",
-        confirmButtonText: "Yes, I am sure!",
-      }).then((result: { [x: string]: any }) => {
-        if (result["isConfirmed"]) {
-          // Put your function here
-          deleteInstrument(itemId);
-          router.push({ name: "instrument-list" });
-        }
-      });
     };
 
     const showSuccessAlert = (title, message) => {
@@ -362,19 +1467,24 @@ export default defineComponent({
       });
     };
 
-    const clear = () => {
-      console.log("clear");
-    };
-
     return {
-      itemDetails,
-      itemDetailsValidator,
-      getAssetPath,
-      submit,
+      validationReportDetails,
+      fillDetails,
+      CustomerData,
+      ClientData,
+      ConductedTests,
+      selectedTests,
+      validationReportDetailsValidator,
       loading,
-      Companies,
-      deleteItem,
-      identifier,
+      onsubmit,
+      CustomerAddress,
+      ClientAddress,
+      deleteReport,
+      getAdditionalProps,
+      getTestComponent,
+      handleTestData,
+      getTestEditComponent,
+      updateReportData,
     };
   },
 });
@@ -384,8 +1494,8 @@ export default defineComponent({
 .el-input__inner {
   font-weight: 500;
 }
+
 .el-input__wrapper {
-  
   height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

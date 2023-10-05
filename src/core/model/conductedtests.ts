@@ -1,36 +1,60 @@
 
 export const ConductedTests = [
     {
+        id: 0,
+        test: "Air Velocity Test",
+        code: "AV",
+    },
+    {
         id: 1,
-        test: "Air Velocity Test"
+        test: "Filter Integrity Test",
+        code: "PAO",
     },
     {
         id: 2,
-        test: "Air Flow Pattern Test"
+        test: "Particle Count Test",
+        code: "PC",
     },
     {
         id: 3,
-        test: "Filter Integrity Test"
-    },
-    {
-        id: 4,
-        test: "Recovery Test"
-    },
-    {
-        id: 5,
-        test: "Particle Count Test"
-    },
-    {
-        id: 6,
-        test: "Pressure Balancing Test"
-    },
-    {
-        id: 7,
-        test: "Noise monitoring Test"
-    },
-    {
-        id: 8,
-        test: "Lux monitoring Test"
+        test: "Recovery Test",
+        code: "RC"
     }
   ];
+
+
+// export const ConductedTests = [
+//     {
+//         id: 0,
+//         test: "Air Velocity Test"
+//     },
+//     {
+//         id: 1,
+//         test: "Air Flow Pattern Test"
+//     },
+//     {
+//         id: 2,
+//         test: "Filter Integrity Test"
+//     },
+//     {
+//         id: 3,
+//         test: "Particle Count Test"
+//     },
+//     {
+//         id: 4,
+//         test: "Recovery Test"
+//     },
+//     {
+//         id: 5,
+//         test: "Pressure Balancing Test"
+//     },
+//     {
+//         id: 6,
+//         test: "Noise monitoring Test"
+//     },
+//     {
+//         id: 7,
+//         test: "Lux monitoring Test"
+//     }
+//   ];
 

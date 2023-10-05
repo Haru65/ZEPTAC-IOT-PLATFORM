@@ -202,7 +202,7 @@ import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { IRGP } from "@/core/model/rgps";
-import { getAllRGatePass, deleteRGatePass, getRGPInfo } from "@/stores/api";
+import { getAllRGatePass, deleteRGatePass, getRGPInfo, gatePassSearch } from "@/stores/api";
 import arraySort from "array-sort";
 import { useAuthStore } from "@/stores/auth";
 import { formatPrice } from "@/core/config/DataFormatter";
@@ -619,10 +619,9 @@ export default defineComponent({
         }
       }
     };
-
     const search = ref<string>("");
-    const searchItems = () => {
-      console.log(search.value);
+    let debounceTimer;
+    const searchItems = async () => {
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value !== "") {
         let results: Array<IRGP> = [];
@@ -632,11 +631,47 @@ export default defineComponent({
           }
         }
         tableData.value.splice(0, tableData.value.length, ...results);
+
+        if (tableData.value.length == 0) {
+          loading.value = true;
+          clearTimeout(debounceTimer); // Clear any existing debounce timer
+          debounceTimer = setTimeout(async () => {
+            await SearchMore();
+          }, 1000);
+        }
+      } else {
+        page.value = 1;
+        while (tableData.value.length != 0) tableData.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
+        await rgp_listing();
       }
     };
 
+    async function SearchMore() {
+      // Your API call logic here
+      try {
+        const response = await gatePassSearch(search.value);
+        //console.log(response.result.total_count);
+        // first 20 displayed
+        total.value = response.result.total_count;
+        more.value = response.result.data.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(
+          ({...rest }) => ({
+            ...rest
+          })
+        );
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        //console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
+      }
+    }
+
     const searchingFunc = (obj: any, value: string): boolean => {
-      console.log(obj);
       for (let key in obj) {
         if (!Number.isInteger(obj[key]) && !(typeof obj[key] === "object")) {
           if (obj[key].indexOf(value) != -1) {
