@@ -15,6 +15,9 @@ const RGP_URL = "returnablegatepasses";
 const DWSHEET_URL = "dailyworksheets";
 const EXPSHEET_URL = "expensesheets";
 const VAL_REPORT_URL = "validationreports";
+const VAL_PROC_URL = "validation";
+const QUAL_PROC_URL = "quality";
+const COMPLAINT_URL = "complaint";
 
 // COMPANIES
 
@@ -1270,6 +1273,249 @@ export async function updateValidationReport(id: any, data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.put(VAL_REPORT_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// VALIDATION PROCEDURE
+
+// getlists
+export async function getValidationProcedures(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(VAL_PROC_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+export async function getValidationProcedure(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(VAL_PROC_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function addValidationProcedure(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(VAL_PROC_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function updateValidationProcedure(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(VAL_PROC_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+export async function deleteValidationProcedure(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(VAL_PROC_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function ValidationProcedureSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('validation_procedure_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// QUALITY PROCEDURE
+
+// getlists
+export async function getQualityProcedures(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(QUAL_PROC_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+export async function getQualityProcedure(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(QUAL_PROC_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function addQualityProcedure(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(QUAL_PROC_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function updateQualityProcedure(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(QUAL_PROC_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+export async function deleteQualityProcedure(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(QUAL_PROC_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function QualityProcedureSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('quality_procedure_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
+// CUSTOMER COMPLAINT
+
+// getlists
+export async function getComplaints(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(COMPLAINT_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+export async function getComplaint(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(COMPLAINT_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function addComplaint(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(COMPLAINT_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function updateComplaint(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(COMPLAINT_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+export async function deleteComplaint(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(COMPLAINT_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function ComplaintSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('complaint_search', data);
         return response.data;
     } catch (errors) {
         console.error(errors);

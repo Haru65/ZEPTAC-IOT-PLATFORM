@@ -267,12 +267,46 @@
                   </div>
                 </div>
                 <!--end::Accordion-->
+                <div class="row mt-6 mb-2">
+                  <div class="form-group col-md-6 mb-8 mb-sd-8">
+                    <label
+                      class="btn btn-lg btn-outline btn-outline-dashed btn-outline-default p-3 d-flex align-items-center"
+                    >
+                      <!--begin::Info-->
+                      <span class="d-block fw-semobold text-start">
+                        <span class="text-gray-700 fw-bold d-block fs-6 mb-2"
+                          >Report Status</span
+                        >
+                        <div class="btn-group" role="group">
+                          <div v-for="status in ReportStatus" :key="status.id">
+                            <input
+                              type="radio"
+                              class="btn-check btn-sm"
+                              name="report_status"
+                              :id="`${status.id}`"
+                              :value="status.id"
+                              v-model="validationReportDetails.report_status"
+                              autocomplete="off"
+                            />
+                            <label
+                              :class="'btn btn-sm btn-outline-primary'"
+                              :for="`${status.id}`"
+                            >
+                              {{ status.status }}
+                            </label>
+                          </div>
+                        </div>
+                      </span>
+                      <!--end::Info-->
+                    </label>
+                  </div>
+                </div>
 
-                <div class="modal-footer flex-center mt-6">
+                <div class="modal-footer flex-center w-100 mt-6">
                   <!--begin::Button-->
                   <button
                     type="reset"
-                    class="btn btn-lg btn-danger text-nowrap w-30"
+                    class="btn btn-lg btn-danger w-sd-25 w-lg-25"
                   >
                     Discard
                   </button>
@@ -281,7 +315,7 @@
                   <!--begin::Button-->
                   <span
                     :data-kt-indicator="loading ? 'on' : null"
-                    class="btn btn-lg btn-primary text-nowrap w-30"
+                    class="btn btn-lg btn-primary w-sd-25 w-lg-25"
                     @click="onsubmit()"
                   >
                     <span v-if="!loading" class="indicator-label">
@@ -316,6 +350,7 @@ import { ConductedTests } from "@/core/model/conductedtests";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import moment from "moment";
 import * as Yup from "yup";
+import { ReportStatus } from "@/core/model/validationreports";
 
 import AirVelocityTestModal from "./TestEditCustomComponent/AirVelocityTest/AirVelocityTestModal.vue";
 import AirVelocityTestEditModal from "./TestEditCustomComponent/AirVelocityTest/AirVelocityTestEditModal.vue";
@@ -1485,6 +1520,7 @@ export default defineComponent({
       handleTestData,
       getTestEditComponent,
       updateReportData,
+      ReportStatus,
     };
   },
 });

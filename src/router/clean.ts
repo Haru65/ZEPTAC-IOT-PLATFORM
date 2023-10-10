@@ -15,6 +15,9 @@ import {
   getDailyWorksheet,
   getExpenseSheet,
   getValidationReport,
+  getValidationProcedure,
+  getQualityProcedure,
+  getComplaint,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
@@ -518,8 +521,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/services/dailyworksheet/DWorksheetEdit.vue"),
         meta: {
-          pageTitle: "Returnable-Gate-Pass Edit",
-          breadcrumbs: ["Returnable-Gate-Pass Edit"],
+          pageTitle: "Daily Worksheet Edit",
+          breadcrumbs: ["Daily Worksheet Edit"],
         },
       },
 
@@ -612,6 +615,148 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Validation Report Edit",
           breadcrumbs: ["Validation Report Edit"],
+        },
+      },
+
+      // Validation Procedure Routes
+      {
+        path: "/validation",
+        name: "validation-list",
+        component: () =>
+          import("@/views/apps/modules/externalaudit/validationprocedure/ValProcedureListing.vue"),
+        meta: {
+          pageTitle: "Validation Procedure List",
+          breadcrumbs: ["Validation Procedure List"],
+        },
+      },
+      {
+        path: "/validation/add",
+        name: "validation-add",
+        component: () =>
+          import("@/views/apps/modules/externalaudit/validationprocedure/ValProcedureAdd.vue"),
+        meta: {
+          pageTitle: "Validation Procedure Add",
+          breadcrumbs: ["Validation Procedure Add"],
+        },
+      },
+      {
+        path: "/validation/edit/:id",
+        name: "validation-edit",
+        beforeEnter: async (to, from, next) => {
+          const valProcedureID = to.params.id;
+          try {
+            const response = await getValidationProcedure(valProcedureID.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/modules/externalaudit/validationprocedure/ValProcedureEdit.vue"),
+        meta: {
+          pageTitle: "Validation Procedure Edit",
+          breadcrumbs: ["Validation Procedure Edit"],
+        },
+      },
+
+      // Quality Procedure Routes
+      {
+        path: "/quality",
+        name: "quality-list",
+        component: () =>
+          import("@/views/apps/modules/externalaudit/qualityprocedure/QualityProcedureListing.vue"),
+        meta: {
+          pageTitle: "Quality Procedure List",
+          breadcrumbs: ["Quality Procedure List"],
+        },
+      },
+      {
+        path: "/quality/add",
+        name: "quality-add",
+        component: () =>
+          import("@/views/apps/modules/externalaudit/qualityprocedure/QualityProcedureAdd.vue"),
+        meta: {
+          pageTitle: "Quality Procedure Add",
+          breadcrumbs: ["Quality Procedure Add"],
+        },
+      },
+      {
+        path: "/quality/edit/:id",
+        name: "quality-edit",
+        beforeEnter: async (to, from, next) => {
+          const qualProcedureID = to.params.id;
+          try {
+            const response = await getQualityProcedure(qualProcedureID.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/modules/externalaudit/qualityprocedure/QualityProcedureEdit.vue"),
+        meta: {
+          pageTitle: "Quality Procedure Edit",
+          breadcrumbs: ["Quality Procedure Edit"],
+        },
+      },
+
+
+      // Customer Feedback Routes
+      {
+        path: "/complaint",
+        name: "complaint-list",
+        component: () =>
+          import("@/views/apps/customerfeedback/complaint/ComplaintListing.vue"),
+        meta: {
+          pageTitle: "Customer Complaint List",
+          breadcrumbs: ["Customer Complaint List"],
+        },
+      },
+      {
+        path: "/complaint/add",
+        name: "complaint-add",
+        component: () =>
+          import("@/views/apps/customerfeedback/complaint/ComplaintAdd.vue"),
+        meta: {
+          pageTitle: "Customer Complaint Add",
+          breadcrumbs: ["Customer Complaint Add"],
+        },
+      },
+      {
+        path: "/complaint/edit/:id",
+        name: "complaint-edit",
+        beforeEnter: async (to, from, next) => {
+          const complaintID = to.params.id;
+          try {
+            const response = await getComplaint(complaintID.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/customerfeedback/complaint/ComplaintEdit.vue"),
+        meta: {
+          pageTitle: "Customer Complaint Edit",
+          breadcrumbs: ["Customer Complaint Edit"],
         },
       },
 

@@ -19,3 +19,27 @@ interface IValidationReport {
 }
   
 export type { IValidationReport };
+
+
+
+export const ReportStatus = [
+    {
+        id: 1,
+        status: "Pending",
+    },
+    {
+        id: 2,
+        status: "Invalid",
+    },
+    {
+        id: 3,
+        status: "Validated",
+    }
+  ];
+
+
+  
+  export const GetReportStatus = (id) => {
+    const status = ReportStatus.find(item => item.id == id);
+    return status ? status.status : "";
+  };

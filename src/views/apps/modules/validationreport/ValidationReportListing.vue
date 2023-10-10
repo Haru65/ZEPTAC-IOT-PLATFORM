@@ -159,17 +159,17 @@
           <span
             v-if="validationreports.report_status == 1"
             class="badge py-3 px-4 fs-7 badge-light-primary"
-            >Pending</span
+            >{{ GetReportStatus(validationreports.report_status) }}</span
           >
           <span
             v-if="validationreports.report_status == 2"
             class="badge py-3 px-4 fs-7 badge-light-danger"
-            >Invalid</span
+            >{{ GetReportStatus(validationreports.report_status) }}</span
           >
           <span
             v-if="validationreports.report_status == 3"
             class="badge py-3 px-4 fs-7 badge-light-success"
-            >Validated</span
+            >{{ GetReportStatus(validationreports.report_status) }}</span
           >
         </template>
         <template v-slot:created_at="{ row: validationreports }">
@@ -243,6 +243,7 @@ import { computed, defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
 import type { IValidationReport } from "@/core/model/validationreports";
+import { GetReportStatus } from "@/core/model/validationreports";
 import {
   getAllValidationReport,
   deleteValidationReport,
@@ -993,6 +994,8 @@ export default defineComponent({
       PageLimitPoiner,
       ConductedTests,
       downloadReport,
+      GetReportStatus,
+      
       
     };
   },

@@ -87,15 +87,27 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
             sub: [
               {
                 heading: "Validation Procedure",
-                route: "/modules/externalaudit/validation",
+                route: "/validation",
               },
               {
                 heading: "Quality Procedure",
-                route: "/modules/externalaudit/quality",
+                route: "/quality",
               },
             ],
           },
         ],
+      },
+    ],
+  },
+  {
+    heading: "FEEDBACK",
+    route: "/feedback",
+    pages: [
+      {
+        heading: "Customer Complaint",
+        route: "/complaint",
+        keenthemesIcon: "educare",
+        bootstrapIcon: "bi-archive",
       },
     ],
   },

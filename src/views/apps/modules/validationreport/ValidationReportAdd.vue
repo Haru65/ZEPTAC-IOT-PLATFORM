@@ -206,9 +206,7 @@
                                     <span
                                       class="badge py-3 px-4 fs-7 badge-light-primary"
                                       >{{
-                                        `${report.report_name}_${
-                                          index + 1
-                                        }`
+                                        `${report.report_name}_${index + 1}`
                                       }}</span
                                     >
                                   </td>
@@ -237,7 +235,9 @@
                                         v-bind:heading="test.test + ' Edit'"
                                         v-bind:id="test.id"
                                         v-bind:code="test.code"
-                                        v-bind:rgp_no="validationReportDetails.rgp_no"
+                                        v-bind:rgp_no="
+                                          validationReportDetails.rgp_no
+                                        "
                                         v-bind:reportId="index"
                                         v-bind:reportData="report"
                                         v-bind:instruments="
@@ -310,12 +310,46 @@
                   </div>
                 </div>
                 <!--end::Accordion-->
+                <div class="row mt-6 mb-2">
+                  <div class="form-group col-md-6 mb-8 mb-sd-8">
+                    <label
+                      class="btn btn-lg btn-outline btn-outline-dashed btn-outline-default p-3 d-flex align-items-center"
+                    >
+                      <!--begin::Info-->
+                      <span class="d-block fw-semobold text-start">
+                        <span class="text-gray-700 fw-bold d-block fs-6 mb-2"
+                          >Report Status</span
+                        >
+                        <div class="btn-group" role="group">
+                          <div v-for="status in ReportStatus" :key="status.id">
+                            <input
+                              type="radio"
+                              class="btn-check btn-sm"
+                              name="report_status"
+                              :id="`${status.id}`"
+                              :value="status.id"
+                              v-model="validationReportDetails.report_status"
+                              autocomplete="off"
+                            />
+                            <label
+                              :class="'btn btn-sm btn-outline-primary'"
+                              :for="`${status.id}`"
+                            >
+                              {{ status.status }}
+                            </label>
+                          </div>
+                        </div>
+                      </span>
+                      <!--end::Info-->
+                    </label>
+                  </div>
+                </div>
 
-                <div class="modal-footer flex-center mt-6">
+                <div class="modal-footer flex-center w-100 mt-6">
                   <!--begin::Button-->
                   <button
                     type="reset"
-                    class="btn btn-lg btn-danger text-nowrap w-30"
+                    class="btn btn-lg btn-danger w-sd-25 w-lg-25"
                   >
                     Discard
                   </button>
@@ -324,7 +358,7 @@
                   <!--begin::Button-->
                   <span
                     :data-kt-indicator="loading ? 'on' : null"
-                    class="btn btn-lg btn-primary text-nowrap w-30"
+                    class="btn btn-lg btn-primary w-sd-25 w-lg-25"
                     @click="onsubmit()"
                   >
                     <span v-if="!loading" class="indicator-label">
@@ -349,7 +383,7 @@
 </template>
 
 <script lang="ts">
-import {  defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import ApiService from "@/core/services/ApiService";
 import { addValidationReport, getAllRGP } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
@@ -359,6 +393,7 @@ import { ConductedTests } from "@/core/model/conductedtests";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import moment from "moment";
 import * as Yup from "yup";
+import { ReportStatus } from "@/core/model/validationreports";
 
 import AirVelocityTestModal from "./TestAddCustomComponent/AirVelocityTest/AirVelocityTestModal.vue";
 import AirVelocityTestEditModal from "./TestAddCustomComponent/AirVelocityTest/AirVelocityTestEditModal.vue";
@@ -560,7 +595,6 @@ interface recoveryTestReport {
   test_witnessed_by: string;
 }
 
-
 interface ValidationReport {
   rgp_id: string;
   rgp_no: string;
@@ -645,7 +679,6 @@ export default defineComponent({
       rgp_id: Yup.string().required().label("RGP"),
     });
 
-  
     /* ========= ADD FUNCTIONS ========*/
     // function that adds air velocity data
     async function addAirVelocityTestData(testId, data) {
@@ -956,7 +989,7 @@ export default defineComponent({
           };
       }
     }
-    
+
     // Render The Add Custom Modal
     function getTestComponent(testId) {
       // Map test IDs to component names
@@ -992,7 +1025,7 @@ export default defineComponent({
           return "DefaultTest";
       }
     }
-    
+
     /* ========= UPDATE FUNCTIONS ========*/
     // function that update air velocity data
     async function updateAirVelocityTestData(testId, reportId, data) {
@@ -1458,37 +1491,41 @@ export default defineComponent({
     // function that delete air velocity data
     async function deleteAirVelocityTestData(testId, index) {
       //zero represent the testID
-      validationReportDetails.value.tests[0].air_velocity_test_reports = await removeObjectWithId(
-        validationReportDetails.value.tests[0].air_velocity_test_reports,
-        index
-      );
+      validationReportDetails.value.tests[0].air_velocity_test_reports =
+        await removeObjectWithId(
+          validationReportDetails.value.tests[0].air_velocity_test_reports,
+          index
+        );
     }
-    
+
     // function that delete filter integrity data
     async function deleteFilterIntegrityTestData(testId, index) {
       //zero represent the testID
-      validationReportDetails.value.tests[1].filter_integrity_test_reports = await removeObjectWithId(
-        validationReportDetails.value.tests[1].filter_integrity_test_reports,
-        index
-      );
+      validationReportDetails.value.tests[1].filter_integrity_test_reports =
+        await removeObjectWithId(
+          validationReportDetails.value.tests[1].filter_integrity_test_reports,
+          index
+        );
     }
-    
+
     // function that delete particle count data
     async function deleteParticleCountTestData(testId, index) {
       //zero represent the testID
-      validationReportDetails.value.tests[2].particle_count_test_reports = await removeObjectWithId(
-        validationReportDetails.value.tests[2].particle_count_test_reports,
-        index
-      );
+      validationReportDetails.value.tests[2].particle_count_test_reports =
+        await removeObjectWithId(
+          validationReportDetails.value.tests[2].particle_count_test_reports,
+          index
+        );
     }
-    
+
     // function that delete recovery data
     async function deleteRecoveryTestData(testId, index) {
       //zero represent the testID
-      validationReportDetails.value.tests[3].recovery_test_reports = await removeObjectWithId(
-        validationReportDetails.value.tests[3].recovery_test_reports,
-        index
-      );
+      validationReportDetails.value.tests[3].recovery_test_reports =
+        await removeObjectWithId(
+          validationReportDetails.value.tests[3].recovery_test_reports,
+          index
+        );
     }
 
     // function that will delete testData
@@ -1619,6 +1656,7 @@ export default defineComponent({
       handleTestData,
       getTestEditComponent,
       updateReportData,
+      ReportStatus,
     };
   },
 });
