@@ -113,6 +113,11 @@
               {{ expensesheets.rgp_no.rgp_no }}
             </span>
           </template>
+          <template v-slot:customer_name="{ row: expensesheets }">
+            <span class="text-gray-600 text-hover-primary mb-1">
+                  {{ expensesheets.customer_name.first_name + " " + expensesheets.customer_name.last_name }}
+            </span>
+          </template>
           <template v-slot:engineer_name="{ row: expensesheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
                   {{ expensesheets.engineer_name.first_name + " " + expensesheets.engineer_name.last_name }}
@@ -214,6 +219,12 @@ export default defineComponent({
         columnLabel: "rgp_no",
         sortEnabled: true,
         columnWidth: 125,
+      },
+      {
+        columnName: "Customer Name",
+        columnLabel: "customer_name",
+        sortEnabled: true,
+        columnWidth: 175,
       },
       {
         columnName: "Engineer Name",

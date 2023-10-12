@@ -53,9 +53,8 @@ const reportGen = async (id, pdfName, reportInfo) => {
 
   // Quotation Heading
   doc
-    .setFontSize(14)
+    .setFontSize(12)
     .setTextColor(0, 0, 0)
-    .setFont('helvetica', "bold")
     .text("Validation Report", doc.internal.pageSize.width / 2, 0.5, {
       align: "center",
     });
@@ -71,15 +70,13 @@ const reportGen = async (id, pdfName, reportInfo) => {
   // Site Address - To
   const clientAddress = reportInfo.value.client_address;
 
-
-  const start = [
-    { title: "All TEST REPORTS", styles: { halign: 'center' } }
-  ]
+  const header = [];
+  const body = [];
 
   autoTable(doc, {
-    columns: start,
-    startY: 1.7,
-    body: [],
+    head: header,
+    startY: 1.4,
+    body: body,
     margin: { left: 0.5, top: 1.25 },
     headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: 'center'},
     didDrawCell: (data) => {
@@ -91,80 +88,65 @@ const reportGen = async (id, pdfName, reportInfo) => {
   
 
   // functions
-  
-    function generate_airVelocityTest(testData){
-        
-      const upper = [
-        [
-          { title: 'Supply Code', rowSpan:2},
-          { title: 'Velocity Reading', colSpan: 5},
-          { title: 'Average', rowSpan:2},
-          { title: 'Supply Filter Size', rowSpan:2 },
-          { title: 'CFM', rowSpan:2}
-        ],
-        ['1', '2', '3', '4', '5','','','']
-      ];
 
-      const body = testData.details.map((detail) => [
-        detail.supply_code,
-        detail.velocity_readings.reading_1,
-        detail.velocity_readings.reading_2,
-        detail.velocity_readings.reading_3,
-        detail.velocity_readings.reading_4,
-        detail.velocity_readings.reading_5,
-        detail.average_reading,
-        detail.supply_filter_size,
-        detail.cfm,
-      ]);
-
-      autoTable(doc, {
-        head: upper,
-        body: body,
-        margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center", valign: "middle"},
-        bodyStyles: { halign: "center"},
-        tableLineColor: [0, 0, 0],
-        didDrawCell: (data) => {
-          const { cell, row, column } = data;
-          doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
-        },
-
-      });
-
-      const lower = [
-        [
-          { title: 'Total CFM' },
-          { title: 'Room Volume'},
-          { title: 'ACPH'}
-        ]
-      ];
-
-      const airVelocityTestCaldetails = [{
-        total_cfm: testData.total_cfm,
-        room_volume: testData.room_volume,
-        acph: testData.acph,
-      }]
-
-      const airVelocityTestCalData = airVelocityTestCaldetails.map((data) => [
-        data.total_cfm,
-        data.room_volume,
-        data.acph
-      ]);
+  function generate_airVelocityTest(testData){
       
-      autoTable(doc, {
-        head: lower,
-        body: airVelocityTestCalData,
-        margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center"},
-        bodyStyles: { halign: "center"},
-        tableLineColor: [0, 0, 0],
-        didDrawCell: (data) => {
-          const { cell, row, column } = data;
+    const length = testData.details.length;
+          
+    const header = [
+      [
+        { title: 'Supply Code', rowSpan:2},
+        { title: 'Velocity Reading', colSpan: 5},
+        { title: 'Average', rowSpan:2},
+        { title: 'Supply Filter Size', rowSpan:2 },
+        { title: 'CFM', rowSpan:2},
+        { title: 'Total CFM', rowSpan:2 },
+        { title: 'Room Volume', rowSpan:2 },
+        { title: 'ACPH', rowSpan:2 }
+      ],
+      ['1', '2', '3', '4', '5','','','','','',''],
+    ];
 
-          doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
-        },
+    const body = testData.details.map((detail) => [
+      detail.supply_code,
+      detail.velocity_readings.reading_1,
+      detail.velocity_readings.reading_2,
+      detail.velocity_readings.reading_3,
+      detail.velocity_readings.reading_4,
+      detail.velocity_readings.reading_5,
+      detail.average_reading,
+      detail.supply_filter_size,
+      detail.cfm,
+      {
+        title: testData.total_cfm,
+        rowSpan: length,
+        styles: { valign: 'middle' }
+      },
+      {
+        title: testData.room_volume,
+        rowSpan: length,
+        styles: { valign: 'middle' }
+      },
+      {
+        title: testData.acph,
+        rowSpan: length,
+        styles: { valign: 'middle' }
+      }
+    ]);
 
-      });
+    autoTable(doc, {
+      head: header,
+      body: body,
+      margin: { left: 0.5, top: 1.25 },
+      headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center", valign: "middle", fontSize: 9},
+      bodyStyles: { halign: "center", fontSize: 9},
+      tableLineColor: [0, 0, 0],
+      didDrawCell: (data) => {
+        const { cell, row, column } = data;
+        doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
+      },
+
+    });
 
 
     }
@@ -193,8 +175,8 @@ const reportGen = async (id, pdfName, reportInfo) => {
         head: upper,
         body: body,
         margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center"},
-        bodyStyles: { halign: "center"},
+        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center",fontSize: 9},
+        bodyStyles: { halign: "center",fontSize: 9},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;
@@ -227,8 +209,8 @@ const reportGen = async (id, pdfName, reportInfo) => {
         head: upper,
         body: body,
         margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center", valign: "middle"},
-        bodyStyles: { halign: "center"},
+        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center", valign: "middle",fontSize: 9},
+        bodyStyles: { halign: "center",fontSize: 9},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;
@@ -262,8 +244,8 @@ const reportGen = async (id, pdfName, reportInfo) => {
         head: upper,
         body: body,
         margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center", valign:"middle"},
-        bodyStyles: { halign: "center"},
+        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center", valign:"middle",fontSize: 9},
+        bodyStyles: { halign: "center",fontSize: 9},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;
@@ -283,7 +265,8 @@ const reportGen = async (id, pdfName, reportInfo) => {
         head: upper,
         body: [],
         margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: "left"},
+        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: "left",fontSize: 9},
+        bodyStyles: { halign: "left",fontSize: 9},
         tableLineColor: [0, 0, 0],
       });
 
@@ -316,7 +299,7 @@ const reportGen = async (id, pdfName, reportInfo) => {
   
       const testMainHeading = [
         [
-          { content: `TEST CERTIFICATE - ${test.test.toUpperCase()}`},
+          { content: `TEST CERTIFICATE - ${test.test.toUpperCase()}` + (test.id == 0 ? " & ACPH CALCULATION" : "")},
         ]      
       ];
 
@@ -332,8 +315,8 @@ const reportGen = async (id, pdfName, reportInfo) => {
           { header: 'Heading', dataKey: '0' }
         ],
         margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center" },
-        bodyStyles: { halign: "left"},
+        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center",fontSize: 9 },
+        bodyStyles: { halign: "left",fontSize: 9},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;
@@ -378,7 +361,8 @@ const reportGen = async (id, pdfName, reportInfo) => {
           '1': { cellWidth: "auto" },
         },
         margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0] },
+        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0] ,fontSize: 9},
+        bodyStyles: { fontSize: 9},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;
@@ -410,8 +394,8 @@ const reportGen = async (id, pdfName, reportInfo) => {
         head: instrumentHead,
         body: instrumentUsedBody,
         margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center", valign: "middle"},
-        bodyStyles: { halign: "center"},
+        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center", valign: "middle",fontSize: 9},
+        bodyStyles: { halign: "center",fontSize: 9},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;
@@ -450,8 +434,8 @@ const reportGen = async (id, pdfName, reportInfo) => {
         head: signatureDetails,
         body: emptyRows,
         margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center", valign: "middle"},
-        bodyStyles: { halign: "left"},
+        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center", valign: "middle",fontSize: 9},
+        bodyStyles: { halign: "left",fontSize: 9},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;

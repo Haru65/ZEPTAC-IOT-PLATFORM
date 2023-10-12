@@ -136,14 +136,6 @@
               name="rgp_id"
             >
               <el-option
-                value=""
-                disabled="disabled"
-                label="Count of Reports"
-                key=""
-              >
-                Select Test
-              </el-option>
-              <el-option
                 disabled="disabled"
                 v-for="test in ConductedTests"
                 :key="test.id"

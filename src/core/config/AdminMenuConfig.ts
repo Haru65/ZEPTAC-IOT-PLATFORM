@@ -24,11 +24,31 @@ const AdminMenuConfig: Array<MenuItem> = [
     route: "/modules",
     pages: [
       {
-        sectionTitle: "CleanRoom",
+        sectionTitle: "CleanRoom Validation",
         route: "/modules/cleanroom",
         keenthemesIcon: "element-plus",
         bootstrapIcon: "bi-archive",
         sub: [
+          {
+            sectionTitle: "Validation Service",
+            route: "/modules/validation",
+            keenthemesIcon: "office-bag",
+            bootstrapIcon: "bi-archive",
+            sub: [
+              {
+                heading: "Returnable Gate Pass",
+                route: "/returnablegatepasses",
+              },
+              {
+                heading: "Daily Worksheet",
+                route: "/dailyworksheets",
+              },
+              {
+                heading: "Expense Sheet",
+                route: "/expensesheets",
+              },
+            ],
+          },
           {
             sectionTitle: "Validation Report",
             route: "/modules/validationreports",
@@ -60,30 +80,6 @@ const AdminMenuConfig: Array<MenuItem> = [
             ],
           },
           {
-            sectionTitle: "Validation Service",
-            route: "/modules/validation",
-            keenthemesIcon: "office-bag",
-            bootstrapIcon: "bi-archive",
-            sub: [
-
-              //
-              {
-                heading: "Returnable Gate Pass",
-                route: "/returnablegatepasses",
-              },
-              //
-
-              {
-                heading: "Daily Worksheet",
-                route: "/dailyworksheets",
-              },
-              {
-                heading: "Expense Sheet",
-                route: "/expensesheets",
-              },
-            ],
-          },
-          {
             sectionTitle: "External Audit",
             route: "/modules/externalaudit",
             keenthemesIcon: "office-bag",
@@ -104,7 +100,7 @@ const AdminMenuConfig: Array<MenuItem> = [
     ],
   },
   {
-    heading: "FEEDBACK",
+    heading: "Feedback",
     route: "/feedback",
     pages: [
       {
@@ -218,7 +214,7 @@ const AdminMenuConfig: Array<MenuItem> = [
     ],
   },
   {
-    heading: "HR",
+    heading: "Hr",
     route: "/hr",
     pages: [
       {
@@ -242,7 +238,7 @@ const AdminMenuConfig: Array<MenuItem> = [
     ],
   },
   {
-    heading: "Admin",
+    heading: "Super Admin",
     route: "/company",
     pages: [
       {

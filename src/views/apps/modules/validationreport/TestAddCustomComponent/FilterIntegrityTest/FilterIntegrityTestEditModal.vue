@@ -294,14 +294,16 @@
                   <!--end::Label-->
 
                   <!--begin::Input-->
-                  <el-date-picker
-                    type="date"
-                    v-model="filterIntegrityTestDetails.validation_date"
-                    name="validation_date"
-                    id="date"
-                    placeholder="Pick a day"
-  :editable="false"
-                  />
+                  <div class="block">
+                    <el-date-picker
+                      type="date"
+                      v-model="filterIntegrityTestDetails.validation_date"
+                      name="validation_date"
+                      id="date"
+                      placeholder="Pick a day"
+                      :editable="false"
+                    />
+                  </div>
                   <ErrorMessage
                     class="invalid-feedback"
                     name="validation_date"
@@ -319,15 +321,17 @@
                   >
                   <!--end::Label-->
 
+                  <div class="block">
+                    <el-date-picker
+                      type="date"
+                      v-model="filterIntegrityTestDetails.due_date"
+                      name="due_date"
+                      id="date"
+                      placeholder="Pick a day"
+                      :editable="false"
+                    />
+                  </div>
                   <!--end::Input-->
-                  <el-date-picker
-                    type="date"
-                    v-model="filterIntegrityTestDetails.due_date"
-                    name="due_date"
-                    id="date"
-                    placeholder="Pick a day"
-  :editable="false"
-                  />
                   <ErrorMessage class="invalid-feedback" name="due_date" />
                   <!--end::Input-->
                 </div>

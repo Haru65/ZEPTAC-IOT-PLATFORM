@@ -109,6 +109,11 @@
               {{ dailyworksheets.rgp_no }}
             </span>
           </template>
+          <template v-slot:customer_name="{ row: dailyworksheets }">
+            <span class="text-gray-600 text-hover-primary mb-1">
+                  {{ dailyworksheets.customer_name.first_name + " " + dailyworksheets.customer_name.last_name }}
+            </span>
+          </template>
           <template v-slot:engineer_name="{ row: dailyworksheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
                   {{ dailyworksheets.engineer_name.first_name + " " + dailyworksheets.engineer_name.last_name }}
@@ -204,6 +209,12 @@ export default defineComponent({
         columnLabel: "rgp_no",
         sortEnabled: true,
         columnWidth: 155,
+      },
+      {
+        columnName: "Customer Name",
+        columnLabel: "customer_name",
+        sortEnabled: true,
+        columnWidth: 175,
       },
       {
         columnName: "Engineer Name",

@@ -110,11 +110,11 @@
             {{ rgps.rgp_no }}
           </span>
         </template>
-        <template v-slot:quotation_id="{ row: rgps }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ rgps.quotation_id }}
-          </span>
-        </template>
+        <template v-slot:customer_name="{ row: rgps }">
+            <span class="text-gray-600 text-hover-primary mb-1">
+                  {{ rgps.customer_name.first_name + " " + rgps.customer_name.last_name }}
+            </span>
+          </template>
         <!-- defualt data -->
         <template v-slot:engineers="{ row: rgps }">
           {{ rgps.engineers }}
@@ -230,10 +230,10 @@ export default defineComponent({
         columnWidth: 75,
       },
       {
-        columnName: "Quotation Id.",
-        columnLabel: "quotation_id",
+        columnName: "Customer Name",
+        columnLabel: "customer_name",
         sortEnabled: true,
-        columnWidth: 75,
+        columnWidth: 175,
       },
       {
         columnName: "No. of Engineers",
@@ -360,6 +360,7 @@ export default defineComponent({
           ({
             id,
             rgp_no,
+            customer_name,
             quotation_id,
             engineers,
             instruments,
@@ -369,6 +370,7 @@ export default defineComponent({
           }) => ({
             id: id,
             rgp_no: rgp_no,
+            customer_name:customer_name,
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
@@ -408,6 +410,7 @@ export default defineComponent({
           ({
             id,
             rgp_no,
+            customer_name,
             quotation_id,
             engineers,
             instruments,
@@ -417,6 +420,7 @@ export default defineComponent({
           }) => ({
             id: id,
             rgp_no: rgp_no,
+            customer_name:customer_name,
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
@@ -462,6 +466,7 @@ export default defineComponent({
           ({
             id,
             rgp_no,
+            customer_name,
             quotation_id,
             engineers,
             instruments,
@@ -471,12 +476,13 @@ export default defineComponent({
           }) => ({
             id: id,
             rgp_no: rgp_no,
+            customer_name:customer_name,
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
             status: status,
-            date: moment(date).format("LL"),
-            duedate: moment(duedate).format("LL"),
+            date: moment(date).format("DD/MM/YYYY"),
+            duedate: moment(duedate).format("DD/MM/YYYY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -656,8 +662,26 @@ export default defineComponent({
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({...rest }) => ({
-            ...rest
+          ({
+            id,
+            rgp_no,
+            customer_name,
+            quotation_id,
+            engineers,
+            instruments,
+            status,
+            date,
+            duedate,
+          }) => ({
+            id: id,
+            rgp_no: rgp_no,
+            customer_name:customer_name,
+            quotation_id: quotation_id,
+            engineers: JSON.parse(engineers).length,
+            instruments: JSON.parse(instruments).length,
+            status: status,
+            date: moment(date).format("DD/MM/YYYY"),
+            duedate: moment(duedate).format("DD/MM/YYYY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
