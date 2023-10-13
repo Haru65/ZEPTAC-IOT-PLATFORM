@@ -18,6 +18,7 @@ import {
   getValidationProcedure,
   getQualityProcedure,
   getComplaint,
+  getTraining,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
@@ -757,6 +758,53 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Customer Complaint Edit",
           breadcrumbs: ["Customer Complaint Edit"],
+        },
+      },
+
+      // Training Routes
+      {
+        path: "/training",
+        name: "training-list",
+        component: () =>
+          import("@/views/apps/hr/training/TrainingListing.vue"),
+        meta: {
+          pageTitle: "Training List",
+          breadcrumbs: ["Training List"],
+        },
+      },
+      {
+        path: "/training/add",
+        name: "training-add",
+        component: () =>
+          import("@/views/apps/hr/training/TrainingAdd.vue"),
+        meta: {
+          pageTitle: "Training Add",
+          breadcrumbs: ["Training Add"],
+        },
+      },
+      {
+        path: "/training/edit/:id",
+        name: "training-edit",
+        beforeEnter: async (to, from, next) => {
+          const trainingID = to.params.id;
+          try {
+            const response = await getTraining(trainingID.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/hr/training/TrainingEdit.vue"),
+        meta: {
+          pageTitle: "Training Edit",
+          breadcrumbs: ["Training Edit"],
         },
       },
 

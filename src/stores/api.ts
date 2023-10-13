@@ -18,6 +18,7 @@ const VAL_REPORT_URL = "validationreports";
 const VAL_PROC_URL = "validation";
 const QUAL_PROC_URL = "quality";
 const COMPLAINT_URL = "complaint";
+const TRAINING_URL = "training";
 
 // COMPANIES
 
@@ -1516,6 +1517,87 @@ export async function ComplaintSearch(search: any) {
         }
         ApiService.setHeader();
         const response = await ApiService.post('complaint_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// TRAINING
+
+// getlists
+export async function getTrainings(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(TRAINING_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+export async function getTraining(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(TRAINING_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function addTraining(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(TRAINING_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function updateTraining(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(TRAINING_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+export async function deleteTraining(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(TRAINING_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function TrainingSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('training_search', data);
         return response.data;
     } catch (errors) {
         console.error(errors);
