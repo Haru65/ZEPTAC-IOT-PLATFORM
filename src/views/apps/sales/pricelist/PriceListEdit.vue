@@ -151,6 +151,7 @@ interface itemDetails {
   company_id: string;
   created_by: number;
   updated_by: number;
+  is_active: number;
 }
 
 export default defineComponent({
@@ -181,6 +182,7 @@ export default defineComponent({
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
+      is_active: 1,
     });
 
     onMounted(async () => {
@@ -193,6 +195,7 @@ export default defineComponent({
         company_id: response.company_id,
         created_by: response.created_by,
         updated_by: response.updated_by,
+        is_active: response.is_active,
       };
     });
 

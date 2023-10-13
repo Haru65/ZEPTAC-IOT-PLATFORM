@@ -309,8 +309,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/sales/pricelist/PriceListEdit.vue"),
         meta: {
-          pageTitle: "Quotation Edit",
-          breadcrumbs: ["Quotation Edit"],
+          pageTitle: "Price List Edit",
+          breadcrumbs: ["Price List Edit"],
         },
       },
       {
