@@ -148,6 +148,22 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
         ],
       },
       {
+        sectionTitle: "Clients",
+        route: "/clients",
+        keenthemesIcon: "user-edit",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add Clients",
+            route: "/clients/add",
+          },
+          {
+            heading: "List Clients",
+            route: "/clients/list",
+          },
+        ],
+      },
+      {
         sectionTitle: "Price List Items",
         route: "/pricelist",
         keenthemesIcon: "bill",

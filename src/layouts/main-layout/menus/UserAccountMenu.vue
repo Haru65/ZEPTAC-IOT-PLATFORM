@@ -27,7 +27,7 @@
             >
           </div>
           <span class="fw-semobold fs-7">
-            {{ User.company_details.company_name }} <br />
+            {{ User.company_details.company_name ? User.company_details.company_name : User.meta.company_name}} <br />
             {{ Identifier }}
             <br />
             <a
@@ -326,6 +326,7 @@ export default defineComponent({
     const store = useAuthStore();
     const User = store.GetUser();
 
+    console.log("USER :>", User)
     i18n.locale.value = localStorage.getItem("lang")
       ? (localStorage.getItem("lang") as string)
       : "en";
