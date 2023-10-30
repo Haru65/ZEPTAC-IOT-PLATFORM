@@ -51,6 +51,7 @@
     "socicon": "^3.0.5",
     "stable": "^0.1.8",
     "sweetalert2": "^11.4.8",
+    "to-words": "^3.6.1",
     "vee-validate": "^4.5.11",
     "vue-axios": "^3.5.0",
     "vue-cookies": "^1.8.3",
