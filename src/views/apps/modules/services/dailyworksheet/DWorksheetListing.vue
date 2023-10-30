@@ -111,12 +111,20 @@
           </template>
           <template v-slot:customer_name="{ row: dailyworksheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
-                  {{ dailyworksheets.customer_name.first_name + " " + dailyworksheets.customer_name.last_name }}
+              {{
+                dailyworksheets.customer_name.first_name +
+                " " +
+                dailyworksheets.customer_name.last_name
+              }}
             </span>
           </template>
           <template v-slot:engineer_name="{ row: dailyworksheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
-                  {{ dailyworksheets.engineer_name.first_name + " " + dailyworksheets.engineer_name.last_name }}
+              {{
+                dailyworksheets.engineer_name.first_name +
+                " " +
+                dailyworksheets.engineer_name.last_name
+              }}
             </span>
           </template>
           <!-- defualt data -->
@@ -125,24 +133,31 @@
           </template>
           <template v-slot:work_status="{ row: dailyworksheets }">
             <span
-            v-if="dailyworksheets.work_status == 1"
-            class="badge py-3 px-4 fs-7 badge-light-primary"
-            >Ongoing</span
-          >
-          <span
-            v-if="dailyworksheets.work_status == 2"
-            class="badge py-3 px-4 fs-7 badge-light-success"
-            >Completed</span
-          >
+              v-if="dailyworksheets.work_status == 1"
+              class="badge py-3 px-4 fs-7 badge-light-primary"
+              >Ongoing</span
+            >
+            <span
+              v-if="dailyworksheets.work_status == 2"
+              class="badge py-3 px-4 fs-7 badge-light-success"
+              >Completed</span
+            >
           </template>
           <template v-slot:actions="{ row: dailyworksheets }">
             <!--begin::Menu Flex-->
             <div class="d-flex flex-lg-row">
-              <span>
-                <i
-                  @click="deleteWorksheet(dailyworksheets.id, false)"
-                  class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
-                ></i>
+
+              <span
+              data-toggle="tooltip" title="Delete Worksheet"
+              class="border rounded badge m-3 py-3 px-4 fs-7 bg-light-primary badge-light-gray text-hover-success cursor-pointer"
+              @click="downloadWorksheet(dailyworksheets.id)"
+                >⤓ Download
+              </span>
+              <span 
+                @click="deleteWorksheet(dailyworksheets.id, false)"
+                data-toggle="tooltip" title="Delete Worksheet"
+                class="border rounded-circle badge m-3 py-3 px-4 bg-light-danger fs-7 badge-light-gray text-hover-danger cursor-pointer"
+                >X
               </span>
             </div>
             <!--end::Menu FLex-->
@@ -193,8 +208,14 @@ import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { IWorksheet } from "@/core/model/dailyworksheets";
 import arraySort from "array-sort";
 import moment from "moment";
-import { deleteDailyWorksheet, getDailyWorksheets, WorksheetSearch } from "@/stores/api";
+import {
+  deleteDailyWorksheet,
+  getDailyWorksheets,
+  getDailyWorksheet,
+  WorksheetSearch,
+} from "@/stores/api";
 import Swal from "sweetalert2";
+import { worksheetGen } from "@/core/config/WorksheetGenerator";
 
 export default defineComponent({
   name: "worksheets_listing",
@@ -238,7 +259,7 @@ export default defineComponent({
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
-        columnWidth: 75,
+        columnWidth: 70,
       },
     ]);
 
@@ -269,11 +290,9 @@ export default defineComponent({
         console.log(response);
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ ...rest }) => ({
-            ...rest
-          })
-        );
+        tableData.value = response.result.data.map(({ ...rest }) => ({
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -293,16 +312,16 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getDailyWorksheets(`page=${page}&limit=${limit.value}`);
+        const response = await getDailyWorksheets(
+          `page=${page}&limit=${limit.value}`
+        );
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ ...rest }) => ({
-            ...rest
-          })
-        );
+        tableData.value = response.result.data.map(({ ...rest }) => ({
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -323,16 +342,16 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getDailyWorksheets(`page=${page.value}&limit=${limit}`);
+        const response = await getDailyWorksheets(
+          `page=${page.value}&limit=${limit}`
+        );
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ ...rest }) => ({
-            ...rest
-          })
-        );
+        tableData.value = response.result.data.map(({ ...rest }) => ({
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -454,11 +473,9 @@ export default defineComponent({
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({...rest }) => ({
-            ...rest
-          })
-        );
+        tableData.value = response.result.data.map(({ ...rest }) => ({
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -491,6 +508,101 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
+    
+    const worksheetInfo = ref({
+      id: "",
+      rgp_id: "",
+      rgp_no: "",
+      engineer_id: "",
+      company_id: "",
+      scope_of_work: "",
+      problem: "",
+      work_date: "",
+      tests: [],
+      other_test: "",
+      start_time: "",
+      end_time: "",
+      work_status: "",
+      standard_used: "",
+      witnessed_by: "",
+
+      contact_person: "",
+
+      customer_address:{
+        address1: "",
+        address2: "",
+        city: "",
+        pincode: "",
+        states: "",
+        country: ""
+      },
+
+      company_details:{
+        company_name: "",
+        company_logo: getAssetPath("media/avatars/default.png"),
+      },
+      
+      customer_data: {
+        id:"",
+        first_name : "",
+        last_name: "",
+        mobile: "",
+      },
+
+      quotation_details: {
+        id:"",
+        customer_id: "",
+        quotation_no: "",
+      },
+    })
+
+    const downloadWorksheet = async (id: any) => {
+
+      const res = await getDailyWorksheet(id);
+
+      worksheetInfo.value.id = res.result.id;
+      worksheetInfo.value.rgp_id = res.result.rgp_id;
+      worksheetInfo.value.rgp_no = res.result.rgp_no;
+      worksheetInfo.value.engineer_id = res.result.engineer_id;
+      worksheetInfo.value.company_id = res.result.company_id;
+      worksheetInfo.value.scope_of_work = res.result.scope_of_work;
+      worksheetInfo.value.problem = res.result.problem ? res.result.problem : "NA";
+      worksheetInfo.value.work_date = res.result.work_date;
+      worksheetInfo.value.tests = JSON.parse(res.result.tests);
+      worksheetInfo.value.other_test = res.result.other_test ? res.result.other_test : "NA";
+      worksheetInfo.value.start_time = res.result.start_time;
+      worksheetInfo.value.end_time = res.result.end_time;
+      worksheetInfo.value.work_status = res.result.work_status;
+      worksheetInfo.value.standard_used = res.result.standard_used;
+      worksheetInfo.value.witnessed_by = res.result.witnessed_by;
+
+      worksheetInfo.value.customer_address.address1 = res.result.customer_address.address1 ? res.result.customer_address.address1 : "";
+      worksheetInfo.value.customer_address.address2 = res.result.customer_address.address2 ? res.result.customer_address.address2 : "";
+      worksheetInfo.value.customer_address.city = res.result.customer_address.city ? res.result.customer_address.city : "";
+      worksheetInfo.value.customer_address.pincode = res.result.customer_address.pincode ? res.result.customer_address.pincode : "";
+      worksheetInfo.value.customer_address.states = res.result.customer_address.states ? res.result.customer_address.states : "";
+      worksheetInfo.value.customer_address.country = res.result.customer_address.country ? res.result.customer_address.country : "";
+
+      worksheetInfo.value.customer_data.id = res.result.customer_data.id;
+      worksheetInfo.value.customer_data.first_name = res.result.customer_data.first_name;
+      worksheetInfo.value.customer_data.last_name = res.result.customer_data.last_name;
+      worksheetInfo.value.customer_data.mobile = res.result.customer_data.mobile;
+
+      worksheetInfo.value.quotation_details = res.result.quotation_details;
+
+      worksheetInfo.value.company_details.company_name = res.result.company_details.company_name;
+      worksheetInfo.value.company_details.company_logo = res.result.company_details.company_logo
+            ? "data: image/png;base64," + res.result.company_details.company_logo
+            : getAssetPath("media/avatars/default.png")
+      
+      console.log(worksheetInfo.value);
+
+      const worksheetName =  `${worksheetInfo.value.quotation_details.quotation_no}_${worksheetInfo.value.rgp_no}`;
+
+      await worksheetGen(id, worksheetName, worksheetInfo);
+
+    }
+
     return {
       tableData,
       tableHeader,
@@ -511,6 +623,8 @@ export default defineComponent({
       limit,
       PageLimitPoiner,
       Limits,
+      downloadWorksheet,
+
     };
   },
 });

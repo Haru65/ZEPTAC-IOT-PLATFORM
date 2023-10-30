@@ -112,6 +112,7 @@
               <thead>
                 <tr>
                   <th scope="col">#</th>
+                  <th scope="col">Instrument ID</th>
                   <th scope="col">Name</th>
                   <th scope="col">Model</th>
                   <th scope="col">Serial</th>
@@ -121,6 +122,7 @@
               <tbody>
                 <tr v-for="(instrument, index) in $props.summary.instruments" :key="instrument.id">
                   <th scope="row">{{ index + 1 }}</th>
+                  <td>{{ instrument.instrument_id }}</td>
                   <td>{{ instrument.name }}</td>
                   <td>{{ instrument.model_no }}</td>
                   <td>{{ instrument.serial_no }}</td>

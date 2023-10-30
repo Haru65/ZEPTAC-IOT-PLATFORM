@@ -12,10 +12,13 @@ interface TestReport {
   report_name: string;
   instrument_used: {
     id: string;
+    instrument_id: string;
     name: string;
     model_no: string;
     serial_no: string;
     make: string;
+    calibration_date: string;
+    calibration_due_date: string;
   };
   area_name: string;
   ahu_no: string;
@@ -373,21 +376,27 @@ const reportGen = async (id, pdfName, reportInfo) => {
 
       const instrumentHead = [
         [
-          { title: 'Instrument Used', colSpan: 2},
+          { title: 'Instrument Used', colSpan: 3},
           { title: 'Calibration Date', rowSpan:2},
           { title: 'Calibration Due Date', rowSpan:2},
         ],
-        ['Model No.','Serial No.']
+        ['Instrument Name','Model No.','Serial No.']
       ];
 
       const instrumentUsedData = [{
+        name: testData.instrument_used.name,
         model_no: testData.instrument_used.model_no,
         serial_no: testData.instrument_used.serial_no,
+        calibration_date: testData.instrument_used.calibration_date,
+        calibration_due_date: testData.instrument_used.calibration_due_date,
       }]
 
       const instrumentUsedBody = instrumentUsedData.map((data) => [
+        data.name,
         data.model_no,
-        data.serial_no
+        data.serial_no,
+        data.calibration_date,
+        data.calibration_due_date,
       ]);
 
       autoTable(doc, {

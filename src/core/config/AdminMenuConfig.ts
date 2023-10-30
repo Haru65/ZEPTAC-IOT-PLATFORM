@@ -224,6 +224,10 @@ const AdminMenuConfig: Array<MenuItem> = [
         bootstrapIcon: "bi-archive",
         sub: [
           {
+            heading: "Add Employee",
+            route: "/employee/add",
+          },
+          {
             heading: "List Employees",
             route: "/employee/list",
           },

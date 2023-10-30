@@ -430,7 +430,7 @@ import * as Yup from "yup";
 
 interface Test {
   id: string;
-  name: string;
+  test: string;
 }
 
 interface worksheet {
@@ -556,7 +556,7 @@ export default defineComponent({
       if (e.target.checked) {
         tests.push({
           id: selectedId,
-          name: e.target.value,
+          test: e.target.value,
         });
         worksheetDetails.value.tests = tests;
       } else {

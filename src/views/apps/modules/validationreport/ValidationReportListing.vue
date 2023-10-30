@@ -256,10 +256,13 @@ interface airVelocityTestReport {
   report_name: string;
   instrument_used: {
     id: string;
+    instrument_id: string;
     name: string;
     model_no: string;
     serial_no: string;
     make: string;
+    calibration_date: string;
+    calibration_due_date: string;
   };
   area_name: string;
   ahu_no: string;
@@ -307,10 +310,13 @@ interface filterIntegrityTestReport {
   report_name: string;
   instrument_used: {
     id: string;
+    instrument_id: string;
     name: string;
     model_no: string;
     serial_no: string;
     make: string;
+    calibration_date: string;
+    calibration_due_date: string;
   };
   area_name: string;
   ahu_no: string;
@@ -348,10 +354,13 @@ interface particleCountTestReport {
   report_name: string;
   instrument_used: {
     id: string;
+    instrument_id: string;
     name: string;
     model_no: string;
     serial_no: string;
     make: string;
+    calibration_date: string;
+    calibration_due_date: string;
   };
   area_name: string;
   ahu_no: string;
@@ -390,10 +399,13 @@ interface recoveryTestReport {
   report_name: string;
   instrument_used: {
     id: string;
+    instrument_id: string;
     name: string;
     model_no: string;
     serial_no: string;
     make: string;
+    calibration_date: string;
+    calibration_due_date: string;
   };
   area_name: string;
   ahu_no: string;

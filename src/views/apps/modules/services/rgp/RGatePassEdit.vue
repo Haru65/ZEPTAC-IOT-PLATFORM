@@ -454,7 +454,7 @@ interface RGP {
 }
 
 export default defineComponent({
-  name: "rgp-add",
+  name: "rgp-edit",
   components: {
     VForm,
   },
@@ -468,7 +468,7 @@ export default defineComponent({
     const AvailableEngineers = ref([{ id: "", first_name: "", last_name: "" }]);
 
     const AvailableInstruments = ref([
-      { id: "", name: "", model_no: "", serial_no: "", make: "" },
+    { id: "", instrument_id: "", name: "", model_no: "", serial_no: "", make: "", calibration_date: "", calibration_due_date: "",}
     ]);
 
     async function engineer_listing(): Promise<void> {

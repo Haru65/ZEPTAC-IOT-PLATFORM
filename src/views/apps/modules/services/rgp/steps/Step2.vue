@@ -74,7 +74,7 @@
         <div class="tab-pane fade show active" aria-labelledby="home-tab">
           <div class="shadow-lg p-5 mb-7 fs-4 rounded">
             <p>
-              Sorry! No engineers are available at this moment.
+              Sorry! All engineers are on work. No engineers are available at this moment.
             </p>
           </div>
         </div>

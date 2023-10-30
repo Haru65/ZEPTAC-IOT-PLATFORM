@@ -517,4 +517,8 @@ export default defineComponent({
 .tagify-remove {
   margin-left: 5px; /* Optional margin between the name and the 'X' button */
 }
+.override-styles {
+  z-index: 99999 !important;
+  pointer-events: initial;
+}
 </style>

@@ -8,7 +8,9 @@ interface IInstrument {
     make: string;
     description: string;
     availability: string;
-    created_at: string;
+    c_id:number;
+    d_id:number;
+    t_id:number;
   }
   
   export type { IInstrument };

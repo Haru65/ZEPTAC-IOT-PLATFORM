@@ -273,20 +273,6 @@ export default defineComponent({
       },
     ]);
 
-    interface Engineer {
-      id: string;
-      first_name: string;
-      last_name: string;
-    }
-
-    interface Instrument {
-      id: string;
-      name: string;
-      model_no: string;
-      serial_no: string;
-      make: string;
-    }
-
     interface RGP {
       rgp_no: string;
       quotation_id: string;

@@ -40,15 +40,10 @@
           </button>
           <!--end::Export-->
           <!--begin::Add customer-->
-          <!-- <button
-            type="button"
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#kt_modal_add_customer"
-          >
+          <router-link to="./add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
             Add Employee
-          </button> -->
+          </router-link>
           <!--end::Add customer-->
         </div>
         <!--end::Toolbar-->
@@ -65,7 +60,7 @@
           <button
             type="button"
             class="btn btn-danger"
-            @click="deleteFewEmployee()"
+            @click="deleteFewEmployees()"
           >
             Delete Selected
           </button>
@@ -152,13 +147,15 @@
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span class="menu-link px-3">
-              <i
-                class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-              ></i>
+              <router-link :to="`/employee/edit/${employee.id}`">
+                <i
+                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                ></i>
+              </router-link>
             </span>
             <span>
               <i
-                @click="deleteCustomer(employee.id)"
+                @click="deleteCustomer(employee.id, false)"
                 class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
@@ -201,9 +198,6 @@
       </div>
     </div>
   </div>
-
-  <ExportCustomerModal></ExportCustomerModal>
-  <AddCustomerModal></AddCustomerModal>
 </template>
 
 <script lang="ts">
@@ -211,15 +205,15 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
-import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
+// import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
+// import AddCustomerModal from "@/components/modals/forms/AddCustomerModal.vue";
 import type { IEmployee } from "@/core/model/employee";
 import arraySort from "array-sort";
 import ApiService from "@/core/services/ApiService";
 import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
 import employee from "@/core/model/employee";
-import { getEmployees, EmployeeSearch } from "@/stores/api";
+import { deleteUser, getEmployees, EmployeeSearch } from "@/stores/api";
 import { blank64 } from "../../admin/users/blank";
 import Swal from "sweetalert2";
 
@@ -227,8 +221,8 @@ export default defineComponent({
   name: "employee-listing",
   components: {
     Datatable,
-    ExportCustomerModal,
-    AddCustomerModal,
+    // ExportCustomerModal,
+    // AddCustomerModal,
   },
   setup() {
     const loading = ref(true);
@@ -277,28 +271,6 @@ export default defineComponent({
       },
     ]);
 
-    // functions
-    // get_employees
-    const employee_listing = async () => {
-      try {
-        ApiService.setHeader();
-        const response = await ApiService.get("/employee");
-        console.log(response.data.result.data);
-        tableData.value = response.data.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-            role_id: get_role(role_id),
-          })
-        );
-        //console.log(tableData.value);
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        //console.log("done");
-      }
-    };
     const selectedIds = ref<Array<number>>([]);
     const tableData = ref<Array<IEmployee>>([]);
     const initvalues = ref<Array<IEmployee>>([]);
@@ -315,6 +287,37 @@ export default defineComponent({
       2: 25,
       3: 50,
     });
+
+    // functions
+    // get_employees
+    const employee_listing = async () => {
+      try {
+        ApiService.setHeader();
+        const response = await getEmployees(
+          `page=${page.value}&limit=${limit.value}`
+        );
+        console.log(response);
+        total.value = response.result.total_count;
+        more.value = response.result.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(
+          ({ created_at, role_id, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+            role_id: get_role(role_id),
+          })
+        );
+        //console.log(tableData.value);
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        //console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
+      }
+    };
+
     // more
     const PagePointer = async (page) => {
       // ? Truncate the tableData
@@ -332,7 +335,7 @@ export default defineComponent({
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
-         tableData.value = response.data.result.data.map(
+        tableData.value = response.result.data.map(
           ({ created_at, role_id, ...rest }) => ({
             ...rest,
             created_at: moment(created_at).format("MMMM Do YYYY"),
@@ -368,9 +371,10 @@ export default defineComponent({
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
+          ({ created_at, role_id, ...rest }) => ({
             ...rest,
             created_at: moment(created_at).format("MMMM Do YYYY"),
+            role_id: get_role(role_id),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -387,6 +391,7 @@ export default defineComponent({
     //console.log(initvalues.value);
 
     const NextPage = () => {
+      console.log(more.value);
       if (more.value != false) {
         page.value = page.value + 1;
         PagePointer(page.value);
@@ -401,23 +406,58 @@ export default defineComponent({
     };
 
     onMounted(async () => {
+      //console.log("done");
       await employee_listing();
-      setTimeout(() => {
-        loading.value = false;
-      }, 250);
     });
 
-    const deleteFewEmployee = () => {
-      selectedIds.value.forEach((item) => {
-        deleteCustomer(item);
+    const deleteFewEmployees = () => {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover from this !",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "red",
+        confirmButtonText: "Yes, I am sure!",
+        cancelButtonText: "No, cancel it!",
+      }).then((result: { [x: string]: any }) => {
+        if (result["isConfirmed"]) {
+          // Put your function here
+          selectedIds.value.forEach((item) => {
+            deleteCustomer(item, true);
+          });
+          selectedIds.value.length = 0;
+        }
       });
-      selectedIds.value.length = 0;
     };
 
-    const deleteCustomer = (id: number) => {
-      for (let i = 0; i < tableData.value.length; i++) {
-        if (tableData.value[i].id === id) {
-          tableData.value.splice(i, 1);
+    const deleteCustomer = (id: number, mul: boolean) => {
+      if (!mul) {
+        for (let i = 0; i < tableData.value.length; i++) {
+          if (tableData.value[i].id === id) {
+            Swal.fire({
+              title: "Are you sure?",
+              text: "You will not be able to recover from this !",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "red",
+              confirmButtonText: "Yes, I am sure!",
+              cancelButtonText: "No, cancel it!",
+            }).then((result: { [x: string]: any }) => {
+              if (result["isConfirmed"]) {
+                // Put your function here
+                deleteUser(id);
+                tableData.value.splice(i, 1);
+              }
+            });
+          }
+        }
+      } else {
+        for (let i = 0; i < tableData.value.length; i++) {
+          if (tableData.value[i].id === id) {
+            // Put your function here
+            deleteUser(id);
+            tableData.value.splice(i, 1);
+          }
         }
       }
     };
@@ -425,7 +465,7 @@ export default defineComponent({
     const search = ref<string>("");
     let debounceTimer;
 
-    const searchItems = () => {
+    const searchItems = async () => {
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value !== "") {
         let results: Array<IEmployee> = [];
@@ -442,6 +482,11 @@ export default defineComponent({
             await SearchMore();
           }, 1000);
         }
+      } else {
+        page.value = 1;
+        while (tableData.value.length != 0) tableData.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
+        await employee_listing();
       }
     };
 
@@ -454,7 +499,7 @@ export default defineComponent({
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
-  tableData.value = response.data.result.data.map(
+        tableData.value = response.result.data.map(
           ({ created_at, role_id, ...rest }) => ({
             ...rest,
             created_at: moment(created_at).format("MMMM Do YYYY"),
@@ -500,7 +545,7 @@ export default defineComponent({
       search,
       searchItems,
       selectedIds,
-      deleteFewEmployee,
+      deleteFewEmployees,
       sort,
       onItemSelect,
       getAssetPath,

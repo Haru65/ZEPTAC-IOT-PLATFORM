@@ -512,7 +512,7 @@ export default defineComponent({
   font-weight: 500;
 }
 .el-input__wrapper {
-  height: 3.5rem;
+  min-height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);
   border-color: var(--bs-gray-100);
@@ -527,5 +527,9 @@ export default defineComponent({
   font-size: 1.15rem;
   border-radius: 0.625rem;
   box-shadow: none !important;
+}
+.override-styles {
+  z-index: 99999 !important;
+  pointer-events: initial;
 }
 </style>

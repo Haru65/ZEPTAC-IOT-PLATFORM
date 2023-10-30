@@ -7,6 +7,7 @@
     tabindex="-1"
     aria-hidden="true"
     data-bs-backdrop="static"
+    data-bs-keyboard="false"
   >
     <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered mw-1000px">
@@ -439,10 +440,13 @@ interface FilterIntegrityTestReport {
   report_name: string;
   instrument_used: {
     id: string;
+    instrument_id: string;
     name: string;
     model_no: string;
     serial_no: string;
     make: string;
+    calibration_date: string;
+    calibration_due_date: string;
   };
   area_name: string;
   room_name: string;
@@ -516,10 +520,13 @@ export default defineComponent({
       report_name: "",
       instrument_used: {
         id: "",
+        instrument_id: "",
         name: "",
         model_no: "",
         serial_no: "",
         make: "",
+        calibration_date: "",
+        calibration_due_date: "",
       },
       area_name: "",
       room_name: "",
@@ -556,16 +563,16 @@ export default defineComponent({
           (instrument) => id === instrument.id
         );
         if (foundInstrument) {
-          filterIntegrityTestDetails.value.instrument_used.id =
-            foundInstrument.id;
-          filterIntegrityTestDetails.value.instrument_used.name =
-            foundInstrument.name;
+          filterIntegrityTestDetails.value.instrument_used.id = foundInstrument.id;
+          filterIntegrityTestDetails.value.instrument_used.instrument_id = foundInstrument.instrument_id;
+          filterIntegrityTestDetails.value.instrument_used.name = foundInstrument.name;
           filterIntegrityTestDetails.value.instrument_used.model_no =
             foundInstrument.model_no;
-          filterIntegrityTestDetails.value.instrument_used.serial_no =
+            filterIntegrityTestDetails.value.instrument_used.serial_no =
             foundInstrument.serial_no;
-          filterIntegrityTestDetails.value.instrument_used.make =
-            foundInstrument.make;
+            filterIntegrityTestDetails.value.instrument_used.make = foundInstrument.make;
+            filterIntegrityTestDetails.value.instrument_used.calibration_date = foundInstrument.calibration_date;
+            filterIntegrityTestDetails.value.instrument_used.calibration_due_date = foundInstrument.calibration_due_date;
         }
       }
     };
@@ -628,10 +635,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         room_name,

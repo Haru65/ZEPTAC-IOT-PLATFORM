@@ -1,11 +1,40 @@
 // import { getAssetPath } from "@/core/helpeassets";
 
 interface IPriceList {
-  id: number;
-  name: string;
-  description: string;
-  price: string;
-  date: string;
+  id: string;
+  site_location: string;
+  per_day_charge: string;
+  equipment_wise: [{
+    id: number;
+    name: string;
+    charge: string;
+  }];
+  accommodation: string;
+  travelling: string;
+  training: string;
+  customer_type: string;
+  created_at: string;
 }
 
 export type { IPriceList };
+
+
+export const Equipments = [
+  {
+      id: 0,
+      name: "Equipment 1",
+  },
+  {
+      id: 1,
+      name: "Equipment 2",
+  },
+  {
+      id: 2,
+      name: "Equipment 3",
+  }
+];
+
+export const GetEquipment = (id) => {
+  const equip = Equipments.find(item => item.id == id);
+  return equip ? equip.name : "";
+};

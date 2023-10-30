@@ -319,11 +319,28 @@ export default defineComponent({
     interface quotationDetails {
       quotation_no: string;
       customer_id: string;
-      items: Array<itemsArr>;
+      items: {
+        id: string;
+        site_location: string;
+        per_day_charge: string;
+        number_of_days: string;
+        accommodation: number;
+        travelling: number;
+        training: number;
+        boarding: number;
+        pickup: number;
+        accomm: boolean;
+        travel: boolean;
+        train: boolean;
+        board: boolean;
+        pick: boolean;
+      };
       date: string;
       duedate: string;
       status: string;
-      notes: string;
+
+      scope_of_work: string;
+      terms_and_conditions: string;
       total: number;
       customer: Meta;
       client: Meta;
@@ -339,11 +356,27 @@ export default defineComponent({
     const quotationDetail = ref<quotationDetails>({
       quotation_no: "21****",
       customer_id: " ",
-      items: [],
+      items: {
+        id: "",
+        site_location: "",
+        per_day_charge: "",
+        number_of_days: "1",
+        accommodation: 0,
+        travelling: 0,
+        training: 0,
+        boarding: 0,
+        pickup: 0,
+        accomm: true,
+        travel: true,
+        train: true,
+        board: true,
+        pick: true,
+      },
       date: "",
       duedate: "",
       status: "",
-      notes: "",
+      scope_of_work: "",
+      terms_and_conditions: "",
       customer: {
         id: "",
         company_name: "",
@@ -736,7 +769,8 @@ export default defineComponent({
             date: response.date,
             duedate: response.duedate,
             status: "1",
-            notes: response.notes,
+            scope_of_work: response.scope_of_work,
+            terms_and_conditions: response.terms_and_conditions,
             total: response.total,
             customer: {
               id: response.customer_id,

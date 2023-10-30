@@ -320,7 +320,7 @@ export default defineComponent({
     }
 
     const AvailableInstruments = ref([
-      { id: "", name: "", model_no: "", serial_no: "", make: "" },
+      { id: "", instrument_id: "", name: "", model_no: "", serial_no: "", make: "", calibration_date: "", calibration_due_date: "",},
     ]);
 
     async function instrument_listing(): Promise<void> {

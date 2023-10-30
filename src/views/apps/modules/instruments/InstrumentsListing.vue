@@ -131,24 +131,82 @@
             >Not Available</span
           >
         </template>
-        <template v-slot:created_at="{ row: instruments }">
-          {{ instruments.created_at }}
+
+        <template v-slot:c_id="{ row: instruments }">
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row">
+            <span
+              data-toggle="tooltip"
+              title="Download Calibration Certificate"
+              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
+              @click="
+                downloadDocument(instruments.id, 'calibration_certificate')
+              "
+              >⤓ Calibration
+            </span>
+          </div>
+          <!--end::Menu FLex-->
         </template>
+
+        <template v-slot:d_id="{ row: instruments }">
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row">
+            <span
+              data-toggle="tooltip"
+              title="Download Datasheet"
+              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
+              @click="downloadDocument(instruments.id, 'datasheet')"
+              >⤓ Datasheet
+            </span>
+          </div>
+          <!--end::Menu FLex-->
+        </template>
+
+        <template v-slot:t_id="{ row: instruments }">
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row">
+            <span
+              data-toggle="tooltip"
+              title="Download Traceability"
+              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
+              @click="downloadDocument(instruments.id, 'traceability')"
+              >⤓ Traceability
+            </span>
+          </div>
+          <!--end::Menu FLex-->
+        </template>
+
+        <template v-slot:card="{ row: instruments }">
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row">
+            <span
+              data-toggle="tooltip"
+              title="Download Instrument History Card"
+              class="border rounded badge py-3 fs-7 badge-light-primary text-hover-success cursor-pointer"
+              @click="downloadHistoryCard(instruments.id)"
+              >⤓ History Card
+            </span>
+          </div>
+          <!--end::Menu FLex-->
+        </template>
+
         <template v-slot:actions="{ row: instruments }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <router-link :to="`./edit/${instruments.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
-            </span>
-            <span class="menu-link px-3">
-              <i
-                @click="deleteInvoice(instruments.id, false)"
-                class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
+
+            <router-link :to="`./edit/${instruments.id}`"
+              data-toggle="tooltip"
+              title="Edit Worksheet"
+              class="las la-edit border border-primary rounded badge m-3 py-3 px-4 bg-light-primary fs-7 badge-light-primary text-primary text-hover-dark cursor-pointer"
+              >Edit
+          </router-link>
+
+            <span
+              @click="deleteInvoice(instruments.id, false)"
+              data-toggle="tooltip"
+              title="Delete Worksheet"
+              class="border border-danger rounded-circle badge m-3 py-3 px-4 bg-light-danger fs-7 badge-light-danger text-danger text-hover-dark cursor-pointer"
+              >X
             </span>
           </div>
           <!--end::Menu FLex-->
@@ -196,14 +254,17 @@ import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
 import type { IInstrument } from "@/core/model/instruments";
+import { instrumentGen } from "@/core/config/InstrumentHCard";
 import {
   getAllInstrument,
   deleteInstrument,
   InstrumentSearch,
+  getInstrument,
 } from "@/stores/api";
 import arraySort from "array-sort";
 import moment from "moment";
 import Swal from "sweetalert2";
+import { getAssetPath } from "@/core/helpers/assets";
 
 export default defineComponent({
   name: "instrument-listing",
@@ -249,9 +310,27 @@ export default defineComponent({
         columnWidth: 80,
       },
       {
-        columnName: "Created At",
-        columnLabel: "created_at",
-        sortEnabled: true,
+        columnName: "Calibration Validity",
+        columnLabel: "c_id",
+        sortEnabled: false,
+        columnWidth: 85,
+      },
+      {
+        columnName: "Datasheet",
+        columnLabel: "d_id",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Traceability",
+        columnLabel: "t_id",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
+        columnName: "History Card",
+        columnLabel: "card",
+        sortEnabled: false,
         columnWidth: 75,
       },
       {
@@ -304,22 +383,16 @@ export default defineComponent({
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
-            id,
-            model_no,
-            serial_no,
-            name,
-            make,
-            availability,
-            created_at,
-          }) => ({
+          ({ id, model_no, serial_no, name, make, availability }) => ({
             id: id,
             model_no: model_no,
             serial_no: serial_no,
             name: name,
             make: make,
             availability: availability,
-            created_at: moment(created_at).format("MMM Do YY"),
+            c_id: id,
+            d_id: id,
+            t_id: id,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -350,22 +423,16 @@ export default defineComponent({
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
-            id,
-            model_no,
-            serial_no,
-            name,
-            make,
-            availability,
-            created_at,
-          }) => ({
+          ({ id, model_no, serial_no, name, make, availability }) => ({
             id: id,
             model_no: model_no,
             serial_no: serial_no,
             name: name,
             make: make,
             availability: availability,
-            created_at: moment(created_at).format("MMM Do YY"),
+            c_id: id,
+            d_id: id,
+            t_id: id,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -408,22 +475,16 @@ export default defineComponent({
           `page=${page.value}&limit=${limit.value}`
         );
         tableData.value = response.result.data.map(
-          ({
-            id,
-            model_no,
-            serial_no,
-            name,
-            make,
-            availability,
-            created_at,
-          }) => ({
+          ({ id, model_no, serial_no, name, make, availability }) => ({
             id: id,
             model_no: model_no,
             serial_no: serial_no,
             name: name,
             make: make,
             availability: availability,
-            created_at: moment(created_at).format("MMM Do YY"),
+            c_id: id,
+            d_id: id,
+            t_id: id,
           })
         );
         total.value = response.result.total_count;
@@ -531,22 +592,16 @@ export default defineComponent({
         //console.log(response.result.total_count);
         // first 20 displayed
         tableData.value = response.result.data.data.map(
-          ({
-            id,
-            model_no,
-            serial_no,
-            name,
-            make,
-            availability,
-            created_at,
-          }) => ({
+          ({ id, model_no, serial_no, name, make, availability }) => ({
             id: id,
             model_no: model_no,
             serial_no: serial_no,
             name: name,
             make: make,
             availability: availability,
-            created_at: moment(created_at).format("DD/MM/YYYY"),
+            c_id: id,
+            d_id: id,
+            t_id: id,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -586,6 +641,134 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
+    function downloadFileObject(base64String, pdfName) {
+      const linkSource = base64String;
+      const downloadLink = document.createElement("a");
+      const fileName = pdfName + ".pdf";
+      downloadLink.href = linkSource;
+      downloadLink.download = fileName;
+      downloadLink.click();
+    }
+
+    const downloadDocument = async (id: any, pdfName: string) => {
+      try {
+        const res = await getInstrument(id);
+
+        const { calibration_certificate, datasheet, traceability } = res;
+
+        let base64String = "";
+        if (pdfName === "calibration_certificate") {
+          base64String = calibration_certificate.replace(
+            /^data:application\/\pdf+;base64,/,
+            ""
+          );
+        } else if (pdfName === "datasheet") {
+          base64String = datasheet.replace(
+            /^data:application\/\pdf+;base64,/,
+            ""
+          );
+        } else if (pdfName === "traceability") {
+          base64String = traceability.replace(
+            /^data:application\/\pdf+;base64,/,
+            ""
+          );
+        }
+
+        // check whether data starts with JVB, JVB is a prefix for pdf files
+
+        if (base64String.startsWith("JVB")) {
+          base64String = "data:application/pdf;base64," + base64String;
+          downloadFileObject(base64String, pdfName);
+        } else if (base64String.startsWith("data:application/pdf;base64")) {
+          downloadFileObject(base64String, pdfName);
+        } else {
+          alert("Not a valid Base64 PDF string. Please check");
+        }
+      } catch (error) {
+        console.error("Error downloading PDF:", error);
+      }
+    };
+
+    const instrumentInfo = ref({
+      id: "",
+      name: "",
+      model_no: "",
+      serial_no: "",
+      make: "",
+
+      accessories_list: [],
+
+      calibration_date: "",
+      calibration_due_date: "",
+      vendor_name: "",
+
+      maintenance_details: {
+        periodicity: "",
+        m_date1: "",
+        m_date2: "",
+        m_date3: "",
+        m_details: "",
+        any_repair_detail: "",
+        maintenance_done_by: "",
+      },
+
+      company_details: {
+        company_name: "",
+        company_logo: getAssetPath("media/avatars/default.png"),
+        address: "",
+        city: "",
+        state: "",
+        country: "",
+        pincode: "",
+      },
+    });
+
+    const downloadHistoryCard = async (id: any) => {
+      const res = await getInstrument(id);
+
+      const {
+        name,
+        model_no,
+        serial_no,
+        make,
+        calibration_date,
+        calibration_due_date,
+        vendor_name,
+        accessories_list,
+        maintenance_details,
+        company_details,
+      } = res;
+
+      instrumentInfo.value.id = id;
+      instrumentInfo.value.name = name;
+      instrumentInfo.value.model_no = model_no;
+      instrumentInfo.value.serial_no = serial_no;
+      instrumentInfo.value.make = make;
+      instrumentInfo.value.calibration_date = calibration_date;
+      instrumentInfo.value.calibration_due_date = calibration_due_date;
+
+      instrumentInfo.value.vendor_name = vendor_name;
+      instrumentInfo.value.accessories_list = JSON.parse(accessories_list);
+      instrumentInfo.value.maintenance_details =
+        JSON.parse(maintenance_details);
+
+      instrumentInfo.value.company_details.address = company_details.address;
+      instrumentInfo.value.company_details.city = company_details.city;
+      instrumentInfo.value.company_details.pincode = company_details.pincode;
+      instrumentInfo.value.company_details.state = company_details.state;
+      instrumentInfo.value.company_details.country = company_details.country;
+      instrumentInfo.value.company_details.company_name =
+        company_details.company_name;
+      instrumentInfo.value.company_details.company_logo =
+        company_details.company_logo
+          ? "data: image/png;base64," + company_details.company_logo
+          : getAssetPath("media/avatars/default.png");
+
+      console.log(instrumentInfo.value.company_details);
+
+      await instrumentGen(id, "instrument", instrumentInfo);
+    };
+
     return {
       tableData,
       tableHeader,
@@ -603,6 +786,8 @@ export default defineComponent({
       page,
       Limits,
       PageLimitPoiner,
+      downloadDocument,
+      downloadHistoryCard,
     };
   },
 });
@@ -630,3 +815,4 @@ export default defineComponent({
   box-shadow: none !important;
 }
 </style>
+

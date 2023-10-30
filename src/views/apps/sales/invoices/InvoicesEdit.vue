@@ -1,35 +1,35 @@
 <template>
-  <div style="width: 99%" class="sm:p-4 md:p-8 lg:p-12 rounded">
+  <div style="width: 99%" class="bg-body p-12 rounded">
     <!--begin::Modal dialog-->
-    <div class="d-flex flex-column flex-lg-row">
-      <div class="flex-xl-row-fluid mb-10 mb-lg-0 me-lg-7 me-xl-10">
-        <div class="card w-20">
-          <div class="card-body sm:p-2 lg:p-12">
-            <!--begin::Form-->
-            <form id="kt_Quotation_form" novalidate>
-              <!--begin::Wrapper-->
-              <div
-                class="d-flex gap-5 flex-column align-items-start flex-xxl-row"
-              >
-                <!--begin::Input group-->
-                <div
-                  class="d-flex align-items-center flex-equal fw-row me-4 order-2"
-                  data-bs-toggle="tooltip"
-                  data-bs-trigger="hover"
-                  data-bs-original-title="Specify Quotation date"
-                  data-kt-initialized="1"
-                >
-                  <!--begin::Date-->
-                  <div class="m-2 fs-6 fw-bold text-gray-700 text-nowrap">
-                    Date:
-                  </div>
-                  <!--end::Date-->
-                  &nbsp;&nbsp;
-                  <!--begin::Input-->
-                  <div
-                    class="position-relative d-flex align-items-center w-150px"
+    <div class="modal-dialog modal-dialog-centered">
+      <!--begin::Modal content-->
+      <div class="modal-content">
+        <!--begin::Form-->
+        <VForm id="kt_account_profile_details_form" class="form" novalidate>
+          <!--begin::Card body-->
+          <div class="card-body border-top p-sd-2 p-lg-9">
+            <!--begin::Input group-->
+
+            <div class="col-lg-12 col-md-12 col-sd-12 fv-row m-auto mb-6">
+              <div class="card mb-3 p-6">
+                <div class="row mb-6 text-center">
+                  <span class="fs-3 fw-bold text-muted"
+                    >Invoice # {{ InvoiceDetails.invoice_no }}</span
                   >
-                    <!--begin::Datepicker-->
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-6">
+              <div class="form-group col-md-6 mb-8 mb-sd-8">
+                <label
+                  class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
+                >
+                  <!--begin::Info-->
+                  <span class="d-block fw-semobold text-start">
+                    <span class="fs-5 fw-bold text-gray-700 text-nowrap"
+                      >Date</span
+                    >
                     <div class="block">
                       <el-date-picker
                         v-model="InvoiceDetails.date"
@@ -37,52 +37,23 @@
                         placeholder="Pick a day"
                         :shortcuts="shortcuts"
                         :disabled-date="disabledDate"
+                        :editable="false"
                       />
                     </div>
-                    <!--end::Datepicker-->
-                  </div>
-                  <!--end::Input-->
-                </div>
-                <!--end::Input group-->
+                  </span>
+                  <!--end::Info-->
+                </label>
+              </div>
 
-                <!--begin::Input group-->
-                <div
-                  class="d-flex flex-center flex-equal fw-row text-nowrap order-1 order-xxl-2 me-4"
-                  data-bs-toggle="tooltip"
-                  data-bs-trigger="hover"
-                  data-bs-original-title="Enter Quotation number"
-                  data-kt-initialized="1"
+              <div class="form-group col-md-6 mb-8 mb-sd-8">
+                <label
+                  class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
                 >
-                  <span class="fs-2 fw-bold text-gray-800">Quotation #</span>
-                  <input
-                    type="text"
-                    class="form-control form-control-flush fw-bold text-muted fs-3 w-auto"
-                    maxlength="6"
-                    v-model="InvoiceDetails.invoice_no"
-                    placehoder="..."
-                  />
-                </div>
-                <!--end::Input group-->
-
-                <!--begin::Input group-->
-                <div
-                  class="d-flex align-items-center justify-content-end flex-equal order-3 fw-row"
-                  data-bs-toggle="tooltip"
-                  data-bs-trigger="hover"
-                  data-bs-original-title="Specify Quotation due date"
-                  data-kt-initialized="1"
-                >
-                  <!--begin::Date-->
-                  <div class="fs-6 fw-bold text-gray-700 text-nowrap">
-                    Due Date:
-                  </div>
-                  <!--end::Date-->
-                  &nbsp; &nbsp;
-                  <!--begin::Input-->
-                  <div
-                    class="position-relative d-flex align-items-center w-150px"
-                  >
-                    <!--begin::Datepicker-->
+                  <!--begin::Info-->
+                  <span class="d-block fw-semobold text-start">
+                    <span class="fs-5 fw-bold text-gray-700 text-nowrap"
+                      >Due Date</span
+                    >
                     <div class="block">
                       <el-date-picker
                         v-model="InvoiceDetails.duedate"
@@ -90,364 +61,655 @@
                         placeholder="Pick a day"
                         :shortcuts="shortcuts"
                         :disabled-date="disabledDate"
+                        :editable="false"
                       />
                     </div>
-                    <!--end::Datepicker-->
-                  </div>
-                  <!--end::Input-->
-                </div>
-                <!--end::Input group-->
+                  </span>
+                  <!--end::Info-->
+                </label>
               </div>
-              <!--end::Input group-->
-              <!--end::Top-->
+            </div>
 
-              <!--begin::Separator-->
-              <div class="separator separator-dashed my-10"></div>
-              <!--end::Separator-->
-
-              <!--begin::Wrapper-->
-              <div class="mb-0">
-                <div class="d-flex flex-grow-1 gap-lg-3 gap-sm-5 gap-5">
-                  <!--begin::Row-->
-                  <div class="w-50">
-                    <div class="row gx-10">
-                      <el-select
-                        v-model="InvoiceDetails.customer_id"
-                        filterable
-                        v-on:change="GetUserData(InvoiceDetails.customer_id)"
-                        placeholder="Please Select Customer..."
+            <div class="row mb-6">
+              <div class="d-flex flex-grow-1 gap-lg-3 gap-sm-5 gap-5">
+                <!--begin::Row-->
+                <div class="w-50">
+                  <div class="py-3">
+                    <h6 class="fs-6">Customer :</h6>
+                  </div>
+                  <div id="customer " class="row gx-10">
+                    <el-select
+                      v-model="InvoiceDetails.customer_id"
+                      placeholder="Please Select Customer"
+                      filterable
+                      v-on:change="GetUserData(InvoiceDetails.customer_id)"
+                    >
+                      <el-option
+                        v-for="item in Customers"
+                        :key="item.id"
+                        :label="`${item.first_name} ${item.last_name}`"
+                        :value="item.id"
+                      />
+                      <el-option
+                        value=""
+                        disabled="disabled"
+                        label="Please Select Customer..."
+                        key=""
+                        >Please Select Customer...</el-option
                       >
-                        <el-option
-                          v-for="item in Customers"
-                          :key="item.id"
-                          :label="`${item.first_name} ${item.last_name}`"
-                          :value="item.id"
-                        />
-                      </el-select>
-                    </div>
-                    <!--end::Row-->
+                    </el-select>
+                  </div>
+                  <!--end::Row-->
 
-                    <div class="mt-2 pt-4">
-                      <h6 class="fw-bold mt-5">Billing Address:</h6>
-                      <div class="mt-2">
-                        <div class="mb-1" v-show="InvoiceDetails.customer">
+                  <div class="mt-2 pt-4">
+                    <h6 class="fw-bold mt-5">Billing Address:</h6>
+                    <div class="mt-2">
+                      <div class="mb-1" v-show="InvoiceDetails.customer">
+                        <br />
+                        <span>
+                          {{
+                            `${InvoiceDetails.customer.first_name} ${InvoiceDetails.customer.last_name}`
+                          }}
+                        </span>
+                        <br />
+                        <span v-show="InvoiceDetails.customer.company_name">
+                          {{ `${InvoiceDetails.customer.company_name}` }}
+                        </span>
+                        <!-- v-if company_data present -->
+                        <div v-show="InvoiceDetails.customer.company_name">
                           <br />
                           <span>
+                            {{ `${InvoiceDetails.customer.address1}` }}
+                          </span>
+                          <br />
+                          <span>
+                            {{ `${InvoiceDetails.customer.address2}` }}
+                          </span>
+                        </div>
+                        <div v-show="InvoiceDetails.customer.country">
+                          <span>
                             {{
-                              `${InvoiceDetails.customer.first_name} ${InvoiceDetails.customer.last_name}`
+                              `${InvoiceDetails.customer.city} - ${InvoiceDetails.customer.pincode}`
                             }}
                           </span>
                           <br />
-                          <span v-show="InvoiceDetails.customer.company_name">
-                            {{ `${InvoiceDetails.customer.company_name}` }}
-                          </span>
-                          <!-- v-if company_data present -->
-                          <div v-show="InvoiceDetails.customer.company_name">
-                            <br />
-                            <span>
-                              {{ `${InvoiceDetails.customer.address1}` }}
-                            </span>
-                            <br />
-                            <span>
-                              {{ `${InvoiceDetails.customer.address2}` }}
-                            </span>
-                          </div>
-                          <div v-show="InvoiceDetails.customer.country">
-                            <span>
-                              {{
-                                `${InvoiceDetails.customer.city} - ${InvoiceDetails.customer.pincode}`
-                              }}
-                            </span>
-                            <br />
-                            <span>
-                              {{
-                                `${InvoiceDetails.customer.states} ${InvoiceDetails.customer.country}`
-                              }}
-                            </span>
-                            <br />
-                          </div>
-                          <br />
-                          <!-- firstname as a flag -->
-                          <a
-                            v-show="InvoiceDetails.customer.first_name"
-                            target="blank"
-                            v-bind:href="`/customers/edit/${InvoiceDetails.customer_id}`"
-                          >
-                            <span class="fs-5"> Edit</span>
-                            <!-- <i
-                          class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                          ></i> -->
-                          </a>
-                        </div>
-                        <br />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="w-50">
-                    <div class="row gx-10">
-                      <el-select
-                        v-model="InvoiceDetails.client.id"
-                        filterable
-                        :disabled="clientSelect"
-                        v-on:change="GetClientData(InvoiceDetails.client.id)"
-                      >
-                        <el-option
-                          v-for="item in Clients"
-                          :key="item.client_data.id"
-                          :label="`${item.client_data.first_name} ${item.client_data.last_name}`"
-                          :value="item.client_data.id"
-                        />
-                      </el-select>
-                    </div>
-                    <!--end::Row-->
-
-                    <div class="mt-2 pt-4">
-                      <h6 class="fw-bold mt-5">Site Address:</h6>
-                      <div class="mt-2">
-                        <div class="mb-1" v-show="InvoiceDetails.client">
-                          <br />
                           <span>
                             {{
-                              `${InvoiceDetails.client.first_name} ${InvoiceDetails.client.last_name}`
+                              `${InvoiceDetails.customer.states} ${InvoiceDetails.customer.country}`
                             }}
                           </span>
                           <br />
-                          <span v-show="InvoiceDetails.client.company_name">
-                            {{ `${InvoiceDetails.client.company_name}` }}
-                          </span>
-                          <!-- v-if company_data present -->
-                          <div v-show="InvoiceDetails.client.company_name">
-                            <br />
-                            <span>
-                              {{ `${InvoiceDetails.client.address1}` }}
-                            </span>
-                            <br />
-                            <span>
-                              {{ `${InvoiceDetails.client.address2}` }}
-                            </span>
-                          </div>
-                          <div v-show="InvoiceDetails.client.country">
-                            <span>
-                              {{
-                                `${InvoiceDetails.client.city} - ${InvoiceDetails.client.pincode}`
-                              }}
-                            </span>
-                            <br />
-                            <span>
-                              {{
-                                `${InvoiceDetails.client.states} ${InvoiceDetails.client.country}`
-                              }}
-                            </span>
-                            <br />
-                          </div>
-                          <br />
-                          <!-- firstname as a flag -->
-                          <a
-                            v-show="InvoiceDetails.client.first_name"
-                            target="blank"
-                            v-bind:href="`/clients/edit/${InvoiceDetails.customer_id}`"
-                          >
-                            <span class="fs-5"> Edit</span>
-                            <!-- <i
-                          class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                          ></i> -->
-                          </a>
                         </div>
                         <br />
+                        <!-- firstname as a flag -->
+                        <a
+                          v-show="InvoiceDetails.customer.first_name"
+                          target="blank"
+                          v-bind:href="`/customers/edit/${InvoiceDetails.customer_id}`"
+                        >
+                          <span class="fs-5"> Edit</span>
+                          <!-- <i
+                          class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                          ></i> -->
+                        </a>
                       </div>
+                      <br />
                     </div>
                   </div>
                 </div>
-                <!--begin::Table wrapper-->
-                <div class="table-responsive mb-10">
-                  <!--begin::Table-->
-                  <table
-                    class="table g-5 gs-0 mb-0 fw-bold text-gray-700"
-                    data-kt-element="Selects"
-                  >
-                    <!--begin::Table head-->
-                    <thead>
-                      <tr
-                        class="border-bottom fs-7 fw-bold text-gray-700 text-uppercase"
-                      >
-                        <th class="min-w-300px w-475px">Item</th>
-                        <th class="min-w-300px w-475px">Item Price</th>
-                        <th class="min-w-75px w-75px text-end">Action</th>
-                      </tr>
-                    </thead>
-                    <!--end::Table head-->
 
-                    <!--begin::Table body-->
-                    <tbody>
-                      <CustomSelect
-                        v-bind:tasks="InvoiceDetails.items"
-                        v-on:removeitem="RemoveItem($event)"
-                        v-on:getval="InvoiceDetailsAddFunc($event)"
-                        v-on:UpdateTotal="UpdateTotal($event)"
+                <div class="w-50">
+                  <div class="row gx-10">
+                    <div class="py-3">
+                      <h6 class="fs-6">Client :</h6>
+                    </div>
+                    <el-select
+                      v-model="InvoiceDetails.client.id"
+                      filterable
+                      :disabled="clientSelect"
+                      v-on:change="GetClientData(InvoiceDetails.client.id)"
+                    >
+                      <el-option
+                        v-for="item in Clients"
+                        :key="item.client_data.id"
+                        :label="`${item.client_data.first_name} ${item.client_data.last_name}`"
+                        :value="item.client_data.id"
                       />
-                    </tbody>
-                    <!--end::Table body-->
-
-                    <!--begin::Table foot-->
-                    <tfoot>
-                      <tr
-                        class="border-top border-top-dashed align-top fs-6 fw-bold text-gray-700"
+                      <el-option
+                        value=""
+                        disabled="disabled"
+                        label="Please Select Client..."
+                        key=""
+                        >Please Select Client...</el-option
                       >
-                        <th class="text-primary">
-                          <span class="btn btn-primary" @click="addNewItem()">
-                            <KTIcon icon-name="plus" icon-class="fs-2" />
-                            Add item
+                    </el-select>
+                  </div>
+                  <!--end::Row-->
+
+                  <div class="mt-2 pt-4">
+                    <h6 class="fw-bold mt-5">Site Address:</h6>
+                    <div class="mt-2">
+                      <div class="mb-1" v-show="InvoiceDetails.client">
+                        <br />
+                        <span>
+                          {{
+                            `${InvoiceDetails.client.first_name} ${InvoiceDetails.client.last_name}`
+                          }}
+                        </span>
+                        <br />
+                        <span v-show="InvoiceDetails.client.company_name">
+                          {{ `${InvoiceDetails.client.company_name}` }}
+                        </span>
+                        <!-- v-if company_data present -->
+                        <div v-show="InvoiceDetails.client.company_name">
+                          <br />
+                          <span>
+                            {{ `${InvoiceDetails.client.address1}` }}
                           </span>
-                        </th>
-                      </tr>
-                      <tr class="align-top fw-bold text-gray-700">
-                        <th colspan="1" class="fs-4 ps-0">Total</th>
-                        <th colspan="1" class="text-end fs-4 text-nowrap">
-                          ₹<span data-kt-element="grand-total">{{
-                            InvoiceDetails.total.toFixed(2)
-                          }}</span>
-                        </th>
-                      </tr>
-                    </tfoot>
-                    <!--end::Table foot-->
-                  </table>
+                          <br />
+                          <span>
+                            {{ `${InvoiceDetails.client.address2}` }}
+                          </span>
+                        </div>
+                        <div v-show="InvoiceDetails.client.country">
+                          <span>
+                            {{
+                              `${InvoiceDetails.client.city} - ${InvoiceDetails.client.pincode}`
+                            }}
+                          </span>
+                          <br />
+                          <span>
+                            {{
+                              `${InvoiceDetails.client.states} ${InvoiceDetails.client.country}`
+                            }}
+                          </span>
+                          <br />
+                        </div>
+                        <br />
+                        <!-- firstname as a flag -->
+                        <a
+                          v-show="InvoiceDetails.client.first_name"
+                          target="blank"
+                          v-bind:href="`/clients/edit/${InvoiceDetails.customer_id}`"
+                        >
+                          <span class="fs-5"> Edit</span>
+                          <!-- <i
+                          class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                          ></i> -->
+                        </a>
+                      </div>
+                      <br />
+                    </div>
+                  </div>
                 </div>
-                <div class="mb-0">
-                  <label class="form-label fs-6 fw-bold text-gray-700"
-                    >Notes</label
-                  >
-
-                  <textarea
-                    name="notes"
-                    class="form-control form-control-solid"
-                    rows="3"
-                    v-model="InvoiceDetails.notes"
-                    placeholder="Thanks for your business"
-                  ></textarea>
-                </div>
-                <!--end::Notes-->
               </div>
-              <br />
-              <br />
-            </form>
-            <!--end::Form-->
-          </div>
-        </div>
-      </div>
+            </div>
 
-      <div class="flex-lg-auto min-w-lg-300px">
-        <!--begin::Card-->
-        <div
-          class="card"
-          data-kt-sticky="true"
-          data-kt-sticky-name="Quotation"
-          data-kt-sticky-offset="{default: false, lg: '100px'}"
-          data-kt-sticky-top="150px"
-          data-kt-sticky-animation="false"
-          data-kt-sticky-zindex="95"
-          data-kt-sticky-width="300px"
-          data-kt-sticky-min-height="400px"
-          data-kt-sticky-enabled="true"
-        >
-          <!--begin::Card body-->
-          <div class="card-body">
-            <!--begin::Input group-->
-            <div class="mb-10">
-              <div class="d-flex flex-lg-row justify-content-between">
-                <h2>Quotation</h2>
-                <span
-                  class="cursor-pointer"
-                  v-on:click="generatePdf(InvoiceDetails.invoice_no)"
-                >
-                  <i class="fa fa-file-pdf" style="font-size: 1.6rem"></i>
-                </span>
-              </div>
-              <br />
-              <div class="row gx-10">
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label
+                class="col-lg-3 col-form-label required fw-bold text-gray-700 fw-semobold fs-6 text-nowrap"
+                >Select Site Location</label
+              >
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-9 fv-row">
                 <el-select
-                  v-model="InvoiceDetails.status"
+                  v-model="InvoiceDetails.items.id"
                   filterable
-                  :disabled="disabledselect"
-                  placeholder="Please Select Status..."
+                  v-on:change="SetLocation"
+                  placeholder="Please Select Site Location..."
+                  class="form-control"
                 >
-                  <!-- <el-option value=" " label="Please Select Status..." key=" "
-                    >Please Select Status...</el-option
-                  > -->
                   <el-option
-                    v-for="item in InvoiceStatusArray"
-                    :key="item.id"
-                    :label="`${item.name}`"
-                    :value="item.id"
+                    value=""
+                    label="Please Select Site Location..."
+                    key=""
+                    disabled
+                    >Please Select Site Location...</el-option
+                  >
+                  <el-option
+                    v-for="ele of locations"
+                    :key="ele.id"
+                    :label="ele.site_location"
+                    :value="ele.id"
                   />
                 </el-select>
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="site_location" />
+                  </div>
+                </div>
               </div>
-              <br />
-              <div class="items">
-                <p v-for="item in InvoiceDetails.items" :key="item.id">
-                  <span
-                    v-if="item.id != ''"
-                    class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                    >+ {{ item.name }}</span
-                  >
-                </p>
+              <!--end::Col-->
+            </div>
+
+            <!-- extra fields -->
+            <div class="row mb-6">
+              <div class="form-group col-md-6">
+                <label
+                  class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
+                  >Per day Charge</label
+                >
+                <input
+                  type="text"
+                  v-on:input="SetPerDayCharge"
+                  v-model="InvoiceDetails.items.per_day_charge"
+                  name="per_day_charge"
+                  placeholder="Per Day Charge..."
+                  class="form-control form-control-lg form-control-solid"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="per_day_charge" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group col-md-6">
+                <label
+                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6 text-nowrap"
+                  >Number of Days</label
+                >
+                <input
+                  type="text"
+                  name="number_of_days"
+                  class="form-control form-control-lg form-control-solid"
+                  v-on:input="SetDays"
+                  v-model="InvoiceDetails.items.number_of_days"
+                  placeholder="Number of Days..."
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="number_of_days" />
+                  </div>
+                </div>
               </div>
             </div>
             <!--end::Input group-->
-            <div class="total">
-              <div>
-                <h6
-                  class="text-start fs-4 text-nowrap badge badge-light flex-shrink-0 align-self-center py-3 px-4 fs-7"
+
+            <div class="row mb-6">
+              <div class="col-lg-6 mb-md-6">
+                <div class="d-flex flex-column align-items-start gap-3">
+                  <label
+                    for="accommodationRef"
+                    class="form-label fw-bold text-primary fw-semibold fs-6"
+                    >Accommodation</label
+                  >
+                  <div
+                    class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
+                  >
+                    <label
+                      class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                    >
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        :value=false
+                        name="accommodationRef"
+                        id="accommodationRef"
+                        v-on:change="ToggleAccommodation"
+                        v-model="accommodationRef"
+                      />
+                    </label>
+                    <div class="flex-grow-1">
+                      <input
+                        type="text"
+                        name="accommodation"
+                        class="form-control w-100"
+                        :disabled="!accommodationRef"
+                        v-on:input="SetAccommodation"
+                        v-model="InvoiceDetails.items.accommodation"
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6 mb-md-6">
+                <div class="d-flex flex-column align-items-start gap-3">
+                  <label
+                    for="accommodationRef2"
+                    class="form-label fw-bold text-primary fw-semibold fs-6"
+                    >Travelling</label
+                  >
+                  <div
+                    class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
+                  >
+                    <label
+                      class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                    >
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        :value=false
+                        name="travellingRef"
+                        id="travellingRef"
+                        v-on:change="ToggleTravelling"
+                        v-model="travellingRef"
+                      />
+                    </label>
+                    <div class="flex-grow-1">
+                      <input
+                        type="text"
+                        name="travelling"
+                        class="form-control w-100"
+                        :disabled="!travellingRef"
+                        v-on:input="SetTravelling"
+                        v-model="InvoiceDetails.items.travelling"
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-6">
+              <div class="col-lg-6 mb-md-6">
+                <div class="d-flex flex-column align-items-start gap-3">
+                  <label
+                    for="trainingRef"
+                    class="form-label fw-bold text-primary fw-semibold fs-6"
+                    >Training</label
+                  >
+                  <div
+                    class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
+                  >
+                    <label
+                      class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                    >
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        :value=false
+                        name="trainingRef"
+                        id="trainingRef"
+                        v-on:change="ToggleTraining"
+                        v-model="trainingRef"
+                      />
+                    </label>
+                    <div class="flex-grow-1">
+                      <input
+                        type="text"
+                        name="training"
+                        class="form-control w-100"
+                        v-on:input="SetTraining"
+                        v-model="InvoiceDetails.items.training"
+                        :disabled="!trainingRef"
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6 mb-md-6">
+                <div class="d-flex flex-column align-items-start gap-3">
+                  <label
+                    for="pickupRef"
+                    class="form-label fw-bold text-primary fw-semibold fs-6"
+                    >Pickup & Delivery</label
+                  >
+                  <div
+                    class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
+                  >
+                    <label
+                      class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                    >
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        :value=false
+                        name="pickupRef"
+                        id="pickupRef"
+                        v-on:change="TogglePickUp"
+                        v-model="pickupRef"
+                      />
+                    </label>
+                    <div class="flex-grow-1">
+                      <input
+                        type="text"
+                        name="pickup"
+                        :disabled="!pickupRef"
+                        class="form-control w-100"
+                        v-on:input="SetPickUp"
+                        v-model="InvoiceDetails.items.pickup"
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-6">
+              <div class="col-lg-6 mb-md-6">
+                <div class="d-flex flex-column align-items-start gap-3">
+                  <label
+                    for="boardingRef"
+                    class="form-label fw-bold text-primary fw-semibold fs-6"
+                    >Boarding & Lodging</label
+                  >
+                  <div
+                    class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
+                  >
+                    <label
+                      class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                    >
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        :value=false
+                        name="boardingRef"
+                        id="boardingRef"
+                        v-on:change="ToggleBoarding"
+                        v-model="boardingRef"
+                      />
+                    </label>
+                    <div class="flex-grow-1">
+                      <input
+                        type="text"
+                        name="boarding"
+                        class="form-control w-100"
+                        v-on:input="SetBoarding"
+                        v-model="InvoiceDetails.items.boarding"
+                        :disabled="!boardingRef"
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Col-->
+              <div class="col-md-12 fv-row mb-8 mb-sd-8">
+                <!--end::Label-->
+                <label class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Scope of Work</label
                 >
-                  {{ GetInvoiceStatus(parseInt(InvoiceDetails.status)) }}
-                </h6>
+                <!--end::Label-->
+                <textarea
+                  name="scope_of_work"
+                  class="form-control form-control-solid"
+                  rows="5"
+                  v-model="InvoiceDetails.scope_of_work"
+                  placeholder="Specify scope of work"
+                ></textarea>
+                <!--end::Input-->
               </div>
-              <div>
-                <h3 class="text-end fs-4 text-nowrap">Total</h3>
-                <h3 class="text-end fs-4 text-nowrap">
-                  ₹<span data-kt-element="grand-total">{{
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Col-->
+              <div class="col-md-12 fv-row mb-8 mb-sd-8">
+                <!--end::Label-->
+                <label class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Terms & Conditions</label
+                >
+                <!--end::Label-->
+                <textarea
+                  name="terms_and_conditions"
+                  class="form-control form-control-solid"
+                  rows="5"
+                  v-model="InvoiceDetails.terms_and_conditions"
+                  placeholder="Specify Terms and Conditions"
+                ></textarea>
+                <!--end::Input-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
+            <div class="row mb-6">
+              <!--begin::Col-->
+
+              <div class="col-lg-12 col-md-12 col-sd-12 fv-row m-auto">
+                <div class="card bg-light mb-3 p-6">
+                  <div
+                    class="row mb-6"
+                  >
+                    <!--begin::Label-->
+                    <label
+                      class="col-lg-3 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                      >Invoice Status</label
+                    >
+                    <!--end::Label-->
+
+                    <!--begin::Col-->
+                    <div class="col-lg-9 fv-row">
+                      <el-select
+                        v-model="InvoiceDetails.status"
+                        filterable
+                        :disabled="disabledselect"
+                        placeholder="Please Select Status..."
+                      >
+                        <el-option
+                    v-for="item in InvoiceStatusArray"
+                          :key="item.id"
+                          :label="`${item.name}`"
+                          :value="item.id"
+                        />
+                        <el-option
+                          value=""
+                          disabled="disabled"
+                          label="Please Select Status..."
+                          key=""
+                          >Please Select Status...</el-option
+                        >
+                      </el-select>
+                    </div>
+                    <!--end::Col-->
+                  </div>
+                  <div class="card-body">
+                    
+                    <div class="items">
+                      <p class="d-inline gap-2">
+                        <span
+                          v-if="InvoiceDetails.items.id != ''"
+                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
+                          >+ {{ InvoiceDetails.items.site_location }} ({{ InvoiceDetails.items.per_day_charge }} x {{  InvoiceDetails.items.number_of_days }})
+                        </span>
+                        <span
+                          v-if="InvoiceDetails.items.accomm"
+                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
+                          >+ Accomodation ({{ InvoiceDetails.items.accommodation }})
+                        </span>
+                        <span
+                          v-if="InvoiceDetails.items.travel"
+                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
+                          >+ Travelling ({{ InvoiceDetails.items.travelling }})
+                        </span>
+                        <span
+                          v-if="InvoiceDetails.items.train"
+                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
+                          >+ Training ({{ InvoiceDetails.items.training }})
+                        </span>
+                        <span
+                          v-if="InvoiceDetails.items.board"
+                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
+                          >+ Boarding & Lodging ({{ InvoiceDetails.items.boarding }})
+                        </span>
+                        <span
+                          v-if="InvoiceDetails.items.pick"
+                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
+                          >+ Pickup & Delivery ({{ InvoiceDetails.items.pickup }})
+                        </span>
+                      </p>
+                    </div>
+                    <div class="total">
+                      <div class="d-flex flex-lg-row justify-content-between">
+                        <h6
+                          class="text-start fs-4 text-nowrap badge badge-light flex-shrink-0 align-self-center py-3 px-4 fs-7"
+                        >
+
+                        {{ GetInvoiceStatus(parseInt(InvoiceDetails.status)) }}
+                        </h6>
+                        <div
+                          class="cursor-pointer"
+                          v-on:click="
+                            generatePdf(InvoiceDetails.invoice_no)
+                          "
+                        >
+                          <i
+                            class="fa fa-download badge py-3 px-4 fs-7 text-gray-700 badge-light-success"
+                            style="font-size: 1.6rem"
+                          >&nbsp; Download</i>
+                        </div>
+                      </div>
+                      <div>
+                        <h3 class="text-end fs-4 text-nowrap">Total</h3>
+                        <h3 class="text-end fs-4 text-nowrap">
+                          ₹<span data-kt-element="grand-total">{{
                     InvoiceDetails.total.toFixed(2)
-                  }}</span>
-                </h3>
-              </div>
-            </div>
-            <!--begin::Separator-->
-            <div class="separator separator-dashed mb-8"></div>
-            <!--end::Separator-->
-
-            <!--begin::Actions-->
-            <!--begin::Row-->
-            <!--end::Row-->
-            <div class="mb-0">
-              <!--begin::Row-->
-              <div class="row mb-5">
-                <!--begin::Col-->
-                <div class="col">
-                  <span
-                    class="btn btn-light btn-light-danger w-100"
-                    v-on:click="deleteQuotation"
-                    >Delete</span
-                  >
+                          }}</span>
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <!--end::Col-->
-
-                <!--begin::Col-->
-                <div class="col">
-                  <span
-                    class="btn btn-light btn-light-primary w-100"
-                    v-on:click="submit"
-                    >Update</span
-                  >
-                </div>
-                <!--end::Col-->
               </div>
-              <!--end::Row-->
+              <!--end::Col-->
             </div>
-            <!--end::Actions-->
           </div>
-          <!--end::Card body-->
-        </div>
-        <!--end::Card-->
+
+          <div class="modal-footer flex-center w-100">
+            <!--begin::Button-->
+            <button
+              type="button"
+              class="btn btn-light btn-light-danger w-sd-25 w-lg-25"
+              v-on:click="deleteQuotation"
+            >
+              Delete
+            </button>
+            <!--end::Button-->
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+            <!--begin::Button-->
+            <span
+              :data-kt-indicator="loading ? 'on' : null"
+              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
+              v-on:click="submit"
+            >
+              <span v-if="!loading" class="indicator-label"> Update </span>
+              <span v-if="loading" class="indicator-progress">
+                Please wait...
+                <span
+                  class="spinner-border spinner-border-sm align-middle ms-2"
+                ></span>
+              </span>
+            </span>
+            <!--end::Button-->
+          </div>
+          <!--end::Input group-->
+          <!--end::Input group-->
+        </VForm>
+        <!--end::Form-->
       </div>
     </div>
   </div>
@@ -468,9 +730,9 @@ import {
   deletequotation,
   updateInvoice,
   deleteinvoice,
+  getPriceList,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
-import CustomSelect from "./CustomComponents/CustomInvoiceItems.vue";
 import moment from "moment";
 import { useRouter, useRoute } from "vue-router";
 import { formatPrice } from "@/core/config/DataFormatter";
@@ -482,9 +744,12 @@ import {
 
 interface itemsArr {
   id: string;
-  price: string;
-  description: string;
-  name: string;
+  site_location: string;
+  per_day_charge: string;
+  number_of_days: string;
+  accommodation: number;
+  travelling: number;
+  training: number;
 }
 
 interface Meta {
@@ -503,11 +768,27 @@ interface Meta {
 interface InvoiceDetails {
   invoice_no: string;
   customer_id: string;
-  items: Array<itemsArr>;
+  items: {
+    id: string;
+    site_location: string;
+    per_day_charge: string;
+    number_of_days: string;
+    accommodation: number;
+    travelling: number;
+    training: number;
+    boarding: number;
+    pickup: number;
+    accomm: boolean;
+    travel: boolean;
+    train: boolean;
+    board: boolean;
+    pick: boolean;
+  };
   date: string;
   duedate: string;
   status: string;
-  notes: string;
+  scope_of_work: string;
+  terms_and_conditions: string;
   total: number;
   customer: Meta;
   client: Meta;
@@ -523,7 +804,6 @@ interface InvoiceDetails {
 export default defineComponent({
   name: "company-add",
   components: {
-    CustomSelect,
   },
   setup() {
     const auth = useAuthStore();
@@ -534,18 +814,71 @@ export default defineComponent({
     const router = useRoute();
     const User = auth.GetUser();
     const InvoiceId = router.params.id;
+    const loading = ref(false);
     const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
     const Clients = ref([
       { id: "", client_data: { id: "", first_name: "", last_name: "" } },
     ]);
+
+    
+    const locations = ref([
+      {
+        id: "",
+        site_location: "",
+        per_day_charge: "",
+        accommodation: "",
+        travelling: "",
+        training: "",
+      },
+    ]);
+
+    const getSelects = async () => {
+      ApiService.setHeader();
+      const response = await getPriceList(``);
+      const data = response.result.data.map(
+        ({
+          id,
+          site_location,
+          per_day_charge,
+          accommodation,
+          travelling,
+          training,
+        }) => ({
+          id,
+          site_location,
+          per_day_charge,
+          accommodation,
+          travelling,
+          training,
+        })
+      );
+      locations.value = data;
+    };
+
     const InvoiceDetails = ref<InvoiceDetails>({
-      invoice_no: "21****",
+      invoice_no: "",
       customer_id: " ",
-      items: [],
+      items: {
+        id: "",
+        site_location: "",
+        per_day_charge: "",
+        number_of_days: "1",
+        accommodation: 0,
+        travelling: 0,
+        training: 0,
+        boarding: 0,
+        pickup: 0,
+        accomm: true,
+        travel: true,
+        train: true,
+        board: true,
+        pick: true,
+      },
       date: "",
       duedate: "",
       status: "",
-      notes: "",
+      scope_of_work: "",
+      terms_and_conditions: "",
       customer: {
         id: "",
         company_name: "",
@@ -585,7 +918,9 @@ export default defineComponent({
 
       Customers.value.pop();
       Clients.value.pop();
+      locations.value.pop();
       await GetCustomers();
+      await getSelects();
 
       //? get the quotaion details from id
       const response = await getInvoice(InvoiceId);
@@ -596,7 +931,15 @@ export default defineComponent({
       InvoiceDetails.value.items = JSON.parse(response.items);
       InvoiceDetails.value.status = response.status;
       InvoiceDetails.value.total = parseFloat(response.total);
-      InvoiceDetails.value.notes = response.notes;
+      InvoiceDetails.value.scope_of_work = response.scope_of_work;
+      InvoiceDetails.value.terms_and_conditions = response.terms_and_conditions;
+
+      accommodationRef.value = InvoiceDetails.value.items.accomm
+      travellingRef.value = InvoiceDetails.value.items.travel
+      trainingRef.value = InvoiceDetails.value.items.train
+      pickupRef.value = InvoiceDetails.value.items.pick
+      boardingRef.value = InvoiceDetails.value.items.board
+
       // Customer
       InvoiceDetails.value.customer_id = response.customer_id;
       GetUserData(InvoiceDetails.value.customer_id);
@@ -706,60 +1049,203 @@ export default defineComponent({
       }
     };
 
-    const addNewItem = () => {
-      InvoiceDetails.value.items.push({
-        id: "",
-        name: "",
-        price: "",
-        description: "",
+    
+    /* --------NEW LOGIC--------*/
+
+    const accommodationRef = ref(true);
+    const travellingRef = ref(true);
+    const trainingRef = ref(true);
+    const pickupRef = ref(true);
+    const boardingRef = ref(true);
+
+    function areAllPropertiesNotNull(array) {
+      return array.some((detail) => {
+        const { site_location, per_day_charge, number_of_days } = detail;
+
+        // Check if any property is null or empty
+
+        return (
+          site_location === "" ||
+          isNaN(parseFloat(per_day_charge)) ||
+          isNaN(parseFloat(number_of_days))
+        );
       });
-    };
-    // on add model data push to the sub-json vlaue InvoiceDetails
-    const InvoiceDetailsAddFunc = (data) => {
-      // selects id not same don't push;
-      // console.log(InvoiceDetails.value);
-      // console.log(data);
-      // console.log(InvoiceDetails.value);
-      InvoiceDetails.value.items.forEach((ele) => {
-        console.log(ele);
-        if (ele.id == data.id) {
-          ele["name"] = data.name;
-          ele["desc"] = data.description;
-          ele["price"] = formatPrice(data.price);
-        }
-      });
-      calPrice();
-    };
+    }
 
-    const removeObjectWithId = (arr, id) => {
-      const objWithIdIndex = arr.findIndex((obj) => obj.id === id);
+    const calculateTotal = async () => {
+      // const days = InvoiceDetails.value.items.number_of_days;
 
-      if (objWithIdIndex > -1) {
-        arr.splice(objWithIdIndex, 1);
-      }
+      // const charge = InvoiceDetails.value.items.per_day_charge ? InvoiceDetails.value.items.per_day_charge.toString() : "";
+      // const charge_per_day = Number(charge.replaceAll(",", "").substring(0));
 
-      return arr;
-    };
+      // const accommo = InvoiceDetails.value.items.accommodation ? InvoiceDetails.value.items.accommodation.toString() : "";
+      // const travel = InvoiceDetails.value.items.travelling ? InvoiceDetails.value.items.travelling.toString() : "";
+      // const train = InvoiceDetails.value.items.training ? InvoiceDetails.value.items.training.toString() : "";
+      // const pick = InvoiceDetails.value.items.pickup ? InvoiceDetails.value.items.pickup.toString() : "";
+      // const board = InvoiceDetails.value.items.boarding ? InvoiceDetails.value.items.boarding.toString() : "";
 
-    const RemoveItem = (index) => {
-      console.log(index);
-      removeObjectWithId(InvoiceDetails.value.items, index);
-      calPrice();
-    };
+      // const accommodation = Number(accommo.replaceAll(",", "").substring(0));
+      // const travelling = Number(travel.replaceAll(",", "").substring(0));
+      // const training = Number(train.replaceAll(",", "").substring(0));
+      // const pickup = Number(pick.replaceAll(",", "").substring(0));
+      // const boarding = Number(board.replaceAll(",", "").substring(0));
 
-    const UpdateTotal = (data) => {
-      console.log(data);
-      removeNulls();
-      calPrice();
-    };
-
-    const calPrice = () => {
-      const prices = InvoiceDetails.value.items.map((ele: any) =>
-        Number(ele.price.replaceAll(",", "").substring(1))
-      );
       InvoiceDetails.value.total =
-        prices.length != 0 ? prices.reduce((acc, curr) => acc + curr) : 0.0;
+        (Number(InvoiceDetails.value.items.number_of_days) * Number(InvoiceDetails.value.items.per_day_charge)) +
+        Number(InvoiceDetails.value.items.accommodation) +
+        Number(InvoiceDetails.value.items.travelling) +
+        Number(InvoiceDetails.value.items.training) +
+        Number(InvoiceDetails.value.items.pickup) +
+        Number(InvoiceDetails.value.items.boarding);
+      
     };
+
+    async function SetLocation(id) {
+      const foundLocation = await locations.value.find((item) => {
+        return item.id === id;
+      });
+      console.log(foundLocation);
+
+      if (foundLocation) {
+        const {
+          id,
+          site_location,
+          per_day_charge,
+          accommodation,
+          travelling,
+          training,
+        } = foundLocation;
+
+        InvoiceDetails.value.items.id = id;
+        InvoiceDetails.value.items.site_location = site_location;
+        InvoiceDetails.value.items.per_day_charge = per_day_charge;
+        InvoiceDetails.value.items.accommodation = Number(accommodation);
+        InvoiceDetails.value.items.travelling = Number(travelling);
+        InvoiceDetails.value.items.training = Number(training);
+        InvoiceDetails.value.items.boarding = 0;
+        InvoiceDetails.value.items.pickup = 0;
+
+        InvoiceDetails.value.items.accomm = true;
+        InvoiceDetails.value.items.travel = true;
+        InvoiceDetails.value.items.train = true;
+        InvoiceDetails.value.items.board = true;
+        InvoiceDetails.value.items.pick = true;
+
+
+
+        accommodationRef.value = true;
+        travellingRef.value = true;
+        trainingRef.value = true;
+        pickupRef.value = true;
+        boardingRef.value = true;
+
+        await calculateTotal();
+        console.log("Function runned")
+      }
+    }
+
+
+    async function SetPerDayCharge() {
+
+      await calculateTotal();
+    }
+
+    async function SetDays() {
+      console.log(InvoiceDetails.value.items.number_of_days)
+      await calculateTotal();
+    }
+
+    async function SetAccommodation() {
+
+      await calculateTotal();
+    }
+
+    async function SetTravelling() {
+
+      await calculateTotal();
+    }
+
+    async function SetTraining() {
+
+      await calculateTotal();
+    }
+
+    async function SetBoarding() {
+
+      await calculateTotal();
+    }
+
+    async function SetPickUp() {
+
+      await calculateTotal();
+    }
+
+    async function ToggleAccommodation() {
+      // console.log(event);
+      if (accommodationRef.value) {
+        accommodationRef.value = true;
+        InvoiceDetails.value.items.accomm = true;
+
+      } else {
+        accommodationRef.value = false;
+        InvoiceDetails.value.items.accommodation = 0;
+        InvoiceDetails.value.items.accomm = false;
+      }
+      await calculateTotal();
+    }
+
+    async function ToggleTravelling() {
+      // console.log(event);
+      if (travellingRef.value) {
+        travellingRef.value = true;
+        InvoiceDetails.value.items.travel = true;
+
+      } else {
+        travellingRef.value = false;
+        InvoiceDetails.value.items.travelling = 0;
+        InvoiceDetails.value.items.travel = false;
+      }
+      await calculateTotal();
+    }
+
+    async function ToggleTraining() {
+      // console.log(event);
+      if (trainingRef.value) {
+        trainingRef.value = true;
+        InvoiceDetails.value.items.train = true;
+      } else {
+        trainingRef.value = false;
+        InvoiceDetails.value.items.training = 0;
+        InvoiceDetails.value.items.train = false;
+      }
+      await calculateTotal();
+    }
+
+    async function ToggleBoarding() {
+      // console.log(event);
+      if (boardingRef.value) {
+        boardingRef.value = true;
+        InvoiceDetails.value.items.board = true;
+      } else {
+        boardingRef.value = false;
+        InvoiceDetails.value.items.boarding = 0;
+        InvoiceDetails.value.items.board = false;
+      }
+      await calculateTotal();
+    }
+
+    async function TogglePickUp() {
+      // console.log(event);
+      if (pickupRef.value) {
+        pickupRef.value = true;
+        InvoiceDetails.value.items.pick = true;
+      } else {
+        pickupRef.value = false;
+        InvoiceDetails.value.items.pickup = 0;
+        InvoiceDetails.value.items.pick = false;
+      }
+      await calculateTotal();
+    }
 
     const GetCustomers = async () => {
       ApiService.setHeader();
@@ -772,14 +1258,7 @@ export default defineComponent({
       );
     };
 
-    const removeNulls = () => {
-      InvoiceDetails.value.items = InvoiceDetails.value.items.filter(
-        (ele: any) => ele.id !== ""
-      );
-    };
-
     const generatePdf = async (pdfName: string) => {
-      removeNulls();
       console.log(InvoiceDetails.value);
       await Gen("invoice", InvoiceId.toString(), pdfName, InvoiceDetails);
     };
@@ -787,8 +1266,6 @@ export default defineComponent({
     // number formating remove
     const submit = async () => {
       disabledselect.value = true;
-      removeNulls();
-      console.log(InvoiceDetails.value);
       InvoiceDetails.value.date = moment(InvoiceDetails.value.date).format(
         "YYYY-MM-DD HH:mm:ss"
       );
@@ -910,16 +1387,32 @@ export default defineComponent({
       clientSelect,
       shortcuts,
       disabledDate,
-      RemoveItem,
       GetUserData,
       GetClientData,
-      UpdateTotal,
-      addNewItem,
       InvoiceStatusArray,
-      InvoiceDetailsAddFunc,
       GetInvoiceStatus,
       Total,
       generatePdf,
+      SetLocation,
+      SetPerDayCharge,
+      SetDays,
+      loading,
+      locations,
+      SetAccommodation,
+      SetTravelling,
+      SetTraining,
+      SetBoarding,
+      SetPickUp,
+      accommodationRef,
+      travellingRef,
+      trainingRef,
+      pickupRef,
+      boardingRef,
+      ToggleAccommodation,
+      ToggleTraining,
+      ToggleTravelling,
+      TogglePickUp,
+      ToggleBoarding,
     };
   },
 });

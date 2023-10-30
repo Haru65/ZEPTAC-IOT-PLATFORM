@@ -105,6 +105,20 @@ export async function updateCompany(data: any, id: any) {
 
 // EMPLOYEES
 
+// add user
+export async function addEmployee(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        console.log(data);
+        const response = await ApiService.post(EMPLOYEE_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 export async function EmployeeSearch(search: any) {
     try {
         //console.log(data)

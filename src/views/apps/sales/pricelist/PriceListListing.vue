@@ -78,19 +78,45 @@
         :loading="loading"
       >
         <!-- img data -->
-        <template v-slot:name="{ row: pricelist }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ pricelist.name }}
-          </span>
+        <template v-slot:id="{ row: pricelist }">
+          {{ pricelist.id }}
+        </template>
+        <template v-slot:customer_type="{ row: pricelist }">
+          {{ pricelist.customer_type }}
         </template>
         <!-- defualt data -->
-        <template v-slot:description="{ row: pricelist }">
-          {{ pricelist.description }}
+        <template v-slot:site_location="{ row: pricelist }">
+          {{ pricelist.site_location }}
         </template>
-        <template v-slot:price="{ row: pricelist }">
-          {{ formatPrice(pricelist.price) }}
+        <template v-slot:per_day_charge="{ row: pricelist }">
+          {{ formatPrice(pricelist.per_day_charge) }}
         </template>
-        <template v-slot:date="{ row: pricelist }">
+        <template v-slot:equipment_wise="{ row: pricelist }">
+          <div>
+            <el-select
+              filterable
+              placeholder="Equipment Wise Charges's"
+            >
+              <el-option
+                disabled="disabled"
+                v-for="(equip,index) in pricelist.equipment_wise"
+                :key="index"
+                :value="`${equip.name} --- ${formatPrice(equip.charge)}`"
+                :label="`${equip.name} --- ${formatPrice(equip.charge)}`"
+              />
+            </el-select>
+          </div>
+        </template>
+        <template v-slot:accommodation="{ row: pricelist }">
+          {{ formatPrice(pricelist.accommodation) }}
+        </template>
+        <template v-slot:travelling="{ row: pricelist }">
+          {{ formatPrice(pricelist.travelling) }}
+        </template>
+        <template v-slot:training="{ row: pricelist }">
+          {{ formatPrice(pricelist.training) }}
+        </template>
+        <template v-slot:created_at="{ row: pricelist }">
           {{ pricelist.created_at }}
         </template>
         <template v-slot:actions="{ row: pricelist }">
@@ -175,30 +201,61 @@ export default defineComponent({
     Datatable,
   },
   setup() {
+
     const tableHeader = ref([
       {
-        columnName: "Name",
-        columnLabel: "name",
+        columnName: "Id",
+        columnLabel: "id",
+        sortEnabled: true,
+        columnWidth: 25,
+      },
+      {
+        columnName: "Customer Type",
+        columnLabel: "customer_type",
         sortEnabled: true,
         columnWidth: 75,
       },
       {
-        columnName: "Description",
-        columnLabel: "description",
+        columnName: "Site Location",
+        columnLabel: "site_location",
         sortEnabled: true,
         columnWidth: 80,
       },
       {
-        columnName: "Price",
-        columnLabel: "price",
+        columnName: "Per Day Wise",
+        columnLabel: "per_day_charge",
         sortEnabled: true,
-        columnWidth: 115,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Equipment Wise",
+        columnLabel: "equipment_wise",
+        sortEnabled: true,
+        columnWidth: 150,
+      },
+      {
+        columnName: "Accommodation",
+        columnLabel: "accommodation",
+        sortEnabled: true,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Travelling",
+        columnLabel: "travelling",
+        sortEnabled: true,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Training",
+        columnLabel: "training",
+        sortEnabled: true,
+        columnWidth: 75,
       },
       {
         columnName: "Created Date",
-        columnLabel: "date",
+        columnLabel: "created_at",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 15,
       },
       {
         columnName: "Actions",
@@ -243,12 +300,30 @@ export default defineComponent({
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
-            ...rest,
+          ({
+            id,
+            customer_type,
+            site_location,
+            per_day_charge,
+            equipment_wise,
+            accommodation,
+            travelling,
+            training,
+            created_at
+           }) => ({
+            id,
+            customer_type: customer_type ? customer_type : "---",
+            site_location: site_location,
+            per_day_charge: per_day_charge,
+            equipment_wise: JSON.parse(equipment_wise),
+            accommodation: accommodation,
+            travelling: travelling,
+            training: training,
             created_at: moment(created_at).format("LL"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        loading.value = false;
       } catch (error) {
         console.error(error);
       } finally {
@@ -276,8 +351,25 @@ export default defineComponent({
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
-            ...rest,
+          ({ 
+            id,
+            customer_type,
+            site_location,
+            per_day_charge,
+            equipment_wise,
+            accommodation,
+            travelling,
+            training,
+            created_at
+           }) => ({
+            id,
+            customer_type: customer_type ? customer_type : "---",
+            site_location: site_location,
+            per_day_charge: per_day_charge,
+            equipment_wise: JSON.parse(equipment_wise),
+            accommodation: accommodation,
+            travelling: travelling,
+            training: training,
             created_at: moment(created_at).format("LL"),
           })
         );
@@ -317,8 +409,25 @@ export default defineComponent({
         );
         console.log(response);
         tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
-            ...rest,
+          ({ 
+            id,
+            customer_type,
+            site_location,
+            per_day_charge,
+            equipment_wise,
+            accommodation,
+            travelling,
+            training,
+            created_at
+           }) => ({
+            id,
+            customer_type: customer_type ? customer_type : "---",
+            site_location: site_location,
+            per_day_charge: per_day_charge,
+            equipment_wise: JSON.parse(equipment_wise),
+            accommodation: accommodation,
+            travelling: travelling,
+            training: training,
             created_at: moment(created_at).format("LL"),
           })
         );
@@ -360,7 +469,7 @@ export default defineComponent({
     const deleteItem = (id: number, mul: boolean) => {
       if (!mul) {
         for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
+          if (tableData.value[i].id === id.toString()) {
             Swal.fire({
               title: "Are you sure?",
               text: "You will not be able to recover from this !",
@@ -379,7 +488,7 @@ export default defineComponent({
         }
       } else {
         for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
+          if (tableData.value[i].id === id.toString()) {
             // Put your function here
             deletePriceListItem(id);
             tableData.value.splice(i, 1);
@@ -420,8 +529,25 @@ export default defineComponent({
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
-            ...rest,
+          ({ 
+            id,
+            customer_type,
+            site_location,
+            per_day_charge,
+            equipment_wise,
+            accommodation,
+            travelling,
+            training,
+            created_at
+           }) => ({
+            id,
+            customer_type: customer_type ? customer_type : "---",
+            site_location: site_location,
+            per_day_charge: per_day_charge,
+            equipment_wise: JSON.parse(equipment_wise),
+            accommodation: accommodation,
+            travelling: travelling,
+            training: training,
             created_at: moment(created_at).format("LL"),
           })
         );

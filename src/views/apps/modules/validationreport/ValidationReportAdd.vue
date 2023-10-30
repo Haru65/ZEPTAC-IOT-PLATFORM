@@ -407,10 +407,13 @@ import DefaultTest from "./TestAddCustomComponent/DefaultTest.vue";
 
 interface Instrument {
   id: string;
+  instrument_id: string;
   name: string;
   model_no: string;
   serial_no: string;
   make: string;
+  calibration_date: string;
+  calibration_due_date: string;
 }
 interface Engineer {
   id: string;
@@ -425,10 +428,13 @@ interface airVelocityTestReport {
   report_name: string;
   instrument_used: {
     id: string;
+    instrument_id: string;
     name: string;
     model_no: string;
     serial_no: string;
     make: string;
+    calibration_date: string;
+    calibration_due_date: string;
   };
   area_name: string;
   ahu_no: string;
@@ -476,10 +482,13 @@ interface filterIntegrityTestReport {
   report_name: string;
   instrument_used: {
     id: string;
+    instrument_id: string;
     name: string;
     model_no: string;
     serial_no: string;
     make: string;
+    calibration_date: string;
+    calibration_due_date: string;
   };
   area_name: string;
   ahu_no: string;
@@ -517,10 +526,13 @@ interface particleCountTestReport {
   report_name: string;
   instrument_used: {
     id: string;
+    instrument_id: string;
     name: string;
     model_no: string;
     serial_no: string;
     make: string;
+    calibration_date: string;
+    calibration_due_date: string;
   };
   area_name: string;
   ahu_no: string;
@@ -559,10 +571,13 @@ interface recoveryTestReport {
   report_name: string;
   instrument_used: {
     id: string;
+    instrument_id: string;
     name: string;
     model_no: string;
     serial_no: string;
     make: string;
+    calibration_date: string;
+    calibration_due_date: string;
   };
   area_name: string;
   ahu_no: string;
@@ -709,10 +724,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         ahu_no,
@@ -778,10 +796,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         room_name,
@@ -838,10 +859,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         room_name,
@@ -899,10 +923,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         room_name,
@@ -1056,10 +1083,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         ahu_no,
@@ -1127,10 +1157,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         room_name,
@@ -1190,10 +1223,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         room_name,
@@ -1254,10 +1290,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         room_name,
@@ -1392,38 +1431,127 @@ export default defineComponent({
     const SetDetails = async (id) => {
       if (id) {
         try {
-          // Find the rgp
-          const foundRGP = RGPS.value.find((rgp) => rgp.id === id);
+          // console.log("Before",validationReportDetails.value.rgp_no);
 
-          // If not found, return early
-          if (!foundRGP) {
+          if (validationReportDetails.value.rgp_no == "") {
+            // Find the rgp
+            const foundRGP = RGPS.value.find((rgp) => rgp.id === id);
+
+            // If not found, return early
+            if (!foundRGP) {
+              return;
+            }
+
+            // Destructure and assign rgp details
+            const {
+              rgp_no,
+              worksheet_filled_count,
+              instruments,
+              engineers,
+              client_address,
+              customer_address,
+              customer_data,
+              client_data,
+            } = await foundRGP;
+            validationReportDetails.value.rgp_id = id;
+            validationReportDetails.value.rgp_no = rgp_no;
+            validationReportDetails.value.worksheet_filled_count =
+              worksheet_filled_count;
+
+            validationReportDetails.value.engineers = [];
+            validationReportDetails.value.instruments = [];
+            validationReportDetails.value.instruments = [...instruments];
+            validationReportDetails.value.engineers = [...engineers];
+            ClientAddress.value = client_address;
+            CustomerAddress.value = customer_address;
+            CustomerData.value = customer_data;
+            ClientData.value = client_data;
+
             return;
           }
 
-          // Destructure and assign rgp details
-          const {
-            rgp_no,
-            worksheet_filled_count,
-            instruments,
-            engineers,
-            client_address,
-            customer_address,
-            customer_data,
-            client_data,
-          } = foundRGP;
-          validationReportDetails.value.rgp_id = id;
-          validationReportDetails.value.rgp_no = rgp_no;
-          validationReportDetails.value.worksheet_filled_count =
-            worksheet_filled_count;
+          if (validationReportDetails.value.rgp_no) {
+            const rgpNumber = validationReportDetails.value.rgp_no;
 
-          validationReportDetails.value.engineers = [];
-          validationReportDetails.value.instruments = [];
-          validationReportDetails.value.instruments = [...instruments];
-          validationReportDetails.value.engineers = [...engineers];
-          ClientAddress.value = client_address;
-          CustomerAddress.value = customer_address;
-          CustomerData.value = customer_data;
-          ClientData.value = client_data;
+            console.log("rgp_no", rgpNumber);
+            // Find the previous rgp
+            const prevRGP = await RGPS.value.find(
+              (rgp) => rgp.rgp_no === rgpNumber
+            );
+
+            // If not found, return early
+            if (!prevRGP) {
+              return;
+            }
+
+            Swal.fire({
+              title: "Are you sure?",
+              text: "This Action will reset all your Test Reports!",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "red",
+              confirmButtonText: "Yes, I am sure!",
+            }).then((result: { [x: string]: any }) => {
+              if (result["isConfirmed"]) {
+                // Put your function here
+                // validationReportDetails.value.engineers = [];
+                // validationReportDetails.value.instruments = [];
+
+                validationReportDetails.value.tests = [
+                  {
+                    air_velocity_test_reports: [],
+                  },
+                  {
+                    filter_integrity_test_reports: [],
+                  },
+                  {
+                    particle_count_test_reports: [],
+                  },
+                  {
+                    recovery_test_reports: [],
+                  },
+                ];
+
+                // Find the rgp
+                const foundRGP = RGPS.value.find((rgp) => rgp.id === id);
+
+                // If not found, return early
+                if (!foundRGP) {
+                  return;
+                }
+
+                // Destructure and assign rgp details
+                const {
+                  rgp_no,
+                  worksheet_filled_count,
+                  instruments,
+                  engineers,
+                  client_address,
+                  customer_address,
+                  customer_data,
+                  client_data,
+                } = foundRGP;
+                validationReportDetails.value.rgp_id = id;
+                validationReportDetails.value.rgp_no = rgp_no;
+                validationReportDetails.value.worksheet_filled_count =
+                  worksheet_filled_count;
+
+                validationReportDetails.value.engineers = [];
+                validationReportDetails.value.instruments = [];
+                validationReportDetails.value.instruments = [...instruments];
+                validationReportDetails.value.engineers = [...engineers];
+                ClientAddress.value = client_address;
+                CustomerAddress.value = customer_address;
+                CustomerData.value = customer_data;
+                ClientData.value = client_data;
+              } else {
+                validationReportDetails.value.rgp_id = prevRGP.id;
+                validationReportDetails.value.rgp_no = prevRGP.rgp_no;
+                validationReportDetails.value.worksheet_filled_count =
+                  prevRGP.worksheet_filled_count;
+              }
+            });
+          }
         } catch (error) {
           console.error("An error occurred:", error);
         }

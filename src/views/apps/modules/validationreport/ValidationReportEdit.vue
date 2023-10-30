@@ -159,13 +159,11 @@
                                   )[0]"
                                   :key="index"
                                 >
-                                <td class="align-middle">
+                                  <td class="align-middle">
                                     <span
                                       class="badge py-3 px-4 fs-7 badge-light-primary"
                                       >{{
-                                        `${report.report_name}_${
-                                          index + 1
-                                        }`
+                                        `${report.report_name}_${index + 1}`
                                       }}</span
                                     >
                                   </td>
@@ -194,7 +192,9 @@
                                         v-bind:heading="test.test + ' Edit'"
                                         v-bind:id="test.id"
                                         v-bind:code="test.code"
-                                        v-bind:rgp_no="validationReportDetails.rgp_no"
+                                        v-bind:rgp_no="
+                                          validationReportDetails.rgp_no
+                                        "
                                         v-bind:reportId="index"
                                         v-bind:reportData="report"
                                         v-bind:instruments="
@@ -364,10 +364,13 @@ import DefaultTest from "./TestEditCustomComponent/DefaultTest.vue";
 
 interface Instrument {
   id: string;
+  instrument_id: string;
   name: string;
   model_no: string;
   serial_no: string;
   make: string;
+  calibration_date: string;
+  calibration_due_date: string;
 }
 interface Engineer {
   id: string;
@@ -382,10 +385,13 @@ interface airVelocityTestReport {
   report_name: string;
   instrument_used: {
     id: string;
+    instrument_id: string;
     name: string;
     model_no: string;
     serial_no: string;
     make: string;
+    calibration_date: string;
+    calibration_due_date: string;
   };
   area_name: string;
   ahu_no: string;
@@ -433,10 +439,13 @@ interface filterIntegrityTestReport {
   report_name: string;
   instrument_used: {
     id: string;
+    instrument_id: string;
     name: string;
     model_no: string;
     serial_no: string;
     make: string;
+    calibration_date: string;
+    calibration_due_date: string;
   };
   area_name: string;
   ahu_no: string;
@@ -474,10 +483,13 @@ interface particleCountTestReport {
   report_name: string;
   instrument_used: {
     id: string;
+    instrument_id: string;
     name: string;
     model_no: string;
     serial_no: string;
     make: string;
+    calibration_date: string;
+    calibration_due_date: string;
   };
   area_name: string;
   ahu_no: string;
@@ -516,10 +528,13 @@ interface recoveryTestReport {
   report_name: string;
   instrument_used: {
     id: string;
+    instrument_id: string;
     name: string;
     model_no: string;
     serial_no: string;
     make: string;
+    calibration_date: string;
+    calibration_due_date: string;
   };
   area_name: string;
   ahu_no: string;
@@ -682,10 +697,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         ahu_no,
@@ -751,10 +769,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         room_name,
@@ -811,10 +832,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         room_name,
@@ -872,10 +896,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         room_name,
@@ -1028,10 +1055,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         ahu_no,
@@ -1099,10 +1129,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         room_name,
@@ -1162,10 +1195,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         room_name,
@@ -1226,10 +1262,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         room_name,
@@ -1317,7 +1356,6 @@ export default defineComponent({
       last_name: "",
     });
 
-    
     // fill the details when response is received
     const fillDetails = async (response) => {
       validationReportDetails.value.id = response.id;
@@ -1363,37 +1401,41 @@ export default defineComponent({
     // function that delete air velocity data
     async function deleteAirVelocityTestData(testId, index) {
       //zero represent the testID
-      validationReportDetails.value.tests[0].air_velocity_test_reports = await removeObjectWithId(
-        validationReportDetails.value.tests[0].air_velocity_test_reports,
-        index
-      );
+      validationReportDetails.value.tests[0].air_velocity_test_reports =
+        await removeObjectWithId(
+          validationReportDetails.value.tests[0].air_velocity_test_reports,
+          index
+        );
     }
-    
+
     // function that delete filter integrity data
     async function deleteFilterIntegrityTestData(testId, index) {
       //zero represent the testID
-      validationReportDetails.value.tests[1].filter_integrity_test_reports = await removeObjectWithId(
-        validationReportDetails.value.tests[1].filter_integrity_test_reports,
-        index
-      );
+      validationReportDetails.value.tests[1].filter_integrity_test_reports =
+        await removeObjectWithId(
+          validationReportDetails.value.tests[1].filter_integrity_test_reports,
+          index
+        );
     }
-    
+
     // function that delete particle count data
     async function deleteParticleCountTestData(testId, index) {
       //zero represent the testID
-      validationReportDetails.value.tests[2].particle_count_test_reports = await removeObjectWithId(
-        validationReportDetails.value.tests[2].particle_count_test_reports,
-        index
-      );
+      validationReportDetails.value.tests[2].particle_count_test_reports =
+        await removeObjectWithId(
+          validationReportDetails.value.tests[2].particle_count_test_reports,
+          index
+        );
     }
-    
+
     // function that delete recovery data
     async function deleteRecoveryTestData(testId, index) {
       //zero represent the testID
-      validationReportDetails.value.tests[3].recovery_test_reports = await removeObjectWithId(
-        validationReportDetails.value.tests[3].recovery_test_reports,
-        index
-      );
+      validationReportDetails.value.tests[3].recovery_test_reports =
+        await removeObjectWithId(
+          validationReportDetails.value.tests[3].recovery_test_reports,
+          index
+        );
     }
 
     // function that will delete testData

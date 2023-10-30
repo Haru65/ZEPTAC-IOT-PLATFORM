@@ -25,7 +25,10 @@
                 Sr.No
               </th>
               <th class="min-w-200px fs-5 fw-bold text-gray-700 text-nowrap">
-                Instrument
+                Instrument ID
+              </th>
+              <th class="min-w-200px fs-5 fw-bold text-gray-700 text-nowrap">
+                Name
               </th>
               <th class="min-w-100px fs-5 fw-bold text-gray-700 text-nowrap">
                 Made By
@@ -53,6 +56,9 @@
             >
               <td class="fs-3 fw-bold">
                 {{ index + 1 }}
+              </td>
+              <td class="fs-3 fw-bold text-nowrap">
+                {{ instrument.instrument_id }}
               </td>
               <td class="fs-3 fw-bold text-wrap">
                 {{ instrument.name }}
@@ -111,10 +117,13 @@ import { ErrorMessage, Field } from "vee-validate";
 
 interface Instrument {
   id: string;
+  instrument_id: string;
   name: string;
   model_no: string;
   serial_no: string;
   make: string;
+  calibration_date: string;
+  calibration_due_date: string;
 }
 
 interface step3Data {
@@ -144,10 +153,13 @@ export default defineComponent({
       if (e.target.checked) {
         step3Data.value.instruments.push({
           id: selectedId,
+          instrument_id: selectedInstruments.instrument_id,
           name: selectedInstruments.name,
           model_no: selectedInstruments.model_no,
           serial_no: selectedInstruments.serial_no,
           make: selectedInstruments.make,
+          calibration_date: selectedInstruments.calibration_date,
+          calibration_due_date: selectedInstruments.calibration_date,
         });
       } else {
         step3Data.value.instruments = step3Data.value.instruments.filter(

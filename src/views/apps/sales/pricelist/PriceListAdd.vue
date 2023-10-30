@@ -15,93 +15,153 @@
           <div class="card-body border-top p-9">
             <!--begin::Input group-->
             <div class="row mb-6">
-              <!--begin::Label-->
-              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                >Product Name</label
-              >
-              <!--end::Label-->
-
               <!--begin::Col-->
-              <div class="col-lg-8 fv-row">
+              <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                <!--end::Label-->
+                <label
+                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Site Location</label
+                >
+                <!--end::Label-->
+
                 <Field
                   type="text"
-                  name="name"
+                  name="site_location"
                   class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Product Name"
-                  v-model="itemDetails.name"
+                  v-model="itemDetails.site_location"
+                  placeholder="Enter Site Location"
                 />
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
-                    <ErrorMessage name="name" />
+                    <ErrorMessage name="site_location" />
                   </div>
                 </div>
+                <!--end::Input-->
               </div>
               <!--end::Col-->
-            </div>
-            <!--end::Input group-->
-            <!--begin::Input group-->
-            <div class="row mb-3">
-              <!--begin::Label-->
-              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                >Product Detials</label
-              >
-              <!--end::Label-->
+
               <!--begin::Col-->
-              <div class="col-lg-8">
-                <!--begin::Row-->
-                <!--begin::Col-->
-                <div class="col-lg fv-row">
-                  <Field
-                    type="text"
-                    as="textarea"
-                    name="description"
-                    rows="10"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Description of product..."
-                    v-model="itemDetails.description"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="description" />
-                    </div>
+              <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                <!--end::Label-->
+                <label
+                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Per Day Charge</label
+                >
+                <!--end::Label-->
+
+                <Field
+                  type="text"
+                  name="per_day_charge"
+                  class="form-control form-control-lg form-control-solid"
+                  v-model="itemDetails.per_day_charge"
+                  placeholder="Per Day Charge is...₹0.0"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="complaint_no" />
                   </div>
                 </div>
-                <!--end::Col-->
-                <!--end::Row-->
+                <!--end::Input-->
               </div>
               <!--end::Col-->
             </div>
             <!--end::Input group-->
+
             <!--begin::Input group-->
             <div class="row mb-6">
-              <!--begin::Label-->
-              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                >Product Price</label
-              >
-              <!--end::Label-->
+              <PriceCustomComponent
+                v-bind:equipment_wise="itemDetails.equipment_wise"
+                v-on:removeRow="RemoveRow"
+                v-on:addNewRow="addNewRow"
+                v-on:setTheEquipment="SetEquipment"
+                v-on:setTheCharge="SetCharge"
+              ></PriceCustomComponent>
+            </div>
+            <!--end::Input group-->
 
+            <!--begin::Input group-->
+            <div class="row mb-6">
               <!--begin::Col-->
-              <div class="col-lg-8 fv-row">
+              <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                <!--end::Label-->
+                <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Accommodation Charge</label
+                >
+                <!--end::Label-->
                 <Field
                   type="text"
-                  name="price"
+                  name="accommodation"
                   class="form-control form-control-lg form-control-solid"
                   placeholder="₹0.00"
-                  v-model="itemDetails.price"
+                  v-model="itemDetails.accommodation"
                 />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="price" />
-                  </div>
-                </div>
+                <!--end::Input-->
+              </div>
+              <!--end::Col-->
+
+              <!--begin::Col-->
+              <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                <!--end::Label-->
+                <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Travelling Charge</label
+                >
+                <!--end::Label-->
+                <Field
+                  type="text"
+                  name="travelling"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="₹0.00"
+                  v-model="itemDetails.travelling"
+                />
+                <!--end::Input-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Col-->
+              <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                <!--end::Label-->
+                <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Training Charge</label
+                >
+                <!--end::Label-->
+                <Field
+                  type="text"
+                  name="training"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="₹0.00"
+                  v-model="itemDetails.training"
+                />
+                <!--end::Input-->
+              </div>
+              <!--end::Col-->
+
+              <!--begin::Col-->
+              <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                <!--end::Label-->
+                <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Customer Type</label
+                >
+                <!--end::Label-->
+                <Field
+                  type="text"
+                  name="customer_type"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Enter Customer Type"
+                  v-model="itemDetails.customer_type"
+                />
+                <!--end::Input-->
               </div>
               <!--end::Col-->
             </div>
             <!--end::Input group-->
           </div>
-          <div class="modal-footer flex-center">
+          <div class="modal-footer flex-center w-100">
             <!--begin::Button-->
-            <button type="reset" class="btn btn-lg btn-danger w-25">
+            <button type="reset" class="btn btn-lg btn-danger w-sd-25 w-lg-25">
               Discard
             </button>
             <!--end::Button-->
@@ -109,7 +169,7 @@
             <!--begin::Button-->
             <span
               :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-25"
+              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
               @click="submit()"
             >
               <span v-if="!loading" class="indicator-label"> Submit </span>
@@ -141,41 +201,42 @@ import packages from "@/core/config/PackagesConfig";
 import { limit } from "@/core/config/WhichUserConfig";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
-
-interface itemDetails {
-  name: string;
-  description: string;
-  price: string;
-  company_id: string;
-  created_by: number;
-  updated_by: number;
-  is_active: number;
-}
+import { Equipments, GetEquipment } from "@/core/model/pricelist";
+import PriceCustomComponent from "./PriceCustomComponent.vue";
 
 export default defineComponent({
-  name: "company-add",
+  name: "price-add",
   components: {
     ErrorMessage,
     Field,
     VForm,
+    PriceCustomComponent,
   },
   setup() {
-
     const loading = ref(false);
     const auth = useAuthStore();
     const router = useRouter();
     const User = auth.GetUser();
 
     const itemDetailsValidator = Yup.object().shape({
-      name: Yup.string().required().label("Product Name"),
-      description: Yup.string().required().label("Description"),
-      price: Yup.string().required().label("Price"),
+      site_location: Yup.string().required().label("Site Location"),
+      per_day_charge: Yup.string().required().label("Per Day Charge"),
     });
 
-    const itemDetails = ref<itemDetails>({
-      name: "",
-      description: "",
-      price: "",
+    const itemDetails = ref({
+      site_location: "",
+      per_day_charge: "",
+      equipment_wise: [
+        {
+          id: "",
+          name: "",
+          charge: "",
+        },
+      ],
+      accommodation: "0",
+      travelling: "0",
+      training: "0",
+      customer_type: "",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -183,6 +244,72 @@ export default defineComponent({
     });
 
     onMounted(() => {});
+
+    function areAllPropertiesNotNull(array) {
+      return array.some((detail) => {
+        const { name, charge } = detail;
+
+        // Check if any property is null or empty
+
+        return name === "" || isNaN(parseFloat(charge));
+      });
+    }
+
+    // add
+    const addNewRow = () => {
+      if (!itemDetails.value.equipment_wise.length) {
+        itemDetails.value.equipment_wise.push({
+          id: "",
+          name: "",
+          charge: "",
+        });
+      } else {
+        const result = areAllPropertiesNotNull(
+          itemDetails.value.equipment_wise
+        );
+        if (!result) {
+          itemDetails.value.equipment_wise.push({
+            id: "",
+            name: "",
+            charge: "",
+          });
+        } else {
+          Swal.fire({
+            icon: "info",
+            title: "Please fill all the details correctly",
+          });
+        }
+      }
+      console.log(itemDetails.value.equipment_wise)
+    };
+
+    async function SetEquipment(foundItem, index) {
+        console.log(foundItem);
+        const {id, name} = foundItem;
+        itemDetails.value.equipment_wise[index].id = await id;
+        itemDetails.value.equipment_wise[index].name = await name;
+    }
+
+    async function SetCharge(e, index) {
+      console.log(e);
+      itemDetails.value.equipment_wise[index].charge = await e.target.value;
+    }
+
+    const removeObjectWithId = (arr, id) => {
+      if (id !== -1) {
+        arr.splice(id, 1);
+      }
+
+      return arr;
+    };
+
+    // Remove
+    const RemoveRow = (index) => {
+      itemDetails.value.equipment_wise = removeObjectWithId(
+        itemDetails.value.equipment_wise,
+        index
+      );
+    };
 
     const submit = async () => {
       loading.value = true;
@@ -253,7 +380,35 @@ export default defineComponent({
       loading,
       packages,
       limit,
+      Equipments,
+      RemoveRow,
+      addNewRow,
+      SetEquipment,
+      SetCharge,
     };
   },
 });
 </script>
+<style>
+.el-input__inner {
+  font-weight: 500;
+}
+
+.el-input__wrapper {
+  height: 3.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--bs-gray-100);
+  border-color: var(--bs-gray-100);
+  color: var(--bs-gray-700);
+  transition: color 0.2s ease;
+  appearance: none;
+  line-height: 1.5;
+  border: none !important;
+  padding-top: 0.825rem;
+  padding-bottom: 0.825rem;
+  padding-left: 1.5rem;
+  font-size: 1.15rem;
+  border-radius: 0.625rem;
+  box-shadow: none !important;
+}
+</style>

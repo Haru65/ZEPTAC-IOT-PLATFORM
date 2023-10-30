@@ -388,6 +388,8 @@ export default defineComponent({
     const formData = ref<CreateAccount>({});
 
     const fillDetails = (response) => {
+      
+      if (Array.isArray(response.result)) {
       RGPS.value.push(
         ...response.result.map((result) => {
           return {
@@ -416,6 +418,10 @@ export default defineComponent({
           };
         })
       );
+      }
+      else{
+        
+      }
     };
 
     const GetOnGoingRGP = async () => {

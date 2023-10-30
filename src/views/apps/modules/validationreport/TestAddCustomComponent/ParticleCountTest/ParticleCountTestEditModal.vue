@@ -7,6 +7,7 @@
     tabindex="-1"
     aria-hidden="true"
     data-bs-backdrop="static"
+    data-bs-keyboard="false"
   >
     <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered mw-1000px">
@@ -434,10 +435,13 @@ interface ParticleCountTestReport {
   test_name: string;
   instrument_used: {
     id: string;
+    instrument_id: string;
     name: string;
     model_no: string;
     serial_no: string;
     make: string;
+    calibration_date: string;
+    calibration_due_date: string;
   };
   area_name: string;
   room_name: string;
@@ -512,10 +516,13 @@ export default defineComponent({
       report_name: "",
       instrument_used: {
         id: "",
+        instrument_id: "",
         name: "",
         model_no: "",
         serial_no: "",
         make: "",
+        calibration_date: "",
+        calibration_due_date: "",
       },
       area_name: "",
       room_name: "",
@@ -555,6 +562,8 @@ export default defineComponent({
         if (foundInstrument) {
           particleCountTestDetails.value.instrument_used.id =
             foundInstrument.id;
+          particleCountTestDetails.value.instrument_used.instrument_id =
+            foundInstrument.instrument_id;
           particleCountTestDetails.value.instrument_used.name =
             foundInstrument.name;
           particleCountTestDetails.value.instrument_used.model_no =
@@ -563,9 +572,14 @@ export default defineComponent({
             foundInstrument.serial_no;
           particleCountTestDetails.value.instrument_used.make =
             foundInstrument.make;
+          particleCountTestDetails.value.instrument_used.calibration_date =
+            foundInstrument.calibration_date;
+          particleCountTestDetails.value.instrument_used.calibration_due_date =
+            foundInstrument.calibration_due_date;
         }
       }
     };
+
     const setEngineer = (id) => {
       const engineerArray = Object.values([...props.engineers]);
       if (engineerArray) {
@@ -625,10 +639,13 @@ export default defineComponent({
         report_name,
         instrument_used: {
           id: instrument_used.id,
+          instrument_id: instrument_used.instrument_id,
           name: instrument_used.name,
           model_no: instrument_used.model_no,
           serial_no: instrument_used.serial_no,
           make: instrument_used.make,
+          calibration_date: instrument_used.calibration_date,
+          calibration_due_date: instrument_used.calibration_due_date,
         },
         area_name,
         room_name,

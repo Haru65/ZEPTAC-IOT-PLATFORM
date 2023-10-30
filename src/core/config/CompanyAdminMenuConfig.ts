@@ -225,7 +225,7 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
         sub: [
           {
             heading: "Add Employee",
-            route: "employee/add",
+            route: "/employee/add",
           },
           {
             heading: "List Employees",
