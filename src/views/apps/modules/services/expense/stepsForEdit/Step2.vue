@@ -212,37 +212,36 @@
                 class="btn-check"
                 name="status"
                 id="1"
-                v-on:change="SetStatus($event)"
-                v-model="$props.status"
                 value="1"
-                disabled
+                disabled="true"
+                v-model="$props.status"
+                v-on:change="SetStatus($event)"
                 autocomplete="off"
               />
-              <label class="btn btn-outline-primary" for="1">Pending</label>
+              <label class="btn btn-md btn-outline-primary" for="1">Pending</label>
 
               <input
                 type="radio"
                 class="btn-check"
                 name="status"
                 id="2"
+                value="2"
                 v-model="$props.status"
                 v-on:change="SetStatus($event)"
-                value="2"
                 autocomplete="off"
               />
-              <label class="btn btn-outline-danger" for="2">Reject</label>
-
+              <label class="btn btn-md btn-outline-danger" for="2">Reject</label>
               <input
                 type="radio"
                 class="btn-check"
                 name="status"
                 id="3"
+                value="3"
                 v-model="$props.status"
                 v-on:change="SetStatus($event)"
-                value="3"
                 autocomplete="off"
               />
-              <label class="btn btn-outline-success" for="3">Approve</label>
+              <label class="btn btn btn-md btn-outline-success" for="3">Approve</label>
             </span>
           </label>
         </div>
@@ -276,18 +275,18 @@ export default defineComponent({
   emit: ["showImage", "HideImage", "changeStatus"],
   setup(props, { emit }) {
     // Handling Emits
-    const showImg = (index) => {
+    const showImg = async (index) => {
       console.log(index);
-      emit("showImage", index);
+      await emit("showImage", index);
     };
 
-    const onHide = (index) => {
+    const onHide = async (index) => {
       console.log(index);
-      emit("HideImage", index);
+      await emit("HideImage", index);
     };
 
-    const SetStatus = (e) => {
-      emit("changeStatus", e.target.value);
+    const SetStatus = async (e) => {
+      await emit("changeStatus", e.target.value);
     };
 
     return {

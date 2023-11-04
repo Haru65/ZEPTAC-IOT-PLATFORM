@@ -190,7 +190,7 @@ import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { ILeads } from "@/core/model/leads";
 import arraySort from "array-sort";
-import { deleteLead, getLeadsList, LeadsSearch } from "@/stores/api";
+import { deleteLead, getLeads, LeadsSearch } from "@/stores/api";
 import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
 import Swal from "sweetalert2";
@@ -265,7 +265,7 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getLeadsList(
+        const response = await getLeads(
           `page=${page}&limit=${limit.value}`
         );
         //console.log(response.result.total_count);
@@ -298,7 +298,7 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getLeadsList(
+        const response = await getLeads(
           `page=${page.value}&limit=${limit}`
         );
         //console.log(response.result.total_count);
@@ -340,7 +340,7 @@ export default defineComponent({
 
     async function leads_listing(): Promise<void> {
       try {
-        const response = await getLeadsList(
+        const response = await getLeads(
           `page=${page.value}&limit=${limit.value}`
         );
         console.log(response);

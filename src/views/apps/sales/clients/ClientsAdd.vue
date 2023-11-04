@@ -145,7 +145,7 @@
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-              >Customer Name</label
+              >Lead Name</label
             >
             <!--end::Label-->
 
@@ -153,9 +153,9 @@
               <!--begin::Row-->
                 <div class="col-lg fv-row">
                   <div>
-                    <el-select v-model="profileDetails.customer_id" filterable placeholder="Please Select Customer...">
+                    <el-select v-model="profileDetails.lead_id" filterable placeholder="Please Select Customer...">
                       <el-option
-                        v-for="item in Customers"
+                        v-for="item in Leads"
                         :key="item.id"
                         :label="`${item.first_name} ${item.last_name}`"
                         :value="item.id"
@@ -545,15 +545,15 @@ import { defineComponent, onMounted, ref, watch } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
-import { addClient, getCustomers, getCustomer } from "@/stores/api";
+import { addClient, getLeads, getLead } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import { countries, INstates } from "@/core/model/countries";
 
-interface CustomerData {
-  customer_id: string;
+interface LeadData {
+  lead_id: string;
   first_name: string;
   last_name: string;
 }
@@ -580,9 +580,9 @@ interface ProfileDetails {
   company_name: string;
   created_by: string;
   updated_by: string;
-  customer_id: string;
-  customer_first_name: string;
-  customer_last_name: string;
+  lead_id: string;
+  lead_first_name: string;
+  lead_last_name: string;
 }
 
 export default defineComponent({
@@ -599,19 +599,19 @@ export default defineComponent({
     const disabledselect = ref(true);
     let limit = ref(500);
     const loading = ref(false);
-    const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
+    const Leads = ref([{ id: "", first_name: "", last_name: "" }]);
     const state = ref([""]);
 
     onMounted(async () => {
       state.value.pop();
-      Customers.value.pop();
-      await GetCustomers();
+      Leads.value.pop();
+      await GetLeads();
     });
 
-    const GetCustomers = async () => {
+    const GetLeads = async () => {
       ApiService.setHeader();
-      const response = await getCustomers(``);
-      Customers.value.push(
+      const response = await getLeads(``);
+      Leads.value.push(
         ...response.result.data.map(({ created_at, ...rest }) => ({
           ...rest,
           created_at: moment(created_at).format("MMMM Do YYYY"),
@@ -619,13 +619,13 @@ export default defineComponent({
       );
     };
 
-    const GetCustomerData = async (id) => {
+    const GetClientData = async (id) => {
       if (id != " ") {
-        const response = await getCustomer(id);
+        const response = await getLead(id);
         console.log(response);
-        profileDetails.value.customer_id = response.id;
-        profileDetails.value.customer_first_name = response.first_name;
-        profileDetails.value.customer_last_name = response.last_name;
+        profileDetails.value.lead_id = response.id;
+        profileDetails.value.lead_first_name = response.first_name;
+        profileDetails.value.lead_last_name = response.last_name;
         disabledselect.value = false;
         console.log(profileDetails.value);
       }
@@ -642,8 +642,8 @@ export default defineComponent({
       company_name: Yup.string().required().label("Company Name"),
     });
 
-    const customer = ref<CustomerData>({
-      customer_id: "",
+    const lead = ref<LeadData>({
+      lead_id: "",
       first_name: "",
       last_name: "",
     });
@@ -669,9 +669,9 @@ export default defineComponent({
       company_name: "",
       created_by: User.id,
       updated_by: User.id,
-      customer_id: "",
-      customer_first_name: "",
-      customer_last_name: "",
+      lead_id: "",
+      lead_first_name: "",
+      lead_last_name: "",
     });
 
     const onsubmit = async () => {
@@ -773,15 +773,15 @@ export default defineComponent({
         company_name: "",
         created_by: User.id,
         updated_by: User.id,
-        customer_id: "",
-        customer_first_name: "",
-        customer_last_name: "",
+        lead_id: "",
+        lead_first_name: "",
+        lead_last_name: "",
       };
     };
 
     return {
       profileDetails,
-      customer,
+      lead,
       emailFormDisplay,
       passwordFormDisplay,
       profileDetailsValidator,
@@ -791,8 +791,8 @@ export default defineComponent({
       clear,
       countries,
       state,
-      GetCustomerData,
-      Customers,
+      GetClientData,
+      Leads,
     };
   },
 });

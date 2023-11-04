@@ -112,7 +112,7 @@
         </template>
         <template v-slot:customer_name="{ row: rgps }">
             <span class="text-gray-600 text-hover-primary mb-1">
-                  {{ rgps.customer_name.first_name + " " + rgps.customer_name.last_name }}
+                  {{ rgps.customer_name }}
             </span>
           </template>
         <!-- defualt data -->
@@ -356,7 +356,7 @@ export default defineComponent({
           }) => ({
             id: id,
             rgp_no: rgp_no,
-            customer_name:customer_name,
+            customer_name:customer_name.company_name,
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
@@ -406,7 +406,7 @@ export default defineComponent({
           }) => ({
             id: id,
             rgp_no: rgp_no,
-            customer_name:customer_name,
+            customer_name:customer_name.company_name,
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
@@ -462,7 +462,7 @@ export default defineComponent({
           }) => ({
             id: id,
             rgp_no: rgp_no,
-            customer_name:customer_name,
+            customer_name:customer_name.company_name,
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
@@ -540,8 +540,8 @@ export default defineComponent({
       rgpInfo.value.rgp_no = res.result.rgp_no;
       rgpInfo.value.date = res.result.date;
       rgpInfo.value.duedate = res.result.duedate;
-      rgpInfo.value.engineers = JSON.parse(res.result.engineers);
-      rgpInfo.value.instruments = JSON.parse(res.result.instruments);
+      rgpInfo.value.engineers = await res.result.engData;
+      rgpInfo.value.instruments = await res.result.instData;
       rgpInfo.value.customer_company.company_name = res.result.customer_company.company_name;
       rgpInfo.value.client_company.company_name = res.result.client_company.company_name;
       rgpInfo.value.customer_address = res.result.customer_address;
@@ -661,7 +661,7 @@ export default defineComponent({
           }) => ({
             id: id,
             rgp_no: rgp_no,
-            customer_name:customer_name,
+            customer_name:customer_name.company_name,
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,

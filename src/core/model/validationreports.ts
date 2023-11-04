@@ -1,8 +1,7 @@
 interface IValidationReport {
     id: number;
     customer_name:{
-        first_name: string;
-        last_name: string;
+        company_name: string;
     };
     site_location:{
         address1: string;

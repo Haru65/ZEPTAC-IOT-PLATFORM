@@ -65,8 +65,7 @@
                         >
                         <div class="form-control form-control-solid">
                           <span class="fs-5 fw-bold text-gray-700">
-                            {{ CustomerData.first_name }}
-                            {{ CustomerData.last_name }}
+                            {{ CustomerData.company.company_name }}
                           </span>
                         </div>
                       </div>
@@ -77,6 +76,7 @@
                         >
                         <div class="form-control form-control-solid">
                           <span class="fs-5 fw-bold text-gray-700">
+                            {{ CustomerAddress.company_name }}
                             {{ CustomerAddress.address1 }}
                             {{ CustomerAddress.address2 }}
                             {{ CustomerAddress.city }} -
@@ -95,8 +95,7 @@
                         >
                         <div class="form-control form-control-solid">
                           <span class="fs-5 fw-bold text-gray-700">
-                            {{ ClientData.first_name }}
-                            {{ ClientData.last_name }}
+                            {{ ClientData.company.company_name }}
                           </span>
                         </div>
                       </div>
@@ -107,6 +106,7 @@
                         >
                         <div class="form-control form-control-solid">
                           <span class="fs-5 fw-bold text-gray-700">
+                            {{ ClientAddress.company_name }}
                             {{ ClientAddress.address1 }}
                             {{ ClientAddress.address2 }}
                             {{ ClientAddress.city }} -
@@ -1368,6 +1368,7 @@ export default defineComponent({
         duedate: "",
         status: "",
         customer_address: {
+          company_name: "",
           address1: "",
           address2: "",
           country: "",
@@ -1376,6 +1377,7 @@ export default defineComponent({
           states: "",
         },
         client_address: {
+          company_name: "",
           address1: "",
           address2: "",
           country: "",
@@ -1387,17 +1389,24 @@ export default defineComponent({
           id: "",
           first_name: "",
           last_name: "",
+          company: {
+            company_name: "",
+          }
         },
         client_data: {
           id: "",
           first_name: "",
           last_name: "",
+          company: {
+            company_name: "",
+          }
         },
         worksheet_filled_count: 0,
       },
     ]);
 
     const CustomerAddress = ref({
+      company_name: "",
       address1: "",
       address2: "",
       country: "",
@@ -1407,6 +1416,7 @@ export default defineComponent({
     });
 
     const ClientAddress = ref({
+      company_name: "",
       address1: "",
       address2: "",
       country: "",
@@ -1419,12 +1429,18 @@ export default defineComponent({
       id: "",
       first_name: "",
       last_name: "",
+      company: {
+        company_name: "",
+      }
     });
 
     const ClientData = ref({
       id: "",
       first_name: "",
       last_name: "",
+      company: {
+        company_name: "",
+      }
     });
 
     // set the details when rgp is selected
@@ -1574,6 +1590,7 @@ export default defineComponent({
               client_id: result.client_id,
               customer_id: result.customer_id,
               client_address: {
+                company_name: result.client_address.company_name,
                 address1: result.client_address.address1,
                 address2: result.client_address.address2,
                 country: result.client_address.country,
@@ -1582,6 +1599,7 @@ export default defineComponent({
                 states: result.client_address.states,
               },
               customer_address: {
+                company_name: result.customer_address.company_name,
                 address1: result.customer_address.address1,
                 address2: result.customer_address.address2,
                 country: result.customer_address.country,
@@ -1593,11 +1611,17 @@ export default defineComponent({
                 id: result.customer_data.id,
                 first_name: result.customer_data.first_name,
                 last_name: result.customer_data.last_name,
+                company: {
+                  company_name : result.customer_data.company.company_name,
+                }
               },
               client_data: {
                 id: result.client_data.id,
                 first_name: result.client_data.first_name,
                 last_name: result.client_data.last_name,
+                company: {
+                  company_name : result.client_data.company.company_name,
+                }
               },
               // Add other properties like 'date' and 'duedate' here if needed
             };

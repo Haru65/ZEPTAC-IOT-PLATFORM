@@ -2,8 +2,7 @@ interface IExpenseSheet {
     id: number;
     rgp_no: string;
     customer_name:{
-        first_name: string;
-        last_name: string;
+        company_name: string;
     };
     engineer_name:{
         first_name: string;
@@ -14,3 +13,24 @@ interface IExpenseSheet {
 }
   
 export type { IExpenseSheet };
+
+
+export const ExpenseStatus = [
+    {
+        id: 1,
+        status: "Pending",
+    },
+    {
+        id: 2,
+        status: "Reject",
+    },
+    {
+        id: 3,
+        status: "Approve",
+    }
+  ];
+
+  export const GetExpenseStatus = (id) => {
+    const status = ExpenseStatus.find(item => item.id == id);
+    return status ? status.status : "";
+  };

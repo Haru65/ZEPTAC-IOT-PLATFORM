@@ -180,7 +180,7 @@
       >
         <!--begin::Label-->
         <label class="col-lg-4 required fs-4 fw-bold text-gray text-start"
-          >Customer Name
+          >Company Name
         </label>
         <!--end::Label-->
 
@@ -213,6 +213,7 @@
           <div class="col-lg fv-row mt-md-3 mt-5">
             <div class="form-control form-control-solid">
               <span class="fs-5 fw-bold text-gray-700">
+                {{ step1Data.site_address.company_name }}
                 {{ step1Data.site_address.address1 }}
                 {{ step1Data.site_address.address2 }}
                 {{ step1Data.site_address.city }}
@@ -255,6 +256,7 @@ export default defineComponent({
       duedate: "",
       customer_name: "",
       site_address: {
+        company_name:"",
         address1: "",
         address2: "",
         city: "",
@@ -312,7 +314,7 @@ export default defineComponent({
           ServiceEngineers.value = [];
           ServiceEngineers.value = [...engineers];
           step1Data.value.site_address = site_address;
-          step1Data.value.customer_name = customer_data.first_name + " " + customer_data.last_name;
+          step1Data.value.customer_name = customer_data.company.company_name;
           step1Data.value.date = date;
           step1Data.value.duedate = duedate;
           step1Data.value.quotation_id = quotation_id;

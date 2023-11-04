@@ -38,26 +38,18 @@
                           class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
                           >Customer Name</label
                         >
-                        <input
-                          type="text"
-                          disabled
-                          :value="`${CustomerData.first_name} ${CustomerData.last_name}`"
-                          class="form-control form-control-lg form-control-solid"
-                          placeholder="Customer Name"
-                        />
+                        <div class="form-control form-control-lg form-control-solid">
+                          {{ `${CustomerData.company.company_name}` }}
+                        </div>
                       </div>
                       <div class="form-group col-md-6 mb-8 mb-sd-8">
                         <label
                           class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
                           >Customer Address</label
                         >
-                        <input
-                          type="text"
-                          disabled
-                          :value="`${CustomerAddress.address1} ${CustomerAddress.address2} ${CustomerAddress.city} - ${CustomerAddress.pincode} ${CustomerAddress.states} ${CustomerAddress.country}`"
-                          class="form-control form-control-lg form-control-solid"
-                          placeholder="Customer Address"
-                        />
+                        <div class="form-control form-control-lg form-control-solid">
+                          {{ `${CustomerAddress.company_name} ${CustomerAddress.address1} ${CustomerAddress.address2} ${CustomerAddress.city} - ${CustomerAddress.pincode} ${CustomerAddress.states} ${CustomerAddress.country}` }}
+                        </div>
                       </div>
                     </div>
                     <div class="row mb-2">
@@ -66,26 +58,18 @@
                           class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
                           >Client Name</label
                         >
-                        <input
-                          type="text"
-                          disabled
-                          :value="`${ClientData.first_name} ${ClientData.last_name}`"
-                          class="form-control form-control-lg form-control-solid"
-                          placeholder="Client Name"
-                        />
+                        <div class="form-control form-control-lg form-control-solid">
+                          {{ `${ClientData.company.company_name}` }}
+                        </div>
                       </div>
                       <div class="form-group col-md-6 mb-8 mb-sd-8">
                         <label
                           class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
                           >Client Address</label
                         >
-                        <input
-                          type="text"
-                          disabled
-                          :value="`${ClientAddress.address1} ${ClientAddress.address2} ${ClientAddress.city} - ${ClientAddress.pincode} ${ClientAddress.states} ${ClientAddress.country}`"
-                          class="form-control form-control-lg form-control-solid"
-                          placeholder="Client Address"
-                        />
+                        <div class="form-control form-control-lg form-control-solid">
+                          {{ `${ClientAddress.company_name} ${ClientAddress.address1} ${ClientAddress.address2} ${ClientAddress.city} - ${ClientAddress.pincode} ${ClientAddress.states} ${ClientAddress.country}` }}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1327,6 +1311,7 @@ export default defineComponent({
     }
 
     const CustomerAddress = ref({
+      company_name: "",
       address1: "",
       address2: "",
       country: "",
@@ -1336,6 +1321,7 @@ export default defineComponent({
     });
 
     const ClientAddress = ref({
+      company_name: "",
       address1: "",
       address2: "",
       country: "",
@@ -1348,12 +1334,18 @@ export default defineComponent({
       id: "",
       first_name: "",
       last_name: "",
+      company: {
+        company_name: "",
+      }
     });
 
     const ClientData = ref({
       id: "",
       first_name: "",
       last_name: "",
+      company: {
+        company_name: "",
+      }
     });
 
     // fill the details when response is received

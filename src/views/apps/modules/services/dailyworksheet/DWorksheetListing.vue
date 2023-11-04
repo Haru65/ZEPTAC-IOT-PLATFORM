@@ -112,10 +112,7 @@
           <template v-slot:customer_name="{ row: dailyworksheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
               {{
-                dailyworksheets.customer_name.first_name +
-                " " +
-                dailyworksheets.customer_name.last_name
-              }}
+                dailyworksheets.customer_name.company_name }}
             </span>
           </template>
           <template v-slot:engineer_name="{ row: dailyworksheets }">
@@ -526,9 +523,7 @@ export default defineComponent({
       standard_used: "",
       witnessed_by: "",
 
-      contact_person: "",
-
-      customer_address:{
+      client_address:{
         address1: "",
         address2: "",
         city: "",
@@ -546,7 +541,16 @@ export default defineComponent({
         id:"",
         first_name : "",
         last_name: "",
+      },
+
+      client_data: {
+        id:"",
+        first_name : "",
+        last_name: "",
         mobile: "",
+        company: {
+          company_name: "",
+        }
       },
 
       quotation_details: {
@@ -576,17 +580,22 @@ export default defineComponent({
       worksheetInfo.value.standard_used = res.result.standard_used;
       worksheetInfo.value.witnessed_by = res.result.witnessed_by;
 
-      worksheetInfo.value.customer_address.address1 = res.result.customer_address.address1 ? res.result.customer_address.address1 : "";
-      worksheetInfo.value.customer_address.address2 = res.result.customer_address.address2 ? res.result.customer_address.address2 : "";
-      worksheetInfo.value.customer_address.city = res.result.customer_address.city ? res.result.customer_address.city : "";
-      worksheetInfo.value.customer_address.pincode = res.result.customer_address.pincode ? res.result.customer_address.pincode : "";
-      worksheetInfo.value.customer_address.states = res.result.customer_address.states ? res.result.customer_address.states : "";
-      worksheetInfo.value.customer_address.country = res.result.customer_address.country ? res.result.customer_address.country : "";
+      worksheetInfo.value.client_address.address1 = res.result.client_address.address1 ? res.result.client_address.address1 : "";
+      worksheetInfo.value.client_address.address2 = res.result.client_address.address2 ? res.result.client_address.address2 : "";
+      worksheetInfo.value.client_address.city = res.result.client_address.city ? res.result.client_address.city : "";
+      worksheetInfo.value.client_address.pincode = res.result.client_address.pincode ? res.result.client_address.pincode : "";
+      worksheetInfo.value.client_address.states = res.result.client_address.states ? res.result.client_address.states : "";
+      worksheetInfo.value.client_address.country = res.result.client_address.country ? res.result.client_address.country : "";
 
       worksheetInfo.value.customer_data.id = res.result.customer_data.id;
       worksheetInfo.value.customer_data.first_name = res.result.customer_data.first_name;
       worksheetInfo.value.customer_data.last_name = res.result.customer_data.last_name;
-      worksheetInfo.value.customer_data.mobile = res.result.customer_data.mobile;
+
+      worksheetInfo.value.client_data.id = res.result.client_data.id;
+      worksheetInfo.value.client_data.first_name = res.result.client_data.first_name;
+      worksheetInfo.value.client_data.last_name = res.result.client_data.last_name;
+      worksheetInfo.value.client_data.mobile = res.result.client_data.mobile ? res.result.client_data.mobile : "";
+      worksheetInfo.value.client_data.company.company_name = res.result.client_data.company.company_name;
 
       worksheetInfo.value.quotation_details = res.result.quotation_details;
 

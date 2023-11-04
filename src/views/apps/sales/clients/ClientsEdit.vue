@@ -144,18 +144,18 @@
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-              >Customer Name</label
+              >Lead Name</label
             >
             <!--end::Label-->
 
             <!--begin::Col-->
             <div class="col-lg-8 fv-row">
-              <el-select v-model="profileDetails.customer_id" filterable>
+              <el-select v-model="profileDetails.lead_id" filterable>
                 <!-- <el-option value="0" label="Please Select Customer..." key="0"
                   >Please Select Customer...</el-option
                 > -->
                 <el-option
-                  v-for="item in Customers"
+                  v-for="item in Leads"
                   :key="item.id"
                   :label="`${item.first_name} ${item.last_name}`"
                   :value="item.id"
@@ -541,7 +541,7 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import {
   updateClient,
-  getCustomers,
+  getLeads,
   getClient,
 } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
@@ -551,7 +551,7 @@ import { useRoute, useRouter } from "vue-router";
 import { countries, INstates } from "@/core/model/countries";
 
 interface CustomerData {
-  customer_id: string;
+  lead_id: string;
   first_name: string;
   last_name: string;
 }
@@ -578,9 +578,9 @@ interface ProfileDetails {
   company_name: string;
   created_by: string;
   updated_by: string;
-  customer_id: number;
-  customer_fisrt_name: string;
-  customer_last_name: string;
+  lead_id: string;
+  lead_first_name: string;
+  lead_last_name: string;
 }
 
 export default defineComponent({
@@ -598,7 +598,7 @@ export default defineComponent({
     const disabledselect = ref(true);
     let limit = ref(500);
     const loading = ref(false);
-    const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
+    const Leads = ref([{ id: "", first_name: "", last_name: "" }]);
     const state = ref([""]);
     const LeadId = route.params.id;
 
@@ -608,7 +608,7 @@ export default defineComponent({
       profileDetails.value.first_name = response.first_name;
       profileDetails.value.last_name = response.last_name;
       profileDetails.value.company_name = response.meta.company_name;
-      profileDetails.value.customer_id = parseInt(response.meta.customer_id);
+      profileDetails.value.lead_id = response.meta.lead_id;
       profileDetails.value.email = response.email;
       profileDetails.value.phone = response.mobile;
       // meta
@@ -628,14 +628,14 @@ export default defineComponent({
       profileDetails.value.pan = response.meta.pan;
 
       state.value.pop();
-      Customers.value.pop();
-      await GetCustomers();
+      Leads.value.pop();
+      await GetLeads();
     });
 
-    const GetCustomers = async () => {
+    const GetLeads = async () => {
       ApiService.setHeader();
-      const response = await getCustomers(``);
-      Customers.value.push(
+      const response = await getLeads(``);
+      Leads.value.push(
         ...response.result.data.map(({ created_at, ...rest }) => ({
           ...rest,
           created_at: moment(created_at).format("MMMM Do YYYY"),
@@ -654,8 +654,8 @@ export default defineComponent({
       company_name: Yup.string().required().label("Company Name"),
     });
 
-    const customer = ref<CustomerData>({
-      customer_id: "",
+    const lead = ref<CustomerData>({
+      lead_id: "",
       first_name: "",
       last_name: "",
     });
@@ -681,9 +681,9 @@ export default defineComponent({
       company_name: "",
       created_by: User.id,
       updated_by: User.id,
-      customer_id: 0,
-      customer_fisrt_name: "",
-      customer_last_name: "",
+      lead_id: "",
+      lead_first_name: "",
+      lead_last_name: "",
     });
 
     const onsubmit = async () => {
@@ -784,15 +784,15 @@ export default defineComponent({
         company_name: "",
         created_by: User.id,
         updated_by: User.id,
-        customer_id: 0,
-        customer_fisrt_name: "",
-        customer_last_name: "",
+        lead_id: "",
+        lead_first_name: "",
+        lead_last_name: "",
       };
     };
 
     return {
       profileDetails,
-      customer,
+      lead,
       emailFormDisplay,
       passwordFormDisplay,
       profileDetailsValidator,
@@ -802,7 +802,7 @@ export default defineComponent({
       clear,
       countries,
       state,
-      Customers,
+      Leads,
     };
   },
 });

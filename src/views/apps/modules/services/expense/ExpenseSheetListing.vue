@@ -115,7 +115,7 @@
           </template>
           <template v-slot:customer_name="{ row: expensesheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
-                  {{ expensesheets.customer_name.first_name + " " + expensesheets.customer_name.last_name }}
+                  {{ expensesheets.customer_name.company_name }}
             </span>
           </template>
           <template v-slot:engineer_name="{ row: expensesheets }">
@@ -131,17 +131,17 @@
             <span
             v-if="expensesheets.status == 1"
             class="badge py-3 px-4 fs-7 badge-light-primary"
-            >Pending</span
+            >{{ GetExpenseStatus(expensesheets.status) }}</span
           >
           <span
             v-if="expensesheets.status == 2"
             class="badge py-3 px-4 fs-7 badge-light-danger"
-            >Rejected</span
+            >{{ GetExpenseStatus(expensesheets.status) }}</span
           >
           <span
             v-if="expensesheets.status == 3"
             class="badge py-3 px-4 fs-7 badge-light-success"
-            >Approved</span
+            >{{ GetExpenseStatus(expensesheets.status) }}</span
           >
           </template>
           <template v-slot:actions="{ row: expensesheets }">
@@ -199,7 +199,7 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import type { IExpenseSheet } from "@/core/model/expensesheets";
+import { GetExpenseStatus, type IExpenseSheet } from "@/core/model/expensesheets";
 import arraySort from "array-sort";
 import moment from "moment";
 import { deleteExpenseSheet, getExpenseSheets, ExpenseSheetSearch } from "@/stores/api";
@@ -522,6 +522,8 @@ export default defineComponent({
       PageLimitPoiner,
       Limits,
       formatPrice,
+      GetExpenseStatus,
+
     };
   },
 });

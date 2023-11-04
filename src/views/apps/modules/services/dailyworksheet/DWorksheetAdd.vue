@@ -93,12 +93,11 @@
                     <div class="form-group col-md-6 mb-8 mb-sd-8">
                       <label
                         class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
-                        >Customer Name</label
+                        >Company Name</label
                       >
                       <div class="form-control form-control-solid">
                         <span class="fs-5 fw-bold text-gray-700">
-                          {{ CustomerData.first_name }}
-                          {{ CustomerData.last_name }}
+                          {{ CustomerData.company.company_name }}
                         </span>
                       </div>
                     </div>
@@ -109,6 +108,7 @@
                       >
                       <div class="form-control form-control-solid">
                         <span class="fs-5 fw-bold text-gray-700">
+                          {{ SiteAddress.company_name }}
                           {{ SiteAddress.address1 }} {{ SiteAddress.address2 }}
                           {{ SiteAddress.city }} - {{ SiteAddress.pincode }}
                           {{ SiteAddress.states }} {{ SiteAddress.country }}
@@ -346,20 +346,40 @@
                     </div>
                   </div>
                 </div>
+
                 <div class="row mb-6">
                   <div class="form-group col-md-6 mb-8 mb-sd-8">
                     <label
                       class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
                       >Standard Used</label
                     >
-                    <Field
-                      type="text"
-                      name="standard_used"
-                      class="form-control form-control-lg form-control-solid"
-                      placeholder="Specify the standard used..."
-                      v-model="worksheetDetails.standard_used"
-                    />
-                    <div class="fv-plugins-message-container">
+                    <div>
+                      <el-select
+                        filterable
+                        placeholder="Please Select Standard Used..."
+                        name="acceptance_criteria"
+                        v-model="worksheetDetails.standard_used"
+                      >
+                        <el-option
+                          value=""
+                          disabled="disabled"
+                          label="Please Select Standard Used..."
+                          key=""
+                        >
+                          Please Select Standard Used...</el-option
+                        >
+                        <el-option
+                          v-for="criteria in AcceptanceCriteria"
+                          :key="criteria.id"
+                          :value="criteria.id"
+                          :label="criteria.certified"
+                        />
+                      </el-select>
+                    </div>
+                    <div
+                      class="fv-plugins-message-container"
+                      v-if="!worksheetDetails.standard_used"
+                    >
                       <div class="fv-help-block">
                         <ErrorMessage name="standard_used" />
                       </div>
@@ -427,6 +447,7 @@ import { ConductedTests } from "@/core/model/conductedtests";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import moment from "moment";
 import * as Yup from "yup";
+import { AcceptanceCriteria } from "@/core/model/dailyworksheets";
 
 interface Test {
   id: string;
@@ -478,6 +499,7 @@ export default defineComponent({
         client_id: "",
         customer_id: "",
         site_address: {
+          company_name: "",
           address1: "",
           address2: "",
           country: "",
@@ -489,6 +511,9 @@ export default defineComponent({
           id: "",
           first_name: "",
           last_name: "",
+          company: {
+            company_name: "",
+          },
         },
       },
     ]);
@@ -534,6 +559,7 @@ export default defineComponent({
     ]);
 
     const SiteAddress = ref({
+      company_name: "",
       address1: "",
       address2: "",
       country: "",
@@ -546,6 +572,9 @@ export default defineComponent({
       id: "",
       first_name: "",
       last_name: "",
+      company: {
+        company_name: "",
+      },
     });
 
     const ToggleCheckBoxForTests = async (e) => {
@@ -569,65 +598,58 @@ export default defineComponent({
     };
 
     const SetDetails = async (id) => {
-
-      if(id){
+      if (id) {
         try {
-        // Find the rgp
-        const foundRGP = RGPS.value.find((rgp) => rgp.id === id);
+          // Find the rgp
+          const foundRGP = RGPS.value.find((rgp) => rgp.id === id);
 
-        // If not found, return early
-        if (!foundRGP) {
-          return;
+          // If not found, return early
+          if (!foundRGP) {
+            return;
+          }
+
+          // Destructure and assign rgp details
+          const { rgp_no, engineers, site_address, customer_data } = foundRGP;
+          worksheetDetails.value.rgp_no = rgp_no;
+          worksheetDetails.value.engineer_id = "";
+          ServiceEngineers.value = [];
+          ServiceEngineers.value = [...engineers];
+          engineerSelect.value = false;
+          SiteAddress.value = site_address;
+          CustomerData.value = customer_data;
+        } catch (error) {
+          console.error("An error occurred:", error);
         }
-
-        // Destructure and assign rgp details
-        const { rgp_no, engineers, site_address, customer_data } = foundRGP;
-        worksheetDetails.value.rgp_no = rgp_no;
-        worksheetDetails.value.engineer_id = "";
-        ServiceEngineers.value = [];
-        ServiceEngineers.value = [...engineers];
-        engineerSelect.value = false;
-        SiteAddress.value = site_address;
-        CustomerData.value = customer_data;
-      } catch (error) {
-        console.error("An error occurred:", error);
-      }
       }
     };
 
     const fillDetails = (response) => {
-  if (Array.isArray(response.result)) {
-    RGPS.value.push(
-      ...response.result.map((result) => {
-        return {
-          id: result.id,
-          rgp_no: result.rgp_no,
-          quotation_id: result.quotation_id,
-          engineers: JSON.parse(result.engineers),
-          client_id: result.client_id,
-          customer_id: result.customer_id,
-          site_address: {
-            address1: result.site_address.address1,
-            address2: result.site_address.address2,
-            country: result.site_address.country,
-            city: result.site_address.city,
-            pincode: result.site_address.pincode,
-            states: result.site_address.states,
-          },
-          customer_data: {
-            id: result.customer_data.id,
-            first_name: result.customer_data.first_name,
-            last_name: result.customer_data.last_name,
-          },
-          // Add other properties like 'date' and 'duedate' here if needed
-        };
-      })
-    );
-  } else {
-    
-  }
-};
-
+      if (Array.isArray(response.result)) {
+        RGPS.value.push(
+          ...response.result.map((result) => {
+            return {
+              id: result.id,
+              rgp_no: result.rgp_no,
+              quotation_id: result.quotation_id,
+              engineers: JSON.parse(result.engineers),
+              client_id: result.client_id,
+              customer_id: result.customer_id,
+              site_address: {
+                company_name: result.site_address.company_name,
+                address1: result.site_address.address1,
+                address2: result.site_address.address2,
+                country: result.site_address.country,
+                city: result.site_address.city,
+                pincode: result.site_address.pincode,
+                states: result.site_address.states,
+              },
+              customer_data: result.customer_data,
+            };
+          })
+        );
+      } else {
+      }
+    };
 
     onMounted(async () => {
       // get all the rgp
@@ -641,20 +663,19 @@ export default defineComponent({
     });
 
     const onsubmit = async () => {
-      
       loading.value = true;
       console.log(worksheetDetails.value);
 
       worksheetDetails.value.work_date = moment(
-            worksheetDetails.value.work_date
-          ).format("YYYY-MM-DD");
-          worksheetDetails.value.start_time = moment(
-            worksheetDetails.value.start_time
-          ).format("YYYY-MM-DD HH:mm:ss");
-          worksheetDetails.value.end_time = moment(
-            worksheetDetails.value.end_time
-          ).format("YYYY-MM-DD HH:mm:ss");
-      console.log(worksheetDetails.value)
+        worksheetDetails.value.work_date
+      ).format("YYYY-MM-DD");
+      worksheetDetails.value.start_time = moment(
+        worksheetDetails.value.start_time
+      ).format("YYYY-MM-DD HH:mm:ss");
+      worksheetDetails.value.end_time = moment(
+        worksheetDetails.value.end_time
+      ).format("YYYY-MM-DD HH:mm:ss");
+      console.log(worksheetDetails.value);
       if (
         worksheetDetails.value.tests.length === 0 &&
         worksheetDetails.value.other_test == ""
@@ -691,8 +712,7 @@ export default defineComponent({
         // Handle any other errors during API call
         // console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
-      }
-      finally {
+      } finally {
         loading.value = false;
       }
     };
@@ -740,6 +760,7 @@ export default defineComponent({
       worksheetDetailsValidator,
       loading,
       onsubmit,
+      AcceptanceCriteria,
       // toggleCheckbox,
     };
   },

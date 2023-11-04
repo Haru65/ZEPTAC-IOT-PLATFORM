@@ -6,150 +6,172 @@ import autoTable from "jspdf-autotable";
 const rgpGen = async (id, pdfName, rgpDetails) => {
   pdfName += `_${id}_returnable_gate_pass`;
 
-  const engineerColumns = [
-    { title: "Id", dataKey: "id" },
-    { title: "Engineer Name", dataKey: "name" }
-  ];
-
-  const instrumentColumns = [
-    { title: "Model No", dataKey: "model_no" },
-    { title: "Serial No", dataKey: "serial_no" },
-    { title: "Instrument Name", dataKey: "name" },
-    { title: "Make By", dataKey: "make" }
-  ];
-
-
   const doc = new jsPDF({
     orientation: "portrait",
     unit: "in",
     format: "a4",
   });
 
-  // Quotation Heading
   doc
-    .setFontSize(14)
-    .setTextColor(0, 0, 0)
-    .setFont('helvetica', "bold")
-    .text("Returnable Gate Pass", doc.internal.pageSize.width / 2, 0.5, {
-      align: "center",
-    });
+  .setFontSize(12)
+  .setTextColor(0, 0, 0)
+  .text("Returnable Gate Pass", doc.internal.pageSize.width / 2, 0.5, {
+    align: "center",
+  });
 
   // Company Logo Img
   const img = new Image()
   img.src = rgpDetails.value.company_details.company_logo;
   doc.addImage(img, 'JPEG', 0.5, 0.7, 0.7, 0.7);
 
-  // RGP number
-  doc
-    .setFontSize(10)
-    .setFont('helvetica', "normal")
-    .text("RGP# : " + rgpDetails.value.rgp_no, doc.internal.pageSize.width - 2.8, 0.8);
-
-  // Quotation Creation Date
-  const creationDate = new Date(rgpDetails.value.date).toDateString();
-  doc
-    .setFontSize(10)
-    .setFont('helvetica', "normal")
-    .text("RGP Date : " + creationDate, doc.internal.pageSize.width - 2.8, 1.0);
-
-  // Quotation Due Date
-  const dueDateText = new Date(rgpDetails.value.duedate).toDateString();
-  doc
-    .setFontSize(10)
-    .setFont('helvetica', "normal")
-    .text("RGP Due Date : " + dueDateText, doc.internal.pageSize.width - 2.8, 1.2);
-
-  // Quotation number
-  doc
-  .setFontSize(10)
-  .setFont('helvetica', "normal")
-  .text("Quotation# : " + rgpDetails.value.quotation_no, doc.internal.pageSize.width - 2.8, 1.4);
-
-
   // create a line under heading
   doc.setLineWidth(0.01).line(0.5, 1.5, 7.75, 1.5);
 
-  // Billing Address - From
-  const customerAddress = rgpDetails.value.customer_address;
-  const customerAddressText = `
-      Billing Address,
-      ${rgpDetails.value.customer_data.first_name} ${rgpDetails.value.customer_data.last_name}
-      ${rgpDetails.value.customer_company.company_name ? rgpDetails.value.customer_company.company_name : ""},
-      ${customerAddress.address1 || ""}
-      ${customerAddress.address2 || ""}
-      ${customerAddress.city || ""} ${customerAddress.pincode || ""}
-      ${customerAddress.states || ""} ${customerAddress.country || ""}
-  `;
-  doc.setFontSize(10).setFont('helvetica', "normal").text(customerAddressText, 0.25, 1.7, {
-    align: "left",
-    maxWidth: 7.5,
-  });
+  
+  const rgpDate = new Date(rgpDetails.value.date).toDateString();
+  const rgpDueDate = new Date(rgpDetails.value.duedate).toDateString();
 
-  // Site Address - To
-  const clientAddress = rgpDetails.value.client_address;
-  const clientAddressText = `
-      Site Address,
-      ${rgpDetails.value.client_data.first_name} ${rgpDetails.value.client_data.last_name}
-      ${rgpDetails.value.client_company.company_name ? rgpDetails.value.client_company.company_name : ""},
-      ${clientAddress.address1 || ""}
-      ${clientAddress.address2 || ""}
-      ${clientAddress.city || ""} ${clientAddress.pincode || ""}
-      ${clientAddress.states || ""} ${clientAddress.country || ""}
-  `;
-  doc.setFontSize(10).setFont('helvetica', "normal").text(clientAddressText, doc.internal.pageSize.width - 3.0, 1.7, {
-    align: "left",
-    maxWidth: 7.5,
-  });
+  const Info = [
+    [`RGP Date : ${rgpDate}`, `#RGP No. : ${rgpDetails.value.rgp_no}`],
+    [`RGP Due Date : ${rgpDueDate}`, `Quotation No. : ${rgpDetails.value.quotation_no}`],
+  ];
 
-  // Using autoTable plugin
-  const service_engineers = rgpDetails.value.engineers.map(({ id, first_name, last_name }) => ({
-    id,
-    name: `${first_name} ${last_name}`
-  }));
-
-  //adding the last row [Total] in the table
-  const engineerData = [...service_engineers]
-
-  // main Content in the table
-  autoTable(doc,{
-    columns: engineerColumns,
-    body: engineerData,
-    startY: 3,
+  autoTable(doc, {
+    body: Info,
+    startY:1.6,
+    columnStyles: {
+        '0': { cellWidth: 3.63},
+        '1': { cellWidth: "auto" },
+    },
     margin: { left: 0.5, top: 1.25 },
-    headStyles: { fillColor: [124, 95, 240] },
+    bodyStyles: { halign: "left",fontSize: 9},
+    tableLineColor: [0, 0, 0],
     didDrawCell: (data) => {
-      if (data.column.index === 0 || data.column.index === 1) {
-        data.cell.styles.halign = 'center';
-      } else {
-        data.cell.styles.halign = 'right';
-      }
+      const { cell, row, column } = data;
+      doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
     },
   });
 
+  const LocationData = [
+    [
+      `Customer Name : ${rgpDetails.value.client_company.company_name} \nContact Person : ${rgpDetails.value.customer_data.first_name} ${rgpDetails.value.customer_data.last_name} \n\nBilling Address : ${rgpDetails.value.customer_address.address1 ? rgpDetails.value.customer_address.address1 : ""} ${rgpDetails.value.customer_address.address2 ? rgpDetails.value.customer_address.address2 : ""} ${rgpDetails.value.customer_address.city ? rgpDetails.value.customer_address.city : ""} - ${rgpDetails.value.customer_address.pincode ? rgpDetails.value.customer_address.pincode : ""}, ${rgpDetails.value.customer_address.states ? rgpDetails.value.customer_address.states : ""}, ${rgpDetails.value.customer_address.country ? rgpDetails.value.customer_address.country : ""}`,
+      `Client Name : ${rgpDetails.value.client_company.company_name} \nContact Person : ${rgpDetails.value.client_data.first_name} ${rgpDetails.value.client_data.last_name} \n\nSite Address : ${rgpDetails.value.client_address.address1 ? rgpDetails.value.client_address.address1 : ""} ${rgpDetails.value.client_address.address2 ? rgpDetails.value.client_address.address2 : ""} ${rgpDetails.value.client_address.city ? rgpDetails.value.client_address.city : ""} - ${rgpDetails.value.client_address.pincode ? rgpDetails.value.client_address.pincode : ""}, ${rgpDetails.value.client_address.states ? rgpDetails.value.client_address.states : ""}, ${rgpDetails.value.client_address.country ? rgpDetails.value.client_address.country : ""}`
+    ]
+  ];
 
-const instruments = rgpDetails.value.instruments.map(({ model_no, serial_no, name, make }) => ({
-  model_no,
-  serial_no,
-  name,
-  make,
-}));
+  autoTable(doc, {
+    body: LocationData,
+    columnStyles: {
+        '0': { cellWidth: 3.63},
+        '1': { cellWidth: "auto" },
+    },
+    margin: { left: 0.5, top: 1.25 },
+    bodyStyles: { halign: "left",fontSize: 9},
+    tableLineColor: [0, 0, 0],
+    didDrawCell: (data) => {
+      const { cell, row, column } = data;
+      doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
+    },
+  });
+
+  const service_engineers = rgpDetails.value.engineers.map(({ first_name, last_name, mobile }, index) => ({
+    index: index + 1,
+    name: `${first_name} ${last_name}`,
+    mobile: mobile
+  }));
   
+  const engData = service_engineers.map(engineer => [engineer.index, engineer.name, engineer.mobile]);
+  
+  const engineerData = [
+    [
+      "Sr. No",
+      "Service Engineer Name",
+      "Mobile No.",
+    ],
+    ...engData,
+  ];
 
-const instrumentData = [...instruments]
+  autoTable(doc, {
+    body: engineerData,
+    margin: { left: 0.5, top: 1.25 },
+    headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "left",fontSize: 9},
+    columnStyles: {
+      '0': { cellWidth: 0.5},
+      '1': { cellWidth: "auto" },
+      '2': { cellWidth: "auto" },
+    },
+    bodyStyles: { halign: "left",fontSize: 9},
+    tableLineColor: [0, 0, 0],
+    didDrawCell: (data) => {
+      const { cell, row, column } = data;
+      doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
+    },
 
-autoTable(doc, {
-  columns: instrumentColumns,
-  body: instrumentData,
-  margin: { left: 0.5 },
-  headStyles: { fillColor: [124, 95, 240] },
-  didDrawCell: (data) => {
-    if (data.column.index === 0 || data.column.index === 1) {
-      data.cell.styles.halign = 'center';
-    } else {
-      data.cell.styles.halign = 'right';
-    }
-  },
-});
+  });
+
+  const instruments = rgpDetails.value.instruments.map(({name , instrument_id, model_no, serial_no, make, accessories_list }, index) => ({
+    index: index+1,
+    name,
+    instrument_id,
+    model_no,
+    serial_no,
+    make,
+    accessories_list,
+  }));
+
+  const instData = instruments.map(instrument => [instrument.index, instrument.name + "\n\nAccessories : " + JSON.parse(instrument.accessories_list), instrument.instrument_id, instrument.model_no, instrument.serial_no, instrument.make]);
+  
+  const instrumentData = [
+    [
+      { title: 'Sr. No'},
+      { title: 'Instrument Name'},
+      { title: 'Instrument ID'},
+      { title: 'Model No.'},
+      { title: 'Serial No.'},
+      { title: 'Make By'},
+    ],
+    ...instData
+  ];
+
+  autoTable(doc, {
+    body: instrumentData,
+    margin: { left: 0.5, top: 1.25 },
+    headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "left",fontSize: 9},
+    columnStyles: {
+      '0': { cellWidth: 0.5},
+      '1': { cellWidth: 3.13 },
+      '2': { cellWidth: "auto" },
+    },
+    bodyStyles: { halign: "left",fontSize: 9},
+    tableLineColor: [0, 0, 0],
+    didDrawCell: (data) => {
+      const { cell, row, column } = data;
+      doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
+    },
+
+  });
+
+  const signatureDetails = [
+    [
+      { title: 'Prepared By,\nSign :\n\n', rowSpan:1},
+      { title: 'Recieved By / Witnessed By,\nSign :\n\n', rowSpan:1},
+    ]
+  ];
+
+  autoTable(doc, {
+    body: signatureDetails,
+    margin: { left: 0.5, top: 1.25 },
+    columnStyles: {
+      '0': { cellWidth: 3.63},
+      '1': { cellWidth: "auto" },
+    },
+    bodyStyles: { halign: "left",fontSize: 9},
+    tableLineColor: [0, 0, 0],
+    didDrawCell: (data) => {
+      const { cell, row, column } = data;
+      doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
+    },
+  });
 
 
   // Creating footer and saving file

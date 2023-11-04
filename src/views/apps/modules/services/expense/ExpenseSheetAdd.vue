@@ -185,6 +185,7 @@ export default defineComponent({
       engineer_id: "",
       engineer_name: "",
       site_address: {
+        company_name: "",
         address1: "",
         address2: "",
         city: "",
@@ -194,7 +195,6 @@ export default defineComponent({
       },
       quotation_id: "",
       customer_name: "",
-      client_name: "",
       quotation_no: "",
       status: "1",
       company_id: User.company_id,
@@ -331,6 +331,7 @@ export default defineComponent({
       expenseSheetDetails.value.engineer_id = "";
       expenseSheetDetails.value.rgp_id = rgp_id ? rgp_id : "";
       expenseSheetDetails.value.rgp_no = rgp_no ? rgp_no : "";
+      expenseSheetDetails.value.site_address.company_name = address.company_name ? address.company_name : "";
       expenseSheetDetails.value.site_address.address1 = address.address1
         ? address.address1
         : "";
@@ -368,6 +369,7 @@ export default defineComponent({
         client_id: "",
         customer_id: "",
         site_address: {
+          company_name: "",
           address1: "",
           address2: "",
           country: "",
@@ -379,6 +381,9 @@ export default defineComponent({
           id: "",
           first_name: "",
           last_name: "",
+          company: {
+            company_name:"",
+          },
         },
         date: "",
         duedate: "",
@@ -401,6 +406,7 @@ export default defineComponent({
             client_id: result.client_id,
             customer_id: result.customer_id,
             site_address: {
+              company_name: result.site_address.company_name,
               address1: result.site_address.address1,
               address2: result.site_address.address2,
               country: result.site_address.country,
@@ -408,11 +414,7 @@ export default defineComponent({
               pincode: result.site_address.pincode,
               states: result.site_address.states,
             },
-            customer_data: {
-              id: result.customer_data.id,
-              first_name: result.customer_data.first_name,
-              last_name: result.customer_data.last_name,
-            },
+            customer_data: result.customer_data,
             date: result.date,
             duedate: result.duedate,
           };

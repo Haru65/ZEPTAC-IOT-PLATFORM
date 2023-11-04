@@ -425,7 +425,7 @@ export async function LeadsSearch(search: any) {
 }
 
 // getlisting
-export async function getLeadsList(data) {
+export async function getLeads(data) {
     try {
         //console.log(data)
         ApiService.setHeader();
@@ -586,12 +586,12 @@ export async function QuotationSearch(search: any) {
 }
 
 // custom
-export async function GetCustomerClients(data: any) {
+export async function GetLeadClients(data: any) {
     try {
         //console.log(data)
-        const id = { "customerid": data };
+        const id = { "leadid": data };
         ApiService.setHeader();
-        const response = await ApiService.post('/get_customer_clients', id);
+        const response = await ApiService.post('/get_lead_clients', id);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -681,6 +681,19 @@ export async function updateQuotation(data: any, id) {
 // INVOICES
 
 // custom
+export async function GetCustomerClients(data: any) {
+    try {
+        //console.log(data)
+        const id = { "customerid": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('/get_customer_clients', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 export async function GetIncrInvoiceId(data: any) {
     try {
         //console.log(data)

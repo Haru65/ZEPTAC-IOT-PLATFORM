@@ -2,7 +2,8 @@
 
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { ConductedTests, AcceptanceCriteria } from "@/core/model/conductedtests";
+import { ConductedTests } from "@/core/model/conductedtests";
+import { AcceptanceCriteria } from "@/core/model/dailyworksheets";
 import moment from "moment";
 
 const worksheetGen = async (id, pdfName, worksheetInfo) => {
@@ -57,12 +58,12 @@ const worksheetGen = async (id, pdfName, worksheetInfo) => {
   const startTime = moment(worksheetInfo.value.start_time).format("YYYY-MM-DD HH:mm:ss")
   const EndTime = moment(worksheetInfo.value.end_time).format("YYYY-MM-DD HH:mm:ss")
 
-  const customer_address = `${worksheetInfo.value.customer_address.address1} ${worksheetInfo.value.customer_address.address2} ${worksheetInfo.value.customer_address.city} ${worksheetInfo.value.customer_address.pincode} ${worksheetInfo.value.customer_address.states} ${worksheetInfo.value.customer_address.country}`
+  const client_address = `${worksheetInfo.value.client_address.address1} ${worksheetInfo.value.client_address.address2} ${worksheetInfo.value.client_address.city} ${worksheetInfo.value.client_address.pincode} ${worksheetInfo.value.client_address.states} ${worksheetInfo.value.client_address.country}`
   const data = [
-    ['Customer Name', `${worksheetInfo.value.customer_data.first_name} ${worksheetInfo.value.customer_data.last_name}`],
-    ['Address', customer_address],
-    ['Phone / Mobile No.', `${worksheetInfo.value.customer_data.mobile}`],
-    ['Contact Person', `COMING SOON`],
+    ['Client Name', `${worksheetInfo.value.client_data.company.company_name}`],
+    ['Address', client_address],
+    ['Phone / Mobile No.', `${worksheetInfo.value.client_data.mobile}`],
+    ['Contact Person', `${worksheetInfo.value.client_data.first_name} ${worksheetInfo.value.client_data.last_name}`],
     ['Witnessed By', worksheetInfo.value.witnessed_by],
     ['Actual Working Date', workingDate],
     ['Work Start Time', startTime],
@@ -144,7 +145,7 @@ const worksheetGen = async (id, pdfName, worksheetInfo) => {
   const standardLength = AcceptanceCriteria.length + 1;
 
   const standardCustomArray = AcceptanceCriteria.map((standardObj, index) => {
-    return [ index + 1, `${standardObj.certified}`, "( NA )"];
+    return [ index + 1, `${standardObj.certified}`,worksheetInfo.value.standard_used === standardObj.id.toString() ? `( YES )` : `( NO )`];
   });
 
   const StandardData = [

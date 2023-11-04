@@ -691,6 +691,7 @@ export default defineComponent({
 
     const instrumentInfo = ref({
       id: "",
+      instrument_id: "",
       name: "",
       model_no: "",
       serial_no: "",
@@ -702,15 +703,7 @@ export default defineComponent({
       calibration_due_date: "",
       vendor_name: "",
 
-      maintenance_details: {
-        periodicity: "",
-        m_date1: "",
-        m_date2: "",
-        m_date3: "",
-        m_details: "",
-        any_repair_detail: "",
-        maintenance_done_by: "",
-      },
+      maintenance_history: [],
 
       company_details: {
         company_name: "",
@@ -727,6 +720,7 @@ export default defineComponent({
       const res = await getInstrument(id);
 
       const {
+        instrument_id,
         name,
         model_no,
         serial_no,
@@ -735,11 +729,12 @@ export default defineComponent({
         calibration_due_date,
         vendor_name,
         accessories_list,
-        maintenance_details,
+        maintenance_history,
         company_details,
       } = res;
 
       instrumentInfo.value.id = id;
+      instrumentInfo.value.instrument_id = instrument_id;
       instrumentInfo.value.name = name;
       instrumentInfo.value.model_no = model_no;
       instrumentInfo.value.serial_no = serial_no;
@@ -749,8 +744,8 @@ export default defineComponent({
 
       instrumentInfo.value.vendor_name = vendor_name;
       instrumentInfo.value.accessories_list = JSON.parse(accessories_list);
-      instrumentInfo.value.maintenance_details =
-        JSON.parse(maintenance_details);
+      instrumentInfo.value.maintenance_history =
+        JSON.parse(maintenance_history);
 
       instrumentInfo.value.company_details.address = company_details.address;
       instrumentInfo.value.company_details.city = company_details.city;

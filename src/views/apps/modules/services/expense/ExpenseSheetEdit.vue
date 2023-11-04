@@ -44,9 +44,9 @@
               v-bind:tasks="expenseSheetDetails.expenses"
               v-bind:total_amount="expenseSheetDetails.total_amount"
               v-bind:status="expenseSheetDetails.status"
+              v-on:changeStatus="setStatus"
               v-on:showImage="showTheImage"
               v-on:HideImage="HideTheImage"
-              v-on:changeStatus="setStatus"
             ></Step2>
           </div>
           <!--end::Step 2-->
@@ -166,6 +166,7 @@ export default defineComponent({
       engineer_id: "",
       engineer_name: "",
       site_address: {
+        company_name: "",
         address1: "",
         address2: "",
         city: "",
@@ -174,7 +175,7 @@ export default defineComponent({
         country: "",
       },
       customer_name: "",
-      status: "",
+      status: "1",
       updated_by: User.id,
     });
 
@@ -182,13 +183,17 @@ export default defineComponent({
 
     const lightBox = ref([]);
 
-    const fillDetails = (result) => {
+    const fillDetails = async (result) => {
       expenseSheetDetails.value.id = result.id;
       expenseSheetDetails.value.rgp_no = result.rgpDetails.rgp_no;
       expenseSheetDetails.value.date = result.rgpDetails.date;
       expenseSheetDetails.value.duedate = result.rgpDetails.duedate;
       expenseSheetDetails.value.total_amount = result.total_amount;
       expenseSheetDetails.value.status = result.status;
+      expenseSheetDetails.value.site_address.company_name = result.site_address
+        .company_name
+        ? result.site_address.company_name
+        : "";
       expenseSheetDetails.value.site_address.address1 = result.site_address
         .address1
         ? result.site_address.address1
@@ -212,7 +217,7 @@ export default defineComponent({
         ? result.site_address.country
         : "";
       expenseSheetDetails.value.customer_name =
-        result.customer_data.first_name + " " + result.customer_data.last_name;
+        result.customer_data.company_name;
       expenseSheetDetails.value.status = result.status;
       expenseSheetDetails.value.engineer_name =
         result.service_engineer_data.first_name +
@@ -244,14 +249,16 @@ export default defineComponent({
       expenseSheetDetails.value.expenses[index].imgData = "";
     }
 
-    function setStatus(e) {
-      expenseSheetDetails.value.status = e;
+    async function setStatus(e) {
+      console.log("before" ,e, expenseSheetDetails.value.status);
+      expenseSheetDetails.value.status = await e;
+      console.log("after", e, expenseSheetDetails.value.status )
     }
 
     onMounted(async () => {
       ApiService.setHeader();
       const response = await getExpenseSheet(itemId.toString());
-      fillDetails(response.result);
+      await fillDetails(response.result);
 
       _stepperObj.value = StepperComponent.createInsance(
         horizontalWizardRef.value as HTMLElement

@@ -97,7 +97,7 @@
                   v-for="item in quotations"
                   :key="item.id"
                   :value="item.id"
-                  :label="`${item.quotation_no} -- ${item.customer_data.first_name} ${item.customer_data.last_name} -- ${item.client_data.first_name} ${item.client_data.last_name}`"
+                  :label="`${item.quotation_no} --- ${item.customer_data.company.company_name} (${item.customer_data.first_name} ${item.customer_data.last_name}) --- ${item.client_data.company.company_name} (${item.client_data.first_name} ${item.client_data.last_name})`"
                 />
                 <el-option
                   value=""
@@ -168,6 +168,8 @@ export default defineComponent({
       quotation_id: "",
       customer_name: "",
       client_name: "",
+      customer_company: "",
+      client_company: "",
       quotation_no: "",
       site_address: {
         address1: "",
@@ -198,6 +200,7 @@ export default defineComponent({
     const GetSiteAddress = async (data: any) => {
       if (data != " ") {
         ApiService.setHeader();
+        console.log(data);
         const id = data;
         const response = await getSiteAddress(id);
         // console.log(response);
@@ -220,10 +223,13 @@ export default defineComponent({
             step1Data.value.client_name = quotation.client_data.first_name +
               " " +
               quotation.client_data.last_name;
+            step1Data.value.customer_company = quotation.customer_data.company.company_name;
+            step1Data.value.client_company = quotation.client_data.company.company_name;
           }
         })
+        
 
-        await emit("quotation-Selected", step1Data.value.quotation_id, step1Data.value.site_address, step1Data.value.customer_name,step1Data.value.client_name,step1Data.value.quotation_no);
+        await emit("quotation-Selected", step1Data.value.quotation_id, step1Data.value.site_address, step1Data.value.customer_name,step1Data.value.customer_company,step1Data.value.client_name,step1Data.value.client_company,step1Data.value.quotation_no);
 
       } else {
         step1Data.value.site_address.address1 = "";

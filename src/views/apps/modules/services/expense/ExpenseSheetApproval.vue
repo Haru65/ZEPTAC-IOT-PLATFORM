@@ -28,8 +28,7 @@
             v-if="selectedIds.length === 0"
             class="d-flex justify-content-end"
             data-kt-customer-table-toolbar="base"
-          >
-          </div>
+          ></div>
           <!--end::Toolbar-->
           <!--begin::Group actions-->
           <div
@@ -93,34 +92,38 @@
           </template>
           <template v-slot:customer_name="{ row: expensesheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
-                  {{ expensesheets.customer_name.first_name + " " + expensesheets.customer_name.last_name }}
+              {{ expensesheets.customer_name.company_name }}
             </span>
           </template>
           <template v-slot:engineer_name="{ row: expensesheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
-                  {{ expensesheets.engineer_name.first_name + " " + expensesheets.engineer_name.last_name }}
+              {{
+                expensesheets.engineer_name.first_name +
+                " " +
+                expensesheets.engineer_name.last_name
+              }}
             </span>
           </template>
           <!-- defualt data -->
           <template v-slot:total_amount="{ row: expensesheets }">
-          {{ formatPrice(expensesheets.total_amount) }}
+            {{ formatPrice(expensesheets.total_amount) }}
           </template>
           <template v-slot:status="{ row: expensesheets }">
             <span
-            v-if="expensesheets.status == 1"
-            class="badge py-3 px-4 fs-7 badge-light-primary"
-            >Pending</span
-          >
-          <span
-            v-if="expensesheets.status == 2"
-            class="badge py-3 px-4 fs-7 badge-light-danger"
-            >Rejected</span
-          >
-          <span
-            v-if="expensesheets.status == 3"
-            class="badge py-3 px-4 fs-7 badge-light-success"
-            >Approved</span
-          >
+              v-if="expensesheets.status == 1"
+              class="badge py-3 px-4 fs-7 badge-light-primary"
+              >{{ GetExpenseStatus(expensesheets.status) }}</span
+            >
+            <span
+              v-if="expensesheets.status == 2"
+              class="badge py-3 px-4 fs-7 badge-light-danger"
+              >{{ GetExpenseStatus(expensesheets.status) }}</span
+            >
+            <span
+              v-if="expensesheets.status == 3"
+              class="badge py-3 px-4 fs-7 badge-light-success"
+              >{{ GetExpenseStatus(expensesheets.status) }}</span
+            >
           </template>
           <template v-slot:actions="{ row: expensesheets }">
             <!--begin::Menu Flex-->
@@ -184,10 +187,14 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import type { IExpenseSheet } from "@/core/model/expensesheets";
+import { GetExpenseStatus, type IExpenseSheet } from "@/core/model/expensesheets";
 import arraySort from "array-sort";
 import moment from "moment";
-import { deleteExpenseSheet, getPendingExpenseSheets, ExpenseSheetSearch } from "@/stores/api";
+import {
+  deleteExpenseSheet,
+  getPendingExpenseSheets,
+  ExpenseSheetSearch,
+} from "@/stores/api";
 import Swal from "sweetalert2";
 import { formatPrice } from "@/core/config/DataFormatter";
 
@@ -264,11 +271,9 @@ export default defineComponent({
         console.log(response);
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ ...rest }) => ({
-            ...rest
-          })
-        );
+        tableData.value = response.result.data.map(({ ...rest }) => ({
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -288,16 +293,16 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getPendingExpenseSheets(`page=${page}&limit=${limit.value}`);
+        const response = await getPendingExpenseSheets(
+          `page=${page}&limit=${limit.value}`
+        );
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ ...rest }) => ({
-            ...rest
-          })
-        );
+        tableData.value = response.result.data.map(({ ...rest }) => ({
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -318,16 +323,16 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getPendingExpenseSheets(`page=${page.value}&limit=${limit}`);
+        const response = await getPendingExpenseSheets(
+          `page=${page.value}&limit=${limit}`
+        );
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ ...rest }) => ({
-            ...rest
-          })
-        );
+        tableData.value = response.result.data.map(({ ...rest }) => ({
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -449,11 +454,9 @@ export default defineComponent({
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({...rest }) => ({
-            ...rest
-          })
-        );
+        tableData.value = response.result.data.map(({ ...rest }) => ({
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -507,6 +510,7 @@ export default defineComponent({
       PageLimitPoiner,
       Limits,
       formatPrice,
+      GetExpenseStatus,
     };
   },
 });

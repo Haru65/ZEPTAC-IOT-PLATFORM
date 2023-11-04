@@ -108,13 +108,12 @@
         </template>
         <template v-slot:customer_name="{ row: validationreports }">
           {{
-            validationreports.customer_name.first_name +
-            " " +
-            validationreports.customer_name.last_name
-          }}
+            validationreports.customer_name.company_name }}
         </template>
         <template v-slot:site_location="{ row: validationreports }">
           {{
+            validationreports.site_location.company_name +
+            " " +
             validationreports.site_location.address1 +
             " " +
             validationreports.site_location.address2 +
@@ -539,43 +538,6 @@ export default defineComponent({
       3: 50,
     });
 
-    const allReports = ref<ValidationReport>({
-      id: "",
-      rgp_id: "",
-      company_id: "",
-      customer_name: {
-        first_name: "",
-        last_name: "",
-      },
-      site_location: {
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        states: "",
-        country: "",
-      },
-      tests: [
-        {
-          air_velocity_test_reports: [],
-        },
-        {
-          filter_integrity_test_reports: [],
-        },
-        {
-          particle_count_test_reports: [],
-        },
-        {
-          recovery_test_reports: [],
-        },
-      ],
-      report_status: "",
-      created_at: "",
-      updated_at: "",
-      created_by: "",
-      updated_by: "",
-    });
-
     const loading = ref(true);
     // staring from 2
     let page = ref(1);
@@ -609,10 +571,10 @@ export default defineComponent({
           }) => ({
             id: id,
             customer_name: {
-              first_name: customer_name.first_name,
-              last_name: customer_name.last_name,
+              company_name: customer_name.company_name
             },
             site_location: {
+              company_name: site_location.company_name ? site_location.company_name : "",
               address1: site_location.address1 ? site_location.address1 : "",
               address2: site_location.address2 ? site_location.address2 : "",
               city: site_location.city ? site_location.city : "",
@@ -664,10 +626,10 @@ export default defineComponent({
           }) => ({
             id: id,
             customer_name: {
-              first_name: customer_name.first_name,
-              last_name: customer_name.last_name,
+              company_name: customer_name.company_name
             },
             site_location: {
+              company_name: site_location.company_name ? site_location.company_name : "",
               address1: site_location.address1 ? site_location.address1 : "",
               address2: site_location.address2 ? site_location.address2 : "",
               city: site_location.city ? site_location.city : "",
@@ -731,10 +693,10 @@ export default defineComponent({
           }) => ({
             id: id,
             customer_name: {
-              first_name: customer_name.first_name,
-              last_name: customer_name.last_name,
+              company_name: customer_name.company_name
             },
             site_location: {
+              company_name: site_location.company_name ? site_location.company_name : "",
               address1: site_location.address1 ? site_location.address1 : "",
               address2: site_location.address2 ? site_location.address2 : "",
               city: site_location.city ? site_location.city : "",
@@ -743,6 +705,7 @@ export default defineComponent({
               country: site_location.country ? site_location.country : "",
             },
             test_sizes: { ...test_sizes },
+
             report_status: report_status,
             created_at: moment(created_at).format("LL"),
           })
@@ -863,10 +826,10 @@ export default defineComponent({
           }) => ({
             id: id,
             customer_name: {
-              first_name: customer_name.first_name,
-              last_name: customer_name.last_name,
+              company_name: customer_name.company_name
             },
             site_location: {
+              company_name: site_location.company_name ? site_location.company_name : "",
               address1: site_location.address1 ? site_location.address1 : "",
               address2: site_location.address2 ? site_location.address2 : "",
               city: site_location.city ? site_location.city : "",
@@ -875,6 +838,7 @@ export default defineComponent({
               country: site_location.country ? site_location.country : "",
             },
             test_sizes: { ...test_sizes },
+
             report_status: report_status,
             created_at: moment(created_at).format("LL"),
           })

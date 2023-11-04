@@ -36,9 +36,10 @@
             <p>Quotation ID: {{ $props.summary.quotation_id }}</p>
             <p>Quotation Number: {{ $props.summary.quotation_no }}</p>
             <p>Engineer Name: {{ $props.summary.engineer_name }}</p>
-            <p>Customer Name: {{ $props.summary.customer_name }}</p>
+            <p>Company Name: {{ $props.summary.customer_name }}</p>
             <p>
-              Site Location: {{ $props.summary.site_address.address1 }}
+              Site Location: {{ $props.summary.site_address.company_name }}
+              {{ $props.summary.site_address.address1 }}
               {{ $props.summary.site_address.address2 }}
               {{ $props.summary.site_address.city }}
               {{ $props.summary.site_address.pincode }}

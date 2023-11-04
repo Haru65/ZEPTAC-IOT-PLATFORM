@@ -33,8 +33,35 @@
           <!--begin::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span class="required">Company Name</span>
+            </label>
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="company_name"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Company Name"
+                v-model="profileDetails.company_name"
+              />
+              <div class="fv-plugins-message-container">
+                <div class="fv-help-block">
+                  <ErrorMessage name="company_name" />
+                </div>
+              </div>
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
             <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-              >Full Name</label
+              >Contact Person</label
             >
             <!--end::Label-->
 
@@ -141,32 +168,6 @@
             <!--end::Col-->
           </div>
           <!--end::Input group-->
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6">
-              <span class="required">Company Name</span>
-            </label>
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8 fv-row">
-              <Field
-                type="text"
-                name="company_name"
-                class="form-control form-control-lg form-control-solid"
-                placeholder="Company Name"
-                v-model="profileDetails.company_name"
-              />
-              <div class="fv-plugins-message-container">
-                <div class="fv-help-block">
-                  <ErrorMessage name="company_name" />
-                </div>
-              </div>
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--end::Input group-->
           <!--end::Input group-->
           <div class="separator my-10"></div>
 
@@ -234,7 +235,11 @@
               <div class="row">
                 <!--begin::Col-->
                 <div class="col-lg fv-row">
-                  <el-select v-model="profileDetails.country" filterable placeholder="Select Your Country...">
+                  <el-select
+                    v-model="profileDetails.country"
+                    filterable
+                    placeholder="Select Your Country..."
+                  >
                     <el-option
                       v-for="item in countries"
                       :key="item.name"
@@ -266,7 +271,11 @@
                 <!--begin::Col-->
                 <div v-if="state.length" class="col-lg fv-row">
                   <div>
-                    <el-select v-model="profileDetails.states" filterable placeholder="Select Your State...">
+                    <el-select
+                      v-model="profileDetails.states"
+                      filterable
+                      placeholder="Select Your State..."
+                    >
                       <el-option
                         v-for="item in state"
                         :key="item"
@@ -331,9 +340,7 @@
           <!--end::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >City</label
-            >
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">City</label>
             <!--end::Label-->
 
             <!--begin::Col-->
@@ -397,7 +404,11 @@
               <div class="row">
                 <div class="col-lg fv-row">
                   <div>
-                    <el-select v-model="profileDetails.gender" filterable placeholder="Select Your Gender...">
+                    <el-select
+                      v-model="profileDetails.gender"
+                      filterable
+                      placeholder="Select Your Gender..."
+                    >
                       <el-option label="Male" value="male" />
                       <el-option label="Female" value="female" />
                       <el-option label="Other" value="other" />
@@ -565,7 +576,6 @@ export default defineComponent({
     const LeadId = router.params.id;
     const User = auth.GetUser();
 
-    
     const getdropcomp = async () => {
       ApiService.setHeader();
       const response = await getCompanies(`limit=${limit.value}`);
@@ -605,7 +615,7 @@ export default defineComponent({
         company_id: User.company_id,
         company_name: res.meta.company_name,
         created_by: User.id,
-        updated_by: User.id
+        updated_by: User.id,
       };
     });
 
@@ -769,7 +779,6 @@ export default defineComponent({
 }
 
 .el-input__wrapper {
-  
   height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

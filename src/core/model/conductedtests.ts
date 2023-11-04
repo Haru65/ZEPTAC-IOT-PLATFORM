@@ -25,7 +25,7 @@ export const ConductedTests = [
   export const AcceptanceCriteria = [
     {
         id: 0,
-        certified: "FED STD 209 E",
+        certified: "ISO - 14644",
     },
     {
         id: 1,
@@ -33,7 +33,7 @@ export const ConductedTests = [
     },
     {
         id: 2,
-        certified: "ISO - 14644",
+        certified: "FED STD 209 E",
     },
     {
         id: 3,

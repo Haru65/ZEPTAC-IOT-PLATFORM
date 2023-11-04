@@ -127,7 +127,7 @@
       >
         <!--begin::Label-->
         <label class="col-lg-4 required fs-4 fw-bold text-gray text-start"
-          >Customer Name
+          >Company Name
         </label>
         <!--end::Label-->
 
@@ -160,6 +160,7 @@
           <div class="col-lg fv-row mt-md-3 mt-5">
             <div class="form-control form-control-solid">
               <span class="fs-5 fw-bold text-gray-700">
+                {{ $props.details.site_address.company_name }}
                 {{ $props.details.site_address.address1 }}
                 {{ $props.details.site_address.address2 }}
                 {{ $props.details.site_address.city }}

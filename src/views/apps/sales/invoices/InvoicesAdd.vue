@@ -71,18 +71,43 @@
             </div>
 
             <div class="row mb-6">
+              <div
+                class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+              >
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  :value="false"
+                  name="siteSameAsBilling"
+                  id="siteSameAsBilling"
+                  v-on:change="ToggleClient"
+                  v-model="siteSameAsBilling"
+                />
+                <label
+                  class="form-check-label fw-bold text-primary fw-semobold fs-5"
+                  for="maintenance_plan"
+                >
+                  Want this service for you then kindly check it.
+                  <i class="text-gray-700"
+                    >( site address same as billing address)</i
+                  >
+                </label>
+              </div>
+            </div>
+
+            <div class="row mb-6">
               <div class="d-flex flex-grow-1 gap-lg-3 gap-sm-5 gap-5">
                 <!--begin::Row-->
                 <div class="w-50">
                   <div class="py-3">
                     <h6 class="fs-6">Customer :</h6>
                   </div>
-                  <div id="customer " class="row gx-10">
+                  <div id="lead " class="row gx-10">
                     <el-select
-                      v-model="InvoiceDetails.customer_id"
+                      v-model="InvoiceDetails.lead_id"
                       placeholder="Please Select Customer"
                       filterable
-                      v-on:change="GetUserData(InvoiceDetails.customer_id)"
+                      v-on:change="GetUserData(InvoiceDetails.lead_id)"
                     >
                       <el-option
                         v-for="item in Customers"
@@ -104,38 +129,38 @@
                   <div class="mt-2 pt-4">
                     <h6 class="fw-bold mt-5">Billing Address:</h6>
                     <div class="mt-2">
-                      <div class="mb-1" v-show="InvoiceDetails.customer">
+                      <div class="mb-1" v-show="InvoiceDetails.lead">
                         <br />
                         <span>
                           {{
-                            `${InvoiceDetails.customer.first_name} ${InvoiceDetails.customer.last_name}`
+                            `${InvoiceDetails.lead.first_name} ${InvoiceDetails.lead.last_name}`
                           }}
                         </span>
                         <br />
-                        <span v-show="InvoiceDetails.customer.company_name">
-                          {{ `${InvoiceDetails.customer.company_name}` }}
+                        <span v-show="InvoiceDetails.lead.company_name">
+                          {{ `${InvoiceDetails.lead.company_name}` }}
                         </span>
                         <!-- v-if company_data present -->
-                        <div v-show="InvoiceDetails.customer.company_name">
+                        <div v-show="InvoiceDetails.lead.company_name">
                           <br />
                           <span>
-                            {{ `${InvoiceDetails.customer.address1}` }}
+                            {{ `${InvoiceDetails.lead.address1}` }}
                           </span>
                           <br />
                           <span>
-                            {{ `${InvoiceDetails.customer.address2}` }}
+                            {{ `${InvoiceDetails.lead.address2}` }}
                           </span>
                         </div>
-                        <div v-show="InvoiceDetails.customer.country">
+                        <div v-show="InvoiceDetails.lead.country">
                           <span>
                             {{
-                              `${InvoiceDetails.customer.city} - ${InvoiceDetails.customer.pincode}`
+                              `${InvoiceDetails.lead.city} - ${InvoiceDetails.lead.pincode}`
                             }}
                           </span>
                           <br />
                           <span>
                             {{
-                              `${InvoiceDetails.customer.states} ${InvoiceDetails.customer.country}`
+                              `${InvoiceDetails.lead.states} ${InvoiceDetails.lead.country}`
                             }}
                           </span>
                           <br />
@@ -143,9 +168,9 @@
                         <br />
                         <!-- firstname as a flag -->
                         <a
-                          v-show="InvoiceDetails.customer.first_name"
+                          v-show="InvoiceDetails.lead.first_name"
                           target="blank"
-                          v-bind:href="`/customers/edit/${InvoiceDetails.customer_id}`"
+                          v-bind:href="`/customers/edit/${InvoiceDetails.lead_id}`"
                         >
                           <span class="fs-5"> Edit</span>
                           <!-- <i
@@ -228,9 +253,12 @@
                         <br />
                         <!-- firstname as a flag -->
                         <a
-                          v-show="InvoiceDetails.client.first_name"
+                          v-show="
+                            !InvoiceDetails.client.id &&
+                            InvoiceDetails.client.first_name
+                          "
                           target="blank"
-                          v-bind:href="`/clients/edit/${InvoiceDetails.customer_id}`"
+                          v-bind:href="`/clients/edit/${InvoiceDetails.client.id}`"
                         >
                           <span class="fs-5"> Edit</span>
                           <!-- <i
@@ -346,7 +374,7 @@
                       <input
                         class="form-check-input"
                         type="checkbox"
-                        :value=false
+                        :value="false"
                         name="accommodationRef"
                         id="accommodationRef"
                         v-on:change="ToggleAccommodation"
@@ -383,7 +411,7 @@
                       <input
                         class="form-check-input"
                         type="checkbox"
-                        :value=false
+                        :value="false"
                         name="travellingRef"
                         id="travellingRef"
                         v-on:change="ToggleTravelling"
@@ -423,7 +451,7 @@
                       <input
                         class="form-check-input"
                         type="checkbox"
-                        :value=false
+                        :value="false"
                         name="trainingRef"
                         id="trainingRef"
                         v-on:change="ToggleTraining"
@@ -460,7 +488,7 @@
                       <input
                         class="form-check-input"
                         type="checkbox"
-                        :value=false
+                        :value="false"
                         name="pickupRef"
                         id="pickupRef"
                         v-on:change="TogglePickUp"
@@ -500,7 +528,7 @@
                       <input
                         class="form-check-input"
                         type="checkbox"
-                        :value=false
+                        :value="false"
                         name="boardingRef"
                         id="boardingRef"
                         v-on:change="ToggleBoarding"
@@ -528,7 +556,8 @@
               <!--begin::Col-->
               <div class="col-md-12 fv-row mb-8 mb-sd-8">
                 <!--end::Label-->
-                <label class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                <label
+                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
                   >Scope of Work</label
                 >
                 <!--end::Label-->
@@ -550,7 +579,8 @@
               <!--begin::Col-->
               <div class="col-md-12 fv-row mb-8 mb-sd-8">
                 <!--end::Label-->
-                <label class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                <label
+                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
                   >Terms & Conditions</label
                 >
                 <!--end::Label-->
@@ -585,11 +615,10 @@
                       <el-select
                         v-model="InvoiceDetails.status"
                         filterable
-                        :disabled="disabledselect"
                         placeholder="Please Select Status..."
                       >
                         <el-option
-                    v-for="item in InvoiceStatusArray"
+                          v-for="item in InvoiceStatusArray"
                           :key="item.id"
                           :label="`${item.name}`"
                           :value="item.id"
@@ -606,18 +635,22 @@
                     <!--end::Col-->
                   </div>
                   <div class="card-body">
-                    
                     <div class="items">
                       <p class="d-inline gap-2">
                         <span
                           v-if="InvoiceDetails.items.id != ''"
                           class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                          >+ {{ InvoiceDetails.items.site_location }} ({{ InvoiceDetails.items.per_day_charge }} x {{  InvoiceDetails.items.number_of_days }})
+                          >+ {{ InvoiceDetails.items.site_location }} ({{
+                            InvoiceDetails.items.per_day_charge
+                          }}
+                          x {{ InvoiceDetails.items.number_of_days }})
                         </span>
                         <span
                           v-if="InvoiceDetails.items.accomm"
                           class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                          >+ Accomodation ({{ InvoiceDetails.items.accommodation }})
+                          >+ Accomodation ({{
+                            InvoiceDetails.items.accommodation
+                          }})
                         </span>
                         <span
                           v-if="InvoiceDetails.items.travel"
@@ -632,12 +665,16 @@
                         <span
                           v-if="InvoiceDetails.items.board"
                           class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                          >+ Boarding & Lodging ({{ InvoiceDetails.items.boarding }})
+                          >+ Boarding & Lodging ({{
+                            InvoiceDetails.items.boarding
+                          }})
                         </span>
                         <span
                           v-if="InvoiceDetails.items.pick"
                           class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                          >+ Pickup & Delivery ({{ InvoiceDetails.items.pickup }})
+                          >+ Pickup & Delivery ({{
+                            InvoiceDetails.items.pickup
+                          }})
                         </span>
                       </p>
                     </div>
@@ -647,9 +684,7 @@
                           class="text-start fs-4 text-nowrap badge badge-light flex-shrink-0 align-self-center py-3 px-4 fs-7"
                         >
                           {{
-                            GetInvoiceStatus(
-                              parseInt(InvoiceDetails.status)
-                            )
+                            GetInvoiceStatus(parseInt(InvoiceDetails.status))
                           }}
                         </h6>
                       </div>
@@ -657,7 +692,7 @@
                         <h3 class="text-end fs-4 text-nowrap">Total</h3>
                         <h3 class="text-end fs-4 text-nowrap">
                           ₹<span data-kt-element="grand-total">{{
-                    InvoiceDetails.total.toFixed(2)
+                            InvoiceDetails.total.toFixed(2)
                           }}</span>
                         </h3>
                       </div>
@@ -740,7 +775,7 @@ interface Meta {
 
 interface InvoiceDetails {
   invoice_no: string;
-  customer_id: string;
+  lead_id: string;
   items: {
     id: string;
     site_location: string;
@@ -763,7 +798,7 @@ interface InvoiceDetails {
   scope_of_work: string;
   terms_and_conditions: string;
   total: number;
-  customer: Meta;
+  lead: Meta;
   client: Meta;
   is_active: number;
   company_id: string;
@@ -773,8 +808,7 @@ interface InvoiceDetails {
 
 export default defineComponent({
   name: "company-add",
-  components: {
-  },
+  components: {},
   setup() {
     const auth = useAuthStore();
     const disabledselect = ref(true);
@@ -783,12 +817,22 @@ export default defineComponent({
     const route = useRouter();
     const User = auth.GetUser();
     const loading = ref(false);
-    const Customers = ref([{ id: "", first_name: "", last_name: "" }]);
+
+    const Customers = ref([
+      { id: "", first_name: "", last_name: "", meta: { company_name: "" } },
+    ]);
     const Clients = ref([
-      { id: "", client_data: { id: "", first_name: "", last_name: "" } },
+      {
+        id: "",
+        client_data: {
+          id: "",
+          first_name: "",
+          last_name: "",
+          meta: { company_name: "" },
+        },
+      },
     ]);
 
-    
     const locations = ref([
       {
         id: "",
@@ -799,6 +843,8 @@ export default defineComponent({
         training: "",
       },
     ]);
+
+    const siteSameAsBilling = ref(false);
 
     const getSelects = async () => {
       ApiService.setHeader();
@@ -825,7 +871,7 @@ export default defineComponent({
 
     const InvoiceDetails = ref<InvoiceDetails>({
       invoice_no: "",
-      customer_id: "",
+      lead_id: "",
       items: {
         id: "",
         site_location: "",
@@ -847,7 +893,7 @@ export default defineComponent({
       status: "",
       scope_of_work: "",
       terms_and_conditions: "",
-      customer: {
+      lead: {
         id: "",
         company_name: "",
         first_name: "",
@@ -878,66 +924,101 @@ export default defineComponent({
       updated_by: User.id,
     });
 
+    const ToggleClient = () => {
+      if (siteSameAsBilling.value) {
+        siteSameAsBilling.value = true;
+        clientSelect.value = true;
+        if (InvoiceDetails.value.lead_id) {
+          InvoiceDetails.value.client = InvoiceDetails.value.lead;
+          InvoiceDetails.value.client.id = "0";
+        } else {
+          InvoiceDetails.value.client = {
+            id: "",
+            company_name: "",
+            first_name: "",
+            last_name: "",
+            address1: "",
+            address2: "",
+            city: "",
+            states: "",
+            pincode: "",
+            country: "",
+          };
+          InvoiceDetails.value.lead = {
+            id: "",
+            company_name: "",
+            first_name: "",
+            last_name: "",
+            address1: "",
+            address2: "",
+            city: "",
+            states: "",
+            pincode: "",
+            country: "",
+          };
+        }
+      } else {
+        siteSameAsBilling.value = false;
+        clientSelect.value = true;
+
+        InvoiceDetails.value.lead_id = "";
+        InvoiceDetails.value.lead = {
+          id: "",
+          company_name: "",
+          first_name: "",
+          last_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          states: "",
+          pincode: "",
+          country: "",
+        };
+
+        InvoiceDetails.value.client = {
+          id: "",
+          company_name: "",
+          first_name: "",
+          last_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          states: "",
+          pincode: "",
+          country: "",
+        };
+      }
+    };
+
     onMounted(async () => {
       // todo: quotation check if pres get last incr 1
       const res = await GetIncrInvoiceId(User.company_id);
       IncrInvoice(res);
       // * basic fetch
       Customers.value.pop();
-      locations.value.pop();
       Clients.value.pop();
+      locations.value.pop();
       await GetCustomers();
       await getSelects();
     });
 
-      /* --------NEW LOGIC--------*/
+    /* --------NEW LOGIC--------*/
 
-      const accommodationRef = ref(true);
+    const accommodationRef = ref(true);
     const travellingRef = ref(true);
     const trainingRef = ref(true);
     const pickupRef = ref(true);
     const boardingRef = ref(true);
 
-    function areAllPropertiesNotNull(array) {
-      return array.some((detail) => {
-        const { site_location, per_day_charge, number_of_days } = detail;
-
-        // Check if any property is null or empty
-
-        return (
-          site_location === "" ||
-          isNaN(parseFloat(per_day_charge)) ||
-          isNaN(parseFloat(number_of_days))
-        );
-      });
-    }
-
     const calculateTotal = async () => {
-      // const days = InvoiceDetails.value.items.number_of_days;
-
-      // const charge = InvoiceDetails.value.items.per_day_charge ? InvoiceDetails.value.items.per_day_charge.toString() : "";
-      // const charge_per_day = Number(charge.replaceAll(",", "").substring(0));
-
-      // const accommo = InvoiceDetails.value.items.accommodation ? InvoiceDetails.value.items.accommodation.toString() : "";
-      // const travel = InvoiceDetails.value.items.travelling ? InvoiceDetails.value.items.travelling.toString() : "";
-      // const train = InvoiceDetails.value.items.training ? InvoiceDetails.value.items.training.toString() : "";
-      // const pick = InvoiceDetails.value.items.pickup ? InvoiceDetails.value.items.pickup.toString() : "";
-      // const board = InvoiceDetails.value.items.boarding ? InvoiceDetails.value.items.boarding.toString() : "";
-
-      // const accommodation = Number(accommo.replaceAll(",", "").substring(0));
-      // const travelling = Number(travel.replaceAll(",", "").substring(0));
-      // const training = Number(train.replaceAll(",", "").substring(0));
-      // const pickup = Number(pick.replaceAll(",", "").substring(0));
-      // const boarding = Number(board.replaceAll(",", "").substring(0));
-
       InvoiceDetails.value.total =
-        (Number(InvoiceDetails.value.items.number_of_days) * Number(InvoiceDetails.value.items.per_day_charge)) +
+        Number(InvoiceDetails.value.items.number_of_days) *
+          Number(InvoiceDetails.value.items.per_day_charge) +
         Number(InvoiceDetails.value.items.accommodation) +
         Number(InvoiceDetails.value.items.travelling) +
         Number(InvoiceDetails.value.items.training) +
         Number(InvoiceDetails.value.items.pickup) +
         Number(InvoiceDetails.value.items.boarding);
-      
     };
 
     async function SetLocation(id) {
@@ -971,8 +1052,6 @@ export default defineComponent({
         InvoiceDetails.value.items.board = true;
         InvoiceDetails.value.items.pick = true;
 
-
-
         accommodationRef.value = true;
         travellingRef.value = true;
         trainingRef.value = true;
@@ -980,42 +1059,36 @@ export default defineComponent({
         boardingRef.value = true;
 
         await calculateTotal();
-        console.log("Function runned")
+        console.log("Function runned");
       }
     }
 
     async function SetPerDayCharge() {
-
       await calculateTotal();
     }
 
     async function SetDays() {
-      console.log(InvoiceDetails.value.items.number_of_days)
+      console.log(InvoiceDetails.value.items.number_of_days);
       await calculateTotal();
     }
 
     async function SetAccommodation() {
-
       await calculateTotal();
     }
 
     async function SetTravelling() {
-
       await calculateTotal();
     }
 
     async function SetTraining() {
-
       await calculateTotal();
     }
 
     async function SetBoarding() {
-
       await calculateTotal();
     }
 
     async function SetPickUp() {
-
       await calculateTotal();
     }
 
@@ -1024,7 +1097,6 @@ export default defineComponent({
       if (accommodationRef.value) {
         accommodationRef.value = true;
         InvoiceDetails.value.items.accomm = true;
-
       } else {
         accommodationRef.value = false;
         InvoiceDetails.value.items.accommodation = 0;
@@ -1038,7 +1110,6 @@ export default defineComponent({
       if (travellingRef.value) {
         travellingRef.value = true;
         InvoiceDetails.value.items.travel = true;
-
       } else {
         travellingRef.value = false;
         InvoiceDetails.value.items.travelling = 0;
@@ -1134,16 +1205,17 @@ export default defineComponent({
         const customer_id = id;
         const response = await getUser(customer_id);
         console.log(response);
-        InvoiceDetails.value.customer = response.meta;
-        InvoiceDetails.value.customer.id = response.id;
-        clientSelect.value = false;
-        /* *
-         TODO : get customer_id and from meta get client ids get customer_id and from meta get client ids and put into Ref object
-         ? Problem of getting clients;
-        */
-        GetClients(customer_id);
+        InvoiceDetails.value.lead = response.meta;
+        InvoiceDetails.value.lead.id = response.id;
+
+        if (siteSameAsBilling.value) {
+          ToggleClient();
+        } else {
+          clientSelect.value = false;
+          GetClients(customer_id);
+        }
       } else {
-        InvoiceDetails.value.customer = {
+        InvoiceDetails.value.lead = {
           id: "",
           company_name: "",
           first_name: "",
@@ -1178,7 +1250,7 @@ export default defineComponent({
          ? Problem of getting clients;
         */
       } else {
-        InvoiceDetails.value.customer = {
+        InvoiceDetails.value.lead = {
           id: "",
           company_name: "",
           first_name: "",
@@ -1193,7 +1265,6 @@ export default defineComponent({
       }
     };
 
-
     const GetCustomers = async () => {
       ApiService.setHeader();
       const response = await getCustomers(``);
@@ -1205,17 +1276,68 @@ export default defineComponent({
       );
     };
 
+    function areAllPropertiesNull(array) {
+      return array.some((detail) => {
+        const {
+          invoice_no,
+          lead_id,
+          lead,
+          client,
+          items,
+          date,
+          duedate,
+          status,
+          scope_of_work,
+          terms_and_conditions,
+          total,
+        } = detail;
+
+        // Check if any property is null or empty
+
+        return (
+          invoice_no === "" ||
+          lead_id === "" ||
+          items.id === "" ||
+          lead.id === "" ||
+          client.id === "" ||
+          date === null ||
+          duedate === null ||
+          status === "" ||
+          scope_of_work === "" ||
+          terms_and_conditions === "" ||
+          isNaN(parseFloat(total))
+        );
+      });
+    }
+
     // number formating remove
-    const submit = async () => {
-      disabledselect.value = true;
-      InvoiceDetails.value.date = moment(InvoiceDetails.value.date).format(
-        "YYYY-MM-DD HH:mm:ss"
-      );
-      InvoiceDetails.value.duedate = moment(
-        InvoiceDetails.value.duedate
-      ).format("YYYY-MM-DD HH:mm:ss");
+    const submit = async (e) => {
+      e.preventDefault();
+
       // console.log(InvoiceDetails.value);
       try {
+        const result = areAllPropertiesNull([InvoiceDetails.value]);
+
+        if (result) {
+          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          loading.value = false;
+          return;
+        }
+
+        if (InvoiceDetails.value.date && InvoiceDetails.value.duedate) {
+          InvoiceDetails.value.date = moment(InvoiceDetails.value.date).format(
+            "YYYY-MM-DD HH:mm:ss"
+          );
+          InvoiceDetails.value.duedate = moment(
+            InvoiceDetails.value.duedate
+          ).format("YYYY-MM-DD HH:mm:ss");
+        } else {
+          showErrorAlert(
+            "Warning",
+            "Dates cannot be empty, please fill all the required details"
+          );
+        }
+
         // Call your API here with the form values
         const response = await addInvoice(InvoiceDetails.value);
         // console.log(response.error);
@@ -1224,7 +1346,7 @@ export default defineComponent({
           // console.log("API response:", response);
           showSuccessAlert(
             "Success",
-            "Company details have been successfully inserted!"
+            "Invoice have been successfully created!"
           );
           route.push({ name: "invoices-list" });
         } else {
@@ -1239,7 +1361,6 @@ export default defineComponent({
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
-        disabledselect.value = false;
       }
     };
 
@@ -1305,7 +1426,7 @@ export default defineComponent({
     const clear = () => {
       InvoiceDetails.value = {
         invoice_no: "",
-        customer_id: " ",
+        lead_id: " ",
         items: {
           id: "",
           site_location: "",
@@ -1328,7 +1449,7 @@ export default defineComponent({
         scope_of_work: "",
         terms_and_conditions: "",
         total: 0,
-        customer: {
+        lead: {
           id: "",
           company_name: "",
           first_name: "",
@@ -1394,6 +1515,8 @@ export default defineComponent({
       ToggleTravelling,
       TogglePickUp,
       ToggleBoarding,
+      siteSameAsBilling,
+      ToggleClient,
     };
   },
 });

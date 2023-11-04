@@ -232,6 +232,8 @@ export default defineComponent({
       quotation_id: "",
       customer_name: "",
       client_name: "",
+      customer_company: "",
+      client_company: "",
       quotation_no: "",
       status: 1,
       company_id: User.company_id,
@@ -249,10 +251,12 @@ export default defineComponent({
         rgpDetails.value.duedate = duedate
     }
 
-    function setQuotation(e,address, customer_name, client_name, quotation_no){
+    function setQuotation(e,address, customer_name, customer_company, client_name, client_company, quotation_no){
       rgpDetails.value.quotation_id = e ? e : ""
       rgpDetails.value.customer_name = customer_name ? customer_name : ""
       rgpDetails.value.client_name = client_name ? client_name : ""
+      rgpDetails.value.customer_company = customer_company ? customer_company : ""
+      rgpDetails.value.client_company = client_company ? client_company : ""
       rgpDetails.value.quotation_no = quotation_no ? quotation_no : ""
       rgpDetails.value.site_address.address1 = address.address1 ? address.address1 : ""
       rgpDetails.value.site_address.address2 = address.address2? address.address2 : ""
@@ -281,10 +285,16 @@ export default defineComponent({
         customer_data: {
           first_name: "",
           last_name: "",
+          company: {
+            company_name: ""
+          },
         },
         client_data: {
           first_name: "",
           last_name: "",
+          company: {
+            company_name: ""
+          },
         },
       },
     ]);
@@ -344,10 +354,9 @@ export default defineComponent({
 
     const GetApprovedQuotations = async () => {
       ApiService.setHeader();
-
       const company_ID = auth.GetUser().company_id;
       const response = await GetAppovedQuotationsList(company_ID);
-
+      console.log("approved quotation: ", response)
       Quotations.value.push(
         ...response.result.map(({ ...rest }) => ({
           ...rest,

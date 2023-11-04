@@ -55,6 +55,7 @@ const instrumentGen = async (id, pdfName, instrumentInfo) => {
   });
 
   const details = [
+    ['Instrument ID', `${instrumentInfo.value.instrument_id}`],
     ['Instrument Name', `${instrumentInfo.value.name}`],
     ['Model No.', instrumentInfo.value.model_no],
     ['Serial No.', `${instrumentInfo.value.serial_no}`],
@@ -141,10 +142,6 @@ const instrumentGen = async (id, pdfName, instrumentInfo) => {
 
   autoTable(doc, {
     body: CalibrationData,
-    columnStyles: {
-      '0': { cellWidth: 2},
-      '1': { cellWidth: "auto" },
-    },
     margin: { left: 0.5, top: 1.25 },
     bodyStyles: { halign: "left",fontSize: 9},
     tableLineColor: [0, 0, 0],
@@ -154,27 +151,29 @@ const instrumentGen = async (id, pdfName, instrumentInfo) => {
     },
   });
 
-  const{ periodicity, m_date1, m_date2, m_date3, m_details, any_repair_detail, maintenance_done_by } = instrumentInfo.value.maintenance_details;
+  const MainData = instrumentInfo.value.maintenance_history.map((detail, index) => [
+    index+1,
+    detail.m_date1,
+    detail.m_details,
+    detail.periodicity,
+    detail.any_repair_detail ? detail.any_repair_detail : "-",
+    detail.maintenance_done_by,
+  ]);
+
 
   const MaintenanceData = [
     [
-      { title: 'MAINTENANCE DETAILS', colSpan:2 },
+      { title: 'Sr. No'},
+      { title: 'Date'},
+      { title: 'Maintenance Details'},
+      { title: 'Frequency (months)' },
+      { title: 'Remark'},
+      { title: 'Any Repair'},
+      { title: 'Maintenence Done By'},
     ],
-    [
-      { title: 'Dates *(maintenance has to be done on the following dates)', rowSpan: 3 },
-      { title: m_date1},
-    ],
-    [
-      { title: m_date2},
-    ],
-    [
-      { title: m_date3},
-    ],
-    ['Maintenance Details', `${m_details}`],
-    ['Frequency', `${periodicity} months`],
-    ['Any Repair/Damage/Adjustment', `${any_repair_detail ? any_repair_detail : "NA"}`],
-    ['Maintenance Done By', `${instrumentInfo.value.make}`],
-  ];
+    ...MainData
+  ]
+
 
   autoTable(doc, {
     body: MaintenanceData,

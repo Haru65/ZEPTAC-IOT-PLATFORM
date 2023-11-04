@@ -34,8 +34,8 @@
             <p>Date: {{  moment($props.summary.date).format("DD-MM-YYYY") }}</p>
             <p>Due Date: {{ moment($props.summary.duedate).format("DD-MM-YYYY") }}</p>
             <p>Quotation Number: {{ $props.summary.quotation_no }}</p>
-            <p>Customer Name: {{ $props.summary.customer_name }}</p>
-            <p>Client Name: {{ $props.summary.client_name }}</p>
+            <p>Customer Name: {{ $props.summary.customer_company }} ({{ $props.summary.customer_name }})</p>
+            <p>Client Name: {{ $props.summary.client_company }} ({{ $props.summary.client_name }})</p>
             <p>
               Site Address: {{ $props.summary.site_address.address1 }}
               {{ $props.summary.site_address.address2 }}

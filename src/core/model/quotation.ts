@@ -1,6 +1,8 @@
 interface IQuotations {
   id: number;
-  customer_name: string;
+  customer_name:{
+    company_name: string;
+  };
   date: string;
   duedate: string;
   status: string;

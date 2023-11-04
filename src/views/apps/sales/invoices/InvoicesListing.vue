@@ -322,7 +322,7 @@ export default defineComponent({
 
     interface invoiceDetails {
       invoice_no: string;
-      customer_id: string;
+      lead_id: string;
       items: {
         id: string;
         site_location: string;
@@ -345,7 +345,7 @@ export default defineComponent({
       scope_of_work: string;
       terms_and_conditions: string;
       total: number;
-      customer: Meta;
+      lead: Meta;
       client: Meta;
       is_active: number;
       company_id: string;
@@ -372,7 +372,7 @@ export default defineComponent({
     const User = auth.GetUser();
     const quotationDetail = ref<invoiceDetails>({
       invoice_no: "21****",
-      customer_id: " ",
+      lead_id: " ",
       items: {
         id: "",
         site_location: "",
@@ -394,7 +394,7 @@ export default defineComponent({
       status: "",
       scope_of_work: "",
       terms_and_conditions: "",
-      customer: {
+      lead: {
         id: "",
         company_name: "",
         first_name: "",
@@ -453,8 +453,7 @@ export default defineComponent({
             status: status,
             id: id,
             invoice_no: invoice_no,
-            customer_name:
-              customer_name[0].first_name + " " + customer_name[0].last_name,
+            customer_name: customer_name.company_name,
             date: moment(invoice_date).format("LL"),
             duedate: moment(invoice_duedate).format("LL"),
             total: total,
@@ -500,8 +499,7 @@ export default defineComponent({
             status: status,
             id: id,
             invoice_no: invoice_no,
-            customer_name:
-              customer_name[0].first_name + " " + customer_name[0].last_name,
+            customer_name: customer_name.company_name,
             date: moment(invoice_date).format("LL"),
             duedate: moment(invoice_duedate).format("LL"),
             total: total,
@@ -558,8 +556,7 @@ export default defineComponent({
             status: status,
             id: id,
             invoice_no: invoice_no,
-            customer_name:
-              customer_name[0].first_name + " " + customer_name[0].last_name,
+            customer_name: customer_name.company_name,
             date: moment(invoice_date).format("LL"),
             duedate: moment(invoice_duedate).format("LL"),
             total: total,
@@ -682,8 +679,7 @@ export default defineComponent({
             status: status,
             id: id,
             invoice_no: invoice_no,
-            customer_name:
-              customer_name[0].first_name + " " + customer_name[0].last_name,
+            customer_name: customer_name.company_name,
             date: moment(invoice_date).format("LL"),
             duedate: moment(invoice_duedate).format("LL"),
             total: total,
@@ -756,7 +752,7 @@ export default defineComponent({
           ).format("YYYY-MM-DD HH:mm:ss");
           quotationDetail.value = {
             invoice_no: latestinvoice_no,
-            customer_id: response.customer_id,
+            lead_id: response.customer_id,
             items: JSON.parse(response.items),
             date: response.date,
             duedate: response.duedate,
@@ -764,7 +760,7 @@ export default defineComponent({
             scope_of_work: response.scope_of_work,
             terms_and_conditions: response.terms_and_conditions,
             total: response.total,
-            customer: {
+            lead: {
               id: response.customer_id,
               first_name: "",
               last_name: "",
