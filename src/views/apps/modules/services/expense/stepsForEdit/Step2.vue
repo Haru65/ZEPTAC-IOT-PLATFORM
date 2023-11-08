@@ -211,37 +211,36 @@
                 type="radio"
                 class="btn-check"
                 name="status"
-                id="1"
+                id="pending"
                 value="1"
-                disabled="true"
                 v-model="$props.status"
                 v-on:change="SetStatus($event)"
                 autocomplete="off"
               />
-              <label class="btn btn-md btn-outline-primary" for="1">Pending</label>
+              <label class="btn btn-md btn-outline-primary" for="pending">Pending</label>
 
               <input
                 type="radio"
                 class="btn-check"
                 name="status"
-                id="2"
+                id="reject"
                 value="2"
                 v-model="$props.status"
                 v-on:change="SetStatus($event)"
                 autocomplete="off"
               />
-              <label class="btn btn-md btn-outline-danger" for="2">Reject</label>
+              <label class="btn btn-md btn-outline-danger" for="reject">Reject</label>
               <input
                 type="radio"
                 class="btn-check"
                 name="status"
-                id="3"
+                id="approve"
                 value="3"
                 v-model="$props.status"
                 v-on:change="SetStatus($event)"
                 autocomplete="off"
               />
-              <label class="btn btn btn-md btn-outline-success" for="3">Approve</label>
+              <label class="btn btn btn-md btn-outline-success" for="approve">Approve</label>
             </span>
           </label>
         </div>
@@ -276,12 +275,10 @@ export default defineComponent({
   setup(props, { emit }) {
     // Handling Emits
     const showImg = async (index) => {
-      console.log(index);
       await emit("showImage", index);
     };
 
     const onHide = async (index) => {
-      console.log(index);
       await emit("HideImage", index);
     };
 

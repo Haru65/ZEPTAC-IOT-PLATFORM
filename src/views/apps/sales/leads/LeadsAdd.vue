@@ -175,6 +175,36 @@
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span>Enquiry Number</span>
+
+              <i
+                class="fas fa-exclamation-circle ms-1 fs-7"
+                data-bs-toggle="tooltip"
+                title="Enquiry Number Required"
+              ></i>
+            </label>
+            <!--begin::Col-->
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="enquiry_no"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Enter enquiry number"
+                v-model="profileDetails.enquiry_no"
+              />
+              <div class="fv-plugins-message-container">
+                <div class="fv-help-block">
+                  <ErrorMessage name="enquiry_no" />
+                </div>
+              </div>
+            </div>
+            <!--end::Col-->
+          </div>
+
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
               <span>Address 1</span>
 
               <i
@@ -555,6 +585,7 @@ interface ProfileDetails {
   password: string;
   confpassword: string;
   role_id: string;
+  enquiry_no: string;
   address1: string;
   address2: string;
   country: string;
@@ -624,6 +655,7 @@ export default defineComponent({
       password: "decodedemo",
       confpassword: "",
       role_id: "8",
+      enquiry_no: "",
       address1: "",
       address2: "",
       country: "",
@@ -728,6 +760,7 @@ export default defineComponent({
         password: "decodedemo",
         confpassword: "",
         role_id: "8",
+        enquiry_no: "",
         address1: "",
         address2: "",
         country: "",

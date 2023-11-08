@@ -241,28 +241,6 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
       },
     ],
   },
-  {
-    heading: "Super Admin",
-    route: "/company",
-    pages: [
-      {
-        sectionTitle: "Users",
-        route: "/users",
-        keenthemesIcon: "profile-user",
-        bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Add User",
-            route: "/users/add",
-          },
-          {
-            heading: "List Users",
-            route: "/users/list",
-          },
-        ],
-      },
-    ],
-  },
 ];
 
 export default CompanyAdminMenuConfig;

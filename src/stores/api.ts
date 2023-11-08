@@ -146,6 +146,30 @@ export async function getEmployees(data) {
     }
 }
 
+export async function getEmployee(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(EMPLOYEE_URL, data);
+        //console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function updateEmployee(data: any, id: any) {
+    try {
+        ApiService.patchsetHeader();
+        console.log(data);
+        const response = await ApiService.put(EMPLOYEE_URL + "/" + id, data);
+        console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
 
 
 // USER

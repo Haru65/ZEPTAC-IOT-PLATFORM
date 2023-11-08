@@ -42,4 +42,21 @@ const get_role = (id: number) => {
     }
 };
 
-export { rolesArray, permissions, get_role };
+// Separate Roles for while (Add / Edit Employees)
+
+const c_roles = {
+    2: "Company Admin",
+    3: "Sales Person",
+    4: "Site In-Charge",
+    5: "Service Enginner",
+    6: "Commercial Executive",
+};
+
+const c_rolesArray = Object.keys(c_roles).map((id) => ({
+    id: parseInt(id),
+    name: c_roles[parseInt(id)],
+}));
+
+
+
+export { rolesArray, permissions, get_role, c_rolesArray};

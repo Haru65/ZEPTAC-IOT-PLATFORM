@@ -250,9 +250,7 @@ export default defineComponent({
     }
 
     async function setStatus(e) {
-      console.log("before" ,e, expenseSheetDetails.value.status);
       expenseSheetDetails.value.status = await e;
-      console.log("after", e, expenseSheetDetails.value.status )
     }
 
     onMounted(async () => {

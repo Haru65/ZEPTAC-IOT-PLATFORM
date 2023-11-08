@@ -797,6 +797,7 @@ interface QuotationDetails {
   };
   date: string;
   duedate: string;
+  enquiry_no: string;
   status: string;
   scope_of_work: string;
   terms_and_conditions: string;
@@ -891,6 +892,7 @@ export default defineComponent({
       },
       date: "",
       duedate: "",
+      enquiry_no:"",
       status: "",
       scope_of_work: "",
       terms_and_conditions: "",
@@ -1225,6 +1227,7 @@ export default defineComponent({
         console.log(response);
         QuotationDetails.value.lead = response.meta;
         QuotationDetails.value.lead.id = response.id;
+        QuotationDetails.value.enquiry_no = response.meta.enquiry_no;
 
         if (siteSameAsBilling.value) {
           ToggleClient();
@@ -1233,6 +1236,7 @@ export default defineComponent({
           GetClients(lead_id);
         }
       } else {
+        QuotationDetails.value.enquiry_no = "";
         QuotationDetails.value.lead = {
           id: "",
           company_name: "",
@@ -1463,6 +1467,7 @@ export default defineComponent({
           board: true,
           pick: true,
         },
+        enquiry_no: "",
         date: "",
         duedate: "",
         status: "",

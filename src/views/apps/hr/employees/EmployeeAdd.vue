@@ -1,33 +1,33 @@
 <template>
-  <!--begin::Basic info-->
-  <div class="card mb-5 mb-xl-10 p-6 pb-12">
-    <!--begin::Card header-->
-    <div
-      class="card-header border-0 cursor-pointer"
-      role="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#kt_account_profile_details"
-      aria-expanded="true"
-      aria-controls="kt_account_profile_details"
-    >
-      <!--begin::Card title-->
-      <div class="card-title m-0">
-        <h3 class="fw-bold m-0">Profile Details</h3>
-      </div>
-      <!--end::Card title-->
-    </div>
-    <!--begin::Card header-->
-
-    <!--begin::Content-->
-    <div id="kt_account_profile_details" class="collapse show">
-      <!--begin::Form-->
-      <Vform
-        id="kt_account_profile_details_form"
-        class="form"
-        novalidate
-        :validation-schema="profileDetailsValidator"
-        enctype="multipart/form-data"
+  <Vform
+    id="kt_account_profile_details_form"
+    class="form"
+    novalidate
+    :validation-schema="profileDetailsValidator"
+    enctype="multipart/form-data"
+  >
+    <!--begin::Basic info-->
+    <div class="card mb-5 mb-xl-10 p-6 pb-12">
+      <!--begin::Card header-->
+      <div
+        class="card-header border-0 cursor-pointer"
+        role="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#kt_account_profile_details"
+        aria-expanded="true"
+        aria-controls="kt_account_profile_details"
       >
+        <!--begin::Card title-->
+        <div class="card-title m-0">
+          <h3 class="fw-bold m-0">Profile Details</h3>
+        </div>
+        <!--end::Card title-->
+      </div>
+      <!--begin::Card header-->
+
+      <!--begin::Content-->
+      <div id="kt_account_profile_details" class="collapse show">
+        <!--begin::Form-->
         <!--begin::Card body-->
         <div class="card-body border-top p-9">
           <!--begin::Input group-->
@@ -221,9 +221,6 @@
           <!--end::Input group-->
 
           <!--begin::Input group-->
-          <!--end::Input group-->
-
-          <!--begin::Input group-->
 
           <div class="row mb-6">
             <!--begin::Label-->
@@ -306,7 +303,7 @@
                 placeholder="Please Select Role..."
               >
                 <el-option
-                  v-for="item in rolesArray"
+                  v-for="item in c_rolesArray"
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
@@ -367,187 +364,6 @@
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6">
-              <span>Employee Code</span>
-            </label>
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8 fv-row">
-              <Field
-                type="text"
-                name="employee_code"
-                class="form-control form-control-lg form-control-solid"
-                placeholder="Enter Employee Code"
-                v-model="profileDetails.employee_code"
-              />
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--end::Input group-->
-
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6">
-              <span>Department</span>
-            </label>
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8 fv-row">
-              <Field
-                type="text"
-                name="department"
-                class="form-control form-control-lg form-control-solid"
-                placeholder="Enter Department Name"
-                v-model="profileDetails.department"
-              />
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--end::Input group-->
-
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6">
-              <span>Designation</span>
-            </label>
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8 fv-row">
-              <Field
-                type="text"
-                name="designation"
-                class="form-control form-control-lg form-control-solid"
-                placeholder="Enter Designation"
-                v-model="profileDetails.designation"
-              />
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--end::Input group-->
-
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6">
-              <span>Date of Joining</span>
-            </label>
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8 fv-row">
-              <el-date-picker
-                type="date"
-                name="date_of_joining"
-                placeholder="Pick date of joining"
-                v-model="profileDetails.date_of_joining"
-                :editable="false"
-              />
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--end::Input group-->
-
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6">
-              <span>Work Experience</span>
-            </label>
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8 fv-row">
-              <Field
-                type="text"
-                name="experience"
-                class="form-control form-control-lg form-control-solid"
-                placeholder="Enter Work Experience"
-                v-model="profileDetails.experience"
-              />
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--end::Input group-->
-
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6">
-              <span>Qualification</span>
-            </label>
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8 fv-row">
-              <Field
-                type="text"
-                name="qualification"
-                class="form-control form-control-lg form-control-solid"
-                placeholder="Your Highest Qualification"
-                v-model="profileDetails.qualification"
-              />
-              <div class="fv-plugins-message-container">
-                <div class="fv-help-block">
-                  <ErrorMessage name="phone" />
-                </div>
-              </div>
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--end::Input group-->
-
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6">
-              <span>Job Description</span>
-            </label>
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8 fv-row">
-              <Field
-                type="text"
-                name="job_desc"
-                class="form-control form-control-lg form-control-solid"
-                placeholder="Enter Job Description"
-                v-model="profileDetails.job_desc"
-              />
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--end::Input group-->
-
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6">
-              <span>Reporting To</span>
-            </label>
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8 fv-row">
-              <Field
-                type="text"
-                name="reports_to"
-                class="form-control form-control-lg form-control-solid"
-                placeholder="Enter Reporting Person name"
-                v-model="profileDetails.reports_to"
-              />
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--end::Input group-->
-
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6">
               <span>WhatsApp No.</span>
             </label>
             <!--end::Label-->
@@ -564,8 +380,6 @@
             <!--end::Col-->
           </div>
           <!--end::Input group-->
-
-          <div class="separator my-10"></div>
 
           <div class="row mb-6">
             <!--begin::Label-->
@@ -886,35 +700,239 @@
           </div>
           <!--end::Input group-->
         </div>
-        <div class="modal-footer flex-center">
-          <!--begin::Button-->
-          <button type="reset" class="btn btn-lg btn-danger w-25">Clear</button>
-          <!--end::Button-->
-          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-          <!--begin::Button-->
-          <span
-            @click="onsubmit()"
-            :data-kt-indicator="loading ? 'on' : null"
-            class="btn btn-lg btn-primary w-25"
-            type="submit"
-          >
-            <span v-if="!loading" class="indicator-label"> Submit </span>
-            <span v-if="loading" class="indicator-progress">
-              Please wait...
-              <span
-                class="spinner-border spinner-border-sm align-middle ms-2"
-              ></span>
-            </span>
-          </span>
-          <!--end::Button-->
+        <!--end::Input group-->
+        <!--end::Form-->
+      </div>
+      <!--end::Content-->
+    </div>
+    <!--end::Basic info-->
+    <div class="card mb-5 mb-xl-10 p-6 pb-12">
+      <!--begin::Card header-->
+      <div
+        class="card-header border-0 cursor-pointer"
+        role="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#kt_account_profile_details_2"
+        aria-expanded="true"
+        aria-controls="kt_account_profile_details_2"
+      >
+        <!--begin::Card title-->
+        <div class="card-title m-0">
+          <h3 class="fw-bold m-0">Employment Details</h3>
+        </div>
+        <!--end::Card title-->
+      </div>
+      <!--begin::Card header-->
+
+      <!--begin::Content-->
+      <div id="kt_account_profile_details_2" class="collapse show">
+        <!--begin::Form-->
+        <!--begin::Card body-->
+        <div class="card-body border-top p-9">
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span>Employee Code</span>
+            </label>
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="employee_code"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Enter Employee Code"
+                v-model="profileDetails.employee_code"
+              />
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span>Department</span>
+            </label>
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="department"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Enter Department Name"
+                v-model="profileDetails.department"
+              />
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span>Designation</span>
+            </label>
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="designation"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Enter Designation"
+                v-model="profileDetails.designation"
+              />
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span>Date of Joining</span>
+            </label>
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <el-date-picker
+                type="date"
+                name="date_of_joining"
+                placeholder="Pick date of joining"
+                v-model="profileDetails.date_of_joining"
+                :editable="false"
+              />
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span>Work Experience</span>
+            </label>
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="experience"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Enter Work Experience"
+                v-model="profileDetails.experience"
+              />
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span>Qualification</span>
+            </label>
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="qualification"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Your Highest Qualification"
+                v-model="profileDetails.qualification"
+              />
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span>Job Description</span>
+            </label>
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="job_desc"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Enter Job Description"
+                v-model="profileDetails.job_desc"
+              />
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span>Reporting To</span>
+            </label>
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="reports_to"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Enter Reporting Person name"
+                v-model="profileDetails.reports_to"
+              />
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
         </div>
         <!--end::Input group-->
-      </Vform>
-      <!--end::Form-->
+        <!--end::Form-->
+      </div>
+      <!--end::Content-->
     </div>
-    <!--end::Content-->
-  </div>
-  <!--end::Basic info-->
+    <div class="modal-footer flex-center">
+      <!--begin::Button-->
+      <button type="reset" class="btn btn-lg btn-danger w-25">Clear</button>
+      <!--end::Button-->
+      &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+      <!--begin::Button-->
+      <span
+        @click="onsubmit()"
+        :data-kt-indicator="loading ? 'on' : null"
+        class="btn btn-lg btn-primary w-25"
+        type="submit"
+      >
+        <span v-if="!loading" class="indicator-label"> Submit </span>
+        <span v-if="loading" class="indicator-progress">
+          Please wait...
+          <span
+            class="spinner-border spinner-border-sm align-middle ms-2"
+          ></span>
+        </span>
+      </span>
+      <!--end::Button-->
+    </div>
+  </Vform>
 </template>
   
   <script lang="ts">
@@ -923,7 +941,7 @@ import { defineComponent, onMounted, ref, watch } from "vue";
 import { ErrorMessage, Field, Form as Vform } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
-import { rolesArray } from "@/core/config/PermissionsRolesConfig";
+import { c_rolesArray } from "@/core/config/PermissionsRolesConfig";
 import { addEmployee, getCompanies } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import { countries, INstates } from "@/core/model/countries";
@@ -970,7 +988,7 @@ interface ProfileDetails {
 }
 
 export default defineComponent({
-  name: "account-settings",
+  name: "employee-add",
   components: {
     ErrorMessage,
     Field,
@@ -1109,8 +1127,8 @@ export default defineComponent({
         if (!response.error) {
           // Handle successful API response
           console.log("API response:", response);
-          showSuccessAlert("Success", "User have been successfully inserted!");
-          router.push({ name: "users-list" });
+          showSuccessAlert("Success", "Employee have been successfully inserted!");
+          router.push({ name: "employees-list" });
         } else {
           // Handle API error response
           const errorData = response.error;
@@ -1258,7 +1276,7 @@ export default defineComponent({
       updatePasswordButton,
       getAssetPath,
       Companies,
-      rolesArray,
+      c_rolesArray,
       onsubmit,
       loading,
       clear,

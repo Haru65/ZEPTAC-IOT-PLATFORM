@@ -19,6 +19,7 @@ import {
   getQualityProcedure,
   getComplaint,
   getTraining,
+  getEmployee,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
@@ -134,6 +135,31 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Employee Add",
           breadcrumbs: ["Employee Add"],
+        },
+      },
+      {
+        path: "/employee/edit/:id",
+        name: "employee-edit",
+        beforeEnter: async (to, from, next) => {
+          const empId = to.params.id;
+          try {
+            const response = await getEmployee(empId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/hr/employees/EmployeeEdit.vue"),
+        meta: {
+          pageTitle: "Employee Edit",
+          breadcrumbs: ["Employee Edit"],
         },
       },
       {
@@ -564,8 +590,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/services/expense/ExpenseSheetEdit.vue"),
         meta: {
-          pageTitle: "Returnable-Gate-Pass Edit",
-          breadcrumbs: ["Returnable-Gate-Pass Edit"],
+          pageTitle: "Expense Sheet Edit",
+          breadcrumbs: ["Expense Sheet Edit"],
         },
       },
 
