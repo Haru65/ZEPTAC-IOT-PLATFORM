@@ -14,7 +14,7 @@
             v-model="search"
             @input="searchItems()"
             class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search Customers"
+            placeholder="Search Client"
           />
         </div>
         <!--end::Search-->
@@ -103,39 +103,39 @@
         :loading="loading"
       >
         <!-- img data -->
-        <template v-slot:name="{ row: customer }">
+        <template v-slot:name="{ row: clients }">
           <div class="d-flex justify-content-start align-items-center">
             <!-- <img :src="user.name" class="w-45px rounded-circle" alt="" /> -->
             <span style="margin-left: 5.5%">
               <span class="text-gray-600 text-hover-primary mb-1">
-                {{ customer.first_name + " " + customer.last_name }}
+                {{ clients.first_name + " " + clients.last_name }}
               </span>
             </span>
           </div>
         </template>
         <!-- defualt data -->
-        <template v-slot:email="{ row: customer }">
+        <template v-slot:email="{ row: clients }">
           <a
-            v-bind:href="'mailto:' + customer.email"
+            v-bind:href="'mailto:' + clients.email"
             class="text-gray-600 text-hover-primary mb-1"
           >
-            {{ customer.email }}
+            {{ clients.email }}
           </a>
         </template>
-        <template v-slot:mobile="{ row: customer }">
-          {{ customer.mobile }}
+        <template v-slot:mobile="{ row: clients }">
+          {{ clients.mobile }}
         </template>
-        <template v-slot:company="{ row: customer }">
-          {{ customer.company_name[0].company_name }}
+        <template v-slot:company="{ row: clients }">
+          {{ clients.company_name[0].company_name }}
         </template>
-        <template v-slot:date="{ row: customer }">
-          {{ customer.created_at }}
+        <template v-slot:date="{ row: clients }">
+          {{ clients.created_at }}
         </template>
-        <template v-slot:actions="{ row: customer }">
+        <template v-slot:actions="{ row: clients }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span class="menu-link px-3">
-              <router-link :to="`./edit/${customer.id}`">
+              <router-link :to="`./edit/${clients.id}`">
                 <i
                   class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
                 ></i>
@@ -143,7 +143,7 @@
             </span>
             <span>
               <i
-                @click="deleteclient(customer.id, false)"
+                @click="deleteclient(clients.id, false)"
                 class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>

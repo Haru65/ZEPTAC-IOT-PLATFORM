@@ -1026,7 +1026,9 @@ export default defineComponent({
     onMounted(async () => {
       state.value.pop();
       Companies.value.pop();
-      await getdropcomp();
+      if(User.role_id === 1){
+        await getdropcomp();
+      }
     });
 
     const emailFormDisplay = ref(false);
@@ -1128,7 +1130,7 @@ export default defineComponent({
           // Handle successful API response
           console.log("API response:", response);
           showSuccessAlert("Success", "Employee have been successfully inserted!");
-          router.push({ name: "employees-list" });
+          router.push({ name: "employee-list" });
         } else {
           // Handle API error response
           const errorData = response.error;

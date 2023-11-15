@@ -20,6 +20,7 @@ import {
   getComplaint,
   getTraining,
   getEmployee,
+  getClient,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
@@ -281,10 +282,10 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/sales/clients/ClientsEdit.vue"),
         beforeEnter: async (to, from, next) => {
-          const customerId = to.params.id;
+          const clientId = to.params.id;
           //console.log(companyId);
           try {
-            const response = await getCustomer(customerId);
+            const response = await getClient(clientId);
             console.log(response);
             if (response.error) {
               next("/404"); // Redirect to the fallback route

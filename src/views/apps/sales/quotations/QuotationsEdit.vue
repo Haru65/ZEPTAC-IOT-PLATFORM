@@ -252,9 +252,10 @@
                         <br />
                         <!-- firstname as a flag -->
                         <a
-                          v-show="
-                            !QuotationDetails.client.id &&
-                            QuotationDetails.client.first_name
+                        v-show="
+                            QuotationDetails.client.id &&
+                            QuotationDetails.client.first_name && 
+                            !qAsiteSameAsBilling
                           "
                           target="blank"
                           v-bind:href="`/clients/edit/${QuotationDetails.client.id}`"
@@ -455,7 +456,11 @@
                         <br />
                         <!-- firstname as a flag -->
                         <a
-                          v-show="QuotationDetails.client.first_name"
+                        v-show="
+                            QuotationDetails.client.id &&
+                            QuotationDetails.client.first_name && 
+                            !qNsiteSameAsBilling
+                          "
                           target="blank"
                           v-bind:href="`/clients/edit/${QuotationDetails.lead_id}`"
                         >

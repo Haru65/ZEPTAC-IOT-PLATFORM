@@ -599,7 +599,7 @@ export default defineComponent({
     onMounted(async () => {
       state.value.pop();
       Companies.value.pop();
-      await getdropcomp();
+      // await getdropcomp();
       // add customer details
       const res = await getCustomer(customerId);
       console.log(res);

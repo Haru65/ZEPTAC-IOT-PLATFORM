@@ -708,7 +708,9 @@ export default defineComponent({
         updated_by: response.updated_by,
         is_active: response.is_active,
       };
-      await getdropcomp();
+      if(User.role_id === 1){
+        await getdropcomp();
+      }
     });
 
     const isPdfInvalid = ref(false);

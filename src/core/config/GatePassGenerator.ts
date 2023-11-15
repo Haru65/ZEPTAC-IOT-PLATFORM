@@ -74,14 +74,19 @@ const rgpGen = async (id, pdfName, rgpDetails) => {
     },
   });
 
-  const service_engineers = rgpDetails.value.engineers.map(({ first_name, last_name, mobile }, index) => ({
+  const service_engineers = await rgpDetails.value.engineers.map(({ first_name, last_name, mobile }, index) => ({
     index: index + 1,
     name: `${first_name} ${last_name}`,
     mobile: mobile
   }));
+
+  console.log("->", service_engineers)
   
-  const engData = service_engineers.map(engineer => [engineer.index, engineer.name, engineer.mobile]);
+  const engData = await service_engineers.map(engineer => [engineer.index, engineer.name, engineer.mobile]);
   
+  
+  console.log("->", engData)
+
   const engineerData = [
     [
       "Sr. No",

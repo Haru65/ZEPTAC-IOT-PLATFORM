@@ -633,7 +633,7 @@ export default defineComponent({
     onMounted(async () => {
       state.value.pop();
       Companies.value.pop();
-      await getdropcomp();
+      // await getdropcomp();
     });
 
     const emailFormDisplay = ref(false);

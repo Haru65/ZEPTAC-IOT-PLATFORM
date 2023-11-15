@@ -218,7 +218,7 @@ import { blank64 } from "../../admin/users/blank";
 import Swal from "sweetalert2";
 
 export default defineComponent({
-  name: "employee-listing",
+  name: "employee-list",
   components: {
     Datatable,
     // ExportCustomerModal,

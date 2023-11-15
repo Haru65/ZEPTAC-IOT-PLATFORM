@@ -254,8 +254,9 @@
                         <!-- firstname as a flag -->
                         <a
                           v-show="
-                            !QuotationDetails.client.id &&
-                            QuotationDetails.client.first_name
+                            QuotationDetails.client.id &&
+                            QuotationDetails.client.first_name && 
+                            !siteSameAsBilling
                           "
                           target="blank"
                           v-bind:href="`/clients/edit/${QuotationDetails.client.id}`"

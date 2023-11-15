@@ -554,7 +554,7 @@ export default defineComponent({
             ? "data: image/png;base64," + res.result.company_details.company_logo
             : getAssetPath("media/avatars/default.png")
       
-      console.log(rgpInfo.value.company_details);
+      console.log(rgpInfo.value);
 
       await rgpGen(id, rgpInfo.value.rgp_no, rgpInfo);
 
@@ -647,7 +647,7 @@ export default defineComponent({
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
+        tableData.value = response.result.data.data.map(
           ({
             id,
             rgp_no,

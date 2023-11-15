@@ -448,7 +448,7 @@ export default defineComponent({
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
-        tableData.value = response.result.data.data.map(
+        tableData.value = response.result.data.map(
           ({ created_at, ...rest }) => ({
             ...rest,
             created_at: moment(created_at).format("MMMM Do YYYY"),

@@ -271,7 +271,7 @@ export async function ClientSearch(search: any) {
             search: search
         }
         ApiService.setHeader();
-        const response = await ApiService.post('customer_search', data);
+        const response = await ApiService.post('client_search', data);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -521,7 +521,7 @@ export async function PriceListSearch(search: any) {
             search: search
         }
         ApiService.setHeader();
-        const response = await ApiService.post('leads_search', data);
+        const response = await ApiService.post('pricelist_search', data);
         return response.data;
     } catch (errors) {
         console.error(errors);

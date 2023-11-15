@@ -1018,7 +1018,9 @@ export default defineComponent({
       state.value.pop();
       Companies.value.pop();
       await loadUser();
-      await getdropcomp();
+      if(User.role_id === 1){
+        await getdropcomp();
+      }
     });
 
     const emailFormDisplay = ref(false);
@@ -1110,7 +1112,7 @@ export default defineComponent({
             "Success",
             "Employee have been successfully inserted!"
           );
-          // router.push({ name: "employees-list" });
+          // router.push({ name: "employee-list" });
         } else {
           // Handle API error response
           const errorData = response.error;

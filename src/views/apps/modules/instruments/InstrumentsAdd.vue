@@ -701,7 +701,9 @@ export default defineComponent({
 
     onMounted(async () => {
       Companies.value.pop();
-      await getdropcomp();
+      if(User.role_id === 1){
+        await getdropcomp();
+      }
     });
 
     const isPdfInvalid = ref(false);

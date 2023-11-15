@@ -253,9 +253,10 @@
                         <br />
                         <!-- firstname as a flag -->
                         <a
-                          v-show="
-                            !InvoiceDetails.client.id &&
-                            InvoiceDetails.client.first_name
+                        v-show="
+                            InvoiceDetails.client.id &&
+                            InvoiceDetails.client.first_name && 
+                            !siteSameAsBilling
                           "
                           target="blank"
                           v-bind:href="`/clients/edit/${InvoiceDetails.client.id}`"
