@@ -31,6 +31,63 @@
         <!--begin::Card body-->
         <div class="card-body border-top p-9">
           <!--begin::Input group-->
+
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >Lead Name</label
+            >
+            <!--end::Label-->
+
+            <div class="col-lg">
+              <!--begin::Row-->
+              <div class="col-lg fv-row">
+                <div>
+                  <el-select
+                    v-model="profileDetails.lead_id"
+                    filterable
+                    placeholder="Please Select Customer..."
+                  >
+                    <el-option
+                      v-for="item in Leads"
+                      :key="item.id"
+                      :label="`${item.meta.company_name}`"
+                      :value="item.id"
+                    />
+                  </el-select>
+                </div>
+              </div>
+              <!--end::Row-->
+            </div>
+          </div>
+
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span class="required">Company Name</span>
+            </label>
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="company_name"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Company Name"
+                v-model="profileDetails.company_name"
+              />
+              <div class="fv-plugins-message-container">
+                <div class="fv-help-block">
+                  <ErrorMessage name="company_name" />
+                </div>
+              </div>
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label required fw-semobold fs-6"
@@ -142,57 +199,6 @@
           </div>
           <!--end::Input group-->
 
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-              >Lead Name</label
-            >
-            <!--end::Label-->
-
-            <div class="col-lg">
-              <!--begin::Row-->
-                <div class="col-lg fv-row">
-                  <div>
-                    <el-select v-model="profileDetails.lead_id" filterable placeholder="Please Select Customer...">
-                      <el-option
-                        v-for="item in Leads"
-                        :key="item.id"
-                        :label="`${item.first_name} ${item.last_name}`"
-                        :value="item.id"
-                      />
-                    </el-select>
-                  </div>
-              </div>
-              <!--end::Row-->
-            </div>
-          </div>
-
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6">
-              <span class="required">Company Name</span>
-            </label>
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8 fv-row">
-              <Field
-                type="text"
-                name="company_name"
-                class="form-control form-control-lg form-control-solid"
-                placeholder="Company Name"
-                v-model="profileDetails.company_name"
-              />
-              <div class="fv-plugins-message-container">
-                <div class="fv-help-block">
-                  <ErrorMessage name="company_name" />
-                </div>
-              </div>
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--end::Input group-->
           <!--end::Input group-->
           <div class="separator my-10"></div>
 
@@ -296,7 +302,11 @@
                 <!--begin::Col-->
                 <div v-if="state.length" class="col-lg fv-row">
                   <div>
-                    <el-select v-model="profileDetails.states" filterable placeholder="Select Your State...">
+                    <el-select
+                      v-model="profileDetails.states"
+                      filterable
+                      placeholder="Select Your State..."
+                    >
                       <el-option
                         v-for="item in state"
                         :key="item"
@@ -360,9 +370,7 @@
           <!--end::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >City</label
-            >
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">City</label>
             <!--end::Label-->
 
             <!--begin::Col-->
@@ -389,118 +397,23 @@
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >Date of Birth</label
+              >GST Number</label
             >
             <!--end::Label-->
 
             <!--begin::Col-->
             <div class="col-lg">
-              <!--begin::Row-->
-              <div class="row">
-                <!--begin::Col-->
-                <div class="col-lg fv-row">
-                  <el-date-picker
-                    v-model="profileDetails.dob"
-                    type="date"
-                    placeholder="Select Date of Birth"
-                  />
-                </div>
-                <!--end::Col-->
-              </div>
-              <!--end::Row-->
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--  -->
-          <!--end::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >Gender</label
-            >
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg">
-              <!--begin::Row-->
-              <div class="row">
-                <div class="col-lg fv-row">
-                  <div>
-                    <el-select v-model="profileDetails.gender" filterable placeholder="Select Your Gender...">
-                      <el-option label="Male" value="male" />
-                      <el-option label="Female" value="female" />
-                      <el-option label="Other" value="other" />
-                    </el-select>
-                  </div>
-                </div>
-              </div>
-              <!--end::Row-->
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--  -->
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >Aadhar Card</label
-            >
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8">
               <!--begin::Row-->
               <div class="row">
                 <!--begin::Col-->
                 <div class="col-lg fv-row">
                   <Field
                     type="text"
-                    name="adhar"
+                    name="gst_number"
                     class="form-control form-control-lg form-control-solid"
-                    placeholder="Enter Aadhar Number"
-                    v-model="profileDetails.adhar"
+                    placeholder="Enter GST Number"
+                    v-model="profileDetails.gst_number"
                   />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="adhar" />
-                    </div>
-                  </div>
-                </div>
-                <!--end::Col-->
-              </div>
-              <!--end::Row-->
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--end::Input group-->
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >Pan Card</label
-            >
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8">
-              <!--begin::Row-->
-              <div class="row">
-                <!--begin::Col-->
-                <div class="col-lg fv-row">
-                  <div>
-                    <Field
-                      type="text"
-                      name="pan"
-                      class="form-control form-control-lg form-control-solid"
-                      placeholder="Enter Pan Number"
-                      v-model="profileDetails.pan"
-                    />
-                    <div class="fv-plugins-message-container">
-                      <div class="fv-help-block">
-                        <ErrorMessage name="pan" />
-                      </div>
-                    </div>
-                  </div>
                 </div>
                 <!--end::Col-->
               </div>
@@ -572,10 +485,7 @@ interface ProfileDetails {
   states: string;
   pincode: string;
   city: string;
-  dob: string;
-  gender: string;
-  adhar: string;
-  pan: string;
+  gst_number: string;
   company_id: string;
   company_name: string;
   created_by: string;
@@ -599,7 +509,8 @@ export default defineComponent({
     const disabledselect = ref(true);
     let limit = ref(500);
     const loading = ref(false);
-    const Leads = ref([{ id: "", first_name: "", last_name: "" }]);
+    // const Leads = ref([{ id: "", first_name: "", last_name: "" }]);
+    const Leads = ref([{ id: "",  meta : {company_name: ""} }]);
     const state = ref([""]);
 
     onMounted(async () => {
@@ -612,7 +523,8 @@ export default defineComponent({
       ApiService.setHeader();
       const response = await getLeads(``);
       Leads.value.push(
-        ...response.result.data.map(({ created_at, ...rest }) => ({
+        ...response.result.data.map(({ created_at, meta, ...rest }) => ({
+          meta: meta,
           ...rest,
           created_at: moment(created_at).format("MMMM Do YYYY"),
         }))
@@ -622,7 +534,7 @@ export default defineComponent({
     const GetClientData = async (id) => {
       if (id != " ") {
         const response = await getLead(id);
-        console.log(response);
+        console.log("->", response);
         profileDetails.value.lead_id = response.id;
         profileDetails.value.lead_first_name = response.first_name;
         profileDetails.value.lead_last_name = response.last_name;
@@ -661,10 +573,7 @@ export default defineComponent({
       states: "",
       city: "",
       pincode: "",
-      dob: "",
-      gender: "",
-      adhar: "",
-      pan: "",
+      gst_number: "",
       company_id: User.company_id,
       company_name: "",
       created_by: User.id,
@@ -765,10 +674,7 @@ export default defineComponent({
         states: "",
         city: "",
         pincode: "",
-        dob: "",
-        gender: "",
-        adhar: "",
-        pan: "",
+        gst_number: "",
         company_id: "",
         company_name: "",
         created_by: User.id,
@@ -804,7 +710,6 @@ export default defineComponent({
 }
 
 .el-input__wrapper {
-  
   height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

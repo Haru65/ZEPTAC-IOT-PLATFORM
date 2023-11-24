@@ -436,6 +436,8 @@ interface airVelocityTestReport {
     calibration_date: string;
     calibration_due_date: string;
   };
+  equipment_name: string;
+  equipment_id: string;
   area_name: string;
   ahu_no: string;
   validation_date: string;
@@ -490,6 +492,8 @@ interface filterIntegrityTestReport {
     calibration_date: string;
     calibration_due_date: string;
   };
+  equipment_name: string;
+  equipment_id: string;
   area_name: string;
   ahu_no: string;
   validation_date: string;
@@ -534,6 +538,8 @@ interface particleCountTestReport {
     calibration_date: string;
     calibration_due_date: string;
   };
+  equipment_name: string;
+  equipment_id: string;
   area_name: string;
   ahu_no: string;
   validation_date: string;
@@ -579,6 +585,8 @@ interface recoveryTestReport {
     calibration_date: string;
     calibration_due_date: string;
   };
+  equipment_name: string;
+  equipment_id: string;
   area_name: string;
   ahu_no: string;
   validation_date: string;
@@ -703,6 +711,8 @@ export default defineComponent({
         test_code,
         report_name,
         instrument_used,
+  equipment_name,
+  equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -732,6 +742,8 @@ export default defineComponent({
           calibration_date: instrument_used.calibration_date,
           calibration_due_date: instrument_used.calibration_due_date,
         },
+  equipment_name,
+  equipment_id,
         area_name,
         ahu_no,
         validation_date,
@@ -778,6 +790,8 @@ export default defineComponent({
         test_code,
         report_name,
         instrument_used,
+        equipment_name,
+  equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -804,6 +818,8 @@ export default defineComponent({
           calibration_date: instrument_used.calibration_date,
           calibration_due_date: instrument_used.calibration_due_date,
         },
+        equipment_name,
+  equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -841,6 +857,8 @@ export default defineComponent({
         test_code,
         report_name,
         instrument_used,
+        equipment_name,
+  equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -867,6 +885,8 @@ export default defineComponent({
           calibration_date: instrument_used.calibration_date,
           calibration_due_date: instrument_used.calibration_due_date,
         },
+        equipment_name,
+  equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -905,6 +925,8 @@ export default defineComponent({
         test_code,
         report_name,
         instrument_used,
+        equipment_name,
+  equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -931,6 +953,8 @@ export default defineComponent({
           calibration_date: instrument_used.calibration_date,
           calibration_due_date: instrument_used.calibration_due_date,
         },
+        equipment_name,
+  equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -1062,6 +1086,8 @@ export default defineComponent({
         test_code,
         report_name,
         instrument_used,
+        equipment_name,
+  equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -1091,6 +1117,8 @@ export default defineComponent({
           calibration_date: instrument_used.calibration_date,
           calibration_due_date: instrument_used.calibration_due_date,
         },
+        equipment_name,
+  equipment_id,
         area_name,
         ahu_no,
         validation_date,
@@ -1139,6 +1167,8 @@ export default defineComponent({
         test_code,
         report_name,
         instrument_used,
+          equipment_name,
+  equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -1165,6 +1195,8 @@ export default defineComponent({
           calibration_date: instrument_used.calibration_date,
           calibration_due_date: instrument_used.calibration_due_date,
         },
+        equipment_name,
+  equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -1205,6 +1237,8 @@ export default defineComponent({
         test_code,
         report_name,
         instrument_used,
+        equipment_name,
+  equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -1231,6 +1265,8 @@ export default defineComponent({
           calibration_date: instrument_used.calibration_date,
           calibration_due_date: instrument_used.calibration_due_date,
         },
+        equipment_name,
+  equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -1272,6 +1308,8 @@ export default defineComponent({
         test_code,
         report_name,
         instrument_used,
+        equipment_name,
+  equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -1298,6 +1336,8 @@ export default defineComponent({
           calibration_date: instrument_used.calibration_date,
           calibration_due_date: instrument_used.calibration_due_date,
         },
+        equipment_name,
+  equipment_id,
         area_name,
         room_name,
         ahu_no,

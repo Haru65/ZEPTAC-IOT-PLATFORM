@@ -220,9 +220,31 @@
           </div>
           <!--end::Input group-->
 
+          <div class="row mb-6">
+            <div
+              class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+            >
+              <input
+                class="form-check-input"
+                type="checkbox"
+                :value="false"
+                name="licenseRef"
+                id="licenseRef"
+                v-on:change="ToggleLicense"
+                v-model="licenseRef"
+              />
+              <label
+                class="form-check-label fw-bold text-primary fw-semobold fs-5"
+                for="licenseRef"
+              >
+                Add this employee with no license.
+              </label>
+            </div>
+          </div>
+
           <!--begin::Input group-->
 
-          <div class="row mb-6">
+          <div class="row mb-6" v-show="licenseRef === false">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6">
               <span class="required">Password</span>
@@ -256,7 +278,7 @@
           <!--begin::Input group-->
           <!--begin::Input group-->
 
-          <div class="row mb-6">
+          <div class="row mb-6" v-show="licenseRef === false">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6">
               <span class="required">Confirm Password</span>
@@ -644,12 +666,13 @@
                 <!--begin::Col-->
                 <div class="col-lg fv-row">
                   <Field
-                    type="text"
-                    name="adhar"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Enter Aadhar Number"
-                    v-model="profileDetails.adhar"
-                  />
+                      type="file"
+                      id="adhar"
+                      name="adhar"
+                      class="form-control form-control-lg form-control-solid"
+                      @change="handleFileChange"
+                      accept=".pdf"
+                    />
                   <div class="fv-plugins-message-container">
                     <div class="fv-help-block">
                       <ErrorMessage name="adhar" />
@@ -679,11 +702,12 @@
                 <div class="col-lg fv-row">
                   <div>
                     <Field
-                      type="text"
+                      type="file"
+                      id="pan"
                       name="pan"
                       class="form-control form-control-lg form-control-solid"
-                      placeholder="Enter Pan Number"
-                      v-model="profileDetails.pan"
+                      @change="handleFileChange"
+                      accept=".pdf"
                     />
                     <div class="fv-plugins-message-container">
                       <div class="fv-help-block">
@@ -829,6 +853,8 @@
             <div class="col-lg-8 fv-row">
               <Field
                 type="text"
+                as="textarea"
+                row="3"
                 name="experience"
                 class="form-control form-control-lg form-control-solid"
                 placeholder="Enter Work Experience"
@@ -851,6 +877,8 @@
             <div class="col-lg-8 fv-row">
               <Field
                 type="text"
+                as="textarea"
+                row="3"
                 name="qualification"
                 class="form-control form-control-lg form-control-solid"
                 placeholder="Your Highest Qualification"
@@ -962,6 +990,9 @@ interface ProfileDetails {
   confpassword: string;
   role_id: string;
 
+  // for checking the license status
+  license: boolean;
+
   employee_code: string;
   department: string;
   designation: string;
@@ -1026,13 +1057,15 @@ export default defineComponent({
     onMounted(async () => {
       state.value.pop();
       Companies.value.pop();
-      if(User.role_id === 1){
+      if (User.role_id === 1) {
         await getdropcomp();
       }
     });
 
     const emailFormDisplay = ref(false);
     const passwordFormDisplay = ref(false);
+
+    const licenseRef = ref(false);
 
     const profileDetailsValidator = Yup.object().shape({
       fname: Yup.string().required().label("First name"),
@@ -1059,6 +1092,8 @@ export default defineComponent({
       confpassword: "",
       role_id: "",
 
+      license: false,
+
       employee_code: "",
       department: "",
       designation: "",
@@ -1083,6 +1118,75 @@ export default defineComponent({
       created_by: User.id,
       updated_by: User.id,
     });
+
+    async function ToggleLicense() {
+      // console.log(event);
+      if (licenseRef.value) {
+        licenseRef.value = true;
+        profileDetails.value.password = "";
+        profileDetails.value.confpassword = "";
+        profileDetails.value.license = true;
+      } else {
+        licenseRef.value = false;
+        profileDetails.value.license = false;
+      }
+    }
+
+    
+    const isPdfInvalid = ref(false);
+
+    const handleFileChange = (event) => {
+      // Get the selected file
+      const selectedFile = event.target?.files?.[0];
+
+      if (selectedFile) {
+        // Check if the selected file is a PDF
+        if (selectedFile.type === "application/pdf") {
+          const reader = new FileReader();
+
+          reader.onload = (e) => {
+            if (e.target) {
+              const result = e.target.result as string;
+
+              console.log(" -> ", e.target);
+              if (event.target.id === "pan") {
+                profileDetails.value.pan = result;
+              } else if (event.target.id === "adhar") {
+                profileDetails.value.adhar = result;
+              }
+            }
+          };
+
+          // Read the file as data URL (base64)
+          reader.readAsDataURL(selectedFile);
+          // Reset the invalid flag
+          isPdfInvalid.value = false;
+        } else {
+          // Clear the data and set the invalid flag
+
+          if (event.target.id === "pan") {
+            profileDetails.value.pan = "";
+
+            isPdfInvalid.value = true;
+          } else if (event.target.id === "adhar") {
+            profileDetails.value.adhar = "";
+
+            isPdfInvalid.value = true;
+          }
+        }
+      } else {
+        if (event.target.id === "pan") {
+          profileDetails.value.pan = "";
+
+          isPdfInvalid.value = true;
+        } else if (event.target.id === "adhar") {
+          profileDetails.value.adhar = "";
+
+          isPdfInvalid.value = true;
+        }
+      }
+      console.log(profileDetails.value);
+    };
 
     watch(
       () => profileDetails.value.country,
@@ -1120,6 +1224,15 @@ export default defineComponent({
         // ? CUSTOMS
         // ? const form = await CUSTOM_FORM(profileDetails);
         // ? push form
+
+        if(licenseRef.value === false){
+          if(profileDetails.value.password === "" || profileDetails.value.confpassword === ""){
+              showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+              return;
+          }
+        }
+
+
         if (User.role_id == "2") {
           const company_id = User.company_id;
           profileDetails.value.company_id = company_id;
@@ -1129,7 +1242,10 @@ export default defineComponent({
         if (!response.error) {
           // Handle successful API response
           console.log("API response:", response);
-          showSuccessAlert("Success", "Employee have been successfully inserted!");
+          showSuccessAlert(
+            "Success",
+            "Employee have been successfully inserted!"
+          );
           router.push({ name: "employee-list" });
         } else {
           // Handle API error response
@@ -1236,6 +1352,8 @@ export default defineComponent({
         confpassword: "",
         role_id: "",
 
+        license: false,
+
         employee_code: "",
         department: "",
         designation: "",
@@ -1286,6 +1404,11 @@ export default defineComponent({
       countries,
       file_size,
       identifier,
+      licenseRef,
+      ToggleLicense,
+      handleFileChange,
+      
+
     };
   },
 });

@@ -579,11 +579,12 @@
                 <!--begin::Col-->
                 <div class="col-lg fv-row">
                   <Field
-                    type="text"
+                    type="file"
+                    id="adhar"
                     name="adhar"
                     class="form-control form-control-lg form-control-solid"
-                    placeholder="Enter Aadhar Number"
-                    v-model="profileDetails.adhar"
+                    @change="handleFileChange"
+                    accept=".pdf"
                   />
                   <div class="fv-plugins-message-container">
                     <div class="fv-help-block">
@@ -614,11 +615,12 @@
                 <div class="col-lg fv-row">
                   <div>
                     <Field
-                      type="text"
+                      type="file"
+                      id="pan"
                       name="pan"
                       class="form-control form-control-lg form-control-solid"
-                      placeholder="Enter Pan Number"
-                      v-model="profileDetails.pan"
+                      @change="handleFileChange"
+                      accept=".pdf"
                     />
                     <div class="fv-plugins-message-container">
                       <div class="fv-help-block">
@@ -764,6 +766,8 @@
             <div class="col-lg-8 fv-row">
               <Field
                 type="text"
+                as="textarea"
+                row="3"
                 name="experience"
                 class="form-control form-control-lg form-control-solid"
                 placeholder="Enter Work Experience"
@@ -808,6 +812,8 @@
             <div class="col-lg-8 fv-row">
               <Field
                 type="text"
+                as="textarea"
+                row="3"
                 name="job_desc"
                 class="form-control form-control-lg form-control-solid"
                 placeholder="Enter Job Description"
@@ -1014,11 +1020,66 @@ export default defineComponent({
       };
     };
 
+    const isPdfInvalid = ref(false);
+
+    const handleFileChange = (event) => {
+      // Get the selected file
+      const selectedFile = event.target?.files?.[0];
+
+      if (selectedFile) {
+        // Check if the selected file is a PDF
+        if (selectedFile.type === "application/pdf") {
+          const reader = new FileReader();
+
+          reader.onload = (e) => {
+            if (e.target) {
+              const result = e.target.result as string;
+
+              console.log(" -> ", e.target);
+              if (event.target.id === "pan") {
+                profileDetails.value.pan = result;
+              } else if (event.target.id === "adhar") {
+                profileDetails.value.adhar = result;
+              }
+            }
+          };
+
+          // Read the file as data URL (base64)
+          reader.readAsDataURL(selectedFile);
+          // Reset the invalid flag
+          isPdfInvalid.value = false;
+        } else {
+          // Clear the data and set the invalid flag
+
+          if (event.target.id === "pan") {
+            profileDetails.value.pan = "";
+
+            isPdfInvalid.value = true;
+          } else if (event.target.id === "adhar") {
+            profileDetails.value.adhar = "";
+
+            isPdfInvalid.value = true;
+          }
+        }
+      } else {
+        if (event.target.id === "pan") {
+          profileDetails.value.pan = "";
+
+          isPdfInvalid.value = true;
+        } else if (event.target.id === "adhar") {
+          profileDetails.value.adhar = "";
+
+          isPdfInvalid.value = true;
+        }
+      }
+      console.log(profileDetails.value);
+    };
+
     onMounted(async () => {
       state.value.pop();
       Companies.value.pop();
       await loadUser();
-      if(User.role_id === 1){
+      if (User.role_id === 1) {
         await getdropcomp();
       }
     });
@@ -1269,6 +1330,7 @@ export default defineComponent({
       countries,
       file_size,
       identifier,
+      handleFileChange,
     };
   },
 });

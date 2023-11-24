@@ -170,6 +170,141 @@
           <!--end::Input group-->
           <!--end::Input group-->
           <div class="separator my-10"></div>
+          <!--begin::Accordion-->
+          <div class="accordion" id="kt_accordion_1">
+            <div class="accordion-item">
+              <h2 class="accordion-header" :id="'kt_accordion_1_header_'">
+                <button
+                  class="accordion-button fs-4 fw-semibold"
+                  type="button"
+                  :data-bs-toggle="'collapse'"
+                  :data-bs-target="'#kt_accordion_1_body_'"
+                  :aria-controls="'kt_accordion_1_body_'"
+                >
+                Leads Information  <i class="fs-6">
+                    ( optional )
+                  </i>
+                </button>
+              </h2>
+              <div
+                :id="'kt_accordion_1_body_'"
+                class="accordion-collapse"
+                :aria-labelledby="'kt_accordion_1_header_'"
+                data-bs-parent="#kt_accordion_1"
+              >
+                <div class="accordion-body">
+                  <div>
+                    <!-- Add content for nested accordion here -->
+                    <div class="table-responsive">
+                      <table
+                        class="table table-rounded table-striped border gy-7 gs-7 text-nowrap"
+                      >
+                        <thead>
+                          <tr
+                            class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200 text-align-center"
+                          >
+                            <th class="col-5">Full Name</th>
+                            <th class="col-3">Email</th>
+                            <th class="col-3">Phone</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr
+                            v-for="(lead, index) in profileDetails.extra_leads"
+                            :key="index"
+                          >
+                            <td class="align-middle">
+                              <span
+                                class="badge py-3 px-4 fs-7 badge-light-primary"
+                                >{{ `${lead.name}` }}</span
+                              >
+                            </td>
+                            <td class="align-middle">
+                              <span
+                                class="badge py-3 px-4 fs-7 badge-light-primary"
+                                >{{ `${lead.email}` }}</span
+                              >
+                            </td>
+                            <td class="align-middle">
+                              <span
+                                class="badge py-3 px-4 fs-7 badge-light-primary"
+                                >{{ `${lead.phone}` }}</span
+                              >
+                            </td>
+                            <td>
+                              <div
+                                class="btn-group"
+                                role="group"
+                                aria-label="View and Delete Buttons"
+                              >
+                                <button
+                                  type="button"
+                                  class="btn btn-primary btn-sm"
+                                  data-bs-toggle="modal"
+                                  :data-bs-target="
+                                    '#kt_modal_new_address_' + index
+                                  "
+                                >
+                                  <i class="bi bi-eye"></i> Edit
+                                </button>
+
+                                <LeadEditModal
+                                  :key="index"
+                                  :leadId="index"
+                                  :heading="'Edit Lead Information'"
+                                  :leadInfo="lead"
+                                  @editData="editLeadData"
+                                ></LeadEditModal>
+
+                                <button
+                                  type="button"
+                                  class="btn btn-danger btn-sm"
+                                  @click="deleteLeadData(index)"
+                                >
+                                  <i class="bi bi-trash"></i> Delete
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr
+                            class="text-center"
+                            v-if="profileDetails.extra_leads.length === 0"
+                          >
+                            <td
+                              colspan="3"
+                              class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200 text-align-center"
+                            >
+                              secondary leads are not added.
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div class="text-start mt-8">
+                    <button
+                      type="button"
+                      data-toggle="tooltip"
+                      title="lead information"
+                      class="btn btn-primary btn-sm"
+                      data-bs-toggle="modal"
+                      :data-bs-target="'#kt_modal_new_address'"
+                    >
+                      Add More Leads
+                    </button>
+                  </div>
+
+                  <LeadModal
+                    :heading="'Secondary Leads'"
+                    @addData="addLeadData"
+                  ></LeadModal>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--end::Accordion-->
+          <div class="separator my-10"></div>
 
           <div class="row mb-6">
             <!--begin::Label-->
@@ -393,126 +528,26 @@
             </div>
             <!--end::Col-->
           </div>
-          <!--end::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >Date of Birth</label
+              >GST Number</label
             >
             <!--end::Label-->
 
             <!--begin::Col-->
             <div class="col-lg">
-              <!--begin::Row-->
-              <div class="row">
-                <!--begin::Col-->
-                <div class="col-lg fv-row">
-                  <el-date-picker
-                    v-model="profileDetails.dob"
-                    type="date"
-                    placeholder="Select Date of Birth"
-                  />
-                </div>
-                <!--end::Col-->
-              </div>
-              <!--end::Row-->
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--  -->
-          <!--end::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >Gender</label
-            >
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg">
-              <!--begin::Row-->
-              <div class="row">
-                <div class="col-lg fv-row">
-                  <div>
-                    <el-select
-                      v-model="profileDetails.gender"
-                      filterable
-                      placeholder="Select Your Gender..."
-                    >
-                      <el-option label="Male" value="male" />
-                      <el-option label="Female" value="female" />
-                      <el-option label="Other" value="other" />
-                    </el-select>
-                  </div>
-                </div>
-              </div>
-              <!--end::Row-->
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--  -->
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >Aadhar Card</label
-            >
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8">
               <!--begin::Row-->
               <div class="row">
                 <!--begin::Col-->
                 <div class="col-lg fv-row">
                   <Field
                     type="text"
-                    name="adhar"
+                    name="gst_number"
                     class="form-control form-control-lg form-control-solid"
-                    placeholder="Enter Aadhar Number"
-                    v-model="profileDetails.adhar"
+                    placeholder="Enter GST Number"
+                    v-model="profileDetails.gst_number"
                   />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="adhar" />
-                    </div>
-                  </div>
-                </div>
-                <!--end::Col-->
-              </div>
-              <!--end::Row-->
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--end::Input group-->
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >Pan Card</label
-            >
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8">
-              <!--begin::Row-->
-              <div class="row">
-                <!--begin::Col-->
-                <div class="col-lg fv-row">
-                  <div>
-                    <Field
-                      type="text"
-                      name="pan"
-                      class="form-control form-control-lg form-control-solid"
-                      placeholder="Enter Pan Number"
-                      v-model="profileDetails.pan"
-                    />
-                    <div class="fv-plugins-message-container">
-                      <div class="fv-help-block">
-                        <ErrorMessage name="pan" />
-                      </div>
-                    </div>
-                  </div>
                 </div>
                 <!--end::Col-->
               </div>
@@ -523,13 +558,9 @@
         </div>
         <div class="modal-footer flex-center">
           <!--begin::Button-->
-          <button type="reset" class="btn btn-lg btn-danger w-25">Clear</button>
-          <!--end::Button-->
-          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-          <!--begin::Button-->
           <button
             :data-kt-indicator="loading ? 'on' : null"
-            class="btn btn-lg btn-primary w-25"
+            class="btn btn-lg btn-primary w-sd-25 w-lg-25"
             type="submit"
           >
             <span v-if="!loading" class="indicator-label"> Update </span>
@@ -563,6 +594,14 @@ import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
 import { useRoute, useRouter } from "vue-router";
 import { countries, INstates } from "@/core/model/countries";
+import LeadModal from "./CustomComponent/LeadModal.vue";
+import LeadEditModal from "./CustomComponent/LeadEditModal.vue";
+
+interface LDetails {
+  name: string;
+  email: string;
+  phone: string;
+}
 
 interface ProfileDetails {
   first_name: string;
@@ -572,6 +611,7 @@ interface ProfileDetails {
   password: string;
   confpassword: string;
   role_id: string;
+  extra_leads: Array<LDetails>;
   enquiry_no: string;
   address1: string;
   address2: string;
@@ -579,10 +619,7 @@ interface ProfileDetails {
   states: string;
   pincode: string;
   city: string;
-  dob: string;
-  gender: string;
-  adhar: string;
-  pan: string;
+  gst_number: string;
   company_id: string;
   company_name: string;
   created_by: string;
@@ -595,6 +632,8 @@ export default defineComponent({
     ErrorMessage,
     Field,
     VForm,
+    LeadModal,
+    LeadEditModal,
   },
   setup() {
     const auth = useAuthStore();
@@ -634,16 +673,14 @@ export default defineComponent({
         confpassword: "",
         role_id: res.role_id,
         enquiry_no: res.meta.enquiry_no,
+        extra_leads: res.meta?.extra_leads ? JSON.parse(res.meta?.extra_leads) : [],
         address1: res.meta.address1,
         address2: res.meta.address2,
         country: res.meta.country,
         states: res.meta.states,
         city: res.meta.city,
         pincode: res.meta.pincode,
-        dob: res.meta.dob,
-        gender: res.meta.gender,
-        adhar: res.meta.adhar,
-        pan: res.meta.pan,
+        gst_number: res.meta.gst_number,
         company_id: User.company_id,
         company_name: res.meta.company_name,
         created_by: User.id,
@@ -670,6 +707,7 @@ export default defineComponent({
       password: "",
       confpassword: "",
       role_id: "",
+      extra_leads: [],
       enquiry_no: "",
       address1: "",
       address2: "",
@@ -677,15 +715,37 @@ export default defineComponent({
       states: "",
       city: "",
       pincode: "",
-      dob: "",
-      gender: "",
-      adhar: "",
-      pan: "",
+      gst_number: "",
       company_id: User.company_id,
       company_name: "",
       created_by: User.id,
       updated_by: User.id,
     });
+
+    async function addLeadData(data) {
+      await profileDetails.value.extra_leads.push(data);
+    }
+
+    async function editLeadData(index, data) {
+      profileDetails.value.extra_leads.push[index] = await data;
+    }
+
+    const removeObjectWithId = (arr, id) => {
+      if (id !== -1) {
+        arr.splice(id, 1);
+      }
+
+      return arr;
+    };
+
+    async function deleteLeadData(index) {
+      //zero represent the testID
+      profileDetails.value.extra_leads = await removeObjectWithId(
+        profileDetails.value.extra_leads,
+        index
+      );
+    }
+
 
     const onsubmit = async () => {
       loading.value = true;
@@ -774,6 +834,7 @@ export default defineComponent({
         password: "decodedemo",
         confpassword: "",
         role_id: "8",
+        extra_leads: [],
         enquiry_no: "",
         address1: "",
         address2: "",
@@ -781,10 +842,7 @@ export default defineComponent({
         states: "",
         city: "",
         pincode: "",
-        dob: "",
-        gender: "",
-        adhar: "",
-        pan: "",
+        gst_number: "",
         company_id: "",
         company_name: "",
         created_by: User.id,
@@ -803,6 +861,10 @@ export default defineComponent({
       clear,
       countries,
       state,
+      addLeadData,
+      editLeadData,
+      deleteLeadData,
+
     };
   },
 });

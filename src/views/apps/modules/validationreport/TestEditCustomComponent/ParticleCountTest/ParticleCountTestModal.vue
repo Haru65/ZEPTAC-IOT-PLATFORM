@@ -190,6 +190,57 @@
                   <!--begin::Label-->
                   <label
                     class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Equipment Name</label
+                  >
+                  <!--end::Label-->
+
+                  <!--begin::Input-->
+                  <Field
+                    type="text"
+                    v-model="particleCountTestDetails.equipment_name"
+                    name="equipment_name"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Enter equipment name..."
+                  />
+                  <ErrorMessage
+                    class="invalid-feedback"
+                    name="equipment_name"
+                  />
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+
+                <!--begin::Col-->
+                <div class="col-md-6 fv-row">
+                  <!--end::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Equipment ID</label
+                  >
+                  <!--end::Label-->
+
+                  <!--end::Input-->
+                  <Field
+                    type="text"
+                    v-model="particleCountTestDetails.equipment_id"
+                    name="equipment_id"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Enter equipment id..."
+                  />
+                  <ErrorMessage class="invalid-feedback" name="equipment_id" />
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Input group-->
+
+              <!--begin::Input group-->
+              <div class="row mb-6">
+                <!--begin::Col-->
+                <div class="col-md-6 fv-row">
+                  <!--begin::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
                     >Area Name</label
                   >
                   <!--end::Label-->
@@ -440,6 +491,8 @@ interface ParticleCountTestReport {
     calibration_date: string;
     calibration_due_date: string;
   };
+  equipment_name: string;
+  equipment_id: string;
   area_name: string;
   room_name: string;
   ahu_no: string;
@@ -480,14 +533,7 @@ export default defineComponent({
 
   emit: ["childDataEmitted"],
 
-  props: [
-    "heading",
-    "instruments",
-    "engineers",
-    "id",
-    "code",
-    "rgp_no",
-  ],
+  props: ["heading", "instruments", "engineers", "id", "code", "rgp_no"],
 
   setup(props, { emit }) {
     const submitButtonRef = ref<null | HTMLButtonElement>(null);
@@ -519,6 +565,8 @@ export default defineComponent({
         calibration_date: "",
         calibration_due_date: "",
       },
+      equipment_name: "",
+      equipment_id: "",
       area_name: "",
       room_name: "",
       ahu_no: "",
@@ -608,7 +656,8 @@ export default defineComponent({
     }
 
     async function setReportName(e) {
-      particleCountTestDetails.value.report_name = await `${props.code}_${particleCountTestDetails.value.room_name}_${props.rgp_no}`;
+      particleCountTestDetails.value.report_name =
+        await `${props.code}_${particleCountTestDetails.value.room_name}_${props.rgp_no}`;
     }
 
     onMounted(function () {
@@ -715,6 +764,8 @@ export default defineComponent({
     }
 
     const clear = () => {
+      particleCountTestDetails.value.equipment_name = "";
+      particleCountTestDetails.value.equipment_id = "";
       particleCountTestDetails.value.area_name = "";
       particleCountTestDetails.value.report_name = "";
       particleCountTestDetails.value.room_name = "";

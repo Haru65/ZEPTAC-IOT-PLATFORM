@@ -300,15 +300,20 @@ export default defineComponent({
     ]);
 
     const IncrRGP = (data: any) => {
-      const latest_rgp_no = data.result.split("_");
-      if (parseInt(latest_rgp_no[1]) == 0) {
-        // ? if no record
-        rgpDetails.value.rgp_no =
-          latest_rgp_no[0] + "_" + latest_rgp_no[1].toString();
-      } else {
-        // ? if record exisit inc 1
-        rgpDetails.value.rgp_no =
-          latest_rgp_no[0] + "_" + (1 + +latest_rgp_no[1]).toString();
+      if(data?.result){
+        const latest_rgp_no = data.result.split("_");
+        if (parseInt(latest_rgp_no[1]) == 0) {
+          // ? if no record
+          rgpDetails.value.rgp_no =
+            latest_rgp_no[0] + "_" + latest_rgp_no[1].toString();
+        } else {
+          // ? if record exisit inc 1
+          rgpDetails.value.rgp_no =
+            latest_rgp_no[0] + "_" + (1 + +latest_rgp_no[1]).toString();
+        }
+      }
+      else{
+        showErrorAlert("Error", "An error occurred during the API call.");
       }
     };
 

@@ -448,6 +448,19 @@ export async function LeadsSearch(search: any) {
     }
 }
 
+export async function GetIncrEnquiry(data: any) {
+    try {
+        //console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('get_latest_enquiry', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 // getlisting
 export async function getLeads(data) {
     try {

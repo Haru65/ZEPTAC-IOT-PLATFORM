@@ -22,16 +22,12 @@ export type { IPriceList };
 export const Equipments = [
   {
       id: 0,
-      name: "Equipment 1",
+      name: "LAF",
   },
   {
       id: 1,
-      name: "Equipment 2",
+      name: "BSF",
   },
-  {
-      id: 2,
-      name: "Equipment 3",
-  }
 ];
 
 export const GetEquipment = (id) => {

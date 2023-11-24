@@ -252,9 +252,9 @@
                         <br />
                         <!-- firstname as a flag -->
                         <a
-                        v-show="
+                          v-show="
                             QuotationDetails.client.id &&
-                            QuotationDetails.client.first_name && 
+                            QuotationDetails.client.first_name &&
                             !qAsiteSameAsBilling
                           "
                           target="blank"
@@ -456,9 +456,9 @@
                         <br />
                         <!-- firstname as a flag -->
                         <a
-                        v-show="
+                          v-show="
                             QuotationDetails.client.id &&
-                            QuotationDetails.client.first_name && 
+                            QuotationDetails.client.first_name &&
                             !qNsiteSameAsBilling
                           "
                           target="blank"
@@ -475,6 +475,46 @@
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div class="row mb-6">
+              <label
+                class="btn btn-outline btn-outline-dashed btn-outline-default p-5 d-flex align-items-center"
+              >
+                <!--begin::Info-->
+                <span class="d-block fw-semobold text-start">
+                  <span class="text-dark fw-bold d-block fs-6 mb-2"
+                    >Quotation based on Day-Wise or Equipment-Wise</span
+                  >
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    name="work_status"
+                    id="day_wise"
+                    value="1"
+                    v-model="QuotationDetails.day_or_equipment"
+                    v-on:change="handleDayWiseChange(true)"
+                    autocomplete="off"
+                  />
+                  <label class="btn btn-outline-primary" for="day_wise"
+                    >Day Wise</label
+                  >
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    name="work_status"
+                    id="equipment_wise"
+                    v-model="QuotationDetails.day_or_equipment"
+                    v-on:change="handleDayWiseChange(false)"
+                    value="2"
+                    autocomplete="off"
+                  />
+                  <label class="btn btn-outline-primary" for="equipment_wise"
+                    >Equiment Wise</label
+                  >
+                </span>
+                <!--end::Info-->
+              </label>
             </div>
 
             <div class="row mb-6">
@@ -517,238 +557,254 @@
               <!--end::Col-->
             </div>
 
-            <!-- extra fields -->
-            <div class="row mb-6">
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
-                  >Per day Charge</label
-                >
-                <input
-                  type="text"
-                  v-on:input="SetPerDayCharge"
-                  v-model="QuotationDetails.items.per_day_charge"
-                  name="per_day_charge"
-                  placeholder="Per Day Charge..."
-                  class="form-control form-control-lg form-control-solid"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="per_day_charge" />
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6 text-nowrap"
-                  >Number of Days</label
-                >
-                <input
-                  type="text"
-                  name="number_of_days"
-                  class="form-control form-control-lg form-control-solid"
-                  v-on:input="SetDays"
-                  v-model="QuotationDetails.items.number_of_days"
-                  placeholder="Number of Days..."
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="number_of_days" />
-                  </div>
-                </div>
-              </div>
+            <!--begin::Input group-->
+            <div class="row mb-6" v-show="dayWiseRef === false">
+              <CustomQuotationItems
+              v-bind:equipments="equipments"
+                v-bind:equipment_wise="QuotationDetails.items.equipment_wise"
+                v-on:removeRow="RemoveRow"
+                v-on:addNewRow="addNewRow"
+                v-on:setTheEquipment="SetEquipment"
+                v-on:setTheEquipmentCharge="SetEquipmentCharge"
+                v-on:setTheQuantity="SetQuantity"
+              ></CustomQuotationItems>
             </div>
             <!--end::Input group-->
 
-            <div class="row mb-6">
-              <div class="col-lg-6 mb-md-6">
-                <div class="d-flex flex-column align-items-start gap-3">
+            <div v-show="dayWiseRef === true">
+              <!-- extra fields -->
+              <div class="row mb-6">
+                <div class="form-group col-md-6">
                   <label
-                    for="accommodationRef"
-                    class="form-label fw-bold text-primary fw-semibold fs-6"
-                    >Accommodation</label
+                    class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
+                    >Per day Charge</label
                   >
-                  <div
-                    class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
-                  >
-                    <label
-                      class="form-check form-switch form-check-custom form-check-primary form-check-solid"
-                    >
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        :value="false"
-                        name="accommodationRef"
-                        id="accommodationRef"
-                        v-on:change="ToggleAccommodation"
-                        v-model="accommodationRef"
-                      />
-                    </label>
-                    <div class="flex-grow-1">
-                      <input
-                        type="text"
-                        name="accommodation"
-                        class="form-control w-100"
-                        :disabled="!accommodationRef"
-                        v-on:input="SetAccommodation"
-                        v-model="QuotationDetails.items.accommodation"
-                        placeholder="0"
-                      />
+                  <input
+                    type="text"
+                    v-on:input="SetPerDayCharge"
+                    v-model="QuotationDetails.items.per_day_charge"
+                    name="per_day_charge"
+                    placeholder="Per Day Charge..."
+                    class="form-control form-control-lg form-control-solid"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="per_day_charge" />
                     </div>
                   </div>
                 </div>
-              </div>
-              <div class="col-lg-6 mb-md-6">
-                <div class="d-flex flex-column align-items-start gap-3">
-                  <label
-                    for="accommodationRef2"
-                    class="form-label fw-bold text-primary fw-semibold fs-6"
-                    >Travelling</label
-                  >
-                  <div
-                    class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
-                  >
-                    <label
-                      class="form-check form-switch form-check-custom form-check-primary form-check-solid"
-                    >
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        :value="false"
-                        name="travellingRef"
-                        id="travellingRef"
-                        v-on:change="ToggleTravelling"
-                        v-model="travellingRef"
-                      />
-                    </label>
-                    <div class="flex-grow-1">
-                      <input
-                        type="text"
-                        name="travelling"
-                        class="form-control w-100"
-                        :disabled="!travellingRef"
-                        v-on:input="SetTravelling"
-                        v-model="QuotationDetails.items.travelling"
-                        placeholder="0"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            <div class="row mb-6">
-              <div class="col-lg-6 mb-md-6">
-                <div class="d-flex flex-column align-items-start gap-3">
+                <div class="form-group col-md-6">
                   <label
-                    for="trainingRef"
-                    class="form-label fw-bold text-primary fw-semibold fs-6"
-                    >Training</label
+                    class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6 text-nowrap"
+                    >Number of Days</label
                   >
-                  <div
-                    class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
-                  >
-                    <label
-                      class="form-check form-switch form-check-custom form-check-primary form-check-solid"
-                    >
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        :value="false"
-                        name="trainingRef"
-                        id="trainingRef"
-                        v-on:change="ToggleTraining"
-                        v-model="trainingRef"
-                      />
-                    </label>
-                    <div class="flex-grow-1">
-                      <input
-                        type="text"
-                        name="training"
-                        class="form-control w-100"
-                        v-on:input="SetTraining"
-                        v-model="QuotationDetails.items.training"
-                        :disabled="!trainingRef"
-                        placeholder="0"
-                      />
+                  <input
+                    type="text"
+                    name="number_of_days"
+                    class="form-control form-control-lg form-control-solid"
+                    v-on:input="SetDays"
+                    v-model="QuotationDetails.items.number_of_days"
+                    placeholder="Number of Days..."
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="number_of_days" />
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="col-lg-6 mb-md-6">
-                <div class="d-flex flex-column align-items-start gap-3">
-                  <label
-                    for="pickupRef"
-                    class="form-label fw-bold text-primary fw-semibold fs-6"
-                    >Pickup & Delivery</label
-                  >
-                  <div
-                    class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
-                  >
-                    <label
-                      class="form-check form-switch form-check-custom form-check-primary form-check-solid"
-                    >
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        :value="false"
-                        name="pickupRef"
-                        id="pickupRef"
-                        v-on:change="TogglePickUp"
-                        v-model="pickupRef"
-                      />
-                    </label>
-                    <div class="flex-grow-1">
-                      <input
-                        type="text"
-                        name="pickup"
-                        :disabled="!pickupRef"
-                        class="form-control w-100"
-                        v-on:input="SetPickUp"
-                        v-model="QuotationDetails.items.pickup"
-                        placeholder="0"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+              <!--end::Input group-->
 
-            <div class="row mb-6">
-              <div class="col-lg-6 mb-md-6">
-                <div class="d-flex flex-column align-items-start gap-3">
-                  <label
-                    for="boardingRef"
-                    class="form-label fw-bold text-primary fw-semibold fs-6"
-                    >Boarding & Lodging</label
-                  >
-                  <div
-                    class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
-                  >
+              <div class="row mb-6">
+                <div class="col-lg-6 mb-md-6">
+                  <div class="d-flex flex-column align-items-start gap-3">
                     <label
-                      class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                      for="accommodationRef"
+                      class="form-label fw-bold text-primary fw-semibold fs-6"
+                      >Accommodation</label
                     >
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        :value="false"
-                        name="boardingRef"
-                        id="boardingRef"
-                        v-on:change="ToggleBoarding"
-                        v-model="boardingRef"
-                      />
-                    </label>
-                    <div class="flex-grow-1">
-                      <input
-                        type="text"
-                        name="boarding"
-                        class="form-control w-100"
-                        v-on:input="SetBoarding"
-                        v-model="QuotationDetails.items.boarding"
-                        :disabled="!boardingRef"
-                        placeholder="0"
-                      />
+                    <div
+                      class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
+                    >
+                      <label
+                        class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                      >
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          :value="false"
+                          name="accommodationRef"
+                          id="accommodationRef"
+                          v-on:change="ToggleAccommodation"
+                          v-model="accommodationRef"
+                        />
+                      </label>
+                      <div class="flex-grow-1">
+                        <input
+                          type="text"
+                          name="accommodation"
+                          class="form-control w-100"
+                          :disabled="!accommodationRef"
+                          v-on:input="SetAccommodation"
+                          v-model="QuotationDetails.items.accommodation"
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6 mb-md-6">
+                  <div class="d-flex flex-column align-items-start gap-3">
+                    <label
+                      for="accommodationRef2"
+                      class="form-label fw-bold text-primary fw-semibold fs-6"
+                      >Travelling</label
+                    >
+                    <div
+                      class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
+                    >
+                      <label
+                        class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                      >
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          :value="false"
+                          name="travellingRef"
+                          id="travellingRef"
+                          v-on:change="ToggleTravelling"
+                          v-model="travellingRef"
+                        />
+                      </label>
+                      <div class="flex-grow-1">
+                        <input
+                          type="text"
+                          name="travelling"
+                          class="form-control w-100"
+                          :disabled="!travellingRef"
+                          v-on:input="SetTravelling"
+                          v-model="QuotationDetails.items.travelling"
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-6">
+                <div class="col-lg-6 mb-md-6">
+                  <div class="d-flex flex-column align-items-start gap-3">
+                    <label
+                      for="trainingRef"
+                      class="form-label fw-bold text-primary fw-semibold fs-6"
+                      >Training</label
+                    >
+                    <div
+                      class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
+                    >
+                      <label
+                        class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                      >
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          :value="false"
+                          name="trainingRef"
+                          id="trainingRef"
+                          v-on:change="ToggleTraining"
+                          v-model="trainingRef"
+                        />
+                      </label>
+                      <div class="flex-grow-1">
+                        <input
+                          type="text"
+                          name="training"
+                          class="form-control w-100"
+                          v-on:input="SetTraining"
+                          v-model="QuotationDetails.items.training"
+                          :disabled="!trainingRef"
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6 mb-md-6">
+                  <div class="d-flex flex-column align-items-start gap-3">
+                    <label
+                      for="pickupRef"
+                      class="form-label fw-bold text-primary fw-semibold fs-6"
+                      >Pickup & Delivery</label
+                    >
+                    <div
+                      class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
+                    >
+                      <label
+                        class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                      >
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          :value="false"
+                          name="pickupRef"
+                          id="pickupRef"
+                          v-on:change="TogglePickUp"
+                          v-model="pickupRef"
+                        />
+                      </label>
+                      <div class="flex-grow-1">
+                        <input
+                          type="text"
+                          name="pickup"
+                          :disabled="!pickupRef"
+                          class="form-control w-100"
+                          v-on:input="SetPickUp"
+                          v-model="QuotationDetails.items.pickup"
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-6">
+                <div class="col-lg-6 mb-md-6">
+                  <div class="d-flex flex-column align-items-start gap-3">
+                    <label
+                      for="boardingRef"
+                      class="form-label fw-bold text-primary fw-semibold fs-6"
+                      >Boarding & Lodging</label
+                    >
+                    <div
+                      class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
+                    >
+                      <label
+                        class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                      >
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          :value="false"
+                          name="boardingRef"
+                          id="boardingRef"
+                          v-on:change="ToggleBoarding"
+                          v-model="boardingRef"
+                        />
+                      </label>
+                      <div class="flex-grow-1">
+                        <input
+                          type="text"
+                          name="boarding"
+                          class="form-control w-100"
+                          v-on:input="SetBoarding"
+                          v-model="QuotationDetails.items.boarding"
+                          :disabled="!boardingRef"
+                          placeholder="0"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1012,6 +1068,8 @@ import {
   GetQuotationStatus,
 } from "@/core/config/QuotationStatusConfig";
 
+import CustomQuotationItems from "./CustomComponents/CustomQuotationItems.vue";
+
 interface itemsArr {
   id: string;
   site_location: string;
@@ -1020,6 +1078,14 @@ interface itemsArr {
   accommodation: number;
   travelling: number;
   training: number;
+}
+
+interface EDetails {
+  id: string;
+  name: string;
+  charge: number;
+  quantity: number;
+  amount: number;
 }
 
 interface Meta {
@@ -1054,6 +1120,7 @@ interface QuotationDetails {
     train: boolean;
     board: boolean;
     pick: boolean;
+    equipment_wise: Array<EDetails>;
   };
   date: string;
   duedate: string;
@@ -1061,6 +1128,7 @@ interface QuotationDetails {
   scope_of_work: string;
   terms_and_conditions: string;
   total: number;
+  day_or_equipment: string;
   lead: Meta;
   client: Meta;
   company_details: {
@@ -1074,7 +1142,9 @@ interface QuotationDetails {
 
 export default defineComponent({
   name: "quotation-edit",
-  components: {},
+  components: {
+    CustomQuotationItems,
+  },
   setup() {
     const auth = useAuthStore();
     const disabledselect = ref(true);
@@ -1109,6 +1179,21 @@ export default defineComponent({
         accommodation: "",
         travelling: "",
         training: "",
+        equipment_wise: [
+          {
+            id: "",
+            name: "",
+            charge: "",
+          },
+        ],
+      },
+    ]);
+
+    const equipments = ref([
+      {
+        id: "",
+        name: "",
+        charge: "",
       },
     ]);
 
@@ -1123,6 +1208,7 @@ export default defineComponent({
           accommodation,
           travelling,
           training,
+          equipment_wise,
         }) => ({
           id,
           site_location,
@@ -1130,6 +1216,7 @@ export default defineComponent({
           accommodation,
           travelling,
           training,
+          equipment_wise: JSON.parse(equipment_wise),
         })
       );
       locations.value = data;
@@ -1154,6 +1241,7 @@ export default defineComponent({
         train: true,
         board: true,
         pick: true,
+        equipment_wise: [],
       },
       date: "",
       duedate: "",
@@ -1189,6 +1277,7 @@ export default defineComponent({
       },
       company_id: User.company_id,
       total: 0,
+      day_or_equipment: "1",
       is_active: 1,
       created_by: "",
       updated_by: User.id,
@@ -1211,6 +1300,7 @@ export default defineComponent({
       Leads.value.pop();
       Clients.value.pop();
       locations.value.pop();
+      equipments.value = [];
       await GetLeads();
       await getSelects();
 
@@ -1221,8 +1311,14 @@ export default defineComponent({
       QuotationDetails.value.quotation_no = response.quotation_no;
       QuotationDetails.value.date = response.date;
       QuotationDetails.value.duedate = response.duedate;
-      QuotationDetails.value.items = JSON.parse(response.items);
+      QuotationDetails.value.items = await JSON.parse(response.items);
+      QuotationDetails.value.items.equipment_wise = await QuotationDetails.value.items.equipment_wise;
       QuotationDetails.value.status = response.status;
+
+      dayWiseRef.value =
+        QuotationDetails.value.items.equipment_wise.length === 0 ? true : false;
+      QuotationDetails.value.day_or_equipment =
+        QuotationDetails.value.items.equipment_wise.length === 0 ? "1" : "2";
 
       globalStatus.value =
         response.status === 3 || response.status === 4 ? true : false;
@@ -1247,6 +1343,9 @@ export default defineComponent({
       trainingRef.value = QuotationDetails.value.items.train;
       pickupRef.value = QuotationDetails.value.items.pick;
       boardingRef.value = QuotationDetails.value.items.board;
+
+      
+      console.log(QuotationDetails.value.items);
 
       // when quotation is approved
       if (globalStatus.value) {
@@ -1446,7 +1545,7 @@ export default defineComponent({
       }
     };
 
-    /* --------NEW LOGIC--------*/
+    /* --------DAY WISE LOGIC--------*/
 
     const accommodationRef = ref(true);
     const travellingRef = ref(true);
@@ -1479,31 +1578,58 @@ export default defineComponent({
           accommodation,
           travelling,
           training,
+          equipment_wise,
         } = foundLocation;
 
-        QuotationDetails.value.items.id = id;
-        QuotationDetails.value.items.site_location = site_location;
-        QuotationDetails.value.items.per_day_charge = per_day_charge;
-        QuotationDetails.value.items.accommodation = Number(accommodation);
-        QuotationDetails.value.items.travelling = Number(travelling);
-        QuotationDetails.value.items.training = Number(training);
-        QuotationDetails.value.items.boarding = 0;
-        QuotationDetails.value.items.pickup = 0;
+        if (dayWiseRef.value) {
+          QuotationDetails.value.items.id = id;
+          QuotationDetails.value.items.site_location = site_location;
+          QuotationDetails.value.items.per_day_charge = per_day_charge;
+          QuotationDetails.value.items.number_of_days = "1";
+          QuotationDetails.value.items.accommodation = Number(accommodation);
+          QuotationDetails.value.items.travelling = Number(travelling);
+          QuotationDetails.value.items.training = Number(training);
+          QuotationDetails.value.items.boarding = 0;
+          QuotationDetails.value.items.pickup = 0;
 
-        QuotationDetails.value.items.accomm = true;
-        QuotationDetails.value.items.travel = true;
-        QuotationDetails.value.items.train = true;
-        QuotationDetails.value.items.board = true;
-        QuotationDetails.value.items.pick = true;
+          equipments.value.pop();
+          equipments.value = [...equipment_wise];
 
-        accommodationRef.value = true;
-        travellingRef.value = true;
-        trainingRef.value = true;
-        pickupRef.value = true;
-        boardingRef.value = true;
+          QuotationDetails.value.items.equipment_wise = [];
 
-        await calculateTotal();
-        console.log("Function runned");
+          QuotationDetails.value.items.accomm = true;
+          QuotationDetails.value.items.travel = true;
+          QuotationDetails.value.items.train = true;
+          QuotationDetails.value.items.board = true;
+          QuotationDetails.value.items.pick = true;
+
+          accommodationRef.value = true;
+          travellingRef.value = true;
+          trainingRef.value = true;
+          pickupRef.value = true;
+          boardingRef.value = true;
+
+          await calculateTotal();
+          console.log("Function day");
+        } else {
+          QuotationDetails.value.items.per_day_charge = "";
+          QuotationDetails.value.items.accommodation = 0;
+          QuotationDetails.value.items.travelling = 0;
+          QuotationDetails.value.items.training = 0;
+          QuotationDetails.value.items.boarding = 0;
+          QuotationDetails.value.items.pickup = 0;
+          QuotationDetails.value.items.number_of_days = "1";
+          equipments.value.pop();
+          equipments.value = await [...equipment_wise];
+          
+          console.log("Function equip", equipment_wise);
+
+          QuotationDetails.value.items.equipment_wise = [];
+
+          QuotationDetails.value.total = 0;
+
+          console.log("Function equip");
+        }
       }
     }
 
@@ -1600,6 +1726,125 @@ export default defineComponent({
       }
       await calculateTotal();
     }
+
+    /* --------EQUIPMENT WISE LOGIC--------*/
+    const dayWiseRef = ref(true);
+
+    function areAllPropertiesNotNull(array) {
+      return array.some((detail) => {
+        const { name, charge, quantity } = detail;
+
+        // Check if any property is null or empty
+
+        return (
+          name === "" ||
+          isNaN(parseFloat(charge)) ||
+          isNaN(parseFloat(quantity))
+        );
+      });
+    }
+
+    function calculateEquipmentCharge(index) {
+      if (
+        QuotationDetails.value.items.equipment_wise[index].charge &&
+        QuotationDetails.value.items.equipment_wise[index].quantity
+      ) {
+        let equipValue =
+          Number(QuotationDetails.value.items.equipment_wise[index].charge) *
+          Number(QuotationDetails.value.items.equipment_wise[index].quantity);
+        QuotationDetails.value.items.equipment_wise[index].amount = Number(
+          equipValue.toFixed(2)
+        );
+      } else {
+        QuotationDetails.value.items.equipment_wise[index].amount = 0;
+      }
+      calculateTotalEquipment();
+    }
+
+    const calculateTotalEquipment = () => {
+      QuotationDetails.value.total =
+        QuotationDetails.value.items.equipment_wise.reduce(
+          (sum, item) => sum + item.amount,
+          0
+        );
+    };
+
+    const addNewRow = () => {
+      if (!QuotationDetails.value.items.equipment_wise.length) {
+        QuotationDetails.value.items.equipment_wise.push({
+          id: "",
+          name: "",
+          charge: 0,
+          quantity: 1,
+          amount: 0,
+        });
+        calculateTotalEquipment();
+      } else {
+        const result = areAllPropertiesNotNull(
+          QuotationDetails.value.items.equipment_wise
+        );
+        if (!result) {
+          QuotationDetails.value.items.equipment_wise.push({
+            id: "",
+            name: "",
+            charge: 0,
+            quantity: 1,
+            amount: 0,
+          });
+          calculateTotalEquipment();
+        } else {
+          Swal.fire({
+            icon: "info",
+            title: "Please fill all the details correctly",
+          });
+        }
+      }
+      console.log(QuotationDetails.value.items.equipment_wise);
+    };
+
+    async function SetEquipment(foundItem, index) {
+      console.log(foundItem);
+      const { id, name, charge } = foundItem;
+      QuotationDetails.value.items.equipment_wise[index].id = await id;
+      QuotationDetails.value.items.equipment_wise[index].name = await name;
+      QuotationDetails.value.items.equipment_wise[index].charge = await charge;
+      QuotationDetails.value.items.equipment_wise[index].quantity = 1;
+      QuotationDetails.value.items.equipment_wise[index].amount = 0;
+      calculateEquipmentCharge(index);
+      console.log("->->->",QuotationDetails.value.items.equipment_wise[index]);
+    }
+
+    async function SetEquipmentCharge(data, index) {
+      console.log(data);
+      QuotationDetails.value.items.equipment_wise[index].charge = await data;
+      calculateEquipmentCharge(index);
+    }
+
+    async function SetQuantity(data, index) {
+      console.log(data);
+      QuotationDetails.value.items.equipment_wise[index].quantity = await data;
+      calculateEquipmentCharge(index);
+    }
+
+    const removeObjectWithId = (arr, id) => {
+      if (id !== -1) {
+        arr.splice(id, 1);
+      }
+
+      return arr;
+    };
+
+    const RemoveRow = (index) => {
+      QuotationDetails.value.items.equipment_wise = removeObjectWithId(
+        QuotationDetails.value.items.equipment_wise,
+        index
+      );
+
+      calculateTotalEquipment();
+    };
+
+    
+    /* --------CUSTOMER-CLIENT LOGIC--------*/
 
     const ToggleClient = () => {
       if (qNsiteSameAsBilling.value) {
@@ -1717,6 +1962,30 @@ export default defineComponent({
       });
     }
 
+    const handleDayWiseChange = async (value) => {
+      
+      QuotationDetails.value.items.id = "";
+      QuotationDetails.value.items = await {
+        id: "",
+        site_location: "",
+        per_day_charge: "",
+        number_of_days: "1",
+        accommodation: 0,
+        travelling: 0,
+        training: 0,
+        boarding: 0,
+        pickup: 0,
+        accomm: true,
+        travel: true,
+        train: true,
+        board: true,
+        pick: true,
+        equipment_wise: [],
+      };
+      QuotationDetails.value.total = 0;
+      dayWiseRef.value = value;
+    };
+
     // number formating remove
     const submit = async (e) => {
       e.preventDefault();
@@ -1743,6 +2012,20 @@ export default defineComponent({
             "Warning",
             "Dates cannot be empty, please fill all the required details"
           );
+          loading.value = false;
+          return;
+        }
+
+        if(dayWiseRef.value === true && QuotationDetails.value.items.id === ""){
+          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          loading.value = false;
+          return;
+        }
+
+        if(dayWiseRef.value === false && QuotationDetails.value.items.id === "" || QuotationDetails.value.items.equipment_wise.length === 0){
+          showErrorAlert("Warning", "Please Fill at least one equipment correctly");
+          loading.value = false;
+          return;
         }
 
         // Call your API here with the form values
@@ -1984,6 +2267,14 @@ export default defineComponent({
       globalLocation,
       globalStatus,
       ToggleClient,
+      RemoveRow,
+      addNewRow,
+      SetEquipment,
+      SetEquipmentCharge,
+      SetQuantity,
+      equipments,
+      dayWiseRef,
+      handleDayWiseChange,
     };
   },
 });

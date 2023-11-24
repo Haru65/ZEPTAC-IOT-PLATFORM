@@ -192,6 +192,57 @@
                   <!--begin::Label-->
                   <label
                     class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Equipment Name</label
+                  >
+                  <!--end::Label-->
+
+                  <!--begin::Input-->
+                  <Field
+                    type="text"
+                    v-model="filterIntegrityTestDetails.equipment_name"
+                    name="equipment_name"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Enter equipment name..."
+                  />
+                  <ErrorMessage
+                    class="invalid-feedback"
+                    name="equipment_name"
+                  />
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+
+                <!--begin::Col-->
+                <div class="col-md-6 fv-row">
+                  <!--end::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Equipment ID</label
+                  >
+                  <!--end::Label-->
+
+                  <!--end::Input-->
+                  <Field
+                    type="text"
+                    v-model="filterIntegrityTestDetails.equipment_id"
+                    name="equipment_id"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Enter equipment id..."
+                  />
+                  <ErrorMessage class="invalid-feedback" name="equipment_id" />
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Input group-->
+
+              <!--begin::Input group-->
+              <div class="row mb-6">
+                <!--begin::Col-->
+                <div class="col-md-6 fv-row">
+                  <!--begin::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
                     >Area Name</label
                   >
                   <!--end::Label-->
@@ -300,7 +351,7 @@
                     name="validation_date"
                     id="date"
                     placeholder="Pick a day"
-  :editable="false"
+                    :editable="false"
                   />
                   <ErrorMessage
                     class="invalid-feedback"
@@ -326,7 +377,7 @@
                     name="due_date"
                     id="date"
                     placeholder="Pick a day"
-  :editable="false"
+                    :editable="false"
                   />
                   <ErrorMessage class="invalid-feedback" name="due_date" />
                   <!--end::Input-->
@@ -443,6 +494,8 @@ interface FilterIntegrityTestReport {
     calibration_date: string;
     calibration_due_date: string;
   };
+  equipment_name: string;
+  equipment_id: string;
   area_name: string;
   room_name: string;
   ahu_no: string;
@@ -482,14 +535,7 @@ export default defineComponent({
 
   emit: ["childDataEmitted"],
 
-  props: [
-    "heading",
-    "instruments",
-    "engineers",
-    "id",
-    "code",
-    "rgp_no",
-  ],
+  props: ["heading", "instruments", "engineers", "id", "code", "rgp_no"],
 
   setup(props, { emit }) {
     const submitButtonRef = ref<null | HTMLButtonElement>(null);
@@ -521,6 +567,8 @@ export default defineComponent({
         calibration_date: "",
         calibration_due_date: "",
       },
+      equipment_name: "",
+      equipment_id: "",
       area_name: "",
       room_name: "",
       ahu_no: "",
@@ -556,16 +604,22 @@ export default defineComponent({
           (instrument) => id === instrument.id
         );
         if (foundInstrument) {
-          filterIntegrityTestDetails.value.instrument_used.id = foundInstrument.id;
-          filterIntegrityTestDetails.value.instrument_used.instrument_id = foundInstrument.instrument_id;
-          filterIntegrityTestDetails.value.instrument_used.name = foundInstrument.name;
+          filterIntegrityTestDetails.value.instrument_used.id =
+            foundInstrument.id;
+          filterIntegrityTestDetails.value.instrument_used.instrument_id =
+            foundInstrument.instrument_id;
+          filterIntegrityTestDetails.value.instrument_used.name =
+            foundInstrument.name;
           filterIntegrityTestDetails.value.instrument_used.model_no =
             foundInstrument.model_no;
-            filterIntegrityTestDetails.value.instrument_used.serial_no =
+          filterIntegrityTestDetails.value.instrument_used.serial_no =
             foundInstrument.serial_no;
-            filterIntegrityTestDetails.value.instrument_used.make = foundInstrument.make;
-            filterIntegrityTestDetails.value.instrument_used.calibration_date = foundInstrument.calibration_date;
-            filterIntegrityTestDetails.value.instrument_used.calibration_due_date = foundInstrument.calibration_due_date;
+          filterIntegrityTestDetails.value.instrument_used.make =
+            foundInstrument.make;
+          filterIntegrityTestDetails.value.instrument_used.calibration_date =
+            foundInstrument.calibration_date;
+          filterIntegrityTestDetails.value.instrument_used.calibration_due_date =
+            foundInstrument.calibration_due_date;
         }
       }
     };
@@ -599,11 +653,13 @@ export default defineComponent({
     };
 
     async function SetSupplyCode(e, index) {
-      filterIntegrityTestDetails.value.details[index].supply_code = await e.target.value;
+      filterIntegrityTestDetails.value.details[index].supply_code = await e
+        .target.value;
     }
 
     async function setReportName(e) {
-      filterIntegrityTestDetails.value.report_name = await `${props.code}_${filterIntegrityTestDetails.value.room_name}_${props.rgp_no}`;
+      filterIntegrityTestDetails.value.report_name =
+        await `${props.code}_${filterIntegrityTestDetails.value.room_name}_${props.rgp_no}`;
     }
 
     onMounted(function () {
@@ -612,15 +668,18 @@ export default defineComponent({
       filterIntegrityTestDetails.value.test_code = props.code;
     });
 
-      async function SetUpstreamConc(e, index) {
-        filterIntegrityTestDetails.value.details[index].up_stream_conc = await e.target.value;
-      };
+    async function SetUpstreamConc(e, index) {
+      filterIntegrityTestDetails.value.details[index].up_stream_conc = await e
+        .target.value;
+    }
 
     async function SetLeakage(e, index) {
-      filterIntegrityTestDetails.value.details[index].leakage = await e.target.value;
+      filterIntegrityTestDetails.value.details[index].leakage = await e.target
+        .value;
     }
     async function SetResultOfPOV(e, index) {
-      filterIntegrityTestDetails.value.details[index].test_result_of_pov = await e.target.value;
+      filterIntegrityTestDetails.value.details[index].test_result_of_pov =
+        await e.target.value;
     }
     async function SetRemark(e, index) {
       filterIntegrityTestDetails.value.details[index].remark = await e.target
@@ -709,6 +768,8 @@ export default defineComponent({
     }
 
     const clear = () => {
+      filterIntegrityTestDetails.value.equipment_name = "";
+      filterIntegrityTestDetails.value.equipment_id = "";
       filterIntegrityTestDetails.value.report_name = "";
       filterIntegrityTestDetails.value.area_name = "";
       filterIntegrityTestDetails.value.room_name = "";
@@ -782,30 +843,38 @@ export default defineComponent({
     const submit = async (e) => {
       console.log(filterIntegrityTestDetails.value);
 
-      if(!filterIntegrityTestDetails.value.validation_date || !filterIntegrityTestDetails.value.due_date){
+      if (
+        !filterIntegrityTestDetails.value.validation_date ||
+        !filterIntegrityTestDetails.value.due_date
+      ) {
         showErrorAlert("Warning", "Please fill all the details Correctly");
         return;
       }
 
-      filterIntegrityTestDetails.value.validation_date = moment(filterIntegrityTestDetails.value.validation_date).format(
-        "YYYY-MM-DD HH:mm:ss"
-      );
-      filterIntegrityTestDetails.value.due_date = moment(filterIntegrityTestDetails.value.due_date).format(
-        "YYYY-MM-DD HH:mm:ss"
-      );
+      filterIntegrityTestDetails.value.validation_date = moment(
+        filterIntegrityTestDetails.value.validation_date
+      ).format("YYYY-MM-DD HH:mm:ss");
+      filterIntegrityTestDetails.value.due_date = moment(
+        filterIntegrityTestDetails.value.due_date
+      ).format("YYYY-MM-DD HH:mm:ss");
 
       const isEmpty = !isNotEmpty(filterIntegrityTestDetails);
 
-      if(!filterIntegrityTestDetails.value.details.length){
+      if (!filterIntegrityTestDetails.value.details.length) {
         showErrorAlert("Warning", "Please fill all the details Correctly");
         return;
       }
 
-      const result = areAllPropertiesNotNull(filterIntegrityTestDetails.value.details);
+      const result = areAllPropertiesNotNull(
+        filterIntegrityTestDetails.value.details
+      );
 
       if (!isEmpty && !result) {
-        
-        await emit("childDataEmitted", filterIntegrityTestDetails.value.id, filterIntegrityTestDetails.value);
+        await emit(
+          "childDataEmitted",
+          filterIntegrityTestDetails.value.id,
+          filterIntegrityTestDetails.value
+        );
 
         showSuccessAlert("Success", "Report Added Successfully!");
 

@@ -184,6 +184,57 @@
                 <!--end::Input group-->
               </div>
 
+                            <!--begin::Input group-->
+                            <div class="row mb-6">
+                <!--begin::Col-->
+                <div class="col-md-6 fv-row">
+                  <!--begin::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Equipment Name</label
+                  >
+                  <!--end::Label-->
+
+                  <!--begin::Input-->
+                  <Field
+                    type="text"
+                    v-model="airVelocityTestDetails.equipment_name"
+                    name="equipment_name"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Enter equipment name..."
+                  />
+                  <ErrorMessage
+                    class="invalid-feedback"
+                    name="equipment_name"
+                  />
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+
+                <!--begin::Col-->
+                <div class="col-md-6 fv-row">
+                  <!--end::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Equipment ID</label
+                  >
+                  <!--end::Label-->
+
+                  <!--end::Input-->
+                  <Field
+                    type="text"
+                    v-model="airVelocityTestDetails.equipment_id"
+                    name="equipment_id"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Enter equipment id..."
+                  />
+                  <ErrorMessage class="invalid-feedback" name="equipment_id" />
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Input group-->
+
               <!--begin::Input group-->
               <div class="row mb-6">
                 <!--begin::Col-->
@@ -452,6 +503,8 @@ interface AirVelocityTestReport {
     calibration_date: string;
     calibration_due_date: string;
   };
+  equipment_name: string;
+  equipment_id: string;
   area_name: string;
   room_name: string;
   ahu_no: string;
@@ -542,6 +595,8 @@ export default defineComponent({
         calibration_date: "",
         calibration_due_date: "",
       },
+      equipment_name: "",
+      equipment_id: "",
       area_name: "",
       room_name: "",
       ahu_no: "",
@@ -644,6 +699,8 @@ export default defineComponent({
         test_code,
         report_name,
         instrument_used,
+        equipment_name,
+        equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -673,6 +730,8 @@ export default defineComponent({
           calibration_date: instrument_used.calibration_date,
           calibration_due_date: instrument_used.calibration_due_date,
         },
+        equipment_name,
+        equipment_id,
         area_name,
         ahu_no,
         validation_date,
@@ -934,8 +993,8 @@ export default defineComponent({
       let acphValue = 0;
       if (roomValue !== 0) {
         acphValue =
-          Number(airVelocityTestDetails.value.total_cfm) /
-          Number(airVelocityTestDetails.value.room_volume);
+        (Number(airVelocityTestDetails.value.total_cfm) /
+          Number(airVelocityTestDetails.value.room_volume)) * 60;
       }
       airVelocityTestDetails.value.acph = acphValue.toString();
     }

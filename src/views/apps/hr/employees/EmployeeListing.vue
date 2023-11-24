@@ -96,7 +96,7 @@
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
-        :header="tableHeader"
+        :header="filteredTableHeader"
         :checkbox-enabled="true"
         :items-per-page="limit"
         :items-per-page-dropdown-enabled="false"
@@ -105,16 +105,6 @@
         <!-- img data -->
         <template v-slot:profile="{ row: employee }">
           <div class="d-flex justify-content-start align-items-center">
-            <img
-              :src="
-                `data: image/png;base64,` +
-                (employee.meta.profile_pic_data
-                  ? employee.meta.profile_pic_data
-                  : blank64)
-              "
-              class="w-40px rounded-circle"
-              :alt="`data: image/png;base64,` + blank64"
-            />
             <span style="margin-left: 5.5%">
               <span class="text-gray-600 text-hover-primary mb-1">
                 {{ employee.first_name + " " + employee.last_name }}
@@ -122,27 +112,61 @@
             </span>
           </div>
         </template>
-        <!-- defualt data -->
-        <template v-slot:email="{ row: employee }">
-          <a
-            v-bind:href="'mailto:' + employee.email"
-            class="text-gray-600 text-hover-primary mb-1"
-          >
-            {{ employee.email }}
-          </a>
-        </template>
         <template v-slot:mobile="{ row: employee }">
           {{ employee.mobile }}
         </template>
         <template v-slot:role="{ row: employee }">
           {{ employee.role_id }}
         </template>
-        <template v-slot:company_name="{ row: employee }">
+        <template
+          v-slot:company_name="{ row: employee }"
+          v-if="identifier == 'Admin'"
+        >
           {{ employee.company_name[0].company_name }}
         </template>
-        <template v-slot:date="{ row: employee }">
-          {{ employee.created_at }}
+
+        <template v-slot:h_id="{ row: employee }">
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row">
+            <span
+              data-toggle="tooltip"
+              title="Download Employee History Card"
+              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
+              @click="downloadHistoryCard(employee.id)"
+              >⤓ History Card
+            </span>
+          </div>
+          <!--end::Menu FLex-->
         </template>
+
+        <template v-slot:a_id="{ row: employee }">
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row">
+            <span
+              data-toggle="tooltip"
+              title="Download Aadhar Card"
+              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
+              @click="downloadDocument(employee.id, 'aadhar_card')"
+              >⤓ Aadhar Card
+            </span>
+          </div>
+          <!--end::Menu FLex-->
+        </template>
+
+        <template v-slot:p_id="{ row: employee }">
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row">
+            <span
+              data-toggle="tooltip"
+              title="Download Photo"
+              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
+              @click="downloadPhoto(employee.id)"
+              >⤓ Photo
+            </span>
+          </div>
+          <!--end::Menu FLex-->
+        </template>
+
         <template v-slot:actions="{ row: employee }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
@@ -202,7 +226,7 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, computed } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 // import ExportCustomerModal from "@/components/modals/forms/ExportCustomerModal.vue";
@@ -212,10 +236,15 @@ import arraySort from "array-sort";
 import ApiService from "@/core/services/ApiService";
 import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
-import employee from "@/core/model/employee";
-import { deleteUser, getEmployees, EmployeeSearch } from "@/stores/api";
+import {
+  deleteUser,
+  getEmployees,
+  getEmployee,
+  EmployeeSearch,
+} from "@/stores/api";
 import { blank64 } from "../../admin/users/blank";
 import Swal from "sweetalert2";
+import { Identifier } from "@/core/config/WhichUserConfig";
 
 export default defineComponent({
   name: "employee-list",
@@ -226,18 +255,14 @@ export default defineComponent({
   },
   setup() {
     const loading = ref(true);
+    const identifier = Identifier;
+
     const tableHeader = ref([
       {
-        columnName: "Profile",
+        columnName: "Name",
         columnLabel: "profile",
         sortEnabled: true,
         columnWidth: 155,
-      },
-      {
-        columnName: "Email",
-        columnLabel: "email",
-        sortEnabled: true,
-        columnWidth: 175,
       },
       {
         columnName: "Mobile",
@@ -258,10 +283,22 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
-        columnName: "Created Date",
-        columnLabel: "date",
-        sortEnabled: true,
-        columnWidth: 175,
+        columnName: "History Card",
+        columnLabel: "h_id",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Aadhar Card",
+        columnLabel: "a_id",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Photo",
+        columnLabel: "p_id",
+        sortEnabled: false,
+        columnWidth: 75,
       },
       {
         columnName: "Actions",
@@ -300,10 +337,13 @@ export default defineComponent({
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+          ({ id, role_id, ...rest }) => ({
+            id: id,
             role_id: get_role(role_id),
+            h_id: id,
+            a_id: id,
+            p_id: id,
+            ...rest,
           })
         );
         //console.log(tableData.value);
@@ -336,10 +376,13 @@ export default defineComponent({
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+          ({ id, role_id, ...rest }) => ({
+            id: id,
             role_id: get_role(role_id),
+            h_id: id,
+            a_id: id,
+            p_id: id,
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -371,10 +414,13 @@ export default defineComponent({
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+          ({ id, role_id, ...rest }) => ({
+            id: id,
             role_id: get_role(role_id),
+            h_id: id,
+            a_id: id,
+            p_id: id,
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -404,6 +450,15 @@ export default defineComponent({
         PagePointer(page.value);
       }
     };
+
+    const filteredTableHeader = computed(() => {
+      // If the identifier is 'Admin', include the 'Company Name' column; otherwise, exclude it
+      return identifier.value === "Admin"
+        ? tableHeader.value
+        : tableHeader.value.filter(
+            (column) => column.columnLabel !== "company_name"
+          );
+    });
 
     onMounted(async () => {
       //console.log("done");
@@ -500,10 +555,13 @@ export default defineComponent({
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+          ({ id, role_id, ...rest }) => ({
+            id: id,
             role_id: get_role(role_id),
+            h_id: id,
+            a_id: id,
+            p_id: id,
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -538,6 +596,79 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
+    function downloadFileObject(base64String, nameOfFile, fExtension) {
+      const linkSource = base64String;
+      const downloadLink = document.createElement("a");
+      const fileName = nameOfFile + fExtension;
+      downloadLink.href = linkSource;
+      downloadLink.download = fileName;
+      downloadLink.click();
+    }
+
+    const downloadDocument = async (id: any, pdfName: string) => {
+      try {
+        const res = await getEmployee(id);
+        console.log("->>>", res);
+
+        const { first_name, last_name, meta } = res;
+
+        const aadhar_card = meta?.adhar;
+        if (!aadhar_card) {
+          alert("User don't have this document.");
+          return;
+        }
+
+        let base64String = "";
+        if (pdfName === "aadhar_card") {
+          base64String = aadhar_card.replace(
+            /^data:application\/\pdf+;base64,/,
+            ""
+          );
+        }
+
+        // check whether data starts with JVB, JVB is a prefix for pdf files
+
+        if (base64String.startsWith("JVB")) {
+          base64String = "data:application/pdf;base64," + base64String;
+          downloadFileObject(
+            base64String,
+            first_name + "_" + last_name + "_" + pdfName,
+            ".pdf"
+          );
+        } else if (base64String.startsWith("data:application/pdf;base64")) {
+          downloadFileObject(
+            base64String,
+            first_name + "_" + last_name + "_" + pdfName,
+            ".pdf"
+          );
+        } else {
+          alert("Not a valid Base64 PDF string. Please check");
+        }
+      } catch (error) {
+        console.error("Error downloading Pdf:", error);
+      }
+    };
+
+    const downloadPhoto = async (id: any) => {
+      try {
+        const res = await getEmployee(id);
+
+        const { first_name, last_name, meta } = res;
+
+        const userPhoto = res.meta?.profile_pic_data
+          ? "data:image/png;base64," + res.meta?.profile_pic_data
+          : "data:image/png;base64," + blank64;
+
+        downloadFileObject(userPhoto, `${first_name}_${last_name}_photo`, ".png");
+      } catch (error) {
+        console.error("Error downloading Photo:", error);
+      }
+    };
+
+    const downloadHistoryCard = async (id: any) => {
+      alert("Employee History Card");
+    };
+
     return {
       tableData,
       tableHeader,
@@ -558,6 +689,11 @@ export default defineComponent({
       limit,
       PageLimitPoiner,
       Limits,
+      identifier,
+      filteredTableHeader,
+      downloadDocument,
+      downloadHistoryCard,
+      downloadPhoto,
     };
   },
 });

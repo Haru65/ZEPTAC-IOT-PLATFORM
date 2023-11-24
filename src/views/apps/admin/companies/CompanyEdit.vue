@@ -13,82 +13,81 @@
         >
           <!--begin::Card body-->
           <div class="card-body border-top p-9">
-
             <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >Company Logo</label
-            >
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8">
-              <!--begin::Image input-->
-              <div
-                class="image-input image-input-outline"
-                data-kt-image-input="true"
-                :style="{
-                  backgroundImage: `url(${getAssetPath(
-                    'media/avatars/default.png'
-                  )})`,
-                }"
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label fw-semobold fs-6"
+                >Company Logo</label
               >
-                <!--begin::Preview existing avatar-->
-                <img
-                  :src="companyDetails.disp_avatar"
-                  class="image-input-wrapper"
-                  alt="company logo"
-                />
-                <!--end::Preview existing avatar-->
+              <!--end::Label-->
 
-                <!--begin::Label-->
-                <label
-                  class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
-                  data-kt-image-input-action="change"
-                  data-bs-toggle="tooltip"
-                  title="Change profile image"
+              <!--begin::Col-->
+              <div class="col-lg-8">
+                <!--begin::Image input-->
+                <div
+                  class="image-input image-input-outline"
+                  data-kt-image-input="true"
+                  :style="{
+                    backgroundImage: `url(${getAssetPath(
+                      'media/avatars/default.png'
+                    )})`,
+                  }"
                 >
-                  <i class="bi bi-pencil-fill fs-7"></i>
-
-                  <!--begin::Inputs-->
-                  <input
-                    type="file"
-                    name="avatar"
-                    accept=".png, .jpg, .jpeg"
-                    @change="updateImage($event)"
+                  <!--begin::Preview existing avatar-->
+                  <img
+                    :src="companyDetails.disp_avatar"
+                    class="image-input-wrapper"
+                    alt="company logo"
                   />
-                  <input max-size="1000" type="hidden" name="avatar_update" />
-                  <!--end::Inputs-->
-                </label>
-                <!--end::Label-->
+                  <!--end::Preview existing avatar-->
 
-                <!--begin::Remove-->
-                <span
-                  class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
-                  data-kt-image-input-action="remove"
-                  data-bs-toggle="tooltip"
-                  @click="removeImage()"
-                  title="Remove image"
-                >
-                  <i class="bi bi-x fs-2"></i>
-                </span>
-                <!--end::Remove-->
-              </div>
-              <!--end::Image input-->
+                  <!--begin::Label-->
+                  <label
+                    class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
+                    data-kt-image-input-action="change"
+                    data-bs-toggle="tooltip"
+                    title="Change profile image"
+                  >
+                    <i class="bi bi-pencil-fill fs-7"></i>
 
-              <!--begin::Hint-->
-              <div class="form-text">
-                Allowed file types: png, jpg, jpeg. <br />
-                Note : Max Upload limit 1 MB.
-                <br />
-                <span class="text-danger" v-if="file_size"
-                  >File Size Exceeded</span
-                >
+                    <!--begin::Inputs-->
+                    <input
+                      type="file"
+                      name="avatar"
+                      accept=".png, .jpg, .jpeg"
+                      @change="updateImage($event)"
+                    />
+                    <input max-size="1000" type="hidden" name="avatar_update" />
+                    <!--end::Inputs-->
+                  </label>
+                  <!--end::Label-->
+
+                  <!--begin::Remove-->
+                  <span
+                    class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
+                    data-kt-image-input-action="remove"
+                    data-bs-toggle="tooltip"
+                    @click="removeImage()"
+                    title="Remove image"
+                  >
+                    <i class="bi bi-x fs-2"></i>
+                  </span>
+                  <!--end::Remove-->
+                </div>
+                <!--end::Image input-->
+
+                <!--begin::Hint-->
+                <div class="form-text">
+                  Allowed file types: png, jpg, jpeg. <br />
+                  Note : Max Upload limit 1 MB.
+                  <br />
+                  <span class="text-danger" v-if="file_size"
+                    >File Size Exceeded</span
+                  >
+                </div>
+                <!--end::Hint-->
               </div>
-              <!--end::Hint-->
+              <!--end::Col-->
             </div>
-            <!--end::Col-->
-          </div>
 
             <!--begin::Input group-->
             <div class="row mb-6">
@@ -463,10 +462,10 @@
                   <div class="col-lg-6 fv-row">
                     <Field
                       type="text"
-                      name="quotation_prefix"
+                      name="quotation_no_prefix"
                       class="form-control form-control-lg form-control-solid"
                       placeholder="Enter Quotation Prefix"
-                      v-model="companyDetails.quotation_prefix"
+                      v-model="companyDetails.quotation_no_prefix"
                     />
                   </div>
                   <!--end::Col-->
@@ -476,10 +475,10 @@
                     <div>
                       <Field
                         type="text"
-                        name="quotation_no"
+                        name="quotation_no_init"
                         class="form-control form-control-lg form-control-solid"
                         placeholder="Enter Quotation No"
-                        v-model="companyDetails.quotation_no"
+                        v-model="companyDetails.quotation_no_init"
                       />
                     </div>
                   </div>
@@ -506,10 +505,10 @@
                   <div class="col-lg-6 fv-row">
                     <Field
                       type="text"
-                      name="invoice_prefix"
+                      name="invoice_no_prefix"
                       class="form-control form-control-lg form-control-solid"
                       placeholder="Enter Invoice Prefix"
-                      v-model="companyDetails.invoice_prefix"
+                      v-model="companyDetails.invoice_no_prefix"
                     />
                   </div>
                   <!--end::Col-->
@@ -519,10 +518,10 @@
                     <div>
                       <Field
                         type="text"
-                        name="invoice_no"
+                        name="invoice_no_init"
                         class="form-control form-control-lg form-control-solid"
                         placeholder="Enter invoice No"
-                        v-model="companyDetails.invoice_no"
+                        v-model="companyDetails.invoice_no_init"
                       />
                     </div>
                   </div>
@@ -549,10 +548,10 @@
                   <div class="col-lg-6 fv-row p-2">
                     <Field
                       type="text"
-                      name="rgp_prefix"
+                      name="rgp_no_prefix"
                       class="form-control form-control-lg form-control-solid"
                       placeholder="Enter RGP Prefix"
-                      v-model="companyDetails.rgp_prefix"
+                      v-model="companyDetails.rgp_no_prefix"
                     />
                   </div>
                   <!--end::Col-->
@@ -562,10 +561,53 @@
                     <div>
                       <Field
                         type="text"
-                        name="rgp_no"
+                        name="rgp_no_init"
                         class="form-control form-control-lg form-control-solid"
                         placeholder="Enter RGP No"
-                        v-model="companyDetails.rgp_no"
+                        v-model="companyDetails.rgp_no_init"
+                      />
+                    </div>
+                  </div>
+                  <!--end::Col-->
+                </div>
+                <!--end::Row-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >Enquiry Prefix & No</label
+              >
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8">
+                <!--begin::Row-->
+                <div class="row">
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row p-2">
+                    <Field
+                      type="text"
+                      name="enquiry_no_prefix"
+                      class="form-control form-control-lg form-control-solid"
+                      placeholder="Enter Enquiry Prefix"
+                      v-model="companyDetails.enquiry_no_prefix"
+                    />
+                  </div>
+                  <!--end::Col-->
+
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row p-2">
+                    <div>
+                      <Field
+                        type="text"
+                        name="enquiry_no_init"
+                        class="form-control form-control-lg form-control-solid"
+                        placeholder="Enter Enquiry No"
+                        v-model="companyDetails.enquiry_no_init"
                       />
                     </div>
                   </div>
@@ -625,7 +667,6 @@ import { useRoute, useRouter } from "vue-router";
 import { limit } from "@/core/config/WhichUserConfig";
 const file_size = ref(false);
 
-
 interface companyDetails {
   disp_avatar: string;
   image: string | null;
@@ -641,12 +682,14 @@ interface companyDetails {
   gst_details: string;
   user_limit: number;
   selected_package: string;
-  quotation_no: string;
-  quotation_prefix: string;
-  invoice_no: string;
-  invoice_prefix: string;
-  rgp_no: string;
-  rgp_prefix: string;
+  quotation_no_init: string;
+  quotation_no_prefix: string;
+  invoice_no_init: string;
+  invoice_no_prefix: string;
+  rgp_no_init: string;
+  rgp_no_prefix: string;
+  enquiry_no_init: string;
+  enquiry_no_prefix: string;
 }
 
 export default defineComponent({
@@ -698,12 +741,14 @@ export default defineComponent({
       gst_details: "",
       user_limit: 1,
       selected_package: "",
-      quotation_no: "",
-      quotation_prefix: "",
-      invoice_no: "",
-      invoice_prefix: "",
-      rgp_no: "",
-      rgp_prefix: "",
+      quotation_no_init: "",
+      quotation_no_prefix: "",
+      invoice_no_init: "",
+      invoice_no_prefix: "",
+      rgp_no_init: "",
+      rgp_no_prefix: "",
+      enquiry_no_init: "",
+      enquiry_no_prefix: "",
     });
 
     onMounted(async () => {
@@ -727,12 +772,14 @@ export default defineComponent({
         gst_details: response.gst_details,
         user_limit: response.user_limit,
         selected_package: response.selected_package,
-        quotation_prefix: response.quoatation_no_prefix,
-        quotation_no: response.initial_quotation_no,
-        invoice_prefix: response.initial_no_prefix,
-        invoice_no: response.initial_invoice_no,
-        rgp_prefix: response.rgp_no_prefix,
-        rgp_no: response.initial_rgp_no,
+        quotation_no_prefix: response.quotation_no_prefix,
+        quotation_no_init: response.quotation_no_init,
+        invoice_no_prefix: response.invoice_no_prefix,
+        invoice_no_init: response.invoice_no_init,
+        rgp_no_prefix: response.rgp_no_prefix,
+        rgp_no_init: response.rgp_no_init,
+        enquiry_no_prefix: response.enquiry_no_prefix,
+        enquiry_no_init: response.enquiry_no_init,
       };
     }),
       watch(
@@ -777,9 +824,9 @@ export default defineComponent({
       });
     };
 
-        // remove file or update
-        const removeImage = () => {
-          companyDetails.value.disp_avatar = getAssetPath(
+    // remove file or update
+    const removeImage = () => {
+      companyDetails.value.disp_avatar = getAssetPath(
         "media/avatars/default.png"
       );
     };
@@ -912,7 +959,6 @@ export default defineComponent({
 }
 
 .el-input__wrapper {
-  
   height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

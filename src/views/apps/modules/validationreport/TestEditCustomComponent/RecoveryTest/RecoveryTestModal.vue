@@ -190,6 +190,57 @@
                   <!--begin::Label-->
                   <label
                     class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Equipment Name</label
+                  >
+                  <!--end::Label-->
+
+                  <!--begin::Input-->
+                  <Field
+                    type="text"
+                    v-model="recoveryTestDetails.equipment_name"
+                    name="equipment_name"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Enter equipment name..."
+                  />
+                  <ErrorMessage
+                    class="invalid-feedback"
+                    name="equipment_name"
+                  />
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+
+                <!--begin::Col-->
+                <div class="col-md-6 fv-row">
+                  <!--end::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Equipment ID</label
+                  >
+                  <!--end::Label-->
+
+                  <!--end::Input-->
+                  <Field
+                    type="text"
+                    v-model="recoveryTestDetails.equipment_id"
+                    name="equipment_id"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Enter equipment id..."
+                  />
+                  <ErrorMessage class="invalid-feedback" name="equipment_id" />
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Input group-->
+
+              <!--begin::Input group-->
+              <div class="row mb-6">
+                <!--begin::Col-->
+                <div class="col-md-6 fv-row">
+                  <!--begin::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
                     >Area Name</label
                   >
                   <!--end::Label-->
@@ -440,6 +491,8 @@ interface RecoveryTestReport {
     calibration_date: string;
     calibration_due_date: string;
   };
+  equipment_name: string;
+  equipment_id: string;
   area_name: string;
   room_name: string;
   ahu_no: string;
@@ -481,14 +534,7 @@ export default defineComponent({
 
   emit: ["childDataEmitted"],
 
-  props: [
-    "heading",
-    "instruments",
-    "engineers",
-    "id",
-    "code",
-    "rgp_no",
-  ],
+  props: ["heading", "instruments", "engineers", "id", "code", "rgp_no"],
 
   setup(props, { emit }) {
     const submitButtonRef = ref<null | HTMLButtonElement>(null);
@@ -520,6 +566,8 @@ export default defineComponent({
         calibration_date: "",
         calibration_due_date: "",
       },
+      equipment_name: "",
+      equipment_id: "",
       area_name: "",
       room_name: "",
       ahu_no: "",
@@ -558,15 +606,18 @@ export default defineComponent({
         );
         if (foundInstrument) {
           recoveryTestDetails.value.instrument_used.id = foundInstrument.id;
-          recoveryTestDetails.value.instrument_used.instrument_id = foundInstrument.instrument_id;
+          recoveryTestDetails.value.instrument_used.instrument_id =
+            foundInstrument.instrument_id;
           recoveryTestDetails.value.instrument_used.name = foundInstrument.name;
           recoveryTestDetails.value.instrument_used.model_no =
             foundInstrument.model_no;
           recoveryTestDetails.value.instrument_used.serial_no =
             foundInstrument.serial_no;
           recoveryTestDetails.value.instrument_used.make = foundInstrument.make;
-          recoveryTestDetails.value.instrument_used.calibration_date = foundInstrument.calibration_date;
-          recoveryTestDetails.value.instrument_used.calibration_due_date = foundInstrument.calibration_due_date;
+          recoveryTestDetails.value.instrument_used.calibration_date =
+            foundInstrument.calibration_date;
+          recoveryTestDetails.value.instrument_used.calibration_due_date =
+            foundInstrument.calibration_due_date;
         }
       }
     };
@@ -599,19 +650,20 @@ export default defineComponent({
     };
 
     async function SetAhuCondition(e, index) {
-      console.log(e)
+      console.log(e);
       recoveryTestDetails.value.details[index].ahu_condition = await e;
     }
 
     async function SetTime(e, index) {
-      console.log(e)
-      recoveryTestDetails.value.details[index].time = await  moment(e).format(
+      console.log(e);
+      recoveryTestDetails.value.details[index].time = await moment(e).format(
         "YYYY-MM-DD HH:mm:ss"
       );
     }
 
     async function setReportName(e) {
-      recoveryTestDetails.value.report_name = await `${props.code}_${recoveryTestDetails.value.room_name}_${props.rgp_no}`;
+      recoveryTestDetails.value.report_name =
+        await `${props.code}_${recoveryTestDetails.value.room_name}_${props.rgp_no}`;
     }
 
     onMounted(function () {
@@ -674,12 +726,12 @@ export default defineComponent({
         if (!result) {
           recoveryTestDetails.value.details.push({
             ahu_condition: "",
-          time: "",
-          particle_readings: {
-            reading_1: "",
-            reading_2: "",
-          },
-          remark: "",
+            time: "",
+            particle_readings: {
+              reading_1: "",
+              reading_2: "",
+            },
+            remark: "",
           });
         } else {
           Swal.fire({
@@ -719,6 +771,8 @@ export default defineComponent({
     }
 
     const clear = () => {
+      recoveryTestDetails.value.equipment_name = "";
+      recoveryTestDetails.value.equipment_id = "";
       recoveryTestDetails.value.area_name = "";
       recoveryTestDetails.value.report_name = "";
       recoveryTestDetails.value.room_name = "";
@@ -800,12 +854,12 @@ export default defineComponent({
         showErrorAlert("Warning", "Please fill all the details Correctly");
         return;
       }
-      recoveryTestDetails.value.validation_date = moment(recoveryTestDetails.value.validation_date).format(
-        "YYYY-MM-DD HH:mm:ss"
-      );
-      recoveryTestDetails.value.due_date = moment(recoveryTestDetails.value.due_date).format(
-        "YYYY-MM-DD HH:mm:ss"
-      );
+      recoveryTestDetails.value.validation_date = moment(
+        recoveryTestDetails.value.validation_date
+      ).format("YYYY-MM-DD HH:mm:ss");
+      recoveryTestDetails.value.due_date = moment(
+        recoveryTestDetails.value.due_date
+      ).format("YYYY-MM-DD HH:mm:ss");
 
       const isEmpty = !isNotEmpty(recoveryTestDetails);
 

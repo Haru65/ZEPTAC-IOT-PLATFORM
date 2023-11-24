@@ -263,6 +263,8 @@ interface airVelocityTestReport {
     calibration_date: string;
     calibration_due_date: string;
   };
+  equipment_name: string;
+  equipment_id: string;
   area_name: string;
   ahu_no: string;
   validation_date: string;
@@ -317,6 +319,8 @@ interface filterIntegrityTestReport {
     calibration_date: string;
     calibration_due_date: string;
   };
+  equipment_name: string;
+  equipment_id: string;
   area_name: string;
   ahu_no: string;
   validation_date: string;
@@ -361,6 +365,8 @@ interface particleCountTestReport {
     calibration_date: string;
     calibration_due_date: string;
   };
+  equipment_name: string;
+  equipment_id: string;
   area_name: string;
   ahu_no: string;
   validation_date: string;
@@ -406,6 +412,8 @@ interface recoveryTestReport {
     calibration_date: string;
     calibration_due_date: string;
   };
+  equipment_name: string;
+  equipment_id: string;
   area_name: string;
   ahu_no: string;
   validation_date: string;
