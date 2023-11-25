@@ -218,6 +218,13 @@
         });
       }
   
+      const clear = () => {
+      leadDetails.value = {
+        name: "",
+        email: "",
+        phone: "",
+      };
+    };
   
       const showSuccessAlert = (title, message) => {
         Swal.fire({
@@ -273,6 +280,7 @@
         leadId: props.leadId,
         leadInfo: props.leadInfo,
         resetTheData,
+        clear,
       };
     },
   });
