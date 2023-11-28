@@ -78,7 +78,7 @@
                         label="Please Select Acceptance Criteria"
                         key=""
                       >
-                        Please Select Acceptance Criteriar</el-option
+                        Please Select Acceptance Criteria</el-option
                       >
                       <el-option
                         v-for="criteria in AcceptanceCriteria"
@@ -185,13 +185,34 @@
                 <!--end::Input group-->
               </div>
 
-                            <!--begin::Input group-->
-                            <div class="row mb-6">
+              <div class="row mb-6">
+                <div
+                  class="form-check form-switch form-check-custom form-check-primary form-check-solid ms-4"
+                >
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    :value="false"
+                    name="EquipmentRef"
+                    id="EquipmentRef"
+                    v-on:change="handleChange"
+                    v-model="EquipmentRef"
+                  />
+                  <label
+                    class="form-check-label fw-bold text-primary fw-semobold fs-5"
+                    for="EquipmentRef"
+                  >
+                    Want to add report using Equipment.
+                  </label>
+                </div>
+              </div>
+
+              <!--begin::Input group-->
+              <div class="row mb-6">
                 <!--begin::Col-->
                 <div class="col-md-6 fv-row">
                   <!--begin::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
                     >Equipment Name</label
                   >
                   <!--end::Label-->
@@ -199,6 +220,7 @@
                   <!--begin::Input-->
                   <Field
                     type="text"
+                    :disabled="EquipmentRef === false"
                     v-model="filterIntegrityTestDetails.equipment_name"
                     name="equipment_name"
                     class="form-control form-control-lg form-control-solid"
@@ -215,8 +237,7 @@
                 <!--begin::Col-->
                 <div class="col-md-6 fv-row">
                   <!--end::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
                     >Equipment ID</label
                   >
                   <!--end::Label-->
@@ -224,7 +245,9 @@
                   <!--end::Input-->
                   <Field
                     type="text"
+                    :disabled="EquipmentRef === false"
                     v-model="filterIntegrityTestDetails.equipment_id"
+                    @keyup="setReportName($event)"
                     name="equipment_id"
                     class="form-control form-control-lg form-control-solid"
                     placeholder="Enter equipment id..."
@@ -241,8 +264,7 @@
                 <!--begin::Col-->
                 <div class="col-md-6 fv-row">
                   <!--begin::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
                     >Area Name</label
                   >
                   <!--end::Label-->
@@ -250,6 +272,7 @@
                   <!--begin::Input-->
                   <Field
                     type="text"
+                    :disabled="EquipmentRef === true"
                     v-model="filterIntegrityTestDetails.area_name"
                     name="area_name"
                     class="form-control form-control-lg form-control-solid"
@@ -263,8 +286,7 @@
                 <!--begin::Col-->
                 <div class="col-md-6 fv-row">
                   <!--end::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
                     >Room Name</label
                   >
                   <!--end::Label-->
@@ -272,6 +294,7 @@
                   <!--end::Input-->
                   <Field
                     type="text"
+                    :disabled="EquipmentRef === true"
                     v-model="filterIntegrityTestDetails.room_name"
                     @keyup="setReportName($event)"
                     name="room_name"
@@ -290,8 +313,7 @@
                 <!--begin::Col-->
                 <div class="col-md-6 fv-row">
                   <!--begin::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
                     >AHU Number</label
                   >
                   <!--end::Label-->
@@ -299,12 +321,12 @@
                   <!--begin::Input-->
                   <Field
                     type="text"
+                    :disabled="EquipmentRef === true"
                     v-model="filterIntegrityTestDetails.ahu_no"
                     name="ahu_no"
                     class="form-control form-control-lg form-control-solid"
                     placeholder="Enter AHU Number"
                   />
-                  <ErrorMessage class="invalid-feedback" name="ahu_no" />
                   <!--end::Input-->
                 </div>
                 <!--end::Col-->
@@ -351,7 +373,7 @@
                     name="validation_date"
                     id="date"
                     placeholder="Pick a day"
-  :editable="false"
+                    :editable="false"
                   />
                   <ErrorMessage
                     class="invalid-feedback"
@@ -377,7 +399,7 @@
                     name="due_date"
                     id="date"
                     placeholder="Pick a day"
-  :editable="false"
+                    :editable="false"
                   />
                   <ErrorMessage class="invalid-feedback" name="due_date" />
                   <!--end::Input-->
@@ -535,19 +557,38 @@ export default defineComponent({
 
   emit: ["childDataEmitted"],
 
-  props: [
-    "heading",
-    "instruments",
-    "engineers",
-    "id",
-    "code",
-    "rgp_no",
-  ],
+  props: ["heading", "instruments", "engineers", "id", "code", "rgp_no"],
 
   setup(props, { emit }) {
     const submitButtonRef = ref<null | HTMLButtonElement>(null);
     const newAddressModalRef = ref<null | HTMLElement>(null);
     const newAddressData = ref<NewAddressData>({});
+
+    const EquipmentRef = ref(false);
+
+    const handleChange = () => {
+      if (EquipmentRef.value === true) {
+        // if it is true it means report has to be filled using equipment id
+        EquipmentRef.value = true;
+
+        // clear room_name,  area_name, ahu_no
+        filterIntegrityTestDetails.value.room_name = "";
+        filterIntegrityTestDetails.value.area_name = "";
+        filterIntegrityTestDetails.value.ahu_no = "";
+
+        filterIntegrityTestDetails.value.report_name = "";
+      } else {
+        // if it is false it means report has to be filled using room name
+        EquipmentRef.value = false;
+
+        // clear equipment_id,  equipment_name field
+        filterIntegrityTestDetails.value.equipment_id = "";
+        filterIntegrityTestDetails.value.equipment_name = "";
+
+        filterIntegrityTestDetails.value.report_name = "";
+      }
+    };
+
     const validationSchema = Yup.object().shape({
       // firstName: Yup.string().required().label("First name"),
       // lastName: Yup.string().required().label("Last name"),
@@ -574,8 +615,8 @@ export default defineComponent({
         calibration_date: "",
         calibration_due_date: "",
       },
-  equipment_name: "",
-  equipment_id: "",
+      equipment_name: "",
+      equipment_id: "",
       area_name: "",
       room_name: "",
       ahu_no: "",
@@ -611,16 +652,22 @@ export default defineComponent({
           (instrument) => id === instrument.id
         );
         if (foundInstrument) {
-          filterIntegrityTestDetails.value.instrument_used.id = foundInstrument.id;
-          filterIntegrityTestDetails.value.instrument_used.instrument_id = foundInstrument.instrument_id;
-          filterIntegrityTestDetails.value.instrument_used.name = foundInstrument.name;
+          filterIntegrityTestDetails.value.instrument_used.id =
+            foundInstrument.id;
+          filterIntegrityTestDetails.value.instrument_used.instrument_id =
+            foundInstrument.instrument_id;
+          filterIntegrityTestDetails.value.instrument_used.name =
+            foundInstrument.name;
           filterIntegrityTestDetails.value.instrument_used.model_no =
             foundInstrument.model_no;
-            filterIntegrityTestDetails.value.instrument_used.serial_no =
+          filterIntegrityTestDetails.value.instrument_used.serial_no =
             foundInstrument.serial_no;
-            filterIntegrityTestDetails.value.instrument_used.make = foundInstrument.make;
-            filterIntegrityTestDetails.value.instrument_used.calibration_date = foundInstrument.calibration_date;
-            filterIntegrityTestDetails.value.instrument_used.calibration_due_date = foundInstrument.calibration_due_date;
+          filterIntegrityTestDetails.value.instrument_used.make =
+            foundInstrument.make;
+          filterIntegrityTestDetails.value.instrument_used.calibration_date =
+            foundInstrument.calibration_date;
+          filterIntegrityTestDetails.value.instrument_used.calibration_due_date =
+            foundInstrument.calibration_due_date;
         }
       }
     };
@@ -647,18 +694,27 @@ export default defineComponent({
 
       if (foundAcceptanceCriteria) {
         filterIntegrityTestDetails.value.acceptance_criteria.id =
-          foundAcceptanceCriteria.id.toString();
+          foundAcceptanceCriteria.id;
         filterIntegrityTestDetails.value.acceptance_criteria.certified =
           foundAcceptanceCriteria.certified;
       }
     };
 
     async function SetSupplyCode(e, index) {
-      filterIntegrityTestDetails.value.details[index].supply_code = await e.target.value;
+      filterIntegrityTestDetails.value.details[index].supply_code = await e
+        .target.value;
     }
 
     async function setReportName(e) {
-      filterIntegrityTestDetails.value.report_name = await `${props.code}_${filterIntegrityTestDetails.value.room_name}_${props.rgp_no}`;
+      if (filterIntegrityTestDetails.value.equipment_id) {
+        filterIntegrityTestDetails.value.report_name =
+          await `${props.code}_${filterIntegrityTestDetails.value.equipment_id}_${props.rgp_no}`;
+      } else if (filterIntegrityTestDetails.value.room_name) {
+        filterIntegrityTestDetails.value.report_name =
+          await `${props.code}_${filterIntegrityTestDetails.value.room_name}_${props.rgp_no}`;
+      } else {
+        filterIntegrityTestDetails.value.report_name = "";
+      }
     }
 
     onMounted(function () {
@@ -667,15 +723,18 @@ export default defineComponent({
       filterIntegrityTestDetails.value.test_code = props.code;
     });
 
-      async function SetUpstreamConc(e, index) {
-        filterIntegrityTestDetails.value.details[index].up_stream_conc = await e.target.value;
-      };
+    async function SetUpstreamConc(e, index) {
+      filterIntegrityTestDetails.value.details[index].up_stream_conc = await e
+        .target.value;
+    }
 
     async function SetLeakage(e, index) {
-      filterIntegrityTestDetails.value.details[index].leakage = await e.target.value;
+      filterIntegrityTestDetails.value.details[index].leakage = await e.target
+        .value;
     }
     async function SetResultOfPOV(e, index) {
-      filterIntegrityTestDetails.value.details[index].test_result_of_pov = await e.target.value;
+      filterIntegrityTestDetails.value.details[index].test_result_of_pov =
+        await e.target.value;
     }
     async function SetRemark(e, index) {
       filterIntegrityTestDetails.value.details[index].remark = await e.target
@@ -753,6 +812,15 @@ export default defineComponent({
 
     function isNotEmpty(obj) {
       for (const key in obj) {
+        if (
+          key === "ahu_no" ||
+          key === "area_name" ||
+          key === "room_name" ||
+          key === "equipment_id" ||
+          key === "equipment_name"
+        ) {
+          continue;
+        }
         if (typeof obj[key] === "string" && obj[key].trim() === "") {
           return false;
         }
@@ -839,30 +907,57 @@ export default defineComponent({
     const submit = async (e) => {
       console.log(filterIntegrityTestDetails.value);
 
-      if(!filterIntegrityTestDetails.value.validation_date || !filterIntegrityTestDetails.value.due_date){
+      if (
+        !filterIntegrityTestDetails.value.validation_date ||
+        !filterIntegrityTestDetails.value.due_date
+      ) {
         showErrorAlert("Warning", "Please fill all the details Correctly");
         return;
       }
 
-      filterIntegrityTestDetails.value.validation_date = moment(filterIntegrityTestDetails.value.validation_date).format(
-        "YYYY-MM-DD HH:mm:ss"
-      );
-      filterIntegrityTestDetails.value.due_date = moment(filterIntegrityTestDetails.value.due_date).format(
-        "YYYY-MM-DD HH:mm:ss"
-      );
+      if (EquipmentRef.value === true) {
+        if (
+          !filterIntegrityTestDetails.value.equipment_id ||
+          !filterIntegrityTestDetails.value.equipment_name
+        ) {
+          showErrorAlert("Warning", "Please fill all the details Correctly");
+          return;
+        }
+      } else if(EquipmentRef.value === false){
+        if (
+          !filterIntegrityTestDetails.value.room_name ||
+          !filterIntegrityTestDetails.value.ahu_no ||
+          !filterIntegrityTestDetails.value.area_name
+        ) {
+          showErrorAlert("Warning", "Please fill all the details Correctly");
+          return;
+        }
+      }
+
+      filterIntegrityTestDetails.value.validation_date = moment(
+        filterIntegrityTestDetails.value.validation_date
+      ).format("YYYY-MM-DD HH:mm:ss");
+      filterIntegrityTestDetails.value.due_date = moment(
+        filterIntegrityTestDetails.value.due_date
+      ).format("YYYY-MM-DD HH:mm:ss");
 
       const isEmpty = !isNotEmpty(filterIntegrityTestDetails);
 
-      if(!filterIntegrityTestDetails.value.details.length){
+      if (!filterIntegrityTestDetails.value.details.length) {
         showErrorAlert("Warning", "Please fill all the details Correctly");
         return;
       }
 
-      const result = areAllPropertiesNotNull(filterIntegrityTestDetails.value.details);
+      const result = areAllPropertiesNotNull(
+        filterIntegrityTestDetails.value.details
+      );
 
       if (!isEmpty && !result) {
-        
-        await emit("childDataEmitted", filterIntegrityTestDetails.value.id, filterIntegrityTestDetails.value);
+        await emit(
+          "childDataEmitted",
+          filterIntegrityTestDetails.value.id,
+          filterIntegrityTestDetails.value
+        );
 
         showSuccessAlert("Success", "Report Added Successfully!");
 
@@ -903,6 +998,8 @@ export default defineComponent({
       setInstrument,
       setAcceptanceCriteria,
       setEngineer,
+      EquipmentRef,
+      handleChange,
     };
   },
 });

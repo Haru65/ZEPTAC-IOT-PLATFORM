@@ -86,7 +86,7 @@ const Gen = async (
             '1': { cellWidth: "auto" },
         },
         margin: { left: 0.5, top: 1.25 },
-        bodyStyles: { halign: "left",fontSize: 9},
+        bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0]},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;
@@ -108,7 +108,7 @@ const Gen = async (
             '1': { cellWidth: "auto" },
         },
         margin: { left: 0.5, top: 1.25 },
-        bodyStyles: { halign: "left",fontSize: 9},
+        bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0]},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;
@@ -392,7 +392,7 @@ const Gen = async (
       autoTable(doc, {
         body: Data,
         margin: { left: 0.5, top: 1.25 },
-        bodyStyles: { halign: "left",fontSize: 9},
+        bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0]},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;
@@ -411,7 +411,7 @@ const Gen = async (
       autoTable(doc, {
         body: termsAndConditions,
         margin: { left: 0.5, top: 1.25 },
-        bodyStyles: { halign: "left",fontSize: 9},
+        bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0]},
         tableLineColor: [0, 0, 0],
       });
 

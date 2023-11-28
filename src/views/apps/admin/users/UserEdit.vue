@@ -229,7 +229,11 @@
 
             <!--begin::Col-->
             <div class="col-lg-8 fv-row">
-              <el-select v-model="profileDetails.role_id" filterable  placeholder="Please Select Role...">
+              <el-select
+                v-model="profileDetails.role_id"
+                filterable
+                placeholder="Please Select Role..."
+              >
                 <el-option
                   v-for="item in rolesArray"
                   :key="item.id"
@@ -257,7 +261,11 @@
 
             <!--begin::Col-->
             <div class="col-lg-8 fv-row">
-              <el-select v-model="profileDetails.company_id" filterable  placeholder="Please Select Company...">
+              <el-select
+                v-model="profileDetails.company_id"
+                filterable
+                placeholder="Please Select Company..."
+              >
                 <el-option
                   v-for="item in Companies"
                   :key="item.id"
@@ -341,7 +349,11 @@
               <div class="row">
                 <!--begin::Col-->
                 <div class="col-lg fv-row">
-                  <el-select v-model="profileDetails.country" filterable placeholder="Select Your Country...">
+                  <el-select
+                    v-model="profileDetails.country"
+                    filterable
+                    placeholder="Select Your Country..."
+                  >
                     <el-option
                       v-for="item in countries"
                       :key="item.name"
@@ -373,7 +385,11 @@
                 <!--begin::Col-->
                 <div v-if="state.length" class="col-lg fv-row">
                   <div>
-                    <el-select v-model="profileDetails.states" filterable placeholder="Select Your State...">
+                    <el-select
+                      v-model="profileDetails.states"
+                      filterable
+                      placeholder="Select Your State..."
+                    >
                       <el-option
                         v-for="item in state"
                         :key="item"
@@ -437,9 +453,7 @@
           <!--end::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >City</label
-            >
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">City</label>
             <!--end::Label-->
 
             <!--begin::Col-->
@@ -502,7 +516,11 @@
               <div class="row">
                 <div class="col-lg fv-row">
                   <div>
-                    <el-select v-model="profileDetails.gender" filterable placeholder="Select Your Gender...">
+                    <el-select
+                      v-model="profileDetails.gender"
+                      filterable
+                      placeholder="Select Your Gender..."
+                    >
                       <el-option label="Male" value="male" />
                       <el-option label="Female" value="female" />
                       <el-option label="Other" value="other" />
@@ -530,11 +548,12 @@
                 <!--begin::Col-->
                 <div class="col-lg fv-row">
                   <Field
-                    type="text"
+                    type="file"
+                    id="adhar"
                     name="adhar"
                     class="form-control form-control-lg form-control-solid"
-                    placeholder="Enter Aadhar Number"
-                    v-model="profileDetails.adhar"
+                    @change="handleFileChange"
+                    accept=".pdf"
                   />
                   <div class="fv-plugins-message-container">
                     <div class="fv-help-block">
@@ -565,11 +584,12 @@
                 <div class="col-lg fv-row">
                   <div>
                     <Field
-                      type="text"
+                      type="file"
+                      id="pan"
                       name="pan"
                       class="form-control form-control-lg form-control-solid"
-                      placeholder="Enter Pan Number."
-                      v-model="profileDetails.pan"
+                      @change="handleFileChange"
+                      accept=".pdf"
                     />
                     <div class="fv-plugins-message-container">
                       <div class="fv-help-block">
@@ -730,6 +750,61 @@ export default defineComponent({
         company_id: response.company_id ? response.company_id : "",
         updated_by: User.id,
       };
+    };
+
+    const isPdfInvalid = ref(false);
+
+    const handleFileChange = (event) => {
+      // Get the selected file
+      const selectedFile = event.target?.files?.[0];
+
+      if (selectedFile) {
+        // Check if the selected file is a PDF
+        if (selectedFile.type === "application/pdf") {
+          const reader = new FileReader();
+
+          reader.onload = (e) => {
+            if (e.target) {
+              const result = e.target.result as string;
+
+              console.log(" -> ", e.target);
+              if (event.target.id === "pan") {
+                profileDetails.value.pan = result;
+              } else if (event.target.id === "adhar") {
+                profileDetails.value.adhar = result;
+              }
+            }
+          };
+
+          // Read the file as data URL (base64)
+          reader.readAsDataURL(selectedFile);
+          // Reset the invalid flag
+          isPdfInvalid.value = false;
+        } else {
+          // Clear the data and set the invalid flag
+
+          if (event.target.id === "pan") {
+            profileDetails.value.pan = "";
+
+            isPdfInvalid.value = true;
+          } else if (event.target.id === "adhar") {
+            profileDetails.value.adhar = "";
+
+            isPdfInvalid.value = true;
+          }
+        }
+      } else {
+        if (event.target.id === "pan") {
+          profileDetails.value.pan = "";
+
+          isPdfInvalid.value = true;
+        } else if (event.target.id === "adhar") {
+          profileDetails.value.adhar = "";
+
+          isPdfInvalid.value = true;
+        }
+      }
+      console.log(profileDetails.value);
     };
 
     onMounted(async () => {
@@ -932,7 +1007,7 @@ export default defineComponent({
         adhar: "",
         pan: "",
         company_id: "",
-        updated_by: User.id
+        updated_by: User.id,
       };
     };
 
@@ -960,6 +1035,8 @@ export default defineComponent({
       file_size,
       countries,
       identifier,
+      handleFileChange,
+      
     };
   },
 });
@@ -970,7 +1047,6 @@ export default defineComponent({
 }
 
 .el-input__wrapper {
-  
   height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

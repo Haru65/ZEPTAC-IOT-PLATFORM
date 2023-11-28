@@ -811,16 +811,6 @@ import {
 
 import CustomQuotationItems from "./CustomComponents/CustomQuotationItems.vue";
 
-interface itemsArr {
-  id: string;
-  site_location: string;
-  per_day_charge: string;
-  number_of_days: string;
-  accommodation: number;
-  travelling: number;
-  training: number;
-}
-
 interface Meta {
   id: string;
   first_name: string;
@@ -1103,23 +1093,6 @@ export default defineComponent({
     const boardingRef = ref(true);
 
     const calculateTotal = async () => {
-      // const days = QuotationDetails.value.items.number_of_days;
-
-      // const charge = QuotationDetails.value.items.per_day_charge ? QuotationDetails.value.items.per_day_charge.toString() : "";
-      // const charge_per_day = Number(charge.replaceAll(",", "").substring(0));
-
-      // const accommo = QuotationDetails.value.items.accommodation ? QuotationDetails.value.items.accommodation.toString() : "";
-      // const travel = QuotationDetails.value.items.travelling ? QuotationDetails.value.items.travelling.toString() : "";
-      // const train = QuotationDetails.value.items.training ? QuotationDetails.value.items.training.toString() : "";
-      // const pick = QuotationDetails.value.items.pickup ? QuotationDetails.value.items.pickup.toString() : "";
-      // const board = QuotationDetails.value.items.boarding ? QuotationDetails.value.items.boarding.toString() : "";
-
-      // const accommodation = Number(accommo.replaceAll(",", "").substring(0));
-      // const travelling = Number(travel.replaceAll(",", "").substring(0));
-      // const training = Number(train.replaceAll(",", "").substring(0));
-      // const pickup = Number(pick.replaceAll(",", "").substring(0));
-      // const boarding = Number(board.replaceAll(",", "").substring(0));
-
       QuotationDetails.value.total =
         Number(QuotationDetails.value.items.number_of_days) *
           Number(QuotationDetails.value.items.per_day_charge) +
@@ -1147,9 +1120,11 @@ export default defineComponent({
           equipment_wise,
         } = foundLocation;
 
+        
+        QuotationDetails.value.items.id = id;
+        QuotationDetails.value.items.site_location = site_location;
+
         if (dayWiseRef.value) {
-          QuotationDetails.value.items.id = id;
-          QuotationDetails.value.items.site_location = site_location;
           QuotationDetails.value.items.per_day_charge = per_day_charge;
           QuotationDetails.value.items.number_of_days = "1";
           QuotationDetails.value.items.accommodation = Number(accommodation);
@@ -1176,7 +1151,6 @@ export default defineComponent({
           boardingRef.value = true;
 
           await calculateTotal();
-          console.log("Function day");
         }
         else{
           QuotationDetails.value.items.per_day_charge = "";
@@ -1193,8 +1167,6 @@ export default defineComponent({
           QuotationDetails.value.items.equipment_wise = [];
           
           QuotationDetails.value.total = 0;
-          
-          console.log("Function equip");
         }
 
       }
@@ -1205,7 +1177,6 @@ export default defineComponent({
     }
 
     async function SetDays() {
-      console.log(QuotationDetails.value.items.number_of_days);
       await calculateTotal();
     }
 
@@ -1774,7 +1745,6 @@ export default defineComponent({
         updated_by: User.id,
         company_id: User.company_id,
       };
-      route.push({ name: "quotation-list" });
     };
 
     return {

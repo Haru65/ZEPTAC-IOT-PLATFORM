@@ -183,13 +183,34 @@
                 <!--end::Input group-->
               </div>
 
+              <div class="row mb-6">
+                <div
+                  class="form-check form-switch form-check-custom form-check-primary form-check-solid ms-4"
+                >
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    :value="false"
+                    name="EquipmentRef"
+                    id="EquipmentRef"
+                    v-on:change="handleChange"
+                    v-model="EquipmentRef"
+                  />
+                  <label
+                    class="form-check-label fw-bold text-primary fw-semobold fs-5"
+                    for="EquipmentRef"
+                  >
+                    Want to add report using Equipment.
+                  </label>
+                </div>
+              </div>
+
               <!--begin::Input group-->
               <div class="row mb-6">
                 <!--begin::Col-->
                 <div class="col-md-6 fv-row">
                   <!--begin::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
                     >Equipment Name</label
                   >
                   <!--end::Label-->
@@ -197,6 +218,7 @@
                   <!--begin::Input-->
                   <Field
                     type="text"
+                    :disabled="EquipmentRef === false"
                     v-model="particleCountTestDetails.equipment_name"
                     name="equipment_name"
                     class="form-control form-control-lg form-control-solid"
@@ -213,8 +235,7 @@
                 <!--begin::Col-->
                 <div class="col-md-6 fv-row">
                   <!--end::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
                     >Equipment ID</label
                   >
                   <!--end::Label-->
@@ -222,7 +243,9 @@
                   <!--end::Input-->
                   <Field
                     type="text"
+                    :disabled="EquipmentRef === false"
                     v-model="particleCountTestDetails.equipment_id"
+                    @keyup="setReportName($event)"
                     name="equipment_id"
                     class="form-control form-control-lg form-control-solid"
                     placeholder="Enter equipment id..."
@@ -239,8 +262,7 @@
                 <!--begin::Col-->
                 <div class="col-md-6 fv-row">
                   <!--begin::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
                     >Area Name</label
                   >
                   <!--end::Label-->
@@ -248,6 +270,7 @@
                   <!--begin::Input-->
                   <Field
                     type="text"
+                    :disabled="EquipmentRef === true"
                     v-model="particleCountTestDetails.area_name"
                     name="area_name"
                     class="form-control form-control-lg form-control-solid"
@@ -261,8 +284,7 @@
                 <!--begin::Col-->
                 <div class="col-md-6 fv-row">
                   <!--end::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
                     >Room Name</label
                   >
                   <!--end::Label-->
@@ -270,6 +292,7 @@
                   <!--end::Input-->
                   <Field
                     type="text"
+                    :disabled="EquipmentRef === true"
                     v-model="particleCountTestDetails.room_name"
                     @keyup="setReportName($event)"
                     name="room_name"
@@ -288,8 +311,7 @@
                 <!--begin::Col-->
                 <div class="col-md-6 fv-row">
                   <!--begin::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
                     >AHU Number</label
                   >
                   <!--end::Label-->
@@ -297,12 +319,12 @@
                   <!--begin::Input-->
                   <Field
                     type="text"
+                    :disabled="EquipmentRef === true"
                     v-model="particleCountTestDetails.ahu_no"
                     name="ahu_no"
                     class="form-control form-control-lg form-control-solid"
                     placeholder="Enter AHU Number"
                   />
-                  <ErrorMessage class="invalid-feedback" name="ahu_no" />
                   <!--end::Input-->
                 </div>
                 <!--end::Col-->
@@ -539,6 +561,32 @@ export default defineComponent({
     const submitButtonRef = ref<null | HTMLButtonElement>(null);
     const newAddressModalRef = ref<null | HTMLElement>(null);
     const newAddressData = ref<NewAddressData>({});
+
+    const EquipmentRef = ref(false);
+
+const handleChange = () => {
+  if (EquipmentRef.value === true) {
+    // if it is true it means report has to be filled using equipment id
+    EquipmentRef.value = true;
+
+    // clear room_name,  area_name, ahu_no
+    particleCountTestDetails.value.room_name = "";
+    particleCountTestDetails.value.area_name = "";
+    particleCountTestDetails.value.ahu_no = "";
+
+    particleCountTestDetails.value.report_name = "";
+  } else {
+    // if it is false it means report has to be filled using room name
+    EquipmentRef.value = false;
+
+    // clear equipment_id,  equipment_name field
+    particleCountTestDetails.value.equipment_id = "";
+    particleCountTestDetails.value.equipment_name = "";
+
+    particleCountTestDetails.value.report_name = "";
+  }
+};
+
     const validationSchema = Yup.object().shape({
       // firstName: Yup.string().required().label("First name"),
       // lastName: Yup.string().required().label("Last name"),
@@ -644,7 +692,7 @@ export default defineComponent({
 
       if (foundAcceptanceCriteria) {
         particleCountTestDetails.value.acceptance_criteria.id =
-          foundAcceptanceCriteria.id.toString();
+          foundAcceptanceCriteria.id;
         particleCountTestDetails.value.acceptance_criteria.certified =
           foundAcceptanceCriteria.certified;
       }
@@ -656,8 +704,15 @@ export default defineComponent({
     }
 
     async function setReportName(e) {
-      particleCountTestDetails.value.report_name =
-        await `${props.code}_${particleCountTestDetails.value.room_name}_${props.rgp_no}`;
+      if (particleCountTestDetails.value.equipment_id) {
+        particleCountTestDetails.value.report_name =
+          await `${props.code}_${particleCountTestDetails.value.equipment_id}_${props.rgp_no}`;
+      } else if (particleCountTestDetails.value.room_name) {
+        particleCountTestDetails.value.report_name =
+          await `${props.code}_${particleCountTestDetails.value.room_name}_${props.rgp_no}`;
+      } else {
+        particleCountTestDetails.value.report_name = "";
+      }
     }
 
     onMounted(function () {
@@ -753,6 +808,15 @@ export default defineComponent({
 
     function isNotEmpty(obj) {
       for (const key in obj) {
+        if (
+          key === "ahu_no" ||
+          key === "area_name" ||
+          key === "room_name" ||
+          key === "equipment_id" ||
+          key === "equipment_name"
+        ) {
+          continue;
+        }
         if (typeof obj[key] === "string" && obj[key].trim() === "") {
           return false;
         }
@@ -846,6 +910,26 @@ export default defineComponent({
         showErrorAlert("Warning", "Please fill all the details Correctly");
         return;
       }
+
+      if (EquipmentRef.value === true) {
+        if (
+          !particleCountTestDetails.value.equipment_id ||
+          !particleCountTestDetails.value.equipment_name
+        ) {
+          showErrorAlert("Warning", "Please fill all the details Correctly");
+          return;
+        }
+      } else if(EquipmentRef.value === false){
+        if (
+          !particleCountTestDetails.value.room_name ||
+          !particleCountTestDetails.value.ahu_no ||
+          !particleCountTestDetails.value.area_name
+        ) {
+          showErrorAlert("Warning", "Please fill all the details Correctly");
+          return;
+        }
+      }
+
       particleCountTestDetails.value.validation_date = moment(
         particleCountTestDetails.value.validation_date
       ).format("YYYY-MM-DD HH:mm:ss");
@@ -909,6 +993,8 @@ export default defineComponent({
       setInstrument,
       setAcceptanceCriteria,
       setEngineer,
+      EquipmentRef,
+      handleChange,
     };
   },
 });

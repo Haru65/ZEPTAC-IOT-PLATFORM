@@ -1,8 +1,12 @@
 
 export const AcceptanceCriteria = [
     {
-        id: 1,
+        id: "1",
         certified: "ISO - 14644",
+    },
+    {
+        id: "2",
+        certified: "ISO",
     }
   ];
 

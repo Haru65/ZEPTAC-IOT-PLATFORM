@@ -532,7 +532,6 @@
                   filterable
                   v-on:change="SetLocation"
                   placeholder="Please Select Site Location..."
-                  class="form-control"
                 >
                   <el-option
                     value=""
@@ -560,7 +559,7 @@
             <!--begin::Input group-->
             <div class="row mb-6" v-show="dayWiseRef === false">
               <CustomQuotationItems
-              v-bind:equipments="equipments"
+                v-bind:equipments="equipments"
                 v-bind:equipment_wise="QuotationDetails.items.equipment_wise"
                 v-on:removeRow="RemoveRow"
                 v-on:addNewRow="addNewRow"
@@ -1300,7 +1299,7 @@ export default defineComponent({
       Leads.value.pop();
       Clients.value.pop();
       locations.value.pop();
-      equipments.value = [];
+      equipments.value.pop();
       await GetLeads();
       await getSelects();
 
@@ -1308,11 +1307,13 @@ export default defineComponent({
       const response = await getQuotation(QuotationId);
       console.log(response);
 
+      const items = JSON.parse(response.items);
+
       QuotationDetails.value.quotation_no = response.quotation_no;
       QuotationDetails.value.date = response.date;
       QuotationDetails.value.duedate = response.duedate;
-      QuotationDetails.value.items = await JSON.parse(response.items);
-      QuotationDetails.value.items.equipment_wise = await QuotationDetails.value.items.equipment_wise;
+      QuotationDetails.value.items = await items;
+
       QuotationDetails.value.status = response.status;
 
       dayWiseRef.value =
@@ -1322,13 +1323,13 @@ export default defineComponent({
 
       globalStatus.value =
         response.status === 3 || response.status === 4 ? true : false;
-      console.log(globalStatus.value);
+      // console.log(globalStatus.value);
       qAisApprovedOrConverted.value = globalStatus.value;
       qNisApprovedOrConverted.value = globalStatus.value;
 
       globalLocation.value = response.client_id === 0 ? true : false;
 
-      console.log(globalLocation.value);
+      // console.log(globalLocation.value);
       qAsiteSameAsBilling.value = globalStatus.value;
       qNsiteSameAsBilling.value = globalStatus.value;
 
@@ -1338,14 +1339,23 @@ export default defineComponent({
         response.terms_and_conditions;
       QuotationDetails.value.created_by = response.created_by;
 
+      const foundLocation = await locations.value.find((item) => {
+        return item.id === QuotationDetails.value.items.id;
+      });
+
+      if (foundLocation) {
+        const {
+          equipment_wise,
+        } = foundLocation;
+
+        equipments.value = [...equipment_wise];
+      }
+
       accommodationRef.value = QuotationDetails.value.items.accomm;
       travellingRef.value = QuotationDetails.value.items.travel;
       trainingRef.value = QuotationDetails.value.items.train;
       pickupRef.value = QuotationDetails.value.items.pick;
       boardingRef.value = QuotationDetails.value.items.board;
-
-      
-      console.log(QuotationDetails.value.items);
 
       // when quotation is approved
       if (globalStatus.value) {
@@ -1568,7 +1578,6 @@ export default defineComponent({
       const foundLocation = await locations.value.find((item) => {
         return item.id === id;
       });
-      console.log(foundLocation);
 
       if (foundLocation) {
         const {
@@ -1581,9 +1590,10 @@ export default defineComponent({
           equipment_wise,
         } = foundLocation;
 
-        if (dayWiseRef.value) {
-          QuotationDetails.value.items.id = id;
-          QuotationDetails.value.items.site_location = site_location;
+        QuotationDetails.value.items.id = id;
+        QuotationDetails.value.items.site_location = site_location;
+
+        if (dayWiseRef.value === true) {
           QuotationDetails.value.items.per_day_charge = per_day_charge;
           QuotationDetails.value.items.number_of_days = "1";
           QuotationDetails.value.items.accommodation = Number(accommodation);
@@ -1610,7 +1620,6 @@ export default defineComponent({
           boardingRef.value = true;
 
           await calculateTotal();
-          console.log("Function day");
         } else {
           QuotationDetails.value.items.per_day_charge = "";
           QuotationDetails.value.items.accommodation = 0;
@@ -1620,15 +1629,13 @@ export default defineComponent({
           QuotationDetails.value.items.pickup = 0;
           QuotationDetails.value.items.number_of_days = "1";
           equipments.value.pop();
-          equipments.value = await [...equipment_wise];
-          
-          console.log("Function equip", equipment_wise);
+          equipments.value = [...equipment_wise];
+
 
           QuotationDetails.value.items.equipment_wise = [];
 
           QuotationDetails.value.total = 0;
 
-          console.log("Function equip");
         }
       }
     }
@@ -1728,7 +1735,7 @@ export default defineComponent({
     }
 
     /* --------EQUIPMENT WISE LOGIC--------*/
-    const dayWiseRef = ref(true);
+    const dayWiseRef = ref(false);
 
     function areAllPropertiesNotNull(array) {
       return array.some((detail) => {
@@ -1799,29 +1806,27 @@ export default defineComponent({
           });
         }
       }
-      console.log(QuotationDetails.value.items.equipment_wise);
     };
 
     async function SetEquipment(foundItem, index) {
-      console.log(foundItem);
-      const { id, name, charge } = foundItem;
-      QuotationDetails.value.items.equipment_wise[index].id = await id;
-      QuotationDetails.value.items.equipment_wise[index].name = await name;
-      QuotationDetails.value.items.equipment_wise[index].charge = await charge;
-      QuotationDetails.value.items.equipment_wise[index].quantity = 1;
-      QuotationDetails.value.items.equipment_wise[index].amount = 0;
-      calculateEquipmentCharge(index);
-      console.log("->->->",QuotationDetails.value.items.equipment_wise[index]);
+      if (foundItem) {
+        const { id, name, charge } = foundItem;
+        QuotationDetails.value.items.equipment_wise[index].id = await id;
+        QuotationDetails.value.items.equipment_wise[index].name = await name;
+        QuotationDetails.value.items.equipment_wise[index].charge =
+          await charge;
+        QuotationDetails.value.items.equipment_wise[index].quantity = 1;
+        QuotationDetails.value.items.equipment_wise[index].amount = 0;
+        calculateEquipmentCharge(index);
+      }
     }
 
     async function SetEquipmentCharge(data, index) {
-      console.log(data);
       QuotationDetails.value.items.equipment_wise[index].charge = await data;
       calculateEquipmentCharge(index);
     }
 
     async function SetQuantity(data, index) {
-      console.log(data);
       QuotationDetails.value.items.equipment_wise[index].quantity = await data;
       calculateEquipmentCharge(index);
     }
@@ -1843,7 +1848,6 @@ export default defineComponent({
       calculateTotalEquipment();
     };
 
-    
     /* --------CUSTOMER-CLIENT LOGIC--------*/
 
     const ToggleClient = () => {
@@ -1963,7 +1967,6 @@ export default defineComponent({
     }
 
     const handleDayWiseChange = async (value) => {
-      
       QuotationDetails.value.items.id = "";
       QuotationDetails.value.items = await {
         id: "",
@@ -1983,7 +1986,9 @@ export default defineComponent({
         equipment_wise: [],
       };
       QuotationDetails.value.total = 0;
+      equipments.value = [];
       dayWiseRef.value = value;
+
     };
 
     // number formating remove
@@ -2016,14 +2021,24 @@ export default defineComponent({
           return;
         }
 
-        if(dayWiseRef.value === true && QuotationDetails.value.items.id === ""){
+        if (
+          dayWiseRef.value === true &&
+          QuotationDetails.value.items.id === ""
+        ) {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           loading.value = false;
           return;
         }
 
-        if(dayWiseRef.value === false && QuotationDetails.value.items.id === "" || QuotationDetails.value.items.equipment_wise.length === 0){
-          showErrorAlert("Warning", "Please Fill at least one equipment correctly");
+        if (
+          (dayWiseRef.value === false &&
+            QuotationDetails.value.items.id === "") ||
+          QuotationDetails.value.items.equipment_wise.length === 0
+        ) {
+          showErrorAlert(
+            "Warning",
+            "Please Fill at least one equipment correctly"
+          );
           loading.value = false;
           return;
         }

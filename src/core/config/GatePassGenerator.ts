@@ -44,7 +44,7 @@ const rgpGen = async (id, pdfName, rgpDetails) => {
         '1': { cellWidth: "auto" },
     },
     margin: { left: 0.5, top: 1.25 },
-    bodyStyles: { halign: "left",fontSize: 9},
+    bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
     tableLineColor: [0, 0, 0],
     didDrawCell: (data) => {
       const { cell, row, column } = data;
@@ -66,7 +66,7 @@ const rgpGen = async (id, pdfName, rgpDetails) => {
         '1': { cellWidth: "auto" },
     },
     margin: { left: 0.5, top: 1.25 },
-    bodyStyles: { halign: "left",fontSize: 9},
+    bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
     tableLineColor: [0, 0, 0],
     didDrawCell: (data) => {
       const { cell, row, column } = data;
@@ -99,13 +99,13 @@ const rgpGen = async (id, pdfName, rgpDetails) => {
   autoTable(doc, {
     body: engineerData,
     margin: { left: 0.5, top: 1.25 },
-    headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "left",fontSize: 9},
+    headStyles: { fillColor: [199, 199, 199], textColor: [0, 0, 0], halign: "left",fontSize: 9, lineColor: [0, 0, 0]},
     columnStyles: {
       '0': { cellWidth: 0.5},
       '1': { cellWidth: "auto" },
       '2': { cellWidth: "auto" },
     },
-    bodyStyles: { halign: "left",fontSize: 9},
+    bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
     tableLineColor: [0, 0, 0],
     didDrawCell: (data) => {
       const { cell, row, column } = data;
@@ -141,13 +141,13 @@ const rgpGen = async (id, pdfName, rgpDetails) => {
   autoTable(doc, {
     body: instrumentData,
     margin: { left: 0.5, top: 1.25 },
-    headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "left",fontSize: 9},
+    headStyles: { fillColor: [199, 199, 199], textColor: [0, 0, 0], halign: "left",fontSize: 9, lineColor: [0, 0, 0]},
     columnStyles: {
       '0': { cellWidth: 0.5},
       '1': { cellWidth: 3.13 },
       '2': { cellWidth: "auto" },
     },
-    bodyStyles: { halign: "left",fontSize: 9},
+    bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
     tableLineColor: [0, 0, 0],
     didDrawCell: (data) => {
       const { cell, row, column } = data;
@@ -170,7 +170,7 @@ const rgpGen = async (id, pdfName, rgpDetails) => {
       '0': { cellWidth: 3.63},
       '1': { cellWidth: "auto" },
     },
-    bodyStyles: { halign: "left",fontSize: 9},
+    bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
     tableLineColor: [0, 0, 0],
     didDrawCell: (data) => {
       const { cell, row, column } = data;

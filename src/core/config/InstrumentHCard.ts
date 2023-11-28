@@ -193,8 +193,8 @@ const instrumentGen = async (id, pdfName, instrumentInfo) => {
 
   const signatureDetails = [
     [
-      { title: 'Employee Signature :\n\n\n', rowSpan:1},
-      { title: 'Digital Signature :\n\n\n', rowSpan:1},
+      { title: 'Employee Signature :\n\n', rowSpan:1},
+      { title: 'Digital Signature :\n\n', rowSpan:1},
     ]
   ];
 

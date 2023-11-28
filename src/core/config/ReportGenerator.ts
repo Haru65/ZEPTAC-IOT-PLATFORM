@@ -83,7 +83,7 @@ const reportGen = async (id, pdfName, reportInfo) => {
     startY: 1.4,
     body: body,
     margin: { left: 0.5, top: 1.25 },
-    headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: 'center'},
+    headStyles: { fillColor: [199, 199, 199], textColor: [0, 0, 0], halign: 'center'},
     didDrawCell: (data) => {
       const { cell, row, column } = data;
       doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
@@ -143,8 +143,8 @@ const reportGen = async (id, pdfName, reportInfo) => {
       head: header,
       body: body,
       margin: { left: 0.5, top: 1.25 },
-      headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center", valign: "middle", fontSize: 9},
-      bodyStyles: { halign: "center", fontSize: 9},
+      headStyles: { fillColor: [199, 199, 199], textColor: [0, 0, 0], halign: "center", valign: "middle", fontSize: 9, lineColor: [0, 0, 0]},
+      bodyStyles: { halign: "center", fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
       tableLineColor: [0, 0, 0],
       didDrawCell: (data) => {
         const { cell, row, column } = data;
@@ -153,7 +153,24 @@ const reportGen = async (id, pdfName, reportInfo) => {
 
     });
 
+    const acceptanceCriteria = [
+      ['ACCEPTANCE CRITERIA : AS PER SCHEDULE ACPH SHOULD NOT BE LESS THAN 20 PER HOUR']
+    ];
 
+    autoTable(doc, {
+      head: acceptanceCriteria,
+      margin: { left: 0.5, top: 1.25 },
+      headStyles: { fillColor: [199, 199, 199], textColor: [0, 0, 0], halign: "center", valign: "middle", fontSize: 9, lineColor: [0, 0, 0]},
+      bodyStyles: { halign: "center", fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
+      tableLineColor: [0, 0, 0],
+      didDrawCell: (data) => {
+        const { cell, row, column } = data;
+        doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
+      },
+
+    });
+
+    
     }
 
     function generate_filterIntegrityTest(testData){
@@ -180,14 +197,31 @@ const reportGen = async (id, pdfName, reportInfo) => {
         head: upper,
         body: body,
         margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center",fontSize: 9},
-        bodyStyles: { halign: "center",fontSize: 9},
+        headStyles: { fillColor: [199, 199, 199], textColor: [0, 0, 0], halign: "center",fontSize: 9, lineColor: [0, 0, 0]},
+        bodyStyles: { halign: "center",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;
           doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
         },
 
+      });
+
+      const acceptanceCriteria = [
+        ['ACCEPTANCE CRITERIA :  PERCENTAGE LEAKAGE FOR PAO LEAK TEST SHOULD BE LESS THAN 0.01%']
+      ];
+  
+      autoTable(doc, {
+        head: acceptanceCriteria,
+        margin: { left: 0.5, top: 1.25 },
+        headStyles: { fillColor: [199, 199, 199], textColor: [0, 0, 0], halign: "center", valign: "middle", fontSize: 9, lineColor: [0, 0, 0]},
+        bodyStyles: { halign: "center", fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
+        tableLineColor: [0, 0, 0],
+        didDrawCell: (data) => {
+          const { cell, row, column } = data;
+          doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
+        },
+  
       });
 
     }
@@ -214,13 +248,46 @@ const reportGen = async (id, pdfName, reportInfo) => {
         head: upper,
         body: body,
         margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center", valign: "middle",fontSize: 9},
-        bodyStyles: { halign: "center",fontSize: 9},
+        headStyles: { fillColor: [199, 199, 199], textColor: [0, 0, 0], halign: "center", valign: "middle",fontSize: 9, lineColor: [0, 0, 0]},
+        bodyStyles: { halign: "center",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;
           doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
         },
+      });
+
+
+      const acceptanceCriteria = [
+        [
+          { title: 'ACCEPTANCE CRITERIA : AS PER ISO - 14644-1', colSpan: 3}
+        ],
+        [
+          { title: 'At Rest', rowSpan:2},
+          { title: 'Maximum concentration limits for particles/m3 of air', colSpan:2},
+        ],
+        ["0.5µ particles/m³","5.0µ particles/m³"]
+      ];
+  
+      const acceptanceCriteriaData = [
+        ["ISO CLASS 5", "3,520", "29" ],
+        ["ISO CLASS 6", "35,200", "293" ],
+        ["ISO CLASS 7", "3,52,000", "2,930" ],
+        ["ISO CLASS 8", "35,20,200", "29,300" ],
+      ]
+
+      autoTable(doc, {
+        head: acceptanceCriteria,
+        body: acceptanceCriteriaData,
+        margin: { left: 0.5, top: 1.25 },
+        headStyles: { fillColor: [199, 199, 199], textColor: [0, 0, 0], halign: "center", valign: "middle", fontSize: 9, lineColor: [0, 0, 0]},
+        bodyStyles: { halign: "center", fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
+        tableLineColor: [0, 0, 0],
+        didDrawCell: (data) => {
+          const { cell, row, column } = data;
+          doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
+        },
+  
       });
 
     }
@@ -249,14 +316,47 @@ const reportGen = async (id, pdfName, reportInfo) => {
         head: upper,
         body: body,
         margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center", valign:"middle",fontSize: 9},
-        bodyStyles: { halign: "center",fontSize: 9},
+        headStyles: { fillColor: [199, 199, 199], textColor: [0, 0, 0], halign: "center", valign:"middle",fontSize: 9, lineColor: [0, 0, 0]},
+        bodyStyles: { halign: "center",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;
           doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
         },
       });
+
+      const acceptanceCriteria = [
+        [
+          { title: 'ACCEPTANCE CRITERIA : AS PER ISO - 14644-1', colSpan: 3}
+        ],
+        [
+          { title: 'At Rest', rowSpan:2},
+          { title: 'Maximum concentration limits for particles/m3 of air', colSpan:2},
+        ],
+        ["0.5µ particles/m³","5.0µ particles/m³"]
+      ];
+  
+      const acceptanceCriteriaData = [
+        ["ISO CLASS 5", "3,520", "29" ],
+        ["ISO CLASS 6", "35,200", "293" ],
+        ["ISO CLASS 7", "3,52,000", "2,930" ],
+        ["ISO CLASS 8", "35,20,200", "29,300" ],
+      ]
+
+      autoTable(doc, {
+        head: acceptanceCriteria,
+        body: acceptanceCriteriaData,
+        margin: { left: 0.5, top: 1.25 },
+        headStyles: { fillColor: [199, 199, 199], textColor: [0, 0, 0], halign: "center", valign: "middle", fontSize: 9, lineColor: [0, 0, 0]},
+        bodyStyles: { halign: "center", fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
+        tableLineColor: [0, 0, 0],
+        didDrawCell: (data) => {
+          const { cell, row, column } = data;
+          doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
+        },
+  
+      });
+
 
     }
 
@@ -270,8 +370,8 @@ const reportGen = async (id, pdfName, reportInfo) => {
         head: upper,
         body: [],
         margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: "left",fontSize: 9},
-        bodyStyles: { halign: "left",fontSize: 9},
+        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: "left",fontSize: 9, lineColor: [0, 0, 0]},
+        bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
         tableLineColor: [0, 0, 0],
       });
 
@@ -320,8 +420,8 @@ const reportGen = async (id, pdfName, reportInfo) => {
           { header: 'Heading', dataKey: '0' }
         ],
         margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center",fontSize: 9 },
-        bodyStyles: { halign: "left",fontSize: 9},
+        headStyles: { fillColor: [199, 199, 199], textColor: [0, 0, 0], halign: "center",fontSize: 9 , lineColor: [0, 0, 0]},
+        bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;
@@ -348,11 +448,26 @@ const reportGen = async (id, pdfName, reportInfo) => {
         ['Test Witnessed By', testData.test_witnessed_by],
         ['Validation Date', validation_date],
         ['Validation Due Date', validation_due_date],
+        ['Acceptance Criteria', testData.acceptance_criteria.certified],
+      ];
+
+      const areaWise = [
         ['Room Name / No', testData.room_name],
         ['Area Name', testData.area_name],
         ['AHU No', testData.ahu_no],
-        ['Acceptance Criteria', testData.acceptance_criteria.certified],
       ];
+      const equipmentWise = [
+        ['Equipment ID', testData.equipment_id],
+        ['Equipment Name', testData.equipment_name],
+      ];
+
+      if(testData.room_name){
+        data.push(...areaWise)
+      }
+
+      if(testData.equipment_id){
+        data.push(...equipmentWise)
+      }
   
       autoTable(doc, {
         head: testHeading,
@@ -366,8 +481,8 @@ const reportGen = async (id, pdfName, reportInfo) => {
           '1': { cellWidth: "auto" },
         },
         margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0] ,fontSize: 9},
-        bodyStyles: { fontSize: 9},
+        headStyles: {  fillColor: [199, 199, 199], textColor: [0, 0, 0] ,fontSize: 9, lineColor: [0, 0, 0]},
+        bodyStyles: { fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;
@@ -405,8 +520,8 @@ const reportGen = async (id, pdfName, reportInfo) => {
         head: instrumentHead,
         body: instrumentUsedBody,
         margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center", valign: "middle",fontSize: 9},
-        bodyStyles: { halign: "center",fontSize: 9},
+        headStyles: {  fillColor: [199, 199, 199], textColor: [0, 0, 0], halign: "center", valign: "middle", fontSize: 9, lineColor: [0, 0, 0]},
+        bodyStyles: { halign: "center", fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;
@@ -438,15 +553,15 @@ const reportGen = async (id, pdfName, reportInfo) => {
       ];
 
       const emptyRows = [[
-        `\n\n`,`\n\n`,`\n\n`
+        `\n`,`\n`,`\n`
       ]
     ];
       autoTable(doc, {
         head: signatureDetails,
         body: emptyRows,
         margin: { left: 0.5, top: 1.25 },
-        headStyles: { fillColor: [191, 191, 191], textColor: [0, 0, 0], halign: "center", valign: "middle",fontSize: 9},
-        bodyStyles: { halign: "left",fontSize: 9},
+        headStyles: {  fillColor: [199, 199, 199], textColor: [0, 0, 0], halign: "center", valign: "middle",fontSize: 9, lineColor: [0, 0, 0]},
+        bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
         tableLineColor: [0, 0, 0],
         didDrawCell: (data) => {
           const { cell, row, column } = data;

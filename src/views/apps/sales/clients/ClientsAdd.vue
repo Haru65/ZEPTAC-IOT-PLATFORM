@@ -47,7 +47,14 @@
                     v-model="profileDetails.lead_id"
                     filterable
                     placeholder="Please Select Customer..."
+                    v-on:change="SetLeadCompany(profileDetails.lead_id)"
                   >
+                    <el-option
+                      disabled
+                      key=""
+                      label="Please Select Customer..."
+                      value=""
+                    >Please Select Customer...</el-option>
                     <el-option
                       v-for="item in Leads"
                       :key="item.id"
@@ -510,7 +517,7 @@ export default defineComponent({
     let limit = ref(500);
     const loading = ref(false);
     // const Leads = ref([{ id: "", first_name: "", last_name: "" }]);
-    const Leads = ref([{ id: "",  meta : {company_name: ""} }]);
+    const Leads = ref([{ id: "", company_name: "",  meta : {company_name: ""} }]);
     const state = ref([""]);
 
     onMounted(async () => {
@@ -523,13 +530,23 @@ export default defineComponent({
       ApiService.setHeader();
       const response = await getLeads(``);
       Leads.value.push(
-        ...response.result.data.map(({ created_at, meta, ...rest }) => ({
+        ...response.result.data.map(({ id, meta }) => ({
+          id: id,
+          company_name: meta.company_name,
           meta: meta,
-          ...rest,
-          created_at: moment(created_at).format("MMMM Do YYYY"),
         }))
       );
     };
+
+    async function SetLeadCompany(id){
+      const foundLead = await Leads.value.find(
+        (lead) => id == lead.id
+      );
+      
+      if (foundLead) {
+        profileDetails.value.lead_id = await foundLead.id;
+      }
+    }
 
     const GetClientData = async (id) => {
       if (id != " ") {
@@ -699,6 +716,7 @@ export default defineComponent({
       state,
       GetClientData,
       Leads,
+      SetLeadCompany,
     };
   },
 });

@@ -374,126 +374,26 @@
             </div>
             <!--end::Col-->
           </div>
-          <!--end::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >Date of Birth</label
+              >GST Number</label
             >
             <!--end::Label-->
 
             <!--begin::Col-->
             <div class="col-lg">
-              <!--begin::Row-->
-              <div class="row">
-                <!--begin::Col-->
-                <div class="col-lg fv-row">
-                  <el-date-picker
-                    v-model="profileDetails.dob"
-                    type="date"
-                    placeholder="select Date of Birth"
-                  />
-                </div>
-                <!--end::Col-->
-              </div>
-              <!--end::Row-->
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--  -->
-          <!--end::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >Gender</label
-            >
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg">
-              <!--begin::Row-->
-              <div class="row">
-                <div class="col-lg fv-row">
-                  <div>
-                    <el-select
-                      v-model="profileDetails.gender"
-                      filterable
-                      placeholder="Select Your Gender..."
-                    >
-                      <el-option label="Male" value="male" />
-                      <el-option label="Female" value="female" />
-                      <el-option label="Other" value="other" />
-                    </el-select>
-                  </div>
-                </div>
-              </div>
-              <!--end::Row-->
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--  -->
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >Aadhar Card</label
-            >
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8">
               <!--begin::Row-->
               <div class="row">
                 <!--begin::Col-->
                 <div class="col-lg fv-row">
                   <Field
                     type="text"
-                    name="adhar"
+                    name="gst_number"
                     class="form-control form-control-lg form-control-solid"
-                    placeholder="Enter Aadhar Number"
-                    v-model="profileDetails.adhar"
+                    placeholder="Enter GST Number"
+                    v-model="profileDetails.gst_number"
                   />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="adhar" />
-                    </div>
-                  </div>
-                </div>
-                <!--end::Col-->
-              </div>
-              <!--end::Row-->
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--end::Input group-->
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6"
-              >Pan Card</label
-            >
-            <!--end::Label-->
-
-            <!--begin::Col-->
-            <div class="col-lg-8">
-              <!--begin::Row-->
-              <div class="row">
-                <!--begin::Col-->
-                <div class="col-lg fv-row">
-                  <div>
-                    <Field
-                      type="text"
-                      name="pan"
-                      class="form-control form-control-lg form-control-solid"
-                      placeholder="Enter Pan Number"
-                      v-model="profileDetails.pan"
-                    />
-                    <div class="fv-plugins-message-container">
-                      <div class="fv-help-block">
-                        <ErrorMessage name="pan" />
-                      </div>
-                    </div>
-                  </div>
                 </div>
                 <!--end::Col-->
               </div>
@@ -559,10 +459,7 @@ interface ProfileDetails {
   states: string;
   pincode: string;
   city: string;
-  dob: string;
-  gender: string;
-  adhar: string;
-  pan: string;
+  gst_number: string;
   company_name: string;
   updated_by: string;
 }
@@ -617,10 +514,7 @@ export default defineComponent({
         states: res.meta.states,
         city: res.meta.city,
         pincode: res.meta.pincode,
-        dob: res.meta.dob,
-        gender: res.meta.gender,
-        adhar: res.meta.adhar,
-        pan: res.meta.pan,
+        gst_number: res.meta.gst_number,
         company_name: res.meta.company_name,
         updated_by: User.id,
       };
@@ -651,10 +545,7 @@ export default defineComponent({
       states: "",
       city: "",
       pincode: "",
-      dob: "",
-      gender: "",
-      adhar: "",
-      pan: "",
+      gst_number: "",
       company_name: "",
       updated_by: User.id,
     });
@@ -755,10 +646,7 @@ export default defineComponent({
         states: "",
         city: "",
         pincode: "",
-        dob: "",
-        gender: "",
-        adhar: "",
-        pan: "",
+        gst_number: "",
         company_name: "",
         updated_by: User.id,
       };

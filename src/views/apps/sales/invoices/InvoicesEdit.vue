@@ -255,7 +255,7 @@
                         <a
                           v-show="
                             InvoiceDetails.client.id &&
-                            InvoiceDetails.client.first_name && 
+                            InvoiceDetails.client.first_name &&
                             !qNsiteSameAsBilling
                           "
                           target="blank"
@@ -275,9 +275,49 @@
             </div>
 
             <div class="row mb-6">
+              <label
+                class="btn btn-outline btn-outline-dashed btn-outline-default p-5 d-flex align-items-center"
+              >
+                <!--begin::Info-->
+                <span class="d-block fw-semobold text-start">
+                  <span class="text-dark fw-bold d-block fs-6 mb-2"
+                    >Quotation based on Day-Wise or Equipment-Wise</span
+                  >
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    name="work_status"
+                    id="day_wise"
+                    value="1"
+                    v-model="InvoiceDetails.day_or_equipment"
+                    v-on:change="handleDayWiseChange(true)"
+                    autocomplete="off"
+                  />
+                  <label class="btn btn-outline-primary" for="day_wise"
+                    >Day Wise</label
+                  >
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    name="work_status"
+                    id="equipment_wise"
+                    v-model="InvoiceDetails.day_or_equipment"
+                    v-on:change="handleDayWiseChange(false)"
+                    value="2"
+                    autocomplete="off"
+                  />
+                  <label class="btn btn-outline-primary" for="equipment_wise"
+                    >Equiment Wise</label
+                  >
+                </span>
+                <!--end::Info-->
+              </label>
+            </div>
+
+            <div class="row mb-6">
               <!--begin::Label-->
               <label
-                class="col-lg-3 col-form-label required fw-bold text-gray-700 fw-semobold fs-6 text-nowrap"
+                class="col-lg-3 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
                 >Select Site Location</label
               >
               <!--end::Label-->
@@ -289,7 +329,6 @@
                   filterable
                   v-on:change="SetLocation"
                   placeholder="Please Select Site Location..."
-                  class="form-control"
                 >
                   <el-option
                     value=""
@@ -314,238 +353,254 @@
               <!--end::Col-->
             </div>
 
-            <!-- extra fields -->
-            <div class="row mb-6">
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
-                  >Per day Charge</label
-                >
-                <input
-                  type="text"
-                  v-on:input="SetPerDayCharge"
-                  v-model="InvoiceDetails.items.per_day_charge"
-                  name="per_day_charge"
-                  placeholder="Per Day Charge..."
-                  class="form-control form-control-lg form-control-solid"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="per_day_charge" />
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6 text-nowrap"
-                  >Number of Days</label
-                >
-                <input
-                  type="text"
-                  name="number_of_days"
-                  class="form-control form-control-lg form-control-solid"
-                  v-on:input="SetDays"
-                  v-model="InvoiceDetails.items.number_of_days"
-                  placeholder="Number of Days..."
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="number_of_days" />
-                  </div>
-                </div>
-              </div>
+            <!--begin::Input group-->
+            <div class="row mb-6" v-show="dayWiseRef === false">
+              <CustomInvoiceItems
+                v-bind:equipment_wise="InvoiceDetails.items.equipment_wise"
+                v-bind:equipments="equipments"
+                v-on:removeRow="RemoveRow"
+                v-on:addNewRow="addNewRow"
+                v-on:setTheEquipment="SetEquipment"
+                v-on:setTheEquipmentCharge="SetEquipmentCharge"
+                v-on:setTheQuantity="SetQuantity"
+              ></CustomInvoiceItems>
             </div>
             <!--end::Input group-->
 
-            <div class="row mb-6">
-              <div class="col-lg-6 mb-md-6">
-                <div class="d-flex flex-column align-items-start gap-3">
+            <div v-show="dayWiseRef === true">
+              <!-- extra fields -->
+              <div class="row mb-6">
+                <div class="form-group col-md-6">
                   <label
-                    for="accommodationRef"
-                    class="form-label fw-bold text-primary fw-semibold fs-6"
-                    >Accommodation</label
+                    class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
+                    >Per day Charge</label
                   >
-                  <div
-                    class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
-                  >
-                    <label
-                      class="form-check form-switch form-check-custom form-check-primary form-check-solid"
-                    >
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        :value="false"
-                        name="accommodationRef"
-                        id="accommodationRef"
-                        v-on:change="ToggleAccommodation"
-                        v-model="accommodationRef"
-                      />
-                    </label>
-                    <div class="flex-grow-1">
-                      <input
-                        type="text"
-                        name="accommodation"
-                        class="form-control w-100"
-                        :disabled="!accommodationRef"
-                        v-on:input="SetAccommodation"
-                        v-model="InvoiceDetails.items.accommodation"
-                        placeholder="0"
-                      />
+                  <input
+                    type="text"
+                    v-on:input="SetPerDayCharge"
+                    v-model="InvoiceDetails.items.per_day_charge"
+                    name="per_day_charge"
+                    placeholder="Per Day Charge..."
+                    class="form-control form-control-lg form-control-solid"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="per_day_charge" />
                     </div>
                   </div>
                 </div>
-              </div>
-              <div class="col-lg-6 mb-md-6">
-                <div class="d-flex flex-column align-items-start gap-3">
-                  <label
-                    for="accommodationRef2"
-                    class="form-label fw-bold text-primary fw-semibold fs-6"
-                    >Travelling</label
-                  >
-                  <div
-                    class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
-                  >
-                    <label
-                      class="form-check form-switch form-check-custom form-check-primary form-check-solid"
-                    >
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        :value="false"
-                        name="travellingRef"
-                        id="travellingRef"
-                        v-on:change="ToggleTravelling"
-                        v-model="travellingRef"
-                      />
-                    </label>
-                    <div class="flex-grow-1">
-                      <input
-                        type="text"
-                        name="travelling"
-                        class="form-control w-100"
-                        :disabled="!travellingRef"
-                        v-on:input="SetTravelling"
-                        v-model="InvoiceDetails.items.travelling"
-                        placeholder="0"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            <div class="row mb-6">
-              <div class="col-lg-6 mb-md-6">
-                <div class="d-flex flex-column align-items-start gap-3">
+                <div class="form-group col-md-6">
                   <label
-                    for="trainingRef"
-                    class="form-label fw-bold text-primary fw-semibold fs-6"
-                    >Training</label
+                    class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6 text-nowrap"
+                    >Number of Days</label
                   >
-                  <div
-                    class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
-                  >
-                    <label
-                      class="form-check form-switch form-check-custom form-check-primary form-check-solid"
-                    >
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        :value="false"
-                        name="trainingRef"
-                        id="trainingRef"
-                        v-on:change="ToggleTraining"
-                        v-model="trainingRef"
-                      />
-                    </label>
-                    <div class="flex-grow-1">
-                      <input
-                        type="text"
-                        name="training"
-                        class="form-control w-100"
-                        v-on:input="SetTraining"
-                        v-model="InvoiceDetails.items.training"
-                        :disabled="!trainingRef"
-                        placeholder="0"
-                      />
+                  <input
+                    type="text"
+                    name="number_of_days"
+                    class="form-control form-control-lg form-control-solid"
+                    v-on:input="SetDays"
+                    v-model="InvoiceDetails.items.number_of_days"
+                    placeholder="Number of Days..."
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="number_of_days" />
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="col-lg-6 mb-md-6">
-                <div class="d-flex flex-column align-items-start gap-3">
-                  <label
-                    for="pickupRef"
-                    class="form-label fw-bold text-primary fw-semibold fs-6"
-                    >Pickup & Delivery</label
-                  >
-                  <div
-                    class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
-                  >
-                    <label
-                      class="form-check form-switch form-check-custom form-check-primary form-check-solid"
-                    >
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        :value="false"
-                        name="pickupRef"
-                        id="pickupRef"
-                        v-on:change="TogglePickUp"
-                        v-model="pickupRef"
-                      />
-                    </label>
-                    <div class="flex-grow-1">
-                      <input
-                        type="text"
-                        name="pickup"
-                        :disabled="!pickupRef"
-                        class="form-control w-100"
-                        v-on:input="SetPickUp"
-                        v-model="InvoiceDetails.items.pickup"
-                        placeholder="0"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+              <!--end::Input group-->
 
-            <div class="row mb-6">
-              <div class="col-lg-6 mb-md-6">
-                <div class="d-flex flex-column align-items-start gap-3">
-                  <label
-                    for="boardingRef"
-                    class="form-label fw-bold text-primary fw-semibold fs-6"
-                    >Boarding & Lodging</label
-                  >
-                  <div
-                    class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
-                  >
+              <div class="row mb-6">
+                <div class="col-lg-6 mb-md-6">
+                  <div class="d-flex flex-column align-items-start gap-3">
                     <label
-                      class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                      for="accommodationRef"
+                      class="form-label fw-bold text-primary fw-semibold fs-6"
+                      >Accommodation</label
                     >
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        :value="false"
-                        name="boardingRef"
-                        id="boardingRef"
-                        v-on:change="ToggleBoarding"
-                        v-model="boardingRef"
-                      />
-                    </label>
-                    <div class="flex-grow-1">
-                      <input
-                        type="text"
-                        name="boarding"
-                        class="form-control w-100"
-                        v-on:input="SetBoarding"
-                        v-model="InvoiceDetails.items.boarding"
-                        :disabled="!boardingRef"
-                        placeholder="0"
-                      />
+                    <div
+                      class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
+                    >
+                      <label
+                        class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                      >
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          :value="false"
+                          name="accommodationRef"
+                          id="accommodationRef"
+                          v-on:change="ToggleAccommodation"
+                          v-model="accommodationRef"
+                        />
+                      </label>
+                      <div class="flex-grow-1">
+                        <input
+                          type="text"
+                          name="accommodation"
+                          class="form-control w-100"
+                          :disabled="!accommodationRef"
+                          v-on:input="SetAccommodation"
+                          v-model="InvoiceDetails.items.accommodation"
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6 mb-md-6">
+                  <div class="d-flex flex-column align-items-start gap-3">
+                    <label
+                      for="accommodationRef2"
+                      class="form-label fw-bold text-primary fw-semibold fs-6"
+                      >Travelling</label
+                    >
+                    <div
+                      class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
+                    >
+                      <label
+                        class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                      >
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          :value="false"
+                          name="travellingRef"
+                          id="travellingRef"
+                          v-on:change="ToggleTravelling"
+                          v-model="travellingRef"
+                        />
+                      </label>
+                      <div class="flex-grow-1">
+                        <input
+                          type="text"
+                          name="travelling"
+                          class="form-control w-100"
+                          :disabled="!travellingRef"
+                          v-on:input="SetTravelling"
+                          v-model="InvoiceDetails.items.travelling"
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-6">
+                <div class="col-lg-6 mb-md-6">
+                  <div class="d-flex flex-column align-items-start gap-3">
+                    <label
+                      for="trainingRef"
+                      class="form-label fw-bold text-primary fw-semibold fs-6"
+                      >Training</label
+                    >
+                    <div
+                      class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
+                    >
+                      <label
+                        class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                      >
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          :value="false"
+                          name="trainingRef"
+                          id="trainingRef"
+                          v-on:change="ToggleTraining"
+                          v-model="trainingRef"
+                        />
+                      </label>
+                      <div class="flex-grow-1">
+                        <input
+                          type="text"
+                          name="training"
+                          class="form-control w-100"
+                          v-on:input="SetTraining"
+                          v-model="InvoiceDetails.items.training"
+                          :disabled="!trainingRef"
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6 mb-md-6">
+                  <div class="d-flex flex-column align-items-start gap-3">
+                    <label
+                      for="pickupRef"
+                      class="form-label fw-bold text-primary fw-semibold fs-6"
+                      >Pickup & Delivery</label
+                    >
+                    <div
+                      class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
+                    >
+                      <label
+                        class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                      >
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          :value="false"
+                          name="pickupRef"
+                          id="pickupRef"
+                          v-on:change="TogglePickUp"
+                          v-model="pickupRef"
+                        />
+                      </label>
+                      <div class="flex-grow-1">
+                        <input
+                          type="text"
+                          name="pickup"
+                          :disabled="!pickupRef"
+                          class="form-control w-100"
+                          v-on:input="SetPickUp"
+                          v-model="InvoiceDetails.items.pickup"
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-6">
+                <div class="col-lg-6 mb-md-6">
+                  <div class="d-flex flex-column align-items-start gap-3">
+                    <label
+                      for="boardingRef"
+                      class="form-label fw-bold text-primary fw-semibold fs-6"
+                      >Boarding & Lodging</label
+                    >
+                    <div
+                      class="d-flex align-items-center gap-6 col-lg-12 col-md-12 col-sm-12"
+                    >
+                      <label
+                        class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+                      >
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          :value="false"
+                          name="boardingRef"
+                          id="boardingRef"
+                          v-on:change="ToggleBoarding"
+                          v-model="boardingRef"
+                        />
+                      </label>
+                      <div class="flex-grow-1">
+                        <input
+                          type="text"
+                          name="boarding"
+                          class="form-control w-100"
+                          v-on:input="SetBoarding"
+                          v-model="InvoiceDetails.items.boarding"
+                          :disabled="!boardingRef"
+                          placeholder="0"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -776,15 +831,7 @@ import {
   GetInvoiceStatus,
 } from "@/core/config/InvoiceStatusConfig";
 
-interface itemsArr {
-  id: string;
-  site_location: string;
-  per_day_charge: string;
-  number_of_days: string;
-  accommodation: number;
-  travelling: number;
-  training: number;
-}
+import CustomInvoiceItems from "./CustomComponents/CustomInvoiceItems.vue";
 
 interface Meta {
   id: string;
@@ -797,6 +844,14 @@ interface Meta {
   states: string;
   pincode: string;
   country: string;
+}
+
+interface EDetails {
+  id: string;
+  name: string;
+  charge: number;
+  quantity: number;
+  amount: number;
 }
 
 interface InvoiceDetails {
@@ -817,6 +872,7 @@ interface InvoiceDetails {
     train: boolean;
     board: boolean;
     pick: boolean;
+    equipment_wise: Array<EDetails>;
   };
   date: string;
   duedate: string;
@@ -824,6 +880,7 @@ interface InvoiceDetails {
   scope_of_work: string;
   terms_and_conditions: string;
   total: number;
+  day_or_equipment: string;
   lead: Meta;
   client: Meta;
   company_details: {
@@ -837,7 +894,9 @@ interface InvoiceDetails {
 
 export default defineComponent({
   name: "invoice-edit",
-  components: {},
+  components: {
+    CustomInvoiceItems,
+  },
   setup() {
     const auth = useAuthStore();
     const disabledselect = ref(true);
@@ -871,9 +930,23 @@ export default defineComponent({
         accommodation: "",
         travelling: "",
         training: "",
+        equipment_wise: [
+          {
+            id: "",
+            name: "",
+            charge: "",
+          },
+        ],
       },
     ]);
 
+    const equipments = ref([
+      {
+        id: "",
+        name: "",
+        charge: "",
+      },
+    ]);
     const getSelects = async () => {
       ApiService.setHeader();
       const response = await getPriceList(``);
@@ -885,6 +958,7 @@ export default defineComponent({
           accommodation,
           travelling,
           training,
+          equipment_wise,
         }) => ({
           id,
           site_location,
@@ -892,6 +966,7 @@ export default defineComponent({
           accommodation,
           travelling,
           training,
+          equipment_wise: JSON.parse(equipment_wise),
         })
       );
       locations.value = data;
@@ -915,6 +990,7 @@ export default defineComponent({
         train: true,
         board: true,
         pick: true,
+        equipment_wise: [],
       },
       date: "",
       duedate: "",
@@ -949,6 +1025,7 @@ export default defineComponent({
         company_logo: getAssetPath("media/avatars/default.png"),
       },
       total: 0,
+      day_or_equipment: "1",
       is_active: 1,
       company_id: User.company_id,
       created_by: User.id,
@@ -966,17 +1043,27 @@ export default defineComponent({
       Customers.value.pop();
       Clients.value.pop();
       locations.value.pop();
+      equipments.value.pop();
       await GetCustomers();
       await getSelects();
 
       //? get the quotaion details from id
       const response = await getInvoice(InvoiceId);
       console.log(response);
+
+      const items = JSON.parse(response.items);
+
       InvoiceDetails.value.invoice_no = response.invoice_no;
       InvoiceDetails.value.date = response.date;
       InvoiceDetails.value.duedate = response.duedate;
-      InvoiceDetails.value.items = JSON.parse(response.items);
+      InvoiceDetails.value.items = await items;
+
       InvoiceDetails.value.status = response.status;
+
+      dayWiseRef.value =
+        InvoiceDetails.value.items.equipment_wise.length === 0 ? true : false;
+      InvoiceDetails.value.day_or_equipment =
+        InvoiceDetails.value.items.equipment_wise.length === 0 ? "1" : "2";
 
       globalLocation.value = response.client_id === 0 ? true : false;
 
@@ -987,6 +1074,18 @@ export default defineComponent({
       InvoiceDetails.value.scope_of_work = response.scope_of_work;
       InvoiceDetails.value.terms_and_conditions = response.terms_and_conditions;
 
+      const foundLocation = await locations.value.find((item) => {
+        return item.id === InvoiceDetails.value.items.id;
+      });
+
+      if (foundLocation) {
+        const {
+          equipment_wise,
+        } = foundLocation;
+
+        equipments.value = [...equipment_wise];
+      }
+      
       accommodationRef.value = InvoiceDetails.value.items.accomm;
       travellingRef.value = InvoiceDetails.value.items.travel;
       trainingRef.value = InvoiceDetails.value.items.train;
@@ -1141,7 +1240,7 @@ export default defineComponent({
       }
     };
 
-    /* --------NEW LOGIC--------*/
+    /* --------DAY WISE LOGIC--------*/
 
     const accommodationRef = ref(true);
     const travellingRef = ref(true);
@@ -1164,7 +1263,6 @@ export default defineComponent({
       const foundLocation = await locations.value.find((item) => {
         return item.id === id;
       });
-      console.log(foundLocation);
 
       if (foundLocation) {
         const {
@@ -1174,31 +1272,56 @@ export default defineComponent({
           accommodation,
           travelling,
           training,
+          equipment_wise,
         } = foundLocation;
 
         InvoiceDetails.value.items.id = id;
         InvoiceDetails.value.items.site_location = site_location;
-        InvoiceDetails.value.items.per_day_charge = per_day_charge;
-        InvoiceDetails.value.items.accommodation = Number(accommodation);
-        InvoiceDetails.value.items.travelling = Number(travelling);
-        InvoiceDetails.value.items.training = Number(training);
-        InvoiceDetails.value.items.boarding = 0;
-        InvoiceDetails.value.items.pickup = 0;
 
-        InvoiceDetails.value.items.accomm = true;
-        InvoiceDetails.value.items.travel = true;
-        InvoiceDetails.value.items.train = true;
-        InvoiceDetails.value.items.board = true;
-        InvoiceDetails.value.items.pick = true;
+        if (dayWiseRef.value === true) {
+          InvoiceDetails.value.items.per_day_charge = per_day_charge;
+          InvoiceDetails.value.items.number_of_days = "1";
+          InvoiceDetails.value.items.accommodation = Number(accommodation);
+          InvoiceDetails.value.items.travelling = Number(travelling);
+          InvoiceDetails.value.items.training = Number(training);
+          InvoiceDetails.value.items.boarding = 0;
+          InvoiceDetails.value.items.pickup = 0;
 
-        accommodationRef.value = true;
-        travellingRef.value = true;
-        trainingRef.value = true;
-        pickupRef.value = true;
-        boardingRef.value = true;
+          equipments.value.pop();
+          equipments.value = [...equipment_wise];
 
-        await calculateTotal();
-        console.log("Function runned");
+          InvoiceDetails.value.items.equipment_wise = [];
+
+          InvoiceDetails.value.items.accomm = true;
+          InvoiceDetails.value.items.travel = true;
+          InvoiceDetails.value.items.train = true;
+          InvoiceDetails.value.items.board = true;
+          InvoiceDetails.value.items.pick = true;
+
+          accommodationRef.value = true;
+          travellingRef.value = true;
+          trainingRef.value = true;
+          pickupRef.value = true;
+          boardingRef.value = true;
+
+          await calculateTotal();
+        } else {
+          InvoiceDetails.value.items.per_day_charge = "";
+          InvoiceDetails.value.items.accommodation = 0;
+          InvoiceDetails.value.items.travelling = 0;
+          InvoiceDetails.value.items.training = 0;
+          InvoiceDetails.value.items.boarding = 0;
+          InvoiceDetails.value.items.pickup = 0;
+          InvoiceDetails.value.items.number_of_days = "1";
+          equipments.value.pop();
+          equipments.value = [...equipment_wise];
+
+
+          InvoiceDetails.value.items.equipment_wise = [];
+
+          InvoiceDetails.value.total = 0;
+
+        }
       }
     }
 
@@ -1295,6 +1418,123 @@ export default defineComponent({
       }
       await calculateTotal();
     }
+
+    
+    /* --------EQUIPMENT WISE LOGIC--------*/
+    const dayWiseRef = ref(false);
+
+    function areAllPropertiesNotNull(array) {
+      return array.some((detail) => {
+        const { name, charge, quantity } = detail;
+
+        // Check if any property is null or empty
+
+        return (
+          name === "" ||
+          isNaN(parseFloat(charge)) ||
+          isNaN(parseFloat(quantity))
+        );
+      });
+    }
+
+    function calculateEquipmentCharge(index) {
+      if (
+        InvoiceDetails.value.items.equipment_wise[index].charge &&
+        InvoiceDetails.value.items.equipment_wise[index].quantity
+      ) {
+        let equipValue =
+          Number(InvoiceDetails.value.items.equipment_wise[index].charge) *
+          Number(InvoiceDetails.value.items.equipment_wise[index].quantity);
+        InvoiceDetails.value.items.equipment_wise[index].amount = Number(
+          equipValue.toFixed(2)
+        );
+      } else {
+        InvoiceDetails.value.items.equipment_wise[index].amount = 0;
+      }
+      calculateTotalEquipment();
+    }
+
+    const calculateTotalEquipment = () => {
+      InvoiceDetails.value.total =
+        InvoiceDetails.value.items.equipment_wise.reduce(
+          (sum, item) => sum + item.amount,
+          0
+        );
+    };
+
+    const addNewRow = () => {
+      if (!InvoiceDetails.value.items.equipment_wise.length) {
+        InvoiceDetails.value.items.equipment_wise.push({
+          id: "",
+          name: "",
+          charge: 0,
+          quantity: 1,
+          amount: 0,
+        });
+        calculateTotalEquipment();
+      } else {
+        const result = areAllPropertiesNotNull(
+          InvoiceDetails.value.items.equipment_wise
+        );
+        if (!result) {
+          InvoiceDetails.value.items.equipment_wise.push({
+            id: "",
+            name: "",
+            charge: 0,
+            quantity: 1,
+            amount: 0,
+          });
+          calculateTotalEquipment();
+        } else {
+          Swal.fire({
+            icon: "info",
+            title: "Please fill all the details correctly",
+          });
+        }
+      }
+    };
+
+    async function SetEquipment(foundItem, index) {
+      if (foundItem) {
+        const { id, name, charge } = foundItem;
+        InvoiceDetails.value.items.equipment_wise[index].id = await id;
+        InvoiceDetails.value.items.equipment_wise[index].name = await name;
+        InvoiceDetails.value.items.equipment_wise[index].charge =
+          await charge;
+        InvoiceDetails.value.items.equipment_wise[index].quantity = 1;
+        InvoiceDetails.value.items.equipment_wise[index].amount = 0;
+        calculateEquipmentCharge(index);
+      }
+    }
+
+    async function SetEquipmentCharge(data, index) {
+      InvoiceDetails.value.items.equipment_wise[index].charge = await data;
+      calculateEquipmentCharge(index);
+    }
+
+    async function SetQuantity(data, index) {
+      InvoiceDetails.value.items.equipment_wise[index].quantity = await data;
+      calculateEquipmentCharge(index);
+    }
+
+    const removeObjectWithId = (arr, id) => {
+      if (id !== -1) {
+        arr.splice(id, 1);
+      }
+
+      return arr;
+    };
+
+    const RemoveRow = (index) => {
+      InvoiceDetails.value.items.equipment_wise = removeObjectWithId(
+        InvoiceDetails.value.items.equipment_wise,
+        index
+      );
+
+      calculateTotalEquipment();
+    };
+
+    /* --------CUSTOMER-CLIENT LOGIC--------*/
 
     const ToggleClient = () => {
       if (qNsiteSameAsBilling.value) {
@@ -1412,6 +1652,31 @@ export default defineComponent({
       });
     }
 
+    const handleDayWiseChange = async (value) => {
+      InvoiceDetails.value.items.id = "";
+      InvoiceDetails.value.items = await {
+        id: "",
+        site_location: "",
+        per_day_charge: "",
+        number_of_days: "1",
+        accommodation: 0,
+        travelling: 0,
+        training: 0,
+        boarding: 0,
+        pickup: 0,
+        accomm: true,
+        travel: true,
+        train: true,
+        board: true,
+        pick: true,
+        equipment_wise: [],
+      };
+      InvoiceDetails.value.total = 0;
+      equipments.value = [];
+      dayWiseRef.value = value;
+
+    };
+
     // number formating remove
     const submit = async (e) => {
       e.preventDefault();
@@ -1438,6 +1703,30 @@ export default defineComponent({
             "Warning",
             "Dates cannot be empty, please fill all the required details"
           );
+          loading.value = false;
+          return;
+        }
+
+        if (
+          dayWiseRef.value === true &&
+          InvoiceDetails.value.items.id === ""
+        ) {
+          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          loading.value = false;
+          return;
+        }
+
+        if (
+          (dayWiseRef.value === false &&
+            InvoiceDetails.value.items.id === "") ||
+          InvoiceDetails.value.items.equipment_wise.length === 0
+        ) {
+          showErrorAlert(
+            "Warning",
+            "Please Fill at least one equipment correctly"
+          );
+          loading.value = false;
+          return;
         }
 
         // Call your API here with the form values
@@ -1582,6 +1871,14 @@ export default defineComponent({
       qNsiteSameAsBilling,
       globalLocation,
       ToggleClient,
+      RemoveRow,
+      addNewRow,
+      SetEquipment,
+      SetEquipmentCharge,
+      SetQuantity,
+      equipments,
+      dayWiseRef,
+      handleDayWiseChange,
     };
   },
 });
