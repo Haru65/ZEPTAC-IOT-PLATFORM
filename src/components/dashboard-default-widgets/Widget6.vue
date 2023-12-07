@@ -79,7 +79,7 @@
 
           <!--begin::Chart-->
           <apexchart
-            ref="chartRef1"
+            :ref="chartRef1"
             type="bubble"
             :options="chart"
             :series="series1"
@@ -225,7 +225,7 @@
 
           <!--begin::Chart-->
           <apexchart
-            ref="chartRef2"
+            :ref="chartRef2"
             type="bubble"
             :options="chart"
             :series="series2"

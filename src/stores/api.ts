@@ -1668,3 +1668,85 @@ export async function TrainingSearch(search: any) {
         return { error: errors };
     }
 }
+
+
+// Dashboard Routes
+
+export async function enquiryGen(company_id, yearOptions) {
+    try {
+      const id = { "company_id": company_id, "years": yearOptions };
+  
+      ApiService.setHeader();
+      const response = await ApiService.post('enquiry_generated', id);
+      return response.data;
+    } catch (errors) {
+      console.error(errors);
+      return { error: errors };
+    }
+  }
+
+export async function quotationSent(company_id, yearOptions) {
+    try {
+      const id = { "company_id": company_id, "years": yearOptions };
+  
+      ApiService.setHeader();
+      const response = await ApiService.post('quotation_sent', id);
+      return response.data;
+    } catch (errors) {
+      console.error(errors);
+      return { error: errors };
+    }
+  }
+
+export async function leadConversion(company_id, yearOptions) {
+    try {
+      const id = { "company_id": company_id, "years": yearOptions };
+  
+      ApiService.setHeader();
+      const response = await ApiService.post('lead_conversion', id);
+      return response.data;
+    } catch (errors) {
+      console.error(errors);
+      return { error: errors };
+    }
+  }
+
+export async function salesDone(company_id, yearOptions) {
+    try {
+      const id = { "company_id": company_id, "years": yearOptions };
+  
+      ApiService.setHeader();
+      const response = await ApiService.post('sales_done', id);
+      return response.data;
+    } catch (errors) {
+      console.error(errors);
+      return { error: errors };
+    }
+  }
+
+export async function calibrationNotification(company_id) {
+    try {
+      const id = { "company_id": company_id};
+  
+      ApiService.setHeader();
+      const response = await ApiService.post('upcoming_calibration_notifications', id);
+      return response.data;
+    } catch (errors) {
+      console.error(errors);
+      return { error: errors };
+    }
+  }
+
+export async function maintenanceNotification(company_id) {
+    try {
+      const id = { "company_id": company_id};
+  
+      ApiService.setHeader();
+      const response = await ApiService.post('upcoming_maintenance_notifications', id);
+      return response.data;
+    } catch (errors) {
+      console.error(errors);
+      return { error: errors };
+    }
+  }
+

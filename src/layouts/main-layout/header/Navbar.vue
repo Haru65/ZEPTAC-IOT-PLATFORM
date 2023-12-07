@@ -22,14 +22,27 @@
     <div class="app-navbar-item ms-1 ms-md-3">
       <!--begin::Menu- wrapper-->
       <div
-        class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-30px h-30px w-md-40px h-md-40px"
+        class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-30px h-30px w-md-40px h-md-40px position-relative"
+        id="kt_drawer_chat_toggle"
         data-kt-menu-trigger="click"
         data-kt-menu-attach="parent"
         data-kt-menu-placement="bottom-end"
       >
-        <KTIcon icon-name="element-plus" icon-class="fs-2 fs-md-1" />
+      <KTIcon icon-name="element-plus" icon-class="fs-2 fs-md-1" />
+        <span
+          class="position-absolute translate-middle top-0 start-50"
+        ><span class="badge rounded badge-success animation-blink">
+          {{ TotalNotification }}
+        </span></span>
       </div>
-      <KTNotificationMenu />
+      
+      <KTNotificationMenu
+      :TotalNotification="TotalNotification"
+      :dueCalibration="dueCalibration"
+      :dueMaintenance="dueMaintenance"
+      :calibrationNotificationCount="calibrationNotificationCount"
+      :maintenanaceNotificationCount="maintenanaceNotificationCount"
+      />
       <!--end::Menu wrapper-->
     </div>
     <!--end::Notifications-->
@@ -127,7 +140,8 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
+
 import KTSearch from "@/layouts/main-layout/search/Search.vue";
 import KTNotificationMenu from "@/layouts/main-layout/menus/NotificationsMenu.vue";
 import KTQuickLinksMenu from "@/layouts/main-layout/menus/QuickLinksMenu.vue";
@@ -136,6 +150,22 @@ import KTThemeModeSwitcher from "@/layouts/main-layout/theme-mode/ThemeModeSwitc
 import { ThemeModeComponent } from "@/assets/ts/layout";
 import { useThemeStore } from "@/stores/theme";
 import { useAuthStore } from "@/stores/auth";
+import { calibrationNotification, maintenanceNotification } from "@/stores/api";
+import moment from "moment";
+
+interface Instrument {
+  id: string;
+  instrument_id: string;
+  name: string;
+  calibration_due_date: string;
+}
+
+interface MaintenanceInstrument {
+  id: string;
+  instrument_id: string;
+  name: string;
+  m_date2: string;
+}
 
 export default defineComponent({
   name: "header-navbar",
@@ -150,6 +180,10 @@ export default defineComponent({
     const auth = useAuthStore();
     const store = useThemeStore();
     const User = auth.GetUser();
+
+    const dueCalibration = ref<Instrument[]>();
+    const dueMaintenance = ref<MaintenanceInstrument[]>();
+
     const themeMode = computed(() => {
       if (store.mode === "system") {
         return ThemeModeComponent.getSystemMode();
@@ -157,10 +191,70 @@ export default defineComponent({
       return store.mode;
     });
 
+    const TotalNotification = ref(0);
+    const calibrationNotificationCount = ref(0);
+    const maintenanaceNotificationCount = ref(0);
+
+    const fetchDueCalibration = async () => {
+      try {
+        const company_id = User.company_id;
+
+        const response = await calibrationNotification(company_id);
+        console.log(response);
+        dueCalibration.value = response.result.map(
+          ({ id, instrument_id, name, calibration_due_date }) => ({
+            id,
+            instrument_id,
+            name,
+            calibration_due_date: moment(calibration_due_date).format("D MMM"),
+          })
+        );
+        calibrationNotificationCount.value = dueCalibration.value ? dueCalibration.value.length : 0;
+      } catch (error) {
+        // Handle errors, e.g., show an error message
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    const fetchDueMaintenance = async () => {
+      try {
+        const company_id = User.company_id;
+
+        const response = await maintenanceNotification(company_id);
+        console.log(response);
+        dueMaintenance.value = response.result.map(
+          ({ id, instrument_id, name, m_date2 }) => ({
+            id,
+            instrument_id,
+            name,
+            m_date2: moment(m_date2).format("D MMM"),
+          })
+        );
+        
+        maintenanaceNotificationCount.value = dueMaintenance.value ? dueMaintenance.value.length : 0;
+      } catch (error) {
+        // Handle errors, e.g., show an error message
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    onMounted(async () => {
+      await fetchDueCalibration();
+      await fetchDueMaintenance();
+
+      TotalNotification.value = calibrationNotificationCount.value + maintenanaceNotificationCount.value;
+
+    });
+
     return {
       themeMode,
       getAssetPath,
       User,
+      dueCalibration,
+      dueMaintenance,
+      maintenanaceNotificationCount,
+      calibrationNotificationCount,
+      TotalNotification,
     };
   },
 });

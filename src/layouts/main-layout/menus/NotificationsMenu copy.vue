@@ -13,8 +13,7 @@
     >
       <!--begin::Title-->
       <h3 class="text-white fw-semobold px-9 mt-10 mb-6">
-        Notifications
-        <span class="fs-8 opacity-75 ms-3 badge badge-primary">{{ $props.TotalNotification }}</span>
+        Notifications <span class="fs-8 opacity-75 ps-3">24 reports</span>
       </h3>
       <!--end::Title-->
 
@@ -27,10 +26,7 @@
             class="nav-link text-white opacity-75 opacity-state-100 pb-4"
             data-bs-toggle="tab"
             href="#kt_topbar_notifications_1"
-            >Calibration
-            <span class="ms-3 badge badge-primary fs-8">{{
-              $props.calibrationNotificationCount
-            }}</span></a
+            >Alerts</a
           >
         </li>
 
@@ -39,10 +35,7 @@
             class="nav-link text-white opacity-75 opacity-state-100 pb-4 active"
             data-bs-toggle="tab"
             href="#kt_topbar_notifications_2"
-            >Maintenance
-            <span class="ms-3 badge badge-primary fs-8">{{
-              $props.maintenanaceNotificationCount
-            }}</span></a
+            >Updates</a
           >
         </li>
 
@@ -65,37 +58,54 @@
       <div class="tab-pane fade" id="kt_topbar_notifications_1" role="tabpanel">
         <!--begin::Items-->
         <div class="scroll-y mh-325px my-5 px-8">
-          <template v-for="(item, index) in $props.dueCalibration" :key="index">
+          <template v-for="(item, index) in data1" :key="index">
             <!--begin::Item-->
             <div class="d-flex flex-stack py-4">
               <!--begin::Section-->
               <div class="d-flex align-items-center">
+                <!--begin::Symbol-->
+                <div class="symbol symbol-35px me-4">
+                  <span :class="`bg-light-${item.state}`" class="symbol-label">
+                    <KTIcon
+                      :icon-name="item.icon"
+                      :icon-class="`text-${item.state}`"
+                    />
+                  </span>
+                </div>
+                <!--end::Symbol-->
+
                 <!--begin::Title-->
                 <div class="mb-0 me-2">
-                  <router-link :to="`/instruments/edit/${item.id}`">
-                    <span
-                      class="fs-6 text-gray-800 text-hover-primary fw-bold"
-                      >{{ item.instrument_id }}</span
-                    >
-                    <div class="text-gray-400 fs-7">
-                      {{ item.name }}
-                    </div>
-                  </router-link>
+                  <a
+                    href="#"
+                    class="fs-6 text-gray-800 text-hover-primary fw-bold"
+                    >{{ item.title }}</a
+                  >
+                  <div class="text-gray-400 fs-7">
+                    {{ item.description }}
+                  </div>
                 </div>
                 <!--end::Title-->
               </div>
               <!--end::Section-->
 
               <!--begin::Label-->
-              <span class="badge badge-light fs-8">{{
-                item.calibration_due_date
-              }}</span>
+              <span class="badge badge-light fs-8">{{ item.time }}</span>
               <!--end::Label-->
             </div>
             <!--end::Item-->
           </template>
         </div>
         <!--end::Items-->
+
+        <!--begin::View more-->
+        <div class="py-3 text-center border-top">
+          <a href="#" class="btn btn-color-gray-600 btn-active-color-primary">
+            View All
+            <KTIcon icon-name="arrow-right" icon-class="fs-5" />
+          </a>
+        </div>
+        <!--end::View more-->
       </div>
       <!--end::Tab panel-->
 
@@ -105,38 +115,44 @@
         id="kt_topbar_notifications_2"
         role="tabpanel"
       >
-        <div class="scroll-y mh-325px my-5 px-8">
-          <template v-for="(item, index) in $props.dueMaintenance" :key="index">
-            <!--begin::Item-->
-            <div class="d-flex flex-stack py-4">
-              <!--begin::Section-->
-              <div class="d-flex align-items-center">
-                <!--begin::Title-->
-                <div class="mb-0 me-2">
-                  <router-link :to="`/instruments/edit/${item.id}`">
-                    <span
-                      class="fs-6 text-gray-800 text-hover-primary fw-bold"
-                      >{{ item.instrument_id }}</span
-                    >
-                    <div class="text-gray-400 fs-7">
-                      {{ item.name }}
-                    </div>
-                  </router-link>
-                </div>
-                <!--end::Title-->
-              </div>
-              <!--end::Section-->
+        <!--begin::Wrapper-->
+        <div class="d-flex flex-column px-9">
+          <!--begin::Section-->
+          <div class="pt-10 pb-0">
+            <!--begin::Title-->
+            <h3 class="text-dark text-center fw-bold">Get Pro Access</h3>
+            <!--end::Title-->
 
-              <!--begin::Label-->
-              <span class="badge badge-light-danger fs-8">{{
-                item.m_date2
-              }}</span>
-              <!--end::Label-->
+            <!--begin::Text-->
+            <div class="text-center text-gray-600 fw-semobold pt-1">
+              Outlines keep you honest. They stoping you from amazing poorly
+              about drive
             </div>
-            <!--end::Item-->
-          </template>
+            <!--end::Text-->
+
+            <!--begin::Action-->
+            <div class="text-center mt-5 mb-9">
+              <a
+                href="#"
+                class="btn btn-sm btn-primary px-6"
+                data-bs-toggle="modal"
+                data-bs-target="#kt_modal_upgrade_plan"
+                >Upgrade</a
+              >
+            </div>
+            <!--end::Action-->
+          </div>
+          <!--end::Section-->
+
+          <!--begin::Illustration-->
+          <img
+            class="mw-100 mh-200px"
+            alt="Portal"
+            :src="getIllustrationsPath('1.png')"
+          />
+          <!--end::Illustration-->
         </div>
-        <!--end::Items-->
+        <!--end::Wrapper-->
       </div>
       <!--end::Tab panel-->
 
@@ -194,37 +210,12 @@
 
 <script lang="ts">
 import { getAssetPath, getIllustrationsPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
-import { useAuthStore } from "@/stores/auth";
-
-interface Instrument {
-  id: string;
-  instrument_id: string;
-  name: string;
-  calibration_due_date: string;
-}
-
-interface MaintenanceInstrument {
-  id: string;
-  instrument_id: string;
-  name: string;
-  m_date2: string;
-}
+import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "notifications-menu",
   components: {},
-  props: [
-    "dueCalibration",
-    "dueMaintenance",
-    "TotalNotification",
-    "calibrationNotificationCount",
-    "maintenanaceNotificationCount",
-  ],
-  setup(props) {
-    const auth = useAuthStore();
-    const User = auth.GetUser();
-
+  setup() {
     const data1 = [
       {
         title: "Project Alice",
@@ -357,11 +348,6 @@ export default defineComponent({
       data2,
       getIllustrationsPath,
       getAssetPath,
-      dueCalibration: props.dueCalibration,
-      dueMaintenance: props.dueMaintenance,
-      maintenanaceNotificationCount: props.maintenanaceNotificationCount,
-      calibrationNotificationCount: props.calibrationNotificationCount,
-      TotalNotification: props.TotalNotification,
     };
   },
 });

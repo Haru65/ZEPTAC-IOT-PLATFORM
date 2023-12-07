@@ -5,7 +5,7 @@
       <!--begin::Title-->
 
       <h3 class="card-title align-items-start flex-column">
-        <span class="card-label fw-bold text-dark">Enquiries</span>
+        <span class="card-label fw-bold text-dark">Quotations</span>
         <span class="text-gray-400 mt-1 fw-semibold fs-6"
           >overview as per {{ selectedYear }}</span
         >
@@ -34,11 +34,11 @@
       <div class="d-flex flex-stack mb-6">
         <!--begin::Title-->
         <div class="flex-shrink-0 me-5">
-          <span class="badge badge-light-primary rounded fs-2hx p-4 fw-bold text-primary me-2 lh-1 ls-n2">{{
-            enquiryYearWise
+          <span class="badge badge-light-success rounded fs-2hx p-4 fw-bold text-success me-2 lh-1 ls-n2">{{
+            QuotationYearWise
           }}</span>
           <span class="text-gray-400 fs-7 fw-bold m-2 d-block lh-1 pb-1"
-            >Total Enquiries</span
+            >Total Quotations Sent</span
           >
         </div>
         <!--end::Title-->
@@ -69,16 +69,16 @@ import { getCSSVariableValue } from "@/assets/ts/_utils";
 import type VueApexCharts from "vue3-apexcharts";
 import { useThemeStore } from "@/stores/theme";
 import { useAuthStore } from "@/stores/auth";
-import { enquiryGen } from "@/stores/api";
+import { quotationSent } from "@/stores/api";
 
 interface Data {
   year: number;
-  leads_by_month: any[]; // Adjust the type based on the actual structure
-  total_leads_count: number;
+  quotations_by_month: any[]; // Adjust the type based on the actual structure
+  total_quotations_count: number;
 }
 
 export default defineComponent({
-  name: "default-dashboard-widget-9",
+  name: "default-dashboard-widget-12",
   components: {},
   props: {
     className: { type: String, required: false },
@@ -94,9 +94,9 @@ export default defineComponent({
 
     const series = ref([
       {
-        name: "Leads Count",
+        name: "Quotations Sent",
         data: [65, 80, 80, 60, 60, 0, 45, 80, 80, 70, 0, 90],
-        type: "line",
+        type: "area",
       },
     ]);
 
@@ -107,15 +107,15 @@ export default defineComponent({
     const chartOptions = (height: number): ApexOptions => {
       const labelColor = getCSSVariableValue("--bs-gray-500");
       const borderColor = getCSSVariableValue("--bs-border-dashed-color");
-      const baseprimaryColor = getCSSVariableValue("--bs-primary");
-      const lightprimaryColor = getCSSVariableValue("--bs-primary");
+      const baseprimaryColor = getCSSVariableValue("--bs-success");
+      const lightprimaryColor = getCSSVariableValue("--bs-warning");
       const basesuccessColor = getCSSVariableValue("--bs-success");
       const lightsuccessColor = getCSSVariableValue("--bs-success");
 
       return {
         chart: {
           fontFamily: "inherit",
-          type: "line",
+          type: "area",
           height: height,
           toolbar: {
             show: true,
@@ -135,7 +135,7 @@ export default defineComponent({
           show: true,
         },
         dataLabels: {
-          enabled: true,
+          enabled: false,
         },
         fill: {
           type: "normal",
@@ -145,12 +145,6 @@ export default defineComponent({
             opacityTo: 0.2,
             stops: [15, 120, 100],
           },
-        },
-        stroke: {
-          curve: "smooth",
-          show: true,
-          width: 3,
-          colors: [baseprimaryColor, basesuccessColor],
         },
         xaxis: {
           categories: [
@@ -236,32 +230,31 @@ export default defineComponent({
     const currentYear = new Date().getFullYear();
     const selectedYear = ref(currentYear);
 
-
     // Generate an array of the last 5 years
     const yearOptions = Array.from(
       { length: 5 },
       (_, index) => currentYear - index
     );
 
-    const leadsData = ref<Data[]>([]);
-    const enquiryYearWise = ref(0);
+    const QuotationsData = ref<Data[]>([]);
+    const QuotationYearWise = ref(0);
 
     function SetYearlyData(year) {
       console.log(year);
 
-      const yearData = leadsData.value.find((entry) => entry.year === year);
-      enquiryYearWise.value = yearData ? yearData.total_leads_count : 0;
-      const leadsByMonthArray = yearData
-        ? yearData.leads_by_month.map((entry) => entry.leads_count)
+      const yearData = QuotationsData.value.find((entry) => entry.year === year);
+      QuotationYearWise.value = yearData ? yearData.total_quotations_count : 0;
+      const QuotationsByMonthArray = yearData
+        ? yearData.quotations_by_month.map((entry) => entry.quotation_sent)
         : [];
 
-      console.log(leadsByMonthArray);
+      console.log(QuotationsByMonthArray);
 
       series.value = [
         {
-          name: "Leads Count",
-          data: leadsByMonthArray,
-          type: "line",
+          name: "Quotations Sent",
+          data: QuotationsByMonthArray,
+          type: "area",
         },
       ];
     }
@@ -273,13 +266,13 @@ export default defineComponent({
         const company_id = User.company_id;
 
         // Pass both company_id and yearOptions to enquiryGen function
-        const response = await enquiryGen(company_id, yearOptions);
+        const response = await quotationSent(company_id, yearOptions);
 
         // Handle the response from the backend, e.g., update the UI or store the data
         console.log(response);
-        leadsData.value = response.result;
+        QuotationsData.value = response.result;
         SetYearlyData(selectedYear.value);
-        console.log(leadsData.value);
+        console.log(QuotationsData.value);
       } catch (error) {
         // Handle errors, e.g., show an error message
         console.error("Error fetching leads data:", error);
@@ -312,7 +305,7 @@ export default defineComponent({
       selectedYear,
       yearOptions,
       SetYearlyData,
-      enquiryYearWise,
+      QuotationYearWise,
     };
   },
 });
