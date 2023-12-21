@@ -799,6 +799,7 @@ import {
   GetLeadClients,
   GetIncrQuotationId,
   getPriceList,
+  getLeadNCustomer,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import moment from "moment";
@@ -1268,7 +1269,7 @@ export default defineComponent({
     /* --------EQUIPMENT WISE LOGIC--------*/
     const dayWiseRef = ref(true);
 
-    function areAllPropertiesNotNull(array) {
+    function areAllPropertiesEmpty(array) {
       return array.some((detail) => {
         const { name, charge, quantity } = detail;
 
@@ -1303,7 +1304,7 @@ export default defineComponent({
     };
 
     const addNewRow = () => {
-      if (!QuotationDetails.value.items.equipment_wise.length) {
+      if (QuotationDetails.value.items.equipment_wise.length === 0) {
         QuotationDetails.value.items.equipment_wise.push({
           id: "",
           name: "",
@@ -1313,10 +1314,10 @@ export default defineComponent({
         });
         calculateTotalEquipment();
       } else {
-        const result = areAllPropertiesNotNull(
+        const isEmpty = areAllPropertiesEmpty(
           QuotationDetails.value.items.equipment_wise
         );
-        if (!result) {
+        if (!isEmpty) {
           QuotationDetails.value.items.equipment_wise.push({
             id: "",
             name: "",
@@ -1425,7 +1426,7 @@ export default defineComponent({
     const GetUserData = async (id) => {
       if (id != " ") {
         const lead_id = id;
-        const response = await getUser(lead_id);
+        const response = await getUser(lead_id); 
         console.log(response);
         QuotationDetails.value.lead = response.meta;
         QuotationDetails.value.lead.id = response.id;
@@ -1491,11 +1492,12 @@ export default defineComponent({
     };
 
     const GetLeads = async () => {
+      const companyId = User.company_id;
       ApiService.setHeader();
-      const response = await getLeads(``);
+      const response = await getLeadNCustomer(companyId);
 
       Leads.value.push(
-        ...response.result.data.map(({ created_at, ...rest }) => ({
+        ...response.result.map(({ created_at, ...rest }) => ({
           ...rest,
           created_at: moment(created_at).format("MMMM Do YYYY"),
         }))
@@ -1507,6 +1509,7 @@ export default defineComponent({
         const {
           quotation_no,
           lead_id,
+          enquiry_no,
           lead,
           client,
           items,
@@ -1523,6 +1526,7 @@ export default defineComponent({
         return (
           quotation_no === "" ||
           lead_id === "" ||
+          enquiry_no === "" ||
           items.id === "" ||
           lead.id === "" ||
           client.id === "" ||
@@ -1564,7 +1568,6 @@ export default defineComponent({
     const submit = async (e) => {
       e.preventDefault();
 
-      // console.log(QuotationDetails.value);
       try {
         const result = areAllPropertiesNull([QuotationDetails.value]);
 
@@ -1590,14 +1593,24 @@ export default defineComponent({
           return;
         }
 
-        if(dayWiseRef.value === true && QuotationDetails.value.items.id === ""){
+        if(dayWiseRef.value === true && (QuotationDetails.value.items.id === "" || QuotationDetails.value.items.per_day_charge === "")){
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           loading.value = false;
           return;
         }
 
-        if(dayWiseRef.value === false && QuotationDetails.value.items.id === "" || QuotationDetails.value.items.equipment_wise.length === 0){
+        const isEmpty = areAllPropertiesEmpty(
+          QuotationDetails.value.items.equipment_wise
+        );
+
+        if(dayWiseRef.value === false && (QuotationDetails.value.items.id === "" || QuotationDetails.value.items.equipment_wise.length === 0)){
           showErrorAlert("Warning", "Please Fill at least one equipment correctly");
+          loading.value = false;
+          return;
+        }
+
+        if(dayWiseRef.value === false && isEmpty){
+          showErrorAlert("Warning", "Please Fill equipment details correctly");
           loading.value = false;
           return;
         }
@@ -1615,6 +1628,11 @@ export default defineComponent({
           route.push({ name: "quotation-list" });
         } else {
           // Handle API error response
+          console.log(dayWiseRef.value);
+        console.log(result);
+
+      console.log(QuotationDetails.value);
+      return;
           const errorData = response.error;
           // console.log("API error:", errorData);
           console.log("API error:", errorData.response.data.errors);

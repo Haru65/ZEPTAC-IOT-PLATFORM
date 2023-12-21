@@ -848,6 +848,7 @@ interface InvoiceDetails {
     pick: boolean;
     equipment_wise: Array<EDetails>;
   };
+  enquiry_no: string;
   date: string;
   duedate: string;
   status: string;
@@ -965,6 +966,7 @@ export default defineComponent({
         pick: true,
         equipment_wise: [],
       },
+      enquiry_no: "",
       date: "",
       duedate: "",
       status: "",
@@ -1260,7 +1262,7 @@ export default defineComponent({
     /* --------EQUIPMENT WISE LOGIC--------*/
     const dayWiseRef = ref(true);
 
-    function areAllPropertiesNotNull(array) {
+    function areAllPropertiesEmpty(array) {
       return array.some((detail) => {
         const { name, charge, quantity } = detail;
 
@@ -1310,10 +1312,10 @@ export default defineComponent({
         });
         calculateTotalEquipment();
       } else {
-        const result = areAllPropertiesNotNull(
+        const isEmpty = areAllPropertiesEmpty(
           InvoiceDetails.value.items.equipment_wise
         );
-        if (!result) {
+        if (!isEmpty) {
           InvoiceDetails.value.items.equipment_wise.push({
             id: "",
             name: "",
@@ -1372,7 +1374,6 @@ export default defineComponent({
       calculateTotalEquipment();
     };
 
-    
     /* --------LATEST INVOICE LOGIC--------*/
 
     const IncrInvoice = (data: any) => {
@@ -1389,7 +1390,6 @@ export default defineComponent({
       }
     };
 
-    
     /* --------CUSTOMER-CLIENT LOGIC--------*/
 
     const GetClients = async (id: string) => {
@@ -1428,6 +1428,7 @@ export default defineComponent({
         console.log(response);
         InvoiceDetails.value.lead = response.meta;
         InvoiceDetails.value.lead.id = response.id;
+        InvoiceDetails.value.enquiry_no = response.meta.enquiry_no;
 
         if (siteSameAsBilling.value) {
           ToggleClient();
@@ -1436,6 +1437,7 @@ export default defineComponent({
           GetClients(customer_id);
         }
       } else {
+        InvoiceDetails.value.enquiry_no = "";
         InvoiceDetails.value.lead = {
           id: "",
           company_name: "",
@@ -1502,6 +1504,7 @@ export default defineComponent({
         const {
           invoice_no,
           lead_id,
+          enquiry_no,
           lead,
           client,
           items,
@@ -1518,6 +1521,7 @@ export default defineComponent({
         return (
           invoice_no === "" ||
           lead_id === "" ||
+          enquiry_no === "" ||
           items.id === "" ||
           lead.id === "" ||
           client.id === "" ||
@@ -1585,14 +1589,35 @@ export default defineComponent({
           return;
         }
 
-        if(dayWiseRef.value === true && InvoiceDetails.value.items.id === ""){
+        if (
+          dayWiseRef.value === true &&
+          (InvoiceDetails.value.items.id === "" ||
+            InvoiceDetails.value.items.per_day_charge === "")
+        ) {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           loading.value = false;
           return;
         }
 
-        if(dayWiseRef.value === false && InvoiceDetails.value.items.id === "" || InvoiceDetails.value.items.equipment_wise.length === 0){
-          showErrorAlert("Warning", "Please Fill at least one equipment correctly");
+        const isEmpty = areAllPropertiesEmpty(
+          InvoiceDetails.value.items.equipment_wise
+        );
+
+        if (
+          dayWiseRef.value === false &&
+          (InvoiceDetails.value.items.id === "" ||
+            InvoiceDetails.value.items.equipment_wise.length === 0)
+        ) {
+          showErrorAlert(
+            "Warning",
+            "Please Fill at least one equipment correctly"
+          );
+          loading.value = false;
+          return;
+        }
+
+        if (dayWiseRef.value === false && isEmpty) {
+          showErrorAlert("Warning", "Please Fill equipment details correctly");
           loading.value = false;
           return;
         }
@@ -1703,6 +1728,7 @@ export default defineComponent({
           pick: true,
           equipment_wise: [],
         },
+        enquiry_no: "",
         date: "",
         duedate: "",
         status: "",

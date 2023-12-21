@@ -624,7 +624,7 @@ const handleChange = () => {
 
       details: [
         {
-          ahu_condition: "",
+          ahu_condition: "ON",
           time: "",
           particle_readings: {
             reading_1: "",
@@ -698,15 +698,26 @@ const handleChange = () => {
     };
 
     async function SetAhuCondition(e, index) {
-      console.log(e);
-      recoveryTestDetails.value.details[index].ahu_condition = await e;
+      console.log(e.target.checked)
+      if(e.target.checked === true){
+        recoveryTestDetails.value.details[index].ahu_condition = "ON";
+      }
+      else{
+        recoveryTestDetails.value.details[index].ahu_condition = "OFF"
+      }
+      console.log(recoveryTestDetails.value.details);
     }
 
     async function SetTime(e, index) {
       console.log(e);
-      recoveryTestDetails.value.details[index].time = await moment(e).format(
-        "YYYY-MM-DD HH:mm:ss"
-      );
+      if(e != null){
+        recoveryTestDetails.value.details[index].time = await moment(e).format(
+          "YYYY-MM-DD HH:mm:ss"
+          );
+      }
+      else{
+        recoveryTestDetails.value.details[index].time = "";
+      }
     }
 
     async function setReportName(e) {
@@ -766,7 +777,7 @@ const handleChange = () => {
     const addNewRow = () => {
       if (!recoveryTestDetails.value.details.length) {
         recoveryTestDetails.value.details.push({
-          ahu_condition: "",
+          ahu_condition: "ON",
           time: "",
           particle_readings: {
             reading_1: "",
@@ -780,7 +791,7 @@ const handleChange = () => {
         );
         if (!result) {
           recoveryTestDetails.value.details.push({
-            ahu_condition: "",
+            ahu_condition: "ON",
             time: "",
             particle_readings: {
               reading_1: "",
@@ -870,7 +881,7 @@ const handleChange = () => {
 
       recoveryTestDetails.value.details = [
         {
-          ahu_condition: "",
+          ahu_condition: "ON",
           time: "",
           particle_readings: {
             reading_1: "",

@@ -365,22 +365,42 @@
             <div class="row mb-3">
               <!--begin::Label-->
               <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-                >GST Details</label
+                >GST Number</label
               >
               <!--end::Label-->
               <!--begin::Col-->
               <div class="col-lg-8">
                 <!--begin::Row-->
                 <!--begin::Col-->
-                <div class="col-lg fv-row">
+                <div class="col-lg fv-row position-relative">
                   <Field
                     type="text"
-                    as="textarea"
                     name="gst_details"
                     class="form-control form-control-lg form-control-solid"
-                    placeholder="GST"
+                    placeholder="Enter GST Number"
                     v-model="companyDetails.gst_details"
+                    v-on:input="isValidGSTNo"
                   />
+                  <div
+                    v-if="validGSTRef === true"
+                    class="position-absolute end-0 top-50 translate-middle-y"
+                  >
+                    <i
+                      class="fas fs-4 fa-check-circle text-success me-6"
+                      data-toggle="tooltip"
+                      title="GST number is valid"
+                    ></i>
+                  </div>
+                  <div
+                    v-else
+                    class="position-absolute end-0 top-50 translate-middle-y"
+                  >
+                    <i
+                      class="fas fs-4 fa-times-circle text-danger me-6"
+                      data-toggle="tooltip"
+                      title="GST number is Invalid/Incorrect"
+                    ></i>
+                  </div>
                   <div class="fv-plugins-message-container">
                     <div class="fv-help-block">
                       <ErrorMessage name="gst_details" />
@@ -723,7 +743,7 @@ export default defineComponent({
       state: Yup.string().required().label("State"),
       city: Yup.string().required().label("City"),
       pincode: Yup.string().required().label("Pincode"),
-      gst_details: Yup.string().required().label("GST Detials"),
+      gst_details: Yup.string().required().label("GST Number"),
     });
 
     const companyDetails = ref<companyDetails>({
@@ -750,6 +770,35 @@ export default defineComponent({
       enquiry_no_init: "",
       enquiry_no_prefix: "",
     });
+
+    const validGSTRef = ref(false);
+
+    function isValidGSTNo() {
+      // Regex to check valid
+      // GST CODE
+      let regex = new RegExp(
+        /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/
+      );
+
+      let str = companyDetails.value.gst_details;
+
+      // GST CODE
+      // is empty return false
+      if (str == null) {
+        validGSTRef.value = false;
+        return false;
+      }
+
+      // Return true if the GST_CODE
+      // matched the ReGex
+      if (regex.test(str) == true) {
+        validGSTRef.value = true;
+        return true;
+      } else {
+        validGSTRef.value = false;
+        return false;
+      }
+    }
 
     onMounted(async () => {
       const response = await getCompany(CompanyId);
@@ -781,6 +830,9 @@ export default defineComponent({
         enquiry_no_prefix: response.enquiry_no_prefix,
         enquiry_no_init: response.enquiry_no_init,
       };
+
+      isValidGSTNo();
+
     }),
       watch(
         () => companyDetails.value.country,
@@ -829,6 +881,7 @@ export default defineComponent({
       companyDetails.value.disp_avatar = getAssetPath(
         "media/avatars/default.png"
       );
+      companyDetails.value.image = "";
     };
 
     const updateImage = (e: any) => {
@@ -949,6 +1002,8 @@ export default defineComponent({
       removeImage,
       updateImage,
       file_size,
+      isValidGSTNo,
+      validGSTRef,
     };
   },
 });

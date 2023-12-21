@@ -154,11 +154,6 @@
           >
           <span
             v-if="validationreports.report_status == 2"
-            class="badge py-3 px-4 fs-7 badge-light-danger"
-            >{{ GetReportStatus(validationreports.report_status) }}</span
-          >
-          <span
-            v-if="validationreports.report_status == 3"
             class="badge py-3 px-4 fs-7 badge-light-success"
             >{{ GetReportStatus(validationreports.report_status) }}</span
           >

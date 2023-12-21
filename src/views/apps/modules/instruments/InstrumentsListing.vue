@@ -193,20 +193,19 @@
         <template v-slot:actions="{ row: instruments }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
-
-            <router-link :to="`./edit/${instruments.id}`"
-              data-toggle="tooltip"
-              title="Edit Worksheet"
-              class="las la-edit border border-primary rounded badge m-3 py-3 px-4 bg-light-primary fs-7 badge-light-primary text-primary text-hover-dark cursor-pointer"
-              >Edit
-          </router-link>
-
-            <span
-              @click="deleteInvoice(instruments.id, false)"
-              data-toggle="tooltip"
-              title="Delete Worksheet"
-              class="border border-danger rounded-circle badge m-3 py-3 px-4 bg-light-danger fs-7 badge-light-danger text-danger text-hover-dark cursor-pointer"
-              >X
+            <span class="menu-link px-3" 
+              data-toggle="tooltip" title="View Instrument">
+              <router-link :to="`./edit/${instruments.id}`">
+                <i
+                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                ></i>
+              </router-link>
+            </span>
+            <span class="menu-link px-3" data-toggle="tooltip" title="Delete Instrument">
+              <i
+                @click="deleteInvoice(instruments.id, false)"
+                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-1"
+              ></i>
             </span>
           </div>
           <!--end::Menu FLex-->

@@ -75,7 +75,7 @@ const Gen = async (
 
       const Info = [
         [`${titleForPdf} Date : ${creationDate}`, `#${titleForPdf} No. : ${uniqueNumber}`],
-        [`${titleForPdf} Due Date : ${validationDate}`, `Enquiry No. : UPCOMING`],
+        [`${titleForPdf} Due Date : ${validationDate}`, `Enquiry No. : ${invoiceDetials.value.enquiry_no}`],
       ];
     
       autoTable(doc, {
@@ -96,8 +96,8 @@ const Gen = async (
 
       const LocationData = [
         [
-          `Customer Name : ${invoiceDetials.value.lead.company_name} \nContact Person : ${invoiceDetials.value.lead.first_name} ${invoiceDetials.value.lead.last_name} \n\nBilling Address : ${invoiceDetials.value.lead.address1 ? invoiceDetials.value.lead.address1 : ""} ${invoiceDetials.value.lead.address2 ? invoiceDetials.value.lead.address2 : ""} ${invoiceDetials.value.lead.city ? invoiceDetials.value.lead.city : ""} - ${invoiceDetials.value.lead.pincode ? invoiceDetials.value.lead.pincode : ""}, ${invoiceDetials.value.lead.states ? invoiceDetials.value.lead.states : ""}, ${invoiceDetials.value.lead.country ? invoiceDetials.value.lead.country : ""}`,
-          `Client Name : ${invoiceDetials.value.client.company_name} \nContact Person : ${invoiceDetials.value.client.first_name} ${invoiceDetials.value.client.last_name} \n\nSite Address : ${invoiceDetials.value.client.address1 ? invoiceDetials.value.client.address1 : ""} ${invoiceDetials.value.client.address2 ? invoiceDetials.value.client.address2 : ""} ${invoiceDetials.value.client.city ? invoiceDetials.value.client.city : ""} - ${invoiceDetials.value.client.pincode ? invoiceDetials.value.client.pincode : ""}, ${invoiceDetials.value.client.states ? invoiceDetials.value.client.states : ""}, ${invoiceDetials.value.client.country ? invoiceDetials.value.client.country : ""}`
+          `Customer Name : ${invoiceDetials.value.lead.company_name} \nContact Person : ${invoiceDetials.value.customer_name.first_name} ${invoiceDetials.value.customer_name.last_name} \n\nBilling Address : ${invoiceDetials.value.lead.address1 ? invoiceDetials.value.lead.address1 : ""} ${invoiceDetials.value.lead.address2 ? invoiceDetials.value.lead.address2 : ""} ${invoiceDetials.value.lead.city ? invoiceDetials.value.lead.city : ""} - ${invoiceDetials.value.lead.pincode ? invoiceDetials.value.lead.pincode : ""}, ${invoiceDetials.value.lead.states ? invoiceDetials.value.lead.states : ""}, ${invoiceDetials.value.lead.country ? invoiceDetials.value.lead.country : ""}`,
+          `Client Name : ${invoiceDetials.value.client.company_name} \nContact Person : ${invoiceDetials.value.client_name.first_name} ${invoiceDetials.value.client_name.last_name} \n\nSite Address : ${invoiceDetials.value.client.address1 ? invoiceDetials.value.client.address1 : ""} ${invoiceDetials.value.client.address2 ? invoiceDetials.value.client.address2 : ""} ${invoiceDetials.value.client.city ? invoiceDetials.value.client.city : ""} - ${invoiceDetials.value.client.pincode ? invoiceDetials.value.client.pincode : ""}, ${invoiceDetials.value.client.states ? invoiceDetials.value.client.states : ""}, ${invoiceDetials.value.client.country ? invoiceDetials.value.client.country : ""}`
         ]
       ];
 

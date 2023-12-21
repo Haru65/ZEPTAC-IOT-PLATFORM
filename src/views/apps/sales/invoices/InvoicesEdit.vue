@@ -874,6 +874,7 @@ interface InvoiceDetails {
     pick: boolean;
     equipment_wise: Array<EDetails>;
   };
+  enquiry_no: string;
   date: string;
   duedate: string;
   status: string;
@@ -992,6 +993,7 @@ export default defineComponent({
         pick: true,
         equipment_wise: [],
       },
+      enquiry_no: "",
       date: "",
       duedate: "",
       status: "",
@@ -1056,6 +1058,7 @@ export default defineComponent({
       InvoiceDetails.value.invoice_no = response.invoice_no;
       InvoiceDetails.value.date = response.date;
       InvoiceDetails.value.duedate = response.duedate;
+      InvoiceDetails.value.enquiry_no = response.enquiry_no;
       InvoiceDetails.value.items = await items;
 
       InvoiceDetails.value.status = response.status;
@@ -1079,13 +1082,11 @@ export default defineComponent({
       });
 
       if (foundLocation) {
-        const {
-          equipment_wise,
-        } = foundLocation;
+        const { equipment_wise } = foundLocation;
 
         equipments.value = [...equipment_wise];
       }
-      
+
       accommodationRef.value = InvoiceDetails.value.items.accomm;
       travellingRef.value = InvoiceDetails.value.items.travel;
       trainingRef.value = InvoiceDetails.value.items.train;
@@ -1179,6 +1180,7 @@ export default defineComponent({
         const response = await getUser(lead_id);
         console.log(response);
         InvoiceDetails.value.lead = response.meta;
+        InvoiceDetails.value.enquiry_no = response.meta.enquiry_no;
         InvoiceDetails.value.lead.id = response.id;
         if (qNsiteSameAsBilling.value) {
           ToggleClient();
@@ -1187,6 +1189,7 @@ export default defineComponent({
           GetClients(lead_id);
         }
       } else {
+        InvoiceDetails.value.enquiry_no = "";
         InvoiceDetails.value.lead = {
           id: "",
           company_name: "",
@@ -1316,11 +1319,9 @@ export default defineComponent({
           equipments.value.pop();
           equipments.value = [...equipment_wise];
 
-
           InvoiceDetails.value.items.equipment_wise = [];
 
           InvoiceDetails.value.total = 0;
-
         }
       }
     }
@@ -1419,11 +1420,10 @@ export default defineComponent({
       await calculateTotal();
     }
 
-    
     /* --------EQUIPMENT WISE LOGIC--------*/
     const dayWiseRef = ref(false);
 
-    function areAllPropertiesNotNull(array) {
+    function areAllPropertiesEmpty(array) {
       return array.some((detail) => {
         const { name, charge, quantity } = detail;
 
@@ -1473,10 +1473,10 @@ export default defineComponent({
         });
         calculateTotalEquipment();
       } else {
-        const result = areAllPropertiesNotNull(
+        const isEmpty = areAllPropertiesEmpty(
           InvoiceDetails.value.items.equipment_wise
         );
-        if (!result) {
+        if (!isEmpty) {
           InvoiceDetails.value.items.equipment_wise.push({
             id: "",
             name: "",
@@ -1499,8 +1499,7 @@ export default defineComponent({
         const { id, name, charge } = foundItem;
         InvoiceDetails.value.items.equipment_wise[index].id = await id;
         InvoiceDetails.value.items.equipment_wise[index].name = await name;
-        InvoiceDetails.value.items.equipment_wise[index].charge =
-          await charge;
+        InvoiceDetails.value.items.equipment_wise[index].charge = await charge;
         InvoiceDetails.value.items.equipment_wise[index].quantity = 1;
         InvoiceDetails.value.items.equipment_wise[index].amount = 0;
         calculateEquipmentCharge(index);
@@ -1623,6 +1622,7 @@ export default defineComponent({
         const {
           quotation_no,
           lead_id,
+          enquiry_no,
           lead,
           client,
           items,
@@ -1639,6 +1639,7 @@ export default defineComponent({
         return (
           quotation_no === "" ||
           lead_id === "" ||
+          enquiry_no === "" ||
           items.id === "" ||
           lead.id === "" ||
           client.id === "" ||
@@ -1674,7 +1675,6 @@ export default defineComponent({
       InvoiceDetails.value.total = 0;
       equipments.value = [];
       dayWiseRef.value = value;
-
     };
 
     // number formating remove
@@ -1709,22 +1709,33 @@ export default defineComponent({
 
         if (
           dayWiseRef.value === true &&
-          InvoiceDetails.value.items.id === ""
+          (InvoiceDetails.value.items.id === "" ||
+            InvoiceDetails.value.items.per_day_charge === "")
         ) {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           loading.value = false;
           return;
         }
 
+        const isEmpty = areAllPropertiesEmpty(
+          InvoiceDetails.value.items.equipment_wise
+        );
+
         if (
-          (dayWiseRef.value === false &&
-            InvoiceDetails.value.items.id === "") ||
-          InvoiceDetails.value.items.equipment_wise.length === 0
+          dayWiseRef.value === false &&
+          (InvoiceDetails.value.items.id === "" ||
+            InvoiceDetails.value.items.equipment_wise.length === 0)
         ) {
           showErrorAlert(
             "Warning",
             "Please Fill at least one equipment correctly"
           );
+          loading.value = false;
+          return;
+        }
+
+        if (dayWiseRef.value === false && isEmpty) {
+          showErrorAlert("Warning", "Please Fill equipment details correctly");
           loading.value = false;
           return;
         }
@@ -1739,6 +1750,8 @@ export default defineComponent({
             "Success",
             "Invoice have been successfully Updated!"
           );
+          
+          route.push({ name: "invoices-list" });
         } else {
           // Handle API error response
           const errorData = response.error;

@@ -111,8 +111,7 @@
           </template>
           <template v-slot:customer_name="{ row: dailyworksheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
-              {{
-                dailyworksheets.customer_name.company_name }}
+              {{ dailyworksheets.customer_name.company_name }}
             </span>
           </template>
           <template v-slot:engineer_name="{ row: dailyworksheets }">
@@ -125,8 +124,11 @@
             </span>
           </template>
           <!-- defualt data -->
-          <template v-slot:work_date="{ row: dailyworksheets }">
-            {{ dailyworksheets.work_date }}
+          <template v-slot:start_time="{ row: dailyworksheets }">
+            {{ dailyworksheets.start_time }}
+          </template>
+          <template v-slot:end_time="{ row: dailyworksheets }">
+            {{ dailyworksheets.end_time }}
           </template>
           <template v-slot:work_status="{ row: dailyworksheets }">
             <span
@@ -142,21 +144,30 @@
           </template>
           <template v-slot:actions="{ row: dailyworksheets }">
             <!--begin::Menu Flex-->
-            <div class="d-flex flex-lg-row">
 
+            <div class="d-flex flex-lg-row">
               <span
-              data-toggle="tooltip" title="Delete Worksheet"
-              class="border rounded badge m-3 py-3 px-4 fs-7 bg-light-primary badge-light-gray text-hover-success cursor-pointer"
-              @click="downloadWorksheet(dailyworksheets.id)"
-                >⤓ Download
+                class="menu-link px-3"
+                data-toggle="tooltip"
+                title="Download Worksheet"
+              >
+                <i
+                  @click="downloadWorksheet(dailyworksheets.id)"
+                  class="las la-download text-gray-600 text-hover-success mb-1 fs-1"
+                ></i>
               </span>
-              <span 
-                @click="deleteWorksheet(dailyworksheets.id, false)"
-                data-toggle="tooltip" title="Delete Worksheet"
-                class="border rounded-circle badge m-3 py-3 px-4 bg-light-danger fs-7 badge-light-gray text-hover-danger cursor-pointer"
-                >X
+              <span
+                class="menu-link px-3"
+                data-toggle="tooltip"
+                title="Delete Worksheet"
+              >
+                <i
+                  @click="deleteWorksheet(dailyworksheets.id, false)"
+                  class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-1"
+                ></i>
               </span>
             </div>
+
             <!--end::Menu FLex-->
           </template>
         </Datatable>
@@ -241,8 +252,14 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
-        columnName: "Work Date",
-        columnLabel: "work_date",
+        columnName: "Work Start Date",
+        columnLabel: "start_time",
+        sortEnabled: true,
+        columnWidth: 175,
+      },
+      {
+        columnName: "Work End Date",
+        columnLabel: "end_time",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -287,9 +304,13 @@ export default defineComponent({
         console.log(response);
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({ start_time, end_time, ...rest }) => ({
+            start_time: moment(start_time).format("MMMM Do YYYY"),
+            end_time: moment(end_time).format("MMMM Do YYYY"),
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -316,9 +337,13 @@ export default defineComponent({
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({ start_time, end_time, ...rest }) => ({
+            start_time: moment(start_time).format("MMMM Do YYYY"),
+            end_time: moment(end_time).format("MMMM Do YYYY"),
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -346,9 +371,13 @@ export default defineComponent({
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({ start_time, end_time, ...rest }) => ({
+            start_time: moment(start_time).format("MMMM Do YYYY"),
+            end_time: moment(end_time).format("MMMM Do YYYY"),
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -470,9 +499,13 @@ export default defineComponent({
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({ start_time, end_time, ...rest }) => ({
+            start_time: moment(start_time).format("MMMM Do YYYY"),
+            end_time: moment(end_time).format("MMMM Do YYYY"),
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -505,7 +538,6 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-    
     const worksheetInfo = ref({
       id: "",
       rgp_id: "",
@@ -523,45 +555,44 @@ export default defineComponent({
       standard_used: "",
       witnessed_by: "",
 
-      client_address:{
+      client_address: {
         address1: "",
         address2: "",
         city: "",
         pincode: "",
         states: "",
-        country: ""
+        country: "",
       },
 
-      company_details:{
+      company_details: {
         company_name: "",
         company_logo: getAssetPath("media/avatars/default.png"),
       },
-      
+
       customer_data: {
-        id:"",
-        first_name : "",
+        id: "",
+        first_name: "",
         last_name: "",
       },
 
       client_data: {
-        id:"",
-        first_name : "",
+        id: "",
+        first_name: "",
         last_name: "",
         mobile: "",
         company: {
           company_name: "",
-        }
+        },
       },
 
       quotation_details: {
-        id:"",
+        id: "",
         customer_id: "",
         quotation_no: "",
       },
-    })
+    });
 
     const downloadWorksheet = async (id: any) => {
-
       const res = await getDailyWorksheet(id);
 
       worksheetInfo.value.id = res.result.id;
@@ -570,47 +601,76 @@ export default defineComponent({
       worksheetInfo.value.engineer_id = res.result.engineer_id;
       worksheetInfo.value.company_id = res.result.company_id;
       worksheetInfo.value.scope_of_work = res.result.scope_of_work;
-      worksheetInfo.value.problem = res.result.problem ? res.result.problem : "NA";
+      worksheetInfo.value.problem = res.result.problem
+        ? res.result.problem
+        : "NA";
       worksheetInfo.value.work_date = res.result.work_date;
       worksheetInfo.value.tests = JSON.parse(res.result.tests);
-      worksheetInfo.value.other_test = res.result.other_test ? res.result.other_test : "NA";
+      worksheetInfo.value.other_test = res.result.other_test
+        ? res.result.other_test
+        : "NA";
       worksheetInfo.value.start_time = res.result.start_time;
       worksheetInfo.value.end_time = res.result.end_time;
       worksheetInfo.value.work_status = res.result.work_status;
       worksheetInfo.value.standard_used = res.result.standard_used;
       worksheetInfo.value.witnessed_by = res.result.witnessed_by;
 
-      worksheetInfo.value.client_address.address1 = res.result.client_address.address1 ? res.result.client_address.address1 : "";
-      worksheetInfo.value.client_address.address2 = res.result.client_address.address2 ? res.result.client_address.address2 : "";
-      worksheetInfo.value.client_address.city = res.result.client_address.city ? res.result.client_address.city : "";
-      worksheetInfo.value.client_address.pincode = res.result.client_address.pincode ? res.result.client_address.pincode : "";
-      worksheetInfo.value.client_address.states = res.result.client_address.states ? res.result.client_address.states : "";
-      worksheetInfo.value.client_address.country = res.result.client_address.country ? res.result.client_address.country : "";
+      worksheetInfo.value.client_address.address1 = res.result.client_address
+        .address1
+        ? res.result.client_address.address1
+        : "";
+      worksheetInfo.value.client_address.address2 = res.result.client_address
+        .address2
+        ? res.result.client_address.address2
+        : "";
+      worksheetInfo.value.client_address.city = res.result.client_address.city
+        ? res.result.client_address.city
+        : "";
+      worksheetInfo.value.client_address.pincode = res.result.client_address
+        .pincode
+        ? res.result.client_address.pincode
+        : "";
+      worksheetInfo.value.client_address.states = res.result.client_address
+        .states
+        ? res.result.client_address.states
+        : "";
+      worksheetInfo.value.client_address.country = res.result.client_address
+        .country
+        ? res.result.client_address.country
+        : "";
 
       worksheetInfo.value.customer_data.id = res.result.customer_data.id;
-      worksheetInfo.value.customer_data.first_name = res.result.customer_data.first_name;
-      worksheetInfo.value.customer_data.last_name = res.result.customer_data.last_name;
+      worksheetInfo.value.customer_data.first_name =
+        res.result.customer_data.first_name;
+      worksheetInfo.value.customer_data.last_name =
+        res.result.customer_data.last_name;
 
       worksheetInfo.value.client_data.id = res.result.client_data.id;
-      worksheetInfo.value.client_data.first_name = res.result.client_data.first_name;
-      worksheetInfo.value.client_data.last_name = res.result.client_data.last_name;
-      worksheetInfo.value.client_data.mobile = res.result.client_data.mobile ? res.result.client_data.mobile : "";
-      worksheetInfo.value.client_data.company.company_name = res.result.client_data.company.company_name;
+      worksheetInfo.value.client_data.first_name =
+        res.result.client_data.first_name;
+      worksheetInfo.value.client_data.last_name =
+        res.result.client_data.last_name;
+      worksheetInfo.value.client_data.mobile = res.result.client_data.mobile
+        ? res.result.client_data.mobile
+        : "";
+      worksheetInfo.value.client_data.company.company_name =
+        res.result.client_data.company.company_name;
 
       worksheetInfo.value.quotation_details = res.result.quotation_details;
 
-      worksheetInfo.value.company_details.company_name = res.result.company_details.company_name;
-      worksheetInfo.value.company_details.company_logo = res.result.company_details.company_logo
-            ? "data: image/png;base64," + res.result.company_details.company_logo
-            : getAssetPath("media/avatars/default.png")
-      
+      worksheetInfo.value.company_details.company_name =
+        res.result.company_details.company_name;
+      worksheetInfo.value.company_details.company_logo = res.result
+        .company_details.company_logo
+        ? "data: image/png;base64," + res.result.company_details.company_logo
+        : getAssetPath("media/avatars/default.png");
+
       console.log(worksheetInfo.value);
 
-      const worksheetName =  `${worksheetInfo.value.quotation_details.quotation_no}_${worksheetInfo.value.rgp_no}`;
+      const worksheetName = `${worksheetInfo.value.quotation_details.quotation_no}_${worksheetInfo.value.rgp_no}`;
 
       await worksheetGen(id, worksheetName, worksheetInfo);
-
-    }
+    };
 
     return {
       tableData,
@@ -633,7 +693,6 @@ export default defineComponent({
       PageLimitPoiner,
       Limits,
       downloadWorksheet,
-
     };
   },
 });

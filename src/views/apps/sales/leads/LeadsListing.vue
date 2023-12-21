@@ -99,32 +99,30 @@
         :items-per-page-dropdown-enabled="false"
         :loading="loading"
       >
-        <!-- img data -->
-        <template v-slot:name="{ row: leads }">
+        <template v-slot:enquiry_no="{ row: leads }">
+          {{ leads.enquiry_no }}
+        </template>
+        <template v-slot:lead_company="{ row: leads }">
+          {{ leads.lead_company }}
+        </template>
+        <template v-slot:location="{ row: leads }">
           <span class="text-gray-600 text-hover-primary mb-1">
-            {{ leads.name }}
+            {{ leads.location?.city }}
+            {{ leads.location?.states }}
           </span>
         </template>
-        <!-- defualt data -->
-        <template v-slot:email="{ row: leads }">
-          <a
-            v-bind:href="'mailto:' + leads.email"
-            class="text-gray-600 text-hover-primary mb-1"
-          >
-            {{ leads.email }}
-          </a>
+        <!-- img data -->
+        <template v-slot:name="{ row: leads }">
+          {{ leads.name }}
         </template>
         <template v-slot:mobile="{ row: leads }">
           {{ leads.mobile }}
         </template>
-        <template v-slot:role="{ row: leads }">
-          {{ leads.role }}
-        </template>
-        <template v-slot:company_name="{ row: leads }">
-          {{ leads.meta.company_name }}
-        </template>
         <template v-slot:created_at="{ row: leads }">
           {{ leads.created_at }}
+        </template>
+        <template v-slot:company="{ row: leads }">
+          {{ leads.company.company_name }}
         </template>
         <template v-slot:actions="{ row: leads }">
           <!--begin::Menu Flex-->
@@ -203,16 +201,28 @@ export default defineComponent({
   setup() {
     const tableHeader = ref([
       {
-        columnName: "Name",
-        columnLabel: "name",
+        columnName: "Enquiry Number",
+        columnLabel: "enquiry_no",
         sortEnabled: true,
         columnWidth: 155,
       },
       {
-        columnName: "Email",
-        columnLabel: "email",
+        columnName: "Company Name",
+        columnLabel: "lead_company",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 155,
+      },
+      {
+        columnName: "Location",
+        columnLabel: "location",
+        sortEnabled: true,
+        columnWidth: 155,
+      },
+      {
+        columnName: "Contact Person",
+        columnLabel: "name",
+        sortEnabled: true,
+        columnWidth: 155,
       },
       {
         columnName: "Mobile",
@@ -221,14 +231,14 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
-        columnName: "Company Name",
-        columnLabel: "company_name",
+        columnName: "Added On",
+        columnLabel: "created_at",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
-        columnName: "Created Date",
-        columnLabel: "created_at",
+        columnName: "Main Company",
+        columnLabel: "company",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -265,17 +275,34 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getLeads(
-          `page=${page}&limit=${limit.value}`
-        );
+        const response = await getLeads(`page=${page}&limit=${limit.value}`);
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.data.map(
-          ({ created_at, ...rest }) => ({
-            ...rest,
+          ({
+            id,
+            first_name,
+            last_name,
+            mobile,
+            company_name,
+            meta,
+            created_at,
+            ...rest
+          }) => ({
+            id,
+            enquiry_no: meta.enquiry_no,
+            lead_company: meta.company_name,
+            location: {
+              city: meta.city ?? "",
+              states: meta.states ?? "",
+            },
+            name: first_name + " " + last_name,
+            mobile,
+            company: company_name,
             created_at: moment(created_at).format("MMMM Do YYYY"),
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -298,17 +325,34 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getLeads(
-          `page=${page.value}&limit=${limit}`
-        );
+        const response = await getLeads(`page=${page.value}&limit=${limit}`);
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.data.map(
-          ({ created_at, ...rest }) => ({
-            ...rest,
+          ({
+            id,
+            first_name,
+            last_name,
+            mobile,
+            company_name,
+            meta,
+            created_at,
+            ...rest
+          }) => ({
+            id,
+            enquiry_no: meta.enquiry_no,
+            lead_company: meta.company_name,
+            location: {
+              city: meta.city ?? "",
+              states: meta.states ?? "",
+            },
+            name: first_name + " " + last_name,
+            mobile,
+            company: company_name,
             created_at: moment(created_at).format("MMMM Do YYYY"),
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -345,11 +389,28 @@ export default defineComponent({
         );
         console.log(response);
         tableData.value = response.result.data.map(
-          ({ created_at, role_id, first_name, last_name, ...rest }) => ({
-            ...rest,
+          ({
+            id,
+            first_name,
+            last_name,
+            mobile,
+            company_name,
+            meta,
+            created_at,
+            ...rest
+          }) => ({
+            id,
+            enquiry_no: meta.enquiry_no,
+            lead_company: meta.company_name,
+            location: {
+              city: meta.city ?? "",
+              states: meta.states ?? "",
+            },
             name: first_name + " " + last_name,
+            mobile,
+            company: company_name,
             created_at: moment(created_at).format("MMMM Do YYYY"),
-            role_id: get_role(role_id),
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -449,9 +510,28 @@ export default defineComponent({
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
-            ...rest,
+          ({
+            id,
+            first_name,
+            last_name,
+            mobile,
+            company_name,
+            meta,
+            created_at,
+            ...rest
+          }) => ({
+            id,
+            enquiry_no: meta.enquiry_no,
+            lead_company: meta.company_name,
+            location: {
+              city: meta.city ?? "",
+              states: meta.states ?? "",
+            },
+            name: first_name + " " + last_name,
+            mobile,
+            company: company_name,
             created_at: moment(created_at).format("MMMM Do YYYY"),
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);

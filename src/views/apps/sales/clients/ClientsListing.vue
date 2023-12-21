@@ -102,34 +102,27 @@
         :items-per-page-dropdown-enabled="false"
         :loading="loading"
       >
+        <template v-slot:client_company="{ row: clients }">
+          {{ clients.client_company }}
+        </template>
+        <template v-slot:customer_company="{ row: clients }">
+          {{ clients.customer_company }}
+        </template>
+        <template v-slot:location="{ row: clients }">
+          <span class="text-gray-600 text-hover-primary mb-1">
+            {{ clients.location?.city }}
+            {{ clients.location?.states }}
+          </span>
+        </template>
         <!-- img data -->
         <template v-slot:name="{ row: clients }">
-          <div class="d-flex justify-content-start align-items-center">
-            <!-- <img :src="user.name" class="w-45px rounded-circle" alt="" /> -->
-            <span style="margin-left: 5.5%">
-              <span class="text-gray-600 text-hover-primary mb-1">
-                {{ clients.first_name + " " + clients.last_name }}
-              </span>
-            </span>
-          </div>
-        </template>
-        <!-- defualt data -->
-        <template v-slot:email="{ row: clients }">
-          <a
-            v-bind:href="'mailto:' + clients.email"
-            class="text-gray-600 text-hover-primary mb-1"
-          >
-            {{ clients.email }}
-          </a>
+          {{ clients.name }}
         </template>
         <template v-slot:mobile="{ row: clients }">
           {{ clients.mobile }}
         </template>
         <template v-slot:company="{ row: clients }">
-          {{ clients.company_name[0].company_name }}
-        </template>
-        <template v-slot:date="{ row: clients }">
-          {{ clients.created_at }}
+          {{ clients.company.company_name }}
         </template>
         <template v-slot:actions="{ row: clients }">
           <!--begin::Menu Flex-->
@@ -209,16 +202,28 @@ export default defineComponent({
     const loading = ref(true);
     const tableHeader = ref([
       {
-        columnName: "Name",
-        columnLabel: "name",
+        columnName: "Client Name",
+        columnLabel: "client_company",
         sortEnabled: true,
         columnWidth: 155,
       },
       {
-        columnName: "Email",
-        columnLabel: "email",
+        columnName: "Lead Company",
+        columnLabel: "customer_company",
+        sortEnabled: true,
+        columnWidth: 155,
+      },
+      {
+        columnName: "Location",
+        columnLabel: "location",
         sortEnabled: true,
         columnWidth: 175,
+      },
+      {
+        columnName: "Contact Person",
+        columnLabel: "name",
+        sortEnabled: true,
+        columnWidth: 155,
       },
       {
         columnName: "Mobile",
@@ -229,12 +234,6 @@ export default defineComponent({
       {
         columnName: "Company Name",
         columnLabel: "company",
-        sortEnabled: true,
-        columnWidth: 175,
-      },
-      {
-        columnName: "Created Date",
-        columnLabel: "date",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -251,13 +250,31 @@ export default defineComponent({
     async function client_listing(): Promise<void> {
       try {
         ApiService.setHeader();
-        const response = await getClients(`page=${page.value}&limit=${limit.value}`);
+        const response = await getClients(
+          `page=${page.value}&limit=${limit.value}`
+        );
         console.log(response);
         tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
+          ({
+            id,
+            first_name,
+            last_name,
+            mobile,
+            company_name,
+            meta,
+            ...rest
+          }) => ({
+            id,
+            client_company: meta.company_name,
+            customer_company: meta.customer_company.company_name ?? "",
+            location: {
+              city: meta.city ?? "",
+              states: meta.states ?? "",
+            },
+            name: first_name + " " + last_name,
+            mobile,
+            company: company_name,
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-            role_id: get_role(role_id),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -299,10 +316,26 @@ export default defineComponent({
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
+          ({
+            id,
+            first_name,
+            last_name,
+            mobile,
+            company_name,
+            meta,
+            ...rest
+          }) => ({
+            id,
+            client_company: meta.company_name,
+            customer_company: meta.customer_company.company_name ?? "",
+            location: {
+              city: meta.city ?? "",
+              states: meta.states ?? "",
+            },
+            name: first_name + " " + last_name,
+            mobile,
+            company: company_name,
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-            role_id: get_role(role_id),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -331,10 +364,26 @@ export default defineComponent({
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
+          ({
+            id,
+            first_name,
+            last_name,
+            mobile,
+            company_name,
+            meta,
+            ...rest
+          }) => ({
+            id,
+            client_company: meta.company_name,
+            customer_company: meta.customer_company.company_name ?? "",
+            location: {
+              city: meta.city ?? "",
+              states: meta.states ?? "",
+            },
+            name: first_name + " " + last_name,
+            mobile,
+            company: company_name,
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-            role_id: get_role(role_id),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -371,11 +420,26 @@ export default defineComponent({
         );
         console.log(response);
         tableData.value = response.result.data.map(
-          ({ created_at, role_id, first_name, last_name, ...rest }) => ({
-            ...rest,
+          ({
+            id,
+            first_name,
+            last_name,
+            mobile,
+            company_name,
+            meta,
+            ...rest
+          }) => ({
+            id,
+            client_company: meta.company_name,
+            customer_company: meta.customer_company.company_name ?? "",
+            location: {
+              city: meta.city ?? "",
+              states: meta.states ?? "",
+            },
             name: first_name + " " + last_name,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-            role_id: get_role(role_id),
+            mobile,
+            company: company_name,
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -479,10 +543,26 @@ export default defineComponent({
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
+          ({
+            id,
+            first_name,
+            last_name,
+            mobile,
+            company_name,
+            meta,
+            ...rest
+          }) => ({
+            id,
+            client_company: meta.company_name,
+            customer_company: meta.customer_company.company_name ?? "",
+            location: {
+              city: meta.city ?? "",
+              states: meta.states ?? "",
+            },
+            name: first_name + " " + last_name,
+            mobile,
+            company: company_name,
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-            role_id: get_role(role_id),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);

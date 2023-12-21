@@ -291,7 +291,7 @@
                       data-bs-toggle="modal"
                       :data-bs-target="'#kt_modal_new_address'"
                     >
-                      Add More Leads
+                    Add more contact persons
                     </button>
                   </div>
 

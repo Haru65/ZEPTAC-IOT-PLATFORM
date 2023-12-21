@@ -715,6 +715,36 @@ export async function updateQuotation(data: any, id) {
     }
 }
 
+export async function DownloadQuotation(data: any) {
+    try {
+        //console.log(data)
+        const id = { "id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post("get_information_of_quotation",id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getLeadNCustomer(data: any) {
+    try {
+        //console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post("get_lead_and_customer",id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
+
+
 // INVOICES
 
 // custom
@@ -816,6 +846,19 @@ export async function deleteinvoice(data) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(INVOICE_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function DownloadInvoice(data: any) {
+    try {
+        //console.log(data)
+        const id = { "id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post("get_information_of_invoice",id);
         return response.data;
     } catch (errors) {
         console.error(errors);

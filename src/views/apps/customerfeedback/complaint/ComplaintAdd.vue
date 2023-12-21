@@ -29,7 +29,7 @@
                   type="text"
                   name="customer_name"
                   class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter document name"
+                  placeholder="Enter customer name"
                   v-model="complaintDetails.customer_name"
                 />
                 <div class="fv-plugins-message-container">

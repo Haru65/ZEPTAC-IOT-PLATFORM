@@ -29,26 +29,30 @@
           <tbody>
             <tr v-for="(detail, index) in $props.details" :key="index">
               <td class="text-nowrap">
-                <div class="form-group">
-                  <el-select
-                    v-model="detail.ahu_condition"
-                    filterable
-                    @change="setAhuCondition($event, index)"
-                    class="ms-3 min-w-200px"
-                    name="ahu_condition"
-                    placeholder="ON / OFF"
+                <div class="form-group min-w-150px">
+                  <div
+                    class="form-check form-switch form-check-custom form-check-primary form-check-solid gap-6"
                   >
-                    <el-option
-                      value=""
-                      disabled="disabled"
-                      label="Select Condition"
-                      key=""
+                    <label
+                      class="form-check-label fw-bold text-primary fw-semobold fs-5"
                     >
-                      Select Condition
-                    </el-option>
-                    <el-option value="ON" label="ON" key="ON"> ON </el-option>
-                    <el-option value="OFF" label="OFF" key="OFF"> OFF </el-option>
-                  </el-select>
+                      OFF
+                    </label>
+                    <input
+                      class="form-check-input w-60px"
+                      type="checkbox"
+                      :checked="detail.ahu_condition === 'ON' ? true : false"
+                      :value="detail.ahu_condition === 'ON' ? true : false"
+                      name="ahu_condition"
+                      id="ahu_condition"
+                      v-on:change="setAhuCondition($event, index)"
+                    />
+                    <label
+                      class="form-check-label fw-bold text-primary fw-semobold fs-5"
+                    >
+                      ON
+                    </label>
+                  </div>
                 </div>
               </td>
               <td class="text-nowrap">

@@ -12,10 +12,7 @@
       )}')`"
     >
       <!--begin::Title-->
-      <h3 class="text-white fw-semobold px-9 mt-10 mb-6">
-        Notifications
-        <span class="fs-8 opacity-75 ms-3 badge badge-primary">{{ $props.TotalNotification }}</span>
-      </h3>
+      <h3 class="text-white fw-semobold px-9 mt-10 mb-6">Notifications</h3>
       <!--end::Title-->
 
       <!--begin::Tabs-->
@@ -94,6 +91,14 @@
             </div>
             <!--end::Item-->
           </template>
+
+          <div
+            class="p-4 text-gray-700 fw-semobold fs-6"
+            v-if="$props.calibrationNotificationCount === 0"
+          >
+            Calibration for all instruments is up-to-date. Currently, there are
+            no pending calibration.
+          </div>
         </div>
         <!--end::Items-->
       </div>
@@ -135,6 +140,14 @@
             </div>
             <!--end::Item-->
           </template>
+
+          <div
+            class="p-4 text-gray-700 fw-semobold fs-6"
+            v-if="$props.maintenanaceNotificationCount === 0"
+          >
+            All instruments are currently functioning well. No maintenance is currently required.
+          </div>
+
         </div>
         <!--end::Items-->
       </div>

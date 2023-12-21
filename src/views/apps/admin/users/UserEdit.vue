@@ -546,7 +546,7 @@
               <!--begin::Row-->
               <div class="row">
                 <!--begin::Col-->
-                <div class="col-lg fv-row">
+                <div class="col-lg fv-row position-relative">
                   <Field
                     type="file"
                     id="adhar"
@@ -554,11 +554,27 @@
                     class="form-control form-control-lg form-control-solid"
                     @change="handleFileChange"
                     accept=".pdf"
+                    placeholder="Heylalk "
                   />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="adhar" />
-                    </div>
+                  <div
+                    v-if="profileDetails.adhar"
+                    class="position-absolute end-0 top-50 translate-middle-y"
+                  >
+                    <i
+                      class="fas fs-4 fa-check-circle text-success me-6"
+                      data-toggle="tooltip"
+                      title="File is selected"
+                    ></i>
+                  </div>
+                  <div
+                    v-else
+                    class="position-absolute end-0 top-50 translate-middle-y"
+                  >
+                    <i
+                      class="fas fs-4 fa-times-circle text-danger me-6"
+                      data-toggle="tooltip"
+                      title="File is not selected"
+                    ></i>
                   </div>
                 </div>
                 <!--end::Col-->
@@ -581,7 +597,7 @@
               <!--begin::Row-->
               <div class="row">
                 <!--begin::Col-->
-                <div class="col-lg fv-row">
+                <div class="col-lg fv-row position-relative">
                   <div>
                     <Field
                       type="file"
@@ -591,10 +607,25 @@
                       @change="handleFileChange"
                       accept=".pdf"
                     />
-                    <div class="fv-plugins-message-container">
-                      <div class="fv-help-block">
-                        <ErrorMessage name="pan" />
-                      </div>
+                    <div
+                      v-if="profileDetails.pan"
+                      class="position-absolute end-0 top-50 translate-middle-y"
+                    >
+                      <i
+                        class="fas fs-4 fa-check-circle text-success me-6"
+                        data-toggle="tooltip"
+                        title="File is selected"
+                      ></i>
+                    </div>
+                    <div
+                      v-else
+                      class="position-absolute end-0 top-50 translate-middle-y"
+                    >
+                      <i
+                        class="fas fs-4 fa-times-circle text-danger me-6"
+                        data-toggle="tooltip"
+                        title="File is not selected"
+                      ></i>
                     </div>
                   </div>
                 </div>
@@ -727,7 +758,7 @@ export default defineComponent({
           response.meta.profile_pic_data != ""
             ? "data: image/png;base64," + response.meta.profile_pic_data
             : getAssetPath("media/avatars/blank.png"),
-        image: "",
+        image: response.meta.profile_pic_data ?? "",
         first_name: response.first_name,
         last_name: response.last_name,
         email: response.email,
@@ -758,21 +789,32 @@ export default defineComponent({
       // Get the selected file
       const selectedFile = event.target?.files?.[0];
 
+      if (!selectedFile) {
+        alert("Please Select a file");
+      }
+
       if (selectedFile) {
         // Check if the selected file is a PDF
         if (selectedFile.type === "application/pdf") {
           const reader = new FileReader();
 
-          reader.onload = (e) => {
-            if (e.target) {
-              const result = e.target.result as string;
+          reader.onload = () => {
+            try {
+              const base64Data = reader.result
+                ?.toString()
+                .replace(/^data:application\/pdf;base64,/, "");
 
-              console.log(" -> ", e.target);
-              if (event.target.id === "pan") {
-                profileDetails.value.pan = result;
-              } else if (event.target.id === "adhar") {
-                profileDetails.value.adhar = result;
+              if (base64Data) {
+                if (event.target.id === "pan") {
+                  profileDetails.value.pan = base64Data;
+                } else if (event.target.id === "adhar") {
+                  profileDetails.value.adhar = base64Data;
+                }
+              } else {
+                console.error("Error: Failed to read the image data.");
               }
+            } catch (e) {
+              console.error("Error:", e);
             }
           };
 
@@ -939,6 +981,7 @@ export default defineComponent({
       profileDetails.value.disp_avatar = getAssetPath(
         "media/avatars/blank.png"
       );
+      profileDetails.value.image = "";
     };
 
     const updateImage = (e: any) => {
@@ -957,7 +1000,6 @@ export default defineComponent({
         file_size.value = false;
         profileDetails.value.disp_avatar = URL.createObjectURL(file);
         const reader = new FileReader();
-
         reader.onload = function () {
           try {
             const base64Data = reader.result

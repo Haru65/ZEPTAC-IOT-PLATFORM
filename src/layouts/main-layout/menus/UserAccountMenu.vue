@@ -10,9 +10,16 @@
         <!--begin::Avatar-->
         <div class="symbol symbol-50px me-5">
           <img
+            v-if="User.meta.profile_pic_data"
             class="rounded-circle"
             alt="Logo"
-            :src="`data: image/png;base64,` + User.meta.profile_pic_data"
+            :src="`data:image/png;base64,` + User.meta.profile_pic_data"
+          />
+          <img
+            v-else
+            class="rounded-circle"
+            alt="Logo"
+            :src="`data:image/png;base64,` + blank64"
           />
         </div>
         <!--end::Avatar-->
@@ -316,6 +323,7 @@ import { useI18n } from "vue-i18n";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import { Identifier } from "@/core/config/WhichUserConfig";
+import { blank64 } from "./blank";
 
 export default defineComponent({
   name: "kt-user-menu",
@@ -381,6 +389,7 @@ export default defineComponent({
       getAssetPath,
       User,
       Identifier,
+      blank64,
     };
   },
 });

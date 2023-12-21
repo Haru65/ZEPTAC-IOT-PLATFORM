@@ -624,7 +624,7 @@ export default defineComponent({
 
       details: [
         {
-          ahu_condition: "",
+          ahu_condition: "ON",
           time: "",
           particle_readings: {
             reading_1: "",
@@ -698,15 +698,24 @@ export default defineComponent({
     };
 
     async function SetAhuCondition(e, index) {
-      console.log(e);
-      recoveryTestDetails.value.details[index].ahu_condition = await e;
+      console.log(e.target.checked);
+      if (e.target.checked === true) {
+        recoveryTestDetails.value.details[index].ahu_condition = "ON";
+      } else {
+        recoveryTestDetails.value.details[index].ahu_condition = "OFF";
+      }
+      console.log(recoveryTestDetails.value.details);
     }
 
     async function SetTime(e, index) {
       console.log(e);
-      recoveryTestDetails.value.details[index].time = await moment(e).format(
-        "YYYY-MM-DD HH:mm:ss"
-      );
+      if (e != null) {
+        recoveryTestDetails.value.details[index].time = await moment(e).format(
+          "YYYY-MM-DD HH:mm:ss"
+        );
+      } else {
+        recoveryTestDetails.value.details[index].time = "";
+      }
     }
 
     async function setReportName(e) {
@@ -766,7 +775,7 @@ export default defineComponent({
     const addNewRow = () => {
       if (!recoveryTestDetails.value.details.length) {
         recoveryTestDetails.value.details.push({
-          ahu_condition: "",
+          ahu_condition: "ON",
           time: "",
           particle_readings: {
             reading_1: "",
@@ -780,7 +789,7 @@ export default defineComponent({
         );
         if (!result) {
           recoveryTestDetails.value.details.push({
-            ahu_condition: "",
+            ahu_condition: "ON",
             time: "",
             particle_readings: {
               reading_1: "",
@@ -870,7 +879,7 @@ export default defineComponent({
 
       recoveryTestDetails.value.details = [
         {
-          ahu_condition: "",
+          ahu_condition: "ON",
           time: "",
           particle_readings: {
             reading_1: "",
@@ -927,7 +936,7 @@ export default defineComponent({
           showErrorAlert("Warning", "Please fill all the details Correctly");
           return;
         }
-      } else if(EquipmentRef.value === false){
+      } else if (EquipmentRef.value === false) {
         if (
           !recoveryTestDetails.value.room_name ||
           !recoveryTestDetails.value.ahu_no ||

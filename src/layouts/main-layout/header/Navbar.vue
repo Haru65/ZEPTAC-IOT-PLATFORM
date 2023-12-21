@@ -111,10 +111,17 @@
         data-kt-menu-placement="bottom-end"
       >
         <img
-          class="rounded-circle"
-          :src="`data: image/png;base64,` + User.meta.profile_pic_data"
-          alt="user"
-        />
+            v-if="User.meta.profile_pic_data"
+            class="rounded-circle"
+            alt="user"
+            :src="`data:image/png;base64,` + User.meta.profile_pic_data"
+          />
+          <img
+            v-else
+            class="rounded-circle"
+            alt="user"
+            :src="`data:image/png;base64,` + blank64"
+          />
       </div>
       <KTUserMenu />
       <!--end::Menu wrapper-->
@@ -152,6 +159,7 @@ import { useThemeStore } from "@/stores/theme";
 import { useAuthStore } from "@/stores/auth";
 import { calibrationNotification, maintenanceNotification } from "@/stores/api";
 import moment from "moment";
+import { blank64 } from "./blank";
 
 interface Instrument {
   id: string;
@@ -255,6 +263,7 @@ export default defineComponent({
       maintenanaceNotificationCount,
       calibrationNotificationCount,
       TotalNotification,
+      blank64,
     };
   },
 });

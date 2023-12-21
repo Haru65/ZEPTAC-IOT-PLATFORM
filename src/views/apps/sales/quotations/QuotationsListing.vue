@@ -96,7 +96,7 @@
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
-        :header="tableHeader"
+        :header="filteredTableHeader"
         :checkbox-enabled="true"
         :items-per-page="limit"
         :items-per-page-dropdown-enabled="false"
@@ -114,20 +114,29 @@
             {{ quotations.quotation_no }}
           </span>
         </template>
-        <template v-slot:customer_name="{ row: quotations }">
+        <template v-slot:customer_company="{ row: quotations }">
           <span class="text-gray-600 text-hover-primary mb-1">
-            {{ quotations.customer_name }}
+            {{ quotations.customer_company }}
+          </span>
+        </template>
+        <template v-slot:site_location="{ row: quotations }">
+          <span class="text-gray-600 text-hover-primary mb-1">
+            {{ quotations.site_location?.city }}
+            {{ quotations.site_location?.states }}
           </span>
         </template>
         <!-- defualt data -->
-        <template v-slot:company="{ row: quotations }">
-          {{ quotations.company }}
+        <template
+          v-slot:company_name="{ row: quotations }"
+          v-if="identifier == 'Admin'"
+        >
+          {{ quotations.company_name }}
         </template>
         <template v-slot:date="{ row: quotations }">
           {{ quotations.date }}
         </template>
-        <template v-slot:duedate="{ row: quotations }">
-          {{ quotations.duedate }}
+        <template v-slot:total="{ row: quotations }">
+          {{ formatPrice(quotations.total) }}
         </template>
         <template v-slot:status="{ row: quotations }">
           <!-- depending on status badge change -->
@@ -152,29 +161,48 @@
             >{{ GetQuotationStatus(quotations.status) }}</span
           >
         </template>
-        <template v-slot:total="{ row: quotations }">
-          {{ formatPrice(quotations.total) }}
-        </template>
         <template v-slot:actions="{ row: quotations }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
+            <span
+              class="menu-link px-3"
+              data-toggle="tooltip"
+              title="Download Quotation"
+            >
+              <i
+                @click="downloadQuotation(quotations.id)"
+                class="las la-download text-gray-600 text-hover-success mb-1 fs-1"
+              ></i>
+            </span>
+            <span
+              class="menu-link px-3"
+              data-toggle="tooltip"
+              title="View Quotation"
+            >
               <router-link :to="`./edit/${quotations.id}`">
                 <i
                   class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
                 ></i>
               </router-link>
             </span>
-            <span class="menu-link px-3">
+            <span
+              class="menu-link px-3"
+              data-toggle="tooltip"
+              title="Delete Quotation"
+            >
               <i
                 @click="deleteInvoice(quotations.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
+                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-1"
               ></i>
             </span>
-            <span class="menu-link px-3">
+            <span
+              class="menu-link px-3"
+              data-toggle="tooltip"
+              title="Duplicate Quotation"
+            >
               <i
                 @click="dupQuotation(quotations.id)"
-                class="las la-copy text-gray-600 text-hover-warning mb-1 fs-2"
+                class="las la-copy text-gray-600 text-hover-warning mb-1 fs-1"
               ></i>
             </span>
           </div>
@@ -220,7 +248,7 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, computed } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { IQuotations } from "@/core/model/quotation";
@@ -231,6 +259,7 @@ import {
   addQuotation,
   QuotationSearch,
   GetIncrQuotationId,
+  DownloadQuotation,
 } from "@/stores/api";
 import arraySort from "array-sort";
 import { useAuthStore } from "@/stores/auth";
@@ -238,20 +267,16 @@ import { formatPrice } from "@/core/config/DataFormatter";
 import { GetQuotationStatus } from "@/core/config/QuotationStatusConfig";
 import moment from "moment";
 import Swal from "sweetalert2";
+import { Identifier } from "@/core/config/WhichUserConfig";
+import { Gen } from "@/core/config/PdfGenerator";
 
 export default defineComponent({
-  name: "quotations-listing",
+  name: "quotation-list",
   components: {
     Datatable,
   },
   setup() {
     const tableHeader = ref([
-      {
-        columnName: "Id",
-        columnLabel: "id",
-        sortEnabled: true,
-        columnWidth: 35,
-      },
       {
         columnName: "Quotation No",
         columnLabel: "quotation_no",
@@ -260,19 +285,31 @@ export default defineComponent({
       },
       {
         columnName: "Customer Name",
-        columnLabel: "customer_name",
+        columnLabel: "customer_company",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
-        columnName: "Invoice Date",
+        columnName: "Site Location",
+        columnLabel: "site_location",
+        sortEnabled: true,
+        columnWidth: 175,
+      },
+      {
+        columnName: "Company Name",
+        columnLabel: "company_name",
+        sortEnabled: true,
+        columnWidth: 175,
+      },
+      {
+        columnName: "Quotation Date",
         columnLabel: "date",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
-        columnName: "Invoice Due Date",
-        columnLabel: "duedate",
+        columnName: "Quotation Amount",
+        columnLabel: "total",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -283,12 +320,6 @@ export default defineComponent({
         columnWidth: 75,
       },
       {
-        columnName: "Total",
-        columnLabel: "total",
-        sortEnabled: true,
-        columnWidth: 175,
-      },
-      {
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
@@ -296,11 +327,12 @@ export default defineComponent({
       },
     ]);
 
-    interface itemsArr {
+    interface EDetails {
       id: string;
-      price: string;
-      description: string;
       name: string;
+      charge: number;
+      quantity: number;
+      amount: number;
     }
 
     interface Meta {
@@ -334,7 +366,9 @@ export default defineComponent({
         train: boolean;
         board: boolean;
         pick: boolean;
+        equipment_wise: Array<EDetails>;
       };
+      enquiry_no: string;
       date: string;
       duedate: string;
       status: string;
@@ -350,11 +384,13 @@ export default defineComponent({
       updated_by: string;
     }
 
+    const identifier = Identifier;
+
     const loading = ref(true);
     const auth = useAuthStore();
     const User = auth.GetUser();
     const quotationDetail = ref<quotationDetails>({
-      quotation_no: "21****",
+      quotation_no: "",
       lead_id: "",
       items: {
         id: "",
@@ -371,7 +407,9 @@ export default defineComponent({
         train: true,
         board: true,
         pick: true,
+        equipment_wise: [],
       },
+      enquiry_no: "",
       date: "",
       duedate: "",
       status: "",
@@ -445,11 +483,11 @@ export default defineComponent({
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
-            created_at,
-            invoice_date,
-            invoice_duedate,
+            date,
             total,
-            customer_name,
+            customer_company,
+            site_location,
+            company_name,
             status,
             id,
             quotation_no,
@@ -457,10 +495,10 @@ export default defineComponent({
             status: status,
             id: id,
             quotation_no: quotation_no,
-            customer_name: customer_name.company_name,
-            created_at: moment(created_at).format("LL"),
-            date: moment(invoice_date).format("LL"),
-            duedate: moment(invoice_duedate).format("LL"),
+            customer_company: customer_company.company_name,
+            company_name: company_name.company_name,
+            site_location: site_location,
+            date: moment(date).format("LL"),
             total: total,
           })
         );
@@ -493,11 +531,11 @@ export default defineComponent({
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
-            created_at,
-            invoice_date,
-            invoice_duedate,
+            date,
             total,
-            customer_name,
+            customer_company,
+            site_location,
+            company_name,
             status,
             id,
             quotation_no,
@@ -505,10 +543,10 @@ export default defineComponent({
             status: status,
             id: id,
             quotation_no: quotation_no,
-            customer_name: customer_name.company_name,
-            created_at: moment(created_at).format("LL"),
-            date: moment(invoice_date).format("LL"),
-            duedate: moment(invoice_duedate).format("LL"),
+            customer_company: customer_company.company_name,
+            company_name: company_name.company_name,
+            site_location: site_location,
+            date: moment(date).format("LL"),
             total: total,
           })
         );
@@ -539,6 +577,15 @@ export default defineComponent({
       }
     };
 
+    const filteredTableHeader = computed(() => {
+      // If the identifier is 'Admin', include the 'Company Name' column; otherwise, exclude it
+      return identifier.value === "Admin"
+        ? tableHeader.value
+        : tableHeader.value.filter(
+            (column) => column.columnLabel !== "company_name"
+          );
+    });
+
     onMounted(async () => {
       //console.log("done");
       await quotation_listing();
@@ -552,11 +599,11 @@ export default defineComponent({
         console.log(response);
         tableData.value = response.result.data.map(
           ({
-            created_at,
-            invoice_date,
-            invoice_duedate,
+            date,
             total,
-            customer_name,
+            customer_company,
+            site_location,
+            company_name,
             status,
             id,
             quotation_no,
@@ -564,10 +611,10 @@ export default defineComponent({
             status: status,
             id: id,
             quotation_no: quotation_no,
-            customer_name: customer_name.company_name,
-            created_at: moment(created_at).format("LL"),
-            date: moment(invoice_date).format("LL"),
-            duedate: moment(invoice_duedate).format("LL"),
+            customer_company: customer_company.company_name,
+            company_name: company_name.company_name,
+            site_location: site_location,
+            date: moment(date).format("LL"),
             total: total,
           })
         );
@@ -674,11 +721,11 @@ export default defineComponent({
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
-            created_at,
-            invoice_date,
-            invoice_duedate,
+            date,
             total,
-            customer_name,
+            customer_company,
+            site_location,
+            company_name,
             status,
             id,
             quotation_no,
@@ -686,10 +733,10 @@ export default defineComponent({
             status: status,
             id: id,
             quotation_no: quotation_no,
-            customer_name: customer_name.company_name,
-            created_at: moment(created_at).format("LL"),
-            date: moment(invoice_date).format("LL"),
-            duedate: moment(invoice_duedate).format("LL"),
+            customer_company: customer_company.company_name,
+            company_name: company_name.company_name,
+            site_location: site_location,
+            date: moment(date).format("LL"),
             total: total,
           })
         );
@@ -764,6 +811,7 @@ export default defineComponent({
             items: JSON.parse(response.items),
             date: response.date,
             duedate: response.duedate,
+            enquiry_no: response.enquiry_no,
             status: "1",
             scope_of_work: response.scope_of_work,
             terms_and_conditions: response.terms_and_conditions,
@@ -808,6 +856,130 @@ export default defineComponent({
       });
     };
 
+    const QuotationInfo = ref({
+      id: "",
+      quotation_no: "",
+      lead_id: "",
+      client_id: "",
+      items: {
+        id: "",
+        site_location: "",
+        per_day_charge: "",
+        number_of_days: "1",
+        accommodation: 0,
+        travelling: 0,
+        training: 0,
+        boarding: 0,
+        pickup: 0,
+        accomm: true,
+        travel: true,
+        train: true,
+        board: true,
+        pick: true,
+        equipment_wise: [],
+      },
+      date: "",
+      duedate: "",
+      enquiry_no: "",
+      status: "",
+      scope_of_work: "",
+      terms_and_conditions: "",
+      lead: {
+        company_name: "",
+        address1: "",
+        address2: "",
+        city: "",
+        states: "",
+        pincode: "",
+        country: "",
+      },
+      client: {
+        company_name: "",
+        address1: "",
+        address2: "",
+        city: "",
+        states: "",
+        pincode: "",
+        country: "",
+      },
+      customer_name: {
+        first_name: "",
+        last_name: "",
+      },
+      client_name: {
+        first_name: "",
+        last_name: "",
+      },
+      company_details: {
+        company_name: "",
+        company_logo: getAssetPath("media/avatars/default.png"),
+      },
+      company_id: User.company_id,
+      total: 0,
+    });
+
+    const showErrorAlert = (title, message) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "error",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
+      });
+    };
+
+    const downloadQuotation = async (id: any) => {
+      const res = await DownloadQuotation(id);
+      console.log(res);
+
+      if (res.result) {
+        QuotationInfo.value.id = res.result.id;
+        QuotationInfo.value.quotation_no = res.result.quotation_no;
+        QuotationInfo.value.lead_id = res.result.customer_id;
+        QuotationInfo.value.client_id = res.result.client_id;
+        QuotationInfo.value.customer_name = res.result.customer_data;
+        QuotationInfo.value.client_name = res.result.client_data;
+        QuotationInfo.value.items = JSON.parse(res.result.items);
+        QuotationInfo.value.lead = res.result.lead;
+        QuotationInfo.value.client = res.result.client;
+        QuotationInfo.value.total = res.result.total;
+        QuotationInfo.value.date = res.result.date;
+        QuotationInfo.value.duedate = res.result.duedate;
+        QuotationInfo.value.enquiry_no = res.result.enquiry_no;
+        QuotationInfo.value.status = res.result.status;
+        QuotationInfo.value.scope_of_work = res.result.scope_of_work;
+        QuotationInfo.value.terms_and_conditions =
+          res.result.terms_and_conditions;
+
+        QuotationInfo.value.company_details.company_name =
+          res.result.company_details.company_name;
+        QuotationInfo.value.company_details.company_logo = res.result
+          .company_details.company_logo
+          ? "data: image/png;base64," + res.result.company_details.company_logo
+          : getAssetPath("media/avatars/default.png");
+
+        console.log(QuotationInfo.value);
+
+        await Gen(
+          "quotation",
+          id.toString(),
+          QuotationInfo.value.quotation_no,
+          QuotationInfo
+        );
+      }
+      else{
+        console.log(res.message)
+        showErrorAlert(
+          "information",
+          res.message ?? "something went wrong"
+        );
+      }
+    };
+
     return {
       tableData,
       tableHeader,
@@ -830,6 +1002,9 @@ export default defineComponent({
       limit,
       PageLimitPoiner,
       Limits,
+      filteredTableHeader,
+      identifier,
+      downloadQuotation,
     };
   },
 });

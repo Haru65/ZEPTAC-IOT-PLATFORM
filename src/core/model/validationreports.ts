@@ -28,12 +28,8 @@ export const ReportStatus = [
     },
     {
         id: 2,
-        status: "Invalid",
+        status: "Completed",
     },
-    {
-        id: 3,
-        status: "Validated",
-    }
   ];
 
 

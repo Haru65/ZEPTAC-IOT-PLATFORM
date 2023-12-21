@@ -1056,6 +1056,7 @@ import {
   deletequotation,
   GetIncrInvoiceId,
   getPriceList,
+getLeadNCustomer,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import moment from "moment";
@@ -1123,6 +1124,7 @@ interface QuotationDetails {
   };
   date: string;
   duedate: string;
+  enquiry_no: string;
   status: string;
   scope_of_work: string;
   terms_and_conditions: string;
@@ -1244,6 +1246,7 @@ export default defineComponent({
       },
       date: "",
       duedate: "",
+      enquiry_no: "",
       status: "",
       scope_of_work: "",
       terms_and_conditions: "",
@@ -1312,6 +1315,7 @@ export default defineComponent({
       QuotationDetails.value.quotation_no = response.quotation_no;
       QuotationDetails.value.date = response.date;
       QuotationDetails.value.duedate = response.duedate;
+      QuotationDetails.value.enquiry_no = response.enquiry_no;
       QuotationDetails.value.items = await items;
 
       QuotationDetails.value.status = response.status;
@@ -1344,9 +1348,7 @@ export default defineComponent({
       });
 
       if (foundLocation) {
-        const {
-          equipment_wise,
-        } = foundLocation;
+        const { equipment_wise } = foundLocation;
 
         equipments.value = [...equipment_wise];
       }
@@ -1494,6 +1496,7 @@ export default defineComponent({
         const response = await getUser(lead_id);
         console.log(response);
         QuotationDetails.value.lead = response.meta;
+        QuotationDetails.value.enquiry_no = response.meta.enquiry_no;
         QuotationDetails.value.lead.id = response.id;
         if (qNsiteSameAsBilling.value) {
           ToggleClient();
@@ -1502,6 +1505,7 @@ export default defineComponent({
           GetClients(lead_id);
         }
       } else {
+        QuotationDetails.value.enquiry_no = "";
         QuotationDetails.value.lead = {
           id: "",
           company_name: "",
@@ -1631,11 +1635,9 @@ export default defineComponent({
           equipments.value.pop();
           equipments.value = [...equipment_wise];
 
-
           QuotationDetails.value.items.equipment_wise = [];
 
           QuotationDetails.value.total = 0;
-
         }
       }
     }
@@ -1737,7 +1739,7 @@ export default defineComponent({
     /* --------EQUIPMENT WISE LOGIC--------*/
     const dayWiseRef = ref(false);
 
-    function areAllPropertiesNotNull(array) {
+    function areAllPropertiesEmpty(array) {
       return array.some((detail) => {
         const { name, charge, quantity } = detail;
 
@@ -1777,7 +1779,7 @@ export default defineComponent({
     };
 
     const addNewRow = () => {
-      if (!QuotationDetails.value.items.equipment_wise.length) {
+      if (QuotationDetails.value.items.equipment_wise.length === 0) {
         QuotationDetails.value.items.equipment_wise.push({
           id: "",
           name: "",
@@ -1787,10 +1789,10 @@ export default defineComponent({
         });
         calculateTotalEquipment();
       } else {
-        const result = areAllPropertiesNotNull(
+        const isEmpty = areAllPropertiesEmpty(
           QuotationDetails.value.items.equipment_wise
         );
-        if (!result) {
+        if (!isEmpty) {
           QuotationDetails.value.items.equipment_wise.push({
             id: "",
             name: "",
@@ -1806,6 +1808,7 @@ export default defineComponent({
           });
         }
       }
+      console.log(QuotationDetails.value.items.equipment_wise);
     };
 
     async function SetEquipment(foundItem, index) {
@@ -1917,10 +1920,11 @@ export default defineComponent({
     };
 
     const GetLeads = async () => {
+      const companyId = User.company_id;
       ApiService.setHeader();
-      const response = await getLeads(``);
+      const response = await getLeadNCustomer(companyId);
       Leads.value.push(
-        ...response.result.data.map(({ created_at, ...rest }) => ({
+        ...response.result.map(({ created_at, ...rest }) => ({
           ...rest,
           created_at: moment(created_at).format("MMMM Do YYYY"),
         }))
@@ -1937,6 +1941,7 @@ export default defineComponent({
         const {
           quotation_no,
           lead_id,
+          enquiry_no,
           lead,
           client,
           items,
@@ -1952,6 +1957,7 @@ export default defineComponent({
 
         return (
           quotation_no === "" ||
+          enquiry_no === "" ||
           lead_id === "" ||
           items.id === "" ||
           lead.id === "" ||
@@ -1988,7 +1994,6 @@ export default defineComponent({
       QuotationDetails.value.total = 0;
       equipments.value = [];
       dayWiseRef.value = value;
-
     };
 
     // number formating remove
@@ -2023,22 +2028,33 @@ export default defineComponent({
 
         if (
           dayWiseRef.value === true &&
-          QuotationDetails.value.items.id === ""
+          (QuotationDetails.value.items.id === "" ||
+            QuotationDetails.value.items.per_day_charge === "")
         ) {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           loading.value = false;
           return;
         }
 
+        const isEmpty = areAllPropertiesEmpty(
+          QuotationDetails.value.items.equipment_wise
+        );
+
         if (
-          (dayWiseRef.value === false &&
-            QuotationDetails.value.items.id === "") ||
-          QuotationDetails.value.items.equipment_wise.length === 0
+          dayWiseRef.value === false &&
+          (QuotationDetails.value.items.id === "" ||
+            QuotationDetails.value.items.equipment_wise.length === 0)
         ) {
           showErrorAlert(
             "Warning",
             "Please Fill at least one equipment correctly"
           );
+          loading.value = false;
+          return;
+        }
+
+        if (dayWiseRef.value === false && isEmpty) {
+          showErrorAlert("Warning", "Please Fill equipment details correctly");
           loading.value = false;
           return;
         }
@@ -2056,6 +2072,8 @@ export default defineComponent({
             "Success",
             "Quotation have been successfully Updated!"
           );
+          
+          route.push({ name: "quotation-list" });
         } else {
           // Handle API error response
           const errorData = response.error;
@@ -2161,14 +2179,74 @@ export default defineComponent({
           QuotationDetails.value.invoice_no = invoice_no;
 
           // QuotationDetails.value.quotation_no = quotationid.toString();
-          QuotationDetails.value.date = moment(
-            QuotationDetails.value.date
-          ).format("YYYY-MM-DD HH:mm:ss");
-          QuotationDetails.value.duedate = moment(
-            QuotationDetails.value.duedate
-          ).format("YYYY-MM-DD HH:mm:ss");
-          // console.log(QuotationDetails.value);
+
           try {
+            const result = areAllPropertiesNull([QuotationDetails.value]);
+
+            if (result) {
+              showErrorAlert(
+                "Warning",
+                "Please Fill the Form Fields Correctly"
+              );
+              loading.value = false;
+              return;
+            }
+
+            if (QuotationDetails.value.date && QuotationDetails.value.duedate) {
+              QuotationDetails.value.date = moment(
+                QuotationDetails.value.date
+              ).format("YYYY-MM-DD HH:mm:ss");
+              QuotationDetails.value.duedate = moment(
+                QuotationDetails.value.duedate
+              ).format("YYYY-MM-DD HH:mm:ss");
+            } else {
+              showErrorAlert(
+                "Warning",
+                "Dates cannot be empty, please fill all the required details"
+              );
+              loading.value = false;
+              return;
+            }
+
+            if (
+              dayWiseRef.value === true &&
+              (QuotationDetails.value.items.id === "" ||
+                QuotationDetails.value.items.per_day_charge === "")
+            ) {
+              showErrorAlert(
+                "Warning",
+                "Please Fill the Form Fields Correctly"
+              );
+              loading.value = false;
+              return;
+            }
+
+            const isEmpty = areAllPropertiesEmpty(
+              QuotationDetails.value.items.equipment_wise
+            );
+
+            if (
+              dayWiseRef.value === false &&
+              (QuotationDetails.value.items.id === "" ||
+                QuotationDetails.value.items.equipment_wise.length === 0)
+            ) {
+              showErrorAlert(
+                "Warning",
+                "Please Fill at least one equipment correctly"
+              );
+              loading.value = false;
+              return;
+            }
+
+            if (dayWiseRef.value === false && isEmpty) {
+              showErrorAlert(
+                "Warning",
+                "Please Fill equipment details correctly"
+              );
+              loading.value = false;
+              return;
+            }
+
             // update the invoice
             // converted to invoice
             QuotationDetails.value.status = "3";
