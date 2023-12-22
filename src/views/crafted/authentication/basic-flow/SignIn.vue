@@ -7,7 +7,6 @@
       id="kt_login_signin_form"
       @submit="onSubmitLogin"
       :validation-schema="login"
-      :initial-values="{ email: 'admin@cleanroom.com', password: 'Admin@123' }"
     >
       <!--begin::Heading-->
       <div class="text-center mb-10">

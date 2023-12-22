@@ -277,7 +277,7 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
-        columnName: "Company Name",
+        columnName: "Main Company",
         columnLabel: "company_name",
         sortEnabled: true,
         columnWidth: 175,

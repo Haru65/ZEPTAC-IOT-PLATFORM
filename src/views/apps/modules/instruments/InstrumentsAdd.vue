@@ -318,7 +318,7 @@
                 >Datasheet</label
               >
               <!--begin::Col-->
-              <div class="col-lg-9 fv-row">
+              <div class="col-lg-9 fv-row position-relative">
                 <Field
                   type="file"
                   id="datasheet"
@@ -327,6 +327,26 @@
                   @change="handleFileChange"
                   accept=".pdf"
                 />
+                <div
+                  v-if="itemDetails.datasheet"
+                  class="position-absolute end-0 top-50 translate-middle-y"
+                >
+                  <i
+                    class="fas fs-4 fa-check-circle text-success me-6"
+                    data-toggle="tooltip"
+                    title="File is selected"
+                  ></i>
+                </div>
+                <div
+                  v-else
+                  class="position-absolute end-0 top-50 translate-middle-y"
+                >
+                  <i
+                    class="fas fs-4 fa-times-circle text-danger me-6"
+                    data-toggle="tooltip"
+                    title="File is not selected"
+                  ></i>
+                </div>
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
                     <ErrorMessage name="datasheet" />
@@ -343,7 +363,7 @@
                 >Calibration Certificate</label
               >
               <!--begin::Col-->
-              <div class="col-lg-9 fv-row">
+              <div class="col-lg-9 fv-row position-relative">
                 <Field
                   type="file"
                   id="calibration_certificate"
@@ -352,6 +372,26 @@
                   @change="handleFileChange"
                   accept=".pdf"
                 />
+                <div
+                  v-if="itemDetails.calibration_certificate"
+                  class="position-absolute end-0 top-50 translate-middle-y"
+                >
+                  <i
+                    class="fas fs-4 fa-check-circle text-success me-6"
+                    data-toggle="tooltip"
+                    title="File is selected"
+                  ></i>
+                </div>
+                <div
+                  v-else
+                  class="position-absolute end-0 top-50 translate-middle-y"
+                >
+                  <i
+                    class="fas fs-4 fa-times-circle text-danger me-6"
+                    data-toggle="tooltip"
+                    title="File is not selected"
+                  ></i>
+                </div>
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
                     <ErrorMessage name="calibration_certificate" />
@@ -368,7 +408,7 @@
                 >Traceability</label
               >
               <!--begin::Col-->
-              <div class="col-lg-9 fv-row">
+              <div class="col-lg-9 fv-row position-relative">
                 <Field
                   type="file"
                   id="traceability"
@@ -377,6 +417,26 @@
                   @change="handleFileChange"
                   accept=".pdf"
                 />
+                <div
+                  v-if="itemDetails.traceability"
+                  class="position-absolute end-0 top-50 translate-middle-y"
+                >
+                  <i
+                    class="fas fs-4 fa-check-circle text-success me-6"
+                    data-toggle="tooltip"
+                    title="File is selected"
+                  ></i>
+                </div>
+                <div
+                  v-else
+                  class="position-absolute end-0 top-50 translate-middle-y"
+                >
+                  <i
+                    class="fas fs-4 fa-times-circle text-danger me-6"
+                    data-toggle="tooltip"
+                    title="File is not selected"
+                  ></i>
+                </div>
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
                     <ErrorMessage name="traceability" />
@@ -482,7 +542,9 @@
                                     type="button"
                                     class="btn btn-primary btn-sm"
                                     data-bs-toggle="modal"
-                                    :data-bs-target="'#kt_modal_new_address_' + index"
+                                    :data-bs-target="
+                                      '#kt_modal_new_address_' + index
+                                    "
                                   >
                                     <i class="bi bi-eye"></i> Edit
                                   </button>
@@ -548,7 +610,10 @@
           </div>
           <div class="modal-footer flex-center">
             <!--begin::Button-->
-            <button @click="clear" class="btn btn-lg btn-danger w-sd-25 w-lg-25">
+            <button
+              @click="clear"
+              class="btn btn-lg btn-danger w-sd-25 w-lg-25"
+            >
               Discard
             </button>
             <!--end::Button-->
@@ -701,7 +766,7 @@ export default defineComponent({
 
     onMounted(async () => {
       Companies.value.pop();
-      if(User.role_id === 1){
+      if (User.role_id === 1) {
         await getdropcomp();
       }
     });
@@ -776,7 +841,7 @@ export default defineComponent({
       await itemDetails.value.maintenance_history.push(data);
     }
 
-    async function editMaintenanceData(index,data) {
+    async function editMaintenanceData(index, data) {
       itemDetails.value.maintenance_history.push[index] = await data;
     }
 
@@ -844,11 +909,10 @@ export default defineComponent({
 
     async function deleteMaintenanceData(index) {
       //zero represent the testID
-      itemDetails.value.maintenance_history =
-        await removeObjectWithId(
-          itemDetails.value.maintenance_history,
-          index
-        );
+      itemDetails.value.maintenance_history = await removeObjectWithId(
+        itemDetails.value.maintenance_history,
+        index
+      );
     }
 
     const submit = async () => {
@@ -863,7 +927,10 @@ export default defineComponent({
       }
 
       if (itemDetails.value.maintenance_history.length === 0) {
-        showErrorAlert("Warning", "At least one maintenance plan is required, please fill the maintenance plan.");
+        showErrorAlert(
+          "Warning",
+          "At least one maintenance plan is required, please fill the maintenance plan."
+        );
         loading.value = false;
         return;
       }
@@ -981,7 +1048,7 @@ export default defineComponent({
         created_by: User.id,
         updated_by: User.id,
         is_active: 1,
-      }
+      };
     };
     return {
       itemDetails,

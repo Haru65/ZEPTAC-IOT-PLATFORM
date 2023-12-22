@@ -1,7 +1,7 @@
 // import { getAssetPath } from "@/core/helpeassets";
 
 interface IPriceList {
-  id: string;
+  id: number;
   site_location: string;
   per_day_charge: string;
   equipment_wise: [{

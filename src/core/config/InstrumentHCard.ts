@@ -167,7 +167,6 @@ const instrumentGen = async (id, pdfName, instrumentInfo) => {
       { title: 'Date'},
       { title: 'Maintenance Details'},
       { title: 'Frequency (months)' },
-      { title: 'Remark'},
       { title: 'Any Repair'},
       { title: 'Maintenence Done By'},
     ],
@@ -178,7 +177,7 @@ const instrumentGen = async (id, pdfName, instrumentInfo) => {
   autoTable(doc, {
     body: MaintenanceData,
     columnStyles: {
-      '0': { cellWidth: 2 },
+      '0': { cellWidth: 0.5 },
       '1': { cellWidth: "auto" },
     },
     margin: { left: 0.5, top: 1.25 },

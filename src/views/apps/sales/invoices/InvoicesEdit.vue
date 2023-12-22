@@ -743,16 +743,6 @@
                             GetInvoiceStatus(parseInt(InvoiceDetails.status))
                           }}
                         </h6>
-                        <div
-                          class="cursor-pointer"
-                          v-on:click="generatePdf(InvoiceDetails.invoice_no)"
-                        >
-                          <i
-                            class="fa fa-download badge py-3 px-4 fs-7 text-gray-700 badge-light-success"
-                            style="font-size: 1.6rem"
-                            >&nbsp; Download</i
-                          >
-                        </div>
                       </div>
                       <div>
                         <h3 class="text-end fs-4 text-nowrap">Total</h3>

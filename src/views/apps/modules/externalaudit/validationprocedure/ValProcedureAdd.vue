@@ -190,7 +190,7 @@
               >
 
               <!--begin::Col-->
-              <div class="col-lg-10 fv-row">
+              <div class="col-lg-10 fv-row position-relative">
                 <Field
                   type="file"
                   id="pdfFile"
@@ -200,6 +200,26 @@
                   @change="handleFileChange"
                   accept=".pdf"
                 />
+                <div
+                  v-if="procedureDetails.uploaded_pdf_data"
+                  class="position-absolute end-0 top-50 translate-middle-y"
+                >
+                  <i
+                    class="fas fs-4 fa-check-circle text-success me-6"
+                    data-toggle="tooltip"
+                    title="File is selected"
+                  ></i>
+                </div>
+                <div
+                  v-else
+                  class="position-absolute end-0 top-50 translate-middle-y"
+                >
+                  <i
+                    class="fas fs-4 fa-times-circle text-danger me-6"
+                    data-toggle="tooltip"
+                    title="File is not selected"
+                  ></i>
+                </div>
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
                     <ErrorMessage name="uploaded_pdf_name" />
@@ -403,7 +423,6 @@ export default defineComponent({
         const result = areAllPropertiesNotNull([procedureDetails.value]);
 
         if (result) {
-
           procedureDetails.value.issue_date = moment(
             procedureDetails.value.issue_date
           ).format("YYYY-MM-DD");
@@ -431,8 +450,7 @@ export default defineComponent({
             showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
             loading.value = false;
           }
-        }
-        else{
+        } else {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           loading.value = false;
         }

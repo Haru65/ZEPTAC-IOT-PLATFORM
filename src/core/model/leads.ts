@@ -7,7 +7,7 @@ interface ILeads {
     states: string;
   };
   name: string;
-  company: {
+  company_name: {
     company_name: string;
   };
   mobile: string;

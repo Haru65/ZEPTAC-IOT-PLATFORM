@@ -96,7 +96,7 @@
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
-        :header="tableHeader"
+        :header="filteredTableHeader"
         :checkbox-enabled="true"
         :items-per-page="limit"
         :items-per-page-dropdown-enabled="false"
@@ -121,8 +121,11 @@
         <template v-slot:mobile="{ row: clients }">
           {{ clients.mobile }}
         </template>
-        <template v-slot:company="{ row: clients }">
-          {{ clients.company.company_name }}
+        <template
+          v-slot:company_name="{ row: clients }"
+          v-if="identifier == 'Admin'"
+        >
+          {{ clients.company_name }}
         </template>
         <template v-slot:actions="{ row: clients }">
           <!--begin::Menu Flex-->
@@ -183,7 +186,7 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, computed } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { IClients } from "@/core/model/clients";
@@ -193,6 +196,8 @@ import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
 import Swal from "sweetalert2";
 import { deleteClient, getClients, ClientSearch } from "@/stores/api";
+import { Identifier } from "@/core/config/WhichUserConfig";
+
 export default defineComponent({
   name: "customers-listing",
   components: {
@@ -200,6 +205,8 @@ export default defineComponent({
   },
   setup() {
     const loading = ref(true);
+    const identifier = Identifier;
+
     const tableHeader = ref([
       {
         columnName: "Client Name",
@@ -232,8 +239,8 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
-        columnName: "Company Name",
-        columnLabel: "company",
+        columnName: "Main Company",
+        columnLabel: "company_name",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -273,7 +280,7 @@ export default defineComponent({
             },
             name: first_name + " " + last_name,
             mobile,
-            company: company_name,
+            company_name: company_name.company_name,
             ...rest,
           })
         );
@@ -282,6 +289,9 @@ export default defineComponent({
         console.error(error);
       } finally {
         //console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 100);
       }
     }
 
@@ -334,7 +344,7 @@ export default defineComponent({
             },
             name: first_name + " " + last_name,
             mobile,
-            company: company_name,
+            company_name: company_name.company_name,
             ...rest,
           })
         );
@@ -382,7 +392,7 @@ export default defineComponent({
             },
             name: first_name + " " + last_name,
             mobile,
-            company: company_name,
+            company_name: company_name.company_name,
             ...rest,
           })
         );
@@ -413,51 +423,16 @@ export default defineComponent({
       }
     };
 
-    async function leads_listing(): Promise<void> {
-      try {
-        const response = await getClients(
-          `page=${page.value}&limit=${limit.value}`
-        );
-        console.log(response);
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            first_name,
-            last_name,
-            mobile,
-            company_name,
-            meta,
-            ...rest
-          }) => ({
-            id,
-            client_company: meta.company_name,
-            customer_company: meta.customer_company.company_name ?? "",
-            location: {
-              city: meta.city ?? "",
-              states: meta.states ?? "",
-            },
-            name: first_name + " " + last_name,
-            mobile,
-            company: company_name,
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        //console.log("done");
-        setTimeout(() => {
-          loading.value = false;
-        }, 100);
-      }
-    }
+    const filteredTableHeader = computed(() => {
+      return identifier.value === "Admin"
+        ? tableHeader.value
+        : tableHeader.value.filter(
+            (column) => column.columnLabel !== "company_name"
+          );
+    });
 
     onMounted(async () => {
       await client_listing();
-      setTimeout(() => {
-        loading.value = false;
-      }, 250);
     });
 
     const deleteFewClients = () => {
@@ -561,7 +536,7 @@ export default defineComponent({
             },
             name: first_name + " " + last_name,
             mobile,
-            company: company_name,
+            company_name: company_name.company_name,
             ...rest,
           })
         );
@@ -616,6 +591,8 @@ export default defineComponent({
       limit,
       PageLimitPoiner,
       Limits,
+      identifier,
+      filteredTableHeader,
     };
   },
 });

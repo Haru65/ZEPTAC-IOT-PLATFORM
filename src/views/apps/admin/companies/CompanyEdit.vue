@@ -808,7 +808,8 @@ export default defineComponent({
           response.company_logo != ""
             ? "data: image/png;base64," + response.company_logo
             : getAssetPath("media/avatars/default.png"),
-        image: "",
+          
+        image: response.company_logo ?? "",
         company_name: response.company_name,
         address: response.address,
         contact_person: response.contact_person,

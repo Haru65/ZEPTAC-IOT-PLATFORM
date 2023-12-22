@@ -302,10 +302,10 @@ export default defineComponent({
           }) => ({
             id,
             customer_name,
-            complaint_date: moment(complaint_date).format("MMM Do YY"),
+            complaint_date: moment(complaint_date).format("MMMM Do YYYY"),
             details_of_complaint,
             corrective_action,
-            resolution_date: moment(resolution_date).format("MMM Do YY"),
+            resolution_date: moment(resolution_date).format("MMMM Do YYYY"),
             complaint_status,
           })
         );
@@ -348,10 +348,10 @@ export default defineComponent({
           }) => ({
             id,
             customer_name,
-            complaint_date: moment(complaint_date).format("MMM Do YY"),
+            complaint_date: moment(complaint_date).format("MMMM Do YYYY"),
             details_of_complaint,
             corrective_action,
-            resolution_date: moment(resolution_date).format("MMM Do YY"),
+            resolution_date: moment(resolution_date).format("MMMM Do YYYY"),
             complaint_status,
           })
         );
@@ -406,10 +406,10 @@ export default defineComponent({
           }) => ({
             id,
             customer_name,
-            complaint_date: moment(complaint_date).format("MMM Do YY"),
+            complaint_date: moment(complaint_date).format("MMMM Do YYYY"),
             details_of_complaint,
             corrective_action,
-            resolution_date: moment(resolution_date).format("MMM Do YY"),
+            resolution_date: moment(resolution_date).format("MMMM Do YYYY"),
             complaint_status,
           })
         );
@@ -529,10 +529,10 @@ export default defineComponent({
           }) => ({
             id,
             customer_name,
-            complaint_date: moment(complaint_date).format("MMM Do YY"),
+            complaint_date: moment(complaint_date).format("MMMM Do YYYY"),
             details_of_complaint,
             corrective_action,
-            resolution_date: moment(resolution_date).format("MMM Do YY"),
+            resolution_date: moment(resolution_date).format("MMMM Do YYYY"),
             complaint_status,
           })
         );

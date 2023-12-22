@@ -763,7 +763,7 @@ export default defineComponent({
 
     const validGSTRef = ref(false);
 
-    function isValidGSTNo(event) {
+    function isValidGSTNo() {
         // Regex to check valid
         // GST CODE
         let regex = new RegExp(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/);

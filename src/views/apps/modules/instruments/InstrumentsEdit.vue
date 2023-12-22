@@ -291,7 +291,7 @@
                 >Datasheet</label
               >
               <!--begin::Col-->
-              <div class="col-lg-9 fv-row">
+              <div class="col-lg-9 fv-row position-relative">
                 <Field
                   type="file"
                   id="datasheet"
@@ -300,6 +300,26 @@
                   @change="handleFileChange"
                   accept=".pdf"
                 />
+                <div
+                  v-if="itemDetails.datasheet"
+                  class="position-absolute end-0 top-50 translate-middle-y"
+                >
+                  <i
+                    class="fas fs-4 fa-check-circle text-success me-6"
+                    data-toggle="tooltip"
+                    title="File is selected"
+                  ></i>
+                </div>
+                <div
+                  v-else
+                  class="position-absolute end-0 top-50 translate-middle-y"
+                >
+                  <i
+                    class="fas fs-4 fa-times-circle text-danger me-6"
+                    data-toggle="tooltip"
+                    title="File is not selected"
+                  ></i>
+                </div>
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
                     <ErrorMessage name="datasheet" />
@@ -316,7 +336,7 @@
                 >Calibration Certificate</label
               >
               <!--begin::Col-->
-              <div class="col-lg-9 fv-row">
+              <div class="col-lg-9 fv-row position-relative">
                 <Field
                   type="file"
                   id="calibration_certificate"
@@ -325,6 +345,26 @@
                   @change="handleFileChange"
                   accept=".pdf"
                 />
+                <div
+                  v-if="itemDetails.calibration_certificate"
+                  class="position-absolute end-0 top-50 translate-middle-y"
+                >
+                  <i
+                    class="fas fs-4 fa-check-circle text-success me-6"
+                    data-toggle="tooltip"
+                    title="File is selected"
+                  ></i>
+                </div>
+                <div
+                  v-else
+                  class="position-absolute end-0 top-50 translate-middle-y"
+                >
+                  <i
+                    class="fas fs-4 fa-times-circle text-danger me-6"
+                    data-toggle="tooltip"
+                    title="File is not selected"
+                  ></i>
+                </div>
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
                     <ErrorMessage name="calibration_certificate" />
@@ -341,7 +381,7 @@
                 >Traceability</label
               >
               <!--begin::Col-->
-              <div class="col-lg-9 fv-row">
+              <div class="col-lg-9 fv-row position-relative">
                 <Field
                   type="file"
                   id="traceability"
@@ -350,6 +390,26 @@
                   @change="handleFileChange"
                   accept=".pdf"
                 />
+                <div
+                  v-if="itemDetails.traceability"
+                  class="position-absolute end-0 top-50 translate-middle-y"
+                >
+                  <i
+                    class="fas fs-4 fa-check-circle text-success me-6"
+                    data-toggle="tooltip"
+                    title="File is selected"
+                  ></i>
+                </div>
+                <div
+                  v-else
+                  class="position-absolute end-0 top-50 translate-middle-y"
+                >
+                  <i
+                    class="fas fs-4 fa-times-circle text-danger me-6"
+                    data-toggle="tooltip"
+                    title="File is not selected"
+                  ></i>
+                </div>
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
                     <ErrorMessage name="traceability" />
@@ -455,7 +515,9 @@
                                     type="button"
                                     class="btn btn-primary btn-sm"
                                     data-bs-toggle="modal"
-                                    :data-bs-target="'#kt_modal_new_address_' + index"
+                                    :data-bs-target="
+                                      '#kt_modal_new_address_' + index
+                                    "
                                   >
                                     <i class="bi bi-eye"></i> Edit
                                   </button>
@@ -518,11 +580,13 @@
               </div>
             </div>
             <!--end::Accordion-->
-
           </div>
           <div class="modal-footer flex-center">
             <!--begin::Button-->
-            <span @click="deleteItem" class="btn btn-lg btn-danger w-sd-25 w-lg-25">
+            <span
+              @click="deleteItem"
+              class="btn btn-lg btn-danger w-sd-25 w-lg-25"
+            >
               Delete
             </span>
             <!--end::Button-->
@@ -700,7 +764,7 @@ export default defineComponent({
         calibration_certificate: response.calibration_certificate || "",
         traceability: response.traceability || "",
 
-        maintenance_plan: response.maintenance_plan ? true: false,
+        maintenance_plan: response.maintenance_plan ? true : false,
         maintenance_history: JSON.parse(response.maintenance_history),
 
         company_id: response.company_id ? response.company_id : "",
@@ -708,7 +772,7 @@ export default defineComponent({
         updated_by: response.updated_by,
         is_active: response.is_active,
       };
-      if(User.role_id === 1){
+      if (User.role_id === 1) {
         await getdropcomp();
       }
     });
@@ -783,7 +847,7 @@ export default defineComponent({
       await itemDetails.value.maintenance_history.push(data);
     }
 
-    async function editMaintenanceData(index,data) {
+    async function editMaintenanceData(index, data) {
       itemDetails.value.maintenance_history.push[index] = await data;
     }
 
@@ -840,7 +904,7 @@ export default defineComponent({
         );
       });
     }
-    
+
     const removeObjectWithId = (arr, id) => {
       if (id !== -1) {
         arr.splice(id, 1);
@@ -851,11 +915,10 @@ export default defineComponent({
 
     async function deleteMaintenanceData(index) {
       //zero represent the testID
-      itemDetails.value.maintenance_history =
-        await removeObjectWithId(
-          itemDetails.value.maintenance_history,
-          index
-        );
+      itemDetails.value.maintenance_history = await removeObjectWithId(
+        itemDetails.value.maintenance_history,
+        index
+      );
     }
 
     const submit = async () => {
@@ -870,7 +933,10 @@ export default defineComponent({
       }
 
       if (itemDetails.value.maintenance_history.length === 0) {
-        showErrorAlert("Warning", "At least one maintenance plan is required, please fill the maintenance plan.");
+        showErrorAlert(
+          "Warning",
+          "At least one maintenance plan is required, please fill the maintenance plan."
+        );
         loading.value = false;
         return;
       }
@@ -878,7 +944,7 @@ export default defineComponent({
       const maintenance = isMaintenanceDataNull([
         itemDetails.value.maintenance_history,
       ]);
-      
+
       if (maintenance) {
         showErrorAlert(
           "Warning",
@@ -887,7 +953,6 @@ export default defineComponent({
         loading.value = false;
         return;
       }
-
 
       if (
         !itemDetails.value.datasheet ||
@@ -903,10 +968,10 @@ export default defineComponent({
       try {
         itemDetails.value.calibration_date = moment(
           itemDetails.value.calibration_date
-          ).format("YYYY-MM-DD");
-          itemDetails.value.calibration_due_date = moment(
-            itemDetails.value.calibration_due_date
-          ).format("YYYY-MM-DD HH:mm:ss");
+        ).format("YYYY-MM-DD");
+        itemDetails.value.calibration_due_date = moment(
+          itemDetails.value.calibration_due_date
+        ).format("YYYY-MM-DD HH:mm:ss");
         // Call your API here with the form values
         const response = await updateInstrument(itemId, itemDetails.value);
         console.log(response.result.error);

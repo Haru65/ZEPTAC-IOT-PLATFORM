@@ -60,7 +60,7 @@
           <button
             type="button"
             class="btn btn-danger"
-            @click="deleteFewInvoice()"
+            @click="deleteFewInstrument()"
           >
             Delete Selected
           </button>
@@ -203,7 +203,7 @@
             </span>
             <span class="menu-link px-3" data-toggle="tooltip" title="Delete Instrument">
               <i
-                @click="deleteInvoice(instruments.id, false)"
+                @click="deleteItem(instruments.id, false)"
                 class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-1"
               ></i>
             </span>
@@ -503,7 +503,7 @@ export default defineComponent({
       await instrument_listing();
     });
 
-    const deleteFewInvoice = () => {
+    const deleteFewInstrument = () => {
       Swal.fire({
         title: "Are you sure?",
         text: "You will not be able to recover from this !",
@@ -516,14 +516,14 @@ export default defineComponent({
         if (result["isConfirmed"]) {
           // Put your function here
           selectedIds.value.forEach((item) => {
-            deleteInvoice(item, true);
+            deleteItem(item, true);
           });
           selectedIds.value.length = 0;
         }
       });
     };
 
-    const deleteInvoice = (id: number, mul: boolean) => {
+    const deleteItem = (id: number, mul: boolean) => {
       if (!mul) {
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
@@ -766,11 +766,11 @@ export default defineComponent({
     return {
       tableData,
       tableHeader,
-      deleteInvoice,
+      deleteItem,
       search,
       searchItems,
       selectedIds,
-      deleteFewInvoice,
+      deleteFewInstrument,
       sort,
       onItemSelect,
       loading,

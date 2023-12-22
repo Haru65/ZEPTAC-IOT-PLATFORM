@@ -454,7 +454,7 @@ export default defineComponent({
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
+        tableData.value = response.result.data.data.map(({ ...rest }) => ({
           ...rest,
         }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);

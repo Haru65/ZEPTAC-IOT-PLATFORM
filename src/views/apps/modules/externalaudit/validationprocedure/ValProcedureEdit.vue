@@ -190,7 +190,7 @@
               >
 
               <!--begin::Col-->
-              <div class="col-lg-10 fv-row">
+              <div class="col-lg-10 fv-row position-relative">
                 <Field
                   type="file"
                   id="pdfFile"
@@ -200,6 +200,26 @@
                   @change="handleFileChange"
                   accept=".pdf"
                 />
+                <div
+                  v-if="procedureDetails.uploaded_pdf_data"
+                  class="position-absolute end-0 top-50 translate-middle-y"
+                >
+                  <i
+                    class="fas fs-4 fa-check-circle text-success me-6"
+                    data-toggle="tooltip"
+                    title="File is selected"
+                  ></i>
+                </div>
+                <div
+                  v-else
+                  class="position-absolute end-0 top-50 translate-middle-y"
+                >
+                  <i
+                    class="fas fs-4 fa-times-circle text-danger me-6"
+                    data-toggle="tooltip"
+                    title="File is not selected"
+                  ></i>
+                </div>
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
                     <ErrorMessage name="uploaded_pdf_name" />
@@ -255,7 +275,10 @@
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { getValidationProcedure, updateValidationProcedure } from "@/stores/api";
+import {
+  getValidationProcedure,
+  updateValidationProcedure,
+} from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import packages from "@/core/config/PackagesConfig";
@@ -337,16 +360,12 @@ export default defineComponent({
         approved_by: response.approved_by,
         uploaded_pdf_name: response.uploaded_pdf_name,
         uploaded_pdf_data: response.uploaded_pdf_data,
-        company_id: response.company_id
-          ? response.company_id
-          : "",
+        company_id: response.company_id ? response.company_id : "",
         created_by: response.created_by,
         updated_by: response.updated_by,
         is_active: response.is_active,
       };
     });
-
-
 
     const isPdfInvalid = ref(false);
 
@@ -425,18 +444,20 @@ export default defineComponent({
       loading.value = true;
 
       try {
-
         procedureDetails.value.issue_date = moment(
-            procedureDetails.value.issue_date
-          ).format("YYYY-MM-DD");
-          procedureDetails.value.revision_date = moment(
-            procedureDetails.value.revision_date
-          ).format("YYYY-MM-DD");
-          
+          procedureDetails.value.issue_date
+        ).format("YYYY-MM-DD");
+        procedureDetails.value.revision_date = moment(
+          procedureDetails.value.revision_date
+        ).format("YYYY-MM-DD");
+
         const result = areAllPropertiesNotNull([procedureDetails.value]);
 
         if (result) {
-          const response = await updateValidationProcedure(itemId, procedureDetails.value);
+          const response = await updateValidationProcedure(
+            itemId,
+            procedureDetails.value
+          );
           // console.log(response.error);
           if (!response.error) {
             // Handle successful API response
@@ -456,8 +477,7 @@ export default defineComponent({
             showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
             loading.value = false;
           }
-        }
-        else{
+        } else {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           loading.value = false;
         }

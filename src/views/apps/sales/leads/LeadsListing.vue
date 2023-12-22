@@ -93,7 +93,7 @@
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
-        :header="tableHeader"
+        :header="filteredTableHeader"
         :checkbox-enabled="true"
         :items-per-page="limit"
         :items-per-page-dropdown-enabled="false"
@@ -121,8 +121,11 @@
         <template v-slot:created_at="{ row: leads }">
           {{ leads.created_at }}
         </template>
-        <template v-slot:company="{ row: leads }">
-          {{ leads.company.company_name }}
+        <template
+          v-slot:company_name="{ row: leads }"
+          v-if="identifier == 'Admin'"
+        >
+          {{ leads.company_name }}
         </template>
         <template v-slot:actions="{ row: leads }">
           <!--begin::Menu Flex-->
@@ -183,7 +186,7 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, computed } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { ILeads } from "@/core/model/leads";
@@ -192,6 +195,7 @@ import { deleteLead, getLeads, LeadsSearch } from "@/stores/api";
 import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
 import Swal from "sweetalert2";
+import { Identifier } from "@/core/config/WhichUserConfig";
 
 export default defineComponent({
   name: "leads-listing",
@@ -238,7 +242,7 @@ export default defineComponent({
       },
       {
         columnName: "Main Company",
-        columnLabel: "company",
+        columnLabel: "company_name",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -251,6 +255,7 @@ export default defineComponent({
     ]);
     const selectedIds = ref<Array<number>>([]);
     const loading = ref(true);
+    const identifier = Identifier;
     const tableData = ref<Array<ILeads>>([]);
     const initvalues = ref<Array<ILeads>>([]);
 
@@ -300,7 +305,7 @@ export default defineComponent({
             },
             name: first_name + " " + last_name,
             mobile,
-            company: company_name,
+            company_name: company_name.company_name,
             created_at: moment(created_at).format("MMMM Do YYYY"),
             ...rest,
           })
@@ -350,7 +355,7 @@ export default defineComponent({
             },
             name: first_name + " " + last_name,
             mobile,
-            company: company_name,
+            company_name: company_name.company_name,
             created_at: moment(created_at).format("MMMM Do YYYY"),
             ...rest,
           })
@@ -408,7 +413,7 @@ export default defineComponent({
             },
             name: first_name + " " + last_name,
             mobile,
-            company: company_name,
+            company_name: company_name.company_name,
             created_at: moment(created_at).format("MMMM Do YYYY"),
             ...rest,
           })
@@ -423,6 +428,14 @@ export default defineComponent({
         }, 100);
       }
     }
+
+    const filteredTableHeader = computed(() => {
+      return identifier.value === "Admin"
+        ? tableHeader.value
+        : tableHeader.value.filter(
+            (column) => column.columnLabel !== "company_name"
+          );
+    });
 
     onMounted(async () => {
       await leads_listing();
@@ -529,7 +542,7 @@ export default defineComponent({
             },
             name: first_name + " " + last_name,
             mobile,
-            company: company_name,
+            company_name: company_name.company_name,
             created_at: moment(created_at).format("MMMM Do YYYY"),
             ...rest,
           })
@@ -586,6 +599,8 @@ export default defineComponent({
       limit,
       PageLimitPoiner,
       Limits,
+      identifier,
+      filteredTableHeader,
     };
   },
 });

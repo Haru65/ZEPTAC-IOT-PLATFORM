@@ -321,13 +321,13 @@ export default defineComponent({
           }) => ({
             id,
             document_name,
-            issue_date: moment(issue_date).format("MMM Do YY"),
+            issue_date: moment(issue_date).format("MMMM Do YYYY"),
             issue_no,
-            revision_date: moment(revision_date).format("MMM Do YY"),
+            revision_date: moment(revision_date).format("MMMM Do YYYY"),
             revision_no,
             prepared_by,
             approved_by,
-            created_at: moment(created_at).format("MMM Do YY"),
+            created_at: moment(created_at).format("MMMM Do YYYY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -371,13 +371,13 @@ export default defineComponent({
           }) => ({
             id,
             document_name,
-            issue_date: moment(issue_date).format("MMM Do YY"),
+            issue_date: moment(issue_date).format("MMMM Do YYYY"),
             issue_no,
-            revision_date: moment(revision_date).format("MMM Do YY"),
+            revision_date: moment(revision_date).format("MMMM Do YYYY"),
             revision_no,
             prepared_by,
             approved_by,
-            created_at: moment(created_at).format("MMM Do YY"),
+            created_at: moment(created_at).format("MMMM Do YYYY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -433,13 +433,13 @@ export default defineComponent({
           }) => ({
             id,
             document_name,
-            issue_date: moment(issue_date).format("MMM Do YY"),
+            issue_date: moment(issue_date).format("MMMM Do YYYY"),
             issue_no,
-            revision_date: moment(revision_date).format("MMM Do YY"),
+            revision_date: moment(revision_date).format("MMMM Do YYYY"),
             revision_no,
             prepared_by,
             approved_by,
-            created_at: moment(created_at).format("MMM Do YY"),
+            created_at: moment(created_at).format("MMMM Do YYYY"),
           })
         );
         total.value = response.result.total_count;
@@ -560,13 +560,13 @@ export default defineComponent({
           }) => ({
             id,
             document_name,
-            issue_date: moment(issue_date).format("MMM Do YY"),
+            issue_date: moment(issue_date).format("MMMM Do YYYY"),
             issue_no,
-            revision_date: moment(revision_date).format("MMM Do YY"),
+            revision_date: moment(revision_date).format("MMMM Do YYYY"),
             revision_no,
             prepared_by,
             approved_by,
-            created_at: moment(created_at).format("MMM Do YY"),
+            created_at: moment(created_at).format("MMMM Do YYYY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);

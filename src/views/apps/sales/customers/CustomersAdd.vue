@@ -373,14 +373,35 @@
               <!--begin::Row-->
               <div class="row">
                 <!--begin::Col-->
-                <div class="col-lg fv-row">
+                <div class="col-lg fv-row position-relative">
                   <Field
                     type="text"
                     name="gst_number"
                     class="form-control form-control-lg form-control-solid"
                     placeholder="Enter GST Number"
                     v-model="profileDetails.gst_number"
+                    v-on:input="isValidGSTNo"
                   />
+                  <div
+                    v-if="validGSTRef === true"
+                    class="position-absolute end-0 top-50 translate-middle-y"
+                  >
+                    <i
+                      class="fas fs-4 fa-check-circle text-success me-6"
+                      data-toggle="tooltip"
+                      title="GST number is valid"
+                    ></i>
+                  </div>
+                  <div
+                    v-else
+                    class="position-absolute end-0 top-50 translate-middle-y"
+                  >
+                    <i
+                      class="fas fs-4 fa-times-circle text-danger me-6"
+                      data-toggle="tooltip"
+                      title="GST number is Invalid/Incorrect"
+                    ></i>
+                  </div>
                 </div>
                 <!--end::Col-->
               </div>
@@ -518,7 +539,34 @@ export default defineComponent({
       created_by: User.id,
       updated_by: User.id,
     });
+    const validGSTRef = ref(false);
 
+    function isValidGSTNo() {
+      // Regex to check valid
+      // GST CODE
+      let regex = new RegExp(
+        /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/
+      );
+
+      let str = profileDetails.value.gst_number;
+
+      // GST CODE
+      // is empty return false
+      if (str == null) {
+        validGSTRef.value = false;
+        return false;
+      }
+
+      // Return true if the GST_CODE
+      // matched the ReGex
+      if (regex.test(str) == true) {
+        validGSTRef.value = true;
+        return true;
+      } else {
+        validGSTRef.value = false;
+        return false;
+      }
+    }
     const onsubmit = async () => {
       loading.value = true;
       console.log(profileDetails.value);
@@ -632,6 +680,8 @@ export default defineComponent({
       clear,
       countries,
       state,
+      isValidGSTNo,
+      validGSTRef,
     };
   },
 });
