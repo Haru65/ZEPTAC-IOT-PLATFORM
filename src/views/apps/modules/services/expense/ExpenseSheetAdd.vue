@@ -240,19 +240,30 @@ export default defineComponent({
 
     async function setExpenseImage(event, index) {
       const input = event.target;
+
       if (input.files && input.files.length > 0) {
         const reader = new FileReader();
-        reader.onload = (e) => {
-          if (e.target) {
-            const result = e.target.result as string;
-            if (expenseSheetDetails.value.expenses) {
-              expenseSheetDetails.value.expenses[index].receipt = result;
+        console.log(reader);
+
+        reader.onload = function () {
+          try {
+            const base64Data = reader.result
+              ?.toString()
+              .replace(/^data:image\/\w+;base64,/, "");
+            if (base64Data) {
+              expenseSheetDetails.value.expenses[index].receipt = base64Data;
+            } else {
+              console.error("Error: Failed to read the image data.");
             }
+          } catch (e) {
+            console.error("Error:", e);
           }
         };
-        expenseSheetDetails.value.expenses[index].receipt = input.files[0];
+
+        // expenseSheetDetails.value.expenses[index].receipt = input.files[0];
         reader.readAsDataURL(input.files[0]);
       }
+      console.log(expenseSheetDetails.value.expenses);
     }
 
     const removeObjectWithId = (arr, id) => {
@@ -331,7 +342,9 @@ export default defineComponent({
       expenseSheetDetails.value.engineer_id = "";
       expenseSheetDetails.value.rgp_id = rgp_id ? rgp_id : "";
       expenseSheetDetails.value.rgp_no = rgp_no ? rgp_no : "";
-      expenseSheetDetails.value.site_address.company_name = address.company_name ? address.company_name : "";
+      expenseSheetDetails.value.site_address.company_name = address.company_name
+        ? address.company_name
+        : "";
       expenseSheetDetails.value.site_address.address1 = address.address1
         ? address.address1
         : "";
@@ -382,7 +395,7 @@ export default defineComponent({
           first_name: "",
           last_name: "",
           company: {
-            company_name:"",
+            company_name: "",
           },
         },
         date: "",
@@ -393,36 +406,33 @@ export default defineComponent({
     const formData = ref<CreateAccount>({});
 
     const fillDetails = (response) => {
-      
       if (Array.isArray(response.result)) {
-      RGPS.value.push(
-        ...response.result.map((result) => {
-          return {
-            id: result.id,
-            rgp_no: result.rgp_no,
-            quotation_id: result.quotation_id,
-            quotation_no: result.quotation_no,
-            engineers: JSON.parse(result.engineers),
-            client_id: result.client_id,
-            customer_id: result.customer_id,
-            site_address: {
-              company_name: result.site_address.company_name,
-              address1: result.site_address.address1,
-              address2: result.site_address.address2,
-              country: result.site_address.country,
-              city: result.site_address.city,
-              pincode: result.site_address.pincode,
-              states: result.site_address.states,
-            },
-            customer_data: result.customer_data,
-            date: result.date,
-            duedate: result.duedate,
-          };
-        })
-      );
-      }
-      else{
-        
+        RGPS.value.push(
+          ...response.result.map((result) => {
+            return {
+              id: result.id,
+              rgp_no: result.rgp_no,
+              quotation_id: result.quotation_id,
+              quotation_no: result.quotation_no,
+              engineers: JSON.parse(result.engineers),
+              client_id: result.client_id,
+              customer_id: result.customer_id,
+              site_address: {
+                company_name: result.site_address.company_name,
+                address1: result.site_address.address1,
+                address2: result.site_address.address2,
+                country: result.site_address.country,
+                city: result.site_address.city,
+                pincode: result.site_address.pincode,
+                states: result.site_address.states,
+              },
+              customer_data: result.customer_data,
+              date: result.date,
+              duedate: result.duedate,
+            };
+          })
+        );
+      } else {
       }
     };
 
@@ -470,23 +480,32 @@ export default defineComponent({
       // formData.value = { ...values };
 
       if (currentStepIndex.value === 0) {
-        if (
-          expenseSheetDetails.value.rgp_id &&
-          expenseSheetDetails.value.engineer_id
-        ) {
-          currentStepIndex.value++;
+        // if (
+        //   expenseSheetDetails.value.rgp_id &&
+        //   expenseSheetDetails.value.engineer_id
+        // ) {
+        //   currentStepIndex.value++;
 
-          if (!_stepperObj.value) {
-            return;
-          }
+        //   if (!_stepperObj.value) {
+        //     return;
+        //   }
 
-          _stepperObj.value.goNext();
-        } else {
-          Swal.fire({
-            icon: "info",
-            title: "Please fill all the required fields",
-          });
+        //   _stepperObj.value.goNext();
+        // } else {
+        //   Swal.fire({
+        //     icon: "info",
+        //     title: "Please fill all the required fields",
+        //   });
+        // }
+
+        currentStepIndex.value++;
+
+        if (!_stepperObj.value) {
+          return;
         }
+
+        _stepperObj.value.goNext();
+        
       } else if (currentStepIndex.value === 1) {
         if (expenseSheetDetails.value.expenses.length > 0) {
           const result = areAllPropertiesNotNull(

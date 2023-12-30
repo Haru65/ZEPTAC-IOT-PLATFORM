@@ -165,6 +165,7 @@ import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import { deletecompany, getCompanies, CompaniesSearch } from "@/stores/api";
+import { useAuthStore } from "@/stores/auth";
 
 export default defineComponent({
   name: "company-listing",
@@ -172,6 +173,10 @@ export default defineComponent({
     Datatable,
   },
   setup() {
+    
+    const auth = useAuthStore();
+    const User = auth.GetUser();
+
     const tableHeader = ref([
       {
         columnName: "Company Name",
@@ -489,6 +494,7 @@ export default defineComponent({
       limit,
       PageLimitPoiner,
       Limits,
+      User,
     };
   },
 });

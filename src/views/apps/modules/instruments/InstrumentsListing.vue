@@ -132,46 +132,47 @@
           >
         </template>
 
-        <template v-slot:c_id="{ row: instruments }">
+        <template v-slot:calibration_certificate="{ row: instruments }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
-            <span
+            <a
+              target="blank"
+              v-bind:href="`https://api.zeptac.com/storage/company/${instruments.company_id}/instruments/${instruments.calibration_certificate}`"
               data-toggle="tooltip"
               title="Download Calibration Certificate"
               class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
-              @click="
-                downloadDocument(instruments.id, 'calibration_certificate')
-              "
               >⤓ Calibration
-            </span>
+            </a>
           </div>
           <!--end::Menu FLex-->
         </template>
 
-        <template v-slot:d_id="{ row: instruments }">
+        <template v-slot:datasheet="{ row: instruments }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
-            <span
+            <a
+              target="blank"
+              v-bind:href="`https://api.zeptac.com/storage/company/${instruments.company_id}/instruments/${instruments.datasheet}`"
               data-toggle="tooltip"
               title="Download Datasheet"
               class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
-              @click="downloadDocument(instruments.id, 'datasheet')"
               >⤓ Datasheet
-            </span>
+            </a>
           </div>
           <!--end::Menu FLex-->
         </template>
 
-        <template v-slot:t_id="{ row: instruments }">
+        <template v-slot:traceability="{ row: instruments }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
-            <span
+            <a
+              target="blank"
+              v-bind:href="`https://api.zeptac.com/storage/company/${instruments.company_id}/instruments/${instruments.traceability}`"
               data-toggle="tooltip"
               title="Download Traceability"
               class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
-              @click="downloadDocument(instruments.id, 'traceability')"
               >⤓ Traceability
-            </span>
+            </a>
           </div>
           <!--end::Menu FLex-->
         </template>
@@ -193,15 +194,22 @@
         <template v-slot:actions="{ row: instruments }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3" 
-              data-toggle="tooltip" title="View Instrument">
+            <span
+              class="menu-link px-3"
+              data-toggle="tooltip"
+              title="View Instrument"
+            >
               <router-link :to="`./edit/${instruments.id}`">
                 <i
                   class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
                 ></i>
               </router-link>
             </span>
-            <span class="menu-link px-3" data-toggle="tooltip" title="Delete Instrument">
+            <span
+              class="menu-link px-3"
+              data-toggle="tooltip"
+              title="Delete Instrument"
+            >
               <i
                 @click="deleteItem(instruments.id, false)"
                 class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-1"
@@ -310,19 +318,19 @@ export default defineComponent({
       },
       {
         columnName: "Calibration Validity",
-        columnLabel: "c_id",
+        columnLabel: "calibration_certificate",
         sortEnabled: false,
         columnWidth: 85,
       },
       {
         columnName: "Datasheet",
-        columnLabel: "d_id",
+        columnLabel: "datasheet",
         sortEnabled: false,
         columnWidth: 75,
       },
       {
         columnName: "Traceability",
-        columnLabel: "t_id",
+        columnLabel: "traceability",
         sortEnabled: false,
         columnWidth: 75,
       },
@@ -339,17 +347,6 @@ export default defineComponent({
         columnWidth: 75,
       },
     ]);
-
-    interface itemDetails {
-      id: string;
-      model_no: string;
-      serial_no: string;
-      make: string;
-      name: string;
-      description: string;
-      availability: string;
-      created_at: string;
-    }
 
     const total = ref(0);
     // functions
@@ -381,19 +378,10 @@ export default defineComponent({
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, model_no, serial_no, name, make, availability }) => ({
-            id: id,
-            model_no: model_no,
-            serial_no: serial_no,
-            name: name,
-            make: make,
-            availability: availability,
-            c_id: id,
-            d_id: id,
-            t_id: id,
-          })
-        );
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id: id,
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -421,19 +409,10 @@ export default defineComponent({
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, model_no, serial_no, name, make, availability }) => ({
-            id: id,
-            model_no: model_no,
-            serial_no: serial_no,
-            name: name,
-            make: make,
-            availability: availability,
-            c_id: id,
-            d_id: id,
-            t_id: id,
-          })
-        );
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id: id,
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -473,19 +452,10 @@ export default defineComponent({
         const response = await getAllInstrument(
           `page=${page.value}&limit=${limit.value}`
         );
-        tableData.value = response.result.data.map(
-          ({ id, model_no, serial_no, name, make, availability }) => ({
-            id: id,
-            model_no: model_no,
-            serial_no: serial_no,
-            name: name,
-            make: make,
-            availability: availability,
-            c_id: id,
-            d_id: id,
-            t_id: id,
-          })
-        );
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id: id,
+          ...rest,
+        }));
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -590,19 +560,12 @@ export default defineComponent({
         const response = await InstrumentSearch(search.value);
         //console.log(response.result.total_count);
         // first 20 displayed
-        tableData.value = response.result.data.data.map(
-          ({ id, model_no, serial_no, name, make, availability }) => ({
-            id: id,
-            model_no: model_no,
-            serial_no: serial_no,
-            name: name,
-            make: make,
-            availability: availability,
-            c_id: id,
-            d_id: id,
-            t_id: id,
-          })
-        );
+        total.value = response.result.total_count;
+        more.value = response.result.data.next_page_url != null ? true : false;
+        tableData.value = response.result.data.data.map(({ id, ...rest }) => ({
+          id: id,
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -649,39 +612,21 @@ export default defineComponent({
       downloadLink.click();
     }
 
-    const downloadDocument = async (id: any, pdfName: string) => {
+    // NEED TO COMPLETE
+    const downloadDocument = async (
+      companyId: any,
+      file: string,
+      pdfName: string
+    ) => {
       try {
-        const res = await getInstrument(id);
-
-        const { calibration_certificate, datasheet, traceability } = res;
-
-        let base64String = "";
-        if (pdfName === "calibration_certificate") {
-          base64String = calibration_certificate.replace(
-            /^data:application\/\pdf+;base64,/,
-            ""
-          );
-        } else if (pdfName === "datasheet") {
-          base64String = datasheet.replace(
-            /^data:application\/\pdf+;base64,/,
-            ""
-          );
-        } else if (pdfName === "traceability") {
-          base64String = traceability.replace(
-            /^data:application\/\pdf+;base64,/,
-            ""
-          );
-        }
-
-        // check whether data starts with JVB, JVB is a prefix for pdf files
-
-        if (base64String.startsWith("JVB")) {
-          base64String = "data:application/pdf;base64," + base64String;
-          downloadFileObject(base64String, pdfName);
-        } else if (base64String.startsWith("data:application/pdf;base64")) {
-          downloadFileObject(base64String, pdfName);
+        if (file != "") {
+          const linkSource = `https://api.zeptac.com/storage/company/${companyId}/instruments/${file}`;
+          const downloadLink = document.createElement("a");
+          downloadLink.href = linkSource;
+          downloadLink.download = `https://api.zeptac.com/storage/company/${companyId}/instruments/${file}`;
+          downloadLink.click();
         } else {
-          alert("Not a valid Base64 PDF string. Please check");
+          alert("Empty File");
         }
       } catch (error) {
         console.error("Error downloading PDF:", error);

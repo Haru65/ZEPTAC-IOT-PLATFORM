@@ -760,9 +760,11 @@ export default defineComponent({
         calibration_due_date: response.calibration_due_date,
         vendor_name: response.vendor_name,
         accessories_list: JSON.parse(response.accessories_list),
-        datasheet: response.datasheet || "",
-        calibration_certificate: response.calibration_certificate || "",
-        traceability: response.traceability || "",
+        datasheet: response.datasheet ? response.datasheet : "",
+        calibration_certificate: response.calibration_certificate
+          ? response.calibration_certificate
+          : "",
+        traceability: response.traceability ? response.traceability : "",
 
         maintenance_plan: response.maintenance_plan ? true : false,
         maintenance_history: JSON.parse(response.maintenance_history),
@@ -783,23 +785,34 @@ export default defineComponent({
       // Get the selected file
       const selectedFile = event.target?.files?.[0];
 
+      if (!selectedFile) {
+        alert("Please Select a file");
+      }
+
       if (selectedFile) {
         // Check if the selected file is a PDF
         if (selectedFile.type === "application/pdf") {
           const reader = new FileReader();
 
-          reader.onload = (e) => {
-            if (e.target) {
-              const result = e.target.result as string;
+          reader.onload = () => {
+            try {
+              const base64Data = reader.result
+                ?.toString()
+                .replace(/^data:application\/pdf;base64,/, "");
 
-              console.log(" -> ", e.target);
-              if (event.target.id === "datasheet") {
-                itemDetails.value.datasheet = result;
-              } else if (event.target.id === "calibration_certificate") {
-                itemDetails.value.calibration_certificate = result;
-              } else if (event.target.id === "traceability") {
-                itemDetails.value.traceability = result;
+              if (base64Data) {
+                if (event.target.id === "datasheet") {
+                  itemDetails.value.datasheet = base64Data;
+                } else if (event.target.id === "calibration_certificate") {
+                  itemDetails.value.calibration_certificate = base64Data;
+                } else if (event.target.id === "traceability") {
+                  itemDetails.value.traceability = base64Data;
+                }
+              } else {
+                console.error("Error: Failed to read the image data.");
               }
+            } catch (e) {
+              console.error("Error:", e);
             }
           };
 
@@ -809,7 +822,6 @@ export default defineComponent({
           isPdfInvalid.value = false;
         } else {
           // Clear the data and set the invalid flag
-          // itemDetails.value.uploaded_pdf_name = "";
 
           if (event.target.id === "datasheet") {
             itemDetails.value.datasheet = "";

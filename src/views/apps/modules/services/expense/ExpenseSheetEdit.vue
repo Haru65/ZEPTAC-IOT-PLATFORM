@@ -226,8 +226,8 @@ export default defineComponent({
 
       expenseSheetDetails.value.expenses = JSON.parse(result.expenses);
 
-      expenseSheetDetails.value.expenses.forEach((expense) => {
-        expense.imgData = ""; // You can set the initial value for imgData here
+      expenseSheetDetails.value.expenses.forEach((expense) => { // You can set the initial value for imgData here
+        expense.imgData = `https://api.zeptac.com/storage/company/${result.company_id}/expenses/${expense.receipt}`; // You can set the initial value for imgData here
         expense.visible = false; // You can set the initial value for visible here
       });
 
@@ -236,17 +236,12 @@ export default defineComponent({
 
     function showTheImage(index) {
       expenseSheetDetails.value.expenses[index].visible = true;
-      expenseSheetDetails.value.expenses[index].imgData =
-        expenseSheetDetails.value.expenses[index].receipt;
-
-      console.log(expenseSheetDetails.value);
       console.log(index);
     }
 
     function HideTheImage(index) {
       console.log(index);
       expenseSheetDetails.value.expenses[index].visible = false;
-      expenseSheetDetails.value.expenses[index].imgData = "";
     }
 
     async function setStatus(e) {

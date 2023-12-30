@@ -182,62 +182,56 @@
             </div>
             <!--end::Input group-->
 
+            <!--begin::Input group-->
             <div class="row mb-6">
-              <label
-                for="pdfFile"
-                class="col-lg-2 col-form-label required fw-semobold fs-6"
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label fw-semobold fs-6"
                 >Upload PDF Document:</label
               >
+              <!--end::Label-->
 
               <!--begin::Col-->
-              <div class="col-lg-10 fv-row position-relative">
-                <Field
-                  type="file"
-                  id="pdfFile"
-                  name="uploaded_pdf_name"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter document name"
-                  @change="handleFileChange"
-                  accept=".pdf"
-                />
-                <div
-                  v-if="procedureDetails.uploaded_pdf_data"
-                  class="position-absolute end-0 top-50 translate-middle-y"
-                >
-                  <i
-                    class="fas fs-4 fa-check-circle text-success me-6"
-                    data-toggle="tooltip"
-                    title="File is selected"
-                  ></i>
-                </div>
-                <div
-                  v-else
-                  class="position-absolute end-0 top-50 translate-middle-y"
-                >
-                  <i
-                    class="fas fs-4 fa-times-circle text-danger me-6"
-                    data-toggle="tooltip"
-                    title="File is not selected"
-                  ></i>
-                </div>
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="uploaded_pdf_name" />
+              <div class="col-lg-8">
+                <!--begin::Row-->
+                <div class="row">
+                  <!--begin::Col-->
+                  <div class="col-lg fv-row position-relative">
+                    <Field
+                      type="file"
+                      id="audit_document"
+                      name="audit_document"
+                      class="form-control form-control-lg form-control-solid"
+                      @change="handleFileChange"
+                      accept=".pdf"
+                    />
+                    <div
+                      v-if="procedureDetails.audit_document"
+                      class="position-absolute end-0 top-50 translate-middle-y"
+                    >
+                      <i
+                        class="fas fs-4 fa-check-circle text-success me-6"
+                        data-toggle="tooltip"
+                        title="File is selected"
+                      ></i>
+                    </div>
+                    <div
+                      v-else
+                      class="position-absolute end-0 top-50 translate-middle-y"
+                    >
+                      <i
+                        class="fas fs-4 fa-times-circle text-danger me-6"
+                        data-toggle="tooltip"
+                        title="File is not selected"
+                      ></i>
+                    </div>
                   </div>
+                  <!--end::Col-->
                 </div>
+                <!--end::Row-->
               </div>
               <!--end::Col-->
             </div>
-
-            <div class="row mb-6">
-              <iframe
-                v-if="procedureDetails.uploaded_pdf_data"
-                :src="procedureDetails.uploaded_pdf_data"
-                width="400"
-                height="400"
-                frameborder="0"
-              ></iframe>
-            </div>
+            <!--end::Input group-->
           </div>
 
           <div class="modal-footer flex-center w-100">
@@ -293,8 +287,7 @@ interface procedures {
   revision_no: string;
   prepared_by: string;
   approved_by: string;
-  uploaded_pdf_name: string;
-  uploaded_pdf_data: string;
+  audit_document: string;
   company_id: string;
   created_by: string;
   updated_by: string;
@@ -324,7 +317,7 @@ export default defineComponent({
       revision_no: Yup.string().required().label("Revision No."),
       prepared_by: Yup.string().required().label("Prepared By"),
       approved_by: Yup.string().required().label("Approved By"),
-      uploaded_pdf_data: Yup.string().required().label("Pdf"),
+      audit_document: Yup.string().required().label("Pdf"),
     });
 
     const procedureDetails = ref<procedures>({
@@ -335,8 +328,7 @@ export default defineComponent({
       revision_no: "",
       prepared_by: "",
       approved_by: "",
-      uploaded_pdf_name: "",
-      uploaded_pdf_data: "",
+      audit_document: "",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -349,39 +341,44 @@ export default defineComponent({
       // Get the selected file
       const selectedFile = event.target?.files?.[0];
 
+      if (!selectedFile) {
+        alert("Please Select a file");
+      }
+
       if (selectedFile) {
         // Check if the selected file is a PDF
-        if (selectedFile.type === "application/pdf") {
-          // Store the file name in procedureDetails
-          procedureDetails.value.uploaded_pdf_name = selectedFile.name;
 
-          // Read the file data using FileReader
+        if (selectedFile.type === "application/pdf") {
           const reader = new FileReader();
 
-          reader.onload = (e) => {
-            // Store the entire PDF data (base64 encoded)
-            if (e.target) {
-              const result = e.target.result as string;
-              procedureDetails.value.uploaded_pdf_data = result;
+          reader.onload = () => {
+            try {
+              const base64Data = reader.result
+                ?.toString()
+                .replace(/^data:application\/pdf;base64,/, "");
+
+              if (base64Data) {
+                procedureDetails.value.audit_document = base64Data;
+              } else {
+                console.error("Error: Failed to read the image data.");
+              }
+            } catch (e) {
+              console.error("Error:", e);
             }
           };
 
           // Read the file as data URL (base64)
           reader.readAsDataURL(selectedFile);
-
           // Reset the invalid flag
           isPdfInvalid.value = false;
         } else {
           // Clear the data and set the invalid flag
-          procedureDetails.value.uploaded_pdf_name = "";
-          procedureDetails.value.uploaded_pdf_data = "";
+          procedureDetails.value.audit_document = "";
           isPdfInvalid.value = true;
         }
       } else {
-        // Clear the selected file name and data if no file is selected
-        procedureDetails.value.uploaded_pdf_name = "";
-        procedureDetails.value.uploaded_pdf_data = "";
-        isPdfInvalid.value = false;
+        procedureDetails.value.audit_document = "";
+        isPdfInvalid.value = true;
       }
       console.log(procedureDetails.value);
     };
@@ -396,8 +393,7 @@ export default defineComponent({
           revision_no,
           prepared_by,
           approved_by,
-          uploaded_pdf_name,
-          uploaded_pdf_data,
+          audit_document,
         } = data;
 
         // Check if any property is null or empty
@@ -410,8 +406,7 @@ export default defineComponent({
           revision_no !== "" &&
           prepared_by !== "" &&
           approved_by !== "" &&
-          uploaded_pdf_name !== "" &&
-          uploaded_pdf_data !== ""
+          audit_document !== ""
         );
       });
     }

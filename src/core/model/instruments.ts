@@ -8,9 +8,10 @@ interface IInstrument {
     make: string;
     description: string;
     availability: string;
-    c_id:number;
-    d_id:number;
-    t_id:number;
+    datasheet:string;
+    calibration_certificate:string;
+    traceability:string;
+    company_id: string;
   }
   
   export type { IInstrument };

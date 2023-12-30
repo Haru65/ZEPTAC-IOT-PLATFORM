@@ -145,7 +145,7 @@
                         <div class="border p-2 mt-3">
                           <template v-if="task.receipt">
                             <img
-                              :src="task.receipt"
+                              :src="task.imgData"
                               class="rounded mx-auto d-block w-200px h-200px cursor-pointer"
                               @click="showImg(index)"
                             />
@@ -156,7 +156,7 @@
                   </div>
                   <vue-easy-lightbox
                     :visible="task.visible"
-                    :imgs="task.receipt"
+                    :imgs="task.imgData"
                     :index="index"
                     @hide="onHide(index)"
                   ></vue-easy-lightbox>

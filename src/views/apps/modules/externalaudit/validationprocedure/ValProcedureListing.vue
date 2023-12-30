@@ -130,15 +130,23 @@
         <template v-slot:created_at="{ row: valprocedure }">
           {{ valprocedure.created_at }}
         </template>
+        <template v-slot:audit_document="{ row: valprocedure }">
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row">
+            <a
+              target="blank"
+              v-bind:href="`https://api.zeptac.com/storage/company/${valprocedure.company_id}/audits/${valprocedure.audit_document}`"
+              data-toggle="tooltip"
+              title="Download Audit Document"
+              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
+              >⤓ Audit Document
+            </a>
+          </div>
+          <!--end::Menu FLex-->
+        </template>
         <template v-slot:actions="{ row: valprocedure }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <i
-                @click="downloadDocument(valprocedure.id)"
-                class="cursor-pointer bi bi-download text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
-            </span>
             <span class="menu-link px-3">
               <router-link :to="`/validation/edit/${valprocedure.id}`">
                 <i
@@ -270,6 +278,12 @@ export default defineComponent({
         columnWidth: 75,
       },
       {
+        columnName: "Audit Document",
+        columnLabel: "audit_document",
+        sortEnabled: true,
+        columnWidth: 75,
+      },
+      {
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
@@ -310,6 +324,7 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({
             id,
+            company_id,
             document_name,
             issue_date,
             issue_no,
@@ -318,8 +333,10 @@ export default defineComponent({
             prepared_by,
             approved_by,
             created_at,
+            audit_document,
           }) => ({
             id,
+            company_id,
             document_name,
             issue_date: moment(issue_date).format("MMMM Do YYYY"),
             issue_no,
@@ -328,6 +345,7 @@ export default defineComponent({
             prepared_by,
             approved_by,
             created_at: moment(created_at).format("MMMM Do YYYY"),
+            audit_document
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -360,6 +378,7 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({
             id,
+            company_id,
             document_name,
             issue_date,
             issue_no,
@@ -368,8 +387,10 @@ export default defineComponent({
             prepared_by,
             approved_by,
             created_at,
+            audit_document,
           }) => ({
             id,
+            company_id,
             document_name,
             issue_date: moment(issue_date).format("MMMM Do YYYY"),
             issue_no,
@@ -378,6 +399,7 @@ export default defineComponent({
             prepared_by,
             approved_by,
             created_at: moment(created_at).format("MMMM Do YYYY"),
+            audit_document,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -422,6 +444,7 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({
             id,
+            company_id,
             document_name,
             issue_date,
             issue_no,
@@ -430,8 +453,10 @@ export default defineComponent({
             prepared_by,
             approved_by,
             created_at,
+            audit_document,
           }) => ({
             id,
+            company_id,
             document_name,
             issue_date: moment(issue_date).format("MMMM Do YYYY"),
             issue_no,
@@ -440,6 +465,7 @@ export default defineComponent({
             prepared_by,
             approved_by,
             created_at: moment(created_at).format("MMMM Do YYYY"),
+            audit_document,
           })
         );
         total.value = response.result.total_count;
@@ -549,6 +575,7 @@ export default defineComponent({
         tableData.value = response.result.data.data.map(
           ({
             id,
+            company_id,
             document_name,
             issue_date,
             issue_no,
@@ -557,8 +584,10 @@ export default defineComponent({
             prepared_by,
             approved_by,
             created_at,
+            audit_document,
           }) => ({
             id,
+            company_id,
             document_name,
             issue_date: moment(issue_date).format("MMMM Do YYYY"),
             issue_no,
@@ -567,6 +596,7 @@ export default defineComponent({
             prepared_by,
             approved_by,
             created_at: moment(created_at).format("MMMM Do YYYY"),
+            audit_document,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -607,43 +637,6 @@ export default defineComponent({
     };
 
 
-    function downloadFileObject(base64String) {
-      const linkSource = base64String;
-      const downloadLink = document.createElement("a");
-      const fileName = "Document.pdf";
-      downloadLink.href = linkSource;
-      downloadLink.download = fileName;
-      downloadLink.click();
-    }
-
-    const downloadDocument = async (id: any) => {
-      try {
-        const res = await getValidationProcedure(id);
-
-        const { uploaded_pdf_name, uploaded_pdf_data } = res;
-
-        // get base64Data
-        let base64String = uploaded_pdf_data.replace(
-          /^data:application\/\pdf+;base64,/,
-          ""
-        );
-
-        // check whether data starts with JVB, JVB is a prefix for pdf files 
-
-        if (base64String.startsWith("JVB")) {
-          base64String = "data:application/pdf;base64," + base64String;
-          downloadFileObject(base64String);
-        } else if (base64String.startsWith("data:application/pdf;base64")) {
-          downloadFileObject(base64String);
-        } else {
-          alert("Not a valid Base64 PDF string. Please check");
-        }
-        
-      } catch (error) {
-        console.error("Error downloading PDF:", error);
-      }
-    };
-
     return {
       tableData,
       tableHeader,
@@ -661,7 +654,6 @@ export default defineComponent({
       page,
       Limits,
       PageLimitPoiner,
-      downloadDocument,
     };
   },
 });

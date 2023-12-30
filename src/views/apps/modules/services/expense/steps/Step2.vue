@@ -108,7 +108,7 @@
                         type="file"
                         class="form-control form-control-file form-control-lg form-control-solid"
                         name="receipt"
-                        accept="image/*"
+                        accept="image/png,jpg,jpeg"
                         @change="setTheImage($event, index)"
                       />
                     </div>
@@ -118,7 +118,7 @@
                       <div class="border p-2 mt-3">
                         <template v-if="task.receipt">
                           <img
-                            :src="task.receipt"
+                            :src="'data:image/png;base64,' + task.receipt"
                             class="rounded mx-auto d-block w-200px h-200px"
                           />
                         </template>
