@@ -21,6 +21,8 @@ import {
   getTraining,
   getEmployee,
   getClient,
+  getThermalInstrument,
+  getThermalReport,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
@@ -845,6 +847,137 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
 
+      
+      // Reports - Thermal Mapping
+      {
+        path: "/thermalreport/list",
+        name: "thermal-report-list",
+        component: () =>
+          import("@/views/apps/thermal/thermalreports/ThermalReportListing.vue"),
+        meta: {
+          pageTitle: "Thermal Report List",
+          breadcrumbs: ["Thermal Report List"],
+        },
+      },
+      {
+        path: "/thermalreport/add",
+        name: "thermal-report-add",
+        component: () =>
+          import("@/views/apps/thermal/thermalreports/ThermalReportAdd.vue"),
+        meta: {
+          pageTitle: "Thermal Report Add",
+          breadcrumbs: ["Thermal Report Add"],
+        },
+      },
+      {
+        path: "/thermalreport/edit/:id",
+        name: "thermal-report-edit",
+        beforeEnter: async (to, from, next) => {
+          const reportID = to.params.id;
+          try {
+            const response = await getThermalReport(reportID.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/thermal/thermalreports/ThermalReportEdit.vue"),
+        meta: {
+          pageTitle: "Create Diagram",
+          breadcrumbs: ["Create Diagram"],
+        },
+      },
+
+      // Instruments - Thermal Mapping
+      {
+        path: "/thermalinstrument/list",
+        name: "thermal-instrument-list",
+        component: () =>
+          import("@/views/apps/thermal/instruments/ThermalInstrumentListing.vue"),
+        meta: {
+          pageTitle: "Thermal Instrument List",
+          breadcrumbs: ["Thermal Instrument List"],
+        },
+      },
+      {
+        path: "/thermalinstrument/add",
+        name: "thermal-instrument-add",
+        component: () =>
+          import("@/views/apps/thermal/instruments/ThermalInstrumentAdd.vue"),
+        meta: {
+          pageTitle: "Thermal Instrument Add",
+          breadcrumbs: ["Thermal Instrument Add"],
+        },
+      },
+      {
+        path: "/thermalinstrument/edit/:id",
+        name: "thermal-instrument-edit",
+        beforeEnter: async (to, from, next) => {
+          
+          console.log("Hit");
+          const instrumentId = to.params.id;
+          try {
+            const response = await getThermalInstrument(instrumentId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/thermal/instruments/ThermalInstrumentEdit.vue"),
+        meta: {
+          pageTitle: "Thermal Instrument Edit",
+          breadcrumbs: ["Thermal Instrument Edit"],
+        },
+      },
+      {
+        path: "/thermalinstrument/cloneinstrument/:id",
+        name: "thermal-instrument-clone",
+        beforeEnter: async (to, from, next) => {
+          const instrumentId = to.params.id;
+          try {
+            const response = await getThermalInstrument(instrumentId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/thermal/instruments/ThermalInstrumentClone.vue"),
+        meta: {
+          pageTitle: "Thermal Instrument Clone",
+          breadcrumbs: ["Thermal Instrument Clone"],
+        },
+      },
+
+      {
+        path: "/profile/changepassword",
+        name: "change-password",
+        component: () =>
+          import("@/views/crafted/account/Settings.vue"),
+        meta: {
+          pageTitle: "Profile Details",
+        }
+      },
     ],
   },
 

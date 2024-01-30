@@ -172,6 +172,7 @@
                               id="work_date"
                               v-model="worksheetDetails.work_date"
                               placeholder="Pick Work Day"
+                              @change="setWorkDate"
                             />
                           </div>
                         </span>
@@ -205,6 +206,7 @@
                               id="start_time"
                               v-model="worksheetDetails.start_time"
                               placeholder="Pick start time"
+                              @change="setStartTime"
                             />
                           </div>
                         </span>
@@ -235,6 +237,7 @@
                               id="end_time"
                               v-model="worksheetDetails.end_time"
                               placeholder="Pick end time"
+                              @change="setEndTime"
                             />
                           </div>
                         </span>
@@ -550,6 +553,42 @@ export default defineComponent({
       tests: Yup.string().required().label("Test"),
     });
 
+    async function setStartTime(e) {
+      console.log(e);
+      if(e != null){
+        worksheetDetails.value.start_time = await moment(e).format(
+          "YYYY-MM-DD HH:mm:ss"
+          );
+      }
+      else{
+        worksheetDetails.value.start_time = "";
+      }
+    }
+
+    async function setEndTime(e) {
+      console.log(e);
+      if(e != null){
+        worksheetDetails.value.end_time = await moment(e).format(
+          "YYYY-MM-DD HH:mm:ss"
+          );
+      }
+      else{
+        worksheetDetails.value.end_time = "";
+      }
+    }
+
+    async function setWorkDate(e) {
+      console.log(e);
+      if(e != null){
+        worksheetDetails.value.work_date = await moment(e).format(
+          "YYYY-MM-DD"
+          );
+      }
+      else{
+        worksheetDetails.value.work_date = "";
+      }
+    }
+
     const ServiceEngineers = ref([
       {
         id: "",
@@ -666,15 +705,16 @@ export default defineComponent({
       loading.value = true;
       console.log(worksheetDetails.value);
 
-      worksheetDetails.value.work_date = moment(
-        worksheetDetails.value.work_date
-      ).format("YYYY-MM-DD");
-      worksheetDetails.value.start_time = moment(
-        worksheetDetails.value.start_time
-      ).format("YYYY-MM-DD HH:mm:ss");
-      worksheetDetails.value.end_time = moment(
-        worksheetDetails.value.end_time
-      ).format("YYYY-MM-DD HH:mm:ss");
+
+      if(worksheetDetails.value.work_date == "" || worksheetDetails.value.start_time == "" || worksheetDetails.value.end_time == ""){
+        showErrorAlert(
+          "Warning",
+          "Please fill all the details correctly"
+        );
+        loading.value = false;
+        return;
+      }
+      
       console.log(worksheetDetails.value);
       if (
         worksheetDetails.value.tests.length === 0 &&
@@ -761,7 +801,9 @@ export default defineComponent({
       loading,
       onsubmit,
       AcceptanceCriteria,
-      // toggleCheckbox,
+      setWorkDate,
+      setStartTime,
+      setEndTime,
     };
   },
 });

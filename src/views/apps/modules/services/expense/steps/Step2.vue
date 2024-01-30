@@ -43,10 +43,10 @@
                       <el-date-picker
                         type="date"
                         name="date"
-                        placeholder="Pick a day"
-                        onchange="setTheDate"
                         class="mb-3 mb-lg-0 min-w-150px"
                         v-model="task.date"
+                        @change="setTheDate($event, index)"
+                        placeholder="Pick a day"
                       />
                     </div>
 

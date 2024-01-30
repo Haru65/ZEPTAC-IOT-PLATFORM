@@ -320,6 +320,7 @@
             <div class="col-lg-8 fv-row">
               <Field
                 type="text"
+                disabled
                 name="enquiry_no"
                 class="form-control form-control-lg form-control-solid"
                 placeholder="Enter enquiry number"

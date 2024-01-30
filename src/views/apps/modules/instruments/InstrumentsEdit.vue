@@ -54,6 +54,29 @@
             <!-- extra fields -->
             <div class="row mb-6">
               <div class="form-group col-md-6">
+                <label
+                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
+                  >Instrument ID.</label
+                >
+                <Field
+                  type="text"
+                  name="instrument_id"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Enter Instrument ID."
+                  v-model="itemDetails.instrument_id"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="instrument_id" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--end::Input group-->
+
+            <!-- extra fields -->
+            <div class="row mb-6">
+              <div class="form-group col-md-6">
                 <label class="col-lg-4 col-form-label required fw-semobold fs-6"
                   >Model No.</label
                 >

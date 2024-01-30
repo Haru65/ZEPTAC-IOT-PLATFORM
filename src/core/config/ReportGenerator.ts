@@ -1,4 +1,4 @@
-// * This file is used to generate GatePass pdf
+// * This file is used to generate Validation Report pdf
 
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";

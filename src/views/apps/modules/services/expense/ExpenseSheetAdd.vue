@@ -137,7 +137,7 @@ import moment from "moment";
 
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-import { addExpenseSheet, getOnGoingRGP } from "@/stores/api";
+import { addExpenseSheet, getOnGoingCompletedRGP } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import { ExpenseTypes } from "@/core/model/expensetypes";
 
@@ -205,10 +205,16 @@ export default defineComponent({
 
     // Expenses Emits
 
-    async function setExpenseDate(event, index) {
-      console.log(event, index);
-      expenseSheetDetails.value.expenses[index].date =
-        moment(event).format("YYYY-MM-DD");
+    async function setExpenseDate(e, index) {
+      console.log(e);
+      if(e != null){
+        expenseSheetDetails.value.expenses[index].date = await moment(e).format(
+          "YYYY-MM-DD"
+          );
+      }
+      else{
+        expenseSheetDetails.value.expenses[index].date = await "";
+      }
     }
 
     async function setExpenseType(typeId, index) {
@@ -440,7 +446,7 @@ export default defineComponent({
       ApiService.setHeader();
 
       const company_ID = auth.GetUser().company_id;
-      const response = await getOnGoingRGP(company_ID);
+      const response = await getOnGoingCompletedRGP(company_ID);
 
       if (response) {
         await fillDetails(response);
@@ -480,32 +486,23 @@ export default defineComponent({
       // formData.value = { ...values };
 
       if (currentStepIndex.value === 0) {
-        // if (
-        //   expenseSheetDetails.value.rgp_id &&
-        //   expenseSheetDetails.value.engineer_id
-        // ) {
-        //   currentStepIndex.value++;
+        if (
+          expenseSheetDetails.value.rgp_id &&
+          expenseSheetDetails.value.engineer_id
+        ) {
+          currentStepIndex.value++;
 
-        //   if (!_stepperObj.value) {
-        //     return;
-        //   }
+          if (!_stepperObj.value) {
+            return;
+          }
 
-        //   _stepperObj.value.goNext();
-        // } else {
-        //   Swal.fire({
-        //     icon: "info",
-        //     title: "Please fill all the required fields",
-        //   });
-        // }
-
-        currentStepIndex.value++;
-
-        if (!_stepperObj.value) {
-          return;
+          _stepperObj.value.goNext();
+        } else {
+          Swal.fire({
+            icon: "info",
+            title: "Please fill all the required fields",
+          });
         }
-
-        _stepperObj.value.goNext();
-        
       } else if (currentStepIndex.value === 1) {
         if (expenseSheetDetails.value.expenses.length > 0) {
           const result = areAllPropertiesNotNull(
@@ -612,8 +609,6 @@ export default defineComponent({
       getAssetPath,
       expenseSheetDetails,
       GetOnGoingRGP,
-      // setDate,
-      // setDueDate,
       showErrorAlert,
       showSuccessAlert,
       RGPS,

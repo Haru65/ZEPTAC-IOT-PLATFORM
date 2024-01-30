@@ -1224,7 +1224,7 @@
       data-bs-target="#kt_account_signin_method"
     >
       <div class="card-title m-0">
-        <h3 class="fw-bolder m-0">Security</h3>
+        <h3 class="fw-bolder m-0">Sign-in Method</h3>
       </div>
     </div>
     <!--end::Card header-->
@@ -1238,8 +1238,105 @@
           <div id="kt_signin_email" :class="{ 'd-none': emailFormDisplay }">
             <div class="fs-4 fw-bolder mb-1">Email Address</div>
             <div class="fs-6 fw-semobold text-gray-600">
-              {{ User.email }}
+              support@portal.com
             </div>
+          </div>
+
+          <div
+            id="kt_signin_email_edit"
+            :class="{ 'd-none': !emailFormDisplay }"
+            class="flex-row-fluid"
+          >
+            <!--begin::Form-->
+            <VForm
+              id="kt_signin_change_email"
+              class="form"
+              novalidate
+              @submit="updateEmail()"
+              :validation-schema="changeEmail"
+            >
+              <div class="row mb-6">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                  <div class="fv-row mb-0">
+                    <label
+                      for="emailaddress"
+                      class="form-label fs-6 fw-bold mb-3"
+                      >Enter New Email Address</label
+                    >
+                    <Field
+                      type="email"
+                      class="form-control form-control-lg form-control-solid fw-semobold fs-6"
+                      id="emailaddress"
+                      placeholder="Email Address"
+                      name="emailaddress"
+                      value="support@portal.com"
+                    />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="emailaddress" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="fv-row mb-0">
+                    <label
+                      for="confirmemailpassword"
+                      class="form-label fs-6 fw-bold mb-3"
+                      >Confirm Password</label
+                    >
+                    <Field
+                      type="password"
+                      class="form-control form-control-lg form-control-solid fw-semobold fs-6"
+                      name="confirmemailpassword"
+                      id="confirmemailpassword"
+                    />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="confirmemailpassword" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex">
+                <button
+                  id="kt_signin_submit"
+                  type="submit"
+                  ref="updateEmailButton"
+                  class="btn btn-primary me-2 px-6"
+                >
+                  <span class="indicator-label"> Update Email </span>
+                  <span class="indicator-progress">
+                    Please wait...
+                    <span
+                      class="spinner-border spinner-border-sm align-middle ms-2"
+                    ></span>
+                  </span>
+                </button>
+                <button
+                  id="kt_signin_cancel"
+                  type="button"
+                  class="btn btn-color-gray-400 btn-active-light-primary px-6"
+                  @click="emailFormDisplay = !emailFormDisplay"
+                >
+                  Cancel
+                </button>
+              </div>
+            </VForm>
+            <!--end::Form-->
+          </div>
+          <div
+            id="kt_signin_email_button"
+            :class="{ 'd-none': emailFormDisplay }"
+            class="ms-auto"
+          >
+            <button
+              class="btn btn-light fw-bolder px-6"
+              @click="emailFormDisplay = !emailFormDisplay"
+            >
+              Change Email
+            </button>
           </div>
         </div>
         <!--end::Email Address-->
@@ -1274,39 +1371,19 @@
                 <div class="col-lg-4">
                   <div class="fv-row mb-0">
                     <label
-                      for="old_password"
+                      for="currentpassword"
                       class="form-label fs-6 fw-bold mb-3"
                       >Current Password</label
                     >
                     <Field
                       type="password"
                       class="form-control form-control-lg form-control-solid fw-semobold fs-6"
-                      name="old_password"
-                      v-model="passwordDetails.old_password"
-                      id="old_password"
+                      name="currentpassword"
+                      id="currentpassword"
                     />
                     <div class="fv-plugins-message-container">
                       <div class="fv-help-block">
-                        <ErrorMessage name="old_password" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-4">
-                  <div class="fv-row mb-0">
-                    <label for="password" class="form-label fs-6 fw-bold mb-3"
-                      >New Password</label
-                    >
-                    <Field
-                      type="password"
-                      class="form-control form-control-lg form-control-solid fw-semobold fs-6"
-                      name="password"
-                      v-model="passwordDetails.password"
-                      id="password"
-                    />
-                    <div class="fv-plugins-message-container">
-                      <div class="fv-help-block">
-                        <ErrorMessage name="password" />
+                        <ErrorMessage name="currentpassword" />
                       </div>
                     </div>
                   </div>
@@ -1314,20 +1391,39 @@
                 <div class="col-lg-4">
                   <div class="fv-row mb-0">
                     <label
-                      for="password_confirmation"
+                      for="newpassword"
+                      class="form-label fs-6 fw-bold mb-3"
+                      >New Password</label
+                    >
+                    <Field
+                      type="password"
+                      class="form-control form-control-lg form-control-solid fw-semobold fs-6"
+                      name="newpassword"
+                      id="newpassword"
+                    />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="newpassword" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="fv-row mb-0">
+                    <label
+                      for="confirmpassword"
                       class="form-label fs-6 fw-bold mb-3"
                       >Confirm New Password</label
                     >
                     <Field
                       type="password"
                       class="form-control form-control-lg form-control-solid fw-semobold fs-6"
-                      name="password_confirmation"
-                      v-model="passwordDetails.password_confirmation"
-                      id="password_confirmation"
+                      name="confirmpassword"
+                      id="confirmpassword"
                     />
                     <div class="fv-plugins-message-container">
                       <div class="fv-help-block">
-                        <ErrorMessage name="password_confirmation" />
+                        <ErrorMessage name="confirmpassword" />
                       </div>
                     </div>
                   </div>
@@ -2159,10 +2255,6 @@ import { defineComponent, ref } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
-import { useAuthStore } from "@/stores/auth";
-import { changeUserPassword } from "@/stores/api";
-
-import ApiService from "@/core/services/ApiService";
 
 interface ProfileDetails {
   avatar: string;
@@ -2182,12 +2274,6 @@ interface ProfileDetails {
   allowMarketing: boolean;
 }
 
-interface PasswordDetails {
-  old_password: string;
-  password: string;
-  password_confirmation: string;
-}
-
 export default defineComponent({
   name: "account-settings",
   components: {
@@ -2196,9 +2282,6 @@ export default defineComponent({
     VForm,
   },
   setup() {
-    const store = useAuthStore();
-    const User = store.GetUser();
-
     const submitButton1 = ref<HTMLElement | null>(null);
     const submitButton2 = ref<HTMLElement | null>(null);
     const submitButton3 = ref<HTMLElement | null>(null);
@@ -2228,12 +2311,12 @@ export default defineComponent({
     });
 
     const changePassword = Yup.object().shape({
-      old_password: Yup.string().required().label("Current password"),
-      password: Yup.string().min(8).required().label("Password"),
-      password_confirmation: Yup.string()
-        .min(8)
+      currentpassword: Yup.string().required().label("Current password"),
+      newpassword: Yup.string().min(4).required().label("Password"),
+      confirmpassword: Yup.string()
+        .min(4)
         .required()
-        .oneOf([Yup.ref("password"), null], "Passwords must match")
+        .oneOf([Yup.ref("newpassword"), null], "Passwords must match")
         .label("Password Confirmation"),
     });
 
@@ -2253,12 +2336,6 @@ export default defineComponent({
         phone: false,
       },
       allowMarketing: false,
-    });
-
-    const passwordDetails = ref<PasswordDetails>({
-      old_password: "",
-      password: "",
-      password_confirmation: "",
     });
 
     const saveChanges1 = () => {
@@ -2342,71 +2419,27 @@ export default defineComponent({
       }
     };
 
-    const updatePassword = async () => {
-      try {
-        if (updatePasswordButton.value) {
-          // Activate indicator
-          updatePasswordButton.value.setAttribute("data-kt-indicator", "on");
+    const updatePassword = () => {
+      if (updatePasswordButton.value) {
+        // Activate indicator
+        updatePasswordButton.value.setAttribute("data-kt-indicator", "on");
 
-          ApiService.setHeader();
+        setTimeout(() => {
+          updatePasswordButton.value?.removeAttribute("data-kt-indicator");
 
-          console.log(passwordDetails.value);
-
-          const response = await changeUserPassword(passwordDetails.value);
-          console.log(response);
-
-          if (!response.error) {
-
-            setTimeout(() => {
-              updatePasswordButton.value?.removeAttribute("data-kt-indicator");
-
-              Swal.fire({
-                text: "Password changesd successfully",
-                icon: "success",
-                confirmButtonText: "Ok",
-                buttonsStyling: false,
-                heightAuto: false,
-                customClass: {
-                  confirmButton: "btn btn-light-primary",
-                },
-              }).then(() => {
-                passwordFormDisplay.value = false;
-              });
-            }, 2000);
-          } else {
-
-            setTimeout(() => {
-              updatePasswordButton.value?.removeAttribute("data-kt-indicator");
-
-              Swal.fire({
-                text: "Please enter correct password",
-                icon: "error",
-                confirmButtonText: "Ok",
-                buttonsStyling: false,
-                heightAuto: false,
-                customClass: {
-                  confirmButton: "btn btn-light-danger",
-                },
-              }).then(() => {
-                passwordFormDisplay.value = false;
-              });
-            }, 2000);
-          }
-        }
-      } catch (error) {
-
-        Swal.fire({
-          text: "Something went wrong during API call",
-          icon: "error",
-          confirmButtonText: "Ok",
-          buttonsStyling: false,
-          heightAuto: false,
-          customClass: {
-            confirmButton: "btn btn-light-primary",
-          },
-        });
-
-        passwordFormDisplay.value = false;
+          Swal.fire({
+            text: "Password is successfully changed!",
+            icon: "success",
+            confirmButtonText: "Ok",
+            buttonsStyling: false,
+            heightAuto: false,
+            customClass: {
+              confirmButton: "btn btn-light-primary",
+            },
+          }).then(() => {
+            passwordFormDisplay.value = false;
+          });
+        }, 2000);
       }
     };
 
@@ -2426,7 +2459,6 @@ export default defineComponent({
       saveChanges4,
       deactivateAccount,
       profileDetails,
-      passwordDetails,
       emailFormDisplay,
       passwordFormDisplay,
       removeImage,
@@ -2438,7 +2470,6 @@ export default defineComponent({
       updateEmail,
       updatePassword,
       getAssetPath,
-      User,
     };
   },
 });

@@ -698,12 +698,11 @@ const handleChange = () => {
     };
 
     async function SetAhuCondition(e, index) {
-      console.log(e.target.checked)
-      if(e.target.checked === true){
-        recoveryTestDetails.value.details[index].ahu_condition = "ON";
-      }
-      else{
-        recoveryTestDetails.value.details[index].ahu_condition = "OFF"
+      console.log(e.target.checked);
+      if (e.target.checked === true) {
+        recoveryTestDetails.value.details[index].ahu_condition = await "ON";
+      } else {
+        recoveryTestDetails.value.details[index].ahu_condition = await "OFF";
       }
       console.log(recoveryTestDetails.value.details);
     }
@@ -716,7 +715,7 @@ const handleChange = () => {
           );
       }
       else{
-        recoveryTestDetails.value.details[index].time = "";
+        recoveryTestDetails.value.details[index].time = await "";
       }
     }
 

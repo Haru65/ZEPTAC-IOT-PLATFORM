@@ -14,7 +14,7 @@
             v-model="search"
             @input="searchItems()"
             class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search Gate Pass"
+            placeholder="Search by instrument name"
           />
         </div>
         <!--end::Search-->
@@ -40,9 +40,9 @@
           </button>
           <!--end::Export-->
           <!--begin::Add customer-->
-          <router-link to="./returnablegatepasses/add" class="btn btn-primary">
+          <router-link to="./add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add RGP
+            Add Thermal Instrument
           </router-link>
           <!--end::Add customer-->
         </div>
@@ -57,7 +57,11 @@
             <span class="me-2">{{ selectedIds.length }}</span
             >Selected
           </div>
-          <button type="button" class="btn btn-danger" @click="deleteFewRGP()">
+          <button
+            type="button"
+            class="btn btn-danger"
+            @click="deleteFewThermalInstrument()"
+          >
             Delete Selected
           </button>
         </div>
@@ -88,7 +92,6 @@
     </div>
     <div class="card-body pt-0">
       <Datatable
-        checkbox-label="id"
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
@@ -100,60 +103,102 @@
       >
         <!-- img data -->
 
-        <template v-slot:id="{ row: rgps }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ rgps.id }}
-          </span>
+        <template v-slot:instrument_id="{ row: thermal_instruments }">
+          {{ thermal_instruments.instrument_id }}
         </template>
-        <template v-slot:rgp_no="{ row: rgps }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ rgps.rgp_no }}
-          </span>
+        <template v-slot:name="{ row: thermal_instruments }">
+          {{ thermal_instruments.name }}
         </template>
-        <template v-slot:customer_name="{ row: rgps }">
-            <span class="text-gray-600 text-hover-primary mb-1">
-                  {{ rgps.customer_name }}
-            </span>
-          </template>
+        <template v-slot:model_no="{ row: thermal_instruments }">
+          {{ thermal_instruments.model_no }}
+        </template>
+        <template v-slot:ranges="{ row: thermal_instruments }">
+          {{ thermal_instruments.ranges }}
+        </template>
+        <template v-slot:accuracy="{ row: thermal_instruments }">
+          {{ thermal_instruments.accuracy }}
+        </template>
+        <template v-slot:serial_no="{ row: thermal_instruments }">
+          {{ thermal_instruments.serial_no }}
+        </template>
         <!-- defualt data -->
-        <template v-slot:engineers="{ row: rgps }">
-          {{ rgps.engineers }}
+        <template v-slot:make="{ row: thermal_instruments }">
+          {{ thermal_instruments.make }}
         </template>
-        <template v-slot:instruments="{ row: rgps }">
-          {{ rgps.instruments }}
+        <template v-slot:calibration_date="{ row: thermal_instruments }">
+          {{ thermal_instruments.calibration_date }}
         </template>
-        <template v-slot:status="{ row: rgps }">
+        <template v-slot:calibration_due_date="{ row: thermal_instruments }">
+          {{ thermal_instruments.calibration_due_date }}
+        </template>
+        <template v-slot:availability="{ row: thermal_instruments }">
           <span
-            v-if="rgps.status == 1"
-            class="badge py-3 px-4 fs-7 badge-light-primary"
-            >In Process</span
-          >
-          <span
-            v-if="rgps.status == 2"
+            v-if="thermal_instruments.availability == 1"
             class="badge py-3 px-4 fs-7 badge-light-success"
-            >Completed</span
+            >Available</span
+          >
+          <span
+            v-if="thermal_instruments.availability == 0"
+            class="badge py-3 px-4 fs-7 badge-light-danger"
+            >Not Available</span
           >
         </template>
-        <template v-slot:date="{ row: rgps }">
-          {{ rgps.date }}
-        </template>
-        <template v-slot:duedate="{ row: rgps }">
-          {{ rgps.duedate }}
-        </template>
-        <template v-slot:actions="{ row: rgps }">
+
+        <template v-slot:actions="{ row: thermal_instruments }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
+            <DuplicateInstrumentModal
+            :key="thermal_instruments.id"
+            :instrumentId="thermal_instruments.id"
+            :companyId="thermal_instruments.company_id"
+            :heading="thermal_instruments.name"
+            @handleDuplicate="HandleDuplicate"
+            ></DuplicateInstrumentModal>
+            <span
+              class="menu-link px-3"
+              data-toggle="tooltip"
+              title="View Instrument"
+            >
+              <router-link :to="`./edit/${thermal_instruments.id}`">
+                <i
+                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
+                ></i>
+              </router-link>
+            </span>
+            <span
+              class="menu-link px-3"
+              data-toggle="tooltip"
+              title="Delete Instrument"
+            >
               <i
-                @click="downloadRGP(rgps.id)"
-                class="cursor-pointer bi bi-download text-gray-600 text-hover-danger mb-1 fs-2"
+                @click="deleteItem(thermal_instruments.id, false)"
+                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-1"
               ></i>
             </span>
-            <span class="menu-link px-3">
+            <span
+              class="menu-link px-3 "
+              
+              data-toggle="tooltip"
+              title="Duplicate this instrument"
+              data-bs-toggle="modal"
+              :data-bs-target="
+                '#kt_modal_new_address_' + thermal_instruments.id
+              "
+            >
               <i
-                @click="deleteRGP(rgps.id, false)"
-                class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
+                class="las la-copy text-gray-600 text-hover-warning mb-1 fs-1"
               ></i>
+            </span>
+            <span
+              class="menu-link px-3"
+              data-toggle="tooltip"
+              title="Duplicate this instrument"
+            >
+              <router-link :to="`./cloneinstrument/${thermal_instruments.id}`">
+                <i
+                  class="las la-copy text-gray-600 text-hover-success mb-1 fs-1"
+                ></i>
+              </router-link>
             </span>
           </div>
           <!--end::Menu FLex-->
@@ -195,75 +240,91 @@
     </div>
   </div>
 </template>
-  
-  <script lang="ts">
-import { getAssetPath } from "@/core/helpers/assets";
+
+<script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
-import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import type { IRGP } from "@/core/model/rgps";
-import { getAllRGatePass, deleteRGatePass, getRGPInfo, gatePassSearch } from "@/stores/api";
+import type { Sort } from "@/components/kt-datatable/table-partials/models";
+import type { ITInstrument } from "@/core/model/thermal_instruments";
+import DuplicateInstrumentModal from "./MaintenanceComponent/DuplicateInstrumentModal.vue";
+import {
+  getThermalInstruments,
+  deleteThermalInstrument,
+  ThermalInstrumentSearch,
+  GetIncrInstrumentId,
+} from "@/stores/api";
 import arraySort from "array-sort";
-import { useAuthStore } from "@/stores/auth";
-import { formatPrice } from "@/core/config/DataFormatter";
-import { rgpGen } from "@/core/config/GatePassGenerator";
 import moment from "moment";
 import Swal from "sweetalert2";
+import { getAssetPath } from "@/core/helpers/assets";
 
 export default defineComponent({
-  name: "rgp_listing",
+  name: "instrument-listing",
   components: {
     Datatable,
+    DuplicateInstrumentModal,
   },
   setup() {
     const tableHeader = ref([
       {
-        columnName: "Id",
-        columnLabel: "id",
+        columnName: "Instrument Id",
+        columnLabel: "instrument_id",
         sortEnabled: true,
         columnWidth: 35,
       },
       {
-        columnName: "RGP No.",
-        columnLabel: "rgp_no",
+        columnName: "Instrument Name",
+        columnLabel: "name",
         sortEnabled: true,
         columnWidth: 75,
       },
       {
-        columnName: "Customer Name",
-        columnLabel: "customer_name",
-        sortEnabled: true,
-        columnWidth: 175,
-      },
-      {
-        columnName: "No. of Engineers",
-        columnLabel: "engineers",
-        sortEnabled: true,
-        columnWidth: 45,
-      },
-      {
-        columnName: "No. of Instruments",
-        columnLabel: "instruments",
-        sortEnabled: true,
-        columnWidth: 45,
-      },
-      {
-        columnName: "Status",
-        columnLabel: "status",
+        columnName: "Model No",
+        columnLabel: "model_no",
         sortEnabled: true,
         columnWidth: 80,
       },
       {
-        columnName: "RGP Date",
-        columnLabel: "date",
+        columnName: "Range",
+        columnLabel: "ranges",
+        sortEnabled: true,
+        columnWidth: 80,
+      },
+      {
+        columnName: "Accuray",
+        columnLabel: "accuracy",
+        sortEnabled: true,
+        columnWidth: 80,
+      },
+      {
+        columnName: "Serial No",
+        columnLabel: "serial_no",
+        sortEnabled: true,
+        columnWidth: 80,
+      },
+      {
+        columnName: "Make",
+        columnLabel: "make",
         sortEnabled: true,
         columnWidth: 125,
       },
       {
-        columnName: "RGP Due Date",
-        columnLabel: "duedate",
+        columnName: "Calibration Date",
+        columnLabel: "calibration_date",
         sortEnabled: true,
         columnWidth: 125,
+      },
+      {
+        columnName: "Calibration Due Date",
+        columnLabel: "calibration_due_date",
+        sortEnabled: true,
+        columnWidth: 125,
+      },
+      {
+        columnName: "Availability",
+        columnLabel: "availability",
+        sortEnabled: true,
+        columnWidth: 80,
       },
       {
         columnName: "Actions",
@@ -273,52 +334,6 @@ export default defineComponent({
       },
     ]);
 
-    interface RGP {
-      rgp_no: string;
-      quotation_id: string;
-      company_id: string;
-      date: string;
-      duedate: string;
-      engineers: string;
-      instruments: string;
-      status: string;
-      created_by: string;
-      updated_by: string;
-      is_active: 1;
-    }
-
-    const loading = ref(true);
-    const auth = useAuthStore();
-    const User = auth.GetUser();
-
-    // RGP Ref
-    // const returnableGatePassDetails = ref<>
-
-    const rgpDetails = ref<RGP>({
-      rgp_no: "",
-      date: "",
-      duedate: "",
-      engineers: "",
-      instruments: "",
-      status: "",
-      quotation_id: "",
-      company_id: User.company_id,
-      created_by: User.id,
-      updated_by: User.id,
-      is_active: 1,
-    });
-    const selectedIds = ref<Array<number>>([]);
-
-    const tableData = ref<Array<IRGP>>([]);
-
-    const initvalues = ref<Array<IRGP>>([]);
-
-    // staring from 2
-    let page = ref(1);
-    let limit = ref(50);
-    // limit 10
-    const more = ref(false);
-
     const total = ref(0);
     // functions
     const Limits = ref({
@@ -326,7 +341,14 @@ export default defineComponent({
       2: 25,
       3: 50,
     });
-    // more
+
+    const loading = ref(true);
+    // staring from 2
+    let page = ref(1);
+    let limit = ref(50);
+    // limit 10
+    const more = ref(false);
+
     const PagePointer = async (page) => {
       // ? Truncate the tableData
       //console.log(limit.value);
@@ -335,34 +357,20 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getAllRGatePass(
-          `page=${page.value}&limit=${limit.value}`
+        const response = await getThermalInstruments(
+          `page=${page}&limit=${limit.value}`
         );
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
-            id,
-            rgp_no,
-            customer_name,
-            quotation_id,
-            engineers,
-            instruments,
-            status,
-            date,
-            duedate,
-          }) => ({
+          ({ id, calibration_date, calibration_due_date, ...rest }) => ({
             id: id,
-            rgp_no: rgp_no,
-            customer_name:customer_name.company_name,
-            quotation_id: quotation_id,
-            engineers: JSON.parse(engineers).length,
-            instruments: JSON.parse(instruments).length,
-            status: status,
-            date: moment(date).format("DD/MM/YYYY"),
-            duedate: moment(duedate).format("DD/MM/YYYY"),
+            calibration_date: moment(calibration_date).format("MMMM Do YYYY"),
+            calibration_due_date:
+              moment(calibration_due_date).format("MMMM Do YYYY"),
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -385,34 +393,20 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getAllRGatePass(
-          `page=${page.value}&limit=${limit.value}`
+        const response = await getThermalInstruments(
+          `page=${page.value}&limit=${limit}`
         );
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
-            id,
-            rgp_no,
-            customer_name,
-            quotation_id,
-            engineers,
-            instruments,
-            status,
-            date,
-            duedate,
-          }) => ({
+          ({ id, calibration_date, calibration_due_date, ...rest }) => ({
             id: id,
-            rgp_no: rgp_no,
-            customer_name:customer_name.company_name,
-            quotation_id: quotation_id,
-            engineers: JSON.parse(engineers).length,
-            instruments: JSON.parse(instruments).length,
-            status: status,
-            date: moment(date).format("DD/MM/YYYY"),
-            duedate: moment(duedate).format("DD/MM/YYYY"),
+            calibration_date: moment(calibration_date).format("MMMM Do YYYY"),
+            calibration_due_date:
+              moment(calibration_due_date).format("MMMM Do YYYY"),
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -428,7 +422,14 @@ export default defineComponent({
 
     //console.log(initvalues.value);
 
+    async function HandleDuplicate(e){
+
+      await thermal_instrument_listing();
+
+    }
+
     const NextPage = () => {
+      console.log(more.value);
       if (more.value != false) {
         page.value = page.value + 1;
         PagePointer(page.value);
@@ -442,35 +443,28 @@ export default defineComponent({
       }
     };
 
-    async function rgp_listing(): Promise<void> {
+    const selectedIds = ref<Array<number>>([]);
+
+    const tableData = ref<Array<ITInstrument>>([]);
+
+    const initvalues = ref<Array<ITInstrument>>([]);
+
+    async function thermal_instrument_listing(): Promise<void> {
       try {
-        const response = await getAllRGatePass(
+        const response = await getThermalInstruments(
           `page=${page.value}&limit=${limit.value}`
         );
-        console.log(response);
         tableData.value = response.result.data.map(
-          ({
-            id,
-            rgp_no,
-            customer_name,
-            quotation_id,
-            engineers,
-            instruments,
-            status,
-            date,
-            duedate,
-          }) => ({
+          ({ id, calibration_date, calibration_due_date, ...rest }) => ({
             id: id,
-            rgp_no: rgp_no,
-            customer_name:customer_name.company_name,
-            quotation_id: quotation_id,
-            engineers: JSON.parse(engineers).length,
-            instruments: JSON.parse(instruments).length,
-            status: status,
-            date: moment(date).format("DD/MM/YYYY"),
-            duedate: moment(duedate).format("DD/MM/YYYY"),
+            calibration_date: moment(calibration_date).format("MMMM Do YYYY"),
+            calibration_due_date:
+              moment(calibration_due_date).format("MMMM Do YYYY"),
+            ...rest,
           })
         );
+        total.value = response.result.total_count;
+        more.value = response.result.next_page_url != null ? true : false;
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -483,85 +477,10 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      await rgp_listing();
+      await thermal_instrument_listing();
     });
 
-    const rgpInfo = ref({
-      id: "",
-      rgp_no: "",
-      date: "",
-      duedate: "",
-      engineers: [],
-      instruments: [],
-      status: "",
-      quotation_no: "",
-      customer_data: {
-        company_id: "",
-        first_name : "",
-        last_name: ""
-      },
-      client_data: {
-        company_id: "",
-        first_name : "",
-        last_name: ""
-      },
-      customer_company:{
-        company_name: ""
-      },
-      client_company:{
-        company_name: ""
-      },
-      customer_address:{
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        states: "",
-        country: ""
-      },
-      client_address:{
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        states: "",
-        country: ""
-      },
-      company_details:{
-        company_name: "",
-        company_logo: getAssetPath("media/avatars/default.png"),
-      }
-    })
-
-    const downloadRGP = async (id: any) => {
-      // get all information of the rgp
-      const res = await getRGPInfo(id);
-      rgpInfo.value.id = res.result.id;
-      rgpInfo.value.rgp_no = res.result.rgp_no;
-      rgpInfo.value.date = res.result.date;
-      rgpInfo.value.duedate = res.result.duedate;
-      rgpInfo.value.engineers = await res.result.engData;
-      rgpInfo.value.instruments = await res.result.instData;
-      rgpInfo.value.customer_company.company_name = res.result.customer_company.company_name;
-      rgpInfo.value.client_company.company_name = res.result.client_company.company_name;
-      rgpInfo.value.customer_address = res.result.customer_address;
-      rgpInfo.value.client_address = res.result.client_address;
-      rgpInfo.value.customer_data = res.result.customer_data;
-      rgpInfo.value.client_data = res.result.client_data;
-      rgpInfo.value.quotation_no = res.result.quotationsDetails.quotation_no;
-      rgpInfo.value.company_details.company_name = res.result.company_details.company_name;
-      rgpInfo.value.company_details.company_logo = res.result.company_details.company_logo
-            ? "data: image/png;base64," + res.result.company_details.company_logo
-            : getAssetPath("media/avatars/default.png")
-      
-      console.log(rgpInfo.value);
-
-      await rgpGen(id, rgpInfo.value.rgp_no, rgpInfo);
-
-    }
-
-
-    const deleteFewRGP = () => {
+    const deleteFewThermalInstrument = () => {
       Swal.fire({
         title: "Are you sure?",
         text: "You will not be able to recover from this !",
@@ -574,14 +493,14 @@ export default defineComponent({
         if (result["isConfirmed"]) {
           // Put your function here
           selectedIds.value.forEach((item) => {
-            deleteRGP(item, true);
+            deleteItem(item, true);
           });
           selectedIds.value.length = 0;
         }
       });
     };
 
-    const deleteRGP = (id: number, mul: boolean) => {
+    const deleteItem = (id: number, mul: boolean) => {
       if (!mul) {
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
@@ -595,7 +514,7 @@ export default defineComponent({
             }).then((result: { [x: string]: any }) => {
               if (result["isConfirmed"]) {
                 // Put your function here
-                deleteRGatePass(id);
+                deleteThermalInstrument(id);
                 tableData.value.splice(i, 1);
               }
             });
@@ -605,69 +524,58 @@ export default defineComponent({
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
             // Put your function here
-            deleteRGatePass(id);
+            deleteThermalInstrument(id);
             tableData.value.splice(i, 1);
           }
         }
       }
     };
+
     const search = ref<string>("");
+    // ? debounce timer
     let debounceTimer;
+
     const searchItems = async () => {
+      console.log(search.value);
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
-      if (search.value !== "") {
-        let results: Array<IRGP> = [];
+      if (search.value.length != 0) {
+        let results: Array<ITInstrument> = [];
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
             results.push(tableData.value[j]);
           }
         }
         tableData.value.splice(0, tableData.value.length, ...results);
-
-        if (tableData.value.length == 0) {
+        if (tableData.value.length == 0 && search.value.length != 0) {
           loading.value = true;
           clearTimeout(debounceTimer); // Clear any existing debounce timer
           debounceTimer = setTimeout(async () => {
             await SearchMore();
-          }, 1000);
+          }, 1500);
         }
       } else {
         page.value = 1;
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
-        await rgp_listing();
+        await thermal_instrument_listing();
       }
     };
 
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await gatePassSearch(search.value);
+        const response = await ThermalInstrumentSearch(search.value);
         //console.log(response.result.total_count);
         // first 20 displayed
         total.value = response.result.total_count;
         more.value = response.result.data.next_page_url != null ? true : false;
         tableData.value = response.result.data.data.map(
-          ({
-            id,
-            rgp_no,
-            customer_name,
-            quotation_id,
-            engineers,
-            instruments,
-            status,
-            date,
-            duedate,
-          }) => ({
+          ({ id, calibration_date, calibration_due_date, ...rest }) => ({
             id: id,
-            rgp_no: rgp_no,
-            customer_name:customer_name.company_name,
-            quotation_id: quotation_id,
-            engineers: JSON.parse(engineers).length,
-            instruments: JSON.parse(instruments).length,
-            status: status,
-            date: moment(date).format("DD/MM/YYYY"),
-            duedate: moment(duedate).format("DD/MM/YYYY"),
+            calibration_date: moment(calibration_date).format("MMMM Do YYYY"),
+            calibration_due_date:
+              moment(calibration_due_date).format("MMMM Do YYYY"),
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -682,9 +590,14 @@ export default defineComponent({
     }
 
     const searchingFunc = (obj: any, value: string): boolean => {
+      console.log(obj);
       for (let key in obj) {
-        if (!Number.isInteger(obj[key]) && !(typeof obj[key] === "object")) {
-          if (obj[key].indexOf(value) != -1) {
+        if (
+          !Number.isInteger(obj[key]) &&
+          !(typeof obj[key] === "object") &&
+          typeof obj[key] === "string" // Add type check here
+        ) {
+          if (obj[key].indexOf(value) !== -1) {
             return true;
           }
         }
@@ -705,27 +618,49 @@ export default defineComponent({
     return {
       tableData,
       tableHeader,
-      deleteRGP,
+      deleteItem,
       search,
       searchItems,
       selectedIds,
-      deleteFewRGP,
+      deleteFewThermalInstrument,
       sort,
       onItemSelect,
-      getAssetPath,
-      formatPrice,
       loading,
-      NextPage,
-      PrevPage,
-      total,
-      page,
       limit,
-      PageLimitPoiner,
+      PrevPage,
+      NextPage,
+      page,
       Limits,
-      downloadRGP,
-      rgpInfo,
+      PageLimitPoiner,
+      HandleDuplicate,
     };
   },
 });
 </script>
-  
+<style>
+.el-input__inner {
+  font-weight: 500;
+}
+
+.el-input__wrapper {
+  height: 3.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--bs-gray-100);
+  border-color: var(--bs-gray-100);
+  color: var(--bs-gray-700);
+  transition: color 0.2s ease;
+  appearance: none;
+  line-height: 1.5;
+  border: none !important;
+  padding-top: 0.825rem;
+  padding-bottom: 0.825rem;
+  padding-left: 1.5rem;
+  font-size: 1.15rem;
+  border-radius: 0.625rem;
+  box-shadow: none !important;
+}
+.switchtoleft{
+  text-align: left;
+}
+</style>
+

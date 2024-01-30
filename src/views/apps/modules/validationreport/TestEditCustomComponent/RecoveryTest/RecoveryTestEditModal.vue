@@ -714,9 +714,9 @@ export default defineComponent({
     async function SetAhuCondition(e, index) {
       console.log(e.target.checked);
       if (e.target.checked === true) {
-        recoveryTestDetails.value.details[index].ahu_condition = "ON";
+        recoveryTestDetails.value.details[index].ahu_condition = await "ON";
       } else {
-        recoveryTestDetails.value.details[index].ahu_condition = "OFF";
+        recoveryTestDetails.value.details[index].ahu_condition = await "OFF";
       }
       console.log(recoveryTestDetails.value.details);
     }
@@ -728,7 +728,7 @@ export default defineComponent({
           "YYYY-MM-DD HH:mm:ss"
         );
       } else {
-        recoveryTestDetails.value.details[index].time = "";
+        recoveryTestDetails.value.details[index].time = await "";
       }
     }
 

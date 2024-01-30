@@ -595,6 +595,50 @@
             <div class="row mb-6">
               <!--begin::Label-->
               <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >Instrument ID Prefix & No</label
+              >
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8">
+                <!--begin::Row-->
+                <div class="row">
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row p-2">
+                    <Field
+                      type="text"
+                      name="instrument_id_prefix"
+                      class="form-control form-control-lg form-control-solid"
+                      placeholder="Enter Instrument Id Prefix"
+                      v-model="companyDetails.instrument_id_prefix"
+                    />
+                  </div>
+                  <!--end::Col-->
+
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row p-2">
+                    <div>
+                      <Field
+                        type="text"
+                        name="instrument_id_init"
+                        class="form-control form-control-lg form-control-solid"
+                        placeholder="Enter initial Instrument Id"
+                        v-model="companyDetails.instrument_id_init"
+                      />
+                    </div>
+                  </div>
+                  <!--end::Col-->
+                </div>
+                <!--end::Row-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
                 >Enquiry Prefix & No</label
               >
               <!--end::Label-->
@@ -704,6 +748,8 @@ interface companyDetails {
   rgp_no_prefix: string;
   enquiry_no_init: string;
   enquiry_no_prefix: string;
+  instrument_id_init: string;
+  instrument_id_prefix: string;
 }
 
 export default defineComponent({
@@ -759,34 +805,37 @@ export default defineComponent({
       rgp_no_prefix: "",
       enquiry_no_init: "",
       enquiry_no_prefix: "",
+      instrument_id_init: "",
+      instrument_id_prefix: "",
     });
 
     const validGSTRef = ref(false);
 
     function isValidGSTNo() {
-        // Regex to check valid
-        // GST CODE
-        let regex = new RegExp(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/);
-  
-        let str = companyDetails.value.gst_details;
+      // Regex to check valid
+      // GST CODE
+      let regex = new RegExp(
+        /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/
+      );
 
-        // GST CODE
-        // is empty return false
-        if (str == null) {
-            validGSTRef.value = false;
-            return false;
-        }
-    
-        // Return true if the GST_CODE
-        // matched the ReGex
-        if (regex.test(str) == true) {
-            validGSTRef.value = true;
-            return true;
-        }
-        else {
-            validGSTRef.value = false;
-            return false;
-        }
+      let str = companyDetails.value.gst_details;
+
+      // GST CODE
+      // is empty return false
+      if (str == null) {
+        validGSTRef.value = false;
+        return false;
+      }
+
+      // Return true if the GST_CODE
+      // matched the ReGex
+      if (regex.test(str) == true) {
+        validGSTRef.value = true;
+        return true;
+      } else {
+        validGSTRef.value = false;
+        return false;
+      }
     }
 
     onMounted(() => {

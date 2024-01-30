@@ -19,6 +19,22 @@ const VAL_PROC_URL = "validation";
 const QUAL_PROC_URL = "quality";
 const COMPLAINT_URL = "complaint";
 const TRAINING_URL = "training";
+const THERMAL_INSTRUMENTS_URL = "thermalinstrument";
+const THERMAL_REPORTS_URL = "thermalreport";
+
+
+// Update Password
+export async function changeUserPassword(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.post("change_password", data);
+        return response.data.message;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 
 // COMPANIES
 
@@ -37,8 +53,6 @@ export async function CompaniesSearch(search: any) {
         return { error: errors };
     }
 }
-
-
 
 export async function getCompanies(data: any) {
     try {
@@ -1189,6 +1203,19 @@ export async function WorksheetSearch(search: any) {
 
 // EXPENSE SHEET
 
+export async function getOnGoingCompletedRGP(data: any) {
+    try {
+        // console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('get_ongoing_completed_rgps', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 export async function addExpenseSheet(data) {
     try {
         //console.log(data)
@@ -1793,3 +1820,191 @@ export async function maintenanceNotification(company_id) {
     }
   }
 
+  // Thermal Instruments
+
+// getlists
+export async function getThermalInstruments(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(THERMAL_INSTRUMENTS_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function ThermalInstrumentSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('thermal_instrument_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function addThermalInstrument(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(THERMAL_INSTRUMENTS_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getThermalInstrument(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(THERMAL_INSTRUMENTS_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function updateThermalInstrument(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(THERMAL_INSTRUMENTS_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete
+export async function deleteThermalInstrument(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(THERMAL_INSTRUMENTS_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// custom
+export async function GetIncrInstrumentId(data: any) {
+    try {
+        //console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('get_latest_instrument', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
+
+// THERMAL MAPPING
+
+// getlists
+export async function getThermalReports(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(THERMAL_REPORTS_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+export async function getThermalReport(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(THERMAL_REPORTS_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function addThermalReport(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(THERMAL_REPORTS_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function updateThermalReport(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(THERMAL_REPORTS_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+export async function deleteThermalReport(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(THERMAL_REPORTS_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function ThermalReportSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('thermal_report_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function DownloadThermalReport(data: any) {
+    try {
+        //console.log(data)
+        const id = { "id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post("download_thermal_report",id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
