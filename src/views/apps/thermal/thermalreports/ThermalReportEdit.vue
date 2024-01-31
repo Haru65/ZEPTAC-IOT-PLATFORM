@@ -99,7 +99,7 @@
     <div class="card-body p-6 w-lg-100 mx-auto w-md-100 w-sd-100 border">
       <img
         class="w-100 rounded"
-        :src="`http://localhost:8000/storage/company/${thermalReportDetails.company_id}/thermal_report_diagram/${thermalReportDetails.sensor_location_diagram}`"
+        :src="`https://api.zeptac.com/storage/company/${thermalReportDetails.company_id}/thermal_report_diagram/${thermalReportDetails.sensor_location_diagram}`"
         alt="Sensor Location Diagram"
       />
     </div>
