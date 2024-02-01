@@ -4,7 +4,7 @@
     <!--begin::Form-->
     <div class="conatiner" v-if="message">
       <div class="alert alert-success">
-        Password reset link successfully sent to your email address
+        "Password reset link successfully sent to your email address"
       </div>
     </div>
     
@@ -13,7 +13,6 @@
       @submit="onSubmitForgotPassword"
       id="kt_login_password_reset_form"
       :validation-schema="forgotPassword"
-      v-if="message == ''"
     >
 
       <!--begin::Heading-->
@@ -101,12 +100,12 @@ export default defineComponent({
     const forgotPassword = Yup.object().shape({
       email: Yup.string().email().required().label("Email"),
     });
- 
+
     //Form submit function
     const onSubmitForgotPassword = async (values: any) => {
       values = values as string;
 
-     // eslint-disable-next-line
+      // eslint-disable-next-line
       submitButton.value!.disabled = true;
       // Activate loading indicator
       submitButton.value?.setAttribute("data-kt-indicator", "on");

@@ -36,6 +36,19 @@ export async function changeUserPassword(data: any) {
 }
 
 
+// forgot Password
+export async function resetPassword(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.post("reset_password", data);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        return { error: error };
+    }
+}
+
+
 // COMPANIES
 
 // gell all comapnies

@@ -87,14 +87,15 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   function forgotPassword(email: string) {
+
     return ApiService.post("forgot_password", email)
-      .then(() => {
-        setError({});
+      .then((response) => {
+        return response.data;
       })
-      .catch(({ response }) => {
-        console.error(response.data.message);
-        setError(response.data.errors);
+      .catch((error) => {
+        return error.response.data
       });
+
   }
 
   // before every page a call is made with a JWT token to request user credentials

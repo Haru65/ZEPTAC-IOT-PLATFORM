@@ -1079,6 +1079,15 @@ const routes: Array<RouteRecordRaw> = [
           pageTitle: "Contact Us",
         },
       },
+      {
+        path: "/password-reset/:email/:token",
+        name: "password-reset-form",
+        component: () =>
+          import("@/views/crafted/authentication/basic-flow/PasswordResetForm.vue"),
+        meta: {
+          pageTitle: "Password Reset Form",
+        },
+      },
     ],
   },
 ];
