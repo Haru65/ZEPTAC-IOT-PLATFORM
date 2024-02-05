@@ -509,13 +509,13 @@ export default {
 
     // LOCATIONS
     const createMultipleCircles = () => {
-      for (let i = 0; i < thermalReportDetails.value.instruments.length; i++) {
+      for (let i = 0; i < thermalReportDetails.value.excel_data.length; i++) {
         const color =
           thermalReportDetails.value.min_temp.instrument_id ==
-          thermalReportDetails.value.instruments[i].instrument_id
+          thermalReportDetails.value.excel_data[i].instrument_id
             ? "#66bb6a"
             : thermalReportDetails.value.max_temp.instrument_id ==
-              thermalReportDetails.value.instruments[i].instrument_id
+              thermalReportDetails.value.excel_data[i].instrument_id
             ? "#f44336"
             : "white";
 

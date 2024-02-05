@@ -333,7 +333,7 @@ export default defineComponent({
         const response = await getEmployees(
           `page=${page.value}&limit=${limit.value}`
         );
-        console.log(response);
+        // console.log(response);
         total.value = response.result.total_count;
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
@@ -608,7 +608,7 @@ export default defineComponent({
     const downloadDocument = async (id: any, pdfName: string) => {
       try {
         const res = await getEmployee(id);
-        console.log("->>>", res);
+        // console.log("->>>", res);
 
         const { first_name, last_name, meta } = res;
 

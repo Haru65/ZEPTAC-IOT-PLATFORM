@@ -995,14 +995,14 @@ export default defineComponent({
           created_at: moment(created_at).format("MMMM Do YYYY"),
         }))
       );
-      console.log(Companies);
+      // console.log(Companies);
     };
 
     // get image as base64 and convert to img form larvel
     const loadUser = async () => {
       ApiService.setHeader();
       const response = await getEmployee(userId);
-      console.log(response);
+      // console.log(response);
       profileDetails.value = {
         id: userId.toString(),
         disp_avatar:
@@ -1114,7 +1114,7 @@ export default defineComponent({
           isPdfInvalid.value = true;
         }
       }
-      console.log(profileDetails.value);
+      // console.log(profileDetails.value);
     };
 
     onMounted(async () => {
@@ -1200,14 +1200,13 @@ export default defineComponent({
 
     const onsubmit = async () => {
       loading.value = true;
-      console.log(profileDetails.value);
-      console.warn("Nice");
+      // console.warn("Nice");
       try {
         // form multipart form post
         // push form
-        console.log(profileDetails.value);
+        // console.log(profileDetails.value);
         const response = await updateEmployee(profileDetails.value, userId);
-        console.log(response.error);
+        // console.log(response.error);
         if (!response.error) {
           // Handle successful API response
           console.log("API response:", response);
@@ -1278,7 +1277,7 @@ export default defineComponent({
 
       const fileSize = file.size;
       const fileMb = fileSize / 1024 ** 2;
-      console.log(fileMb);
+      // console.log(fileMb);
 
       if (fileMb <= 1) {
         file_size.value = false;
@@ -1292,7 +1291,7 @@ export default defineComponent({
               .replace(/^data:image\/\w+;base64,/, "");
             if (base64Data) {
               profileDetails.value.image = base64Data;
-              console.log(profileDetails.value.image);
+              // console.log(profileDetails.value.image);
             } else {
               console.error("Error: Failed to read the image data.");
             }

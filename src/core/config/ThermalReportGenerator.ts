@@ -16,7 +16,13 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
     orientation: "portrait",
     unit: "in",
     format: "a4",
+    
   });
+
+  // HEADER // Depend on company
+  function addHeader() {
+    
+  }
 
   // functions
   function drawHeader(titleName){
@@ -133,6 +139,7 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
 
       autoTable(doc, {
         body: signatureData,
+        startY: 10,
         margin: { left: 0.5, top: 1.25 },
         bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0], },
         tableLineColor: [0, 0, 0],
@@ -250,6 +257,7 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
 
       autoTable(doc, {
         body: signatureData,
+        startY: 10,
         margin: { left: 0.5, top: 1.25 },
         bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0], },
         tableLineColor: [0, 0, 0],
@@ -383,6 +391,7 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
 
     autoTable(doc, {
       body: signatureData,
+      startY: 10,
       margin: { left: 0.5, top: 1.25 },
       bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0], },
       tableLineColor: [0, 0, 0],
@@ -485,7 +494,7 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
     ];
 
     autoTable(doc, {
-      startY: doc.autoTable.previous.finalY + imgHeight,
+      startY: 7.66,
       body: colorData,
       margin: { left: 0.5, top: 1.25 },
       columnStyles: {
@@ -529,6 +538,7 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
 
     autoTable(doc, {
       body: signatureData,
+      startY: 10,
       margin: { left: 0.5, top: 1.25 },
       bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0], },
       tableLineColor: [0, 0, 0],
@@ -596,20 +606,20 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
       [{ title: "Data Logger Location", colSpan: 2 }],
     ];
     
-    for (let i = 0; i < reportInfo.value.instruments.length; i += 2) {
-      const instrument1 = reportInfo.value.instruments[i];
-      const instrument2 = reportInfo.value.instruments[i + 1];
+    for (let i = 0; i < reportInfo.value.excel_data.length; i += 2) {
+      const excel_data1 = reportInfo.value.excel_data[i];
+      const excel_data2 = reportInfo.value.excel_data[i + 1];
     
-      const x = instrument1
+      const x = excel_data1
         ? {
-            title: `Location: L${i + 1}, LoggerID: ${instrument1.serial_no}`,
+            title: `Location: L${i + 1}, LoggerID: ${excel_data1["logger_id"]}`,
             colSpan: 1
           }
         : null;
     
-      const y = instrument2
+      const y = excel_data2
         ? {
-            title: `Location: L${i + 2}, LoggerID: ${instrument2.serial_no}`,
+            title: `Location: L${i + 2}, LoggerID: ${excel_data2["logger_id"]}`,
             colSpan: 1
           }
         : null;
@@ -661,6 +671,7 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
 
     autoTable(doc, {
       body: signatureData,
+      startY: 10,
       margin: { left: 0.5, top: 1.25 },
       bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0], },
       tableLineColor: [0, 0, 0],
@@ -774,7 +785,7 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
 
     autoTable(doc, {
       body: signatureData,
-      startY: doc.autoTable.previous.finalY + imgHeight,
+      startY: 10,
       margin: { left: 0.5, top: 1.25 },
       bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0], },
       tableLineColor: [0, 0, 0],
@@ -887,6 +898,7 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
 
     autoTable(doc, {
       body: signatureData,
+      startY: 10,
       margin: { left: 0.5, top: 1.25 },
       bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0], },
       tableLineColor: [0, 0, 0],
@@ -910,28 +922,28 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
 
     // Min Temp Location
     const findMinTempIndex = () => {
-      const index = reportInfo.value.instruments.findIndex((instrument) => instrument.instrument_id == reportInfo.value.min_temp.instrument_id);
+      const index = reportInfo.value.excel_data.findIndex((data) => data["instrument_id"] == reportInfo.value.min_temp.instrument_id);
       return index !== -1 ? index + 1 : null;
     };
     const minTempLocation = `L${findMinTempIndex()}`;
 
     // Max Temp Location
     const findMaxTempIndex = () => {
-      const index = reportInfo.value.instruments.findIndex((instrument) => instrument.instrument_id == reportInfo.value.max_temp.instrument_id);
+      const index = reportInfo.value.excel_data.findIndex((data) => data["instrument_id"] == reportInfo.value.max_temp.instrument_id);
       return index !== -1 ? index + 1 : null;
     };
     const maxTempLocation = `L${findMaxTempIndex()}`;
 
     // Min RH Location
     const findMinRhIndex = () => {
-      const index = reportInfo.value.instruments.findIndex((instrument) => instrument.instrument_id == reportInfo.value.min_rh.instrument_id);
+      const index = reportInfo.value.excel_data.findIndex((data) => data["instrument_id"] == reportInfo.value.min_rh.instrument_id);
       return index !== -1 ? index + 1 : null;
     };
     const minRhLocation = `L${findMinRhIndex()}`;
 
     // Max RH Location
     const findMaxRhIndex = () => {
-      const index = reportInfo.value.instruments.findIndex((instrument) => instrument.instrument_id == reportInfo.value.max_rh.instrument_id);
+      const index = reportInfo.value.excel_data.findIndex((data) => data["instrument_id"] == reportInfo.value.max_rh.instrument_id);
       return index !== -1 ? index + 1 : null;
     };
     const maxRhLocation = `L${findMaxRhIndex()}`;
@@ -943,6 +955,7 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
     
     // Instruments Page Logic
     const instrumentLength = reportInfo.value.instruments.length;
+    // const instrumentLength = reportInfo.value.excel_data.length;
     const instrumentsPerPage = 10;
     const instrumentPages = Math.ceil(instrumentLength / instrumentsPerPage);
     

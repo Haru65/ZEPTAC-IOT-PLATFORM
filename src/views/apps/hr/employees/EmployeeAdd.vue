@@ -1081,7 +1081,7 @@ export default defineComponent({
           created_at: moment(created_at).format("MMMM Do YYYY"),
         }))
       );
-      console.log(Companies);
+      // console.log(Companies);
     };
 
     onMounted(async () => {
@@ -1225,7 +1225,7 @@ export default defineComponent({
           isPdfInvalid.value = true;
         }
       }
-      console.log(profileDetails.value);
+      // console.log(profileDetails.value);
     };
 
     watch(
@@ -1256,7 +1256,7 @@ export default defineComponent({
           ""
         );
       loading.value = true;
-      console.log(profileDetails.value);
+      // console.log(profileDetails.value);
       console.warn("Nice");
       try {
         // ? form multipart form post
@@ -1280,7 +1280,7 @@ export default defineComponent({
           profileDetails.value.company_id = company_id;
         }
         const response = await addEmployee(profileDetails.value);
-        console.log(response.error);
+        // console.log(response.error);
         if (!response.error) {
           // Handle successful API response
           console.log("API response:", response);
@@ -1351,7 +1351,7 @@ export default defineComponent({
 
       const fileSize = file.size;
       const fileMb = fileSize / 1024 ** 2;
-      console.log(fileMb);
+      // console.log(fileMb);
 
       if (fileMb <= 1) {
         file_size.value = false;
@@ -1365,7 +1365,7 @@ export default defineComponent({
               .replace(/^data:image\/\w+;base64,/, "");
             if (base64Data) {
               profileDetails.value.image = base64Data;
-              console.log(profileDetails.value.image);
+              // console.log(profileDetails.value.image);
             } else {
               console.error("Error: Failed to read the image data.");
             }

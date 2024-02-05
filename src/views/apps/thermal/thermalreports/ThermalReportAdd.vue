@@ -741,7 +741,8 @@ export default defineComponent({
           return;
         }
       } else if (currentStepIndex.value === 1) {
-        if (thermalReportDetails.value.instruments.length > 0) {
+        // Atleat 2 instruments needed (for analysis)
+        if (thermalReportDetails.value.instruments.length > 1) {
           currentStepIndex.value++;
 
           if (!_stepperObj.value) {
@@ -752,7 +753,7 @@ export default defineComponent({
         } else {
           Swal.fire({
             icon: "info",
-            title: "Please select at least one instrument.",
+            title: "Please select at least two instrument.",
           });
           return;
         }

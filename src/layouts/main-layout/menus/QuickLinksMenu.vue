@@ -16,82 +16,109 @@
       <!--begin::Title-->
       <h3 class="text-white fw-semobold mb-3">Quick Links</h3>
       <!--end::Title-->
-
-      <!--begin::Status-->
-      <span class="badge bg-success py-2 px-3">25 pending tasks</span>
-      <!--end::Status-->
     </div>
     <!--end::Heading-->
 
     <!--begin:Nav-->
-    <div class="row g-0">
+    <div class="row g-0" v-if="Identifier == 'Company-Admin' || Identifier == 'Admin' || Identifier == 'Sales-Person'">
       <!--begin:Item-->
       <div class="col-6">
-        <a
-          href="#"
+        <router-link
+          to="/leads/add"
           class="d-flex flex-column flex-center h-100 p-6 bg-hover-light border-end border-bottom"
         >
-          <KTIcon icon-name="euro" icon-class="fs-3x text-success mb-2" />
-          <span class="fs-5 fw-semobold text-gray-800 mb-0">Accounting</span>
-          <span class="fs-7 text-gray-400">eCommerce</span>
-        </a>
+          <KTIcon icon-name="people" icon-class="fs-3x text-success mb-2" />
+          <span class="fs-5 fw-semobold text-gray-800 mb-0">Lead</span>
+          <span class="fs-7 text-primary-400">generate lead</span>
+        </router-link>
       </div>
       <!--end:Item-->
 
       <!--begin:Item-->
       <div class="col-6">
-        <a
-          href="#"
+        <router-link
+          to="/quotations/add"
           class="d-flex flex-column flex-center h-100 p-6 bg-hover-light border-bottom"
         >
-          <KTIcon icon-name="sms" icon-class="fs-3x text-success mb-2" />
-          <span class="fs-5 fw-semobold text-gray-800 mb-0"
-            >Administration</span
-          >
-          <span class="fs-7 text-gray-400">Console</span>
-        </a>
+          <KTIcon icon-name="note-2" icon-class="fs-3x text-success mb-2" />
+          <span class="fs-5 fw-semobold text-gray-800 mb-0">Quotation</span>
+          <span class="fs-7 text-primary-400">make a quotation</span>
+        </router-link>
       </div>
       <!--end:Item-->
 
       <!--begin:Item-->
       <div class="col-6">
-        <a
-          href="#"
+        <router-link
+          to="/clients/add"
           class="d-flex flex-column flex-center h-100 p-6 bg-hover-light border-end"
         >
-          <KTIcon
-            icon-name="abstract-41"
-            icon-class="fs-3x text-success mb-2"
-          />
-          <span class="fs-5 fw-semobold text-gray-800 mb-0">Projects</span>
-          <span class="fs-7 text-gray-400">Pending Tasks</span>
-        </a>
+          <KTIcon icon-name="user-edit" icon-class="fs-3x text-success mb-2" />
+          <span class="fs-5 fw-semobold text-gray-800 mb-0">Client</span>
+          <span class="fs-7 text-primary-400">add new client</span>
+        </router-link>
       </div>
       <!--end:Item-->
 
       <!--begin:Item-->
       <div class="col-6">
-        <a
-          href="#"
+        <router-link
+          to="/pricelist/add"
           class="d-flex flex-column flex-center h-100 p-6 bg-hover-light"
         >
-          <KTIcon icon-name="briefcase" icon-class="fs-3x text-success mb-2" />
-          <span class="fs-5 fw-semobold text-gray-800 mb-0">Customers</span>
-          <span class="fs-7 text-gray-400">Latest cases</span>
-        </a>
+          <KTIcon
+            icon-name="text-circle"
+            icon-class="fs-3x text-success mb-2"
+          />
+          <span class="fs-5 fw-semobold text-gray-800 mb-0">PriceList</span>
+          <span class="fs-7 text-primary-400">create pricelist</span>
+        </router-link>
       </div>
       <!--end:Item-->
     </div>
     <!--end:Nav-->
+    <!--begin:Nav-->
+    <div class="row g-0" v-if="Identifier == 'Company-Admin' || Identifier == 'Admin' || Identifier == 'Site-Incharge' || Identifier == 'Service-Engineer'">
+      <!--begin:Item-->
+      <div class="col-6">
+        <router-link
+          to="/returnablegatepasses/add"
+          class="d-flex flex-column flex-center h-100 p-6 bg-hover-light border-end border-bottom"
+        >
+          <KTIcon icon-name="data" icon-class="fs-3x text-success mb-2" />
+          <span class="fs-5 fw-semobold text-gray-800 mb-0">RGP</span>
+          <span class="fs-7 text-primary-400">generate gatepass</span>
+        </router-link>
+      </div>
+      <!--end:Item-->
 
-    <!--begin::View more-->
-    <div class="py-2 text-center border-top">
-      <a href="#" class="btn btn-color-gray-600 btn-active-color-primary">
-        View All
-        <KTIcon icon-name="arrow-right" icon-class="fs-5" />
-      </a>
+      <!--begin:Item-->
+      <div class="col-6">
+        <router-link
+          to="/dailyworksheets/add"
+          class="d-flex flex-column flex-center h-100 p-6 bg-hover-light border-bottom"
+        >
+          <KTIcon icon-name="tablet-text-up" icon-class="fs-3x text-success mb-2" />
+          <span class="fs-5 fw-semobold text-gray-800 mb-0">Worksheet</span>
+          <span class="fs-7 text-primary-400">fill daily worksheet</span>
+        </router-link>
+      </div>
+      <!--end:Item-->
+
+      <!--begin:Item-->
+      <div class="col-6">
+        <router-link
+          to="/expensesheets/add"
+          class="d-flex flex-column flex-center h-100 p-6 bg-hover-light border-end"
+        >
+          <KTIcon icon-name="tag" icon-class="fs-3x text-success mb-2" />
+          <span class="fs-5 fw-semobold text-gray-800 mb-0">Expense Sheet</span>
+          <span class="fs-7 text-primary-400">make expense sheet</span>
+        </router-link>
+      </div>
+      <!--end:Item-->
     </div>
-    <!--end::View more-->
+    <!--end:Nav-->
   </div>
   <!--end::Menu-->
 </template>
@@ -100,12 +127,15 @@
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent } from "vue";
 
+import { Identifier } from "@/core/config/WhichUserConfig";
+
 export default defineComponent({
   name: "kt-quick-links-menu",
   components: {},
   setup() {
     return {
       getAssetPath,
+      Identifier,
     };
   },
 });

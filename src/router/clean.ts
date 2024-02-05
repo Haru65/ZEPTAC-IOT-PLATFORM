@@ -94,6 +94,15 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/company/settings/:id",
+        name: "company-settings",
+        component: () => import("@/views/apps/admin/companies/CompanySettings.vue"),
+        meta: {
+          pageTitle: "Company Settings",
+          breadcrumbs: ["Company Settings"],
+        },
+      },
+      {
         path: "/users/list",
         name: "users-list",
         component: () => import("@/views/apps/admin/users/UserListing.vue"),
@@ -322,8 +331,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/sales/pricelist/PriceListAdd.vue"),
         meta: {
-          pageTitle: "Price List Item Add",
-          breadcrumbs: ["Price List Item Add"],
+          pageTitle: "Price List Add",
+          breadcrumbs: ["Price List Add"],
         },
       },
       {
