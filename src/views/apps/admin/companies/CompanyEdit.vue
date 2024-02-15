@@ -850,7 +850,7 @@ export default defineComponent({
 
     onMounted(async () => {
       const response = await getCompany(CompanyId);
-      console.log(CompanyId);
+      // console.log(CompanyId);
       companyDetails.value = {
         disp_avatar:
           response.company_logo != ""
@@ -944,7 +944,7 @@ export default defineComponent({
 
       const fileSize = file.size;
       const fileMb = fileSize / 1024 ** 2;
-      console.log(fileMb);
+      // console.log(fileMb);
 
       if (fileMb <= 1) {
         file_size.value = false;
@@ -958,7 +958,7 @@ export default defineComponent({
               .replace(/^data:image\/\w+;base64,/, "");
             if (base64Data) {
               companyDetails.value.image = base64Data;
-              console.log(companyDetails.value.image);
+              // console.log(companyDetails.value.image);
             } else {
               console.error("Error: Failed to read the image data.");
             }
@@ -982,10 +982,10 @@ export default defineComponent({
       try {
         // Call your API here with the form values
         const response = await updateCompany(companyDetails.value, CompanyId);
-        console.log(response.error);
+        // console.log(response.error);
         if (!response.error) {
           // Handle successful API response
-          console.log("API response:", response);
+          // console.log("API response:", response);
           showSuccessAlert(
             "Success",
             "Company details have been successfully updated!"
@@ -1058,26 +1058,3 @@ export default defineComponent({
   },
 });
 </script>
-<style>
-.el-input__inner {
-  font-weight: 500;
-}
-
-.el-input__wrapper {
-  height: 3.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--bs-gray-100);
-  border-color: var(--bs-gray-100);
-  color: var(--bs-gray-700);
-  transition: color 0.2s ease;
-  appearance: none;
-  line-height: 1.5;
-  border: none !important;
-  padding-top: 0.825rem;
-  padding-bottom: 0.825rem;
-  padding-left: 1.5rem;
-  font-size: 1.15rem;
-  border-radius: 0.625rem;
-  box-shadow: none !important;
-}
-</style>

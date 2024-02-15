@@ -247,7 +247,7 @@ export default defineComponent({
     const enquiryYearWise = ref(0);
 
     function SetYearlyData(year) {
-      console.log(year);
+      // console.log(year);
 
       const yearData = leadsData.value.find((entry) => entry.year === year);
       enquiryYearWise.value = yearData ? yearData.total_leads_count : 0;
@@ -255,7 +255,7 @@ export default defineComponent({
         ? yearData.leads_by_month.map((entry) => entry.leads_count)
         : [];
 
-      console.log(leadsByMonthArray);
+      // console.log(leadsByMonthArray);
 
       series.value = [
         {
@@ -276,10 +276,10 @@ export default defineComponent({
         const response = await enquiryGen(company_id, yearOptions);
 
         // Handle the response from the backend, e.g., update the UI or store the data
-        console.log(response);
+        // console.log(response);
         leadsData.value = response.result;
         SetYearlyData(selectedYear.value);
-        console.log(leadsData.value);
+        // console.log(leadsData.value);
       } catch (error) {
         // Handle errors, e.g., show an error message
         console.error("Error fetching leads data:", error);

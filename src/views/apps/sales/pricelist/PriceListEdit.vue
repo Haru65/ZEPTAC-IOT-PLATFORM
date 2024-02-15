@@ -256,7 +256,7 @@ export default defineComponent({
 
     onMounted(async () => {
       const response = await getPriceListItem(itemId.toString());
-      console.log(response);
+      // console.log(response);
       itemDetails.value = {
         site_location: response.site_location,
         per_day_charge: response.per_day_charge,
@@ -307,18 +307,18 @@ export default defineComponent({
           });
         }
       }
-      console.log(itemDetails.value.equipment_wise)
+      // console.log(itemDetails.value.equipment_wise)
     };
 
     async function SetEquipment(foundItem, index) {
-        console.log(foundItem);
+        // console.log(foundItem);
         const {id, name} = foundItem;
         itemDetails.value.equipment_wise[index].id = await id;
         itemDetails.value.equipment_wise[index].name = await name;
     }
 
     async function SetCharge(e, index) {
-      console.log(e);
+      // console.log(e);
       itemDetails.value.equipment_wise[index].charge = await e.target.value;
     }
 
@@ -341,14 +341,14 @@ export default defineComponent({
 
     const submit = async () => {
       loading.value = true;
-      console.warn("Nice");
+      // console.warn("Nice");
       try {
         // Call your API here with the form values
         const response = await updatePriceListItem(itemId, itemDetails.value);
-        console.log(response.error);
+        // console.log(response.error);
         if (!response.error) {
           // Handle successful API response
-          console.log("API response:", response);
+          // console.log("API response:", response);
           showSuccessAlert("Success", "Item has been successfully updated!");
           router.push({ name: "price-list" });
         } else {
@@ -412,9 +412,6 @@ export default defineComponent({
       });
     };
 
-    const clear = () => {
-      console.log("clear");
-    };
     return {
       itemDetails,
       itemDetailsValidator,
@@ -431,26 +428,3 @@ export default defineComponent({
   },
 });
 </script>
-<style>
-.el-input__inner {
-  font-weight: 500;
-}
-
-.el-input__wrapper {
-  height: 3.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--bs-gray-100);
-  border-color: var(--bs-gray-100);
-  color: var(--bs-gray-700);
-  transition: color 0.2s ease;
-  appearance: none;
-  line-height: 1.5;
-  border: none !important;
-  padding-top: 0.825rem;
-  padding-bottom: 0.825rem;
-  padding-left: 1.5rem;
-  font-size: 1.15rem;
-  border-radius: 0.625rem;
-  box-shadow: none !important;
-}
-</style>

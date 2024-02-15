@@ -240,7 +240,7 @@ export default defineComponent({
     const QuotationYearWise = ref(0);
 
     function SetYearlyData(year) {
-      console.log(year);
+      // console.log(year);
 
       const yearData = QuotationsData.value.find((entry) => entry.year === year);
       QuotationYearWise.value = yearData ? yearData.total_quotations_count : 0;
@@ -248,7 +248,7 @@ export default defineComponent({
         ? yearData.quotations_by_month.map((entry) => entry.quotation_sent)
         : [];
 
-      console.log(QuotationsByMonthArray);
+      // console.log(QuotationsByMonthArray);
 
       series.value = [
         {
@@ -269,10 +269,10 @@ export default defineComponent({
         const response = await quotationSent(company_id, yearOptions);
 
         // Handle the response from the backend, e.g., update the UI or store the data
-        console.log(response);
+        // console.log(response);
         QuotationsData.value = response.result;
         SetYearlyData(selectedYear.value);
-        console.log(QuotationsData.value);
+        // console.log(QuotationsData.value);
       } catch (error) {
         // Handle errors, e.g., show an error message
         console.error("Error fetching leads data:", error);

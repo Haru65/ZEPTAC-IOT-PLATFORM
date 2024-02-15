@@ -338,13 +338,6 @@
                 placeholder="Please Select Company..."
               >
                 <el-option
-                  disabled="disabled"
-                  value=""
-                  label="Please Select Company..."
-                >
-                  Please Select Company
-                </el-option>
-                <el-option
                   v-for="item in Companies"
                   :key="item.id"
                   :label="item.company_name"
@@ -812,14 +805,17 @@ export default defineComponent({
     const file_size = ref(false);
     const getdropcomp = async () => {
       ApiService.setHeader();
-      const response = await getCompanies(`limit=${limit.value}`);
-      Companies.value.push(
-        ...response.result.data.data.map(({ created_at, ...rest }) => ({
-          ...rest,
-          created_at: moment(created_at).format("MMMM Do YYYY"),
-        }))
-      );
-      console.log(Companies);
+
+      const response = await getCompanies(`fetchAll=true`);
+      if (response.result != null && response.result) {
+        Companies.value.push(
+          ...response.result?.map(({ created_at, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+          }))
+        );
+        // console.log(Companies);
+      }
     };
 
     onMounted(async () => {
@@ -933,7 +929,7 @@ export default defineComponent({
           isPdfInvalid.value = true;
         }
       }
-      console.log(profileDetails.value);
+      // console.log(profileDetails.value);
     };
 
     watch(
@@ -964,8 +960,8 @@ export default defineComponent({
           ""
         );
       loading.value = true;
-      console.log(profileDetails.value);
-      console.warn("Nice");
+      // console.log(profileDetails.value);
+      // console.warn("Nice");
       try {
         // ? form multipart form post
         // ? Call your API here with the form values
@@ -977,10 +973,10 @@ export default defineComponent({
           profileDetails.value.company_id = company_id;
         }
         const response = await addUser(profileDetails.value);
-        console.log(response.error);
+        // console.log(response.error);
         if (!response.error) {
           // Handle successful API response
-          console.log("API response:", response);
+          // console.log("API response:", response);
           showSuccessAlert("Success", "User have been successfully inserted!");
           router.push({ name: "users-list" });
         } else {
@@ -1045,7 +1041,7 @@ export default defineComponent({
 
       const fileSize = file.size;
       const fileMb = fileSize / 1024 ** 2;
-      console.log(fileMb);
+      // console.log(fileMb);
 
       if (fileMb <= 1) {
         file_size.value = false;
@@ -1059,7 +1055,7 @@ export default defineComponent({
               .replace(/^data:image\/\w+;base64,/, "");
             if (base64Data) {
               profileDetails.value.image = base64Data;
-              console.log(profileDetails.value.image);
+              // console.log(profileDetails.value.image);
             } else {
               console.error("Error: Failed to read the image data.");
             }
@@ -1133,25 +1129,5 @@ export default defineComponent({
   },
 });
 </script>
-<style>
-.el-input__inner {
-  font-weight: 500;
-}
-.el-input__wrapper {
-  height: 3.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--bs-gray-100);
-  border-color: var(--bs-gray-100);
-  color: var(--bs-gray-700);
-  transition: color 0.2s ease;
-  appearance: none;
-  line-height: 1.5;
-  border: none !important;
-  padding-top: 0.825rem;
-  padding-bottom: 0.825rem;
-  padding-left: 1.5rem;
-  font-size: 1.15rem;
-  border-radius: 0.625rem;
-  box-shadow: none !important;
-}
-</style>
+
+

@@ -21,6 +21,7 @@ const COMPLAINT_URL = "complaint";
 const TRAINING_URL = "training";
 const THERMAL_INSTRUMENTS_URL = "thermalinstrument";
 const THERMAL_REPORTS_URL = "thermalreport";
+const PERMISSION_URL = "permission_manager";
 
 
 // Update Password
@@ -310,7 +311,7 @@ export async function getClients(data: any) {
     try {
         //console.log(data)
         ApiService.setHeader();
-        const response = await ApiService.listingget(CLIENTS_URL);
+        const response = await ApiService.listingget(CLIENTS_URL, data);
         console.log(response.data);
         return response.data;
     } catch (errors) {
@@ -2015,6 +2016,87 @@ export async function DownloadThermalReport(data: any) {
         const id = { "id": data };
         ApiService.setHeader();
         const response = await ApiService.post("download_thermal_report",id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// PERMISSION MANAGER
+
+export async function getPermission(data: string) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.get(PERMISSION_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function addPermission(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(PERMISSION_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getPermissions(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(PERMISSION_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function deletePermission(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(PERMISSION_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function updatePermission(userId: any, permArr: any) {
+    try {
+        //console.log(data)
+        const data = {
+            "id": userId,
+            "permArr" : permArr
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('update_permission', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function PermissionSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('permissions_search', data);
         return response.data;
     } catch (errors) {
         console.error(errors);

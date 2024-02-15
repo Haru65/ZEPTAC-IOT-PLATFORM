@@ -782,11 +782,10 @@ export default defineComponent({
 </script>
 
 <style>
-.el-input__inner {
+.el-input__inner, .el-select__inner {
   font-weight: 500;
 }
-
-.el-input__wrapper {
+.el-input__wrapper, .el-select__wrapper {
   height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

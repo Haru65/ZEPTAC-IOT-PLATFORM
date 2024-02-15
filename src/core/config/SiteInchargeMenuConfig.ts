@@ -20,6 +20,44 @@ export interface MenuItem {
       ],
     },
     {
+      heading: "Thermal Mapping",
+      route: "/thermalmapping",
+      pages: [
+        {
+          sectionTitle: "Thermal Report",
+          route: "/thermalreport",
+          keenthemesIcon: "wrench",
+          bootstrapIcon: "bi-archive",
+          sub: [
+            {
+              heading: "Add Thermal Report",
+              route: "/thermalreport/add",
+            },
+            {
+              heading: "List Thermal Report",
+              route: "/thermalreport/list",
+            },
+          ],
+        },
+        {
+          sectionTitle: "Thermal Instrument",
+          route: "/thermalinstrument",
+          keenthemesIcon: "office-bag",
+          bootstrapIcon: "bi-archive",
+          sub: [
+            {
+              heading: "Add Thermal Instrument",
+              route: "/thermalinstrument/add",
+            },
+            {
+              heading: "List Thermal Instrument",
+              route: "/thermalinstrument/list",
+            },
+          ],
+        },
+      ],
+    },
+    {
       heading: "Modules",
       route: "/modules",
       pages: [

@@ -266,7 +266,7 @@ export default defineComponent({
       logger_used: 0,
 
       dates: ref<string[]>([]),
-      
+
       min_temp: {
         instrument_id: "",
         logger_id: "",
@@ -368,29 +368,28 @@ export default defineComponent({
         instrument_id: "",
         logger_id: "",
         reading: Number.MAX_VALUE,
-      }
+      };
 
       thermalReportDetails.value.max_temp = {
         instrument_id: "",
         logger_id: "",
         reading: Number.MIN_VALUE,
-      }
+      };
 
       thermalReportDetails.value.min_rh = {
         instrument_id: "",
         logger_id: "",
         reading: Number.MAX_VALUE,
-      }
+      };
 
       thermalReportDetails.value.max_rh = {
         instrument_id: "",
         logger_id: "",
         reading: Number.MIN_VALUE,
-      }
+      };
 
       thermalReportDetails.value.avg_temp = 0;
       thermalReportDetails.value.avg_rh = 0;
-
     }
 
     // remove single instrument and excel file
@@ -409,7 +408,7 @@ export default defineComponent({
       }
 
       calculateTemperatureAndHumidity();
-      
+
       console.log(thermalReportDetails.value.instruments);
       console.log(thermalReportDetails.value.excel_data);
     }
@@ -418,7 +417,7 @@ export default defineComponent({
     async function storeInstrument(data) {
       // store the instrument
       thermalReportDetails.value.instruments.push(data);
-      
+
       console.log(thermalReportDetails.value.instruments);
       console.log(thermalReportDetails.value.excel_data);
     }
@@ -615,15 +614,19 @@ export default defineComponent({
 
     async function thermal_instrument_listing(): Promise<void> {
       try {
-        const response = await getThermalInstruments(``);
-        thermalInstruments.value = response.result.data.map(
-          ({ id, name, instrument_id, serial_no }) => ({
-            id: id,
-            instrument_name: name,
-            instrument_id: instrument_id,
-            serial_no: serial_no,
-          })
-        );
+        const response = await getThermalInstruments(`fetchAll=true`);
+
+        if (response.result != null && response.result) {
+          thermalInstruments.value = response.result?.map(
+            ({ id, name, instrument_id, serial_no }) => ({
+              id: id,
+              instrument_name: name,
+              instrument_id: instrument_id,
+              serial_no: serial_no,
+            })
+          );
+        }
+        
       } catch (error) {
         console.error(error);
       } finally {

@@ -14,7 +14,7 @@
             v-model="search"
             @input="searchItems()"
             class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search by instrument name"
+            placeholder="Search by instrument serial number"
           />
         </div>
         <!--end::Search-->
@@ -259,7 +259,7 @@ import Swal from "sweetalert2";
 import { getAssetPath } from "@/core/helpers/assets";
 
 export default defineComponent({
-  name: "instrument-listing",
+  name: "thermal-instrument-listing",
   components: {
     Datatable,
     DuplicateInstrumentModal,
@@ -334,7 +334,6 @@ export default defineComponent({
       },
     ]);
 
-    const total = ref(0);
     // functions
     const Limits = ref({
       1: 10,
@@ -343,9 +342,9 @@ export default defineComponent({
     });
 
     const loading = ref(true);
-    // staring from 2
-    let page = ref(1);
-    let limit = ref(50);
+    // staring from 1
+    const page = ref(1);
+    const limit = ref(10);
     // limit 10
     const more = ref(false);
 
@@ -360,9 +359,7 @@ export default defineComponent({
         const response = await getThermalInstruments(
           `page=${page}&limit=${limit.value}`
         );
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({ id, calibration_date, calibration_due_date, ...rest }) => ({
@@ -387,7 +384,6 @@ export default defineComponent({
     const PageLimitPoiner = async (limit) => {
       // ? Truncate the tableData
       page.value = 1;
-      //console.log(page.value, limit);
       loading.value = true;
       try {
         while (tableData.value.length != 0) tableData.value.pop();
@@ -396,9 +392,7 @@ export default defineComponent({
         const response = await getThermalInstruments(
           `page=${page.value}&limit=${limit}`
         );
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({ id, calibration_date, calibration_due_date, ...rest }) => ({
@@ -463,7 +457,7 @@ export default defineComponent({
             ...rest,
           })
         );
-        total.value = response.result.total_count;
+        
         more.value = response.result.next_page_url != null ? true : false;
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
@@ -565,11 +559,9 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await ThermalInstrumentSearch(search.value);
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
-        tableData.value = response.result.data.data.map(
+
+        more.value = response.result.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(
           ({ id, calibration_date, calibration_due_date, ...rest }) => ({
             id: id,
             calibration_date: moment(calibration_date).format("MMMM Do YYYY"),
@@ -638,11 +630,10 @@ export default defineComponent({
 });
 </script>
 <style>
-.el-input__inner {
+.el-input__inner, .el-select__inner {
   font-weight: 500;
 }
-
-.el-input__wrapper {
+.el-input__wrapper, .el-select__wrapper {
   height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

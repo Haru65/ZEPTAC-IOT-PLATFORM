@@ -172,7 +172,7 @@ export default defineComponent({
     const saleYearWise = ref(0);
 
     function SetYearlyData(year) {
-      console.log(year);
+      // console.log(year);
 
       const yearData = data.value.find((entry) => entry.year === year);
       saleYearWise.value = yearData ? yearData.yearly_sale : 0;
@@ -192,7 +192,7 @@ export default defineComponent({
         },
       ];
 
-      console.log(series.value);
+      // console.log(series.value);
     }
 
     onMounted(async () => {
@@ -203,10 +203,10 @@ export default defineComponent({
         const response = await salesDone(company_id, yearOptions);
 
         // Handle the response from the backend, e.g., update the UI or store the data
-        console.log(response);
+        // console.log(response);
         data.value = response.result;
         SetYearlyData(selectedYear.value);
-        console.log(data.value);
+        // console.log(data.value);
       } catch (error) {
         // Handle errors, e.g., show an error message
         console.error("Error fetching leads data:", error);

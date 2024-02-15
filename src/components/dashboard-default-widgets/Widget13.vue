@@ -142,7 +142,7 @@ export default defineComponent({
     const leadYearWise = ref(0);
 
     function SetYearlyData(year) {
-      console.log(year);
+      // console.log(year);
 
       const yearData = data.value.find((entry) => entry.year === year);
       leadYearWise.value = yearData ? yearData.total_actual_leads_count : 0;
@@ -151,13 +151,13 @@ export default defineComponent({
         ? yearData.monthly_data.map((entry) => entry.actual_leads)
         : [];
 
-      console.log(ActualLeadsByMonthArray);
+      // console.log(ActualLeadsByMonthArray);
 
       const ConvertedLeadsByMonthArray = yearData
         ? yearData.monthly_data.map((entry) => entry.customers_count)
         : [];
 
-      console.log(ConvertedLeadsByMonthArray);
+      // console.log(ConvertedLeadsByMonthArray);
 
       series.value = [
         {
@@ -179,10 +179,10 @@ export default defineComponent({
         const response = await leadConversion(company_id, yearOptions);
 
         // Handle the response from the backend, e.g., update the UI or store the data
-        console.log(response);
+        // console.log(response);
         data.value = response.result;
         SetYearlyData(selectedYear.value);
-        console.log(data.value);
+        // console.log(data.value);
       } catch (error) {
         // Handle errors, e.g., show an error message
         console.error("Error fetching leads data:", error);

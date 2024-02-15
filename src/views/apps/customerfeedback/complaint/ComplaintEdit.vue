@@ -391,7 +391,7 @@ export default defineComponent({
 
     onMounted(async () => {
       let response = await getComplaint(itemId.toString());
-      console.log(response);
+      // console.log(response);
       complaintDetails.value = {
 
         customer_name: response.customer_name,
@@ -455,12 +455,12 @@ export default defineComponent({
           complaintDetails.value.resolution_date
         ).format("YYYY-MM-DD");
 
-        console.log(complaintDetails.value);
+        // console.log(complaintDetails.value);
         const result = areAllPropertiesNotNull([complaintDetails.value]);
 
         if (result) {
           const response = await updateComplaint(itemId, complaintDetails.value);
-          console.log(response)
+          // console.log(response)
           // console.log(response.error);
           if (!response.error) {
             // Handle successful API response
@@ -537,26 +537,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style>
-.el-input__inner {
-  font-weight: 500;
-}
-.el-input__wrapper {
-  height: 3.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--bs-gray-100);
-  border-color: var(--bs-gray-100);
-  color: var(--bs-gray-700);
-  transition: color 0.2s ease;
-  appearance: none;
-  line-height: 1.5;
-  border: none !important;
-  padding-top: 0.825rem;
-  padding-bottom: 0.825rem;
-  padding-left: 1.5rem;
-  font-size: 1.15rem;
-  border-radius: 0.625rem;
-  box-shadow: none !important;
-}
-</style>

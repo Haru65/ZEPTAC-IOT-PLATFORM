@@ -882,6 +882,59 @@
       </div>
       <!--end::Content-->
     </div>
+
+    <!--begin::Notifications-->
+    <div class="card mb-5 mb-xl-10">
+      <!--begin::Card header-->
+      <div
+        class="card-header border-0 cursor-pointer"
+        role="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#kt_account_notifications"
+        aria-expanded="true"
+        aria-controls="kt_account_notifications"
+      >
+        <div class="card-title m-0">
+          <h3 class="fw-bold m-0">User Permissions</h3>
+        </div>
+      </div>
+      <!--begin::Card header-->
+
+      <!--begin::Content-->
+      <div id="kt_account_notifications" class="collapse show">
+        <!--begin::Form-->
+        <form class="form">
+          <UserPermission
+            v-bind:permissionsWithStatus="permissionsWithStatus"
+            @appendPermission="addOrRemovePermission"
+          >
+          </UserPermission>
+
+          <!--begin::Card footer-->
+          <div class="card-footer d-flex justify-content-end py-6 px-9">
+            <button
+              ref="submitButton4"
+              @click="submitPermissions"
+              :data-kt-indicator="pLoading ? 'on' : null"
+              class="btn btn-primary px-6"
+            >
+              <span v-if="!pLoading" class="indicator-label"> Save Permissions </span>
+              <span v-if="pLoading"  class="indicator-progress">
+                Please wait...
+                <span
+                  class="spinner-border spinner-border-sm align-middle ms-2"
+                ></span>
+              </span>
+            </button>
+          </div>
+          <!--end::Card footer-->
+        </form>
+        <!--end::Form-->
+      </div>
+      <!--end::Content-->
+    </div>
+    <!--end::Notifications-->
+
     <div class="modal-footer flex-center">
       <!--begin::Button-->
       <button type="reset" class="btn btn-lg btn-danger w-25">Clear</button>
@@ -914,7 +967,7 @@ import { ErrorMessage, Field, Form as Vform } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import { c_rolesArray } from "@/core/config/PermissionsRolesConfig";
-import { getEmployee, updateEmployee, getCompanies } from "@/stores/api";
+import { getEmployee, updateEmployee, getCompanies, updatePermission } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import { countries, INstates } from "@/core/model/countries";
 import moment from "moment";
@@ -922,6 +975,12 @@ import { Identifier } from "@/core/config/WhichUserConfig";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter, useRoute } from "vue-router";
 import { blank64 } from "./blank";
+import UserPermission from "./customUserPermission/UserPermission.vue";
+
+interface Permission {
+  id: number;
+  name: string;
+}
 
 interface ProfileDetails {
   id: string;
@@ -934,7 +993,7 @@ interface ProfileDetails {
   password: string;
   confpassword: string;
   role_id: string;
-  roles: object;
+  userPermissions: Array<Permission>;
 
   employee_code: string;
   department: string;
@@ -958,6 +1017,14 @@ interface ProfileDetails {
   pan: string;
   company_id: string;
   updated_by: string;
+
+  allPermissions: Array<Permission>;
+}
+
+interface PermissionWithStatus {
+  id: number;
+  name: string;
+  isPresent: boolean;
 }
 
 export default defineComponent({
@@ -966,36 +1033,56 @@ export default defineComponent({
     ErrorMessage,
     Field,
     Vform,
+    UserPermission,
   },
   setup() {
     const auth = useAuthStore();
     const identifier = Identifier;
-    const submitButton1 = ref<HTMLElement | null>(null);
-    const submitButton2 = ref<HTMLElement | null>(null);
-    const submitButton3 = ref<HTMLElement | null>(null);
     const submitButton4 = ref<HTMLElement | null>(null);
-    const submitButton5 = ref<HTMLElement | null>(null);
     const updateEmailButton = ref<HTMLElement | null>(null);
     const updatePasswordButton = ref<HTMLElement | null>(null);
     const User = auth.GetUser();
     let limit = ref(500);
+    const router = useRouter();
     const route = useRoute();
     const loading = ref(false);
+    const pLoading = ref(false);
     const Companies = ref([{ id: "", company_name: "" }]);
     const state = ref([""]);
     const file_size = ref(false);
     const userId = route.params.id;
 
+    // PERMISSION MANAGER
+    // const userPermissions = ref([]);
+    // const allPermissions = ref([]);
+
+    const permissionsWithStatus = ref<PermissionWithStatus[]>([]);
+    const permArr = ref<String[]>([]);
+
+    async function addOrRemovePermission(e) {
+      if(e.target && e.target.value){
+        if(e.target.checked == true){
+          permArr.value.push(e.target.value);
+        }
+        else{
+          permArr.value = permArr.value.filter((permission) => permission != e.target.value);
+        }
+        // console.log(permArr.value)
+      }
+    }
+
     const getdropcomp = async () => {
       ApiService.setHeader();
-      const response = await getCompanies(`limit=${limit.value}`);
-      Companies.value.push(
-        ...response.result.data.data.map(({ created_at, ...rest }) => ({
-          ...rest,
-          created_at: moment(created_at).format("MMMM Do YYYY"),
-        }))
-      );
-      // console.log(Companies);
+      const response = await getCompanies(`fetchAll=true`);
+      if (response.result != null && response.result) {
+        Companies.value.push(
+          ...response.result?.map(({ created_at, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+          }))
+        );
+        // console.log(Companies);
+      }
     };
 
     // get image as base64 and convert to img form larvel
@@ -1017,7 +1104,7 @@ export default defineComponent({
         password: " ",
         confpassword: " ",
         role_id: response.role_id,
-        roles: response.roles,
+        userPermissions: response.userPermissions,
         //  ? optional fields check for data
 
         employee_code: response.meta.employee_code
@@ -1048,6 +1135,7 @@ export default defineComponent({
         pan: response.meta.pan ? response.meta.pan : "",
         company_id: response.company_id ? response.company_id : "",
         updated_by: User.id,
+        allPermissions: response.allPermissions ? response.allPermissions : [],
       };
     };
 
@@ -1117,6 +1205,21 @@ export default defineComponent({
       // console.log(profileDetails.value);
     };
 
+    const updatePermissionsWithStatus = () => {
+      const userPermissions = profileDetails.value.userPermissions;
+      const allPermissions = profileDetails.value.allPermissions;
+
+      permissionsWithStatus.value = allPermissions.map((permission) => {
+        const isPresent = userPermissions.some(
+          (userPermission) => userPermission.id === permission.id
+        );
+        return { ...permission, isPresent };
+      });
+
+      permArr.value = userPermissions.map((permission) => permission.name);
+      // console.log(permArr.value);
+    };
+
     onMounted(async () => {
       state.value.pop();
       Companies.value.pop();
@@ -1124,6 +1227,10 @@ export default defineComponent({
       if (User.role_id === 1) {
         await getdropcomp();
       }
+
+      // create an array for permissions
+
+      updatePermissionsWithStatus();
     });
 
     const emailFormDisplay = ref(false);
@@ -1154,7 +1261,7 @@ export default defineComponent({
       password: "",
       confpassword: "",
       role_id: "",
-      roles: {},
+      userPermissions: [],
 
       employee_code: "",
       department: "",
@@ -1178,6 +1285,8 @@ export default defineComponent({
       pan: "",
       company_id: "",
       updated_by: User.id,
+
+      allPermissions: [],
     });
 
     watch(
@@ -1209,12 +1318,12 @@ export default defineComponent({
         // console.log(response.error);
         if (!response.error) {
           // Handle successful API response
-          console.log("API response:", response);
+          // console.log("API response:", response);
           showSuccessAlert(
             "Success",
-            "Employee have been successfully inserted!"
+            "Employee have been successfully Updated!"
           );
-          // router.push({ name: "employee-list" });
+          router.push({ name: "employee-list" });
         } else {
           // Handle API error response
           const errorData = response.error;
@@ -1228,6 +1337,40 @@ export default defineComponent({
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
         loading.value = false;
+      }
+    };
+
+    const submitPermissions = async (e) => {
+      e.preventDefault();
+      pLoading.value = true;
+      // console.warn("Nice");
+      try {
+        // form multipart form post
+        // push form
+        // console.log(profileDetails.value);
+        const response = await updatePermission(userId, permArr.value);
+        // console.log(response.error);
+        if (!response.error) {
+          // Handle successful API response
+          console.log("API response:", response);
+          showSuccessAlert(
+            "Success",
+            "Permission have been successfully updated!"
+          );
+          router.push({ name: "employee-list" });
+        } else {
+          // Handle API error response
+          const errorData = response.error;
+          console.log("API error:", errorData);
+          // console.log("API error:", errorData.response.data.errors);
+          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+        }
+      } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
+        showErrorAlert("Error", "An error occurred during the API call.");
+      } finally {
+        pLoading.value = false;
       }
     };
 
@@ -1321,7 +1464,7 @@ export default defineComponent({
         password: "",
         confpassword: "",
         role_id: "",
-        roles: {},
+        userPermissions: [],
 
         employee_code: "",
         department: "",
@@ -1345,15 +1488,13 @@ export default defineComponent({
         pan: "",
         company_id: "",
         updated_by: User.id,
+
+        allPermissions: [],
       };
     };
 
     return {
-      submitButton1,
-      submitButton2,
-      submitButton3,
       submitButton4,
-      submitButton5,
       profileDetails,
       emailFormDisplay,
       passwordFormDisplay,
@@ -1366,38 +1507,18 @@ export default defineComponent({
       Companies,
       c_rolesArray,
       onsubmit,
+      submitPermissions,
       loading,
+      pLoading,
       clear,
       state,
       countries,
       file_size,
       identifier,
       handleFileChange,
-
+      permissionsWithStatus,
+      addOrRemovePermission,
     };
   },
 });
 </script>
-<style>
-.el-input__inner {
-  font-weight: 500;
-}
-.el-input__wrapper {
-  height: 3.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--bs-gray-100);
-  border-color: var(--bs-gray-100);
-  color: var(--bs-gray-700);
-  transition: color 0.2s ease;
-  appearance: none;
-  line-height: 1.5;
-  border: none !important;
-  padding-top: 0.825rem;
-  padding-bottom: 0.825rem;
-  padding-left: 1.5rem;
-  font-size: 1.15rem;
-  border-radius: 0.625rem;
-  box-shadow: none !important;
-}
-</style>
-    

@@ -203,22 +203,22 @@
                   >Trainer's Name</label
                 >
                 <el-form-item>
-                <el-select
-                  v-model="trainingDetails.trainers"
-                  multiple
-                  filterable
-                  allow-create
-                  placeholder="Enter trainer name and select it to add..."
-                >
-                  <el-option
-                    v-for="(item, index) in trainingDetails.trainers"
-                    :key="index"
-                    :label="item"
-                    :value="item"
-                  />
-                </el-select>
-              </el-form-item>
-              <div
+                  <el-select
+                    v-model="trainingDetails.trainers"
+                    multiple
+                    filterable
+                    allow-create
+                    placeholder="Enter trainer name and select it to add..."
+                  >
+                    <el-option
+                      v-for="(item, index) in trainingDetails.trainers"
+                      :key="index"
+                      :label="item"
+                      :value="item"
+                    />
+                  </el-select>
+                </el-form-item>
+                <div
                   class="fv-plugins-message-container mt-0"
                   v-if="!trainingDetails.trainers.length"
                 >
@@ -237,22 +237,22 @@
                   >Trainee's Name</label
                 >
                 <el-form-item>
-                <el-select
-                  v-model="trainingDetails.trainees"
-                  multiple
-                  filterable
-                  allow-create
-                  placeholder="Enter trainee name and select it to add..."
-                >
-                  <el-option
-                    v-for="(item, index) in trainingDetails.trainees"
-                    :key="index"
-                    :label="item"
-                    :value="item"
-                  />
-                </el-select>
-              </el-form-item>
-              <div
+                  <el-select
+                    v-model="trainingDetails.trainees"
+                    multiple
+                    filterable
+                    allow-create
+                    placeholder="Enter trainee name and select it to add..."
+                  >
+                    <el-option
+                      v-for="(item, index) in trainingDetails.trainees"
+                      :key="index"
+                      :label="item"
+                      :value="item"
+                    />
+                  </el-select>
+                </el-form-item>
+                <div
                   class="fv-plugins-message-container mt-0"
                   v-if="!trainingDetails.trainees.length"
                 >
@@ -395,8 +395,7 @@ export default defineComponent({
     }
 
     const submit = async () => {
-
-      console.log(trainingDetails.value)
+      // console.log(trainingDetails.value)
 
       loading.value = true;
 
@@ -422,7 +421,9 @@ export default defineComponent({
             loading.value = false;
           } else {
             // Handle API error response
-            //   console.log("API error:", errorData);
+
+            const errorData = response.error;
+            console.log("API error:", errorData);
             // console.log("API error:", errorData.response.data.errors);
             showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
             loading.value = false;
@@ -485,10 +486,12 @@ export default defineComponent({
 </script>
 
 <style>
-.el-input__inner {
+.el-input__inner,
+.el-select__inner {
   font-weight: 500;
 }
-.el-input__wrapper {
+.el-input__wrapper,
+.el-select__wrapper {
   min-height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

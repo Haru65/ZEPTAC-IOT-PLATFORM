@@ -1,6 +1,6 @@
 <template>
   
-  <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
+  <div v-if="User.role_id == 1 || User.role_id == 2" class="row g-5 g-xl-10 mb-5 mb-xl-10">
 
     <!--begin::Row-->
     <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
@@ -147,6 +147,7 @@ export default defineComponent({
 
     return {
       getAssetPath,
+      User,
     };
   },
 });

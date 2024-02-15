@@ -923,27 +923,30 @@ export default defineComponent({
 
     const getSelects = async () => {
       ApiService.setHeader();
-      const response = await getPriceList(``);
-      const data = response.result.data.map(
-        ({
-          id,
-          site_location,
-          per_day_charge,
-          accommodation,
-          travelling,
-          training,
-          equipment_wise,
-        }) => ({
-          id,
-          site_location,
-          per_day_charge,
-          accommodation,
-          travelling,
-          training,
-          equipment_wise: JSON.parse(equipment_wise),
-        })
-      );
-      locations.value = data;
+      const response = await getPriceList(`fetchAll=true`);
+
+      if (response.result != null && response.result) {
+        const data = response?.result?.map(
+          ({
+            id,
+            site_location,
+            per_day_charge,
+            accommodation,
+            travelling,
+            training,
+            equipment_wise,
+          }) => ({
+            id,
+            site_location,
+            per_day_charge,
+            accommodation,
+            travelling,
+            training,
+            equipment_wise: JSON.parse(equipment_wise),
+          })
+        );
+        locations.value = data;
+      }
     };
 
     const InvoiceDetails = ref<InvoiceDetails>({
@@ -1105,7 +1108,7 @@ export default defineComponent({
       const foundLocation = await locations.value.find((item) => {
         return item.id === id;
       });
-      console.log(foundLocation);
+      // console.log(foundLocation);
 
       if (foundLocation) {
         const {
@@ -1331,11 +1334,11 @@ export default defineComponent({
           });
         }
       }
-      console.log(InvoiceDetails.value.items.equipment_wise);
+      // console.log(InvoiceDetails.value.items.equipment_wise);
     };
 
     async function SetEquipment(foundItem, index) {
-      console.log(foundItem);
+      // console.log(foundItem);
       const { id, name, charge } = foundItem;
       InvoiceDetails.value.items.equipment_wise[index].id = await id;
       InvoiceDetails.value.items.equipment_wise[index].name = await name;
@@ -1346,13 +1349,13 @@ export default defineComponent({
     }
 
     async function SetEquipmentCharge(data, index) {
-      console.log(data);
+      // console.log(data);
       InvoiceDetails.value.items.equipment_wise[index].charge = await data;
       calculateEquipmentCharge(index);
     }
 
     async function SetQuantity(data, index) {
-      console.log(data);
+      // console.log(data);
       InvoiceDetails.value.items.equipment_wise[index].quantity = await data;
       calculateEquipmentCharge(index);
     }
@@ -1377,7 +1380,7 @@ export default defineComponent({
     /* --------LATEST INVOICE LOGIC--------*/
 
     const IncrInvoice = (data: any) => {
-      console.log(data.result);
+      // console.log(data.result);
       const latestInvoice_no = data.result.split("_");
       if (parseInt(latestInvoice_no[1]) == 0) {
         // ? if no record
@@ -1394,7 +1397,7 @@ export default defineComponent({
 
     const GetClients = async (id: string) => {
       // ? empty clients
-      console.log(Clients.value);
+      // console.log(Clients.value);
       Clients.value.length = 0;
 
       // * empty clents data
@@ -1411,21 +1414,21 @@ export default defineComponent({
 
       ApiService.setHeader();
       const response = await GetCustomerClients(id);
-      console.log(response);
+      // console.log(response);
       Clients.value.push(
         ...response.result.map(({ created_at, ...rest }) => ({
           ...rest,
           created_at: moment(created_at).format("MMMM Do YYYY"),
         }))
       );
-      console.log(Clients.value);
+      // console.log(Clients.value);
     };
 
     const GetUserData = async (id) => {
       if (id != " ") {
         const customer_id = id;
         const response = await getUser(customer_id);
-        console.log(response);
+        // console.log(response);
         InvoiceDetails.value.lead = response.meta;
         InvoiceDetails.value.lead.id = response.id;
         InvoiceDetails.value.enquiry_no = response.meta.enquiry_no;
@@ -1457,7 +1460,7 @@ export default defineComponent({
       if (id != " ") {
         const customer_id = id;
         const response = await getClient(customer_id);
-        console.log(response);
+        // console.log(response);
         InvoiceDetails.value.client.address1 = response.meta.address1;
         InvoiceDetails.value.client.company_name = response.meta.company_name;
         InvoiceDetails.value.client.address2 = response.meta.address2;
@@ -1490,13 +1493,15 @@ export default defineComponent({
 
     const GetCustomers = async () => {
       ApiService.setHeader();
-      const response = await getCustomers(``);
-      Customers.value.push(
-        ...response.result.data.map(({ created_at, ...rest }) => ({
-          ...rest,
-          created_at: moment(created_at).format("MMMM Do YYYY"),
-        }))
-      );
+      const response = await getCustomers(`fetchAll=true`);
+      if (response.result != null && response.result) {
+        Customers.value.push(
+          ...response.result?.map(({ created_at, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+          }))
+        );
+      }
     };
 
     function areAllPropertiesNull(array) {
@@ -1636,15 +1641,18 @@ export default defineComponent({
         } else {
           // Handle API error response
           const errorData = response.error;
-          // console.log("API error:", errorData);
+          console.log("API error:", errorData);
           console.log("API error:", errorData.response.data.errors);
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
         }
+        loading.value = false;
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
+        loading.value = false;
       } finally {
+        loading.value = false;
       }
     };
 
@@ -1817,26 +1825,3 @@ export default defineComponent({
 });
 </script>
 
-<style>
-.el-input__inner {
-  font-weight: 500;
-}
-
-.el-input__wrapper {
-  height: 3.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--bs-gray-100);
-  border-color: var(--bs-gray-100);
-  color: var(--bs-gray-700);
-  transition: color 0.2s ease;
-  appearance: none;
-  line-height: 1.5;
-  border: none !important;
-  padding-top: 0.825rem;
-  padding-bottom: 0.825rem;
-  padding-left: 1.5rem;
-  font-size: 1.15rem;
-  border-radius: 0.625rem;
-  box-shadow: none !important;
-}
-</style>

@@ -372,13 +372,16 @@ export default defineComponent({
 
     const getdropcomp = async () => {
       ApiService.setHeader();
-      const response = await getCompanies(`limit=${limit.value}`);
-      Companies.value.push(
-        ...response.result.data.data.map(({ created_at, ...rest }) => ({
-          ...rest,
-          created_at: moment(created_at).format("MMMM Do YYYY"),
-        }))
-      );
+      const response = await getCompanies(`fetchAll=true`);
+      if (response.result != null && response.result) {
+        Companies.value.push(
+          ...response.result?.map(({ created_at, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+          }))
+        );
+        console.log(Companies);
+      }
     };
 
     const setCompany = async (id) => {
@@ -577,10 +580,10 @@ export default defineComponent({
 </script>
 
 <style>
-.el-input__inner {
+.el-input__inner, .el-select__inner {
   font-weight: 500;
 }
-.el-input__wrapper {
+.el-input__wrapper, .el-select__wrapper {
   min-height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

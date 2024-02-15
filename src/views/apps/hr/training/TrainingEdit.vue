@@ -370,7 +370,7 @@ export default defineComponent({
 
     onMounted(async () => {
       let response = await getTraining(itemId.toString());
-      console.log(response);
+      // console.log(response);
       trainingDetails.value = {
         training_date: response.training_date,
         training_topic: response.training_topic,
@@ -508,10 +508,10 @@ export default defineComponent({
 </script>
 
 <style>
-.el-input__inner {
+.el-input__inner, .el-select__inner {
   font-weight: 500;
 }
-.el-input__wrapper {
+.el-input__wrapper, .el-select__wrapper {
   min-height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

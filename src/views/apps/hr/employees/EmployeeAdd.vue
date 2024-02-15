@@ -1074,14 +1074,16 @@ export default defineComponent({
     const file_size = ref(false);
     const getdropcomp = async () => {
       ApiService.setHeader();
-      const response = await getCompanies(`limit=${limit.value}`);
-      Companies.value.push(
-        ...response.result.data.data.map(({ created_at, ...rest }) => ({
-          ...rest,
-          created_at: moment(created_at).format("MMMM Do YYYY"),
-        }))
-      );
-      // console.log(Companies);
+      const response = await getCompanies(`fetchAll=true`);
+      if (response.result != null && response.result) {
+        Companies.value.push(
+          ...response.result?.map(({ created_at, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+          }))
+        );
+        // console.log(Companies);
+      }
     };
 
     onMounted(async () => {
@@ -1283,7 +1285,7 @@ export default defineComponent({
         // console.log(response.error);
         if (!response.error) {
           // Handle successful API response
-          console.log("API response:", response);
+          // console.log("API response:", response);
           showSuccessAlert(
             "Success",
             "Employee have been successfully inserted!"
@@ -1454,26 +1456,3 @@ export default defineComponent({
   },
 });
 </script>
-  <style>
-.el-input__inner {
-  font-weight: 500;
-}
-.el-input__wrapper {
-  height: 3.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--bs-gray-100);
-  border-color: var(--bs-gray-100);
-  color: var(--bs-gray-700);
-  transition: color 0.2s ease;
-  appearance: none;
-  line-height: 1.5;
-  border: none !important;
-  padding-top: 0.825rem;
-  padding-bottom: 0.825rem;
-  padding-left: 1.5rem;
-  font-size: 1.15rem;
-  border-radius: 0.625rem;
-  box-shadow: none !important;
-}
-</style>
-  

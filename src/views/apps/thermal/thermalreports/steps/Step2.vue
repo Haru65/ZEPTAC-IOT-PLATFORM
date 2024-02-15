@@ -275,18 +275,20 @@ export default defineComponent({
 
     async function thermal_instrument_listing(): Promise<void> {
       try {
-        const response = await getThermalInstruments(``);
-        mainData.value = response.result.data.map(
-          ({ id, calibration_date, calibration_due_date, ...rest }) => ({
-            id: id,
-            calibration_date: moment(calibration_date).format("MMMM Do YYYY"),
-            calibration_due_date:
-              moment(calibration_due_date).format("MMMM Do YYYY"),
-            ...rest,
-            checked: false,
-          })
-        );
+        const response = await getThermalInstruments(`fetchAll=true`);
 
+        if (response.result != null && response.result) {
+          mainData.value = response.result?.map(
+            ({ id, calibration_date, calibration_due_date, ...rest }) => ({
+              id: id,
+              calibration_date: moment(calibration_date).format("MMMM Do YYYY"),
+              calibration_due_date:
+                moment(calibration_due_date).format("MMMM Do YYYY"),
+              ...rest,
+              checked: false,
+            })
+          );
+        }
         // tableData.value = response.result.data.map(
         //   ({ id, calibration_date, calibration_due_date, ...rest }) => ({
         //     id: id,
@@ -310,7 +312,15 @@ export default defineComponent({
 
     const instrumentsTo = ref<Inst[]>([]);
 
-    const toggleInstrument = (event, id, inst_id, inst_name, inst_srno, inst_calib_date, inst_calib_due) => {
+    const toggleInstrument = (
+      event,
+      id,
+      inst_id,
+      inst_name,
+      inst_srno,
+      inst_calib_date,
+      inst_calib_due
+    ) => {
       console.log(event.target.checked);
 
       const data = {
@@ -349,7 +359,7 @@ export default defineComponent({
 
       console.log(instrumentsTo.value);
 
-      await emit('remove-all-instrument', selectedIds.value);
+      await emit("remove-all-instrument", selectedIds.value);
     };
 
     const handleTo = async (id: any) => {
@@ -375,7 +385,7 @@ export default defineComponent({
         .map((item) => ({ ...item, checked: false }));
       console.log(tableData.value);
 
-      await emit('remove-all-instrument', selectedIds.value);
+      await emit("remove-all-instrument", selectedIds.value);
     };
 
     onMounted(async () => {

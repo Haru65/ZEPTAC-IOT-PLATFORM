@@ -938,30 +938,35 @@ export default defineComponent({
         charge: "",
       },
     ]);
+
     const getSelects = async () => {
       ApiService.setHeader();
-      const response = await getPriceList(``);
-      const data = response.result.data.map(
-        ({
-          id,
-          site_location,
-          per_day_charge,
-          accommodation,
-          travelling,
-          training,
-          equipment_wise,
-        }) => ({
-          id,
-          site_location,
-          per_day_charge,
-          accommodation,
-          travelling,
-          training,
-          equipment_wise: JSON.parse(equipment_wise),
-        })
-      );
-      locations.value = data;
+      const response = await getPriceList(`fetchAll=true`);
+
+      if (response.result != null && response.result) {
+        const data = response?.result?.map(
+          ({
+            id,
+            site_location,
+            per_day_charge,
+            accommodation,
+            travelling,
+            training,
+            equipment_wise,
+          }) => ({
+            id,
+            site_location,
+            per_day_charge,
+            accommodation,
+            travelling,
+            training,
+            equipment_wise: JSON.parse(equipment_wise),
+          })
+        );
+        locations.value = data;
+      }
     };
+    
 
     const InvoiceDetails = ref<InvoiceDetails>({
       invoice_no: "",
@@ -1041,7 +1046,7 @@ export default defineComponent({
 
       //? get the quotaion details from id
       const response = await getInvoice(InvoiceId);
-      console.log(response);
+      // console.log(response);
 
       const items = JSON.parse(response.items);
 
@@ -1060,7 +1065,7 @@ export default defineComponent({
 
       globalLocation.value = response.client_id === 0 ? true : false;
 
-      console.log(globalLocation.value);
+      // console.log(globalLocation.value);
       qNsiteSameAsBilling.value = globalLocation.value;
 
       InvoiceDetails.value.total = parseFloat(response.total);
@@ -1091,7 +1096,7 @@ export default defineComponent({
         if (response.customer_id != "") {
           const customer_id = response.customer_id;
           const res = await getUser(customer_id);
-          console.log(res);
+          // console.log(res);
           InvoiceDetails.value.lead = res.meta;
           InvoiceDetails.value.lead.id = res.id;
 
@@ -1106,7 +1111,7 @@ export default defineComponent({
         if (response.customer_id != "") {
           const customer_id = response.customer_id;
           const res = await getUser(customer_id);
-          console.log(res);
+          // console.log(res);
           InvoiceDetails.value.lead = res.meta;
           InvoiceDetails.value.lead.id = res.id;
           GetClients(customer_id);
@@ -1136,7 +1141,7 @@ export default defineComponent({
 
     const GetClients = async (id: string) => {
       // ? empty clients
-      console.log(Clients.value);
+      // console.log(Clients.value);
       Clients.value = [];
       Clients.value.length = 0;
 
@@ -1154,21 +1159,21 @@ export default defineComponent({
 
       ApiService.setHeader();
       const response = await GetCustomerClients(id);
-      console.log(response);
+      // console.log(response);
       Clients.value.push(
         ...response.result.map(({ created_at, ...rest }) => ({
           ...rest,
           created_at: moment(created_at).format("MMMM Do YYYY"),
         }))
       );
-      console.log(Clients.value);
+      // console.log(Clients.value);
     };
 
     const GetUserData = async (id) => {
       if (id != " ") {
         const lead_id = id;
         const response = await getUser(lead_id);
-        console.log(response);
+        // console.log(response);
         InvoiceDetails.value.lead = response.meta;
         InvoiceDetails.value.enquiry_no = response.meta.enquiry_no;
         InvoiceDetails.value.lead.id = response.id;
@@ -1199,7 +1204,7 @@ export default defineComponent({
       if (id != " ") {
         const customer_id = id;
         const response = await getClient(customer_id);
-        console.log(response);
+        // console.log(response);
 
         // ? set client details
         InvoiceDetails.value.client.id = response.id;
@@ -1321,7 +1326,7 @@ export default defineComponent({
     }
 
     async function SetDays() {
-      console.log(InvoiceDetails.value.items.number_of_days);
+      // console.log(InvoiceDetails.value.items.number_of_days);
       await calculateTotal();
     }
 
@@ -1593,17 +1598,19 @@ export default defineComponent({
 
     const GetCustomers = async () => {
       ApiService.setHeader();
-      const response = await getCustomers(``);
-      Customers.value.push(
-        ...response.result.data.map(({ created_at, ...rest }) => ({
-          ...rest,
-          created_at: moment(created_at).format("MMMM Do YYYY"),
-        }))
-      );
+      const response = await getCustomers(`fetchAll=true`);
+      if (response.result != null && response.result) {
+        Customers.value.push(
+          ...response.result?.map(({ created_at, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("MMMM Do YYYY"),
+          }))
+        );
+      }
     };
 
     const generatePdf = async (pdfName: string) => {
-      console.log(InvoiceDetails.value);
+      // console.log(InvoiceDetails.value);
       await Gen("invoice", InvoiceId.toString(), pdfName, InvoiceDetails);
     };
 
@@ -1740,21 +1747,24 @@ export default defineComponent({
             "Success",
             "Invoice have been successfully Updated!"
           );
-          
+
           route.push({ name: "invoices-list" });
         } else {
           // Handle API error response
           const errorData = response.error;
-          // console.log("API error:", errorData);
-          console.log("API error:", errorData.response.data.errors);
+          console.log("API error:", errorData);
+          // console.log("API error:", errorData.response.data.errors);
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          loading.value = false;
         }
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
+        loading.value = false;
       } finally {
         disabledselect.value = false;
+        loading.value = false;
       }
     };
 
@@ -1787,7 +1797,7 @@ export default defineComponent({
           confirmButton: "btn btn-primary",
         },
       }).then(() => {
-        console.log("Done");
+        // console.log("Done");
       });
     };
 
@@ -1888,11 +1898,12 @@ export default defineComponent({
 </script>
 
 <style>
-.el-input__inner {
+.el-input__inner,
+.el-select__inner {
   font-weight: 500;
 }
-
-.el-input__wrapper {
+.el-input__wrapper,
+.el-select__wrapper {
   height: 3rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

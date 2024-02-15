@@ -111,10 +111,10 @@
           </span>
         </template>
         <template v-slot:customer_name="{ row: rgps }">
-            <span class="text-gray-600 text-hover-primary mb-1">
-                  {{ rgps.customer_name }}
-            </span>
-          </template>
+          <span class="text-gray-600 text-hover-primary mb-1">
+            {{ rgps.customer_name }}
+          </span>
+        </template>
         <!-- defualt data -->
         <template v-slot:engineers="{ row: rgps }">
           {{ rgps.engineers }}
@@ -202,7 +202,12 @@ import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { IRGP } from "@/core/model/rgps";
-import { getAllRGatePass, deleteRGatePass, getRGPInfo, gatePassSearch } from "@/stores/api";
+import {
+  getAllRGatePass,
+  deleteRGatePass,
+  getRGPInfo,
+  gatePassSearch,
+} from "@/stores/api";
 import arraySort from "array-sort";
 import { useAuthStore } from "@/stores/auth";
 import { formatPrice } from "@/core/config/DataFormatter";
@@ -307,26 +312,26 @@ export default defineComponent({
       updated_by: User.id,
       is_active: 1,
     });
+    
     const selectedIds = ref<Array<number>>([]);
 
     const tableData = ref<Array<IRGP>>([]);
 
     const initvalues = ref<Array<IRGP>>([]);
 
-    // staring from 2
-    let page = ref(1);
-    let limit = ref(50);
-    // limit 10
-    const more = ref(false);
-
-    const total = ref(0);
     // functions
     const Limits = ref({
       1: 10,
       2: 25,
       3: 50,
     });
-    // more
+
+    // staring from 1
+    const page = ref(1);
+    const limit = ref(10);
+    // limit 10
+    const more = ref(false);
+
     const PagePointer = async (page) => {
       // ? Truncate the tableData
       //console.log(limit.value);
@@ -336,12 +341,10 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         const response = await getAllRGatePass(
-          `page=${page.value}&limit=${limit.value}`
+          `page=${page}&limit=${limit.value}`
         );
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
+        
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
             id,
@@ -356,7 +359,7 @@ export default defineComponent({
           }) => ({
             id: id,
             rgp_no: rgp_no,
-            customer_name:customer_name.company_name,
+            customer_name: customer_name.company_name,
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
@@ -386,12 +389,10 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         const response = await getAllRGatePass(
-          `page=${page.value}&limit=${limit.value}`
+          `page=${page.value}&limit=${limit}`
         );
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
+        
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
             id,
@@ -406,7 +407,7 @@ export default defineComponent({
           }) => ({
             id: id,
             rgp_no: rgp_no,
-            customer_name:customer_name.company_name,
+            customer_name: customer_name.company_name,
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
@@ -462,7 +463,7 @@ export default defineComponent({
           }) => ({
             id: id,
             rgp_no: rgp_no,
-            customer_name:customer_name.company_name,
+            customer_name: customer_name.company_name,
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
@@ -497,41 +498,41 @@ export default defineComponent({
       quotation_no: "",
       customer_data: {
         company_id: "",
-        first_name : "",
-        last_name: ""
+        first_name: "",
+        last_name: "",
       },
       client_data: {
         company_id: "",
-        first_name : "",
-        last_name: ""
+        first_name: "",
+        last_name: "",
       },
-      customer_company:{
-        company_name: ""
+      customer_company: {
+        company_name: "",
       },
-      client_company:{
-        company_name: ""
+      client_company: {
+        company_name: "",
       },
-      customer_address:{
+      customer_address: {
         address1: "",
         address2: "",
         city: "",
         pincode: "",
         states: "",
-        country: ""
+        country: "",
       },
-      client_address:{
+      client_address: {
         address1: "",
         address2: "",
         city: "",
         pincode: "",
         states: "",
-        country: ""
+        country: "",
       },
-      company_details:{
+      company_details: {
         company_name: "",
         company_logo: getAssetPath("media/avatars/default.png"),
-      }
-    })
+      },
+    });
 
     const downloadRGP = async (id: any) => {
       // get all information of the rgp
@@ -542,24 +543,26 @@ export default defineComponent({
       rgpInfo.value.duedate = res.result.duedate;
       rgpInfo.value.engineers = await res.result.engData;
       rgpInfo.value.instruments = await res.result.instData;
-      rgpInfo.value.customer_company.company_name = res.result.customer_company.company_name;
-      rgpInfo.value.client_company.company_name = res.result.client_company.company_name;
+      rgpInfo.value.customer_company.company_name =
+        res.result.customer_company.company_name;
+      rgpInfo.value.client_company.company_name =
+        res.result.client_company.company_name;
       rgpInfo.value.customer_address = res.result.customer_address;
       rgpInfo.value.client_address = res.result.client_address;
       rgpInfo.value.customer_data = res.result.customer_data;
       rgpInfo.value.client_data = res.result.client_data;
       rgpInfo.value.quotation_no = res.result.quotationsDetails.quotation_no;
-      rgpInfo.value.company_details.company_name = res.result.company_details.company_name;
-      rgpInfo.value.company_details.company_logo = res.result.company_details.company_logo
-            ? "data: image/png;base64," + res.result.company_details.company_logo
-            : getAssetPath("media/avatars/default.png")
-      
+      rgpInfo.value.company_details.company_name =
+        res.result.company_details.company_name;
+      rgpInfo.value.company_details.company_logo = res.result.company_details
+        .company_logo
+        ? "data: image/png;base64," + res.result.company_details.company_logo
+        : getAssetPath("media/avatars/default.png");
+
       console.log(rgpInfo.value);
 
       await rgpGen(id, rgpInfo.value.rgp_no, rgpInfo);
-
-    }
-
+    };
 
     const deleteFewRGP = () => {
       Swal.fire({
@@ -643,11 +646,9 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await gatePassSearch(search.value);
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
-        tableData.value = response.result.data.data.map(
+        
+        more.value = response.result.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(
           ({
             id,
             rgp_no,
@@ -661,7 +662,7 @@ export default defineComponent({
           }) => ({
             id: id,
             rgp_no: rgp_no,
-            customer_name:customer_name.company_name,
+            customer_name: customer_name.company_name,
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
@@ -717,7 +718,6 @@ export default defineComponent({
       loading,
       NextPage,
       PrevPage,
-      total,
       page,
       limit,
       PageLimitPoiner,

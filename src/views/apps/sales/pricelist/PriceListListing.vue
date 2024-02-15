@@ -161,7 +161,7 @@
             class="w-100px rounded-2"
             v-model="limit"
             filterable
-            @change="PageLimitPoiner(limit)"
+            v-on:change="PageLimitPoiner(limit)"
           >
             <el-option
               v-for="item in Limits"
@@ -273,25 +273,24 @@ export default defineComponent({
       },
     ]);
 
-    const loading = ref(true);
-
-    // staring from 2
-    let page = ref(1);
-    let limit = ref(50);
-    // limit 10
-    const more = ref(false);
-
-    const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<IPriceList>>([]);
-    const initvalues = ref<Array<IPriceList>>([]);
-    const total = ref(0);
     // functions
     const Limits = ref({
       1: 10,
       2: 25,
       3: 50,
     });
-    // more
+
+    const loading = ref(true);
+    // staring from 1
+    const page = ref(1);
+    const limit = ref(10);
+    // limit 10
+    const more = ref(false);
+
+    const selectedIds = ref<Array<number>>([]);
+    const tableData = ref<Array<IPriceList>>([]);
+    const initvalues = ref<Array<IPriceList>>([]);
+
     const PagePointer = async (page) => {
       // ? Truncate the tableData
       //console.log(limit.value);
@@ -303,10 +302,8 @@ export default defineComponent({
         const response = await getPriceList(
           `page=${page}&limit=${limit.value}`
         );
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
+        
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
             id,
@@ -354,10 +351,8 @@ export default defineComponent({
         const response = await getPriceList(
           `page=${page.value}&limit=${limit}`
         );
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
+        
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
             id,
@@ -415,7 +410,9 @@ export default defineComponent({
         const response = await getPriceList(
           `page=${page.value}&limit=${limit.value}`
         );
-        console.log(response);
+        // console.log(response);
+        
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
             id,
@@ -539,11 +536,9 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await PriceListSearch(search.value);
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
-        tableData.value = response.result.data.data.map(
+        
+        more.value = response.result.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(
           ({
             id,
             customer_type,
@@ -578,7 +573,7 @@ export default defineComponent({
     }
 
     const searchingFunc = (obj: any, value: string): boolean => {
-      console.log(obj);
+      // console.log(obj);
       for (let key in obj) {
         if (
           !Number.isInteger(obj[key]) &&
@@ -618,7 +613,6 @@ export default defineComponent({
       loading,
       NextPage,
       PrevPage,
-      total,
       page,
       limit,
       PageLimitPoiner,
@@ -627,26 +621,3 @@ export default defineComponent({
   },
 });
 </script>
-<style>
-.el-input__inner {
-  font-weight: 500;
-}
-
-.el-input__wrapper {
-  height: 3.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--bs-gray-100);
-  border-color: var(--bs-gray-100);
-  color: var(--bs-gray-700);
-  transition: color 0.2s ease;
-  appearance: none;
-  line-height: 1.5;
-  border: none !important;
-  padding-top: 0.825rem;
-  padding-bottom: 0.825rem;
-  padding-left: 1.5rem;
-  font-size: 1.15rem;
-  border-radius: 0.625rem;
-  box-shadow: none !important;
-}
-</style>

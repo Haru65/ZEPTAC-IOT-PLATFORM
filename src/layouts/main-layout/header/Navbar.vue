@@ -175,7 +175,7 @@ export default defineComponent({
         const company_id = User.company_id;
 
         const response = await calibrationNotification(company_id);
-        console.log(response);
+        // console.log(response);
         dueCalibration.value = response.result.map(
           ({ id, instrument_id, name, calibration_due_date }) => ({
             id,
@@ -196,7 +196,7 @@ export default defineComponent({
         const company_id = User.company_id;
 
         const response = await maintenanceNotification(company_id);
-        console.log(response);
+        // console.log(response);
         dueMaintenance.value = response.result.map(
           ({ id, instrument_id, name, m_date2 }) => ({
             id,

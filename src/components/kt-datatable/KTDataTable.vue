@@ -40,8 +40,8 @@ export default defineComponent({
     itemsPerPage: { type: Number, default: 10 },
     itemsPerPageDropdownEnabled: {
       type: Boolean,
-      required: false,
-      default: true,
+      required: true,
+      default: false,
     },
     checkboxEnabled: { type: Boolean, required: false, default: false },
     checkboxLabel: { type: String, required: false, default: "id" },

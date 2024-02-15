@@ -312,18 +312,18 @@ export default defineComponent({
     const tableData = ref<Array<IEmployee>>([]);
     const initvalues = ref<Array<IEmployee>>([]);
 
-    // staring from 2
-    let page = ref(1);
-    let limit = ref(50);
-    // limit 10
-    const more = ref(false);
-    const total = ref(0);
     // functions
     const Limits = ref({
       1: 10,
       2: 25,
       3: 50,
     });
+
+    // staring from 1
+    const page = ref(1);
+    const limit = ref(10);
+    // limit 10
+    const more = ref(false);
 
     // functions
     // get_employees
@@ -333,8 +333,7 @@ export default defineComponent({
         const response = await getEmployees(
           `page=${page.value}&limit=${limit.value}`
         );
-        // console.log(response);
-        total.value = response.result.total_count;
+        
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({ id, role_id, ...rest }) => ({
@@ -371,10 +370,8 @@ export default defineComponent({
         const response = await getEmployees(
           `page=${page}&limit=${limit.value}`
         );
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
+        
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({ id, role_id, ...rest }) => ({
             id: id,
@@ -409,10 +406,8 @@ export default defineComponent({
         const response = await getEmployees(
           `page=${page.value}&limit=${limit}`
         );
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
+        
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({ id, role_id, ...rest }) => ({
             id: id,
@@ -437,7 +432,7 @@ export default defineComponent({
     //console.log(initvalues.value);
 
     const NextPage = () => {
-      console.log(more.value);
+      // console.log(more.value);
       if (more.value != false) {
         page.value = page.value + 1;
         PagePointer(page.value);
@@ -550,10 +545,8 @@ export default defineComponent({
       try {
         ApiService.setHeader();
         const response = await EmployeeSearch(search.value);
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
+        
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({ id, role_id, ...rest }) => ({
             id: id,
@@ -608,7 +601,6 @@ export default defineComponent({
     const downloadDocument = async (id: any, pdfName: string) => {
       try {
         const res = await getEmployee(id);
-        // console.log("->>>", res);
 
         const { first_name, last_name, meta } = res;
 
@@ -684,7 +676,6 @@ export default defineComponent({
       blank64,
       NextPage,
       PrevPage,
-      total,
       page,
       limit,
       PageLimitPoiner,
@@ -698,26 +689,3 @@ export default defineComponent({
   },
 });
 </script>
-<style>
-.el-input__inner {
-  font-weight: 500;
-}
-
-.el-input__wrapper {
-  height: 3.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--bs-gray-100);
-  border-color: var(--bs-gray-100);
-  color: var(--bs-gray-700);
-  transition: color 0.2s ease;
-  appearance: none;
-  line-height: 1.5;
-  border: none !important;
-  padding-top: 0.825rem;
-  padding-bottom: 0.825rem;
-  padding-left: 1.5rem;
-  font-size: 1.15rem;
-  border-radius: 0.625rem;
-  box-shadow: none !important;
-}
-</style>

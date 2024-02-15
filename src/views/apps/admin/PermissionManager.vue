@@ -1,5 +1,43 @@
 <template>
   <div class="card">
+    <Vform
+      id="kt_account_profile_details_form"
+      class="form card-body"
+      novalidate
+      :validation-schema="permissionValidator"
+    >
+      <!--begin::Input group-->
+      <div class="mb-6 mt-6">
+        <!--begin::Title-->
+        <h4 class="fs-5 fw-semobold text-gray-800">Permission Name</h4>
+        <!--end::Title-->
+
+        <!--begin::Title-->
+        <div class="d-flex gap-6">
+          <Field
+            type="text"
+            name="permission_name"
+            class="form-control form-control-lg form-control-solid flex-grow-1"
+            placeholder="Enter permission name"
+            v-model="permissionDetails.permission_name"
+          />
+          <button
+            @click.prevent="onsubmit"
+            class="btn btn-success fw-bold flex-shrink-0"
+          >
+            Add permission
+          </button>
+        </div>
+        <div class="fv-plugins-message-container">
+          <div class="fv-help-block">
+            <ErrorMessage name="permission_name" />
+          </div>
+        </div>
+        <!--end::Title-->
+      </div>
+      <!--end::Input group-->
+    </Vform>
+
     <div class="card-header border-0 pt-6">
       <!--begin::Card title-->
       <div class="card-title">
@@ -14,7 +52,7 @@
             v-model="search"
             @input="searchItems()"
             class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search Companies"
+            placeholder="Search Permission"
           />
         </div>
         <!--end::Search-->
@@ -42,7 +80,7 @@
           <!--begin::Add customer-->
           <router-link to="./add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Company
+            Add Permission
           </router-link>
           <!--end::Add customer-->
         </div>
@@ -60,7 +98,7 @@
           <button
             type="button"
             class="btn btn-danger"
-            @click="deleteFewCompany()"
+            @click="deleteFewPermission()"
           >
             Delete Selected
           </button>
@@ -80,28 +118,14 @@
         :items-per-page-dropdown-enabled="false"
         :loading="loading"
       >
-        <template v-slot:company_name="{ row: company }">
-          {{ company.company_name }}
+        <template v-slot:name="{ row: permissions }">
+          {{ permissions.name }}
         </template>
-        <template v-slot:email="{ row: company }">
-          <a
-            v-bind:href="'mailto:' + company.email"
-            class="text-gray-600 text-hover-primary mb-1"
-          >
-            {{ company.email }}
-          </a>
-        </template>
-        <template v-slot:address="{ row: company }">
-          {{ company.address }}
-        </template>
-        <template v-slot:created_at="{ row: company }">
-          {{ company.created_at }}
-        </template>
-        <template v-slot:actions="{ row: company }">
+        <template v-slot:actions="{ row: permissions }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span class="menu-link px-3">
-              <router-link :to="`./edit/${company.id}`">
+              <router-link :to="`./edit/${permissions.id}`">
                 <i
                   class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
                 ></i>
@@ -109,7 +133,7 @@
             </span>
             <span>
               <i
-                @click="deleteCompany(company.id, false)"
+                @click="deletepermission(permissions.id, false)"
                 class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
@@ -153,53 +177,57 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
+  
+  <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import type { ICompany } from "@/core/model/company";
+import { ErrorMessage, Field, Form as Vform } from "vee-validate";
+import type { IPermissions } from "@/core/model/permissions";
 import arraySort from "array-sort";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { deletecompany, getCompanies, CompaniesSearch } from "@/stores/api";
+import { useRouter } from "vue-router";
+import * as Yup from "yup";
+import {
+  addPermission,
+  deletePermission,
+  getPermissions,
+  PermissionSearch,
+} from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
+import router from "@/router";
 
 export default defineComponent({
-  name: "company-listing",
+  name: "permission-manager-list",
   components: {
     Datatable,
+    ErrorMessage,
+    Field,
+    Vform,
   },
   setup() {
     const auth = useAuthStore();
     const User = auth.GetUser();
+    const route = useRouter();
+
+    const permissionValidator = Yup.object().shape({
+      permission_name: Yup.string().required().label("Permission"),
+    });
+
+    // permission
+    const permissionDetails = ref({
+      permission_name: "",
+    });
 
     const tableHeader = ref([
       {
-        columnName: "Company Name",
-        columnLabel: "company_name",
+        columnName: "Permission Name",
+        columnLabel: "name",
         sortEnabled: true,
-        columnWidth: 175,
-      },
-      {
-        columnName: "Company Email",
-        columnLabel: "email",
-        sortEnabled: true,
-        columnWidth: 230,
-      },
-      {
-        columnName: "Company Address",
-        columnLabel: "address",
-        sortEnabled: true,
-        columnWidth: 175,
-      },
-      {
-        columnName: "Created Date",
-        columnLabel: "created_at",
-        sortEnabled: true,
-        columnWidth: 225,
+        columnWidth: 275,
       },
       {
         columnName: "Actions",
@@ -210,8 +238,8 @@ export default defineComponent({
     ]);
 
     const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<ICompany>>([]);
-    const initvalues = ref<Array<ICompany>>([]);
+    const tableData = ref<Array<IPermissions>>([]);
+    const initvalues = ref<Array<IPermissions>>([]);
 
     // functions
     const Limits = ref({
@@ -236,17 +264,14 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         ApiService.setHeader();
-        const response = await getCompanies(
+        const response = await getPermissions(
           `page=${page}&limit=${limit.value}`
         );
-
+        
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-          })
-        );
+        tableData.value = response.result.data.map(({ ...rest }) => ({
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -268,17 +293,14 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         ApiService.setHeader();
-        const response = await getCompanies(
+        const response = await getPermissions(
           `page=${page.value}&limit=${limit}`
         );
-
+        
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-          })
-        );
+        tableData.value = response.result.data.map(({ ...rest }) => ({
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -292,35 +314,32 @@ export default defineComponent({
 
     //console.log(initvalues.value);
 
-    const NextPage = () => {
+    const NextPage = async () => {
       if (more.value != false) {
         page.value = page.value + 1;
-        PagePointer(page.value);
+        await PagePointer(page.value);
       }
     };
 
-    const PrevPage = () => {
+    const PrevPage = async () => {
       if (page.value > 1) {
         page.value = page.value - 1;
-        PagePointer(page.value);
+        await PagePointer(page.value);
       }
     };
 
     // get_compaines
-    const company_listing = async () => {
+    const permission_listing = async () => {
       try {
         ApiService.setHeader();
-        const response = await getCompanies(
+        const response = await getPermissions(
           `page=${page.value}&limit=${limit.value}`
         );
-
+        
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-          })
-        );
+        tableData.value = response.result.data.map(({ ...rest }) => ({
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -333,13 +352,13 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      await company_listing();
+      await permission_listing();
       setTimeout(() => {
         loading.value = false;
       }, 250);
     });
 
-    const deleteFewCompany = () => {
+    const deleteFewPermission = () => {
       Swal.fire({
         title: "Are you sure?",
         text: "You will not be able to recover from this !",
@@ -352,14 +371,14 @@ export default defineComponent({
         if (result["isConfirmed"]) {
           // Put your function here
           selectedIds.value.forEach((item) => {
-            deleteCompany(item, true);
+            deletepermission(item, true);
           });
           selectedIds.value.length = 0;
         }
       });
     };
 
-    const deleteCompany = (id: number, mul: boolean) => {
+    const deletepermission = (id: number, mul: boolean) => {
       if (!mul) {
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
@@ -373,7 +392,7 @@ export default defineComponent({
             }).then((result: { [x: string]: any }) => {
               if (result["isConfirmed"]) {
                 // Put your function here
-                deletecompany(id);
+                deletePermission(id);
                 tableData.value.splice(i, 1);
               }
             });
@@ -383,7 +402,7 @@ export default defineComponent({
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
             // Put your function here
-            deletecompany(id);
+            deletePermission(id);
             tableData.value.splice(i, 1);
           }
         }
@@ -397,7 +416,7 @@ export default defineComponent({
     const searchItems = async () => {
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value !== "") {
-        let results: Array<ICompany> = [];
+        let results: Array<IPermissions> = [];
         // if Search
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
@@ -416,7 +435,7 @@ export default defineComponent({
         page.value = 1;
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
-        await company_listing();
+        await permission_listing();
       }
     };
 
@@ -424,15 +443,12 @@ export default defineComponent({
       // Your API call logic here
       try {
         ApiService.setHeader();
-        const response = await CompaniesSearch(search.value);
-
+        const response = await PermissionSearch(search.value);
+        
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-          })
-        );
+        tableData.value = response.result.data.map(({ ...rest }) => ({
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -466,14 +482,75 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
+    const showSuccessAlert = (title, message) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "success",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
+      });
+    };
+
+    const showErrorAlert = (title, message) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "error",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
+      });
+    };
+
+    const onsubmit = async () => {
+      if (permissionDetails.value.permission_name == "") {
+        showErrorAlert("Warning", "Please enter a permission name");
+        loading.value = false;
+        return;
+      }
+
+      try {
+        // Call your API here with the form values
+        const response = await addPermission(permissionDetails.value);
+        // console.log(response.error);
+        if (!response.error) {
+          // Handle successful API response
+          // console.log("API response:", response);
+          showSuccessAlert("Success", "Permission added successfully");
+
+          // clear();
+          route.push({ name: "permission-manager-list" });
+        } else {
+          // Handle API error response
+          // const errorData = response.error;
+          showErrorAlert("Warning", "Please enter a permission name");
+        }
+      } catch (error) {
+        // Handle any other errors during API call
+        // console.error("API call error:", error);
+        showErrorAlert("Error", "An error occurred during the API call.");
+      } finally {
+      }
+    };
     return {
+      onsubmit,
+      permissionValidator,
+      permissionDetails,
       tableData,
       tableHeader,
-      deleteCompany,
+      deletepermission,
       search,
       searchItems,
       selectedIds,
-      deleteFewCompany,
+      deleteFewPermission,
       sort,
       onItemSelect,
       getAssetPath,
@@ -489,3 +566,4 @@ export default defineComponent({
   },
 });
 </script>
+  

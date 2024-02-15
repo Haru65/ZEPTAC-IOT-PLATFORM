@@ -361,7 +361,7 @@ export default defineComponent({
       ApiService.setHeader();
       const company_ID = auth.GetUser().company_id;
       const response = await GetAppovedQuotationsList(company_ID);
-      console.log("approved quotation: ", response)
+      // console.log("approved quotation: ", response)
       Quotations.value.push(
         ...response.result.map(({ ...rest }) => ({
           ...rest,
@@ -525,7 +525,7 @@ export default defineComponent({
     const formSubmit = async () => {
 
       loading.value = true;
-      console.log(rgpDetails.value);
+      // console.log(rgpDetails.value);
       rgpDetails.value.date = moment(rgpDetails.value.date).format(
         "YYYY-MM-DD HH:mm:ss"
       );

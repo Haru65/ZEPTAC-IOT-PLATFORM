@@ -50,6 +50,15 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/permission_manager/list",
+        name: "permission-manager-list",
+        component: () => import("@/views/apps/admin/PermissionManager.vue"),
+        meta: {
+          pageTitle: "Permission Manager",
+          breadcrumbs: ["Permission Manager"],
+        },
+      },
+      {
         path: "/company/list",
         name: "company-list",
         component: () =>
@@ -1043,6 +1052,14 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/crafted/authentication/Error404.vue"),
         meta: {
           pageTitle: "Error 404",
+        },
+      },
+      {
+        path: "/401",
+        name: "401",
+        component: () => import("@/views/crafted/authentication/Error401.vue"),
+        meta: {
+          pageTitle: "Error 401",
         },
       },
       {

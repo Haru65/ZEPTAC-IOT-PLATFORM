@@ -260,7 +260,6 @@ export default defineComponent({
       },
     ]);
 
-    const total = ref(0);
     // functions
     const Limits = ref({
       1: 10,
@@ -269,9 +268,9 @@ export default defineComponent({
     });
 
     const loading = ref(true);
-    // staring from 2
-    let page = ref(1);
-    let limit = ref(50);
+    // staring from 1
+    const page = ref(1);
+    const limit = ref(10);
     // limit 10
     const more = ref(false);
 
@@ -286,9 +285,7 @@ export default defineComponent({
         const response = await getComplaints(
           `page=${page}&limit=${limit.value}`
         );
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
+        
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -332,9 +329,7 @@ export default defineComponent({
         const response = await getComplaints(
           `page=${page.value}&limit=${limit}`
         );
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
+        
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -369,7 +364,7 @@ export default defineComponent({
     //console.log(initvalues.value);
 
     const NextPage = () => {
-      console.log(more.value);
+      // console.log(more.value);
       if (more.value != false) {
         page.value = page.value + 1;
         PagePointer(page.value);
@@ -413,7 +408,7 @@ export default defineComponent({
             complaint_status,
           })
         );
-        total.value = response.result.total_count;
+        
         more.value = response.result.next_page_url != null ? true : false;
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
@@ -486,7 +481,7 @@ export default defineComponent({
     let debounceTimer;
 
     const searchItems = async () => {
-      console.log(search.value);
+      // console.log(search.value);
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value.length != 0) {
         let results: Array<IComplaint> = [];
@@ -515,9 +510,9 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await ComplaintSearch(search.value);
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        tableData.value = response.result.data.data.map(
+        
+        more.value = response.result.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(
           ({
             id,
             customer_name,
@@ -548,7 +543,7 @@ export default defineComponent({
     }
 
     const searchingFunc = (obj: any, value: string): boolean => {
-      console.log(obj);
+      // console.log(obj);
       for (let key in obj) {
         if (
           !Number.isInteger(obj[key]) &&
@@ -595,26 +590,3 @@ export default defineComponent({
   },
 });
 </script>
-<style>
-.el-input__inner {
-  font-weight: 500;
-}
-
-.el-input__wrapper {
-  height: 3.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--bs-gray-100);
-  border-color: var(--bs-gray-100);
-  color: var(--bs-gray-700);
-  transition: color 0.2s ease;
-  appearance: none;
-  line-height: 1.5;
-  border: none !important;
-  padding-top: 0.825rem;
-  padding-bottom: 0.825rem;
-  padding-left: 1.5rem;
-  font-size: 1.15rem;
-  border-radius: 0.625rem;
-  box-shadow: none !important;
-}
-</style>

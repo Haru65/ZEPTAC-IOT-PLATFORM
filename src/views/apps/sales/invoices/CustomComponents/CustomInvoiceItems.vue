@@ -121,8 +121,8 @@ export default {
       // Equipments.value.pop();
       // Equipments.value = await [...props.equipments];
 
-      console.log("-------------------------------->",props.equipments);
-      console.log("-------------------------------->",props.equipment_wise);
+      // console.log("-------------------------------->",props.equipments);
+      // console.log("-------------------------------->",props.equipment_wise);
     });
 
     async function setEquipment(id, index) {
@@ -134,7 +134,7 @@ export default {
 
     async function setEquipmentCharge(newval, index) {
       await emit("setTheEquipmentCharge", newval.target.value, index);
-      console.log(Equipments.value);
+      // console.log(Equipments.value);
     }
 
     async function setQuantity(newval, index) {

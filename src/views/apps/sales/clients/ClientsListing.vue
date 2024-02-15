@@ -92,7 +92,6 @@
     </div>
     <div class="card-body pt-0">
       <Datatable
-        checkbox-label="id"
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
@@ -252,59 +251,15 @@ export default defineComponent({
       },
     ]);
 
-    // functions
-    // get users function
-    async function client_listing(): Promise<void> {
-      try {
-        ApiService.setHeader();
-        const response = await getClients(
-          `page=${page.value}&limit=${limit.value}`
-        );
-        console.log(response);
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            first_name,
-            last_name,
-            mobile,
-            company_name,
-            meta,
-            ...rest
-          }) => ({
-            id,
-            client_company: meta.company_name,
-            customer_company: meta.customer_company.company_name ?? "",
-            location: {
-              city: meta.city ?? "",
-              states: meta.states ?? "",
-            },
-            name: first_name + " " + last_name,
-            mobile,
-            company_name: company_name.company_name,
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        //console.log("done");
-        setTimeout(() => {
-          loading.value = false;
-        }, 100);
-      }
-    }
-
     const selectedIds = ref<Array<number>>([]);
     const tableData = ref<Array<IClients>>([]);
     const initvalues = ref<Array<IClients>>([]);
 
-    // staring from 2
-    let page = ref(1);
-    let limit = ref(50);
+    // staring from 1
+    const page = ref(1);
+    const limit = ref(10);
     // limit 10
     const more = ref(false);
-    const total = ref(0);
     // functions
     const Limits = ref({
       1: 10,
@@ -321,10 +276,8 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         const response = await getClients(`page=${page}&limit=${limit.value}`);
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
+
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
             id,
@@ -369,10 +322,8 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         const response = await getClients(`page=${page.value}&limit=${limit}`);
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
+
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
             id,
@@ -431,6 +382,51 @@ export default defineComponent({
           );
     });
 
+        // functions
+    // get users function
+    async function client_listing(): Promise<void> {
+      try {
+        ApiService.setHeader();
+        const response = await getClients(
+          `page=${page.value}&limit=${limit.value}`
+        );
+        // console.log(response);
+
+        more.value = response.result.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(
+          ({
+            id,
+            first_name,
+            last_name,
+            mobile,
+            company_name,
+            meta,
+            ...rest
+          }) => ({
+            id,
+            client_company: meta.company_name,
+            customer_company: meta.customer_company.company_name ?? "",
+            location: {
+              city: meta.city ?? "",
+              states: meta.states ?? "",
+            },
+            name: first_name + " " + last_name,
+            mobile,
+            company_name: company_name.company_name,
+            ...rest,
+          })
+        );
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        //console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 100);
+      }
+    }
+    
     onMounted(async () => {
       await client_listing();
     });
@@ -488,7 +484,7 @@ export default defineComponent({
 
     const search = ref<string>("");
     let debounceTimer;
-    const searchItems = () => {
+    const searchItems = async () => {
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value !== "") {
         let results: Array<IClients> = [];
@@ -504,8 +500,13 @@ export default defineComponent({
           clearTimeout(debounceTimer); // Clear any existing debounce timer
           debounceTimer = setTimeout(async () => {
             await SearchMore();
-          }, 1000);
+          }, 1500);
         }
+      } else {
+        page.value = 1;
+        while (tableData.value.length != 0) tableData.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
+        await client_listing();
       }
     };
 
@@ -513,10 +514,8 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await ClientSearch(search.value);
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
+
+        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
             id,
@@ -586,7 +585,6 @@ export default defineComponent({
       loading,
       NextPage,
       PrevPage,
-      total,
       page,
       limit,
       PageLimitPoiner,
@@ -597,26 +595,3 @@ export default defineComponent({
   },
 });
 </script>
-<style>
-.el-input__inner {
-  font-weight: 500;
-}
-
-.el-input__wrapper {
-  height: 3.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--bs-gray-100);
-  border-color: var(--bs-gray-100);
-  color: var(--bs-gray-700);
-  transition: color 0.2s ease;
-  appearance: none;
-  line-height: 1.5;
-  border: none !important;
-  padding-top: 0.825rem;
-  padding-bottom: 0.825rem;
-  padding-left: 1.5rem;
-  font-size: 1.15rem;
-  border-radius: 0.625rem;
-  box-shadow: none !important;
-}
-</style>

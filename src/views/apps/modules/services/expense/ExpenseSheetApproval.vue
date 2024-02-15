@@ -244,32 +244,30 @@ export default defineComponent({
       },
     ]);
 
-    // staring from 2
-    let page = ref(1);
-    let limit = ref(50);
-    // limit 10
-    const more = ref(false);
-
-    const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<IExpenseSheet>>([]);
-    const initvalues = ref<Array<IExpenseSheet>>([]);
-    const total = ref(0);
     // functions
     const Limits = ref({
       1: 10,
       2: 25,
       3: 50,
     });
-    // more
-    // functions
+
+    // staring from 1
+    const page = ref(1);
+    const limit = ref(10);
+    // limit 10
+    const more = ref(false);
+
+    const selectedIds = ref<Array<number>>([]);
+    const tableData = ref<Array<IExpenseSheet>>([]);
+    const initvalues = ref<Array<IExpenseSheet>>([]);
+
     // get users function
     async function expensesheets_listing(): Promise<void> {
       try {
         const response = await getPendingExpenseSheets(
           `page=${page.value}&limit=${limit.value}`
         );
-        console.log(response);
-        total.value = response.result.total_count;
+        
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(({ ...rest }) => ({
           ...rest,
@@ -296,9 +294,7 @@ export default defineComponent({
         const response = await getPendingExpenseSheets(
           `page=${page}&limit=${limit.value}`
         );
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
+        
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(({ ...rest }) => ({
           ...rest,
@@ -326,9 +322,7 @@ export default defineComponent({
         const response = await getPendingExpenseSheets(
           `page=${page.value}&limit=${limit}`
         );
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
+        
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(({ ...rest }) => ({
           ...rest,
@@ -450,11 +444,9 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await ExpenseSheetSearch(search.value);
-        //console.log(response.result.total_count);
-        // first 20 displayed
-        total.value = response.result.total_count;
-        more.value = response.result.data.next_page_url != null ? true : false;
-        tableData.value = response.result.data.data.map(({ ...rest }) => ({
+        
+        more.value = response.result.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(({ ...rest }) => ({
           ...rest,
         }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -504,7 +496,6 @@ export default defineComponent({
       loading,
       NextPage,
       PrevPage,
-      total,
       page,
       limit,
       PageLimitPoiner,

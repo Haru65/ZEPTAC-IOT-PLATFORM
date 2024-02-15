@@ -315,6 +315,18 @@ const AdminMenuConfig: Array<MenuItem> = [
           },
         ],
       },
+      {
+        sectionTitle: "Permission",
+        route: "/permission_manager",
+        keenthemesIcon: "setting-4",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Permission Manager",
+            route: "/permission_manager/list",
+          },
+        ],
+      },
     ],
   },
 ];
