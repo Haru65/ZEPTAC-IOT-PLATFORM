@@ -230,7 +230,7 @@ import moment from "moment";
 import Swal from "sweetalert2";
 
 export default defineComponent({
-  name: "validation-list",
+  name: "training-list",
   components: {
     Datatable,
   },

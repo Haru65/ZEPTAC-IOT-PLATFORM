@@ -730,6 +730,7 @@ export default defineComponent({
     let limit = ref(500);
     const User = auth.GetUser();
     const route = useRoute();
+    const router = useRouter();
     const loading = ref(false);
     const Companies = ref([{ id: "", company_name: "" }]);
     const state = ref([""]);
@@ -933,7 +934,7 @@ export default defineComponent({
           // Handle successful API response
           // console.log("API response:", response);
           showSuccessAlert("Success", "User have been successfully inserted!");
-          // router.push({ name: "users-list" });
+          router.push({ name: "users-list" });
         } else {
           // Handle API error response
           const errorData = response.error;

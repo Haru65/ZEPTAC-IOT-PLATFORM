@@ -770,10 +770,10 @@ export default defineComponent({
     const updatePasswordButton = ref<HTMLElement | null>(null);
 
     const loading = ref(false);
-    const router = useRoute();
-    const route = useRouter();
+    const router = useRouter();
+    const route = useRoute();
 
-    const CompanyId = router.params.id;
+    const CompanyId = route.params.id;
     const emailFormDisplay = ref(false);
     const passwordFormDisplay = ref(false);
 
@@ -920,7 +920,7 @@ export default defineComponent({
                 confirmButton: "btn btn-primary rounded",
               },
             });
-            route.go(-1);
+            router.go(-1);
           });
         }
       });

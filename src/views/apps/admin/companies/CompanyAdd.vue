@@ -762,7 +762,7 @@ export default defineComponent({
   setup() {
     const updateEmailButton = ref<HTMLElement | null>(null);
     const updatePasswordButton = ref<HTMLElement | null>(null);
-    const route = useRouter();
+    const router = useRouter();
     const loading = ref(false);
     const emailFormDisplay = ref(false);
     const passwordFormDisplay = ref(false);
@@ -882,7 +882,7 @@ export default defineComponent({
             "Success",
             "Company details have been successfully inserted!"
           );
-          route.push({ name: "company-list" });
+          router.push({ name: "company-list" });
         } else {
           // Handle API error response
           const errorData = response.error;

@@ -206,7 +206,7 @@ import { deleteUser, getUsers, UserSearch } from "@/stores/api";
 import Swal from "sweetalert2";
 
 export default defineComponent({
-  name: "users-listing",
+  name: "users-list",
   components: {
     Datatable,
   },

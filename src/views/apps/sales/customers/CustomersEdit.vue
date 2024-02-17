@@ -493,15 +493,17 @@ export default defineComponent({
     VForm,
   },
   setup() {
+
     const auth = useAuthStore();
-    const router = useRoute();
-    const route = useRouter();
+    const router = useRouter();
+    const route = useRoute();
+    
     let limit = ref(500);
     const loading = ref(false);
     const User = auth.GetUser();
     const Companies = ref([{ id: "", company_name: "" }]);
     const state = ref([""]);
-    const customerId = router.params.id;
+    const customerId = route.params.id;
     const getdropcomp = async () => {
       ApiService.setHeader();
       const response = await getCompanies(`fetchAll=true`);
@@ -618,7 +620,7 @@ export default defineComponent({
             "Customer Information successfully Updated!"
           );
           
-          route.push({ name: "customers-list" });
+          router.push({ name: "customers-list" });
         } else {
           // Handle API error response
           const errorData = response.error;

@@ -23,6 +23,9 @@ import {
   getClient,
   getThermalInstrument,
   getThermalReport,
+  getExternalDoc,
+  getInternalDoc,
+  getNonConformanceRecord,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
@@ -987,6 +990,119 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
 
+      // Quality Work - Quality Documentation
+      {
+        path: "/internaldocuments",
+        name: "internal-documents",
+        component: () =>
+          import("@/views/apps/qualitydocumentation/qualitywork/internal/InternalDocListing.vue"),
+        meta: {
+          pageTitle: "Internal Document List",
+          breadcrumbs: ["Internal Document List"],
+        },
+      },
+      {
+        path: "/internaldocuments/edit/:id",
+        name: "internal-document-edit",
+        beforeEnter: async (to, from, next) => {
+
+          const docId = to.params.id;
+          try {
+            const response = await getInternalDoc(docId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/qualitydocumentation/qualitywork/internal/InternalDocEdit.vue"),
+        meta: {
+          pageTitle: "Internal Document Edit",
+          breadcrumbs: ["Internal Document Edit"],
+        },
+      },
+
+      {
+        path: "/externaldocuments",
+        name: "external-documents",
+        component: () =>
+          import("@/views/apps/qualitydocumentation/qualitywork/external/ExternalDocListing.vue"),
+        meta: {
+          pageTitle: "External Document List",
+          breadcrumbs: ["External Document List"],
+        },
+      },
+      {
+        path: "/externaldocuments/edit/:id",
+        name: "external-document-edit",
+        beforeEnter: async (to, from, next) => {
+
+          const docId = to.params.id;
+          try {
+            const response = await getExternalDoc(docId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/qualitydocumentation/qualitywork/external/ExternalDocEdit.vue"),
+        meta: {
+          pageTitle: "External Document Edit",
+          breadcrumbs: ["External Document Edit"],
+        },
+      },
+
+      {
+        path: "/ncrs",
+        name: "non-conformance-records",
+        component: () =>
+          import("@/views/apps/qualitydocumentation/qualitywork/ncr/NCRListing.vue"),
+        meta: {
+          pageTitle: "Non Conformance Record List",
+          breadcrumbs: ["Non Conformance Record List"],
+        },
+      },
+      {
+        path: "/ncrs/edit/:id",
+        name: "non-conformance-record-edit",
+        beforeEnter: async (to, from, next) => {
+
+          const itemId = to.params.id;
+          try {
+            const response = await getNonConformanceRecord(itemId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/qualitydocumentation/qualitywork/ncr/NCREdit.vue"),
+        meta: {
+          pageTitle: "Non Conformance Record Edit",
+          breadcrumbs: ["Non Conformance Record List Edit"],
+        },
+      },
+
+      // Profile Page - Change Password
       {
         path: "/profile/changepassword",
         name: "change-password",

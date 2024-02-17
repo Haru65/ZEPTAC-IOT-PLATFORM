@@ -22,6 +22,9 @@ const TRAINING_URL = "training";
 const THERMAL_INSTRUMENTS_URL = "thermalinstrument";
 const THERMAL_REPORTS_URL = "thermalreport";
 const PERMISSION_URL = "permission_manager";
+const EXTERNAL_DOC_URL = "externaldocuments";
+const INTERNAL_DOC_URL = "internaldocuments";
+const NCR_URL = "ncrs";
 
 
 // Update Password
@@ -2097,6 +2100,262 @@ export async function PermissionSearch(search: any) {
         }
         ApiService.setHeader();
         const response = await ApiService.post('permissions_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// Quality Documentation
+// Quality Work - External
+
+// listing function
+export async function getExternalDocs(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(EXTERNAL_DOC_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function ExternalDocSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('external_doc_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addExternalDoc(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(EXTERNAL_DOC_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getExternalDoc(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(EXTERNAL_DOC_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateExternalDoc(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(EXTERNAL_DOC_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteExternalDoc(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(EXTERNAL_DOC_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// Quality Documentation
+// Quality Work - Internal
+
+// listing function
+export async function getInternalDocs(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(INTERNAL_DOC_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function InternalDocSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('internal_doc_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addInternalDoc(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(INTERNAL_DOC_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getInternalDoc(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(INTERNAL_DOC_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateInternalDoc(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(INTERNAL_DOC_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteInternalDoc(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(INTERNAL_DOC_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
+// Quality Documentation
+// Quality Work - Non Conformance Record
+
+// listing function
+export async function getNonConformanceRecords(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(NCR_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function NonConformanceRecordSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('ncr_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addNonConformanceRecord(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(NCR_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getNonConformanceRecord(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(NCR_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateNonConformanceRecord(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(NCR_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteNonConformanceRecord(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(NCR_URL + "/" + data);
         return response.data;
     } catch (errors) {
         console.error(errors);

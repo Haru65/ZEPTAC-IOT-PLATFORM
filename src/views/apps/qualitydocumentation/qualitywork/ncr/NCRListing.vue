@@ -14,7 +14,7 @@
             v-model="search"
             @input="searchItems()"
             class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search Companies"
+            placeholder="Search document name"
           />
         </div>
         <!--end::Search-->
@@ -40,11 +40,17 @@
           </button>
           <!--end::Export-->
           <!--begin::Add customer-->
-          <router-link to="./add" class="btn btn-primary">
+          <button
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#kt_modal_ncr"
+          >
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Company
-          </router-link>
+            Add NCR
+          </button>
           <!--end::Add customer-->
+
+          <NCRModal @ncr-added="reLoadData"></NCRModal>
         </div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->
@@ -60,17 +66,38 @@
           <button
             type="button"
             class="btn btn-danger"
-            @click="deleteFewCompany()"
+            @click="deleteFewItem()"
           >
             Delete Selected
           </button>
         </div>
+        <!--end::Group actions-->
+        <!--begin::Group actions-->
+        <div
+          class="d-flex justify-content-end align-items-center d-none"
+          data-kt-customer-table-toolbar="selected"
+        >
+          <div class="fw-bold me-5">
+            <span
+              class="me-2"
+              data-kt-customer-table-select="selected_count"
+            ></span
+            >Selected
+          </div>
+          <button
+            type="button"
+            class="btn btn-danger"
+            data-kt-customer-table-select="delete_selected"
+          >
+            Delete Selected
+          </button>
+        </div>
+        <!--end::Group actions-->
       </div>
       <!--end::Card toolbar-->
     </div>
     <div class="card-body pt-0">
       <Datatable
-        checkbox-label="id"
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
@@ -80,37 +107,46 @@
         :items-per-page-dropdown-enabled="false"
         :loading="loading"
       >
-        <template v-slot:company_name="{ row: company }">
-          {{ company.company_name }}
+        <!-- img data -->
+
+        <template v-slot:id="{ row: ncr }">
+          {{ ncr.id }}
         </template>
-        <template v-slot:email="{ row: company }">
-          <a
-            v-bind:href="'mailto:' + company.email"
-            class="text-gray-600 text-hover-primary mb-1"
-          >
-            {{ company.email }}
-          </a>
+        <template v-slot:nc_details="{ row: ncr }">
+          {{ ncr.nc_details }}
         </template>
-        <template v-slot:address="{ row: company }">
-          {{ company.address }}
+        <template v-slot:action_required="{ row: ncr }">
+          {{ ncr.action_required }}
         </template>
-        <template v-slot:created_at="{ row: company }">
-          {{ company.created_at }}
+        <template v-slot:completion_date="{ row: ncr }">
+          {{ ncr.completion_date }}
         </template>
-        <template v-slot:actions="{ row: company }">
+        <template v-slot:review_date="{ row: ncr }">
+          {{ ncr.review_date }}
+        </template>
+        <template v-slot:verification_details="{ row: ncr }">
+          {{ ncr.verification_details }}
+        </template>
+        <template v-slot:prepared_by="{ row: ncr }">
+          {{ ncr.prepared_by }}
+        </template>
+        <template v-slot:approved_by="{ row: ncr }">
+          {{ ncr.approved_by }}
+        </template>
+        <template v-slot:actions="{ row: ncr }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span class="menu-link px-3">
-              <router-link :to="`./edit/${company.id}`">
+              <router-link :to="`/ncrs/edit/${ncr.id}`">
                 <i
                   class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
                 ></i>
               </router-link>
             </span>
-            <span>
+            <span class="menu-link px-3">
               <i
-                @click="deleteCompany(company.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
+                @click="deleteItem(ncr.id, false)"
+                class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
           </div>
@@ -153,53 +189,72 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import { getAssetPath } from "@/core/helpers/assets";
+    
+    <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
-import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import type { ICompany } from "@/core/model/company";
+import type { Sort } from "@/components/kt-datatable/table-partials/models";
+import type { INCR } from "@/core/model/ncr";
+import {
+  getNonConformanceRecords,
+  deleteNonConformanceRecord,
+  NonConformanceRecordSearch,
+  
+} from "@/stores/api";
 import arraySort from "array-sort";
-import ApiService from "@/core/services/ApiService";
 import moment from "moment";
-import Swal from "sweetalert2/dist/sweetalert2.js";
-import { deletecompany, getCompanies, CompaniesSearch } from "@/stores/api";
-import { useAuthStore } from "@/stores/auth";
+import Swal from "sweetalert2";
+import NCRModal from "./NCRModal.vue";
 
 export default defineComponent({
-  name: "company-list",
+  name: "non-conformance-records",
   components: {
     Datatable,
+    NCRModal,
   },
   setup() {
-    const auth = useAuthStore();
-    const User = auth.GetUser();
-
     const tableHeader = ref([
       {
-        columnName: "Company Name",
-        columnLabel: "company_name",
+        columnName: "NCR Detail",
+        columnLabel: "nc_details",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 100,
       },
       {
-        columnName: "Company Email",
-        columnLabel: "email",
+        columnName: "Action Required",
+        columnLabel: "action_required",
         sortEnabled: true,
-        columnWidth: 230,
+        columnWidth: 100,
       },
       {
-        columnName: "Company Address",
-        columnLabel: "address",
+        columnName: "Completion Date",
+        columnLabel: "completion_date",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 75,
       },
       {
-        columnName: "Created Date",
-        columnLabel: "created_at",
+        columnName: "Review Date",
+        columnLabel: "review_date",
         sortEnabled: true,
-        columnWidth: 225,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Verification Detail",
+        columnLabel: "verification_details",
+        sortEnabled: true,
+        columnWidth: 100,
+      },
+      {
+        columnName: "Prepared By",
+        columnLabel: "prepared_by",
+        sortEnabled: true,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Approved By",
+        columnLabel: "approved_by",
+        sortEnabled: true,
+        columnWidth: 75,
       },
       {
         columnName: "Actions",
@@ -208,10 +263,6 @@ export default defineComponent({
         columnWidth: 75,
       },
     ]);
-
-    const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<ICompany>>([]);
-    const initvalues = ref<Array<ICompany>>([]);
 
     // functions
     const Limits = ref({
@@ -235,16 +286,18 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        ApiService.setHeader();
-        const response = await getCompanies(
+        const response = await getNonConformanceRecords(
           `page=${page}&limit=${limit.value}`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+          ({
+            id,
+            ...rest
+          }) => ({
+            id,
+            ...rest
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -267,16 +320,18 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        ApiService.setHeader();
-        const response = await getCompanies(
+        const response = await getNonConformanceRecords(
           `page=${page.value}&limit=${limit}`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+          ({
+            id,
+            ...rest
+          }) => ({
+            id,
+            ...rest
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -293,6 +348,7 @@ export default defineComponent({
     //console.log(initvalues.value);
 
     const NextPage = () => {
+      console.log(more.value);
       if (more.value != false) {
         page.value = page.value + 1;
         PagePointer(page.value);
@@ -306,40 +362,44 @@ export default defineComponent({
       }
     };
 
-    // get_compaines
-    const company_listing = async () => {
+    const selectedIds = ref<Array<number>>([]);
+
+    const tableData = ref<Array<INCR>>([]);
+
+    const initvalues = ref<Array<INCR>>([]);
+
+    async function ncr_listing(): Promise<void> {
       try {
-        ApiService.setHeader();
-        const response = await getCompanies(
+        const response = await getNonConformanceRecords(
           `page=${page.value}&limit=${limit.value}`
+        );
+        tableData.value = response.result.data.map(
+          ({
+            id,
+            ...rest
+          }) => ({
+            id,
+            ...rest
+          })
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-          })
-        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
       } finally {
-        ////console.log("done");
+        //console.log("done");
         setTimeout(() => {
           loading.value = false;
-        }, 250);
+        }, 100);
       }
-    };
+    }
 
     onMounted(async () => {
-      await company_listing();
-      setTimeout(() => {
-        loading.value = false;
-      }, 250);
+      await ncr_listing();
     });
 
-    const deleteFewCompany = () => {
+    const deleteFewItem = () => {
       Swal.fire({
         title: "Are you sure?",
         text: "You will not be able to recover from this !",
@@ -352,14 +412,14 @@ export default defineComponent({
         if (result["isConfirmed"]) {
           // Put your function here
           selectedIds.value.forEach((item) => {
-            deleteCompany(item, true);
+            deleteItem(item, true);
           });
           selectedIds.value.length = 0;
         }
       });
     };
 
-    const deleteCompany = (id: number, mul: boolean) => {
+    const deleteItem = (id: number, mul: boolean) => {
       if (!mul) {
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
@@ -373,7 +433,7 @@ export default defineComponent({
             }).then((result: { [x: string]: any }) => {
               if (result["isConfirmed"]) {
                 // Put your function here
-                deletecompany(id);
+                deleteNonConformanceRecord(id);
                 tableData.value.splice(i, 1);
               }
             });
@@ -383,7 +443,7 @@ export default defineComponent({
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
             // Put your function here
-            deletecompany(id);
+            deleteNonConformanceRecord(id);
             tableData.value.splice(i, 1);
           }
         }
@@ -391,14 +451,14 @@ export default defineComponent({
     };
 
     const search = ref<string>("");
-
     // ? debounce timer
     let debounceTimer;
+
     const searchItems = async () => {
+      console.log(search.value);
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
-      if (search.value !== "") {
-        let results: Array<ICompany> = [];
-        // if Search
+      if (search.value.length != 0) {
+        let results: Array<INCR> = [];
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
             results.push(tableData.value[j]);
@@ -410,27 +470,28 @@ export default defineComponent({
           clearTimeout(debounceTimer); // Clear any existing debounce timer
           debounceTimer = setTimeout(async () => {
             await SearchMore();
-          }, 1000);
+          }, 1500);
         }
       } else {
         page.value = 1;
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
-        await company_listing();
+        await ncr_listing();
       }
     };
 
     async function SearchMore() {
       // Your API call logic here
       try {
-        ApiService.setHeader();
-        const response = await CompaniesSearch(search.value);
+        const response = await NonConformanceRecordSearch(search.value);
 
-        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+          ({
+            id,
+            ...rest
+          }) => ({
+            id,
+            ...rest
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -445,10 +506,14 @@ export default defineComponent({
     }
 
     const searchingFunc = (obj: any, value: string): boolean => {
-      //console.log(initvalues.value);
+      console.log(obj);
       for (let key in obj) {
-        if (!Number.isInteger(obj[key]) && !(typeof obj[key] === "object")) {
-          if (obj[key].indexOf(value) != -1) {
+        if (
+          !Number.isInteger(obj[key]) &&
+          !(typeof obj[key] === "object") &&
+          typeof obj[key] === "string" // Add type check here
+        ) {
+          if (obj[key].indexOf(value) !== -1) {
             return true;
           }
         }
@@ -466,26 +531,31 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
+    async function reLoadData() {
+      await ncr_listing();
+    }
+
     return {
       tableData,
       tableHeader,
-      deleteCompany,
+      reLoadData,
+      deleteItem,
       search,
       searchItems,
       selectedIds,
-      deleteFewCompany,
+      deleteFewItem,
       sort,
       onItemSelect,
-      getAssetPath,
       loading,
-      NextPage,
-      PrevPage,
-      page,
       limit,
-      PageLimitPoiner,
+      PrevPage,
+      NextPage,
+      page,
       Limits,
-      User,
+      PageLimitPoiner,
     };
   },
 });
 </script>
+    
+    

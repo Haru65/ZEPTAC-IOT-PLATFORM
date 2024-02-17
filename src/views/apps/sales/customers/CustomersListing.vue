@@ -201,7 +201,7 @@ import moment from "moment";
 import Swal from "sweetalert2";
 import { deletecustomer, CustomerSearch, getCustomers } from "@/stores/api";
 export default defineComponent({
-  name: "customers-listing",
+  name: "customers-list",
   components: {
     Datatable,
   },
@@ -427,7 +427,7 @@ export default defineComponent({
 
     const search = ref<string>("");
     let debounceTimer;
-    const searchItems = () => {
+    const searchItems = async () => {
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value !== "") {
         let results: Array<ICustomers> = [];
@@ -445,6 +445,12 @@ export default defineComponent({
             await SearchMore();
           }, 1000);
         }
+      }
+       else {
+        page.value = 1;
+        while (tableData.value.length != 0) tableData.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
+        await customer_listing();
       }
     };
 

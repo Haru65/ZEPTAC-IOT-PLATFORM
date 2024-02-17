@@ -723,10 +723,10 @@ export default defineComponent({
     const updatePasswordButton = ref<HTMLElement | null>(null);
 
     const loading = ref(false);
-    const router = useRoute();
-    const route = useRouter();
+    const route = useRoute();
+    const router = useRouter();
 
-    const CompanyId = router.params.id;
+    const CompanyId = route.params.id;
     const emailFormDisplay = ref(false);
     const passwordFormDisplay = ref(false);
 

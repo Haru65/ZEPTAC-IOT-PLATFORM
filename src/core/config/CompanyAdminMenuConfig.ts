@@ -138,6 +138,32 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
     ],
   },
   {
+    heading: "Quality Documentation",
+    route: "/qualitydocumentation",
+    pages: [
+      {
+        sectionTitle: "Quality Work",
+        route: "/qualitywork",
+        keenthemesIcon: "document",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Internal Document",
+            route: "/internaldocuments",
+          },
+          {
+            heading: "External Document",
+            route: "/externaldocuments",
+          },
+          {
+            heading: "Non Conformance Record",
+            route: "/ncrs",
+          },
+        ],
+      },
+    ],
+  },
+  {
     heading: "Feedback",
     route: "/feedback",
     pages: [

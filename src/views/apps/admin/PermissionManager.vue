@@ -189,7 +189,7 @@ import arraySort from "array-sort";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import * as Yup from "yup";
 import {
   addPermission,
@@ -198,7 +198,6 @@ import {
   PermissionSearch,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
-import router from "@/router";
 
 export default defineComponent({
   name: "permission-manager-list",
@@ -211,7 +210,8 @@ export default defineComponent({
   setup() {
     const auth = useAuthStore();
     const User = auth.GetUser();
-    const route = useRouter();
+    const route = useRoute();
+    const router = useRouter();
 
     const permissionValidator = Yup.object().shape({
       permission_name: Yup.string().required().label("Permission"),
@@ -527,7 +527,7 @@ export default defineComponent({
           showSuccessAlert("Success", "Permission added successfully");
 
           // clear();
-          route.push({ name: "permission-manager-list" });
+          router.push({ name: "permission-manager-list" });
         } else {
           // Handle API error response
           // const errorData = response.error;
