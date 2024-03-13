@@ -159,6 +159,67 @@ const AdminMenuConfig: Array<MenuItem> = [
             heading: "Non Conformance Record",
             route: "/ncrs",
           },
+          {
+            heading: "Risk Register",
+            route: "/risks",
+          },
+          {
+            heading: "Improvement Plan",
+            route: "/improvements",
+          },
+        ],
+      },
+      {
+        sectionTitle: "Internal Audit",
+        route: "/internalaudit",
+        keenthemesIcon: "document",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Internal Audit Observation",
+            route: "/auditobservations",
+          },
+          {
+            heading: "Internal Audit Schedule",
+            route: "/auditschedule",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    heading: "Master List",
+    pages: [
+      {
+        sectionTitle: "Master List",
+        keenthemesIcon: "document",
+        route: "/masterlist",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "QMS Procedure",
+            route: "/qms_procedures",
+          },
+          {
+            heading: "Work Instruction",
+            route: "/work_instructions",
+          },
+          {
+            heading: "Forms & Formats",
+            route: "/forms_and_formats",
+          },
+          {
+            heading: "NABL Document",
+            route: "/nabl_documents",
+          },
+          {
+            heading: "National-International Document",
+            route: "/ni_documents",
+          },
+          {
+            heading: "Records",
+            route: "/records",
+          },
         ],
       },
     ],
@@ -303,6 +364,12 @@ const AdminMenuConfig: Array<MenuItem> = [
         keenthemesIcon: "educare",
         bootstrapIcon: "bi-archive",
       },
+      {
+        heading: "Skill Matrix",
+        route: "/skill_matrix",
+        keenthemesIcon: "educare",
+        bootstrapIcon: "bi-archive",
+      },
     ],
   },
   {
@@ -350,6 +417,22 @@ const AdminMenuConfig: Array<MenuItem> = [
           {
             heading: "Permission Manager",
             route: "/permission_manager/list",
+          },
+        ],
+      },
+      {
+        sectionTitle: "ISO Rules",
+        route: "/iso",
+        keenthemesIcon: "setting-4",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "ISO Rules",
+            route: "/iso/add",
+          },
+          {
+            heading: "ISO Rules",
+            route: "/iso/list",
           },
         ],
       },

@@ -28,6 +28,19 @@
           class="d-flex justify-content-end"
           data-kt-customer-table-toolbar="base"
         >
+          <!--begin::Import-->
+          <button
+            type="button"
+            class="btn btn-light-success me-3"
+            data-bs-toggle="modal"
+            data-bs-target="#kt_modal_thermal_instrument"
+          >
+            <KTIcon icon-name="add-item" icon-class="fs-2" />
+            Import
+          </button>
+          <!--end::Import-->
+          
+          <ThermalImportModal></ThermalImportModal>
           <!--begin::Export-->
           <button
             type="button"
@@ -148,11 +161,11 @@
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <DuplicateInstrumentModal
-            :key="thermal_instruments.id"
-            :instrumentId="thermal_instruments.id"
-            :companyId="thermal_instruments.company_id"
-            :heading="thermal_instruments.name"
-            @handleDuplicate="HandleDuplicate"
+              :key="thermal_instruments.id"
+              :instrumentId="thermal_instruments.id"
+              :companyId="thermal_instruments.company_id"
+              :heading="thermal_instruments.name"
+              @handleDuplicate="HandleDuplicate"
             ></DuplicateInstrumentModal>
             <span
               class="menu-link px-3"
@@ -176,8 +189,7 @@
               ></i>
             </span>
             <span
-              class="menu-link px-3 "
-              
+              class="menu-link px-3"
               data-toggle="tooltip"
               title="Duplicate this instrument"
               data-bs-toggle="modal"
@@ -247,6 +259,7 @@ import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
 import type { ITInstrument } from "@/core/model/thermal_instruments";
 import DuplicateInstrumentModal from "./MaintenanceComponent/DuplicateInstrumentModal.vue";
+import ThermalImportModal from "./MaintenanceComponent/ThermalImportModal.vue";
 import {
   getThermalInstruments,
   deleteThermalInstrument,
@@ -263,6 +276,7 @@ export default defineComponent({
   components: {
     Datatable,
     DuplicateInstrumentModal,
+    ThermalImportModal,
   },
   setup() {
     const tableHeader = ref([
@@ -416,10 +430,8 @@ export default defineComponent({
 
     //console.log(initvalues.value);
 
-    async function HandleDuplicate(e){
-
+    async function HandleDuplicate(e) {
       await thermal_instrument_listing();
-
     }
 
     const NextPage = () => {
@@ -457,7 +469,7 @@ export default defineComponent({
             ...rest,
           })
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
@@ -630,10 +642,12 @@ export default defineComponent({
 });
 </script>
 <style>
-.el-input__inner, .el-select__inner {
+.el-input__inner,
+.el-select__inner {
   font-weight: 500;
 }
-.el-input__wrapper, .el-select__wrapper {
+.el-input__wrapper,
+.el-select__wrapper {
   height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);
@@ -650,7 +664,7 @@ export default defineComponent({
   border-radius: 0.625rem;
   box-shadow: none !important;
 }
-.switchtoleft{
+.switchtoleft {
   text-align: left;
 }
 </style>

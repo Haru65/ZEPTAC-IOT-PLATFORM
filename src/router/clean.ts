@@ -26,6 +26,17 @@ import {
   getExternalDoc,
   getInternalDoc,
   getNonConformanceRecord,
+  getRiskRegister,
+  getImprovementAction,
+  getIAuditObservation,
+  getQMSProcedure,
+  getNABLDoc,
+  getNIDoc,
+  getFormAndFormat,
+  getWorkInstruction,
+  getRecord,
+  getSkillMatrix,
+
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
@@ -61,6 +72,50 @@ const routes: Array<RouteRecordRaw> = [
           breadcrumbs: ["Permission Manager"],
         },
       },
+      {
+        path: "/iso/list",
+        name: "iso-list",
+        component: () => import("@/views/apps/admin/isorules/ISOClausesListing.vue"),
+        meta: {
+          pageTitle: "ISO Clauses",
+          breadcrumbs: ["ISO Clauses"],
+        },
+      },
+      {
+        path: "/iso/add",
+        name: "iso-add",
+        component: () => import("@/views/apps/admin/isorules/ISOClausesAdd.vue"),
+        meta: {
+          pageTitle: "ISO Clauses Add",
+          breadcrumbs: ["ISO Clauses Add"],
+        },
+      },
+      {
+        path: "/iso/edit/:id",
+        name: "iso-edit",
+        beforeEnter: async (to, from, next) => {
+          const companyId = to.params.id;
+          //console.log(companyId);
+          try {
+            const response = await getCompany(companyId);
+            // //console.log(response);
+            if (response.error) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () => import("@/views/apps/admin/isorules/ISOClausesEdit.vue"),
+        meta: {
+          pageTitle: "ISO Clauses Edit",
+          breadcrumbs: ["ISO Clauses Edit"],
+        },
+      },
+
       {
         path: "/company/list",
         name: "company-list",
@@ -868,6 +923,53 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
 
+      // Skill Matrix Routes
+      {
+        path: "/skill_matrix",
+        name: "skill-matrix-list",
+        component: () =>
+          import("@/views/apps/hr/skillmatrix/SkillMatrixListing.vue"),
+        meta: {
+          pageTitle: "Skill Matrix List",
+          breadcrumbs: ["Skill Matrix List"],
+        },
+      },
+      {
+        path: "/skill_matrix/add",
+        name: "skill-matrix-add",
+        component: () =>
+          import("@/views/apps/hr/skillmatrix/SkillMatrixAdd.vue"),
+        meta: {
+          pageTitle: "Skill Matrix Add",
+          breadcrumbs: ["Skill Matrix Add"],
+        },
+      },
+      {
+        path: "/skill_matrix/edit/:id",
+        name: "skill-matrix-edit",
+        beforeEnter: async (to, from, next) => {
+          const itemId = to.params.id;
+          try {
+            const response = await getSkillMatrix(itemId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/hr/skillmatrix/SkillMatrixEdit.vue"),
+        meta: {
+          pageTitle: "Skill Matrix Edit",
+          breadcrumbs: ["Skill Matrix Edit"],
+        },
+      },
+
       
       // Reports - Thermal Mapping
       {
@@ -1098,9 +1200,361 @@ const routes: Array<RouteRecordRaw> = [
           import("@/views/apps/qualitydocumentation/qualitywork/ncr/NCREdit.vue"),
         meta: {
           pageTitle: "Non Conformance Record Edit",
-          breadcrumbs: ["Non Conformance Record List Edit"],
+          breadcrumbs: ["Non Conformance Record Edit"],
         },
       },
+      
+      {
+        path: "/risks",
+        name: "risks-list",
+        component: () =>
+          import("@/views/apps/qualitydocumentation/qualitywork/risk/RiskListing.vue"),
+        meta: {
+          pageTitle: "Risk Register List",
+          breadcrumbs: ["Risk Register List"],
+        },
+      },
+      {
+        path: "/risks/edit/:id",
+        name: "risk-edit",
+        beforeEnter: async (to, from, next) => {
+
+          const itemId = to.params.id;
+          try {
+            const response = await getRiskRegister(itemId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/qualitydocumentation/qualitywork/risk/RiskEdit.vue"),
+        meta: {
+          pageTitle: "Risk Register Edit",
+          breadcrumbs: ["Risk Register Edit"],
+        },
+      },
+
+      {
+        path: "/improvements",
+        name: "improvements-list",
+        component: () =>
+          import("@/views/apps/qualitydocumentation/qualitywork/improvement/ImprovementListing.vue"),
+        meta: {
+          pageTitle: "Improvement Action Plan List",
+          breadcrumbs: ["Improvement Action Plan List"],
+        },
+      },
+      {
+        path: "/improvements/edit/:id",
+        name: "improvement-edit",
+        beforeEnter: async (to, from, next) => {
+
+          const itemId = to.params.id;
+          try {
+            const response = await getImprovementAction(itemId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/qualitydocumentation/qualitywork/improvement/ImprovementEdit.vue"),
+        meta: {
+          pageTitle: "Improvement Action Plan Edit",
+          breadcrumbs: ["Improvement Action Plan Edit"],
+        },
+      },
+
+      // Internal Audit - Audit Observation - Quality Documentation
+      {
+        path: "/auditobservations/add",
+        name: "auditobservation-add",
+        component: () =>
+          import("@/views/apps/qualitydocumentation/internalaudit/auditobservation/IAObservationAdd.vue"),
+        meta: {
+          pageTitle: "Internal Audit Observation Add",
+          breadcrumbs: ["Internal Audit Observation Add"],
+        },
+      },
+      {
+        path: "/auditobservations",
+        name: "auditobservations-list",
+        component: () =>
+          import("@/views/apps/qualitydocumentation/internalaudit/auditobservation/IAObservationListing.vue"),
+        meta: {
+          pageTitle: "Internal Audit Observation List",
+          breadcrumbs: ["Internal Audit Observation List"],
+        },
+      },
+      {
+        path: "/auditobservations/edit/:id",
+        name: "auditobservation-edit",
+        beforeEnter: async (to, from, next) => {
+
+          const itemId = to.params.id;
+          try {
+            const response = await getIAuditObservation(itemId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/qualitydocumentation/internalaudit/auditobservation/IAObservationEdit.vue"),
+        meta: {
+          pageTitle: "Internal Audit Observation Edit",
+          breadcrumbs: ["Internal Audit Observation Edit"],
+        },
+      },
+      
+      // Master List - QMS Procedure
+      {
+        path: "/qms_procedures",
+        name: "qms-procedures",
+        component: () =>
+          import("@/views/apps/master/QMSProcedure/QMSProcedureListing.vue"),
+        meta: {
+          pageTitle: "QMS Procedure List",
+          breadcrumbs: ["QMS Procedure List"],
+        },
+      },
+      {
+        path: "/qms_procedures/edit/:id",
+        name: "qms-procedure-edit",
+        beforeEnter: async (to, from, next) => {
+
+          const docId = to.params.id;
+          try {
+            const response = await getQMSProcedure(docId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/master/QMSProcedure/QMSProcedureEdit.vue"),
+        meta: {
+          pageTitle: "QMS Procedure Edit",
+          breadcrumbs: ["QMS Procedure Edit"],
+        },
+      },
+
+      // Master List - Work Instruction
+      {
+        path: "/work_instructions",
+        name: "work-instructions",
+        component: () =>
+          import("@/views/apps/master/WorkInstruction/WorkInstructionListing.vue"),
+        meta: {
+          pageTitle: "Work Instruction List",
+          breadcrumbs: ["Work Instruction List"],
+        },
+      },
+      {
+        path: "/work_instructions/edit/:id",
+        name: "work-instruction-edit",
+        beforeEnter: async (to, from, next) => {
+
+          const docId = to.params.id;
+          try {
+            const response = await getWorkInstruction(docId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/master/WorkInstruction/WorkInstructionEdit.vue"),
+        meta: {
+          pageTitle: "Work Instruction Edit",
+          breadcrumbs: ["Work Instruction Edit"],
+        },
+      },
+
+      // Master List - Forms and Formats
+      {
+        path: "/forms_and_formats",
+        name: "forms-formats",
+        component: () =>
+          import("@/views/apps/master/FormsAndFormats/FormsAndFormatsListing.vue"),
+        meta: {
+          pageTitle: "Forms & Formats List",
+          breadcrumbs: ["Forms & Formats List"],
+        },
+      },
+      {
+        path: "/forms_and_formats/edit/:id",
+        name: "form-format-edit",
+        beforeEnter: async (to, from, next) => {
+
+          const docId = to.params.id;
+          try {
+            const response = await getFormAndFormat(docId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/master/FormsAndFormats/FormsAndFormatsEdit.vue"),
+        meta: {
+          pageTitle: "Forms & Formats Edit",
+          breadcrumbs: ["Forms & Formats Edit"],
+        },
+      },
+
+      // Master List - NABL Document
+      {
+        path: "/nabl_documents",
+        name: "nabl-documents",
+        component: () =>
+          import("@/views/apps/master/NABLDocument/NABLDocumentListing.vue"),
+        meta: {
+          pageTitle: "NABL Document List",
+          breadcrumbs: ["NABL Document List"],
+        },
+      },
+      {
+        path: "/nabl_documents/edit/:id",
+        name: "nabl-document-edit",
+        beforeEnter: async (to, from, next) => {
+
+          const docId = to.params.id;
+          try {
+            const response = await getNABLDoc(docId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/master/NABLDocument/NABLDocumentEdit.vue"),
+        meta: {
+          pageTitle: "NABL Document Edit",
+          breadcrumbs: ["NABL Document Edit"],
+        },
+      },
+
+      // Master List - NI Document
+      {
+        path: "/ni_documents",
+        name: "ni-documents",
+        component: () =>
+          import("@/views/apps/master/NIDocument/NIDocumentListing.vue"),
+        meta: {
+          pageTitle: "National-International Document List",
+          breadcrumbs: ["National-International Document List"],
+        },
+      },
+      {
+        path: "/ni_documents/edit/:id",
+        name: "ni-document-edit",
+        beforeEnter: async (to, from, next) => {
+
+          const docId = to.params.id;
+          try {
+            const response = await getNIDoc(docId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/master/NIDocument/NIDocumentEdit.vue"),
+        meta: {
+          pageTitle: "National-International Document Edit",
+          breadcrumbs: ["National-International Document Edit"],
+        },
+      },
+
+      // Master List - Records
+      {
+        path: "/records",
+        name: "records",
+        component: () =>
+          import("@/views/apps/master/Records/RecordsListing.vue"),
+        meta: {
+          pageTitle: "Records List",
+          breadcrumbs: ["Records List"],
+        },
+      },
+      {
+        path: "/records/edit/:id",
+        name: "record-edit",
+        beforeEnter: async (to, from, next) => {
+
+          const docId = to.params.id;
+          try {
+            const response = await getRecord(docId.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/master/Records/RecordsEdit.vue"),
+        meta: {
+          pageTitle: "Records Edit",
+          breadcrumbs: ["Records Edit"],
+        },
+      },
+
+      
 
       // Profile Page - Change Password
       {

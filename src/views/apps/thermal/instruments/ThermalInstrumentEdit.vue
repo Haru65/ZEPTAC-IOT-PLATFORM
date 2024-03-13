@@ -59,19 +59,9 @@
                   class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
                   >Instrument ID.</label
                 >
-                <Field
-                  type="text"
-                  disabled
-                  name="instrument_id"
+                <div
                   class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Instrument ID."
-                  v-model="itemDetails.instrument_id"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="instrument_id" />
-                  </div>
-                </div>
+                >{{ itemDetails.instrument_id }}</div>
               </div>
             </div>
             <!--end::Input group-->
@@ -214,6 +204,7 @@
                         name="calibration_date"
                         id="calibration_date"
                         v-model="itemDetails.calibration_date"
+                        @change="setDates($event, 'calibration_date')"
                         placeholder="Pick a Day"
                         :editable="false"
                       />
@@ -246,6 +237,7 @@
                         name="calibration_due_date"
                         id="calibration_due_date"
                         v-model="itemDetails.calibration_due_date"
+                        @change="setDates($event, 'calibration_due_date')"
                         placeholder="Pick a Day"
                         :editable="false"
                       />
@@ -355,7 +347,6 @@ export default defineComponent({
     const itemId = route.params.id;
 
     const itemDetailsValidator = Yup.object().shape({
-      instrument_id: Yup.string().required().label("Instrument ID"),
       name: Yup.string().required().label("Instrument Name"),
       model_no: Yup.string().required().label("Model No."),
       serial_no: Yup.string().required().label("Serial No."),
@@ -450,12 +441,38 @@ export default defineComponent({
           model_no === "" ||
           serial_no === "" ||
           make === "" ||
-          calibration_date === null ||
-          calibration_due_date === null ||
+          calibration_date === "" ||
+          calibration_due_date === "" ||
           ranges === "" ||
           accuracy === ""
         );
       });
+    }
+
+    
+    /* --------SET DATE LOGIC--------*/
+    
+    async function setDates(e, dateType) {
+      try{
+        if (e != null) {
+
+          if(e != "" && e != null){
+            itemDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          }
+          else{
+            itemDetails.value[dateType] = "";
+          }
+
+      } else {
+        itemDetails.value[dateType] = "";
+      }
+      }
+      catch(err){
+        itemDetails.value[dateType] = "";
+      }
+      
+      console.log(dateType, " ", itemDetails.value[dateType]);
+
     }
 
     const submit = async () => {
@@ -561,6 +578,7 @@ export default defineComponent({
       deleteItem,
       identifier,
       User,
+      setDates,
     };
   },
 });

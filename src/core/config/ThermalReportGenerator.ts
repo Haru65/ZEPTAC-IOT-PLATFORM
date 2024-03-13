@@ -4,6 +4,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getAssetPath } from "@/core/helpers/assets";
 import moment from "moment";
+import { ref } from "vue";
 
 const imgData = getAssetPath(
   "media/avatars/blank.png"
@@ -152,7 +153,7 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
       doc.addPage();
   }
 
-  function drawInstrumentPage(pageNumber){
+  function drawInstrumentPage(pageNumber, instrumentsPerPage){
 
       // INSTRUMENT PAGE TITLE
       const instrumentPageTitle = drawHeader('CALIBRATION CERTIFICATE WITH TRACEABILITY OF INSTRUMENT USE');
@@ -216,7 +217,7 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
       // Add body content for instruments on the current page
       const instrumentBody = reportInfo.value.instruments.slice(startIndex, endIndex)
       .map((instrument, i) => [
-        i + 1,
+        startIndex + i + 1,
         instrument.instrument_name,
         instrument.serial_no,
         instrument.calibration_date,
@@ -908,6 +909,158 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
       },
     });
 
+    doc.addPage();
+
+  }
+
+  function drawReadingPage() {
+
+    // READING PAGE TITLE
+
+    // const Info = [
+    //   [{ title: "READING SET REFERENCE", halign: "center"}],
+    // ];
+
+    // autoTable(doc, {
+    //   body: Info,
+    //   startY:0.5,
+    //   margin: { left: 0.5, top: 1.25 },
+    //   bodyStyles: { halign: "left",fontSize: 9, lineColor: [0, 0, 0], textColor: [0, 0, 0]},
+    //   tableLineColor: [0, 0, 0],
+    //   didDrawCell: (data) => {
+    //     const { cell, row, column } = data;
+    //     doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
+    //   },
+    // });
+
+    const logger = reportInfo.value.excel_data;
+    const instrumentsPerPage = 5;
+
+    // Initialize data array for AutoTable
+    const tableData: any = ref([]);
+
+    // Iterate over instruments in chunks of 5
+    for (let i = 0; i < logger.length; i += instrumentsPerPage) {
+
+        const instrumentsChunk = logger.slice(i, i + instrumentsPerPage);
+
+        console.log(instrumentsChunk);
+        const {logger_id :LoggerId1, MIN_TEMP: MIN_TEMP1, MAX_TEMP : MAX_TEMP1, MIN_RH : MIN_RH1, MAX_RH : MAX_RH1, AVG_TEMP: AVG_TEMP1, AVG_RH: AVG_RH1 } = logger[i];
+        const {logger_id :LoggerId2, MIN_TEMP: MIN_TEMP2, MAX_TEMP : MAX_TEMP2, MIN_RH : MIN_RH2, MAX_RH : MAX_RH2, AVG_TEMP: AVG_TEMP2, AVG_RH: AVG_RH2 } = logger[(i+1)];
+        const {logger_id :LoggerId3, MIN_TEMP: MIN_TEMP3, MAX_TEMP : MAX_TEMP3, MIN_RH : MIN_RH3, MAX_RH : MAX_RH3, AVG_TEMP: AVG_TEMP3, AVG_RH: AVG_RH3 } = logger[(i+2)];
+        const {logger_id :LoggerId4, MIN_TEMP: MIN_TEMP4, MAX_TEMP : MAX_TEMP4, MIN_RH : MIN_RH4, MAX_RH : MAX_RH4, AVG_TEMP: AVG_TEMP4, AVG_RH: AVG_RH4 } = logger[(i+3)];
+        const {logger_id :LoggerId5, MIN_TEMP: MIN_TEMP5, MAX_TEMP : MAX_TEMP5, MIN_RH : MIN_RH5, MAX_RH : MAX_RH5, AVG_TEMP: AVG_TEMP5, AVG_RH: AVG_RH5 } = logger[(i+4)];
+
+        const headers = [
+            [                
+                {title: `Sr.No`, rowSpan:3},
+                {title: `Date & Time`, rowSpan:3},
+                {title: `Location-${i+1}`, colSpan:2},
+                {title: `Location-${i+2}`, colSpan:2},
+                {title: `Location-${i+3}`, colSpan:2},
+                {title: `Location-${i+4}`, colSpan:2},
+                {title: `Location-${i+5}`, colSpan:2},
+            ],
+            [                
+              {title: `DL-${LoggerId1}`, colSpan:2},
+              {title: `DL-${LoggerId2}`, colSpan:2},
+              {title: `DL-${LoggerId3}`, colSpan:2},
+              {title: `DL-${LoggerId4}`, colSpan:2},
+              {title: `DL-${LoggerId5}`, colSpan:2},
+          ],
+            [
+                `Temp`,`RH`,`Temp`,`RH`,`Temp`,`RH`,`Temp`,`RH`,`Temp`,`RH`
+            ]
+        ];
+
+        for (let j = 0; j < 432; j++) {
+            const formattedDate  = moment(reportInfo.value.dates[j], "YYYY-MM-DD HH:mm:ss").format("YYYY-MM-DD hh:mm A");
+            const rowData:any = ref([]);
+            instrumentsChunk.forEach((inst) => {
+                const { data } = inst;
+                const { temp, rh } = data[j] || { temp: '', rh: '' };
+                rowData.value.push(temp, rh);
+            });
+            rowData.value.unshift(formattedDate);
+            rowData.value.unshift(j+1);
+            tableData.value.push(rowData.value);
+
+            rowData.value = [];
+        }
+
+        // MIN MAX AVG DATA
+        const blankData = [
+          {title: ``, colSpan:12},
+        ];
+
+        const minData = [
+          {title: `MIN`, colSpan:2},
+          {title: `${MIN_TEMP1}`},
+          {title: `${MIN_RH1}`},
+          {title: `${MIN_TEMP2}`},
+          {title: `${MIN_RH2}`},
+          {title: `${MIN_TEMP3}`},
+          {title: `${MIN_RH3}`},
+          {title: `${MIN_TEMP4}`},
+          {title: `${MIN_RH4}`},
+          {title: `${MIN_TEMP5}`},
+          {title: `${MIN_RH5}`},
+        ];
+
+        const maxData = [
+          {title: `MAX`, colSpan:2},
+          {title: `${MAX_TEMP1}`},
+          {title: `${MAX_RH1}`},
+          {title: `${MAX_TEMP2}`},
+          {title: `${MAX_RH2}`},
+          {title: `${MAX_TEMP3}`},
+          {title: `${MAX_RH3}`},
+          {title: `${MAX_TEMP4}`},
+          {title: `${MAX_RH4}`},
+          {title: `${MAX_TEMP5}`},
+          {title: `${MAX_RH5}`},
+        ];
+
+        const avgData = [
+          {title: `AVG`, colSpan:2},
+          {title: `${AVG_TEMP1.toFixed(2)}`},
+          {title: `${AVG_RH1.toFixed(2)}`},
+          {title: `${AVG_TEMP2.toFixed(2)}`},
+          {title: `${AVG_RH2.toFixed(2)}`},
+          {title: `${AVG_TEMP3.toFixed(2)}`},
+          {title: `${AVG_RH3.toFixed(2)}`},
+          {title: `${AVG_TEMP4.toFixed(2)}`},
+          {title: `${AVG_RH4.toFixed(2)}`},
+          {title: `${AVG_TEMP5.toFixed(2)}`},
+          {title: `${AVG_RH5.toFixed(2)}`},
+        ];
+
+        tableData.value.push(blankData);
+        tableData.value.push(minData);
+        tableData.value.push(maxData);
+        tableData.value.push(avgData);
+        
+        autoTable(doc, {
+            head: headers,
+            body: tableData.value,
+            margin: { left: 0.5, top: 0.5 },
+            headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: "center", valign: "middle", fontSize: 5, lineColor: [0, 0, 0]},
+            bodyStyles: { halign: "center", fontSize: 5, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
+            tableLineColor: [0, 0, 0],
+            didDrawCell: (data) => {
+            const { cell, row, column } = data;
+            doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
+            },
+        });
+
+        tableData.value = [];
+
+        // Check if it's not the last set of instruments
+        if (i + instrumentsPerPage < logger.length) {
+          doc.addPage();
+        }
+        
+    }
   }
 
     // Heading
@@ -962,7 +1115,7 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
     let currentPage = 1;
     
     while (currentPage <= instrumentPages) {
-      drawInstrumentPage(currentPage);
+      drawInstrumentPage(currentPage, instrumentsPerPage);
       currentPage++;
     }
 
@@ -979,6 +1132,9 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
 
     // Conclusion Page Logic
     drawConclusionPage();
+
+    // Reading Page Logic
+    drawReadingPage();
 
     // Creating footer and saving file
     doc

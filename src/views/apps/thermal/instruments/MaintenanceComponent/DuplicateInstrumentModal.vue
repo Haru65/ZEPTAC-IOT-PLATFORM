@@ -115,18 +115,9 @@ import { useRouter } from "vue-router";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import moment from "moment";
-import { GetIncrInstrumentId, addThermalInstrument, getThermalInstrument } from "@/stores/api";
+import { addThermalInstrument, getThermalInstrument } from "@/stores/api";
 
 interface NewAddressData {}
-
-interface MDetails {
-  periodicity: string;
-  m_date1: string;
-  m_date2: string;
-  m_details: string;
-  any_repair_detail: string;
-  maintenance_done_by: string;
-}
 
 interface itemDetails {
   instrument_id: string;
@@ -141,10 +132,6 @@ interface itemDetails {
 
   ranges: string;
   accuracy: string;
-
-  maintenance_plan: boolean;
-
-  maintenance_history: Array<MDetails>;
 
   company_id: string;
   created_by: number;
@@ -189,32 +176,11 @@ export default defineComponent({
       ranges: "",
       accuracy: "",
 
-      maintenance_plan: true,
-      maintenance_history: [],
-
       company_id: props.companyId,
       created_by: User.id,
       updated_by: User.id,
       is_active: 1,
     });
-
-    /* --------LATEST INSTRUMENT ID LOGIC--------*/
-
-    const IncrInstrument = (data: any) => {
-      console.log(data.result);
-      const latestInstrument_id = data.result.split("_");
-      if (parseInt(latestInstrument_id[1]) == 0) {
-        // ? if no record
-        itemDetails.value.instrument_id =
-          latestInstrument_id[0] + "_" + latestInstrument_id[1].toString();
-      } else {
-        // ? if record exisit inc 1
-        itemDetails.value.instrument_id =
-          latestInstrument_id[0] +
-          "_" +
-          (1 + +latestInstrument_id[1]).toString();
-      }
-    };
 
     async function resetTheData() {}
 
@@ -231,7 +197,6 @@ export default defineComponent({
           calibration_due_date,
           ranges,
           accuracy,
-          maintenance_plan,
         } = detail;
 
         // Check if any property is null or empty
@@ -241,11 +206,10 @@ export default defineComponent({
           model_no === "" ||
           serial_no === "" ||
           make === "" ||
-          calibration_date === null ||
-          calibration_due_date === null ||
+          calibration_date === "" ||
+          calibration_due_date === "" ||
           ranges === "" ||
-          accuracy === "" ||
-          maintenance_plan === false
+          accuracy === ""
         );
       });
     }
@@ -310,10 +274,6 @@ export default defineComponent({
             loading.value = false;
             return;
           }
-
-          const data = await GetIncrInstrumentId(props.companyId);
-
-          IncrInstrument(data);
 
           const res = await addThermalInstrument(itemDetails.value);
           // console.log(response.error);

@@ -273,7 +273,6 @@ export default defineComponent({
         const response = await getThermalReports(
           `page=${page}&limit=${limit.value}`
         );
-        
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -317,7 +316,7 @@ export default defineComponent({
         const response = await getThermalReports(
           `page=${page.value}&limit=${limit}`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -400,7 +399,7 @@ export default defineComponent({
             ...rest,
           })
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
@@ -510,7 +509,7 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await ThermalReportSearch(search.value);
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -712,31 +711,79 @@ export default defineComponent({
         thermalReportDetails.value.avg_temp = res.result.avg_temp;
         thermalReportDetails.value.avg_rh = res.result.avg_rh;
 
-        thermalReportDetails.value.sensor_location_diagram = res.result.sensor_location_diagram ? res.result.sensor_location_diagram : "";
-        thermalReportDetails.value.sensor_location_diagram_data = res.result.sensor_location_diagram_data ? "data: image/png;base64," + res.result.sensor_location_diagram_data : "";
-        
-        thermalReportDetails.value.sensor_location_chart = res.result.sensor_location_chart ? res.result.sensor_location_chart : "";
-        thermalReportDetails.value.sensor_location_chart_data = res.result.sensor_location_chart_data ? "data: image/png;base64," + res.result.sensor_location_chart_data : "";
-        
-        thermalReportDetails.value.customer_address.address1 = res.result.customer_address.address1 ? res.result.customer_address.address1 : "";
-        thermalReportDetails.value.customer_address.address2 = res.result.customer_address.address2 ? res.result.customer_address.address2  : "";
-        thermalReportDetails.value.customer_address.city = res.result.customer_address.city ? res.result.customer_address.city : "";
-        thermalReportDetails.value.customer_address.pincode = res.result.customer_address.pincode ? res.result.customer_address.pincode : "";
-        thermalReportDetails.value.customer_address.states = res.result.customer_address.states ? res.result.customer_address.states : "";
-        thermalReportDetails.value.customer_address.country = res.result.customer_address.country ? res.result.customer_address.country :  "";
+        thermalReportDetails.value.sensor_location_diagram = res.result
+          .sensor_location_diagram
+          ? res.result.sensor_location_diagram
+          : "";
+        thermalReportDetails.value.sensor_location_diagram_data = res.result
+          .sensor_location_diagram_data
+          ? "data: image/png;base64," + res.result.sensor_location_diagram_data
+          : "";
 
-        thermalReportDetails.value.client_address.address1 = res.result.client_address.address1 ? res.result.client_address.address1 : "";
-        thermalReportDetails.value.client_address.address2 = res.result.client_address.address2 ? res.result.client_address.address2 : "";
-        thermalReportDetails.value.client_address.city = res.result.client_address.city ? res.result.client_address.city : "";
-        thermalReportDetails.value.client_address.pincode = res.result.client_address.address1 ? res.result.client_address.pincode : "";
-        thermalReportDetails.value.client_address.states = res.result.client_address.address1 ? res.result.client_address.states : "";
-        thermalReportDetails.value.client_address.country = res.result.client_address.address1 ? res.result.client_address.country : "";
+        thermalReportDetails.value.sensor_location_chart = res.result
+          .sensor_location_chart
+          ? res.result.sensor_location_chart
+          : "";
+        thermalReportDetails.value.sensor_location_chart_data = res.result
+          .sensor_location_chart_data
+          ? "data: image/png;base64," + res.result.sensor_location_chart_data
+          : "";
+
+        thermalReportDetails.value.customer_address.address1 = res.result
+          .customer_address.address1
+          ? res.result.customer_address.address1
+          : "";
+        thermalReportDetails.value.customer_address.address2 = res.result
+          .customer_address.address2
+          ? res.result.customer_address.address2
+          : "";
+        thermalReportDetails.value.customer_address.city = res.result
+          .customer_address.city
+          ? res.result.customer_address.city
+          : "";
+        thermalReportDetails.value.customer_address.pincode = res.result
+          .customer_address.pincode
+          ? res.result.customer_address.pincode
+          : "";
+        thermalReportDetails.value.customer_address.states = res.result
+          .customer_address.states
+          ? res.result.customer_address.states
+          : "";
+        thermalReportDetails.value.customer_address.country = res.result
+          .customer_address.country
+          ? res.result.customer_address.country
+          : "";
+
+        thermalReportDetails.value.client_address.address1 = res.result
+          .client_address.address1
+          ? res.result.client_address.address1
+          : "";
+        thermalReportDetails.value.client_address.address2 = res.result
+          .client_address.address2
+          ? res.result.client_address.address2
+          : "";
+        thermalReportDetails.value.client_address.city = res.result
+          .client_address.city
+          ? res.result.client_address.city
+          : "";
+        thermalReportDetails.value.client_address.pincode = res.result
+          .client_address.address1
+          ? res.result.client_address.pincode
+          : "";
+        thermalReportDetails.value.client_address.states = res.result
+          .client_address.address1
+          ? res.result.client_address.states
+          : "";
+        thermalReportDetails.value.client_address.country = res.result
+          .client_address.address1
+          ? res.result.client_address.country
+          : "";
 
         const reportName = `${thermalReportDetails.value.rgp_no}`;
 
         await thermalReportGen(id, reportName, thermalReportDetails);
       } catch (error) {
-        console.log(error)
+        console.log(error);
         alert("Unable to download the report. Please try again.");
       }
     };
@@ -767,10 +814,12 @@ export default defineComponent({
 });
 </script>
   <style>
-.el-input__inner, .el-select__inner {
+.el-input__inner,
+.el-select__inner {
   font-weight: 500;
 }
-.el-input__wrapper, .el-select__wrapper {
+.el-input__wrapper,
+.el-select__wrapper {
   height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

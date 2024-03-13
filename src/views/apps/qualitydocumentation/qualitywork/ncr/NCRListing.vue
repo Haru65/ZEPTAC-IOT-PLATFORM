@@ -113,19 +113,37 @@
           {{ ncr.id }}
         </template>
         <template v-slot:nc_details="{ row: ncr }">
-          {{ ncr.nc_details }}
+          {{
+            ncr.nc_details.length > 20
+              ? ncr.nc_details.substring(0, 20) + "..."
+              : ncr.nc_details
+          }}
         </template>
         <template v-slot:action_required="{ row: ncr }">
-          {{ ncr.action_required }}
+          {{
+            ncr.action_required.length > 20
+              ? ncr.action_required.substring(0, 20) + "..."
+              : ncr.action_required
+          }}
         </template>
         <template v-slot:completion_date="{ row: ncr }">
-          {{ ncr.completion_date }}
+          <span
+            class="badge py-3 px-4 fs-7 badge-light-primary"
+            >{{ ncr.completion_date }}</span
+          >
         </template>
         <template v-slot:review_date="{ row: ncr }">
-          {{ ncr.review_date }}
+          <span
+            class="badge py-3 px-4 fs-7 badge-light-primary"
+            >{{ ncr.review_date }}</span
+          >
         </template>
         <template v-slot:verification_details="{ row: ncr }">
-          {{ ncr.verification_details }}
+          {{
+            ncr.verification_details.length > 20
+              ? ncr.verification_details.substring(0, 20) + "..."
+              : ncr.verification_details
+          }}
         </template>
         <template v-slot:prepared_by="{ row: ncr }">
           {{ ncr.prepared_by }}

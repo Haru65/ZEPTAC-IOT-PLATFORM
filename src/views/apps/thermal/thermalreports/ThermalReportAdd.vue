@@ -178,6 +178,8 @@ interface Logger {
   MIN_TEMP: number;
   MAX_RH: number;
   MIN_RH: number;
+  AVG_TEMP: number;
+  AVG_RH: number;
 }
 
 export default defineComponent({
@@ -254,6 +256,8 @@ export default defineComponent({
           MIN_TEMP: 0,
           MAX_RH: 0,
           MIN_RH: 0,
+          AVG_TEMP: 0,
+          AVG_RH: 0,
         },
       ],
       room_name: "",

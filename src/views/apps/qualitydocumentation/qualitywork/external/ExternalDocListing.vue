@@ -119,13 +119,22 @@
           {{ documents.format_no }}
         </template>
         <template v-slot:review_date="{ row: documents }">
-          {{ documents.review_date }}
+          <span
+            class="badge py-3 px-4 fs-7 badge-light-primary"
+            >{{ documents.review_date }}</span
+          >
         </template>
         <template v-slot:revision_date="{ row: documents }">
-          {{ documents.revision_date }}
+          <span
+            class="badge py-3 px-4 fs-7 badge-light-primary"
+            >{{ documents.revision_date }}</span
+          >
         </template>
         <template v-slot:issue_date="{ row: documents }">
-          {{ documents.issue_date }}
+          <span
+            class="badge py-3 px-4 fs-7 badge-light-primary"
+            >{{ documents.issue_date }}</span
+          >
         </template>
         <template v-slot:location="{ row: documents }">
           {{ documents.location }}

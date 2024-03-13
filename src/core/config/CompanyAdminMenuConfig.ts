@@ -159,6 +159,63 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
             heading: "Non Conformance Record",
             route: "/ncrs",
           },
+          {
+            heading: "Risk Register",
+            route: "/risks",
+          },
+          {
+            heading: "Improvement Plan",
+            route: "/improvements",
+          },
+        ],
+      },
+      {
+        sectionTitle: "Internal Audit",
+        route: "/internalaudit",
+        keenthemesIcon: "document",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Internal Audit Observation",
+            route: "/auditobservations",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    heading: "Master List",
+    pages: [
+      {
+        sectionTitle: "Master List",
+        keenthemesIcon: "document",
+        route: "/masterlist",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "QMS Procedure",
+            route: "/qms_procedures",
+          },
+          {
+            heading: "Work Instruction",
+            route: "/work_instructions",
+          },
+          {
+            heading: "Forms & Formats",
+            route: "/forms_and_formats",
+          },
+          {
+            heading: "NABL Document",
+            route: "/nabl_documents",
+          },
+          {
+            heading: "National-International Document",
+            route: "/ni_documents",
+          },
+          {
+            heading: "Records",
+            route: "/records",
+          },
         ],
       },
     ],
@@ -300,6 +357,12 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
       {
         heading: "Trainings",
         route: "/training",
+        keenthemesIcon: "educare",
+        bootstrapIcon: "bi-archive",
+      },
+      {
+        heading: "Skill Matrix",
+        route: "/skill_matrix",
         keenthemesIcon: "educare",
         bootstrapIcon: "bi-archive",
       },

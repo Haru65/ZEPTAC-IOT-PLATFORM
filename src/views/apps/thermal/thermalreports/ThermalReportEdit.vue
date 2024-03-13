@@ -364,6 +364,8 @@ export default {
           MIN_TEMP: 0,
           MAX_RH: 0,
           MIN_RH: 0,
+          AVG_TEMP: 0,
+          AVG_RH: 0,
         },
       ],
 

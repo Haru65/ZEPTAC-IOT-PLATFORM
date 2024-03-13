@@ -8,7 +8,6 @@
         <VForm
           id="kt_account_profile_details_form"
           class="form"
-          novalidate
           :validation-schema="itemDetailsValidator"
         >
           <!--begin::Card body-->
@@ -28,7 +27,6 @@
                   v-model="itemDetails.company_id"
                   filterable
                   placeholder="Please Select Company..."
-                  @change="setCompany"
                 >
                   <el-option
                     disabled="disabled"
@@ -60,19 +58,9 @@
                   class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
                   >Instrument ID.</label
                 >
-                <Field
-                  type="text"
-                  disabled
-                  name="instrument_id"
+                <div
                   class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Instrument ID."
-                  v-model="itemDetails.instrument_id"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="instrument_id" />
-                  </div>
-                </div>
+                >######</div>
               </div>
             </div>
             <!--end::Input group-->
@@ -219,6 +207,7 @@
                         id="calibration_date"
                         v-model="itemDetails.calibration_date"
                         placeholder="Pick a Day"
+                        @change="setDates($event, 'calibration_date')"
                         :editable="false"
                       />
                     </div>
@@ -251,6 +240,7 @@
                         id="calibration_due_date"
                         v-model="itemDetails.calibration_due_date"
                         placeholder="Pick a Day"
+                        @change="setDates($event, 'calibration_due_date')"
                         :editable="false"
                       />
                     </div>
@@ -357,7 +347,6 @@ export default defineComponent({
     let limit = ref(500);
 
     const itemDetailsValidator = Yup.object().shape({
-      instrument_id: Yup.string().required().label("Instrument ID"),
       name: Yup.string().required().label("Instrument Name"),
       model_no: Yup.string().required().label("Model No."),
       serial_no: Yup.string().required().label("Serial No."),
@@ -384,10 +373,10 @@ export default defineComponent({
       }
     };
 
-    const setCompany = async (id) => {
-      const res = await GetIncrInstrumentId(id);
-      IncrInstrument(res);
-    };
+    // const setCompany = async (id) => {
+    //   const res = await GetIncrInstrumentId(id);
+    //   IncrInstrument(res);
+    // };
 
     const itemDetails = ref<itemDetails>({
       instrument_id: "",
@@ -408,29 +397,35 @@ export default defineComponent({
       is_active: 1,
     });
 
-    /* --------LATEST INSTRUMENT ID LOGIC--------*/
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try{
+        if (e != null) {
 
-    const IncrInstrument = (data: any) => {
-      console.log(data.result);
-      const latestInstrument_id = data.result.split("_");
-      if (parseInt(latestInstrument_id[1]) == 0) {
-        // ? if no record
-        itemDetails.value.instrument_id =
-          latestInstrument_id[0] + "_" + latestInstrument_id[1].toString();
+          if(e != "" && e != null){
+            itemDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          }
+          else{
+            itemDetails.value[dateType] = "";
+          }
+
       } else {
-        // ? if record exisit inc 1
-        itemDetails.value.instrument_id =
-          latestInstrument_id[0] + "_" + (1 + +latestInstrument_id[1]).toString();
+        itemDetails.value[dateType] = "";
       }
-    };
+      }
+      catch(err){
+        itemDetails.value[dateType] = "";
+      }
+      
+      console.log(dateType, " ", itemDetails.value[dateType]);
+
+    }
 
     onMounted(async () => {
       Companies.value.pop();
       if (User.role_id === 1) {
         await getdropcomp();
       }
-      const res = await GetIncrInstrumentId(User.company_id);
-      IncrInstrument(res);
     });
 
     function areAllPropertiesNull(array) {
@@ -453,8 +448,8 @@ export default defineComponent({
           model_no === "" ||
           serial_no === "" ||
           make === "" ||
-          calibration_date === null ||
-          calibration_due_date === null ||
+          calibration_date === "" ||
+          calibration_due_date === "" ||
           ranges === "" ||
           accuracy === ""
         );
@@ -482,9 +477,6 @@ export default defineComponent({
           itemDetails.value.calibration_due_date
         ).format("YYYY-MM-DD HH:mm:ss");
 
-        // Again Checking the latest instrument ID
-        const res = await GetIncrInstrumentId(itemDetails.value.company_id);
-        IncrInstrument(res);
         
         // Call your API here with the form values
         const response = await addThermalInstrument(itemDetails.value);
@@ -573,7 +565,8 @@ export default defineComponent({
       Companies,
       User,
       clear,
-      setCompany,
+      setDates,
+      // setCompany,
     };
   },
 });

@@ -286,7 +286,7 @@ interface NCR {
 }
 
 export default defineComponent({
-  name: "validation-edit",
+  name: "non-conformance-record-edit",
   components: {
     ErrorMessage,
     Field,

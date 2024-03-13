@@ -65,6 +65,8 @@ interface Logger {
   MIN_TEMP: number;
   MAX_RH: number;
   MIN_RH: number;
+  AVG_TEMP: number;
+  AVG_RH: number;
 }
 
 export default defineComponent({
@@ -115,6 +117,8 @@ export default defineComponent({
             MIN_TEMP: 0,
             MAX_RH: 0,
             MIN_RH: 0,
+            AVG_TEMP: 0,
+            AVG_RH: 0,
           });
 
           // Read the file as an ArrayBuffer
@@ -174,6 +178,14 @@ export default defineComponent({
           tempData.value.MAX_RH = Math.max(...rhValues);
           tempData.value.MIN_RH = Math.min(...rhValues);
 
+          // Calculate average temperature
+          const sumTemp = tempValues.reduce((acc, currentValue) => acc + currentValue, 0);
+          tempData.value.AVG_TEMP = Number((sumTemp / tempValues.length).toFixed(2));
+
+          // Calculate average relative humidity
+          const sumRH = rhValues.reduce((acc, currentValue) => acc + currentValue, 0);
+          tempData.value.AVG_RH = Number((sumRH / rhValues.length).toFixed(2));
+          
           console.log(tempData.value);
 
           await emit("store-excel-file", tempData);

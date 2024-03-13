@@ -58,19 +58,9 @@
                   class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
                   >Instrument ID.</label
                 >
-                <Field
-                  type="text"
-                  disabled
-                  name="instrument_id"
+                <div
                   class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Instrument ID."
-                  v-model="itemDetails.instrument_id"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="instrument_id" />
-                  </div>
-                </div>
+                >######</div>
               </div>
             </div>
             <!--end::Input group-->
@@ -236,6 +226,7 @@
                         name="calibration_date"
                         id="calibration_date"
                         v-model="itemDetails.calibration_date"
+                        @change="setDates($event, 'calibration_date')"
                         placeholder="Pick a Day"
                         :editable="false"
                       />
@@ -269,6 +260,7 @@
                         name="calibration_due_date"
                         id="calibration_due_date"
                         v-model="itemDetails.calibration_due_date"
+                        @change="setDates($event, 'calibration_due_date')"
                         placeholder="Pick a Day"
                         :editable="false"
                       />
@@ -317,7 +309,6 @@ import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import {
   addThermalInstrument,
-  GetIncrInstrumentId,
   getThermalInstrument,
   deleteThermalInstrument,
   getCompanies,
@@ -372,7 +363,6 @@ export default defineComponent({
     const CalibrationDue = ref("");
 
     const itemDetailsValidator = Yup.object().shape({
-      instrument_id: Yup.string().required().label("Instrument ID"),
       name: Yup.string().required().label("Instrument Name"),
       model_no: Yup.string().required().label("Model No."),
       serial_no: Yup.string().required().label("Serial No."),
@@ -424,7 +414,7 @@ export default defineComponent({
       console.log(response);
 
       itemDetails.value = {
-        instrument_id: response.instrument_id,
+        instrument_id: "",
         name: response.name,
         availability: response.availability,
         model_no: response.model_no,
@@ -472,32 +462,40 @@ export default defineComponent({
           model_no === "" ||
           serial_no === "" ||
           make === "" ||
-          calibration_date === null ||
-          calibration_due_date === null ||
+          calibration_date === "" ||
+          calibration_due_date === "" ||
           ranges === "" ||
           accuracy === ""
         );
       });
     }
 
-    /* --------LATEST INSTRUMENT ID LOGIC--------*/
+    
+    /* --------SET DATE LOGIC--------*/
 
-    const IncrInstrument = (data: any) => {
-      console.log(data.result);
-      const latestInstrument_id = data.result.split("_");
-      if (parseInt(latestInstrument_id[1]) == 0) {
-        // ? if no record
-        itemDetails.value.instrument_id =
-          latestInstrument_id[0] + "_" + latestInstrument_id[1].toString();
+    async function setDates(e, dateType) {
+      try{
+        if (e != null) {
+
+          if(e != "" && e != null){
+            itemDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          }
+          else{
+            itemDetails.value[dateType] = "";
+          }
+
       } else {
-        // ? if record exisit inc 1
-        itemDetails.value.instrument_id =
-          latestInstrument_id[0] +
-          "_" +
-          (1 + +latestInstrument_id[1]).toString();
+        itemDetails.value[dateType] = "";
       }
-    };
+      }
+      catch(err){
+        itemDetails.value[dateType] = "";
+      }
+      
+      console.log(dateType, " ", itemDetails.value[dateType]);
 
+    }
+    
     const handleToggle = (e) => {
       if (e.target.checked === true) {
         CalibRef.value = true;
@@ -514,12 +512,13 @@ export default defineComponent({
 
     const submit = async () => {
       loading.value = true;
-      const result = areAllPropertiesNull([itemDetails.value]);
 
       if (CalibRef.value === true) {
         itemDetails.value.calibration_date = Calibration.value;
         itemDetails.value.calibration_due_date = CalibrationDue.value;
       }
+
+      const result = areAllPropertiesNull([itemDetails.value]);
 
       if (result) {
         showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
@@ -531,8 +530,8 @@ export default defineComponent({
       console.warn("Nice");
       try {
         if (
-          itemDetails.value.calibration_date === null ||
-          itemDetails.value.calibration_due_date === null
+          itemDetails.value.calibration_date === "" ||
+          itemDetails.value.calibration_due_date === ""
         ) {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           loading.value = false;
@@ -545,11 +544,6 @@ export default defineComponent({
         itemDetails.value.calibration_due_date = moment(
           itemDetails.value.calibration_due_date
         ).format("YYYY-MM-DD HH:mm:ss");
-        // Call your API here with the form values
-        // Again Checking the latest instrument ID
-
-        const res = await GetIncrInstrumentId(itemDetails.value.company_id);
-        IncrInstrument(res);
 
         // Call your API here with the form values
         const response = await addThermalInstrument(itemDetails.value);
@@ -638,6 +632,7 @@ export default defineComponent({
       User,
       handleToggle,
       CalibRef,
+      setDates,
     };
   },
 });
