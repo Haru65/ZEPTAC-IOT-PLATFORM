@@ -607,6 +607,134 @@
               </div>
             </div>
             <!--end::Accordion-->
+
+            <!--begin::Accordion-->
+            <div class="accordion mt-6" id="kt_accordion_2">
+              <div class="accordion-item">
+                <h2 class="accordion-header" :id="'kt_accordion_2_header_'">
+                  <button
+                    class="accordion-button fs-4 fw-semibold"
+                    type="button"
+                    :data-bs-toggle="'collapse'"
+                    :data-bs-target="'#kt_accordion_2_body_'"
+                    :aria-controls="'kt_accordion_2_body_'"
+                  >
+                    Intermediate Check Plans
+                  </button>
+                </h2>
+                <div
+                  :id="'kt_accordion_2_body_'"
+                  class="accordion-collapse collapse"
+                  :aria-labelledby="'kt_accordion_2_header_'"
+                  data-bs-parent="#kt_accordion_2"
+                >
+                  <div class="accordion-body">
+                    <div class="table-responsive">
+                      <table
+                        class="table table-rounded table-border border gy-7 gs-7 text-nowrap"
+                      >
+                        <thead>
+                          <tr
+                            class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200 text-align-center"
+                          >
+                            <th class="col-3">Sr.No</th>
+                            <th class="col-5">Plan Dates</th>
+                            <th class="col-2">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr
+                            v-for="(
+                              date, index
+                            ) in itemDetails.intermediate_check_plan"
+                            :key="index"
+                          >
+                            <td class="align-middle">{{ index + 1 }}</td>
+                            <td class="align-middle">
+                              <template v-if="index !== editingIndex">
+                                <span
+                                  class="badge py-3 px-4 fs-7 badge-light-primary"
+                                  >{{ date }}</span
+                                >
+                              </template>
+                              <template v-else>
+                                <el-date-picker
+                                  type="date"
+                                  v-model="editedDate"
+                                  class="badge"
+                                  @change="setDates($event, 'editedDate')"
+                                  placeholder="Pick a day"
+                                ></el-date-picker>
+                              </template>
+                            </td>
+                            <td class="align-middle">
+                              <template v-if="index !== editingIndex">
+                                <button
+                                  class="btn btn-sm btn-primary"
+                                  @click="editPlanDate(index)"
+                                >
+                                  Edit
+                                </button>
+                              </template>
+                              <template v-else>
+                                <button
+                                  class="btn btn-sm btn-success"
+                                  @click="savePlanDate(index)"
+                                >
+                                  Save
+                                </button>
+                              </template>
+                              <button
+                                class="btn btn-sm btn-danger"
+                                @click="deletePlanDate(index)"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                          <tr
+                            class="text-center"
+                            v-if="
+                              itemDetails.intermediate_check_plan.length === 0
+                            "
+                          >
+                            <td
+                              colspan="3"
+                              class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200 text-align-center"
+                            >
+                              No Dates.
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div class="text-start mt-8">
+                      <div class="input-group p-2 flex gap-6">
+                        <el-date-picker
+                          type="date"
+                          v-model="planDate"
+                          @change="setDates($event, 'planDate')"
+                          placeholder="Pick a day"
+                          style="flex: 1"
+                        ></el-date-picker>
+
+                        <div class="input-group-append">
+                          <button
+                            class="btn btn-md btn-primary"
+                            type="button"
+                            @click="addPlanDate"
+                          >
+                            + Add
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--end::Accordion-->
           </div>
           <div class="modal-footer flex-center">
             <!--begin::Button-->
@@ -667,6 +795,10 @@ interface MDetails {
   maintenance_done_by: string;
 }
 
+interface PlanDates {
+  date: string;
+}
+
 interface itemDetails {
   instrument_id: string;
   name: string;
@@ -688,6 +820,7 @@ interface itemDetails {
   maintenance_plan: boolean;
 
   maintenance_history: Array<MDetails>;
+  intermediate_check_plan: string[];
 
   company_id: string;
   created_by: number;
@@ -712,6 +845,60 @@ export default defineComponent({
     const User = auth.GetUser();
     const Companies = ref([{ id: "", company_name: "" }]);
     let limit = ref(500);
+
+    // INTERMEDIATE CHECK PLAN REF
+    const editingIndex = ref(null);
+    const editedDate = ref("");
+    const planDate = ref("");
+
+    // INTERMEDIATE CHECK PLAN LOGICAL FUNCTION
+    const addPlanDate = () => {
+      if (planDate.value) {
+        itemDetails.value.intermediate_check_plan.push(planDate.value);
+        planDate.value = "";
+      }
+    };
+
+    const editPlanDate = (index) => {
+      editingIndex.value = index;
+      editedDate.value = itemDetails.value.intermediate_check_plan[index];
+    };
+
+    const savePlanDate = (index) => {
+      if (editedDate.value) {
+        itemDetails.value.intermediate_check_plan[index] = editedDate.value;
+        editingIndex.value = null;
+      }
+    };
+
+    const deletePlanDate = (index) => {
+      itemDetails.value.intermediate_check_plan.splice(index, 1);
+    };
+
+    async function setDates(e, dateType) {
+      if (dateType === "planDate") {
+        if (e != null) {
+          if (e != "" && e != null) {
+            planDate.value = moment(e).format("YYYY-MM-DD");
+          } else {
+            planDate.value = "";
+          }
+        } else {
+          planDate.value = "";
+        }
+      } else if (dateType === "editedDate") {
+        if (e != null) {
+          if (e != "" && e != null) {
+            editedDate.value = moment(e).format("YYYY-MM-DD");
+          } else {
+            editedDate.value = "";
+          }
+        } else {
+          editedDate.value = "";
+        }
+      }
+    }
+
 
     const itemDetailsValidator = Yup.object().shape({
       instrument_id: Yup.string().required().label("Instrument ID"),
@@ -760,6 +947,7 @@ export default defineComponent({
       maintenance_plan: true,
 
       maintenance_history: [],
+      intermediate_check_plan: [],
 
       company_id: User.company_id,
       created_by: User.id,
@@ -1056,6 +1244,7 @@ export default defineComponent({
         maintenance_plan: true,
 
         maintenance_history: [],
+        intermediate_check_plan: [],
 
         company_id: User.company_id,
         created_by: User.id,
@@ -1079,16 +1268,26 @@ export default defineComponent({
       deleteMaintenanceData,
       User,
       clear,
+      setDates,
+      editingIndex,
+      editedDate,
+      planDate,
+      addPlanDate,
+      editPlanDate,
+      savePlanDate,
+      deletePlanDate,
     };
   },
 });
 </script>
 
 <style>
-.el-input__inner, .el-select__inner {
+.el-input__inner,
+.el-select__inner {
   font-weight: 500;
 }
-.el-input__wrapper, .el-select__wrapper {
+.el-input__wrapper,
+.el-select__wrapper {
   min-height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

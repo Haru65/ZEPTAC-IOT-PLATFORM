@@ -14,7 +14,7 @@
             v-model="search"
             @input="searchItems()"
             class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search Clause"
+            placeholder="Search auditor name"
           />
         </div>
         <!--end::Search-->
@@ -39,12 +39,6 @@
             Export
           </button>
           <!--end::Export-->
-          <!--begin::Add customer-->
-          <router-link to="/auditobservations/add" class="btn btn-primary">
-            <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Observation
-          </router-link>
-          <!--end::Add customer-->
         </div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->
@@ -103,99 +97,61 @@
       >
         <!-- img data -->
 
-        <template v-slot:id="{ row: audit_observation }">
-          {{ audit_observation.id }}
+        <template v-slot:id="{ row: audit_schedule }">
+          {{ audit_schedule.id }}
         </template>
-        <template v-slot:auditor_name="{ row: audit_observation }">
-          {{ audit_observation.auditor_name }}
+        <template v-slot:auditor_name="{ row: audit_schedule }">
+          {{ audit_schedule.auditor_name }}
         </template>
-        <template v-slot:clause_name="{ row: audit_observation }">
-          {{ audit_observation.clause_name }}
+        <template v-slot:address="{ row: audit_schedule }">
+          {{ audit_schedule.address }}
         </template>
-        <template v-slot:clauses="{ row: audit_observation }">
-          <div class="table-responsive">
-            <table
-              class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer"
-            >
-              <thead>
-                <tr
-                  class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0"
-                >
-                  <th
-                    class="text-start"
-                    :style="{
-                      minWidth: `100px`,
-                      width: '100px',
-                      cursor: 'pointer',
-                    }"
-                  >
-                    Clause No.
-                  </th>
-                  <th
-                    class="text-start"
-                    :style="{
-                      minWidth: `200px`,
-                      width: '200px',
-                      cursor: 'pointer',
-                    }"
-                  >
-                    Clause Details
-                  </th>
-                  <th
-                    class="text-start"
-                    :style="{
-                      minWidth: `200px`,
-                      width: '200px',
-                      cursor: 'pointer',
-                    }"
-                  >
-                    NC Observation
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="fw-semibold text-gray-600">
-                <tr v-for="(clause, index) in audit_observation.clauses"
-                    :key="index">
-                    <td class="text-start">
-                      {{ clause.clause_no }}
-                    </td>
-                    <td class="text-start">
-                      {{ clause.clause_details }}
-                    </td>
-                    <td class="text-start">
-                      {{ clause.nc_observation }}
-                    </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <template v-slot:meeting_place="{ row: audit_schedule }">
+          {{ audit_schedule.meeting_place }}
         </template>
-
-        <template v-slot:actions="{ row: audit_observation }">
+        <template v-slot:observation="{ row: audit_schedule }">
+          <span
+            class="menu-link"
+            data-toggle="tooltip"
+            title="Add Audit Observation"
+          >
+            <router-link :to="`/auditobservations/add/${audit_schedule.id}`">
+              <span
+                class="border rounded badge py-3 fs-7 badge-light-primary text-hover-success cursor-pointer"
+                >+ Add Observation
+              </span>
+            </router-link>
+          </span>
+        </template>
+        <template v-slot:non_conformance="{ row: audit_schedule }">
+          <span
+            class="menu-link"
+            data-toggle="tooltip"
+            title="View Non-Conformance"
+          >
+            <router-link :to="`/non_conformance/list/${audit_schedule.id}`">
+              <span
+                class="border rounded badge py-3 fs-7 badge-light-primary text-hover-success cursor-pointer"
+                >View Non-conformances
+              </span>
+            </router-link>
+          </span>
+        </template>
+        <template v-slot:actions="{ row: audit_schedule }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span
               class="menu-link px-3"
               data-toggle="tooltip"
-              title="View Audit Observation"
+              title="View Audit Schedule"
             >
               <router-link
-                :to="`/auditobservations/edit/${audit_observation.id}`"
+                :to="`/auditschedule/edit/${audit_schedule.id}`"
               >
                 <i
                   class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
                 ></i>
               </router-link>
-            </span>
-            <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="Delete Audit Observation"
-            >
-              <i
-                @click="deleteItem(audit_observation.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-1"
-              ></i>
             </span>
           </div>
           <!--end::Menu FLex-->
@@ -242,11 +198,11 @@
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
-import type { IAObservation } from "@/core/model/audit_observation";
+import type { IAuditSchedule } from "@/core/model/audit_schedule";
 import {
-  getIAuditObservations,
-  deleteIAuditObservation,
-  IAuditObservationSearch,
+  getIAuditSchedules,
+  deleteIAuditSchedule,
+  IAuditScheduleSearch,
 } from "@/stores/api";
 import arraySort from "array-sort";
 import moment from "moment";
@@ -254,7 +210,7 @@ import Swal from "sweetalert2";
 import { getAssetPath } from "@/core/helpers/assets";
 
 export default defineComponent({
-  name: "auditobservations-list",
+  name: "auditschedule-list",
   components: {
     Datatable,
   },
@@ -267,16 +223,28 @@ export default defineComponent({
         columnWidth: 125,
       },
       {
-        columnName: "Clause",
-        columnLabel: "clause_name",
+        columnName: "Address",
+        columnLabel: "address",
         sortEnabled: true,
-        columnWidth: 125,
+        columnWidth: 200,
       },
       {
-        columnName: "Clauses",
-        columnLabel: "clauses",
+        columnName: "Meeting Place",
+        columnLabel: "meeting_place",
         sortEnabled: true,
-        columnWidth: 400,
+        columnWidth: 200,
+      },
+      {
+        columnName: "Observation",
+        columnLabel: "observation",
+        sortEnabled: false,
+        columnWidth: 100,
+      },
+      {
+        columnName: "Non-Conformance",
+        columnLabel: "non_conformance",
+        sortEnabled: false,
+        columnWidth: 100,
       },
       {
         columnName: "Actions",
@@ -308,15 +276,14 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getIAuditObservations(
+        const response = await getIAuditSchedules(
           `page=${page}&limit=${limit.value}`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ id, clauses, ...rest }) => ({
+          ({ id, ...rest }) => ({
             id: id,
-            clauses: JSON.parse(clauses),
             ...rest,
           })
         );
@@ -339,15 +306,14 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getIAuditObservations(
+        const response = await getIAuditSchedules(
           `page=${page.value}&limit=${limit}`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ id, clauses, ...rest }) => ({
+          ({ id, ...rest }) => ({
             id: id,
-            clauses: JSON.parse(clauses),
             ...rest,
           })
         );
@@ -381,19 +347,18 @@ export default defineComponent({
 
     const selectedIds = ref<Array<number>>([]);
 
-    const tableData = ref<Array<IAObservation>>([]);
+    const tableData = ref<Array<IAuditSchedule>>([]);
 
-    const initvalues = ref<Array<IAObservation>>([]);
+    const initvalues = ref<Array<IAuditSchedule>>([]);
 
-    async function observation_listing(): Promise<void> {
+    async function schedule_listing(): Promise<void> {
       try {
-        const response = await getIAuditObservations(
+        const response = await getIAuditSchedules(
           `page=${page.value}&limit=${limit.value}`
         );
         tableData.value = response.result.data.map(
-          ({ id, clauses, ...rest }) => ({
+          ({ id, ...rest }) => ({
             id: id,
-            clauses: JSON.parse(clauses),
             ...rest,
           })
         );
@@ -411,7 +376,7 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      await observation_listing();
+      await schedule_listing();
     });
 
     const deleteFewInstrument = () => {
@@ -448,7 +413,7 @@ export default defineComponent({
             }).then((result: { [x: string]: any }) => {
               if (result["isConfirmed"]) {
                 // Put your function here
-                deleteIAuditObservation(id);
+                deleteIAuditSchedule(id);
                 tableData.value.splice(i, 1);
               }
             });
@@ -458,7 +423,7 @@ export default defineComponent({
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
             // Put your function here
-            deleteIAuditObservation(id);
+            deleteIAuditSchedule(id);
             tableData.value.splice(i, 1);
           }
         }
@@ -473,7 +438,7 @@ export default defineComponent({
       console.log(search.value);
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value.length != 0) {
-        let results: Array<IAObservation> = [];
+        let results: Array<IAuditSchedule> = [];
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
             results.push(tableData.value[j]);
@@ -491,20 +456,19 @@ export default defineComponent({
         page.value = 1;
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
-        await observation_listing();
+        await schedule_listing();
       }
     };
 
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await IAuditObservationSearch(search.value);
+        const response = await IAuditScheduleSearch(search.value);
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ id, clauses, ...rest }) => ({
+          ({ id, ...rest }) => ({
             id: id,
-            clauses: JSON.parse(clauses),
             ...rest,
           })
         );

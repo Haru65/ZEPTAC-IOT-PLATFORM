@@ -23,8 +23,8 @@
 
                 <div>
                   <el-select
-                    v-model="skillMatrixDetails.employee_id"
-                    name="employee_id"
+                    v-model="skillMatrixDetails.user_id"
+                    name="user_id"
                     filterable
                     placeholder="Please Select Employee"
                   >
@@ -137,7 +137,7 @@
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref, reactive } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { addTraining, getEmployees } from "@/stores/api";
+import { addSkillMatrix, addTraining, getEmployees } from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import packages from "@/core/config/PackagesConfig";
@@ -149,7 +149,6 @@ import moment from "moment";
 
 import RangeSlider from "./RangeSlider.vue";
 
-import { TrainingMode, TrainingStatus } from "@/core/model/training";
 
 export default defineComponent({
   name: "skill-matrix-add",
@@ -170,7 +169,7 @@ export default defineComponent({
     const Employees = ref([{ id: "", first_name: "", last_name: "" }]);
 
     const skillMatrixDetails = ref({
-      employee_id: "",
+      user_id: "",
       skills: [{}],
       company_id: User.company_id,
       created_by: User.id,
@@ -237,55 +236,56 @@ export default defineComponent({
     };
 
     const updateProgress = (index, value) => {
-      console.log(index, value);
       skills[index].score = value;
+      console.log(...skills);
+      console.log("--------------------------------");
     };
 
     const submit = async () => {
 
-      // loading.value = true;
+      loading.value = true;
 
-      // try {
+      try {
 
-      //   skillMatrixDetails.value.skills = skills;
+        skillMatrixDetails.value.skills = skills;
         
-      //   console.log(skillMatrixDetails.value);
-      //   // return;
-      //   if (skillMatrixDetails.value.employee_id != "") {
-      //     const response = await addTraining(skillMatrixDetails.value);
-      //     // console.log(response.error);
-      //     if (!response.error) {
-      //       // Handle successful API response
-      //       //   console.log("API response:", response);
-      //       showSuccessAlert(
-      //         "Success",
-      //         "Skill Matrix has been successfully inserted!"
-      //       );
+        console.log(skillMatrixDetails.value);
+        // return;
+        if (skillMatrixDetails.value.user_id != "") {
+          const response = await addSkillMatrix(skillMatrixDetails.value);
+          // console.log(response.error);
+          if (!response.error) {
+            // Handle successful API response
+            //   console.log("API response:", response);
+            showSuccessAlert(
+              "Success",
+              "Skill Matrix has been successfully inserted!"
+            );
+            loading.value = false;
+            
+            router.push({ name: "skill-matrix-list" });
+          } else {
+            // Handle API error response
 
-      //       router.push({ name: "skill-matrix" });
-      //       loading.value = false;
-      //     } else {
-      //       // Handle API error response
-
-      //       const errorData = response.error;
-      //       console.log("API error:", errorData);
-      //       // console.log("API error:", errorData.response.data.errors);
-      //       showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-      //       loading.value = false;
-      //     }
-      //   } else {
-      //     showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-      //     loading.value = false;
-      //     return;
-      //   }
-      // } catch (error) {
-      //   // Handle any other errors during API call
-      //   // console.error("API call error:", error);
-      //   showErrorAlert("Error", "An error occurred during the API call.");
-      //   loading.value = false;
-      // } finally {
-      //   loading.value = false;
-      // }
+            const errorData = response.error;
+            console.log("API error:", errorData);
+            // console.log("API error:", errorData.response.data.errors);
+            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            loading.value = false;
+          }
+        } else {
+          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          loading.value = false;
+          return;
+        }
+      } catch (error) {
+        // Handle any other errors during API call
+        // console.error("API call error:", error);
+        showErrorAlert("Error", "An error occurred during the API call.");
+        loading.value = false;
+      } finally {
+        loading.value = false;
+      }
     };
 
     const showSuccessAlert = (title, message) => {
@@ -324,8 +324,6 @@ export default defineComponent({
       loading,
       packages,
       limit,
-      TrainingMode,
-      TrainingStatus,
       skills,
       widgetClasses,
       getColor,

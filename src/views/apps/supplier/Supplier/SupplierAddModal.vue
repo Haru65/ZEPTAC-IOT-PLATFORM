@@ -3,7 +3,7 @@
   <div
     class="modal fade"
     ref="newAddressModalRef"
-    id="kt_modal_ncr"
+    id="kt_modal_internal_doc"
     tabindex="-1"
     aria-hidden="true"
     data-bs-backdrop="static"
@@ -17,13 +17,13 @@
         <VForm
           class="form"
           id="kt_modal_new_address_form"
-          :validation-schema="riskValidator"
+          :validation-schema="ItemValidator"
           @submit="submit"
         >
           <!--begin::Modal header-->
           <div class="modal-header" id="kt_modal_new_address_header">
             <!--begin::Modal title-->
-            <h2>Add Risk Register</h2>
+            <h2>Add QMS Procedure</h2>
             <!--end::Modal title-->
 
             <!--begin::Close-->
@@ -51,201 +51,88 @@
               data-kt-scroll-wrappers="#kt_modal_new_address_scroll"
               data-kt-scroll-offset="auto"
             >
+              <!--begin::Input group-->
               <div class="row mb-6">
                 <!--begin::Col-->
                 <div class="col-md-6 fv-row mb-8 mb-sd-8">
-                  <!--end::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                    >Entity</label
-                  >
-                  <!--end::Label-->
-
-                  <div>
-                    <el-select
-                      filterable
-                      placeholder="Please Select Entity"
-                      name="entity"
-                      v-model="riskDetails.entity"
-                    >
-                      <el-option
-                        value=""
-                        disabled="disabled"
-                        label="Please Select Entity"
-                        key=""
-                      >
-                        Please Select Entity</el-option
-                      >
-                      <el-option
-                        v-for="entity in EntityList"
-                        :key="entity"
-                        :value="entity"
-                        :label="`${entity}`"
-                      />
-                    </el-select>
-                    <div class="fv-help-block">
-                      <ErrorMessage class="invalid-feedback" name="entity" />
-                    </div>
-                    <!--end::Input-->
-                  </div>
-                </div>
-                <!--end::Col-->
-              </div>
-
-              <div class="row mb-6">
-                <!--begin::Col-->
-                <div class="col-md-12 fv-row">
                   <!--begin::Label-->
                   <label
                     class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                    >Threats</label
+                    >Registration Date</label
                   >
                   <!--end::Label-->
 
                   <!--begin::Input-->
-                  <Field
-                    type="text"
-                    as="textarea"
-                    rows="5"
-                    v-model="riskDetails.threats"
-                    name="threats"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Enter threats..."
+                  <el-date-picker
+                    type="date"
+                    name="registration_date"
+                    id="registration_date"
+                    v-model="itemDetails.registration_date"
+                    @change="setDates($event, 'registration_date')"
+                    placeholder="Pick a day"
+                    :editable="false"
                   />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="threats" />
-                    </div>
-                  </div>
-                  <!--end::Input-->
-                </div>
-                <!--end::Col-->
-              </div>
-
-              <div class="row mb-6">
-                <!--begin::Col-->
-                <div class="col-md-12 fv-row">
-                  <!--begin::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                    >Impacts</label
-                  >
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <Field
-                    type="text"
-                    as="textarea"
-                    rows="5"
-                    v-model="riskDetails.impacts"
-                    name="impacts"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Enter impacts..."
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="impacts" />
-                    </div>
-                  </div>
-                  <!--end::Input-->
-                </div>
-                <!--end::Col-->
-              </div>
-
-              <div class="row mb-6">
-                <div class="form-group col-md-6 mb-8 mb-sd-8">
-                  <label
-                    class="btn btn-outline btn-outline-dashed btn-outline-default p-5 d-flex align-items-center"
-                  >
-                    <!--begin::Info-->
-                    <span class="d-block fw-semobold text-start">
-                      <span class="text-dark fw-bold d-block fs-4 mb-2"
-                        >Control Adequacy</span
-                      >
-                      <input
-                        type="radio"
-                        class="btn-check"
-                        name="control_adequacy"
-                        id="yes"
-                        value="yes"
-                        v-model="riskDetails.control_adequacy"
-                        autocomplete="off"
-                      />
-                      <label class="btn btn-outline-primary" for="yes"
-                        >Yes</label
-                      >
-                      <input
-                        type="radio"
-                        class="btn-check"
-                        name="work_status"
-                        id="no"
-                        v-model="riskDetails.control_adequacy"
-                        value="no"
-                        autocomplete="off"
-                      />
-                      <label class="btn btn-outline-primary" for="no">No</label>
-                    </span>
-                    <!--end::Info-->
-                  </label>
-                </div>
-                <div class="form-group col-md-6 mb-8 mb-sd-8">
-                  <label
-                    class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
-                  >
-                    <!--begin::Info-->
-                    <span class="d-block fw-semobold text-start">
-                      <span class="text-dark fw-bold d-block fs-4 mb-2"
-                        >Review Date</span
-                      >
-                      <div class="block">
-                        <el-date-picker
-                          type="date"
-                          name="review_date"
-                          id="review_date"
-                          v-model="riskDetails.review_date"
-                          @change="setDates($event, 'review_date')"
-                          placeholder="Pick a day"
-                          :editable="false"
-                        />
-                      </div>
-                    </span>
-                    <!--end::Info-->
-                  </label>
                   <div
-                    class="fv-plugins-message-container"
-                    v-if="!riskDetails.review_date"
+                    class="fv-plugins-message-container mt-3"
+                    v-if="!itemDetails.registration_date"
                   >
                     <div class="fv-help-block">
-                      <ErrorMessage name="review_date" />
+                      <ErrorMessage name="registration_date" />
                     </div>
                   </div>
+                  <!--end::Input-->
                 </div>
+                <!--end::Col-->
               </div>
+              <!--end::Input group-->
 
               <!--begin::Input group-->
               <div class="row mb-6">
                 <!--begin::Col-->
-                <div class="col-md-12 fv-row">
+                <div class="col-md-6 fv-row mb-8 mb-sd-8">
                   <!--begin::Label-->
                   <label
                     class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                    >Present Control</label
+                    >Supplier Name</label
                   >
                   <!--end::Label-->
 
                   <!--begin::Input-->
                   <Field
                     type="text"
-                    as="textarea"
-                    rows="5"
-                    v-model="riskDetails.present_control"
-                    name="present_control"
+                    name="supplier_name"
+                    v-model="itemDetails.supplier_name"
                     class="form-control form-control-lg form-control-solid"
-                    placeholder="Specify present controls..."
+                    placeholder="Enter supplier name"
                   />
                   <div class="fv-plugins-message-container">
                     <div class="fv-help-block">
-                      <ErrorMessage name="present_control" />
+                      <ErrorMessage name="supplier_name" />
+                    </div>
+                  </div>
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+                <!--begin::Col-->
+                <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                  <!--begin::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Supplier Code</label
+                  >
+                  <!--end::Label-->
+
+                  <!--begin::Input-->
+                  <Field
+                    type="text"
+                    name="supplier_code"
+                    v-model="itemDetails.supplier_code"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Enter supplier code"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="supplier_code" />
                     </div>
                   </div>
                   <!--end::Input-->
@@ -256,33 +143,151 @@
               <!--begin::Input group-->
               <div class="row mb-6">
                 <!--begin::Col-->
-                <div class="col-md-12 fv-row">
+                <div class="col-md-6 fv-row mb-8 mb-sd-8">
                   <!--begin::Label-->
                   <label
                     class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                    >Additional Control</label
+                    >Contact Person</label
                   >
                   <!--end::Label-->
 
                   <!--begin::Input-->
                   <Field
                     type="text"
-                    as="textarea"
-                    rows="5"
-                    v-model="riskDetails.additional_control"
-                    name="additional_control"
+                    name="contact_person"
+                    v-model="itemDetails.contact_person"
                     class="form-control form-control-lg form-control-solid"
-                    placeholder="Specify additonal controls..."
+                    placeholder="Enter contact person name"
                   />
                   <div class="fv-plugins-message-container">
                     <div class="fv-help-block">
-                      <ErrorMessage name="additional_control" />
+                      <ErrorMessage name="contact_person" />
+                    </div>
+                  </div>
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+                <!--begin::Col-->
+                <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                  <!--begin::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Contact Number</label
+                  >
+                  <!--end::Label-->
+
+                  <!--begin::Input-->
+                  <Field
+                    type="text"
+                    name="contact_number"
+                    v-model="itemDetails.contact_number"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Enter contact person number"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="contact_number" />
                     </div>
                   </div>
                   <!--end::Input-->
                 </div>
                 <!--end::Col-->
               </div>
+
+              <div class="row mb-6">
+                <!--begin::Col-->
+                <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                  <!--begin::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Email ID</label
+                  >
+                  <!--end::Label-->
+
+                  <!--begin::Input-->
+                  <Field
+                    type="text"
+                    name="email"
+                    v-model="itemDetails.email"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Enter Email"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="email" />
+                    </div>
+                  </div>
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+                <!--begin::Col-->
+                <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                  <!--begin::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Supplier Category</label
+                  >
+                  <!--end::Label-->
+
+                  <!--begin::Input-->
+                  <div>
+                    <el-select
+                      filterable
+                      placeholder="Please Select Category"
+                      v-model="itemDetails.supplier_category"
+                    >
+                      <el-option
+                        value=""
+                        disabled="disabled"
+                        label="Please Select Category"
+                        key=""
+                      >
+                        Please Select Category</el-option
+                      >
+                      <el-option
+                        v-for="item in SupplierCategory"
+                        :key="item.id"
+                        :value="item.id"
+                        :label="item.category"
+                      />
+                    </el-select>
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage
+                          class="invalid-feedback"
+                          name="supplier_category"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+              </div>
+
+              <div class="row mb-6">
+                <div class="form-group col-lg-12 col-md-12">
+                  <label
+                    class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Product/Service Details</label
+                  >
+                  <Field
+                    type="text"
+                    as="textarea"
+                    name="product_service_details"
+                    rows="5"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Enter the product/service detail..."
+                    v-model="itemDetails.product_service_details"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="product_service_details" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!--end::Input group-->
             </div>
             <!--end::Scroll-->
@@ -303,13 +308,12 @@
 
             <!--begin::Button-->
             <button
-              :data-kt-indicator="loading2 ? 'on' : null"
               ref="submitButtonRef"
               id="kt_modal_new_address_submit"
               class="btn btn-primary"
             >
-              <span v-if="!loading2" class="indicator-label"> Submit </span>
-              <span v-if="loading2" class="indicator-progress">
+              <span class="indicator-label"> Submit </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
@@ -326,8 +330,8 @@
   </div>
   <!--end::Modal - New Address-->
 </template>
-  
-  <script lang="ts">
+      
+      <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import { hideModal } from "@/core/helpers/dom";
@@ -336,19 +340,21 @@ import { useAuthStore } from "@/stores/auth";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import moment from "moment";
-import { addRiskRegister } from "@/stores/api";
-import { EntityList } from "@/core/model/risk";
+import { addSupplier } from "@/stores/api";
+import { SupplierCategory } from "@/core/model/suppliers";
 
 interface NewAddressData {}
 
-interface RISK {
-  entity: string;
-  threats: string;
-  impacts: string;
-  present_control: string;
-  control_adequacy: string;
-  review_date: string;
-  additional_control: string;
+interface Item {
+  registration_date: string;
+  supplier_name: string;
+  supplier_code: string;
+  contact_person: string;
+  contact_number: string;
+  email: string;
+  supplier_category: string;
+  product_service_details: string;
+  status: string;
   company_id: string;
   created_by: string;
   updated_by: string;
@@ -362,10 +368,10 @@ export default defineComponent({
     Field,
     VForm,
   },
-  emits: ["risk-added"],
+
+  emits: ["document-added"],
   setup(props, { emit }) {
     const loading = ref(false);
-    const loading2 = ref(false);
     const auth = useAuthStore();
     const router = useRouter();
     const User = auth.GetUser();
@@ -374,71 +380,91 @@ export default defineComponent({
     const newAddressModalRef = ref<null | HTMLElement>(null);
     const newAddressData = ref<NewAddressData>({});
 
-    const riskDetails = ref<RISK>({
-      entity: "",
-      threats: "",
-      impacts: "",
-      present_control: "",
-      control_adequacy: "yes",
-      review_date: "",
-      additional_control: "",
+    const itemDetails = ref<Item>({
+      registration_date: "",
+      supplier_name: "",
+      supplier_code: "",
+      contact_person: "",
+      contact_number: "",
+      email: "",
+      supplier_category: "",
+      product_service_details: "",
+      status: "1",
+
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
       is_active: "1",
     });
 
-    const riskValidator = Yup.object().shape({
-      threats: Yup.string().required().label("Threats"),
-      impacts: Yup.string().required().label("Impacts"),
-      present_control: Yup.string().required().label("Present Control"),
-      additional_control: Yup.string().required().label("Addtional Control"),
+    const ItemValidator = Yup.object().shape({
+      supplier_name: Yup.string().required().label("Supplier Name"),
+      supplier_code: Yup.string().required().label("Supplier Code"),
+      contact_person: Yup.string().required().label("Contact Person"),
+      contact_number: Yup.string().required().label("Contact Number"),
+      email: Yup.string().required().label("Email"),
+      product_service_details: Yup.string().required().label("product/Service"),
     });
 
+    /* --------SET DATE LOGIC--------*/
     async function setDates(e, dateType) {
-      if (e != null) {
-        riskDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
-      } else {
-        riskDetails.value[dateType] = "";
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            itemDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            itemDetails.value[dateType] = "";
+          }
+        } else {
+          itemDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        itemDetails.value[dateType] = "";
       }
-      console.log(dateType, " ", riskDetails.value[dateType]);
     }
 
     function areAllPropertiesNull(array) {
       return array.some((detail) => {
         const {
-          entity,
-          threats,
-          impacts,
-          present_control,
-          control_adequacy,
-          review_date,
-          additional_control,
+          registration_date,
+          supplier_name,
+          supplier_code,
+          contact_person,
+          contact_number,
+          email,
+          supplier_category,
+          product_service_details,
+          status,
         } = detail;
 
         // Check if any property is null or empty
 
         return (
-          entity === "" ||
-          threats === "" ||
-          impacts === "" ||
-          present_control === "" ||
-          control_adequacy === "" ||
-          review_date === "" ||
-          additional_control === ""
+          registration_date === "" ||
+          supplier_name === "" ||
+          supplier_code === "" ||
+          contact_person === "" ||
+          contact_number === "" ||
+          email === "" ||
+          supplier_category === "" ||
+          product_service_details === "" ||
+          status === ""
         );
       });
     }
 
     const clear = () => {
-      riskDetails.value = {
-        entity: "",
-        threats: "",
-        impacts: "",
-        present_control: "",
-        control_adequacy: "yes",
-        review_date: "",
-        additional_control: "",
+      itemDetails.value = {
+        registration_date: "",
+        supplier_name: "",
+        supplier_code: "",
+        contact_person: "",
+        contact_number: "",
+        email: "",
+        supplier_category: "",
+        product_service_details: "",
+        status: "1",
+
         company_id: User.company_id,
         created_by: User.id,
         updated_by: User.id,
@@ -475,28 +501,29 @@ export default defineComponent({
     };
 
     const submit = async (e) => {
-      console.log(riskDetails.value);
-      loading2.value = true;
+      console.log(itemDetails.value);
 
-      const result = areAllPropertiesNull([riskDetails.value]);
+      const result = areAllPropertiesNull([itemDetails.value]);
       if (!result) {
         try {
           // Call your API here with the form values
-          const response = await addRiskRegister(riskDetails.value);
+          const response = await addSupplier(itemDetails.value);
           // console.log(response.error);
           if (!response.error) {
             // Handle successful API response
             //   console.log("API response:", response);
             loading.value = false;
-            showSuccessAlert("Success", "Risk Added Successfully!");
+
+            showSuccessAlert("Success", "Supplier Added Successfully!");
             clear();
-            await emit("risk-added");
+
+            await emit("document-added");
             hideModal(newAddressModalRef.value);
             // clear();
           } else {
             // Handle API error response
             // const errorData = response.error;
-            loading2.value = false;
+            loading.value = false;
             showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           }
         } catch (error) {
@@ -504,29 +531,27 @@ export default defineComponent({
           // console.error("API call error:", error);
           showErrorAlert("Error", "An error occurred during the API call.");
         } finally {
-          loading2.value = false;
+          loading.value = false;
         }
       } else {
         showErrorAlert("Warning", "Please fill all the details Correctly");
-        loading2.value = false;
         return;
       }
     };
 
     return {
-      loading2,
       newAddressData,
-      riskDetails,
-      riskValidator,
+      itemDetails,
+      ItemValidator,
       submit,
       submitButtonRef,
       newAddressModalRef,
       setDates,
       clear,
-      EntityList,
+      SupplierCategory,
     };
   },
 });
 </script>
-  
-  
+      
+      

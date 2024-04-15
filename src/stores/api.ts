@@ -28,6 +28,8 @@ const NCR_URL = "ncrs";
 const RISK_URL = "risks";
 const IMPROVEMENT_PLAN__URL = "improvements";
 const AUDIT_OBSERVATION_URL = "auditobservations";
+const CORRECTIVE_ACTION_URL = "non_conformance";
+const AUDIT_SCHEDULE_URL = "auditschedule";
 const ISO_RULE_URL = "iso";
 const QMS_PROCEDURE_URL = "qms_procedures";
 const WORK_INSTRUCTION_URL = "work_instructions";
@@ -36,6 +38,19 @@ const NABL_DOC_URL = "nabl_documents";
 const NI_DOC_URL = "ni_documents";
 const RECORDS_URL = "records";
 const SKILL_MATRIX_URL = "skill_matrix";
+const INTERMEDIATE_RECORD_URL = "intermediate_check_records";
+const INSPECTION_RECORD_URL = "inspection_records";
+const SUPPLIER_URL = "suppliers";
+const SUPPLIER_EVALUATION_URL = "supplier_evaluation";
+const METHOD_VALIDATION_URL = "method_validation";
+const INTER_LAB_COMPARISON_URL = "interlaboratory";
+const REPLICATE_REPORT_URL = "replicate_report";
+const DOC_CHANGE_URL = "document_change_request";
+const PLAN_URL = "plan";
+const PLANNER_URL = "planner";
+const MRM_SCHEDULE_URL = "mrm_schedule";
+const MRM_MINUTE_URL = "mrm_minutes";
+
 
 
 // Update Password
@@ -2435,6 +2450,47 @@ export async function addRiskRegister(data) {
     }
 }
 
+// update function
+export async function addUpdateRiskIdenfication(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post("store_risk_identification", data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function addUpdateRiskEvaluation(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post("store_risk_evaluation", data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function addUpdateRiskCounter(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post("store_risk_counter", data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
 // get function
 export async function getRiskRegister(data: any) {
     try {
@@ -2476,12 +2532,97 @@ export async function deleteRiskRegister(data: any) {
 
 
 
+// Quality Documentation
+// Quality Work - Document Change Request
+
+// listing function
+export async function getDocumentChanges(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(DOC_CHANGE_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function DocumentChangeSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('document_change_request_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addDocumentChange(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(DOC_CHANGE_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getDocumentChange(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(DOC_CHANGE_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateDocumentChange(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(DOC_CHANGE_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteDocumentChange(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(DOC_CHANGE_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
 
 // Quality Documentation
 // Quality Work - Improvement Action Plan
 
 // listing function
-export async function getImprovementActions(data) {
+export async function getImprovementPlans(data) {
     try {
         //console.log(data)
         ApiService.setHeader();
@@ -2494,7 +2635,7 @@ export async function getImprovementActions(data) {
 }
 
 // searching function
-export async function ImprovementActionSearch(search: any) {
+export async function ImprovementPlanSearch(search: any) {
     try {
         //console.log(data)
         const data = {
@@ -2510,7 +2651,7 @@ export async function ImprovementActionSearch(search: any) {
 }
 
 // add function
-export async function addImprovementAction(data) {
+export async function addImprovementPlan(data) {
     try {
         //console.log(data)
         ApiService.setHeader();
@@ -2523,7 +2664,7 @@ export async function addImprovementAction(data) {
 }
 
 // get function
-export async function getImprovementAction(data: any) {
+export async function getImprovementPlan(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get(IMPROVEMENT_PLAN__URL, data);
@@ -2536,7 +2677,7 @@ export async function getImprovementAction(data: any) {
 }
 
 // update function
-export async function updateImprovementAction(id: any, data: any) {
+export async function updateImprovementPlan(id: any, data: any) {
     try {
         //console.log(data)
         ApiService.setHeader();
@@ -2549,7 +2690,7 @@ export async function updateImprovementAction(id: any, data: any) {
 }
 
 // delete function
-export async function deleteImprovementAction(data: any) {
+export async function deleteImprovementPlan(data: any) {
     try {
         //console.log(data)
         ApiService.setHeader();
@@ -2566,7 +2707,7 @@ export async function deleteImprovementAction(data: any) {
 // SUPER ADMIN - ISO Audit Rule
 
 // listing function
-export async function getISORuless(data) {
+export async function getISORules(data) {
     try {
         //console.log(data)
         ApiService.setHeader();
@@ -2716,6 +2857,164 @@ export async function deleteIAuditObservation(data: any) {
         return { error: errors };
     }
 }
+
+
+
+
+// Quality Documentation
+// Internal Audit - Non-Conformance List (NON COMPILANCE)
+
+// listing function
+export async function getCorrectiveActions(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(CORRECTIVE_ACTION_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addCorrectiveAction(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(CORRECTIVE_ACTION_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getCorrectiveAction(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(CORRECTIVE_ACTION_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateCorrectiveAction(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(CORRECTIVE_ACTION_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteCorrectiveAction(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(CORRECTIVE_ACTION_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
+// Quality Documentation
+// Internal Audit - Audit Schedule 
+
+// listing function
+export async function getIAuditSchedules(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(AUDIT_SCHEDULE_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function IAuditScheduleSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('audit_schedule_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addIAuditSchedule(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(AUDIT_SCHEDULE_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getIAuditSchedule(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(AUDIT_SCHEDULE_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateIAuditSchedule(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(AUDIT_SCHEDULE_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteIAuditSchedule(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(AUDIT_SCHEDULE_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 
 
 // MASTER LIST MODULE
@@ -3313,6 +3612,980 @@ export async function deleteSkillMatrix(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(SKILL_MATRIX_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
+
+// INSTRUMENT MANAGEMENT
+// INTERMEDIATE CHECK RECORD
+
+// listing function
+export async function getIntermediateCheckRecords(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(INTERMEDIATE_RECORD_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function IntermediateCheckRecordSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('intermediate_check_records_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getCalibrationInstrumentForIntermediate(data: any) {
+    try {
+        //console.log(data)
+        const id = { "id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('intermediate_instrument', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addIntermediateCheckRecord(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(INTERMEDIATE_RECORD_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getIntermediateCheckRecord(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(INTERMEDIATE_RECORD_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateIntermediateCheckRecord(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(INTERMEDIATE_RECORD_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteIntermediateCheckRecord(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(INTERMEDIATE_RECORD_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
+// INSTRUMENT MANAGEMENT
+// INSPECTION RECORD
+
+// listing function
+export async function getInspectionRecords(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(INSPECTION_RECORD_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function InspectionRecordSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('inspection_records_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getCalibrationInstrumentForInspection(data: any) {
+    try {
+        //console.log(data)
+        const id = { "id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('inspection_instrument', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addInspectionRecord(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(INSPECTION_RECORD_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getInspectionRecord(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(INSPECTION_RECORD_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateInspectionRecord(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(INSPECTION_RECORD_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteInspectionRecord(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(INSPECTION_RECORD_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
+
+// SUPPLIER MANAGEMENT
+
+// listing function
+export async function getSuppliers(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(SUPPLIER_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function SupplierSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('suppliers_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addSupplier(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(SUPPLIER_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getSupplier(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(SUPPLIER_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateSupplier(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(SUPPLIER_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteSupplier(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(SUPPLIER_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// SUPPLIER EVALUATION MANAGEMENT
+
+// listing function
+export async function getSupplierEvaluations(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(SUPPLIER_EVALUATION_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function SupplierEvaluationSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('supplier_evaluation_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addSupplierEvaluation(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(SUPPLIER_EVALUATION_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getSupplierEvaluation(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(SUPPLIER_EVALUATION_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateSupplierEvaluation(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(SUPPLIER_EVALUATION_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteSupplierEvaluation(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(SUPPLIER_EVALUATION_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// QUALITY ASSURANCE
+// Method Validation
+
+// listing function
+export async function getMethodValidations(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(METHOD_VALIDATION_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function MethodValidationSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('method_validation_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addMethodValidation(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(METHOD_VALIDATION_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getMethodValidation(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(METHOD_VALIDATION_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateMethodValidation(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(METHOD_VALIDATION_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteMethodValidation(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(METHOD_VALIDATION_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// QUALITY ASSURANCE
+// InterLaboratory Comparision
+
+// listing function
+export async function getInterLabComparisons(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(INTER_LAB_COMPARISON_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function InterLabComparisonSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('interlaboratory_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addInterLabComparison(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(INTER_LAB_COMPARISON_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getInterLabComparison(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(INTER_LAB_COMPARISON_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateInterLabComparison(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(INTER_LAB_COMPARISON_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteInterLabComparison(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(INTER_LAB_COMPARISON_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// QUALITY ASSURANCE
+// Replicate Report
+
+// listing function
+export async function getReplicateReports(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(REPLICATE_REPORT_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function ReplicateReportSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('replicate_report_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addReplicateReport(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(REPLICATE_REPORT_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getReplicateReport(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(REPLICATE_REPORT_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateReplicateReport(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(REPLICATE_REPORT_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteReplicateReport(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(REPLICATE_REPORT_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// PLAN - PLANNER  
+
+// listing function
+export async function getPlans(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(PLAN_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addPlan(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(PLAN_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getPlan(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(PLAN_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updatePlan(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(PLAN_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deletePlan(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(PLAN_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
+
+// PLAN - PLANNER  
+
+// listing function
+export async function getPlanners(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(PLANNER_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function PlannerSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('planner_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addPlanner(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(PLANNER_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getPlanner(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(PLANNER_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updatePlanner(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(PLANNER_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deletePlanner(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(PLANNER_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// add function
+export async function getCalibratedInstruments(data:any) {
+    try {
+        //console.log(data)
+        const companyID = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post("get_calibration_instruments", companyID);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+
+}
+
+// add function
+export async function getPlansWithPlanner() {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.get("plans_with_planner");
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+
+}
+
+
+
+
+// MRM - MRM Schedule  
+
+// listing function
+export async function getMRMSchedules(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(MRM_SCHEDULE_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function MRMScheduleSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('mrm_schedule_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addMRMSchedule(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(MRM_SCHEDULE_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getMRMSchedule(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(MRM_SCHEDULE_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateMRMSchedule(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(MRM_SCHEDULE_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteMRMSchedule(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(MRM_SCHEDULE_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// MRM - MRM Schedule  
+export async function getMrmWithMinutes(data: any) {
+    try {
+        //console.log(data)
+        const id = { "id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('get_mrm_minutes', id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// listing function
+export async function getMRMMinutes(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(MRM_MINUTE_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addMRMMinute(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(MRM_MINUTE_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getMRMMinute(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(MRM_MINUTE_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateMRMMinute(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(MRM_MINUTE_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteMRMMinute(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(MRM_MINUTE_URL + "/" + data);
         return response.data;
     } catch (errors) {
         console.error(errors);

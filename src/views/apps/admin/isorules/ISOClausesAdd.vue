@@ -54,18 +54,13 @@
                   <li>
                     <div class="card mb-3">
                       <div class="card-header border-0">
-                        <div class="input-group p-2">
+                        <div class="d-block p-2 w-100">
                           <span
                             class="input-group-text"
                             @click="toggleAccordion(clause)"
-                            >{{ clause.clause_number }}</span
                           >
-                          <input
-                            type="text"
-                            class="form-control"
-                            v-model="clause.clause_name"
-                            placeholder="clause name"
-                          />
+                            {{ clause.clause_number }}
+                          </span>
                         </div>
                       </div>
                       <div class="card-body" v-if="clause.open">
@@ -76,6 +71,51 @@
                             v-model="clause.description"
                           ></textarea>
                         </div>
+
+                        <div class="row mb-6 mt-6">
+                          <div class="form-group d-flex align-items-center">
+                            <label class="form-label me-3 text-nowrap required"
+                              >Has NC</label
+                            >
+                            <div
+                              class="input-group"
+                              :id="'has_nc_' + clause.clause_number"
+                            >
+                              <div class="form-check form-check-inline me-2">
+                                <input
+                                  class="form-check-input"
+                                  type="radio"
+                                  :value="true"
+                                  v-model="clause.has_nc"
+                                  :id="'has_nc_yes_' + clause.clause_number"
+                                  :name="'has_nc_' + clause.clause_number"
+                                />
+                                <label
+                                  :for="'has_nc_yes_' + clause.clause_number"
+                                  class="form-check-label"
+                                  >Yes</label
+                                >
+                              </div>
+
+                              <div class="form-check form-check-inline">
+                                <input
+                                  class="form-check-input"
+                                  type="radio"
+                                  :value="false"
+                                  v-model="clause.has_nc"
+                                  :id="'has_nc_no_' + clause.clause_number"
+                                  :name="'has_nc_' + clause.clause_number"
+                                />
+                                <label
+                                  :for="'has_nc_no_' + clause.clause_number"
+                                  class="form-check-label"
+                                  >No</label
+                                >
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
                         <div v-if="clause.hierarchies.length">
                           <ul>
                             <template
@@ -85,18 +125,13 @@
                               <li>
                                 <div class="card">
                                   <div class="card-header border-0">
-                                    <div class="input-group p-2">
+                                    <div class="d-block p-2 w-100">
                                       <span
                                         class="input-group-text"
                                         @click="toggleAccordion(child)"
-                                        >{{ child.clause_number }}</span
                                       >
-                                      <input
-                                        type="text"
-                                        class="form-control"
-                                        v-model="child.clause_name"
-                                        placeholder="clause name"
-                                      />
+                                        {{ child.clause_number }}
+                                      </span>
                                     </div>
                                   </div>
 
@@ -110,6 +145,72 @@
                                         v-model="child.description"
                                       ></textarea>
                                     </div>
+                                    <div class="row mb-6 mt-6">
+                                      <div
+                                        class="form-group d-flex align-items-center"
+                                      >
+                                        <label
+                                          class="form-label me-3 text-nowrap required"
+                                          >Has NC</label
+                                        >
+                                        <div
+                                          class="input-group"
+                                          :id="'has_nc_' + child.clause_number"
+                                        >
+                                          <div
+                                            class="form-check form-check-inline me-2"
+                                          >
+                                            <input
+                                              class="form-check-input"
+                                              type="radio"
+                                              :value="true"
+                                              v-model="child.has_nc"
+                                              :id="
+                                                'has_nc_yes_' +
+                                                child.clause_number
+                                              "
+                                              :name="
+                                                'has_nc_' + child.clause_number
+                                              "
+                                            />
+                                            <label
+                                              :for="
+                                                'has_nc_yes_' +
+                                                child.clause_number
+                                              "
+                                              class="form-check-label"
+                                              >Yes</label
+                                            >
+                                          </div>
+
+                                          <div
+                                            class="form-check form-check-inline"
+                                          >
+                                            <input
+                                              class="form-check-input"
+                                              type="radio"
+                                              :value="false"
+                                              v-model="child.has_nc"
+                                              :id="
+                                                'has_nc_no_' +
+                                                child.clause_number
+                                              "
+                                              :name="
+                                                'has_nc_' + child.clause_number
+                                              "
+                                            />
+                                            <label
+                                              :for="
+                                                'has_nc_no_' +
+                                                child.clause_number
+                                              "
+                                              class="form-check-label"
+                                              >No</label
+                                            >
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
                                     <div v-if="child.hierarchies.length">
                                       <ul>
                                         <template
@@ -122,24 +223,15 @@
                                             <div class="card">
                                               <!-- Added margin to create gap -->
                                               <div class="card-header border-0">
-                                                <div class="input-group p-2">
+                                                <div class="d-block p-2 w-100">
                                                   <span
                                                     class="input-group-text"
                                                     @click="
                                                       toggleAccordion(subChild)
                                                     "
-                                                    >{{
-                                                      subChild.clause_number
-                                                    }}</span
                                                   >
-                                                  <input
-                                                    type="text"
-                                                    class="form-control"
-                                                    v-model="
-                                                      subChild.clause_name
-                                                    "
-                                                    placeholder="clause name"
-                                                  />
+                                                    {{ subChild.clause_number }}
+                                                  </span>
                                                 </div>
                                               </div>
                                               <div
@@ -156,6 +248,81 @@
                                                       subChild.description
                                                     "
                                                   ></textarea>
+                                                </div>
+                                                <div class="row mb-6 mt-6">
+                                                  <div
+                                                    class="form-group d-flex align-items-center"
+                                                  >
+                                                    <label
+                                                      class="form-label me-3 text-nowrap required"
+                                                      >Has NC</label
+                                                    >
+                                                    <div
+                                                      class="input-group"
+                                                      :id="
+                                                        'has_nc_' +
+                                                        subChild.clause_number
+                                                      "
+                                                    >
+                                                      <div
+                                                        class="form-check form-check-inline me-2"
+                                                      >
+                                                        <input
+                                                          class="form-check-input"
+                                                          type="radio"
+                                                          :value="true"
+                                                          v-model="
+                                                            subChild.has_nc
+                                                          "
+                                                          :id="
+                                                            'has_nc_yes_' +
+                                                            subChild.clause_number
+                                                          "
+                                                          :name="
+                                                            'has_nc_' +
+                                                            subChild.clause_number
+                                                          "
+                                                        />
+                                                        <label
+                                                          :for="
+                                                            'has_nc_yes_' +
+                                                            subChild.clause_number
+                                                          "
+                                                          class="form-check-label"
+                                                          >Yes</label
+                                                        >
+                                                      </div>
+
+                                                      <div
+                                                        class="form-check form-check-inline"
+                                                      >
+                                                        <input
+                                                          class="form-check-input"
+                                                          type="radio"
+                                                          :value="false"
+                                                          v-model="
+                                                            subChild.has_nc
+                                                          "
+                                                          :id="
+                                                            'has_nc_no_' +
+                                                            subChild.clause_number
+                                                          "
+                                                          :name="
+                                                            'has_nc_' +
+                                                            subChild.clause_number
+                                                          "
+                                                        />
+                                                        <label
+                                                          :for="
+                                                            'has_nc_no_' +
+                                                            subChild.clause_number
+                                                          "
+                                                          class="form-check-label"
+                                                          >No</label
+                                                        >
+                                                      </div>
+                                                    </div>
+                                                  </div>
                                                 </div>
                                                 <div
                                                   v-if="
@@ -176,7 +343,7 @@
                                                             class="card-header border-0"
                                                           >
                                                             <div
-                                                              class="input-group p-2"
+                                                              class="d-block p-2 w-100"
                                                             >
                                                               <span
                                                                 class="input-group-text"
@@ -185,18 +352,11 @@
                                                                     subSubChild
                                                                   )
                                                                 "
-                                                                >{{
-                                                                  subSubChild.clause_number
-                                                                }}</span
                                                               >
-                                                              <input
-                                                                type="text"
-                                                                class="form-control"
-                                                                v-model="
-                                                                  subSubChild.clause_name
-                                                                "
-                                                                placeholder="clause name"
-                                                              />
+                                                                {{
+                                                                  subSubChild.clause_number
+                                                                }}
+                                                              </span>
                                                             </div>
                                                           </div>
                                                           <div
@@ -218,6 +378,87 @@
                                                                   subSubChild.description
                                                                 "
                                                               ></textarea>
+                                                            </div>
+                                                            <div
+                                                              class="row mb-6 mt-6"
+                                                            >
+                                                              <div
+                                                                class="form-group d-flex align-items-center"
+                                                              >
+                                                                <label
+                                                                  class="form-label me-3 text-nowrap required"
+                                                                  >Has NC</label
+                                                                >
+                                                                <div
+                                                                  class="input-group"
+                                                                  :id="
+                                                                    'has_nc_' +
+                                                                    subSubChild.clause_number
+                                                                  "
+                                                                >
+                                                                  <div
+                                                                    class="form-check form-check-inline me-2"
+                                                                  >
+                                                                    <input
+                                                                      class="form-check-input"
+                                                                      type="radio"
+                                                                      :value="
+                                                                        true
+                                                                      "
+                                                                      v-model="
+                                                                        subSubChild.has_nc
+                                                                      "
+                                                                      :id="
+                                                                        'has_nc_yes_' +
+                                                                        subSubChild.clause_number
+                                                                      "
+                                                                      :name="
+                                                                        'has_nc_' +
+                                                                        subSubChild.clause_number
+                                                                      "
+                                                                    />
+                                                                    <label
+                                                                      :for="
+                                                                        'has_nc_yes_' +
+                                                                        subSubChild.clause_number
+                                                                      "
+                                                                      class="form-check-label"
+                                                                      >Yes</label
+                                                                    >
+                                                                  </div>
+
+                                                                  <div
+                                                                    class="form-check form-check-inline"
+                                                                  >
+                                                                    <input
+                                                                      class="form-check-input"
+                                                                      type="radio"
+                                                                      :value="
+                                                                        false
+                                                                      "
+                                                                      v-model="
+                                                                        subSubChild.has_nc
+                                                                      "
+                                                                      :id="
+                                                                        'has_nc_no_' +
+                                                                        subSubChild.clause_number
+                                                                      "
+                                                                      :name="
+                                                                        'has_nc_' +
+                                                                        subSubChild.clause_number
+                                                                      "
+                                                                    />
+                                                                    <label
+                                                                      :for="
+                                                                        'has_nc_no_' +
+                                                                        subSubChild.clause_number
+                                                                      "
+                                                                      class="form-check-label"
+                                                                      >No</label
+                                                                    >
+                                                                  </div>
+                                                                </div>
+                                                              </div>
                                                             </div>
                                                           </div>
                                                         </div>
@@ -340,9 +581,9 @@ export default defineComponent({
     const clauses = reactive([
       {
         clause_number: "1",
-        clause_name: "",
         description: "",
         hierarchies: [],
+        has_nc: "",
         open: true,
       },
     ]);
@@ -377,22 +618,28 @@ export default defineComponent({
     };
 
     const addHierarchy = (parent, level) => {
-      const newClauseNumber = getNextClauseNumber(parent, level);
-      parent.hierarchies.push({
-        clause_number: newClauseNumber,
-        clause_name: "",
-        description: "",
-        hierarchies: [],
-        open: true,
-      });
+      if (parent.has_nc !== "") {
+        const newClauseNumber = getNextClauseNumber(parent, level);
+        console.log(parent, level);
+        console.log(newClauseNumber);
+        parent.hierarchies.push({
+          clause_number: newClauseNumber,
+          description: "",
+          hierarchies: [],
+          has_nc: "",
+          open: true,
+        });
+      }else {
+        alert("Has NC Is Required Field.");
+      }
     };
 
     const addClause = () => {
       clauses.push({
         clause_number: String(clauses.length + 1),
-        clause_name: "",
         description: "",
         hierarchies: [],
+        has_nc: "",
         open: true,
       });
     };
@@ -405,6 +652,7 @@ export default defineComponent({
 
     const onSubmit = async () => {
       try {
+        console.log(clauses);
         loading.value = true;
 
         if (clauses.length == 0) {

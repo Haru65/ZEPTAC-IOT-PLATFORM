@@ -164,6 +164,10 @@ const AdminMenuConfig: Array<MenuItem> = [
             route: "/risks",
           },
           {
+            heading: "Document Change",
+            route: "/document_change_request",
+          },
+          {
             heading: "Improvement Plan",
             route: "/improvements",
           },
@@ -182,6 +186,99 @@ const AdminMenuConfig: Array<MenuItem> = [
           {
             heading: "Internal Audit Schedule",
             route: "/auditschedule",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    heading: "MRM",
+    route: "/",
+    pages: [
+      {
+        heading: "Schedule Meeting",
+        route: "/mrm_schedule",
+        keenthemesIcon: "educare",
+        bootstrapIcon: "bi-archive",
+      },
+      {
+        heading: "Minutes of Meeting",
+        route: "/mrm_minutes",
+        keenthemesIcon: "educare",
+        bootstrapIcon: "bi-archive",
+      },
+    ],
+  },
+  {
+    heading: "Quality Assurance",
+    route: "/",
+    pages: [
+      {
+        sectionTitle: "Method Validation",
+        route: "/method_validation",
+        keenthemesIcon: "wrench",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add Method Validation",
+            route: "/method_validation/add",
+          },
+          {
+            heading: "List Method Validation",
+            route: "/method_validation/list",
+          },
+        ],
+      },
+      {
+        sectionTitle: "InterLaboratory",
+        route: "/interlaboratory",
+        keenthemesIcon: "office-bag",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add InterLaboratory",
+            route: "/interlaboratory/add",
+          },
+          {
+            heading: "List InterLaboratory",
+            route: "/interlaboratory/list",
+          },
+        ],
+      },
+      {
+        sectionTitle: "Replicate Report",
+        route: "/replicate_report",
+        keenthemesIcon: "office-bag",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add Replicate Report",
+            route: "/replicate_report/add",
+          },
+          {
+            heading: "List Replicate Report",
+            route: "/replicate_report/list",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    heading: "Instrument Management",
+    pages: [
+      {
+        sectionTitle: "Instrument Management",
+        keenthemesIcon: "document",
+        route: "/",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Intermediate Check Records",
+            route: "/intermediate_check_records",
+          },
+          {
+            heading: "Inspection Records",
+            route: "/inspection_records",
           },
         ],
       },
@@ -221,6 +318,18 @@ const AdminMenuConfig: Array<MenuItem> = [
             route: "/records",
           },
         ],
+      },
+    ],
+  },
+  {
+    heading: "Suppliers",
+    route: "/",
+    pages: [
+      {
+        heading: "Suppliers",
+        route: "/suppliers",
+        keenthemesIcon: "educare",
+        bootstrapIcon: "bi-archive",
       },
     ],
   },
@@ -373,6 +482,24 @@ const AdminMenuConfig: Array<MenuItem> = [
     ],
   },
   {
+    heading: "Plan",
+    route: "/",
+    pages: [
+      {
+        heading: "Planner",
+        route: "/plan",
+        keenthemesIcon: "educare",
+        bootstrapIcon: "bi-archive",
+      },
+      {
+        heading: "CheckList",
+        route: "/checklist",
+        keenthemesIcon: "educare",
+        bootstrapIcon: "bi-archive",
+      },
+    ],
+  },
+  {
     heading: "Super Admin",
     route: "/company",
     pages: [
@@ -427,11 +554,11 @@ const AdminMenuConfig: Array<MenuItem> = [
         bootstrapIcon: "bi-archive",
         sub: [
           {
-            heading: "ISO Rules",
+            heading: "ISO Rules Add",
             route: "/iso/add",
           },
           {
-            heading: "ISO Rules",
+            heading: "ISO Rules List",
             route: "/iso/list",
           },
         ],

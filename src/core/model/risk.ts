@@ -2,13 +2,22 @@
 
 interface IRisk {
     id: number;
-    entity: string;
-    threats: string;
-    impacts: string;
-    present_control: string;
-    control_adequacy: string;
-    review_date: string;
-    additional_control: string;
+    risk_identification: {
+      description: string;
+      cause: string;
+      effect: string;
+    };
+    risk_evaluation: {
+      probability: string;
+      severity: string;
+      risk_mode: string;
+    };
+    risk_counter: {
+      controls: string;
+      probability: string;
+      severity: string;
+      risk_mode: string;
+    };
     company_id: string;
   }
   

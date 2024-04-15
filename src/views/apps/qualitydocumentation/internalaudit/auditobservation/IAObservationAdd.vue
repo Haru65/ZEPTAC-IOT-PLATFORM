@@ -1,475 +1,857 @@
 <template>
-  <div style="width: 99%" class="bg-body p-12 rounded">
-    <!--begin::Modal dialog-->
-    <div class="modal-dialog modal-dialog-centered">
-      <!--begin::Modal content-->
-      <div class="modal-content">
-        <!--begin::Form-->
-        <VForm
-          id="kt_account_profile_details_form"
-          class="form"
-          novalidate
-          :validation-schema="auditValidator"
+  <div style="width: 99%" class="bg-body p-4 rounded">
+    <div class="container mt-6">
+      <!-- extra fields -->
+      <div class="row mb-6">
+        <div class="form-group col-lg-12 col-md-12">
+          <label
+            class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+            >Auditor Name</label
+          >
+          <div class="form-control form-control-lg form-control-solid">
+            {{ auditDetails.auditor_name }}
+          </div>
+        </div>
+      </div>
+      <!--end::Input group-->
+
+      <h3 class="fw-bold text-gray-700 fw-semobold fs-6">Clauses</h3>
+      <!-- Horizontal tabs for clause numbers -->
+      <div class="row row-cols-4">
+        <div
+          v-for="(clause, index) in clauses"
+          :key="index"
+          class="col text-center"
         >
-          <!--begin::Card body-->
-          <div class="card-body p-6">
-            <div class="row mb-6">
-              <div class="fv-row container-fluid">
-                <div class="alert alert-success">
-                  <span class="fs-5 fw-bold text-gray-700">
-                    Internal audit at
-                    <span class="text-primary">{{
-                      User?.company_details?.company_name ?? ""
-                    }}</span>
-                    as per ISO/IEC 17025 : 2017
-                  </span>
-                </div>
-              </div>
-            </div>
+          <div
+            class="tab-item rounded border border-bottom-0 p-2"
+            :class="{ 'active-tab': selectedClause === index }"
+            @click="selectClause(index)"
+          >
+            {{ clause.clause_number }}
+          </div>
+        </div>
+      </div>
+    </div>
 
-            <div class="row mb-6">
-              <!--begin::Col-->
-              <div class="col-md-12 fv-row">
-                <!--begin::Label-->
-                <label
-                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                  >Auditor Name</label
-                >
-                <!--end::Label-->
+    <div class="table-responsive mb-10">
+      <!--begin::Table-->
 
-                <!--begin::Input-->
-                <Field
-                  type="text"
-                  v-model="auditObservationDetails.auditor_name"
-                  disabled
-                  name="auditor_name"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Auditor name"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="auditor_name" />
-                  </div>
-                </div>
-                <!--end::Input-->
-              </div>
-              <!--end::Col-->
-            </div>
-
-            <div class="row mb-6">
-              <!--begin::Col-->
-              <div class="col-md-12 fv-row">
-                <!--begin::Label-->
-                <label
-                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                  >Clause Name</label
-                >
-                <!--end::Label-->
-
-                <!--begin::Input-->
-                <Field
-                  type="text"
-                  v-model="auditObservationDetails.clause_name"
-                  name="clause_name"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Clause name"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="clause_name" />
-                  </div>
-                </div>
-                <!--end::Input-->
-              </div>
-              <!--end::Col-->
-            </div>
-
-            <!--begin::Accordion-->
-            <div class="accordion" id="kt_accordion_1">
-              <div class="accordion-item">
-                <h2 class="accordion-header" :id="'kt_accordion_1_header_'">
-                  <button
-                    class="accordion-button fs-4 fw-semibold"
-                    type="button"
-                    :data-bs-toggle="'collapse'"
-                    :data-bs-target="'#kt_accordion_1_body_'"
-                    :aria-controls="'kt_accordion_1_body_'"
-                  >
-                    Rules / Clauses
-                    <span
-                      class="badge m-3 py-3 px-4 fs-7 badge-light-primary rounded animate__animated animate__pulse animate__infinite"
-                      >{{
-                        auditObservationDetails.clauses.length
-                          ? auditObservationDetails.clauses.length
-                          : "0"
-                      }}
-                      Clauses</span
+      <table
+        class="table table-responsive g-5 m-2 w-100 fw-bold text-gray-700 table-bordered"
+        data-kt-element="Selects"
+      >
+        <!--begin::Table body-->
+        <tbody>
+          <tr class="justifiy-content-start">
+            <div class="min-w-500px">
+              <!-- Accordions for respective clauses -->
+              <div
+                v-for="(clause, index) in clauses"
+                :key="index"
+                v-show="selectedClause === index"
+                class="accordion mt-6"
+                :id="`accordion_${index}`"
+              >
+                <div class="accordion-item">
+                  <h2 class="accordion-header" :id="`heading_${index}`">
+                    <button
+                      class="accordion-button"
+                      type="button"
+                      :data-bs-toggle="'collapse'"
+                      :data-bs-target="`#collapse_${index}`"
+                      :aria-expanded="index === 0 ? 'true' : 'false'"
+                      :aria-controls="`collapse_${index}`"
                     >
-                  </button>
-                </h2>
-                <div
-                  :id="'kt_accordion_1_body_'"
-                  class="accordion-collapse collapse"
-                  :aria-labelledby="'kt_accordion_1_header_'"
-                  data-bs-parent="#kt_accordion_1"
-                >
-                  <div class="accordion-body">
-                    <div>
-                      <!-- Add content for nested accordion here -->
-                      <div class="table-responsive">
-                        <table
-                          class="table table-rounded table-striped border gy-7 gs-7 text-nowrap"
+                      {{ clause.clause_number }}
+                    </button>
+                  </h2>
+                  <div
+                    :id="`collapse_${index}`"
+                    class="accordion-collapse collapse"
+                    :aria-labelledby="`heading_${index}`"
+                    :data-bs-parent="`#accordion_${index}`"
+                  >
+                    <div class="accordion-body">
+                      <div
+                        class="form-control form-control-lg form-control-solid mb-6"
+                      >
+                        {{ clause.description }}
+                      </div>
+
+                      <div class="text-start mb-6">
+                        <span
+                          v-if="clause.has_nc"
+                          type="button"
+                          data-toggle="tooltip"
+                          title="View NC Observation"
+                          class="btn btn-primary rounded btn-sm"
+                          data-bs-toggle="modal"
+                          :data-bs-target="'#kt_modal_new_address'"
+                          @click="addNC(clause)"
                         >
-                          <thead>
-                            <tr
-                              class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200 text-align-center"
-                            >
-                              <th class="col-2">Clause No.</th>
-                              <th class="col-4">Clause Details</th>
-                              <th class="col-4">NC Observations</th>
-                              <th class="col-2">Download Evidence</th>
-                              <th>Action</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr
-                              v-for="(
-                                item, index
-                              ) in auditObservationDetails.clauses"
-                              :key="index"
-                            >
-                              <td class="align-middle">
-                                <span
-                                  class="badge py-3 px-4 fs-7 badge-light-primary"
-                                  >{{ `${item.clause_no}` }}</span
-                                >
-                              </td>
-                              <td class="align-middle">
-                                <span
-                                  class="badge py-3 px-4 fs-7 badge-light-primary"
-                                  >{{ `${item.clause_details}` }}</span
-                                >
-                              </td>
-                              <td class="align-middle">
-                                <span
-                                  class="badge py-3 px-4 fs-7 badge-light-primary"
-                                  >{{ `${item.nc_observation}` }}</span
-                                >
-                              </td>
-                              <td class="align-middle">
-                                <span
-                                  class="badge py-3 px-4 fs-7 badge-light-primary"
-                                  >asdasd</span
-                                >
-                              </td>
-                              <td>
-                                <div
-                                  class="btn-group"
-                                  role="group"
-                                  aria-label="View and Delete Buttons"
-                                >
-                                  <span
-                                    class="btn btn-primary btn-sm"
-                                    data-bs-toggle="modal"
-                                    :data-bs-target="
-                                      '#kt_modal_new_address_' + index
-                                    "
-                                  >
-                                    <i class="bi bi-eye"></i>
-                              </span>
+                          <span class="text-center">+ Add NC</span>
+                        </span>
+                      </div>
 
-                                  <IAObservationEditModal
-                                    :key="index"
-                                    :clauseId="index"
-                                    :clauseData="item"
-                                    @editData="editClauseData"
-                                  ></IAObservationEditModal>
-
-                                  <span
-                                    class="btn btn-danger btn-sm"
-                                    @click="deleteClauseData(index)"
-                                  >
-                                    <i class="bi bi-trash"></i>
-                            </span>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr
-                              class="text-center"
-                              v-if="
-                                auditObservationDetails.clauses.length === 0
+                      <div class="accordion" :id="`nested_accordion_${index}`">
+                        <div
+                          class="accordion-item"
+                          v-for="(
+                            nestedClause, nestedIndex
+                          ) in clause.hierarchies"
+                          :key="nestedIndex"
+                        >
+                          <h2
+                            class="accordion-header"
+                            :id="`nested_heading_${index}_${nestedIndex}`"
+                          >
+                            <button
+                              class="accordion-button"
+                              type="button"
+                              :data-bs-toggle="'collapse'"
+                              :data-bs-target="`#nested_collapse_${index}_${nestedIndex}`"
+                              :aria-expanded="
+                                nestedIndex === 0 ? 'true' : 'false'
                               "
+                              :aria-controls="`nested_collapse_${index}_${nestedIndex}`"
                             >
-                              <td
-                                colspan="5"
-                                class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200 text-align-center"
+                              {{ nestedClause.clause_number }}
+                            </button>
+                          </h2>
+                          <div
+                            :id="`nested_collapse_${index}_${nestedIndex}`"
+                            class="accordion-collapse collapse"
+                            :aria-labelledby="`nested_heading_${index}_${nestedIndex}`"
+                            :data-bs-parent="`#nested_accordion_${index}`"
+                          >
+                            <div class="accordion-body">
+                              <div
+                                class="form-control form-control-lg form-control-solid mb-6"
                               >
-                                No Clause.
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
+                                {{ nestedClause.description }}
+                              </div>
+
+                              <div class="text-start mb-6">
+                                <span
+                                  v-if="nestedClause.has_nc"
+                                  type="button"
+                                  data-toggle="tooltip"
+                                  title="View NC Observation"
+                                  class="btn btn-primary rounded btn-sm"
+                                  data-bs-toggle="modal"
+                                  :data-bs-target="'#kt_modal_new_address'"
+                                  @click="addNC(nestedClause)"
+                                >
+                                  <span class="text-center">+ Add NC</span>
+                                </span>
+                              </div>
+
+                              <!-- Additional nested accordions or content here -->
+                              <div
+                                class="accordion"
+                                :id="`nested_nested_accordion_${index}_${nestedIndex}`"
+                              >
+                                <div
+                                  class="accordion-item"
+                                  v-for="(
+                                    nestedNestedClause, nestedNestedIndex
+                                  ) in nestedClause.hierarchies"
+                                  :key="nestedNestedIndex"
+                                >
+                                  <h2
+                                    class="accordion-header"
+                                    :id="`nested_nested_heading_${index}_${nestedIndex}_${nestedNestedIndex}`"
+                                  >
+                                    <button
+                                      class="accordion-button"
+                                      type="button"
+                                      :data-bs-toggle="'collapse'"
+                                      :data-bs-target="`#nested_nested_collapse_${index}_${nestedIndex}_${nestedNestedIndex}`"
+                                      :aria-expanded="
+                                        nestedNestedIndex === 0
+                                          ? 'true'
+                                          : 'false'
+                                      "
+                                      :aria-controls="`nested_nested_collapse_${index}_${nestedIndex}_${nestedNestedIndex}`"
+                                    >
+                                      {{ nestedNestedClause.clause_number }}
+                                    </button>
+                                  </h2>
+                                  <div
+                                    :id="`nested_nested_collapse_${index}_${nestedIndex}_${nestedNestedIndex}`"
+                                    class="accordion-collapse collapse"
+                                    :aria-labelledby="`nested_nested_heading_${index}_${nestedIndex}_${nestedNestedIndex}`"
+                                    :data-bs-parent="`#nested_nested_accordion_${index}_${nestedIndex}`"
+                                  >
+                                    <div class="accordion-body">
+                                      <div
+                                        class="form-control form-control-lg form-control-solid mb-6"
+                                      >
+                                        {{ nestedNestedClause.description }}
+                                      </div>
+
+                                      <div class="text-start mb-6">
+                                        <span
+                                          v-if="nestedNestedClause.has_nc"
+                                          type="button"
+                                          data-toggle="tooltip"
+                                          title="View NC Observation"
+                                          class="btn btn-primary rounded btn-sm"
+                                          data-bs-toggle="modal"
+                                          :data-bs-target="'#kt_modal_new_address'"
+                                          @click="addNC(nestedNestedClause)"
+                                        >
+                                          <span class="text-center"
+                                            >+ Add NC</span
+                                          >
+                                        </span>
+                                      </div>
+
+                                      <!-- Additional nested accordions or content here -->
+                                      <div
+                                        class="accordion"
+                                        :id="`nested_nested_nested_accordion_${index}_${nestedIndex}_${nestedNestedIndex}`"
+                                      >
+                                        <div
+                                          class="accordion-item"
+                                          v-for="(
+                                            nestedNestedNestedClause,
+                                            nestedNestedNestedIndex
+                                          ) in nestedNestedClause.hierarchies"
+                                          :key="nestedNestedNestedIndex"
+                                        >
+                                          <h2
+                                            class="accordion-header"
+                                            :id="`nested_nested_nested_heading_${index}_${nestedIndex}_${nestedNestedIndex}_${nestedNestedNestedIndex}`"
+                                          >
+                                            <button
+                                              class="accordion-button"
+                                              type="button"
+                                              :data-bs-toggle="'collapse'"
+                                              :data-bs-target="`#nested_nested_nested_collapse_${index}_${nestedIndex}_${nestedNestedIndex}_${nestedNestedNestedIndex}`"
+                                              :aria-expanded="
+                                                nestedNestedNestedIndex === 0
+                                                  ? 'true'
+                                                  : 'false'
+                                              "
+                                              :aria-controls="`nested_nested_nested_collapse_${index}_${nestedIndex}_${nestedNestedIndex}_${nestedNestedNestedIndex}`"
+                                            >
+                                              {{
+                                                nestedNestedNestedClause.clause_number
+                                              }}
+                                            </button>
+                                          </h2>
+                                          <div
+                                            :id="`nested_nested_nested_collapse_${index}_${nestedIndex}_${nestedNestedIndex}_${nestedNestedNestedIndex}`"
+                                            class="accordion-collapse collapse"
+                                            :aria-labelledby="`nested_nested_nested_heading_${index}_${nestedIndex}_${nestedNestedIndex}_${nestedNestedNestedIndex}`"
+                                            :data-bs-parent="`#nested_nested_nested_accordion_${index}_${nestedIndex}_${nestedNestedIndex}`"
+                                          >
+                                            <div class="accordion-body">
+                                              <div
+                                                class="form-control form-control-lg form-control-solid mb-6"
+                                              >
+                                                {{
+                                                  nestedNestedNestedClause.description
+                                                }}
+                                              </div>
+
+                                              <div class="text-start mb-6">
+                                                <span
+                                                  v-if="
+                                                    nestedNestedNestedClause.has_nc
+                                                  "
+                                                  type="button"
+                                                  data-toggle="tooltip"
+                                                  title="View NC Observation"
+                                                  class="btn btn-primary rounded btn-sm"
+                                                  data-bs-toggle="modal"
+                                                  :data-bs-target="'#kt_modal_new_address'"
+                                                  @click="
+                                                    addNC(
+                                                      nestedNestedNestedClause
+                                                    )
+                                                  "
+                                                >
+                                                  <span class="text-center"
+                                                    >+ Add NC</span
+                                                  >
+                                                </span>
+                                              </div>
+                                              <!-- Additional nested accordions or content here -->
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div class="text-start mt-8">
-                      <span
-                        data-toggle="tooltip"
-                        title="Add clause"
-                        class="btn btn-primary btn-md rounded-circle fs-3"
-                        data-bs-toggle="modal"
-                        :data-bs-target="'#kt_modal_new_address'"
-                      >
-                        +
-                    </span>
-                    </div>
-
-                    <IAObservationAddModal
-                      @addData="addClauseData"
-                    ></IAObservationAddModal>
                   </div>
                 </div>
               </div>
             </div>
-            <!--end::Accordion-->
+          </tr>
+        </tbody>
+        <!--end::Table body-->
+        <!--begin::Table foot-->
+        <!--end::Table foot-->
+      </table>
+    </div>
+
+    <IAObservationAddModal
+      @addData="reLoadData"
+      v-bind:data="clauseDetails"
+    ></IAObservationAddModal>
+
+    <div class="card mb-5 mb-xl-10 pb-12">
+      <div class="card-header border-0 pt-6">
+        <!--begin::Card title-->
+        <div class="card-title">
+          <!--begin::Card title-->
+          <div class="card-title m-0">
+            <h3 class="fw-bold m-0">Audit Observation List</h3>
           </div>
-          <div class="modal-footer flex-center">
-            <!--begin::Button-->
+          <!--end::Card title-->
+        </div>
+        <!--begin::Card title-->
+        <!--begin::Card toolbar-->
+
+        <div class="card-toolbar">
+          <!--begin::Group actions-->
+          <div
+            v-if="selectedIds.length === 0"
+            class="d-flex justify-content-end"
+            data-kt-customer-table-toolbar="base"
+          >
+            <!--begin::Add customer-->
+            <router-link
+              :to="`/non_conformance/list/${itemId}`"
+              class="btn btn-primary"
+            >
+              <KTIcon icon-name="link" icon-class="fs-2" />
+              Non-Conformances
+            </router-link>
+            <!--end::Add customer-->
+          </div>
+
+          <div
+            v-if="selectedIds.length !== 0"
+            class="d-flex justify-content-end align-items-center"
+            data-kt-customer-table-toolbar="selected"
+          >
+            <div class="fw-bold me-5">
+              <span class="me-2">{{ selectedIds.length }}</span
+              >Selected
+            </div>
             <button
-              @click="clear"
-              class="btn btn-lg btn-danger w-sd-25 w-lg-25"
+              type="button"
+              class="btn btn-danger"
+              @click="deleteFewItem()"
             >
-              Discard
+              Delete Selected
             </button>
-            <!--end::Button-->
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-            <!--begin::Button-->
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click="submit()"
-            >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
-              <span v-if="loading" class="indicator-progress">
-                Please wait...
-                <span
-                  class="spinner-border spinner-border-sm align-middle ms-2"
-                ></span>
-              </span>
-            </span>
-            <!--end::Button-->
           </div>
-          <!--end::Input group-->
-        </VForm>
-        <!--end::Form-->
+          <!--end::Group actions-->
+          <!--begin::Group actions-->
+          <div
+            class="d-flex justify-content-end align-items-center d-none"
+            data-kt-customer-table-toolbar="selected"
+          >
+            <div class="fw-bold me-5">
+              <span
+                class="me-2"
+                data-kt-customer-table-select="selected_count"
+              ></span
+              >Selected
+            </div>
+            <button
+              type="button"
+              class="btn btn-danger"
+              data-kt-customer-table-select="delete_selected"
+            >
+              Delete Selected
+            </button>
+          </div>
+          <!--end::Group actions-->
+        </div>
+        <!--end::Card toolbar-->
+      </div>
+
+      <!--begin::Card body-->
+      <div class="card-body pt-0">
+        <div class="table-responsive">
+          <Datatable
+            checkbox-label="id"
+            @on-sort="sort"
+            @on-items-select="onItemSelect"
+            :data="tableData"
+            :header="tableHeader"
+            :checkbox-enabled="true"
+            :items-per-page="limit"
+            :items-per-page-dropdown-enabled="false"
+            :loading="loading"
+          >
+            <template v-slot:id="{ row: audit_observation }">
+              {{ audit_observation.id }}
+            </template>
+            <template v-slot:clause_number="{ row: audit_observation }">
+              <span class="badge py-3 px-4 fs-7 badge-light-primary">
+                {{ audit_observation.clause_number }}
+              </span>
+            </template>
+            <template v-slot:description="{ row: audit_observation }">
+              {{ audit_observation.description }}
+            </template>
+            <template v-slot:nc_observation="{ row: audit_observation }">
+              {{ audit_observation.nc_observation }}
+            </template>
+            <template v-slot:compilance_type="{ row: audit_observation }">
+              <span class="badge py-3 px-4 fs-7 badge-light-primary">
+                {{ audit_observation.compilance_type }}
+              </span>
+            </template>
+            <template v-slot:evidence="{ row: audit_observation }">
+              <!--begin::Menu Flex-->
+              <div class="d-flex flex-lg-row">
+                <a
+                  target="blank"
+                  v-bind:href="`http://localhost:8000/storage/company/${audit_observation.company_id}/audit_evidences/${audit_observation.evidence}`"
+                  data-toggle="tooltip"
+                  title="Download File"
+                  class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
+                  >⤓ File
+                </a>
+              </div>
+            </template>
+            <template v-slot:actions="{ row: audit_observation }">
+              <!--begin::Menu Flex-->
+              <div class="d-flex flex-lg-row">
+                <span>
+                  <i
+                    @click="deleteItem(audit_observation.id, false)"
+                    class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
+                  ></i>
+                </span>
+              </div>
+              <!--end::Menu FLex-->
+              <!--end::Menu-->
+            </template>
+          </Datatable>
+          <div class="d-flex justify-content-between p-2">
+            <div>
+              <el-select
+                class="w-100px rounded-2"
+                v-model="limit"
+                filterable
+                @change="PageLimitPoiner(limit)"
+              >
+                <el-option
+                  v-for="item in Limits"
+                  :key="item"
+                  :label="item"
+                  :value="item"
+                />
+              </el-select>
+            </div>
+            <ul class="pagination">
+              <li class="paginate_button page-item" style="cursor: auto">
+                <span @click="PrevPage" class="paginate_button page-link"
+                  ><i class="ki-duotone ki-left fs-2"><!--v-if--></i></span
+                >
+              </li>
+              <li class="paginate_button disabled">
+                <span class="paginate_button page-link">
+                  Page - {{ page }}
+                </span>
+              </li>
+              <li class="paginate_button page-item" style="cursor: pointer">
+                <span @click="NextPage" class="paginate_button page-link"
+                  ><i class="ki-duotone ki-right fs-2"><!--v-if--></i></span
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
-    
-    <script lang="ts">
+
+<script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, reactive, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { addIAuditObservation, getCompanies } from "@/stores/api";
-import { ErrorMessage, Field, Form as VForm } from "vee-validate";
+import { getIAuditObservation, getISORule } from "@/stores/api";
 import * as Yup from "yup";
 import { Identifier } from "@/core/config/WhichUserConfig";
 import { useAuthStore } from "@/stores/auth";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import IAObservationAddModal from "./ObservationCustomComponent/IAObservationAddModal.vue";
-import IAObservationEditModal from "./ObservationCustomComponent/IAObservationEditModal.vue";
 
-interface ClauseDetail {
-  clause_no: string;
-  clause_details: string;
-  nc_observation: string;
-  compilance_type: string;
-  evidence: string;
-}
-
-interface IAO {
-  auditor_name: string;
-  clause_name: string;
-  clauses: Array<ClauseDetail>;
-  company_id: string;
-  created_by: number;
-  updated_by: number;
-  is_active: number;
-}
+import {
+  getIAuditSchedule,
+  addIAuditObservation,
+  getIAuditObservations,
+  deleteIAuditObservation,
+  PlannerSearch,
+} from "@/stores/api";
+import type { IClause } from "@/core/model/audit_observation";
+import Datatable from "@/components/kt-datatable/KTDataTable.vue";
+import type { Sort } from "@/components/kt-datatable//table-partials/models";
+import arraySort from "array-sort";
 
 export default defineComponent({
   name: "auditobservation-add",
   components: {
-    ErrorMessage,
-    Field,
-    VForm,
     IAObservationAddModal,
-    IAObservationEditModal,
+    Datatable,
   },
   setup() {
-    const identifier = Identifier;
-    const loading = ref(false);
     const auth = useAuthStore();
     const router = useRouter();
     const User = auth.GetUser();
-    const Companies = ref([{ id: "", company_name: "" }]);
+    const selectedClause = ref(0);
+    const route = useRoute();
+    const itemId = route.params.id;
 
-    const auditValidator = Yup.object().shape({
-      auditor_name: Yup.string().required().label("Auditor Name"),
-      clause_name: Yup.string().required().label("Clause Name"),
+    const tableHeader = ref([
+      {
+        columnName: "Clause No.",
+        columnLabel: "clause_number",
+        sortEnabled: true,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Description",
+        columnLabel: "description",
+        sortEnabled: true,
+        columnWidth: 125,
+      },
+      {
+        columnName: "Nc Observation",
+        columnLabel: "nc_observation",
+        sortEnabled: true,
+        columnWidth: 125,
+      },
+      {
+        columnName: "Compilance Type",
+        columnLabel: "compilance_type",
+        sortEnabled: true,
+        columnWidth: 100,
+      },
+      {
+        columnName: "Download Evidence",
+        columnLabel: "evidence",
+        sortEnabled: true,
+        columnWidth: 100,
+      },
+      {
+        columnName: "Actions",
+        columnLabel: "actions",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+    ]);
+
+    const selectedIds = ref<Array<number>>([]);
+    const tableData = ref<Array<IClause>>([]);
+    const initvalues = ref<Array<IClause>>([]);
+
+    // functions
+    const Limits = ref({
+      1: 10,
+      2: 25,
+      3: 50,
     });
 
-    const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-          }))
+    const loading = ref(true);
+    // staring from 1
+    const page = ref(1);
+    const limit = ref(10);
+    // limit 10
+    const more = ref(false);
+
+    const PagePointer = async (page) => {
+      // ? Truncate the tableData
+      //console.log(limit.value);
+      loading.value = true;
+      try {
+        while (tableData.value.length != 0) tableData.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
+
+        ApiService.setHeader();
+        const response = await getIAuditObservations(
+          `page=${page}&limit=${limit.value}&itemId=${itemId}`
         );
-        console.log(Companies);
+
+        more.value = response.result.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id,
+          ...rest,
+        }));
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        ////console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
       }
     };
 
-    const auditObservationDetails = ref<IAO>({
-      auditor_name: `${User.first_name} ${User.last_name}`,
-      clause_name: "",
-      clauses: [],
+    const PageLimitPoiner = async (limit) => {
+      // ? Truncate the tableData
+      page.value = 1;
+      //console.log(page.value, limit);
+      loading.value = true;
+      try {
+        while (tableData.value.length != 0) tableData.value.pop();
+        while (initvalues.value.length != 0) initvalues.value.pop();
 
+        ApiService.setHeader();
+        const response = await getIAuditObservations(
+          `page=${page.value}&limit=${limit}&itemId=${itemId}`
+        );
+
+        more.value = response.result.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id,
+          ...rest,
+        }));
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        ////console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
+      }
+    };
+
+    //console.log(initvalues.value);
+
+    const NextPage = async () => {
+      if (more.value != false) {
+        page.value = page.value + 1;
+        await PagePointer(page.value);
+      }
+    };
+
+    const PrevPage = async () => {
+      if (page.value > 1) {
+        page.value = page.value - 1;
+        await PagePointer(page.value);
+      }
+    };
+
+    // get_compaines
+    const observation_listing = async () => {
+      try {
+        ApiService.setHeader();
+        const response = await getIAuditObservations(
+          `page=${page.value}&limit=${limit.value}&itemId=${itemId}`
+        );
+
+        more.value = response.result.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id,
+          ...rest,
+        }));
+        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        ////console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
+      }
+    };
+
+    const auditDetails = ref({
+      id: "",
+      auditor_name: "",
+      address: "",
+      meeting_place: "",
+      auditees: [],
+      audit_area: "",
+      scope: "",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
+      is_active: "1",
+    });
+
+    const clauses = reactive([]);
+
+    const clauseDetails = ref({
+      audit_schedule_id: "",
+      clause_number: "",
+      description: "",
+      nc_observation: "",
+      compilance_type: "",
+      evidence: "",
+      company_id: User.company_id,
+      created_by: User.id,
+      updated_by: User.id,
+      is_active: "1",
+    });
+
+    const ISO = ref({
+      id: "",
+      clauses: [],
+      company_id: User.company_id,
       is_active: 1,
     });
 
     onMounted(async () => {
-      Companies.value.pop();
-      if (User.role_id === 1) {
-        await getdropcomp();
+      try {
+        let response = await getIAuditSchedule(itemId.toString());
+        console.log(response);
+        auditDetails.value = {
+          id: response.id,
+          auditor_name: response.auditor_name,
+          address: response.address,
+          meeting_place: response.meeting_place,
+          auditees: JSON.parse(response.auditees),
+          audit_area: response.audit_area,
+          scope: response.scope,
+
+          company_id: response.company_id ? response.company_id : "",
+          created_by: response.created_by,
+          updated_by: response.updated_by,
+          is_active: response.is_active,
+        };
+        clauseDetails.value.audit_schedule_id = response.id;
+      } catch (error) {
+        // Handle errors, e.g., show an error message
+        console.error("Error fetching leads data:", error);
+      }
+
+      try {
+        let response = await getISORule(1);
+        console.log(response);
+        ISO.value = {
+          id: response.id,
+          clauses: JSON.parse(response.clauses),
+          company_id: response.company_id ? response.company_id : "",
+          is_active: response.is_active,
+        };
+
+        Object.assign(clauses, ISO.value.clauses);
+      } catch (error) {
+        console.log(error);
+        showErrorAlert("Error", "An error occurred during the API call.");
+        loading.value = false;
+      }
+
+      try {
+        await observation_listing();
+        setTimeout(() => {
+          loading.value = false;
+        }, 250);
+      } catch (error) {
+        // Handle errors, e.g., show an error message
+        console.error("Error fetching leads data:", error);
       }
     });
 
-    async function addClauseData(data) {
-      await auditObservationDetails.value.clauses.push(data);
-    }
-
-    async function editClauseData(index, data) {
-        auditObservationDetails.value.clauses.push[index] = await data;
-    }
-
-    function areAllPropertiesNull(array) {
-      return array.some((detail) => {
-        const { auditor_name, clause_name, clauses } = detail;
-
-        // Check if any property is null or empty
-
-        return (
-          auditor_name === "" || clause_name === "" || clauses.length === 0
-        );
-      });
-    }
-
-    function isClauseDataNull(array) {
-      return array.some((detail) => {
-        const {
-          clause_no,
-          clause_details,
-          nc_observation,
-          compilance_type,
-          evidence,
-        } = detail;
-
-        // Check if any property is null or empty
-
-        return (
-          clause_no === "" ||
-          clause_details === "" ||
-          nc_observation === "" ||
-          compilance_type === "" ||
-          evidence === ""
-        );
-      });
-    }
-
-    const removeObjectWithId = (arr, id) => {
-      if (id !== -1) {
-        arr.splice(id, 1);
-      }
-
-      return arr;
+    // Function to handle tab click
+    const selectClause = (index) => {
+      console.log(index);
+      selectedClause.value = index;
     };
 
-    async function deleteClauseData(index) {
-      //zero represent the testID
-      auditObservationDetails.value.clauses = await removeObjectWithId(
-        auditObservationDetails.value.clauses,
-        index
-      );
-    }
+    // Function to add NC
+    const addNC = (clause) => {
+      clauseDetails.value = {
+        audit_schedule_id: clauseDetails.value.audit_schedule_id,
+        clause_number: clause.clause_number,
+        description: clause.description,
+        nc_observation: "",
+        compilance_type: "",
+        evidence: "",
+        company_id: User.company_id,
+        created_by: User.id,
+        updated_by: User.id,
+        is_active: "1",
+      };
+      console.log("Clause Details are:", clauseDetails.value);
+    };
 
-    const submit = async () => {
-      loading.value = true;
-
-      const result = areAllPropertiesNull([auditObservationDetails.value]);
-
-      if (result) {
-        showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-        loading.value = false;
-        return;
-      }
-
-      if (auditObservationDetails.value.clauses.length === 0) {
-        showErrorAlert(
-          "Warning",
-          "At least one clause is required, please fill the clause details."
-        );
-        loading.value = false;
-        return;
-      }
-
-      const clause = isClauseDataNull([auditObservationDetails.value.clauses]);
-
-      if (clause) {
-        showErrorAlert(
-          "Warning",
-          "Please Fill the required details for Clauses "
-        );
-        loading.value = false;
-        return;
-      }
-
-      //   console.warn("Nice");
-      try {
-        // Call your API here with the form values
-        const response = await addIAuditObservation(auditObservationDetails.value);
-        // console.log(response.error);
-        if (!response.error) {
-          // Handle successful API response
-          //   console.log("API response:", response);
-          showSuccessAlert(
-            "Success",
-            "Internal Audit Observation has been successfully inserted!"
-          );
-
-          clear();
-          router.push({ name: "auditobservations-list" });
-        } else {
-          // Handle API error response
-          //   console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+    // Table Data
+    const deleteItem = async (id: number, mul: boolean) => {
+      if (!mul) {
+        for (let i = 0; i < tableData.value.length; i++) {
+          if (tableData.value[i].id === id) {
+            Swal.fire({
+              title: "Are you sure?",
+              text: "You will not be able to recover from this !",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "red",
+              confirmButtonText: "Yes, I am sure!",
+            }).then((result: { [x: string]: any }) => {
+              if (result["isConfirmed"]) {
+                // Put your function here
+                deleteIAuditObservation(id);
+                tableData.value.splice(i, 1);
+                observation_listing();
+              }
+            });
+          }
         }
-      } catch (error) {
-        // Handle any other errors during API call
-        // console.error("API call error:", error);
-        showErrorAlert("Error", "An error occurred during the API call.");
-      } finally {
-        loading.value = false;
+      } else {
+        for (let i = 0; i < tableData.value.length; i++) {
+          if (tableData.value[i].id === id) {
+            // Put your function here
+            deleteIAuditObservation(id);
+            tableData.value.splice(i, 1);
+          }
+        }
       }
+    };
+
+    const deleteFewItem = () => {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will not be able to recover from this !",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "red",
+        confirmButtonText: "Yes, I am sure!",
+        cancelButtonText: "No, cancel it!",
+      }).then((result: { [x: string]: any }) => {
+        if (result["isConfirmed"]) {
+          // Put your function here
+          selectedIds.value.forEach((item) => {
+            deleteItem(item, true);
+          });
+          selectedIds.value.length = 0;
+          observation_listing();
+        }
+      });
+    };
+
+    const sort = (sort: Sort) => {
+      const reverse: boolean = sort.order === "asc";
+      if (sort.label) {
+        arraySort(tableData.value, sort.label, { reverse });
+      }
+    };
+    const onItemSelect = (selectedItems: Array<number>) => {
+      selectedIds.value = selectedItems;
     };
 
     const showSuccessAlert = (title, message) => {
@@ -500,73 +882,52 @@ export default defineComponent({
       });
     };
 
-    const clear = () => {
-      auditObservationDetails.value = {
-        auditor_name: "",
-        clause_name: "",
-        clauses: [],
-        company_id: User.company_id,
-        created_by: User.id,
-        updated_by: User.id,
-        is_active: 1,
-      };
-    };
+    async function reLoadData() {
+      await observation_listing();
+    }
+
     return {
-      auditObservationDetails,
-      auditValidator,
-      getAssetPath,
-      submit,
+      clauses,
+      selectedClause,
+      selectClause,
+      addNC,
+      auditDetails,
+      clauseDetails,
       loading,
-      identifier,
-      Companies,
-      //   handleFileChange,
-      addClauseData,
-      editClauseData,
-      deleteClauseData,
-      User,
-      clear,
+      reLoadData,
+      tableData,
+      tableHeader,
+      deleteItem,
+      selectedIds,
+      deleteFewItem,
+      sort,
+      onItemSelect,
+      NextPage,
+      PrevPage,
+      page,
+      limit,
+      PageLimitPoiner,
+      Limits,
+      itemId,
     };
   },
 });
 </script>
-  
-  <style>
-.el-input__inner,
-.el-select__inner {
-  font-weight: 500;
-}
-.el-input__wrapper,
-.el-select__wrapper {
-  min-height: 3.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--bs-gray-100);
-  border-color: var(--bs-gray-100);
-  color: var(--bs-gray-700);
-  transition: color 0.2s ease;
-  appearance: none;
-  line-height: 1.5;
-  border: none !important;
-  padding-top: 0.825rem;
-  padding-bottom: 0.825rem;
-  padding-left: 1.5rem;
-  font-size: 1.15rem;
-  border-radius: 0.625rem;
-  box-shadow: none !important;
+
+<style>
+.tab-item {
+  cursor: pointer;
 }
 
-.trainer-container {
-  display: flex;
-  align-items: center;
-  margin-right: 10px; /* Adjust as needed */
-  background-color: #000; /* Optional background color for each trainer container */
-  padding: 5px 10px; /* Optional padding */
-  border-radius: 5px; /* Optional border radius */
+.tab-item:hover {
+  background-color: blue;
+  color: #fff;
+  cursor: pointer;
 }
-.tagify-remove {
-  margin-left: 5px; /* Optional margin between the name and the 'X' button */
-}
-.override-styles {
-  z-index: 99999 !important;
-  pointer-events: initial;
+
+.active-tab {
+  background-color: blue;
+  color: #fff;
 }
 </style>
+

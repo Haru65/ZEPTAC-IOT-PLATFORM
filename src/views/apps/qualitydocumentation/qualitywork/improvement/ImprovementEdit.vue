@@ -8,226 +8,132 @@
         <VForm
           id="kt_account_profile_details_form"
           class="form"
-          :validation-schema="improvementValidator"
+          :validation-schema="itemDetailsValidator"
         >
           <!--begin::Card body-->
           <div class="card-body border-top p-sd-2 p-lg-9">
             <div class="row mb-6">
-                <!--begin::Col-->
-                <div class="col-md-12 fv-row">
+                <div class="col-md-12 fv-row mb-8 mb-sd-8">
                   <!--begin::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                    >Areas To Be Improved</label
+                  <label class="required fs-5 fw-bold text-gray-700 mb-2"
+                    >Area of Improvement</label
                   >
                   <!--end::Label-->
 
                   <!--begin::Input-->
-                  <Field
-                    type="text"
-                    as="textarea"
-                    rows="5"
-                    v-model="improvementDetails.areas_to_improve"
-                    name="areas_to_improve"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Specify areas to be improved..."
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="areas_to_improve" />
-                    </div>
-                  </div>
-                  <!--end::Input-->
-                </div>
-                <!--end::Col-->
-              </div>
-
-              <div class="row mb-6">
-                <!--begin::Col-->
-                <div class="col-md-12 fv-row">
-                  <!--begin::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                    >Action To Be Taken</label
-                  >
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <Field
-                    type="text"
-                    as="textarea"
-                    rows="5"
-                    v-model="improvementDetails.action_taken"
-                    name="action_taken"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Specify action to be taken..."
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="action_taken" />
-                    </div>
-                  </div>
-                  <!--end::Input-->
-                </div>
-                <!--end::Col-->
-              </div>
-
-              <div class="row mb-6">
-                <!--begin::Col-->
-                <div class="col-md-12 fv-row">
-                  <!--begin::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                    >TimeFrame</label
-                  >
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <Field
-                    type="text"
-                    v-model="improvementDetails.timeframe"
-                    name="timeframe"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Timeframe for improvement..."
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="timeframe" />
-                    </div>
-                  </div>
-                  <!--end::Input-->
-                </div>
-                <!--end::Col-->
-              </div>
-
-              <!--begin::Input group-->
-              <div class="row mb-6">
-                <!--begin::Col-->
-                <div class="col-md-12 fv-row">
-                  <!--begin::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                    >Resources Required</label
-                  >
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <Field
-                    type="text"
-                    as="textarea"
-                    rows="5"
-                    v-model="improvementDetails.resources_required"
-                    name="resources_required"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Specify resources required..."
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="resources_required" />
-                    </div>
-                  </div>
-                  <!--end::Input-->
-                </div>
-                <!--end::Col-->
-              </div>
-              <!--end::Input group-->
-              <!--begin::Input group-->
-              <div class="row mb-6">
-                <!--begin::Col-->
-                <div class="col-md-12 fv-row">
-                  <!--begin::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                    >Evidence of Improvement Indicator Control</label
-                  >
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <Field
-                    type="text"
-                    as="textarea"
-                    rows="5"
-                    v-model="improvementDetails.evidence_indicator"
-                    name="evidence_indicator"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Specify Evidence of Improvement Indicator Control..."
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="evidence_indicator" />
-                    </div>
-                  </div>
-                  <!--end::Input-->
-                </div>
-                <!--end::Col-->
-              </div>
-              <!--end::Input group-->
-              <!--begin::Input group-->
-              <div class="row mb-6">
-                <!--begin::Col-->
-                <div class="col-md-12 fv-row">
-                  <!--begin::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                    >Responsible Person</label
-                  >
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <Field
-                    type="text"
-                    v-model="improvementDetails.responsible_person"
-                    name="responsible_person"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Enter responsible person name..."
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="responsible_person" />
-                    </div>
-                  </div>
-                  <!--end::Input-->
-                </div>
-                <!--end::Col-->
-              </div>
-              <!--end::Input group-->
-              
-              <div class="row mb-6">
-                <div class="form-group col-md-6 mb-8 mb-sd-8">
-                  <label
-                    class="btn btn-outline btn-outline-dashed btn-outline-default p-5 d-flex align-items-center"
-                  >
-                    <!--begin::Info-->
-                    <span class="d-block fw-semobold text-start">
-                      <span class="text-dark fw-bold d-block fs-4 mb-2"
-                        >Progress Achieved</span
-                      >
-                      <input
-                        type="radio"
-                        class="btn-check"
-                        name="progress_achieved"
-                        id="yes"
-                        value="yes"
-                        v-model="improvementDetails.progress_achieved"
-                        autocomplete="off"
+                  <div>
+                    <el-select
+                      v-model="itemDetails.area"
+                      filterable
+                      name="area"
+                      @change="setTarget($event)"
+                      placeholder="--Select--"
+                    >
+                      <el-option
+                        v-for="item in AreaOfImprovement"
+                        :key="item.id"
+                        :label="item.area"
+                        :value="item.id"
                       />
-                      <label class="btn btn-outline-primary" for="yes"
-                        >Yes</label
-                      >
-                      <input
-                        type="radio"
-                        class="btn-check"
-                        name="progress_achieved"
-                        id="no"
-                        v-model="improvementDetails.progress_achieved"
-                        value="no"
-                        autocomplete="off"
-                      />
-                      <label class="btn btn-outline-primary" for="no">No</label>
-                    </span>
-                    <!--end::Info-->
-                  </label>
+                    </el-select>
+                  </div>
+                  <!--end::Col-->
+                  <div
+                    class="fv-plugins-message-container mt-3"
+                    v-if="!itemDetails.area"
+                  >
+                    <div class="fv-help-block">
+                      <ErrorMessage name="area" />
+                    </div>
+                  </div>
                 </div>
+              </div>
+
+              <div class="row mb-6">
+                <!--begin::Col-->
+                <div class="col-md-12 fv-row">
+                  <!--begin::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Target Rating</label
+                  >
+                  <!--end::Label-->
+
+                  <!--begin::Input-->
+                  <div class="form-control form-control-lg form-control-solid">
+                    {{ itemDetails.target }}
+                  </div>
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+              </div>
+
+              <div class="row mb-6">
+                <!--begin::Col-->
+                <div class="col-md-12 fv-row">
+                  <!--begin::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Select Quarter</label
+                  >
+                  <!--end::Label-->
+
+                  <div>
+                    <el-select
+                      v-model="itemDetails.quarter"
+                      filterable
+                      name="quarter"
+                      placeholder="--Select--"
+                    >
+                      <el-option
+                        v-for="item in Quarters"
+                        :key="item.quarter"
+                        :label="item.quarter"
+                        :value="item.quarter"
+                      />
+                    </el-select>
+                  </div>
+                  <!--end::Col-->
+                  <div
+                    class="fv-plugins-message-container mt-3"
+                    v-if="!itemDetails.quarter"
+                  >
+                    <div class="fv-help-block">
+                      <ErrorMessage name="quarter" />
+                    </div>
+                  </div>
+                </div>
+                <!--end::Col-->
+              </div>
+
+              <div class="row mb-6">
+                <!--begin::Col-->
+                <div class="col-md-12 fv-row">
+                  <!--begin::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >OutCome of Improvement</label
+                  >
+                  <!--end::Label-->
+
+                  <!--begin::Input-->
+                  <Field
+                    type="text"
+                    as="textarea"
+                    rows="3"
+                    v-model="itemDetails.outcome"
+                    name="outcome"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Specify the outcome achieved..."
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="outcome" />
+                    </div>
+                  </div>
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
               </div>
           </div>
 
@@ -260,7 +166,7 @@
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { getImprovementAction, updateImprovementAction } from "@/stores/api";
+import { getImprovementPlan, updateImprovementPlan } from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import { Identifier } from "@/core/config/WhichUserConfig";
@@ -268,15 +174,13 @@ import { useAuthStore } from "@/stores/auth";
 import { useRouter, useRoute } from "vue-router";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
+import { AreaOfImprovement, GetAreaTarget, Quarters } from "@/core/model/improvement";
 
-interface IMPROVEMENT_PLAN {
-  areas_to_improve: string;
-  action_taken: string;
-  timeframe: string;
-  resources_required: string;
-  evidence_indicator: string;
-  responsible_person: string;
-  progress_achieved: string;
+interface Item {
+  area: string;
+  target: string;
+  outcome: string;
+  quarter: string;
   company_id: string;
   created_by: string;
   updated_by: string;
@@ -298,40 +202,35 @@ export default defineComponent({
     const User = auth.GetUser();
     const itemId = route.params.id;
 
-    const improvementDetails = ref<IMPROVEMENT_PLAN>({
-      areas_to_improve: "",
-      action_taken: "",
-      timeframe: "",
-      resources_required: "",
-      evidence_indicator: "",
-      responsible_person: "",
-      progress_achieved: "yes",
+    const itemDetails = ref<Item>({
+      area: "",
+      target: "",
+      outcome: "",
+      quarter: "",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
       is_active: "1",
     });
 
-    const improvementValidator = Yup.object().shape({
-      areas_to_improve: Yup.string().required().label("Areas to improve"),
-      action_taken: Yup.string().required().label("Action to be taken"),
-      timeframe: Yup.string().required().label("TimeFrame for improvement"),
-      resources_required: Yup.string().required().label("Resources"),
-      evidence_indicator: Yup.string().required().label("Evidence Indicator"),
-      responsible_person: Yup.string().required().label("Responsible Person Name"),
+    const itemDetailsValidator = Yup.object().shape({
+      outcome: Yup.string().required().label("OutCome"),
     });
 
+    async function setTarget(id) {
+      if(id !== ""){
+        itemDetails.value.target = await GetAreaTarget(id);
+      }
+    }
+
     onMounted(async () => {
-      let response = await getImprovementAction(itemId.toString());
+      let response = await getImprovementPlan(itemId.toString());
       console.log(response);
-      improvementDetails.value = {
-        areas_to_improve: response.areas_to_improve,
-        action_taken: response.action_taken,
-        timeframe: response.timeframe,
-        resources_required: response.resources_required,
-        evidence_indicator: response.evidence_indicator,
-        responsible_person: response.responsible_person,
-        progress_achieved: response.progress_achieved,
+      itemDetails.value = {
+        area: response.area,
+        target: response.target,
+        outcome: response.outcome,
+        quarter: response.quarter,
         company_id: response.company_id ? response.company_id : "",
         created_by: response.created_by,
         updated_by: response.updated_by,
@@ -341,39 +240,23 @@ export default defineComponent({
 
     function areAllPropertiesNull(array) {
       return array.some((detail) => {
-        const {
-          areas_to_improve,
-          action_taken,
-          timeframe,
-          resources_required,
-          evidence_indicator,
-          responsible_person,
-          progress_achieved,
-        } = detail;
+        const { area, target, outcome, quarter } = detail;
 
         // Check if any property is null or empty
 
-        return (
-          areas_to_improve === "" ||
-          action_taken === "" ||
-          timeframe === "" ||
-          resources_required === "" ||
-          evidence_indicator === "" ||
-          responsible_person === "" ||
-          progress_achieved === ""
-        );
+        return area === "" || target === "" || outcome === "" || quarter === "";
       });
     }
 
     const submit = async () => {
       try {
         loading.value = true;
-        console.log(improvementDetails.value);
+        console.log(itemDetails.value);
 
-        const result = areAllPropertiesNull([improvementDetails.value]);
+        const result = areAllPropertiesNull([itemDetails.value]);
 
         if (!result) {
-          const response = await updateImprovementAction(itemId, improvementDetails.value);
+          const response = await updateImprovementPlan(itemId, itemDetails.value);
           // console.log(response.error);
           if (!response.error) {
             // Handle successful API response
@@ -430,11 +313,14 @@ export default defineComponent({
       });
     };
     return {
-      improvementDetails,
-      improvementValidator,
+      itemDetails,
+      itemDetailsValidator,
       getAssetPath,
       submit,
       loading,
+      AreaOfImprovement,
+      Quarters,
+      setTarget,
     };
   },
 });

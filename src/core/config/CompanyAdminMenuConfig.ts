@@ -138,6 +138,60 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
     ],
   },
   {
+    heading: "Quality Assurance",
+    route: "/",
+    pages: [
+      {
+        sectionTitle: "Method Validation",
+        route: "/method_validation",
+        keenthemesIcon: "wrench",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add Method Validation",
+            route: "/method_validation/add",
+          },
+          {
+            heading: "List Method Validation",
+            route: "/method_validation/list",
+          },
+        ],
+      },
+      {
+        sectionTitle: "InterLaboratory",
+        route: "/interlaboratory",
+        keenthemesIcon: "office-bag",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add InterLaboratory",
+            route: "/interlaboratory/add",
+          },
+          {
+            heading: "List InterLaboratory",
+            route: "/interlaboratory/list",
+          },
+        ],
+      },
+      {
+        sectionTitle: "Replicate Report",
+        route: "/replicate_report",
+        keenthemesIcon: "office-bag",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Add Replicate Report",
+            route: "/replicate_report/add",
+          },
+          {
+            heading: "List Replicate Report",
+            route: "/replicate_report/list",
+          },
+        ],
+      },
+    ],
+  },
+  {
     heading: "Quality Documentation",
     route: "/qualitydocumentation",
     pages: [
@@ -164,6 +218,10 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
             route: "/risks",
           },
           {
+            heading: "Document Change",
+            route: "/document_change_request",
+          },
+          {
             heading: "Improvement Plan",
             route: "/improvements",
           },
@@ -178,6 +236,27 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
           {
             heading: "Internal Audit Observation",
             route: "/auditobservations",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    heading: "Instrument Management",
+    pages: [
+      {
+        sectionTitle: "Instrument Management",
+        keenthemesIcon: "document",
+        route: "/",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Intermediate Check Records",
+            route: "/intermediate_check_records",
+          },
+          {
+            heading: "Inspection Records",
+            route: "/inspection_records",
           },
         ],
       },
@@ -217,6 +296,18 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
             route: "/records",
           },
         ],
+      },
+    ],
+  },
+  {
+    heading: "Suppliers",
+    route: "/",
+    pages: [
+      {
+        heading: "Suppliers",
+        route: "/suppliers",
+        keenthemesIcon: "educare",
+        bootstrapIcon: "bi-archive",
       },
     ],
   },

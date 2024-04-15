@@ -14,7 +14,7 @@
             v-model="search"
             @input="searchItems()"
             class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search by Entity"
+            placeholder="Search by description"
           />
         </div>
         <!--end::Search-->
@@ -40,17 +40,11 @@
           </button>
           <!--end::Export-->
           <!--begin::Add customer-->
-          <button
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#kt_modal_ncr"
-          >
+          <router-link to="/risks/add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Risk
-          </button>
+            Risk Register
+          </router-link>
           <!--end::Add customer-->
-
-          <RiskModal @risk-added="reLoadData"></RiskModal>
         </div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->
@@ -103,72 +97,59 @@
         :items-per-page-dropdown-enabled="false"
         :loading="loading"
       >
-        <!-- img data -->
-
         <template v-slot:id="{ row: risk }">
           {{ risk.id }}
         </template>
-        <template v-slot:entity="{ row: risk }">
-          {{ risk.entity }}
+        <template v-slot:r_description="{ row: risk }">
+          {{ risk.risk_identification.description }}
         </template>
-        <template v-slot:threats="{ row: risk }">
-          {{
-            risk.threats.length > 20
-              ? risk.threats.substring(0, 20) + "..."
-              : risk.threats
-          }}
+        <template v-slot:r_cause="{ row: risk }">
+          {{ risk.risk_identification.cause }}
         </template>
-        <template v-slot:impacts="{ row: risk }">
-          {{
-            risk.impacts.length > 20
-              ? risk.impacts.substring(0, 20) + "..."
-              : risk.impacts
-          }}
+        <template v-slot:r_effect="{ row: risk }">
+          {{ risk.risk_identification.effect }}
         </template>
-        <template v-slot:present_control="{ row: risk }">
-          {{
-            risk.present_control.length > 20
-              ? risk.present_control.substring(0, 20) + "..."
-              : risk.present_control
-          }}
+        <template v-slot:e_probability="{ row: risk }">
+          {{ risk.risk_evaluation.probability }}
         </template>
-        <template v-slot:control_adequacy="{ row: risk }">
-          <span
-            v-if="risk.control_adequacy == 'yes'"
-            class="badge py-3 px-4 fs-7 badge-light-success"
-            >Yes</span
-          >
-          <span
-            v-if="risk.control_adequacy == 'no'"
-            class="badge py-3 px-4 fs-7 badge-light-danger"
-            >No</span
-          >
+        <template v-slot:e_severity="{ row: risk }">
+          {{ risk.risk_evaluation.severity }}
+        </template>
+        <template v-slot:e_risk_mode="{ row: risk }">
+          {{ risk.risk_evaluation.risk_mode }}
+        </template>
+        <template v-slot:c_controls="{ row: risk }">
+          {{ risk.risk_counter.controls }}
+        </template>
+        <template v-slot:c_probability="{ row: risk }">
+          {{ risk.risk_counter.probability }}
+        </template>
+        <template v-slot:c_severity="{ row: risk }">
+          {{ risk.risk_counter.severity }}
+        </template>
+        <template v-slot:c_risk_mode="{ row: risk }">
+          {{ risk.risk_counter.risk_mode }}
         </template>
 
-        <template v-slot:review_date="{ row: risk }">
-          <span
-            class="badge py-3 px-4 fs-7 badge-light-primary"
-            >{{ risk.review_date }}</span
-          >
-        </template>
-        <template v-slot:additional_control="{ row: risk }">
-          {{
-            risk.additional_control.length > 20
-              ? risk.additional_control.substring(0, 20) + "..."
-              : risk.additional_control
-          }}
-        </template>
         <template v-slot:actions="{ row: risk }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
+            <span
+              class="menu-link px-3"
+              data-toggle="tooltip"
+              title="View Risk Register"
+            >
               <router-link :to="`/risks/edit/${risk.id}`">
                 <i
                   class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
                 ></i>
               </router-link>
             </span>
-            <span class="menu-link px-3">
+            <span
+              class="menu-link px-3"
+              data-toggle="tooltip"
+              title="Delete Risk Register"
+            >
               <i
                 @click="deleteItem(risk.id, false)"
                 class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
@@ -214,8 +195,8 @@
     </div>
   </div>
 </template>
-    
-    <script lang="ts">
+  
+  <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
@@ -228,60 +209,77 @@ import {
 import arraySort from "array-sort";
 import moment from "moment";
 import Swal from "sweetalert2";
-import RiskModal from "./RiskModal.vue";
+import { getAssetPath } from "@/core/helpers/assets";
 
 export default defineComponent({
-  name: "risks-list",
+  name: "risk-list",
   components: {
     Datatable,
-    RiskModal,
   },
   setup() {
     const tableHeader = ref([
       {
-        columnName: "Entity",
-        columnLabel: "entity",
+        columnName: "Description",
+        columnLabel: "r_description",
         sortEnabled: true,
         columnWidth: 100,
       },
       {
-        columnName: "Threats",
-        columnLabel: "threats",
+        columnName: "Cause",
+        columnLabel: "r_cause",
         sortEnabled: true,
         columnWidth: 100,
       },
       {
-        columnName: "Impacts",
-        columnLabel: "impacts",
+        columnName: "Effect",
+        columnLabel: "r_effect",
         sortEnabled: true,
         columnWidth: 100,
       },
       {
-        columnName: "Present Control",
-        columnLabel: "present_control",
+        columnName: "Probability",
+        columnLabel: "e_probability",
         sortEnabled: true,
         columnWidth: 100,
       },
       {
-        columnName: "Control Adequacy",
-        columnLabel: "control_adequacy",
+        columnName: "Severity",
+        columnLabel: "e_severity",
         sortEnabled: true,
         columnWidth: 100,
       },
       {
-        columnName: "Review Date",
-        columnLabel: "review_date",
-        sortEnabled: true,
-        columnWidth: 75,
-      },
-      {
-        columnName: "Additonal Control",
-        columnLabel: "additional_control",
+        columnName: "Risk Mode",
+        columnLabel: "e_risk_mode",
         sortEnabled: true,
         columnWidth: 100,
       },
       {
-        columnName: "Actions",
+        columnName: "Controls",
+        columnLabel: "c_controls",
+        sortEnabled: true,
+        columnWidth: 100,
+      },
+      {
+        columnName: "Probability",
+        columnLabel: "c_probability",
+        sortEnabled: true,
+        columnWidth: 100,
+      },
+      {
+        columnName: "Severity",
+        columnLabel: "c_severity",
+        sortEnabled: true,
+        columnWidth: 100,
+      },
+      {
+        columnName: "Risk Mode",
+        columnLabel: "c_risk_mode",
+        sortEnabled: true,
+        columnWidth: 100,
+      },
+      {
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,
@@ -315,10 +313,21 @@ export default defineComponent({
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id,
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({
+            id,
+            risk_identification,
+            risk_evaluation,
+            risk_counter,
+            ...rest
+          }) => ({
+            id: id,
+            risk_identification: JSON.parse(risk_identification),
+            risk_evaluation: JSON.parse(risk_evaluation),
+            risk_counter: JSON.parse(risk_counter),
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -333,7 +342,6 @@ export default defineComponent({
     const PageLimitPoiner = async (limit) => {
       // ? Truncate the tableData
       page.value = 1;
-      //console.log(page.value, limit);
       loading.value = true;
       try {
         while (tableData.value.length != 0) tableData.value.pop();
@@ -344,10 +352,21 @@ export default defineComponent({
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id,
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({
+            id,
+            risk_identification,
+            risk_evaluation,
+            risk_counter,
+            ...rest
+          }) => ({
+            id: id,
+            risk_identification: JSON.parse(risk_identification),
+            risk_evaluation: JSON.parse(risk_evaluation),
+            risk_counter: JSON.parse(risk_counter),
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -382,15 +401,26 @@ export default defineComponent({
 
     const initvalues = ref<Array<IRisk>>([]);
 
-    async function risk_listing(): Promise<void> {
+    async function replicate_report_listing(): Promise<void> {
       try {
         const response = await getRiskRegisters(
           `page=${page.value}&limit=${limit.value}`
         );
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id,
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({
+            id,
+            risk_identification,
+            risk_evaluation,
+            risk_counter,
+            ...rest
+          }) => ({
+            id: id,
+            risk_identification: JSON.parse(risk_identification),
+            risk_evaluation: JSON.parse(risk_evaluation),
+            risk_counter: JSON.parse(risk_counter),
+            ...rest,
+          })
+        );
 
         more.value = response.result.next_page_url != null ? true : false;
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -405,7 +435,7 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      await risk_listing();
+      await replicate_report_listing();
     });
 
     const deleteFewItem = () => {
@@ -485,7 +515,7 @@ export default defineComponent({
         page.value = 1;
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
-        await risk_listing();
+        await replicate_report_listing();
       }
     };
 
@@ -494,10 +524,22 @@ export default defineComponent({
       try {
         const response = await RiskRegisterSearch(search.value);
 
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id,
-          ...rest,
-        }));
+        more.value = response.result.next_page_url != null ? true : false;
+        tableData.value = response.result.data.map(
+          ({
+            id,
+            risk_identification,
+            risk_evaluation,
+            risk_counter,
+            ...rest
+          }) => ({
+            id: id,
+            risk_identification: JSON.parse(risk_identification),
+            risk_evaluation: JSON.parse(risk_evaluation),
+            risk_counter: JSON.parse(risk_counter),
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -535,14 +577,9 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-    async function reLoadData() {
-      await risk_listing();
-    }
-
     return {
       tableData,
       tableHeader,
-      reLoadData,
       deleteItem,
       search,
       searchItems,
@@ -561,5 +598,5 @@ export default defineComponent({
   },
 });
 </script>
-    
-    
+  
+  

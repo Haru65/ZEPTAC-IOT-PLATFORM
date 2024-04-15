@@ -884,7 +884,7 @@
     </div>
 
     <!--begin::Notifications-->
-    <div class="card mb-5 mb-xl-10">
+    <div class="card mb-5 mb-xl-10 p-6 pb-12">
       <!--begin::Card header-->
       <div
         class="card-header border-0 cursor-pointer"

@@ -23,7 +23,7 @@
             <!--begin::Modal header-->
             <div class="modal-header" id="kt_modal_new_address_header">
               <!--begin::Modal title-->
-              <h2>Add QMS Procedure</h2>
+              <h2>Add Forms & Formats Procedure</h2>
               <!--end::Modal title-->
   
               <!--begin::Close-->

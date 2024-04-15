@@ -61,17 +61,8 @@
                     >Clause No.</label
                   >
                   <!--end::Label-->
-                  <Field
-                    type="text"
-                    name="clause_no"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Enter clause no."
-                    v-model="clauseDetails.clause_no"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="clause_no" />
-                    </div>
+                  <div class="form-control form-control-lg form-control-solid">
+                    {{ clauseDetails.clause_number }}
                   </div>
                 </div>
                 <!--end::Col-->
@@ -85,19 +76,8 @@
                     class="col-lg-4 col-form-label required fw-semobold fs-6 fw-bold text-gray-700 text-nowrap"
                     >Clause Details</label
                   >
-                  <Field
-                    type="text"
-                    as="textarea"
-                    name="clause_details"
-                    rows="5"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Enter clause details..."
-                    v-model="clauseDetails.clause_details"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="clause_details" />
-                    </div>
+                  <div class="form-control form-control-lg form-control-solid">
+                    {{ clauseDetails.description }}
                   </div>
                 </div>
               </div>
@@ -134,39 +114,37 @@
                     class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
                     >Compilance Type
                   </label>
-                  <div>
-                    <el-select
-                      filterable
-                      name="compilance_type"
-                      placeholder="Please Select Type"
-                      v-model="clauseDetails.compilance_type"
-                    >
-                      <el-option
-                        value=""
-                        disabled="disabled"
-                        label="Please Select Type"
-                        key=""
-                      >
-                        Please Select Instrument</el-option
-                      >
-                      <el-option
-                        id="compilance"
+                  <div class="input-group gap-6">
+                    <div class="form-check form-check-inline">
+                      <input
+                        class="form-check-input"
+                        type="radio"
                         value="compilance"
-                        label="Compilance"
+                        v-model="clauseDetails.compilance_type"
+                        id="compilance"
+                        name="compilance"
                       />
-                      <el-option
-                        id="non_compilance"
+                      <label
+                        for="compilance"
+                        class="form-check-label fw-bold text-gray-700 text-nowrap"
+                        >Compilance</label
+                      >
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                      <input
+                        class="form-check-input"
+                        type="radio"
                         value="non_compilance"
-                        label="Non-Compilance"
+                        v-model="clauseDetails.compilance_type"
+                        id="non_compilance"
+                        name="non_compilance"
                       />
-                    </el-select>
-                    <div class="fv-plugins-message-container">
-                      <div class="fv-help-block">
-                        <ErrorMessage
-                          class="invalid-feedback"
-                          name="compilance_type"
-                        />
-                      </div>
+                      <label
+                        for="non_compilance"
+                        class="form-check-label fw-bold text-gray-700 text-nowrap"
+                        >Non Compilance</label
+                      >
                     </div>
                   </div>
                 </div>
@@ -238,11 +216,12 @@
             <button
               ref="submitButtonRef"
               type="submit"
+              :data-kt-indicator="dataLoading ? 'on' : ''"
               id="kt_modal_new_address_submit"
-              class="btn btn-primary"
+              class="btn btn-primary px-6"
             >
-              <span class="indicator-label"> Submit </span>
-              <span class="indicator-progress">
+              <span v-if="!dataLoading" class="indicator-label"> Submit</span>
+              <span v-if="dataLoading" class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
@@ -261,22 +240,16 @@
 </template>
     
     <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import { hideModal } from "@/core/helpers/dom";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import moment from "moment";
+import { addIAuditObservation } from "@/stores/api";
+import Loading from "@/components/kt-datatable/table-partials/Loading.vue";
 
 interface NewAddressData {}
-
-interface ClauseDetail {
-  clause_no: string;
-  clause_details: string;
-  nc_observation: string;
-  compilance_type: string;
-  evidence: string;
-}
 
 export default defineComponent({
   name: "new-address-modal",
@@ -287,7 +260,7 @@ export default defineComponent({
   },
 
   emits: ["addData"],
-  props: [],
+  props: ["data"],
 
   setup(props, { emit }) {
     const submitButtonRef = ref<null | HTMLButtonElement>(null);
@@ -296,14 +269,30 @@ export default defineComponent({
     const validationSchema = Yup.object().shape({});
 
     const clauseDetails = ref({
-      clause_no: "",
-      clause_details: "",
+      audit_schedule_id: "",
+      clause_number: "",
+      description: "",
       nc_observation: "",
       compilance_type: "",
       evidence: "",
+      company_id: "",
+      created_by: "",
+      updated_by: "",
+      is_active: "1",
+    });
+
+    onMounted(async () => {
+      // Watch for changes in props.data and update clauseDetails accordingly
+      watch(
+        () => props.data,
+        (newValue) => {
+          clauseDetails.value = { ...newValue };
+        }
+      );
     });
 
     const isPdfInvalid = ref(false);
+    const dataLoading = ref(false);
 
     const handleFileChange = (event) => {
       // Get the selected file
@@ -351,35 +340,78 @@ export default defineComponent({
       console.log(clauseDetails.value);
     };
 
-    function areAllPropertiesNull(array) {
-      return array.some((detail) => {
-        const {
-          clause_no,
-          clause_details,
-          nc_observation,
-          compilance_type,
-          evidence,
-        } = detail;
+    const validateForm = (formData) => {
+      for (const key in formData) {
+        let value = formData[key];
+        if (Array.isArray(value)) {
+          for (const item of value) {
+            if (!validateForm(item)) {
+              return false;
+            }
+          }
+        } else if (typeof value === "object" && value !== null) {
+          if (!validateForm(value)) {
+            return false;
+          }
+        } else if (typeof value === "string") {
+          // Trim the string before validation
+          value = value.trim();
+          if (value === "") {
+            return false;
+          }
+        }
+      }
+      return true;
+    };
 
-        // Check if any property is null or empty
+    const submit = async () => {
+      console.log(clauseDetails.value);
+      dataLoading.value = true;
 
-        return (
-          clause_no === "" ||
-          clause_details === "" ||
-          nc_observation === "" ||
-          compilance_type === "" ||
-          evidence === ""
-        );
-      });
-    }
+      //   console.warn("Nice");
+      try {
+        if (validateForm(clauseDetails)) {
+          const response = await addIAuditObservation(clauseDetails.value);
+          if (!response.error) {
+            await emit("addData", clauseDetails.value);
+
+            showSuccessAlert("Success", "Sub-Clause Added Successfully!");
+            await clear();
+            console.log(clauseDetails.value);
+            hideModal(newAddressModalRef.value);
+          } else {
+            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            dataLoading.value = false;
+            return;
+          }
+        } else {
+          showErrorAlert("Warning", "Please fill all the details Correctly");
+          return;
+        }
+      } catch (error) {
+        // Handle any other errors during API call
+        // console.error("API call error:", error);
+        showErrorAlert("Error", "An error occurred during the API call.");
+        await clear();
+        console.log(clauseDetails.value);
+        hideModal(newAddressModalRef.value);
+      } finally {
+        dataLoading.value = false;
+      }
+    };
 
     const clear = () => {
       clauseDetails.value = {
-        clause_no: "",
-        clause_details: "",
+        audit_schedule_id: "",
+        clause_number: "",
+        description: "",
         nc_observation: "",
         compilance_type: "",
         evidence: "",
+        company_id: "",
+        created_by: "",
+        updated_by: "",
+        is_active: "1",
       };
     };
 
@@ -411,33 +443,17 @@ export default defineComponent({
       });
     };
 
-    const submit = async () => {
-      console.log(clauseDetails.value);
-
-      const result = areAllPropertiesNull([clauseDetails.value]);
-
-      if (!result) {
-        await emit("addData", clauseDetails.value);
-
-        showSuccessAlert("Success", "Sub-Clause Added Successfully!");
-        await clear();
-        console.log(clauseDetails.value);
-        hideModal(newAddressModalRef.value);
-      } else {
-        showErrorAlert("Warning", "Please fill all the details Correctly");
-        return;
-      }
-    };
-
     return {
-      newAddressData,
       clauseDetails,
+      newAddressData,
       validationSchema,
       submit,
       submitButtonRef,
       newAddressModalRef,
       clear,
       handleFileChange,
+      data: props.data,
+      dataLoading,
     };
   },
 });
