@@ -9,6 +9,7 @@ interface IDocument {
     storage_medium: string;
     responsible_person: string;
     document_file: string;
+    approval_status: string;
     company_id: string;
   }
   

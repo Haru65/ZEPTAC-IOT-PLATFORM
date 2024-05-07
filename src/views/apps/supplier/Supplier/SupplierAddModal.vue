@@ -23,7 +23,7 @@
           <!--begin::Modal header-->
           <div class="modal-header" id="kt_modal_new_address_header">
             <!--begin::Modal title-->
-            <h2>Add QMS Procedure</h2>
+            <h2>Add Supplier</h2>
             <!--end::Modal title-->
 
             <!--begin::Close-->
@@ -355,6 +355,7 @@ interface Item {
   supplier_category: string;
   product_service_details: string;
   status: string;
+  approval_status: string;
   company_id: string;
   created_by: string;
   updated_by: string;
@@ -390,6 +391,7 @@ export default defineComponent({
       supplier_category: "",
       product_service_details: "",
       status: "1",
+      approval_status: "1",
 
       company_id: User.company_id,
       created_by: User.id,
@@ -421,6 +423,7 @@ export default defineComponent({
       } catch (err) {
         itemDetails.value[dateType] = "";
       }
+      console.log(itemDetails.value[dateType]);
     }
 
     function areAllPropertiesNull(array) {
@@ -464,6 +467,7 @@ export default defineComponent({
         supplier_category: "",
         product_service_details: "",
         status: "1",
+        approval_status: "1",
 
         company_id: User.company_id,
         created_by: User.id,

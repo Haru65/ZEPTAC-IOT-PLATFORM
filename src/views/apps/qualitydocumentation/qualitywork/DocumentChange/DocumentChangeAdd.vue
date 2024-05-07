@@ -389,6 +389,7 @@ interface itemDetails {
   effective_date: string;
   authority_comments: string;
   comments: string;
+  approval_status: string;
 
   company_id: string;
   created_by: number;
@@ -434,6 +435,7 @@ export default defineComponent({
       effective_date: "",
       authority_comments: "",
       comments: "",
+      approval_status: "1",
 
       company_id: User.company_id,
       created_by: User.id,
@@ -457,7 +459,7 @@ export default defineComponent({
         itemDetails.value[dateType] = "";
       }
 
-      console.log(dateType, " ", itemDetails.value[dateType]);
+      console.log(itemDetails.value[dateType]);
     }
 
     const validateForm = (formData) => {
@@ -562,6 +564,7 @@ export default defineComponent({
         effective_date: "",
         authority_comments: "",
         comments: "",
+        approval_status: "1",
 
         company_id: User.company_id,
         created_by: User.id,

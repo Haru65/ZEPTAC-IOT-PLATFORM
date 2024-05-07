@@ -101,8 +101,7 @@
               <!--begin::Col-->
               <div class="col-md-6 fv-row mb-8 mb-sd-8">
                 <!--begin::Label-->
-                <label
-                  class="required fs-5 fw-bold text-gray-700 mb-2"
+                <label class="required fs-5 fw-bold text-gray-700 mb-2"
                   >Is the condition at the time of handover after installation
                   satisfactory? Yes/No</label
                 >
@@ -203,6 +202,68 @@
               </div>
             </div>
 
+            <div
+              class="row mb-6"
+              v-if="Identifier == 'Admin' || Identifier == 'Company-Admin'"
+            >
+              <div class="form-group col-md-12 mb-8 mb-sd-8">
+                <label
+                  class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
+                  >Select Approval Status
+                </label>
+                <div class="input-group gap-6">
+                  <div class="form-check form-check-inline">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      value="1"
+                      v-model="itemDetails.approval_status"
+                      id="pending"
+                      name="approval_status"
+                    />
+                    <label
+                      for="pending"
+                      class="form-check-label fw-bold text-gray-700 text-nowrap"
+                      >Pending</label
+                    >
+                  </div>
+
+                  <div class="form-check form-check-inline">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      value="2"
+                      v-model="itemDetails.approval_status"
+                      id="reject"
+                      name="approval_status"
+                    />
+                    <label
+                      for="reject"
+                      class="form-check-label fw-bold text-gray-700 text-nowrap"
+                      >Reject</label
+                    >
+                  </div>
+
+                  <div class="form-check form-check-inline">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      value="3"
+                      v-model="itemDetails.approval_status"
+                      id="approve"
+                      name="approval_status"
+                    />
+                    <label
+                      for="approve"
+                      class="form-check-label fw-bold text-gray-700 text-nowrap"
+                      >Approve</label
+                    >
+                  </div>
+                </div>
+              </div>
+              <!--end::Input group-->
+            </div>
+
             <!--end::Input group-->
           </div>
 
@@ -253,7 +314,6 @@ export default defineComponent({
     VForm,
   },
   setup() {
-    const identifier = Identifier;
     const loading = ref(false);
     const auth = useAuthStore();
     const router = useRouter();
@@ -286,6 +346,7 @@ export default defineComponent({
       installation_details: "",
       training_details: "",
       remarks: "",
+      approval_status: "",
 
       company_id: User.company_id,
       created_by: User.id,
@@ -298,24 +359,26 @@ export default defineComponent({
         let response = await getInspectionRecord(itemId.toString());
         console.log(response);
 
-          itemDetails.value.instrument.name = response.instrument.name;
-          itemDetails.value.instrument.make = response.instrument.make;
-          itemDetails.value.instrument.model_no = response.instrument.model_no;
-          itemDetails.value.instrument.serial_no = response.instrument.serial_no;
+        itemDetails.value.instrument.name = response.instrument.name;
+        itemDetails.value.instrument.make = response.instrument.make;
+        itemDetails.value.instrument.model_no = response.instrument.model_no;
+        itemDetails.value.instrument.serial_no = response.instrument.serial_no;
 
-          itemDetails.value.instrument_id = response.instrument_id;
-          itemDetails.value.satisfactory = response.satisfactory;
-          itemDetails.value.installation_date = response.installation_date;
-          itemDetails.value.installation_details = response.installation_details;
-          itemDetails.value.training_details = response.training_details;
-          itemDetails.value.remarks = response.remarks;
-          itemDetails.value.company_id = response.company_id ? response.company_id : "";
-          itemDetails.value.created_by = response.created_by;
-          itemDetails.value.updated_by = response.updated_by;
-          itemDetails.value.is_active = response.is_active;
+        itemDetails.value.instrument_id = response.instrument_id;
+        itemDetails.value.satisfactory = response.satisfactory;
+        itemDetails.value.installation_date = response.installation_date;
+        itemDetails.value.installation_details = response.installation_details;
+        itemDetails.value.training_details = response.training_details;
+        itemDetails.value.remarks = response.remarks;
+        itemDetails.value.approval_status = response.approval_status;
+        itemDetails.value.company_id = response.company_id
+          ? response.company_id
+          : "";
+        itemDetails.value.created_by = response.created_by;
+        itemDetails.value.updated_by = response.updated_by;
+        itemDetails.value.is_active = response.is_active;
 
-          console.log(itemDetails.value)
-
+        console.log(itemDetails.value);
       } catch (error) {
         showErrorAlert("Error", "An error occurred during the API call.");
         loading.value = false;
@@ -337,6 +400,7 @@ export default defineComponent({
       } catch (err) {
         itemDetails.value[dateType] = "";
       }
+      console.log(itemDetails.value[dateType]);
     }
 
     function areAllPropertiesNull(array) {
@@ -368,7 +432,10 @@ export default defineComponent({
       if (!result) {
         try {
           if (itemDetails.value.instrument_id != "") {
-            const response = await updateInspectionRecord(itemId, itemDetails.value);
+            const response = await updateInspectionRecord(
+              itemId,
+              itemDetails.value
+            );
             if (!response.error) {
               showSuccessAlert(
                 "Success",
@@ -431,6 +498,7 @@ export default defineComponent({
     };
 
     return {
+      Identifier,
       itemDetails,
       getAssetPath,
       submit,

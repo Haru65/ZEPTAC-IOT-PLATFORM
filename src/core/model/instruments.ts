@@ -11,6 +11,7 @@ interface IInstrument {
     datasheet:string;
     calibration_certificate:string;
     traceability:string;
+    approval_status:string;
     company_id: string;
   }
   

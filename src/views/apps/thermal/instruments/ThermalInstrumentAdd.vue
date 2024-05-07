@@ -366,7 +366,7 @@ export default defineComponent({
         Companies.value.push(
           ...response.result?.map(({ created_at, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
           }))
         );
         console.log(Companies);
@@ -469,14 +469,6 @@ export default defineComponent({
 
       try {
         console.log(itemDetails.value);
-
-        itemDetails.value.calibration_date = moment(
-          itemDetails.value.calibration_date
-        ).format("YYYY-MM-DD");
-        itemDetails.value.calibration_due_date = moment(
-          itemDetails.value.calibration_due_date
-        ).format("YYYY-MM-DD HH:mm:ss");
-
         
         // Call your API here with the form values
         const response = await addThermalInstrument(itemDetails.value);

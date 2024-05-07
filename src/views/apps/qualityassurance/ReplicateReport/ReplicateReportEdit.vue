@@ -689,6 +689,7 @@ export default defineComponent({
         },
       ]),
       review_commands: "",
+      approval_status: "",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -711,6 +712,7 @@ export default defineComponent({
           response.replicate_report_readings
         );
         itemDetails.value.review_commands = response.review_commands;
+        itemDetails.value.approval_status = response.approval_status;
         itemDetails.value.company_id = response.company_id
           ? response.company_id
           : "";
@@ -738,6 +740,7 @@ export default defineComponent({
       } catch (err) {
         itemDetails.value[dateType] = "";
       }
+      console.log(itemDetails[dateType]);
     }
 
     const addReading = () => {

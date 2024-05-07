@@ -6,7 +6,8 @@ interface ICustomers {
   email: string;
   company: string;
   mobile: string;
-  date: string;
+  created_at: string;
+  srf_link: string;
 }
 
 

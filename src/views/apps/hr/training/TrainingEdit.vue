@@ -33,6 +33,7 @@
                     name="training_date"
                     id="training_date"
                     v-model="trainingDetails.training_date"
+                    @change="setDates($event, 'training_date')"
                     placeholder="Pick Training Day"
                     :editable="false"
                   />
@@ -203,22 +204,22 @@
                   >Trainer's Name</label
                 >
                 <el-form-item>
-                <el-select
-                  v-model="trainingDetails.trainers"
-                  multiple
-                  filterable
-                  allow-create
-                  placeholder="Enter trainer name and select it to add..."
-                >
-                  <el-option
-                    v-for="(item, index) in trainingDetails.trainers"
-                    :key="index"
-                    :label="item"
-                    :value="item"
-                  />
-                </el-select>
-              </el-form-item>
-              <div
+                  <el-select
+                    v-model="trainingDetails.trainers"
+                    multiple
+                    filterable
+                    allow-create
+                    placeholder="Enter trainer name and select it to add..."
+                  >
+                    <el-option
+                      v-for="(item, index) in trainingDetails.trainers"
+                      :key="index"
+                      :label="item"
+                      :value="item"
+                    />
+                  </el-select>
+                </el-form-item>
+                <div
                   class="fv-plugins-message-container mt-0"
                   v-if="!trainingDetails.trainers.length"
                 >
@@ -237,22 +238,22 @@
                   >Trainee's Name</label
                 >
                 <el-form-item>
-                <el-select
-                  v-model="trainingDetails.trainees"
-                  multiple
-                  filterable
-                  allow-create
-                  placeholder="Enter trainee name and select it to add..."
-                >
-                  <el-option
-                    v-for="(item, index) in trainingDetails.trainees"
-                    :key="index"
-                    :label="item"
-                    :value="item"
-                  />
-                </el-select>
-              </el-form-item>
-              <div
+                  <el-select
+                    v-model="trainingDetails.trainees"
+                    multiple
+                    filterable
+                    allow-create
+                    placeholder="Enter trainee name and select it to add..."
+                  >
+                    <el-option
+                      v-for="(item, index) in trainingDetails.trainees"
+                      :key="index"
+                      :label="item"
+                      :value="item"
+                    />
+                  </el-select>
+                </el-form-item>
+                <div
                   class="fv-plugins-message-container mt-0"
                   v-if="!trainingDetails.trainees.length"
                 >
@@ -310,7 +311,6 @@ import { useRouter, useRoute } from "vue-router";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 
-
 import { TrainingMode, TrainingStatus } from "@/core/model/training";
 
 interface Training {
@@ -322,6 +322,7 @@ interface Training {
   trainees: Array<string>;
   training_mode: string;
   training_status: string;
+  approval_status: string;
   company_id: string;
   created_by: string;
   updated_by: string;
@@ -352,7 +353,6 @@ export default defineComponent({
       trainees: Yup.string().required().label("Trainees"),
     });
 
-
     const trainingDetails = ref<Training>({
       training_date: "",
       training_topic: "",
@@ -362,6 +362,7 @@ export default defineComponent({
       trainees: [],
       training_mode: "",
       training_status: "",
+      approval_status: "",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -380,9 +381,8 @@ export default defineComponent({
         trainees: JSON.parse(response.trainees),
         training_mode: response.training_mode,
         training_status: response.training_status,
-        company_id: response.company_id
-          ? response.company_id
-          : "",
+        approval_status: response.approval_status,
+        company_id: response.company_id ? response.company_id : "",
         created_by: response.created_by,
         updated_by: response.updated_by,
         is_active: response.is_active,
@@ -405,7 +405,7 @@ export default defineComponent({
         // Check if any property is null or empty
 
         return (
-          training_date !== null &&
+          training_date !== "" &&
           training_topic !== "" &&
           training_criteria !== "" &&
           training_desc !== "" &&
@@ -417,15 +417,28 @@ export default defineComponent({
       });
     }
 
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            trainingDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            trainingDetails.value[dateType] = "";
+          }
+        } else {
+          trainingDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        trainingDetails.value[dateType] = "";
+      }
+      console.log(trainingDetails.value[dateType]);
+    }
+
     const submit = async () => {
       loading.value = true;
 
       try {
-
-        trainingDetails.value.training_date = moment(
-          trainingDetails.value.training_date
-        ).format("YYYY-MM-DD");
-          
         const result = areAllPropertiesNotNull([trainingDetails.value]);
 
         if (result) {
@@ -449,8 +462,7 @@ export default defineComponent({
             showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
             loading.value = false;
           }
-        }
-        else{
+        } else {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           loading.value = false;
         }
@@ -502,16 +514,19 @@ export default defineComponent({
       limit,
       TrainingMode,
       TrainingStatus,
+      setDates,
     };
   },
 });
 </script>
 
 <style>
-.el-input__inner, .el-select__inner {
+.el-input__inner,
+.el-select__inner {
   font-weight: 500;
 }
-.el-input__wrapper, .el-select__wrapper {
+.el-input__wrapper,
+.el-select__wrapper {
   min-height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

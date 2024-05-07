@@ -228,6 +228,7 @@ interface Item {
   auditees: [];
   audit_area: string;
   scope: string;
+  approval_status: string;
   company_id: string;
   created_by: string;
   updated_by: string;
@@ -266,6 +267,7 @@ export default defineComponent({
       auditees: [],
       audit_area: "",
       scope: "",
+      approval_status: "1",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -308,6 +310,7 @@ export default defineComponent({
       } catch (err) {
         itemDetails.value[dateType] = "";
       }
+      console.log(itemDetails.value[dateType]);
     }
 
     const validateForm = (formData) => {
@@ -381,6 +384,7 @@ export default defineComponent({
         auditees: [],
         audit_area: "",
         scope: "",
+        approval_status: "1",
         company_id: User.company_id,
         created_by: User.id,
         updated_by: User.id,

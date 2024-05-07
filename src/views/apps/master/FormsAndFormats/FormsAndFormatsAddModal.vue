@@ -333,6 +333,7 @@
     amendment_date: string;
     storage_medium: string;
     responsible_person: string;
+    approval_status: string;
     document_file: string;
     company_id: string;
     created_by: string;
@@ -366,6 +367,7 @@
         amendment_date: "",
         storage_medium: "",
         responsible_person: "",
+        approval_status: "1",
         document_file: "",
         company_id: User.company_id,
         created_by: User.id,
@@ -380,14 +382,23 @@
         responsible_person: Yup.string().required().label("Responsible Person"),
       });
   
-      async function setDates(e, dateType) {
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
         if (e != null) {
-          documentDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          if (e != "" && e != null) {
+            documentDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            documentDetails.value[dateType] = "";
+          }
         } else {
           documentDetails.value[dateType] = "";
         }
-        console.log(dateType, " ", documentDetails.value[dateType]);
+      } catch (err) {
+        documentDetails.value[dateType] = "";
       }
+      console.log(documentDetails.value[dateType]);
+    }
   
       const handleFileChange = (event) => {
         // Get the selected file
@@ -465,6 +476,7 @@
           amendment_date: "",
           storage_medium: "",
           responsible_person: "",
+          approval_status: "1",
           document_file: "",
           company_id: User.company_id,
           created_by: User.id,

@@ -8,6 +8,7 @@ interface IAuditSchedule {
     meeting_place: string;
     audit_area: string;
     scope: string;
+    approval_status: string;
     company_id: string;
   }
   

@@ -10,6 +10,7 @@ interface IExpenseSheet {
     };
     status:string;
     total_amount:string;
+    approval_status:string;
 }
   
 export type { IExpenseSheet };

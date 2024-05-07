@@ -476,7 +476,7 @@ export default defineComponent({
         const response = await getQuotationList(
           `page=${page}&limit=${limit.value}`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -495,7 +495,7 @@ export default defineComponent({
             customer_company: customer_company.company_name,
             company_name: company_name.company_name,
             site_location: site_location,
-            date: moment(date).format("LL"),
+            date,
             total: total,
           })
         );
@@ -522,7 +522,7 @@ export default defineComponent({
         const response = await getQuotationList(
           `page=${page.value}&limit=${limit}`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -541,7 +541,7 @@ export default defineComponent({
             customer_company: customer_company.company_name,
             company_name: company_name.company_name,
             site_location: site_location,
-            date: moment(date).format("LL"),
+            date,
             total: total,
           })
         );
@@ -592,7 +592,7 @@ export default defineComponent({
           `page=${page.value}&limit=${limit.value}`
         );
         // console.log(response);
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -611,7 +611,7 @@ export default defineComponent({
             customer_company: customer_company.company_name,
             company_name: company_name.company_name,
             site_location: site_location,
-            date: moment(date).format("LL"),
+            date,
             total: total,
           })
         );
@@ -712,7 +712,7 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await QuotationSearch(search.value);
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -731,7 +731,7 @@ export default defineComponent({
             customer_company: customer_company.company_name,
             company_name: company_name.company_name,
             site_location: site_location,
-            date: moment(date).format("LL"),
+            date,
             total: total,
           })
         );
@@ -794,12 +794,12 @@ export default defineComponent({
         if (result["isConfirmed"]) {
           const response = await getQuotation(id);
           // update date
-          quotationDetail.value.date = moment(
-            quotationDetail.value.date
-          ).format("YYYY-MM-DD HH:mm:ss");
-          quotationDetail.value.duedate = moment(
-            quotationDetail.value.duedate
-          ).format("YYYY-MM-DD HH:mm:ss");
+          // quotationDetail.value.date = moment(
+          //   quotationDetail.value.date
+          // ).format("YYYY-MM-DD HH:mm:ss");
+          // quotationDetail.value.duedate = moment(
+          //   quotationDetail.value.duedate
+          // ).format("YYYY-MM-DD HH:mm:ss");
           quotationDetail.value = {
             quotation_no: latestquotation_no,
             lead_id: response.customer_id,
@@ -965,13 +965,9 @@ export default defineComponent({
           QuotationInfo.value.quotation_no,
           QuotationInfo
         );
-      }
-      else{
+      } else {
         // console.log(res.message)
-        showErrorAlert(
-          "information",
-          res.message ?? "something went wrong"
-        );
+        showErrorAlert("information", res.message ?? "something went wrong");
       }
     };
 

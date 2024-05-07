@@ -370,13 +370,14 @@
                   <!--begin::Input-->
                   <div class="block">
                     <el-date-picker
-                      type="date"
-                      v-model="filterIntegrityTestDetails.validation_date"
-                      name="validation_date"
-                      id="date"
-                      placeholder="Pick a day"
-                      :editable="false"
-                    />
+                    type="date"
+                    name="validation_date"
+                    id="validation_date"
+                    v-model="filterIntegrityTestDetails.validation_date"
+                    @change="setDates($event, 'validation_date')"
+                    placeholder="Pick a day"
+                    :editable="false"
+                  />
                   </div>
                   <ErrorMessage
                     class="invalid-feedback"
@@ -397,13 +398,14 @@
 
                   <div class="block">
                     <el-date-picker
-                      type="date"
-                      v-model="filterIntegrityTestDetails.due_date"
-                      name="due_date"
-                      id="date"
-                      placeholder="Pick a day"
-                      :editable="false"
-                    />
+                    type="date"
+                    name="due_date"
+                    id="due_date"
+                    v-model="filterIntegrityTestDetails.due_date"
+                    @change="setDates($event, 'due_date')"
+                    placeholder="Pick a day"
+                    :editable="false"
+                  />
                   </div>
                   <!--end::Input-->
                   <ErrorMessage class="invalid-feedback" name="due_date" />
@@ -919,6 +921,8 @@ export default defineComponent({
           key === "area_name" ||
           key === "room_name" ||
           key === "equipment_id" ||
+          key === "validation_date" ||
+          key === "due_date" ||
           key === "equipment_name"
         ) {
           continue;
@@ -961,6 +965,26 @@ export default defineComponent({
       });
     };
 
+        /* --------SET DATE LOGIC--------*/
+        async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            filterIntegrityTestDetails.value[dateType] =
+              moment(e).format("YYYY-MM-DD");
+          } else {
+            filterIntegrityTestDetails.value[dateType] = "";
+          }
+        } else {
+          filterIntegrityTestDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        filterIntegrityTestDetails.value[dateType] = "";
+      }
+      console.log(filterIntegrityTestDetails.value[dateType]);
+    }
+    
+
     const submit = async (e) => {
       console.log(filterIntegrityTestDetails.value);
 
@@ -990,13 +1014,6 @@ export default defineComponent({
           return;
         }
       }
-
-      filterIntegrityTestDetails.value.validation_date = moment(
-        filterIntegrityTestDetails.value.validation_date
-      ).format("YYYY-MM-DD HH:mm:ss");
-      filterIntegrityTestDetails.value.due_date = moment(
-        filterIntegrityTestDetails.value.due_date
-      ).format("YYYY-MM-DD HH:mm:ss");
 
       const isEmpty = !isNotEmpty(filterIntegrityTestDetails);
 
@@ -1059,6 +1076,7 @@ export default defineComponent({
       resetTheData,
       EquipmentRef,
       handleChange,
+      setDates,
     };
   },
 });

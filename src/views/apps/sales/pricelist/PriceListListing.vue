@@ -324,7 +324,7 @@ export default defineComponent({
             accommodation: accommodation,
             travelling: travelling,
             training: training,
-            created_at: moment(created_at).format("LL"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -373,7 +373,7 @@ export default defineComponent({
             accommodation: accommodation,
             travelling: travelling,
             training: training,
-            created_at: moment(created_at).format("LL"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -433,7 +433,7 @@ export default defineComponent({
             accommodation: accommodation,
             travelling: travelling,
             training: training,
-            created_at: moment(created_at).format("LL"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -558,7 +558,7 @@ export default defineComponent({
             accommodation: accommodation,
             travelling: travelling,
             training: training,
-            created_at: moment(created_at).format("LL"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);

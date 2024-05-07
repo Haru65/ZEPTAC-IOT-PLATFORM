@@ -97,12 +97,17 @@
         <!--end::Card toolbar-->
       </div>
       <div class="card-body pt-0">
+        <ApprovalModal
+          @reloadData="reLoadData"
+          v-bind:data="itemData"
+        ></ApprovalModal>
+
         <Datatable
           checkbox-label="id"
           @on-sort="sort"
           @on-items-select="onItemSelect"
           :data="tableData"
-          :header="tableHeader"
+          :header="filteredTableHeader"
           :checkbox-enabled="true"
           :items-per-page="limit"
           :items-per-page-dropdown-enabled="false"
@@ -144,6 +149,37 @@
             >{{ GetExpenseStatus(expensesheets.status) }}</span
           >
           </template>
+
+          <template v-slot:approval_status="{ row: expensesheets }">
+            <span
+              v-if="expensesheets.approval_status == 1"
+              class="badge py-3 px-4 fs-7 badge-light-primary"
+              >{{ GetApprovalStatus(expensesheets.approval_status) }}</span
+            >
+            <span
+              v-if="expensesheets.approval_status == 2"
+              class="badge py-3 px-4 fs-7 badge-light-danger"
+              >{{ GetApprovalStatus(expensesheets.approval_status) }}</span
+            >
+            <span
+              v-if="expensesheets.approval_status == 3"
+              class="badge py-3 px-4 fs-7 badge-light-success"
+              >{{ GetApprovalStatus(expensesheets.approval_status) }}</span
+            >
+          </template>
+
+          <template v-slot:approval_button="{ row: expensesheets }">
+            <button
+              type="button"
+              class="btn btn-sm btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#kt_modal_1"
+              @click="fillItemData(expensesheets)"
+            >
+              Open
+            </button>
+          </template>
+          
           <template v-slot:actions="{ row: expensesheets }">
             <!--begin::Menu Flex-->
             <div class="text-gray-600 text-hover-primary mb-1">
@@ -196,22 +232,32 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import { GetExpenseStatus, type IExpenseSheet } from "@/core/model/expensesheets";
 import arraySort from "array-sort";
 import moment from "moment";
 import { deleteExpenseSheet, getExpenseSheets, ExpenseSheetSearch } from "@/stores/api";
+import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
+import { hideModal } from "@/core/helpers/dom";
+import ApprovalModal from "./ApprovalModal.vue";
+import { useAuthStore } from "@/stores/auth";
+import { Identifier } from "@/core/config/WhichUserConfig";
 import Swal from "sweetalert2";
 import { formatPrice } from "@/core/config/DataFormatter";
 
 export default defineComponent({
-  name: "expensesheets_listing",
+  name: "expensesheet-list",
   components: {
     Datatable,
+    ApprovalModal,
   },
   setup() {
+    const auth = useAuthStore();
+    const User = auth.GetUser();
+    const identifier = Identifier;
+
     const loading = ref(true);
     const tableHeader = ref([
       {
@@ -245,12 +291,32 @@ export default defineComponent({
         columnWidth: 100,
       },
       {
+        columnName: "Approval Status",
+        columnLabel: "approval_status",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Reject/Approve",
+        columnLabel: "approval_button",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 70,
       },
     ]);
+
+    const itemData = ref({
+      id: "",
+      approval_status: "",
+      new_status: "",
+      company_id: "",
+      updated_by: "",
+    });
 
     // functions
     const Limits = ref({
@@ -364,6 +430,21 @@ export default defineComponent({
         PagePointer(page.value);
       }
     };
+
+    const filteredTableHeader = computed(() => {
+      const isAdmin = identifier.value === "Admin";
+      const isCompanyAdmin = identifier.value === "Company-Admin";
+
+      if (isAdmin || isCompanyAdmin) {
+        // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
+        return tableHeader.value;
+      } else {
+        // Otherwise, exclude the 'approval_button' column
+        return tableHeader.value.filter(
+          (column) => column.columnLabel !== "approval_button"
+        );
+      }
+    });
 
     onMounted(async () => {
       //console.log("done");
@@ -493,6 +574,25 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
+    async function reLoadData() {
+      await expensesheets_listing();
+    }
+
+    // Function
+    const fillItemData = (ncr) => {
+      const { id, approval_status, company_id } = ncr;
+
+      itemData.value = {
+        id: id,
+        approval_status: approval_status,
+        new_status: "",
+        company_id: company_id,
+        updated_by: User.id,
+      };
+      console.log("itemData are:", itemData.value);
+    };
+
+
     return {
       tableData,
       tableHeader,
@@ -514,6 +614,13 @@ export default defineComponent({
       Limits,
       formatPrice,
       GetExpenseStatus,
+      filteredTableHeader,
+      ApprovalStatus,
+      GetApprovalStatus,
+      itemData,
+      fillItemData,
+      identifier,
+      reLoadData,
 
     };
   },

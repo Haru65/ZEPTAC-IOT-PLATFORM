@@ -367,9 +367,10 @@
                   <!--begin::Input-->
                   <el-date-picker
                     type="date"
-                    v-model="particleCountTestDetails.validation_date"
                     name="validation_date"
-                    id="date"
+                    id="validation_date"
+                    v-model="particleCountTestDetails.validation_date"
+                    @change="setDates($event, 'validation_date')"
                     placeholder="Pick a day"
                     :editable="false"
                   />
@@ -393,9 +394,10 @@
                   <!--end::Input-->
                   <el-date-picker
                     type="date"
-                    v-model="particleCountTestDetails.due_date"
                     name="due_date"
-                    id="date"
+                    id="due_date"
+                    v-model="particleCountTestDetails.due_date"
+                    @change="setDates($event, 'due_date')"
                     placeholder="Pick a day"
                     :editable="false"
                   />
@@ -813,6 +815,8 @@ export default defineComponent({
           key === "area_name" ||
           key === "room_name" ||
           key === "equipment_id" ||
+          key === "validation_date" ||
+          key === "due_date" ||
           key === "equipment_name"
         ) {
           continue;
@@ -901,6 +905,25 @@ export default defineComponent({
       });
     };
 
+        /* --------SET DATE LOGIC--------*/
+        async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            particleCountTestDetails.value[dateType] =
+              moment(e).format("YYYY-MM-DD");
+          } else {
+            particleCountTestDetails.value[dateType] = "";
+          }
+        } else {
+          particleCountTestDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        particleCountTestDetails.value[dateType] = "";
+      }
+      console.log(particleCountTestDetails.value[dateType]);
+    }
+
     const submit = async (e) => {
       console.log(particleCountTestDetails.value);
       if (
@@ -929,13 +952,6 @@ export default defineComponent({
           return;
         }
       }
-
-      particleCountTestDetails.value.validation_date = moment(
-        particleCountTestDetails.value.validation_date
-      ).format("YYYY-MM-DD HH:mm:ss");
-      particleCountTestDetails.value.due_date = moment(
-        particleCountTestDetails.value.due_date
-      ).format("YYYY-MM-DD HH:mm:ss");
 
       const isEmpty = !isNotEmpty(particleCountTestDetails);
 
@@ -995,6 +1011,7 @@ export default defineComponent({
       setEngineer,
       EquipmentRef,
       handleChange,
+      setDates,
     };
   },
 });

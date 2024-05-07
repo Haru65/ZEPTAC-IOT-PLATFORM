@@ -6,6 +6,7 @@ interface IImprovement {
     target: string;
     outcome: string;
     quarter: string;
+    approval_status: string;
     created_at: string;
     company_id: string;
   }

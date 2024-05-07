@@ -32,8 +32,11 @@
                     >
                     <div class="block">
                       <el-date-picker
-                        v-model="InvoiceDetails.date"
                         type="date"
+                        name="date"
+                        id="date"
+                        v-model="InvoiceDetails.date"
+                        @change="setDates($event, 'date')"
                         placeholder="Pick a day"
                         :shortcuts="shortcuts"
                         :disabled-date="disabledDate"
@@ -56,8 +59,11 @@
                     >
                     <div class="block">
                       <el-date-picker
-                        v-model="InvoiceDetails.duedate"
                         type="date"
+                        name="duedate"
+                        id="duedate"
+                        v-model="InvoiceDetails.duedate"
+                        @change="setDates($event, 'duedate')"
                         placeholder="Pick a day"
                         :shortcuts="shortcuts"
                         :disabled-date="disabledDate"
@@ -966,7 +972,6 @@ export default defineComponent({
         locations.value = data;
       }
     };
-    
 
     const InvoiceDetails = ref<InvoiceDetails>({
       invoice_no: "",
@@ -1063,7 +1068,9 @@ export default defineComponent({
       InvoiceDetails.value.day_or_equipment =
         InvoiceDetails.value.items.equipment_wise.length === 0 ? "1" : "2";
 
-      globalLocation.value = response.client_id === 0 ? true : false;
+      // globalLocation.value = response.client_id === 0 ? true : false;
+      globalLocation.value =
+        response.client_id === response.customer_id ? true : false;
 
       // console.log(globalLocation.value);
       qNsiteSameAsBilling.value = globalLocation.value;
@@ -1536,7 +1543,7 @@ export default defineComponent({
         clientSelect.value = true;
         if (InvoiceDetails.value.lead_id) {
           InvoiceDetails.value.client = InvoiceDetails.value.lead;
-          InvoiceDetails.value.client.id = "0";
+          // InvoiceDetails.value.client.id = "0";
         } else {
           InvoiceDetails.value.client = {
             id: "",
@@ -1640,8 +1647,8 @@ export default defineComponent({
           items.id === "" ||
           lead.id === "" ||
           client.id === "" ||
-          date === null ||
-          duedate === null ||
+          date === "" ||
+          duedate === "" ||
           status === "" ||
           scope_of_work === "" ||
           terms_and_conditions === "" ||
@@ -1674,6 +1681,24 @@ export default defineComponent({
       dayWiseRef.value = value;
     };
 
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            InvoiceDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            InvoiceDetails.value[dateType] = "";
+          }
+        } else {
+          InvoiceDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        InvoiceDetails.value[dateType] = "";
+      }
+      console.log(InvoiceDetails.value[dateType]);
+    }
+
     // number formating remove
     const submit = async (e) => {
       e.preventDefault();
@@ -1684,22 +1709,6 @@ export default defineComponent({
 
         if (result) {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-          loading.value = false;
-          return;
-        }
-
-        if (InvoiceDetails.value.date && InvoiceDetails.value.duedate) {
-          InvoiceDetails.value.date = moment(InvoiceDetails.value.date).format(
-            "YYYY-MM-DD HH:mm:ss"
-          );
-          InvoiceDetails.value.duedate = moment(
-            InvoiceDetails.value.duedate
-          ).format("YYYY-MM-DD HH:mm:ss");
-        } else {
-          showErrorAlert(
-            "Warning",
-            "Dates cannot be empty, please fill all the required details"
-          );
           loading.value = false;
           return;
         }
@@ -1892,6 +1901,7 @@ export default defineComponent({
       equipments,
       dayWiseRef,
       handleDayWiseChange,
+      setDates,
     };
   },
 });

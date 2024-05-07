@@ -66,23 +66,6 @@
           class="d-flex justify-content-end"
           data-kt-customer-table-toolbar="base"
         >
-          <!--begin::Export-->
-          <button
-            type="button"
-            class="btn btn-light-primary me-3"
-            data-bs-toggle="modal"
-            data-bs-target="#kt_customers_export_modal"
-          >
-            <KTIcon icon-name="exit-up" icon-class="fs-2" />
-            Export
-          </button>
-          <!--end::Export-->
-          <!--begin::Add customer-->
-          <router-link to="./add" class="btn btn-primary">
-            <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Permission
-          </router-link>
-          <!--end::Add customer-->
         </div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->
@@ -124,13 +107,6 @@
         <template v-slot:actions="{ row: permissions }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <router-link :to="`./edit/${permissions.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
-            </span>
             <span>
               <i
                 @click="deletepermission(permissions.id, false)"

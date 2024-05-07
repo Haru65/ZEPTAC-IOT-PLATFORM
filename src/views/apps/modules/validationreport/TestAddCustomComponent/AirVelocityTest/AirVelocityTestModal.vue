@@ -367,9 +367,10 @@
                   <!--begin::Input-->
                   <el-date-picker
                     type="date"
-                    v-model="airVelocityTestDetails.validation_date"
                     name="validation_date"
-                    id="date"
+                    id="validation_date"
+                    v-model="airVelocityTestDetails.validation_date"
+                    @change="setDates($event, 'validation_date')"
                     placeholder="Pick a day"
                     :editable="false"
                   />
@@ -393,9 +394,10 @@
                   <!--end::Input-->
                   <el-date-picker
                     type="date"
-                    v-model="airVelocityTestDetails.due_date"
                     name="due_date"
-                    id="date"
+                    id="due_date"
+                    v-model="airVelocityTestDetails.due_date"
+                    @change="setDates($event, 'due_date')"
                     placeholder="Pick a day"
                     :editable="false"
                   />
@@ -968,6 +970,8 @@ export default defineComponent({
           key === "area_name" ||
           key === "room_name" ||
           key === "equipment_id" ||
+          key === "validation_date" ||
+          key === "due_date" ||
           key === "equipment_name"
         ) {
           continue;
@@ -1071,6 +1075,25 @@ export default defineComponent({
       });
     };
 
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            airVelocityTestDetails.value[dateType] =
+              moment(e).format("YYYY-MM-DD");
+          } else {
+            airVelocityTestDetails.value[dateType] = "";
+          }
+        } else {
+          airVelocityTestDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        airVelocityTestDetails.value[dateType] = "";
+      }
+      console.log(airVelocityTestDetails.value[dateType]);
+    }
+
     const submit = async (e) => {
       console.log(airVelocityTestDetails.value);
 
@@ -1090,7 +1113,7 @@ export default defineComponent({
           showErrorAlert("Warning", "Please fill all the details Correctly");
           return;
         }
-      } else if(EquipmentRef.value === false){
+      } else if (EquipmentRef.value === false) {
         if (
           !airVelocityTestDetails.value.room_name ||
           !airVelocityTestDetails.value.ahu_no ||
@@ -1100,13 +1123,6 @@ export default defineComponent({
           return;
         }
       }
-
-      airVelocityTestDetails.value.validation_date = moment(
-        airVelocityTestDetails.value.validation_date
-      ).format("YYYY-MM-DD HH:mm:ss");
-      airVelocityTestDetails.value.due_date = moment(
-        airVelocityTestDetails.value.due_date
-      ).format("YYYY-MM-DD HH:mm:ss");
 
       const isEmpty = !isNotEmpty(airVelocityTestDetails);
 
@@ -1182,6 +1198,7 @@ export default defineComponent({
       setEngineer,
       EquipmentRef,
       handleChange,
+      setDates,
     };
   },
 });

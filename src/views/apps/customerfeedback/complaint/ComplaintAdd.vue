@@ -59,6 +59,7 @@
                     name="complaint_date"
                     id="complaint_date"
                     v-model="complaintDetails.complaint_date"
+                    @change="setDates($event, 'complaint_date')"
                     placeholder="Pick Complaint Day"
                     :editable="false"
                   />
@@ -85,13 +86,13 @@
                 <!--end::Label-->
 
                 <Field
-                    type="text"
-                    name="complaint_no"
-                    class="form-control form-control-lg form-control-solid"
-                    v-model="complaintDetails.complaint_no"
-                    placeholder="Enter Complaint Number"
-                  />
-                  <div class="fv-plugins-message-container">
+                  type="text"
+                  name="complaint_no"
+                  class="form-control form-control-lg form-control-solid"
+                  v-model="complaintDetails.complaint_no"
+                  placeholder="Enter Complaint Number"
+                />
+                <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
                     <ErrorMessage name="complaint_no" />
                   </div>
@@ -176,8 +177,10 @@
                     :value="item.id"
                   />
                 </el-select>
-                <div class="fv-plugins-message-container" 
-                  v-if="!complaintDetails.source_of_complaint">
+                <div
+                  class="fv-plugins-message-container"
+                  v-if="!complaintDetails.source_of_complaint"
+                >
                   <div class="fv-help-block">
                     <ErrorMessage name="source_of_complaint" />
                   </div>
@@ -227,6 +230,7 @@
                         name="resolution_date"
                         id="resolution_date"
                         v-model="complaintDetails.resolution_date"
+                        @change="setDates($event, 'resolution_date')"
                         placeholder="Pick Resolution Day"
                         :editable="false"
                       />
@@ -243,7 +247,6 @@
                   </div>
                 </div>
               </div>
-
 
               <div class="form-group col-md-6 mb-8 mb-sd-8">
                 <label
@@ -315,7 +318,7 @@
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import {  addComplaint } from "@/stores/api";
+import { addComplaint } from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import packages from "@/core/config/PackagesConfig";
@@ -325,10 +328,7 @@ import { useRouter } from "vue-router";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 
-import {
-  SourceOfComplaint,
-  ComplaintStatus,
-} from "@/core/model/complaints";
+import { SourceOfComplaint, ComplaintStatus } from "@/core/model/complaints";
 
 interface Complaint {
   customer_name: string;
@@ -340,6 +340,7 @@ interface Complaint {
   comment_by_customer: string;
   resolution_date: string;
   complaint_status: string;
+  approval_status: string;
   company_id: string;
   created_by: string;
   updated_by: string;
@@ -384,6 +385,7 @@ export default defineComponent({
       comment_by_customer: "",
       resolution_date: "",
       complaint_status: "1",
+      approval_status: "1",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -408,28 +410,40 @@ export default defineComponent({
 
         return (
           customer_name !== "" &&
-          complaint_date !== null &&
+          complaint_date !== "" &&
           complaint_no !== "" &&
           details_of_complaint !== "" &&
           corrective_action !== "" &&
           source_of_complaint !== "" &&
           comment_by_customer !== "" &&
-          resolution_date !== null &&
+          resolution_date !== "" &&
           complaint_status !== ""
         );
       });
+    }
+
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            complaintDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            complaintDetails.value[dateType] = "";
+          }
+        } else {
+          complaintDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        complaintDetails.value[dateType] = "";
+      }
+      console.log(complaintDetails.value[dateType]);
     }
 
     const submit = async () => {
       loading.value = true;
 
       try {
-        complaintDetails.value.complaint_date = moment(
-          complaintDetails.value.complaint_date
-        ).format("YYYY-MM-DD");
-        complaintDetails.value.resolution_date = moment(
-          complaintDetails.value.resolution_date
-        ).format("YYYY-MM-DD");
 
         const result = areAllPropertiesNotNull([complaintDetails.value]);
 
@@ -505,6 +519,7 @@ export default defineComponent({
       limit,
       SourceOfComplaint,
       ComplaintStatus,
+      setDates,
     };
   },
 });

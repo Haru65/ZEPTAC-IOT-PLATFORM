@@ -2,7 +2,7 @@
   <!--begin::Wrapper-->
   <div class="w-lg-500px p-10">
     <!--begin::Form-->
-    <div class="conatiner" v-if="message">
+    <div class="container" v-if="message">
       <div class="alert alert-success">
         Password reset link successfully sent to your email address
       </div>

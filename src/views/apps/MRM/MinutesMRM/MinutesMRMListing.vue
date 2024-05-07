@@ -103,11 +103,23 @@
             mrm.meeting_date
           }}</span>
         </template>
+
         <template v-slot:attendees="{ row: mrm }">
-          <span class="badge py-3 px-4 fs-7 badge-light-primary">{{
-            mrm.attendees
-          }}</span>
-        </template>
+            <div>
+            <el-select
+              filterable
+              placeholder="Attendees Name"
+            >
+              <el-option
+                disabled="disabled"
+                v-for="(item, index) in mrm.attendees_names"
+                :key="index"
+                :value="item"
+                :label="item"
+              />
+            </el-select>
+          </div>
+          </template>
         <template v-slot:meetings_count="{ row: mrm }">
           <span
             v-if="mrm.meetings_count === 0"

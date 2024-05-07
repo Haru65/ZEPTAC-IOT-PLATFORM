@@ -55,6 +55,7 @@
                         name="issue_date"
                         id="issue_date"
                         v-model="procedureDetails.issue_date"
+                        @change="setDates($event, 'issue_date')"
                         placeholder="Pick Issue Day"
                         :editable="false"
                       />
@@ -86,6 +87,7 @@
                         name="revision_date"
                         id="revision_date"
                         v-model="procedureDetails.revision_date"
+                        @change="setDates($event, 'revision_date')"
                         placeholder="Pick Revision Day"
                         :editable="false"
                       />
@@ -400,15 +402,33 @@ export default defineComponent({
 
         return (
           document_name !== "" &&
-          issue_date !== null &&
+          issue_date !== "" &&
           issue_no !== "" &&
-          revision_date !== null &&
+          revision_date !== "" &&
           revision_no !== "" &&
           prepared_by !== "" &&
           approved_by !== "" &&
           audit_document !== ""
         );
       });
+    }
+
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            procedureDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            procedureDetails.value[dateType] = "";
+          }
+        } else {
+          procedureDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        procedureDetails.value[dateType] = "";
+      }
+      console.log(procedureDetails.value[dateType]);
     }
 
     const submit = async () => {
@@ -418,13 +438,6 @@ export default defineComponent({
         const result = areAllPropertiesNotNull([procedureDetails.value]);
 
         if (result) {
-          procedureDetails.value.issue_date = moment(
-            procedureDetails.value.issue_date
-          ).format("YYYY-MM-DD");
-          procedureDetails.value.revision_date = moment(
-            procedureDetails.value.revision_date
-          ).format("YYYY-MM-DD");
-
           const response = await addValidationProcedure(procedureDetails.value);
           // console.log(response.error);
           if (!response.error) {
@@ -500,6 +513,7 @@ export default defineComponent({
       limit,
       isPdfInvalid,
       handleFileChange,
+      setDates,
     };
   },
 });

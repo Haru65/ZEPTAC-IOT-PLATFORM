@@ -585,7 +585,7 @@ export default defineComponent({
             test_sizes: { ...test_sizes },
 
             report_status: report_status,
-            created_at: moment(created_at).format("LL"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -638,7 +638,7 @@ export default defineComponent({
             test_sizes: { ...test_sizes },
 
             report_status: report_status,
-            created_at: moment(created_at).format("LL"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -705,7 +705,7 @@ export default defineComponent({
             test_sizes: { ...test_sizes },
 
             report_status: report_status,
-            created_at: moment(created_at).format("LL"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
           })
         );
         
@@ -837,7 +837,7 @@ export default defineComponent({
             test_sizes: { ...test_sizes },
 
             report_status: report_status,
-            created_at: moment(created_at).format("LL"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);

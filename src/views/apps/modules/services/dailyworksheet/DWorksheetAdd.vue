@@ -171,8 +171,9 @@
                               name="work_date"
                               id="work_date"
                               v-model="worksheetDetails.work_date"
+                              @change="setDates($event, 'work_date')"
                               placeholder="Pick Work Day"
-                              @change="setWorkDate"
+                              :editable="false"
                             />
                           </div>
                         </span>
@@ -202,11 +203,12 @@
                           <div class="block">
                             <el-time-picker
                               type="time"
-                              name="start_time"
                               id="start_time"
+                              name="start_time"
                               v-model="worksheetDetails.start_time"
+                              @change="setDateTiming($event, 'start_time')"
                               placeholder="Pick start time"
-                              @change="setStartTime"
+                              :editable="false"
                             />
                           </div>
                         </span>
@@ -236,8 +238,9 @@
                               name="end_time"
                               id="end_time"
                               v-model="worksheetDetails.end_time"
+                              @change="setDateTiming($event, 'end_time')"
                               placeholder="Pick end time"
-                              @change="setEndTime"
+                              :editable="false"
                             />
                           </div>
                         </span>
@@ -468,6 +471,7 @@ interface worksheet {
   start_time: string;
   end_time: string;
   work_status: string;
+  approval_status: string;
   tests: Array<Test>;
   other_test: string;
   standard_used: string;
@@ -478,7 +482,7 @@ interface worksheet {
 }
 
 export default defineComponent({
-  name: "worksheet-add",
+  name: "dailyworksheet-add",
   components: {
     ErrorMessage,
     Field,
@@ -534,6 +538,7 @@ export default defineComponent({
       start_time: "",
       end_time: "",
       work_status: "1",
+      approval_status: "1",
       standard_used: "",
       witnessed_by: "",
       created_by: User.id,
@@ -553,40 +558,42 @@ export default defineComponent({
       tests: Yup.string().required().label("Test"),
     });
 
-    async function setStartTime(e) {
-      console.log(e);
-      if(e != null){
-        worksheetDetails.value.start_time = await moment(e).format(
-          "YYYY-MM-DD HH:mm:ss"
-          );
+    /* --------SET DATE-TIME LOGIC--------*/
+    async function setDateTiming(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            worksheetDetails.value[dateType] = moment(e).format(
+              "YYYY-MM-DD HH:mm:ss"
+            );
+          } else {
+            worksheetDetails.value[dateType] = "";
+          }
+        } else {
+          worksheetDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        worksheetDetails.value[dateType] = "";
       }
-      else{
-        worksheetDetails.value.start_time = "";
-      }
+      console.log(worksheetDetails.value[dateType]);
     }
 
-    async function setEndTime(e) {
-      console.log(e);
-      if(e != null){
-        worksheetDetails.value.end_time = await moment(e).format(
-          "YYYY-MM-DD HH:mm:ss"
-          );
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            worksheetDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            worksheetDetails.value[dateType] = "";
+          }
+        } else {
+          worksheetDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        worksheetDetails.value[dateType] = "";
       }
-      else{
-        worksheetDetails.value.end_time = "";
-      }
-    }
-
-    async function setWorkDate(e) {
-      console.log(e);
-      if(e != null){
-        worksheetDetails.value.work_date = await moment(e).format(
-          "YYYY-MM-DD"
-          );
-      }
-      else{
-        worksheetDetails.value.work_date = "";
-      }
+      console.log(worksheetDetails.value[dateType]);
     }
 
     const ServiceEngineers = ref([
@@ -705,16 +712,16 @@ export default defineComponent({
       loading.value = true;
       console.log(worksheetDetails.value);
 
-
-      if(worksheetDetails.value.work_date == "" || worksheetDetails.value.start_time == "" || worksheetDetails.value.end_time == ""){
-        showErrorAlert(
-          "Warning",
-          "Please fill all the details correctly"
-        );
+      if (
+        worksheetDetails.value.work_date == "" ||
+        worksheetDetails.value.start_time == "" ||
+        worksheetDetails.value.end_time == ""
+      ) {
+        showErrorAlert("Warning", "Please fill all the details correctly");
         loading.value = false;
         return;
       }
-      
+
       console.log(worksheetDetails.value);
       if (
         worksheetDetails.value.tests.length === 0 &&
@@ -801,9 +808,8 @@ export default defineComponent({
       loading,
       onsubmit,
       AcceptanceCriteria,
-      setWorkDate,
-      setStartTime,
-      setEndTime,
+      setDates,
+      setDateTiming,
     };
   },
 });

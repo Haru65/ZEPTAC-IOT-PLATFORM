@@ -10,6 +10,7 @@ interface IWorksheet {
     };
     total_amount:string;
     status:string;
+    approval_status:string;
 }
 
 export type { IWorksheet };

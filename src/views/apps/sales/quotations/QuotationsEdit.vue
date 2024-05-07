@@ -32,8 +32,11 @@
                     >
                     <div class="block">
                       <el-date-picker
-                        v-model="QuotationDetails.date"
                         type="date"
+                        name="date"
+                        id="date"
+                        v-model="QuotationDetails.date"
+                        @change="setDates($event, 'date')"
                         placeholder="Pick a day"
                         :shortcuts="shortcuts"
                         :disabled-date="disabledDate"
@@ -56,8 +59,11 @@
                     >
                     <div class="block">
                       <el-date-picker
-                        v-model="QuotationDetails.duedate"
                         type="date"
+                        name="duedate"
+                        id="duedate"
+                        v-model="QuotationDetails.duedate"
+                        @change="setDates($event, 'duedate')"
                         placeholder="Pick a day"
                         :shortcuts="shortcuts"
                         :disabled-date="disabledDate"
@@ -1322,7 +1328,9 @@ export default defineComponent({
       qAisApprovedOrConverted.value = globalStatus.value;
       qNisApprovedOrConverted.value = globalStatus.value;
 
-      globalLocation.value = response.client_id === 0 ? true : false;
+      // globalLocation.value = response.client_id === 0 ? true : false;
+      globalLocation.value =
+        response.client_id === response.customer_id ? true : false;
 
       // console.log(globalLocation.value);
       qAsiteSameAsBilling.value = globalStatus.value;
@@ -1475,7 +1483,7 @@ export default defineComponent({
       Clients.value.push(
         ...response.result.map(({ created_at, ...rest }) => ({
           ...rest,
-          created_at: moment(created_at).format("MMMM Do YYYY"),
+          created_at: moment(created_at).format("DD-MM-YYYY"),
         }))
       );
       // console.log(Clients.value);
@@ -1850,7 +1858,7 @@ export default defineComponent({
         clientSelect.value = true;
         if (QuotationDetails.value.lead_id) {
           QuotationDetails.value.client = QuotationDetails.value.lead;
-          QuotationDetails.value.client.id = "0";
+          // QuotationDetails.value.client.id = "0";
         } else {
           QuotationDetails.value.client = {
             id: "",
@@ -1917,7 +1925,7 @@ export default defineComponent({
       Leads.value.push(
         ...response.result.map(({ created_at, ...rest }) => ({
           ...rest,
-          created_at: moment(created_at).format("MMMM Do YYYY"),
+          created_at: moment(created_at).format("DD-MM-YYYY"),
         }))
       );
     };
@@ -1953,8 +1961,8 @@ export default defineComponent({
           items.id === "" ||
           lead.id === "" ||
           client.id === "" ||
-          date === null ||
-          duedate === null ||
+          date === "" ||
+          duedate === "" ||
           status === "" ||
           scope_of_work === "" ||
           terms_and_conditions === "" ||
@@ -1987,6 +1995,24 @@ export default defineComponent({
       dayWiseRef.value = value;
     };
 
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            QuotationDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            QuotationDetails.value[dateType] = "";
+          }
+        } else {
+          QuotationDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        QuotationDetails.value[dateType] = "";
+      }
+      console.log(QuotationDetails.value[dateType]);
+    }
+
     // number formating remove
     const submit = async (e) => {
       e.preventDefault();
@@ -1997,22 +2023,6 @@ export default defineComponent({
 
         if (result) {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-          loading.value = false;
-          return;
-        }
-
-        if (QuotationDetails.value.date && QuotationDetails.value.duedate) {
-          QuotationDetails.value.date = moment(
-            QuotationDetails.value.date
-          ).format("YYYY-MM-DD HH:mm:ss");
-          QuotationDetails.value.duedate = moment(
-            QuotationDetails.value.duedate
-          ).format("YYYY-MM-DD HH:mm:ss");
-        } else {
-          showErrorAlert(
-            "Warning",
-            "Dates cannot be empty, please fill all the required details"
-          );
           loading.value = false;
           return;
         }
@@ -2184,22 +2194,6 @@ export default defineComponent({
               return;
             }
 
-            if (QuotationDetails.value.date && QuotationDetails.value.duedate) {
-              QuotationDetails.value.date = moment(
-                QuotationDetails.value.date
-              ).format("YYYY-MM-DD HH:mm:ss");
-              QuotationDetails.value.duedate = moment(
-                QuotationDetails.value.duedate
-              ).format("YYYY-MM-DD HH:mm:ss");
-            } else {
-              showErrorAlert(
-                "Warning",
-                "Dates cannot be empty, please fill all the required details"
-              );
-              loading.value = false;
-              return;
-            }
-
             if (
               dayWiseRef.value === true &&
               (QuotationDetails.value.items.id === "" ||
@@ -2361,6 +2355,7 @@ export default defineComponent({
       equipments,
       dayWiseRef,
       handleDayWiseChange,
+      setDates,
     };
   },
 });

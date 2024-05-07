@@ -234,6 +234,7 @@
     amendment_date: string;
     storage_medium: string;
     responsible_person: string;
+    approval_status: string;
     company_id: string;
     created_by: string;
     updated_by: string;
@@ -271,6 +272,7 @@
         amendment_date: "",
         storage_medium: "",
         responsible_person: "",
+        approval_status: "",
         company_id: User.company_id,
         created_by: User.id,
         updated_by: User.id,
@@ -287,6 +289,7 @@
           amendment_date: response.amendment_date,
           storage_medium: response.storage_medium,
           responsible_person: response.responsible_person,
+          approval_status: response.approval_status,
           company_id: response.company_id ? response.company_id : "",
           created_by: response.created_by,
           updated_by: response.updated_by,
@@ -294,14 +297,23 @@
         };
       });
   
-      async function setDates(e, dateType) {
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
         if (e != null) {
-          documentDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          if (e != "" && e != null) {
+            documentDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            documentDetails.value[dateType] = "";
+          }
         } else {
           documentDetails.value[dateType] = "";
         }
-        console.log(dateType, " ", documentDetails.value[dateType]);
+      } catch (err) {
+        documentDetails.value[dateType] = "";
       }
+      console.log(documentDetails.value[dateType]);
+    }
   
       function areAllPropertiesNull(array) {
         return array.some((detail) => {

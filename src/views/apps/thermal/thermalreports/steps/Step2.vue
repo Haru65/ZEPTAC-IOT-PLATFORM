@@ -281,23 +281,13 @@ export default defineComponent({
           mainData.value = response.result?.map(
             ({ id, calibration_date, calibration_due_date, ...rest }) => ({
               id: id,
-              calibration_date: moment(calibration_date).format("MMMM Do YYYY"),
-              calibration_due_date:
-                moment(calibration_due_date).format("MMMM Do YYYY"),
+              calibration_date,
+              calibration_due_date,
               ...rest,
               checked: false,
             })
           );
         }
-        // tableData.value = response.result.data.map(
-        //   ({ id, calibration_date, calibration_due_date, ...rest }) => ({
-        //     id: id,
-        //     calibration_date: moment(calibration_date).format("MMMM Do YYYY"),
-        //     calibration_due_date:
-        //       moment(calibration_due_date).format("MMMM Do YYYY"),
-        //     ...rest,
-        //   })
-        // );
       } catch (error) {
         console.error(error);
       } finally {

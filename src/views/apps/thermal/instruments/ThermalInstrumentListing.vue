@@ -39,7 +39,7 @@
             Import
           </button>
           <!--end::Import-->
-          
+
           <ThermalImportModal></ThermalImportModal>
           <!--begin::Export-->
           <button
@@ -376,11 +376,8 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ id, calibration_date, calibration_due_date, ...rest }) => ({
+          ({ id, ...rest }) => ({
             id: id,
-            calibration_date: moment(calibration_date).format("MMMM Do YYYY"),
-            calibration_due_date:
-              moment(calibration_due_date).format("MMMM Do YYYY"),
             ...rest,
           })
         );
@@ -409,11 +406,8 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ id, calibration_date, calibration_due_date, ...rest }) => ({
+          ({ id, ...rest }) => ({
             id: id,
-            calibration_date: moment(calibration_date).format("MMMM Do YYYY"),
-            calibration_due_date:
-              moment(calibration_due_date).format("MMMM Do YYYY"),
             ...rest,
           })
         );
@@ -461,11 +455,8 @@ export default defineComponent({
           `page=${page.value}&limit=${limit.value}`
         );
         tableData.value = response.result.data.map(
-          ({ id, calibration_date, calibration_due_date, ...rest }) => ({
+          ({ id, ...rest }) => ({
             id: id,
-            calibration_date: moment(calibration_date).format("MMMM Do YYYY"),
-            calibration_due_date:
-              moment(calibration_due_date).format("MMMM Do YYYY"),
             ...rest,
           })
         );
@@ -574,11 +565,8 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ id, calibration_date, calibration_due_date, ...rest }) => ({
+          ({ id, ...rest }) => ({
             id: id,
-            calibration_date: moment(calibration_date).format("MMMM Do YYYY"),
-            calibration_due_date:
-              moment(calibration_due_date).format("MMMM Do YYYY"),
             ...rest,
           })
         );

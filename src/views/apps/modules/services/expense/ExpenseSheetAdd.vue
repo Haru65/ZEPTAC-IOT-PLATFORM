@@ -150,7 +150,7 @@ interface IStep3 {}
 interface CreateAccount extends IStep1, IStep2, IStep3 {}
 
 export default defineComponent({
-  name: "kt-horizontal-wizard",
+  name: "expensesheet-add",
   components: {
     Step1,
     Step2,
@@ -206,15 +206,22 @@ export default defineComponent({
     // Expenses Emits
 
     async function setExpenseDate(e, index) {
-      console.log(e);
-      if(e != null){
-        expenseSheetDetails.value.expenses[index].date = await moment(e).format(
-          "YYYY-MM-DD"
-          );
-      }
-      else{
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            expenseSheetDetails.value.expenses[index].date = await moment(
+              e
+            ).format("YYYY-MM-DD");
+          } else {
+            expenseSheetDetails.value.expenses[index].date = await "";
+          }
+        } else {
+          expenseSheetDetails.value.expenses[index].date = await "";
+        }
+      } catch (err) {
         expenseSheetDetails.value.expenses[index].date = await "";
       }
+      console.log(expenseSheetDetails.value.expenses[index].date);
     }
 
     async function setExpenseType(typeId, index) {

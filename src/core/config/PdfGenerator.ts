@@ -251,7 +251,7 @@ const Gen = async (
       ]
 
       
-      let numbersToWords = toWords.convert(invoiceDetials.value.total.toFixed(2), { currency: true });
+      let numbersToWords = toWords.convert(invoiceDetials.value.total, { currency: true });
 
       const Footer = [
         [],
@@ -332,7 +332,7 @@ const Gen = async (
                 title: `Total Amount`,
             },
             {
-                title: `Rs.${invoiceDetials.value.total.toFixed(2)}`,
+                title: `Rs.${invoiceDetials.value.total}`,
             },
         ],
       ]

@@ -215,6 +215,7 @@ interface Item {
   meeting_date: string;
   agenda: string;
   attendees: [];
+  approval_status: string;
   company_id: string;
   created_by: string;
   updated_by: string;
@@ -247,6 +248,7 @@ export default defineComponent({
       meeting_date: "",
       agenda: "",
       attendees: [],
+      approval_status: "1",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -291,6 +293,7 @@ export default defineComponent({
       } catch (err) {
         itemDetails.value[dateType] = "";
       }
+      console.log(itemDetails.value[dateType]);
     }
 
     const validateForm = (formData) => {
@@ -363,6 +366,7 @@ export default defineComponent({
         meeting_date: "",
         agenda: "",
         attendees: [],
+        approval_status: "1",
         company_id: User.company_id,
         created_by: User.id,
         updated_by: User.id,

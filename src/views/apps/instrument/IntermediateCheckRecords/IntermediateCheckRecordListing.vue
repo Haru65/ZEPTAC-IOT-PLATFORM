@@ -96,16 +96,17 @@
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span
-              class="menu-link px-3"
+              class="menu-link"
               data-toggle="tooltip"
               title="View Intermediate Check Plan"
             >
               <router-link
-                :to="`/intermediate_check_records/view/${intermediate_instrument.id}`"
+              :to="`/intermediate_check_records/view/${intermediate_instrument.id}`"
               >
-                <i
-                  class="la la-eye text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
+                <span
+                  class="border rounded badge py-3 fs-7 badge-light-primary text-hover-success cursor-pointer"
+                  >View Intermediate Checks
+                </span>
               </router-link>
             </span>
           </div>

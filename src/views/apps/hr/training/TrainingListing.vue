@@ -91,11 +91,17 @@
       <!--end::Card toolbar-->
     </div>
     <div class="card-body pt-0">
+      <ApprovalModal
+        @reloadData="reLoadData"
+        v-bind:data="itemData"
+      ></ApprovalModal>
+
       <Datatable
+        checkbox-label="id"
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
-        :header="tableHeader"
+        :header="filteredTableHeader"
         :checkbox-enabled="true"
         :items-per-page="limit"
         :items-per-page-dropdown-enabled="false"
@@ -114,13 +120,10 @@
         </template>
         <template v-slot:trainers="{ row: training }">
           <div>
-            <el-select
-              filterable
-              placeholder="Trainer's Names"
-            >
+            <el-select filterable placeholder="Trainer's Names">
               <el-option
                 disabled="disabled"
-                v-for="(trainer,index) in training.trainers"
+                v-for="(trainer, index) in training.trainers"
                 :key="index"
                 :value="trainer"
                 :label="`${trainer}`"
@@ -156,6 +159,35 @@
             class="badge py-3 px-4 fs-7 badge-light-success"
             >{{ GetTrainingStatus(training.training_status) }}</span
           >
+        </template>
+        <template v-slot:approval_status="{ row: training }">
+          <span
+            v-if="training.approval_status == 1"
+            class="badge py-3 px-4 fs-7 badge-light-primary"
+            >{{ GetApprovalStatus(training.approval_status) }}</span
+          >
+          <span
+            v-if="training.approval_status == 2"
+            class="badge py-3 px-4 fs-7 badge-light-danger"
+            >{{ GetApprovalStatus(training.approval_status) }}</span
+          >
+          <span
+            v-if="training.approval_status == 3"
+            class="badge py-3 px-4 fs-7 badge-light-success"
+            >{{ GetApprovalStatus(training.approval_status) }}</span
+          >
+        </template>
+
+        <template v-slot:approval_button="{ row: training }">
+          <button
+            type="button"
+            class="btn btn-sm btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#kt_modal_1"
+            @click="fillItemData(training)"
+          >
+            Open
+          </button>
         </template>
         <template v-slot:actions="{ row: training }">
           <!--begin::Menu Flex-->
@@ -215,16 +247,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
 import type { ITraining } from "@/core/model/training";
 import { GetTrainingStatus, GetTrainingMode } from "@/core/model/training";
-import {
-  getTrainings,
-  deleteTraining,
-  TrainingSearch,
-} from "@/stores/api";
+import { getTrainings, deleteTraining, TrainingSearch } from "@/stores/api";
+import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
+import { hideModal } from "@/core/helpers/dom";
+import ApprovalModal from "./ApprovalModal.vue";
+import { useAuthStore } from "@/stores/auth";
+import { Identifier } from "@/core/config/WhichUserConfig";
 import arraySort from "array-sort";
 import moment from "moment";
 import Swal from "sweetalert2";
@@ -233,8 +266,13 @@ export default defineComponent({
   name: "training-list",
   components: {
     Datatable,
+    ApprovalModal,
   },
   setup() {
+    const auth = useAuthStore();
+    const User = auth.GetUser();
+    const identifier = Identifier;
+
     const tableHeader = ref([
       {
         columnName: "Id",
@@ -273,12 +311,32 @@ export default defineComponent({
         columnWidth: 85,
       },
       {
+        columnName: "Approval Status",
+        columnLabel: "approval_status",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Reject/Approve",
+        columnLabel: "approval_button",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,
       },
     ]);
+
+    const itemData = ref({
+      id: "",
+      approval_status: "",
+      new_status: "",
+      company_id: "",
+      updated_by: "",
+    });
 
     // functions
     const Limits = ref({
@@ -305,7 +363,7 @@ export default defineComponent({
         const response = await getTrainings(
           `page=${page}&limit=${limit.value}`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -315,13 +373,15 @@ export default defineComponent({
             trainers,
             training_mode,
             training_status,
+            ...rest
           }) => ({
             id,
-            training_date: moment(training_date).format("MMM Do YY"),
+            training_date,
             training_topic,
             trainers: JSON.parse(trainers),
             training_mode,
             training_status,
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -347,7 +407,7 @@ export default defineComponent({
         const response = await getTrainings(
           `page=${page.value}&limit=${limit}`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -357,13 +417,15 @@ export default defineComponent({
             trainers,
             training_mode,
             training_status,
+            ...rest
           }) => ({
             id,
-            training_date: moment(training_date).format("MMM Do YY"),
+            training_date,
             training_topic,
             trainers: JSON.parse(trainers),
             training_mode,
             training_status,
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -413,16 +475,18 @@ export default defineComponent({
             trainers,
             training_mode,
             training_status,
+            ...rest
           }) => ({
             id,
-            training_date: moment(training_date).format("MMM Do YY"),
+            training_date,
             training_topic,
             trainers: JSON.parse(trainers),
             training_mode,
             training_status,
+            ...rest,
           })
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
@@ -434,6 +498,21 @@ export default defineComponent({
         }, 100);
       }
     }
+
+    const filteredTableHeader = computed(() => {
+      const isAdmin = identifier.value === "Admin";
+      const isCompanyAdmin = identifier.value === "Company-Admin";
+
+      if (isAdmin || isCompanyAdmin) {
+        // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
+        return tableHeader.value;
+      } else {
+        // Otherwise, exclude the 'approval_button' column
+        return tableHeader.value.filter(
+          (column) => column.columnLabel !== "approval_button"
+        );
+      }
+    });
 
     onMounted(async () => {
       await training_listing();
@@ -524,7 +603,7 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await TrainingSearch(search.value);
-        
+
         tableData.value = response.result.data.map(
           ({
             id,
@@ -533,13 +612,15 @@ export default defineComponent({
             trainers,
             training_mode,
             training_status,
+            ...rest
           }) => ({
             id,
-            training_date: moment(training_date).format("MMM Do YY"),
+            training_date,
             training_topic,
             trainers: JSON.parse(trainers),
             training_mode,
             training_status,
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -579,6 +660,22 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
+    async function reLoadData() {
+      await training_listing();
+    }
+    // Function
+    const fillItemData = (ncr) => {
+      const { id, approval_status, company_id } = ncr;
+
+      itemData.value = {
+        id: id,
+        approval_status: approval_status,
+        new_status: "",
+        company_id: company_id,
+        updated_by: User.id,
+      };
+      console.log("itemData are:", itemData.value);
+    };
 
     return {
       tableData,
@@ -599,7 +696,13 @@ export default defineComponent({
       PageLimitPoiner,
       GetTrainingStatus,
       GetTrainingMode,
-
+      filteredTableHeader,
+      ApprovalStatus,
+      GetApprovalStatus,
+      itemData,
+      fillItemData,
+      identifier,
+      reLoadData,
     };
   },
 });

@@ -47,10 +47,10 @@ import {
   getDocumentChange,
   getPlan,
   getMRMSchedule,
-  getMrmWithMinutes,
   getIAuditSchedule,
   getISORule,
   getCorrectiveAction,
+  validateUser,
 
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
@@ -533,6 +533,18 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
 
+      // Service Request Form
+      {
+        path: "/srf/list",
+        name: "srf-list",
+        component: () =>
+          import("@/views/apps/srf/ServiceRequestListing.vue"),
+        meta: {
+          pageTitle: "Service Requests List",
+          breadcrumbs: ["Service Requests List"],
+        },
+      },
+
 
       // Instruments Front End Routes
       {
@@ -707,8 +719,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/validationreport/ValidationReportListing.vue"),
         meta: {
-          pageTitle: "Validation Report List",
-          breadcrumbs: ["Validation Report List"],
+          pageTitle: "Non-NABL Report List",
+          breadcrumbs: ["Non-NABL Report List"],
         },
       },
       {
@@ -717,8 +729,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/validationreport/ValidationReportAdd.vue"),
         meta: {
-          pageTitle: "Validation Report Add",
-          breadcrumbs: ["Validation Report Add"],
+          pageTitle: "Non-NABL Report Add",
+          breadcrumbs: ["Non-NABL Report Add"],
         },
       },
       {
@@ -743,10 +755,63 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/validationreport/ValidationReportEdit.vue"),
         meta: {
-          pageTitle: "Validation Report Edit",
-          breadcrumbs: ["Validation Report Edit"],
+          pageTitle: "Non-NABL Report Edit",
+          breadcrumbs: ["Non-NABL Report Edit"],
         },
       },
+
+      // NABL Reports - Laminar Air Flow , BioSafety Cabinets
+      {
+        path: "/laf/list",
+        name: "laf-list",
+        component: () =>
+          import("@/views/apps/modules/nablreport/LAF/LaminarAirFlowListing.vue"),
+        meta: {
+          pageTitle: "Laminar Air Flow Report List",
+          breadcrumbs: ["Laminar Air Flow Report List"],
+        },
+      },
+      {
+        path: "/laf/add",
+        name: "laf-add",
+        component: () =>
+          import("@/views/apps/modules/nablreport/LAF/LaminarAirFlowAdd.vue"),
+        meta: {
+          pageTitle: "Laminar Air Flow Add",
+          breadcrumbs: ["Laminar Air Flow Add"],
+        },
+      },
+      {
+        path: "/laf/edit/:id",
+        name: "laf-edit",
+        component: () =>
+          import("@/views/apps/modules/nablreport/LAF/LaminarAirFlowEdit.vue"),
+        meta: {
+          pageTitle: "Laminar Air Flow Reports",
+          breadcrumbs: ["Laminar Air Flow Reports"],
+        },
+      },
+      {
+        path: "/laf_reports/add/:id",
+        name: "laf-report-add",
+        component: () =>
+          import("@/views/apps/modules/nablreport/LAF/LAFComponents/LAFAdd.vue"),
+        meta: {
+          pageTitle: "Laminar Air Flow Report Add",
+          breadcrumbs: ["Laminar Air Flow Report Add"],
+        },
+      },
+      {
+        path: "/laf_reports/edit/:id",
+        name: "laf-report-edit",
+        component: () =>
+          import("@/views/apps/modules/nablreport/LAF/LAFComponents/LAFEdit.vue"),
+        meta: {
+          pageTitle: "Laminar Air Flow Report Edit",
+          breadcrumbs: ["Laminar Air Flow Report Edit"],
+        },
+      },
+
 
       // Validation Procedure Routes
       {
@@ -892,7 +957,7 @@ const routes: Array<RouteRecordRaw> = [
 
       // Training Routes
       {
-        path: "/training",
+        path: "/training/list",
         name: "training-list",
         component: () =>
           import("@/views/apps/hr/training/TrainingListing.vue"),
@@ -939,7 +1004,7 @@ const routes: Array<RouteRecordRaw> = [
 
       // Skill Matrix Routes
       {
-        path: "/skill_matrix",
+        path: "/skill_matrix/list",
         name: "skill-matrix-list",
         component: () =>
           import("@/views/apps/hr/skillmatrix/SkillMatrixListing.vue"),
@@ -2451,6 +2516,36 @@ const routes: Array<RouteRecordRaw> = [
           import("@/views/crafted/authentication/basic-flow/PasswordResetForm.vue"),
         meta: {
           pageTitle: "Password Reset Form",
+        },
+      },
+      {
+        path: "/srf/:company/:customer",
+        name: "srf-add",
+        beforeEnter: async (to, from, next) => {
+
+          const companyID = to.params.company;
+          const customerID = to.params.customer;
+          const data = {
+            company_id: companyID,
+            customer_id: customerID,
+          }
+          try {
+            const response = await validateUser(data);
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/srf/ServiceRequestAdd.vue"),
+        meta: {
+          pageTitle: "Service Request Form",
         },
       },
     ],

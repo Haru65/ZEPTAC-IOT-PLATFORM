@@ -243,7 +243,7 @@
               class="btn btn-light me-3"
             >
               Discard
-          </span>
+            </span>
             <!--end::Button-->
 
             <!--begin::Button-->
@@ -335,13 +335,22 @@ export default defineComponent({
       location: Yup.string().required().label("Location"),
     });
 
+    /* --------SET DATE LOGIC--------*/
     async function setDates(e, dateType) {
-      if (e != null) {
-        documentDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
-      } else {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            documentDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            documentDetails.value[dateType] = "";
+          }
+        } else {
+          documentDetails.value[dateType] = "";
+        }
+      } catch (err) {
         documentDetails.value[dateType] = "";
       }
-      console.log(dateType, " ", documentDetails.value[dateType]);
+      console.log(documentDetails.value[dateType]);
     }
 
     function areAllPropertiesNull(array) {
@@ -428,7 +437,7 @@ export default defineComponent({
             showSuccessAlert("Success", "Document Added Successfully!");
             clear();
 
-            await emit('document-added');
+            await emit("document-added");
             hideModal(newAddressModalRef.value);
             // clear();
           } else {

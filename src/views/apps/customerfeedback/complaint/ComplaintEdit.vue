@@ -59,6 +59,7 @@
                     name="complaint_date"
                     id="complaint_date"
                     v-model="complaintDetails.complaint_date"
+                    @change="setDates($event, 'complaint_date')"
                     placeholder="Pick Complaint Day"
                     :editable="false"
                   />
@@ -85,13 +86,13 @@
                 <!--end::Label-->
 
                 <Field
-                    type="text"
-                    name="complaint_no"
-                    class="form-control form-control-lg form-control-solid"
-                    v-model="complaintDetails.complaint_no"
-                    placeholder="Enter Complaint Number"
-                  />
-                  <div class="fv-plugins-message-container">
+                  type="text"
+                  name="complaint_no"
+                  class="form-control form-control-lg form-control-solid"
+                  v-model="complaintDetails.complaint_no"
+                  placeholder="Enter Complaint Number"
+                />
+                <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
                     <ErrorMessage name="complaint_no" />
                   </div>
@@ -175,8 +176,10 @@
                     :label="item.source"
                   />
                 </el-select>
-                <div class="fv-plugins-message-container" 
-                  v-if="!complaintDetails.source_of_complaint">
+                <div
+                  class="fv-plugins-message-container"
+                  v-if="!complaintDetails.source_of_complaint"
+                >
                   <div class="fv-help-block">
                     <ErrorMessage name="source_of_complaint" />
                   </div>
@@ -226,6 +229,7 @@
                         name="resolution_date"
                         id="resolution_date"
                         v-model="complaintDetails.resolution_date"
+                        @change="setDates($event, 'resolution_date')"
                         placeholder="Pick Resolution Day"
                         :editable="false"
                       />
@@ -322,10 +326,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useRouter, useRoute } from "vue-router";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
-import {
-  SourceOfComplaint,
-  ComplaintStatus,
-} from "@/core/model/complaints";
+import { SourceOfComplaint, ComplaintStatus } from "@/core/model/complaints";
 
 interface Complaint {
   customer_name: string;
@@ -337,6 +338,7 @@ interface Complaint {
   comment_by_customer: string;
   resolution_date: string;
   complaint_status: string;
+  approval_status: string;
   company_id: string;
   created_by: string;
   updated_by: string;
@@ -382,18 +384,17 @@ export default defineComponent({
       comment_by_customer: "",
       resolution_date: "",
       complaint_status: "",
+      approval_status: "",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
       is_active: "1",
     });
 
-
     onMounted(async () => {
       let response = await getComplaint(itemId.toString());
       // console.log(response);
       complaintDetails.value = {
-
         customer_name: response.customer_name,
         complaint_date: response.complaint_date,
         complaint_no: response.complaint_no,
@@ -403,9 +404,8 @@ export default defineComponent({
         comment_by_customer: response.comment_by_customer,
         resolution_date: response.resolution_date,
         complaint_status: response.complaint_status,
-        company_id: response.company_id
-          ? response.company_id
-          : "",
+        approval_status: response.approval_status,
+        company_id: response.company_id ? response.company_id : "",
         created_by: response.created_by,
         updated_by: response.updated_by,
         is_active: response.is_active,
@@ -430,24 +430,40 @@ export default defineComponent({
 
         return (
           customer_name !== "" &&
-          complaint_date !== null &&
+          complaint_date !== "" &&
           complaint_no !== "" &&
           details_of_complaint !== "" &&
           corrective_action !== "" &&
           source_of_complaint !== "" &&
           comment_by_customer !== "" &&
-          resolution_date !== null &&
+          resolution_date !== "" &&
           complaint_status !== ""
         );
       });
     }
 
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            complaintDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            complaintDetails.value[dateType] = "";
+          }
+        } else {
+          complaintDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        complaintDetails.value[dateType] = "";
+      }
+      console.log(complaintDetails.value[dateType]);
+    }
 
     const submit = async () => {
       loading.value = true;
 
       try {
-
         complaintDetails.value.complaint_date = moment(
           complaintDetails.value.complaint_date
         ).format("YYYY-MM-DD");
@@ -459,7 +475,10 @@ export default defineComponent({
         const result = areAllPropertiesNotNull([complaintDetails.value]);
 
         if (result) {
-          const response = await updateComplaint(itemId, complaintDetails.value);
+          const response = await updateComplaint(
+            itemId,
+            complaintDetails.value
+          );
           // console.log(response)
           // console.log(response.error);
           if (!response.error) {
@@ -479,8 +498,7 @@ export default defineComponent({
             showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
             loading.value = false;
           }
-        }
-        else{
+        } else {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           loading.value = false;
         }
@@ -531,8 +549,8 @@ export default defineComponent({
       packages,
       limit,
       SourceOfComplaint,
-  ComplaintStatus,
-      
+      ComplaintStatus,
+      setDates,
     };
   },
 });

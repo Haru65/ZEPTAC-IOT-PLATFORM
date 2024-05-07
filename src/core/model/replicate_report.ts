@@ -10,6 +10,7 @@ interface IRReport {
     engineer_1: string;
     engineer_2: string;
     replicate_date: string;
+    approval_status: string;
   }
   
   

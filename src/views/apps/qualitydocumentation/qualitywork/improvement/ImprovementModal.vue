@@ -237,6 +237,7 @@ interface Item {
   target: string;
   outcome: string;
   quarter: string;
+  approval_status: string;
   company_id: string;
   created_by: string;
   updated_by: string;
@@ -268,6 +269,7 @@ export default defineComponent({
       target: "",
       outcome: "",
       quarter: "",
+      approval_status: "1",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -300,6 +302,7 @@ export default defineComponent({
         target: "",
         outcome: "",
         quarter: "",
+        approval_status: "1",
         company_id: User.company_id,
         created_by: User.id,
         updated_by: User.id,

@@ -694,7 +694,7 @@ export default defineComponent({
         Companies.value.push(
           ...response.result?.map(({ created_at, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
           }))
         );
         // console.log(Companies);

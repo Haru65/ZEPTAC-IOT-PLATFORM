@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 // all apis for CRUD options
 import ApiService from "@/core/services/ApiService";
+import axios, { type AxiosProgressEvent } from "axios";
 const COMPANY_URL = "company";
 const USER_URL = "users";
 const CUSTOMERS_URL = "customers";
@@ -50,6 +51,9 @@ const PLAN_URL = "plan";
 const PLANNER_URL = "planner";
 const MRM_SCHEDULE_URL = "mrm_schedule";
 const MRM_MINUTE_URL = "mrm_minutes";
+const SRF_URL = "srf";
+const LAF_URL = "laf";
+const LAF_REPORT_URL = "laf_reports";
 
 
 
@@ -78,6 +82,17 @@ export async function resetPassword(data: any) {
     }
 }
 
+// Validate User for Service Request
+export async function validateUser(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.post("validate_user", data);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        return { error: error };
+    }
+}
 
 // COMPANIES
 
@@ -978,6 +993,24 @@ export async function getInstrument(data: any) {
     }
 }
 
+
+// update function
+export async function InstrumentStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("instruments_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 export async function updateInstrument(id: any, data: any) {
     try {
         //console.log(data)
@@ -1111,6 +1144,23 @@ export async function UpdateStatus(data: object) {
     }
 }
 
+// update function
+export async function RGatePassStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("returnablegatepasses_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 export async function getRGatePass(data: string) {
     try {
         //console.log(data)
@@ -1196,6 +1246,23 @@ export async function getDailyWorksheets(data) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.listingget(DWSHEET_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function DailyWorksheetStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("dailyworksheet_status", details);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -1337,6 +1404,22 @@ export async function getExpenseSheet(id: any) {
     }
 }
 
+// update function
+export async function ExpenseSheetStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("expensesheets_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
 
 export async function updateExpenseSheet(id: any, data: any) {
     try {
@@ -1673,6 +1756,22 @@ export async function updateComplaint(id: any, data: any) {
     }
 }
 
+// update function
+export async function ComplaintStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("complaint_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
 
 export async function deleteComplaint(data: any) {
     try {
@@ -1747,6 +1846,24 @@ export async function updateTraining(id: any, data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.put(TRAINING_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// update function
+export async function TrainingStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("training_status", details);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -2390,6 +2507,24 @@ export async function updateNonConformanceRecord(id: any, data: any) {
     }
 }
 
+// update function
+export async function NonConformanceRecordStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("non_conformance_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
 // delete function
 export async function deleteNonConformanceRecord(data: any) {
     try {
@@ -2517,6 +2652,23 @@ export async function updateRiskRegister(id: any, data: any) {
     }
 }
 
+// update function
+export async function RiskRegisterStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("risk_register_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 // delete function
 export async function deleteRiskRegister(data: any) {
     try {
@@ -2603,6 +2755,24 @@ export async function updateDocumentChange(id: any, data: any) {
     }
 }
 
+// update function
+export async function DocumentChangeStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("document_change_request_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
 // delete function
 export async function deleteDocumentChange(data: any) {
     try {
@@ -2682,6 +2852,23 @@ export async function updateImprovementPlan(id: any, data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.put(IMPROVEMENT_PLAN__URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function ImprovementPlanStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("improvement_plan_status", details);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -2845,6 +3032,24 @@ export async function updateIAuditObservation(id: any, data: any) {
     }
 }
 
+// update function
+export async function IAuditObservationStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("auditobservations_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
 // delete function
 export async function deleteIAuditObservation(data: any) {
     try {
@@ -2915,6 +3120,24 @@ export async function updateCorrectiveAction(id: any, data: any) {
         return { error: errors };
     }
 }
+
+// update function
+export async function CorrectiveActionStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("non_conformance_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 
 // delete function
 export async function deleteCorrectiveAction(data: any) {
@@ -3002,6 +3225,24 @@ export async function updateIAuditSchedule(id: any, data: any) {
     }
 }
 
+// update function
+export async function IAuditScheduleStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("auditschedule_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
 // delete function
 export async function deleteIAuditSchedule(data: any) {
     try {
@@ -3088,6 +3329,23 @@ export async function updateQMSProcedure(id: any, data: any) {
     }
 }
 
+// update function
+export async function QMSProcedureStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("qms_procedure_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 // delete function
 export async function deleteQMSProcedure(data: any) {
     try {
@@ -3167,6 +3425,23 @@ export async function updateWorkInstruction(id: any, data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.put(WORK_INSTRUCTION_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function WorkInstructionStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("work_instruction_status", details);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -3261,6 +3536,24 @@ export async function updateFormAndFormat(id: any, data: any) {
     }
 }
 
+// update function
+export async function FormAndFormatStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("form_format_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
 // delete function
 export async function deleteFormAndFormat(data: any) {
     try {
@@ -3347,6 +3640,24 @@ export async function updateNABLDoc(id: any, data: any) {
     }
 }
 
+// update function
+export async function NABLDocStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("nabl_document_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
 // delete function
 export async function deleteNABLDoc(data: any) {
     try {
@@ -3427,6 +3738,23 @@ export async function updateNIDoc(id: any, data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.put(NI_DOC_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function NIDocStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("ni_status", details);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -3520,6 +3848,24 @@ export async function updateRecord(id: any, data: any) {
     }
 }
 
+
+// update function
+export async function RecordStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("quality_record_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 // delete function
 export async function deleteRecord(data: any) {
     try {
@@ -3599,6 +3945,23 @@ export async function updateSkillMatrix(id: any, data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.put(SKILL_MATRIX_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function SkillMatrixStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("skill_matrix_status", details);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -3706,6 +4069,24 @@ export async function updateIntermediateCheckRecord(id: any, data: any) {
     }
 }
 
+
+// // update function
+// export async function IntermediateCheckRecordStatus(id: any, data: any) {
+//     try {
+//         //console.log(data)
+//         const details = {
+//             id: id,
+//             data: data
+//         }
+//         ApiService.setHeader();
+//         const response = await ApiService.post("intermediate_check_status", details);
+//         return response.data;
+//     } catch (errors) {
+//         console.error(errors);
+//         return { error: errors };
+//     }
+// }
+
 // delete function
 export async function deleteIntermediateCheckRecord(data: any) {
     try {
@@ -3805,6 +4186,24 @@ export async function updateInspectionRecord(id: any, data: any) {
     }
 }
 
+
+// // update function
+// export async function InspectionRecordStatus(id: any, data: any) {
+//     try {
+//         //console.log(data)
+//         const details = {
+//             id: id,
+//             data: data
+//         }
+//         ApiService.setHeader();
+//         const response = await ApiService.post("inspection_records_status", details);
+//         return response.data;
+//     } catch (errors) {
+//         console.error(errors);
+//         return { error: errors };
+//     }
+// }
+
 // delete function
 export async function deleteInspectionRecord(data: any) {
     try {
@@ -3890,6 +4289,24 @@ export async function updateSupplier(id: any, data: any) {
         return { error: errors };
     }
 }
+
+// update function
+export async function SupplierStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("suppliers_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 
 // delete function
 export async function deleteSupplier(data: any) {
@@ -4060,6 +4477,23 @@ export async function updateMethodValidation(id: any, data: any) {
     }
 }
 
+// update function
+export async function MethodValidationStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("method_validation_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 // delete function
 export async function deleteMethodValidation(data: any) {
     try {
@@ -4145,6 +4579,23 @@ export async function updateInterLabComparison(id: any, data: any) {
     }
 }
 
+// update function
+export async function InterLabComparisonStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("interlaboratory_status", details);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 // delete function
 export async function deleteInterLabComparison(data: any) {
     try {
@@ -4223,6 +4674,24 @@ export async function updateReplicateReport(id: any, data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.put(REPLICATE_REPORT_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// update function
+export async function ReplicateReportStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("replicate_report_status", details);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -4500,12 +4969,16 @@ export async function updateMRMSchedule(id: any, data: any) {
     }
 }
 
-// delete function
-export async function deleteMRMSchedule(data: any) {
+// update function
+export async function MRMScheduleStatus(id: any, data: any) {
     try {
         //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
         ApiService.setHeader();
-        const response = await ApiService.delete(MRM_SCHEDULE_URL + "/" + data);
+        const response = await ApiService.post("mrm_schedule_status", details);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -4513,14 +4986,12 @@ export async function deleteMRMSchedule(data: any) {
     }
 }
 
-
-// MRM - MRM Schedule  
-export async function getMrmWithMinutes(data: any) {
+// delete function
+export async function deleteMRMSchedule(data: any) {
     try {
         //console.log(data)
-        const id = { "id": data };
         ApiService.setHeader();
-        const response = await ApiService.post('get_mrm_minutes', id);
+        const response = await ApiService.delete(MRM_SCHEDULE_URL + "/" + data);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -4586,6 +5057,292 @@ export async function deleteMRMMinute(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(MRM_MINUTE_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// // image upload api
+// export async function uploadImage(fileData: any) {
+//     try {
+//         ApiService.setHeader();
+//         const response = await ApiService.post("upload_image", fileData);
+//         // console.log(response)
+//         return response.data;
+//     } catch (errors) {
+//         console.error(errors);
+//         return { error: errors };
+//     }
+// }
+
+// Define a custom type for the onUploadProgress callback
+type UploadProgressCallback = (progressEvent: AxiosProgressEvent) => void;
+
+// image upload api
+export async function uploadImage(fileData: FormData, onUploadProgress: UploadProgressCallback) {
+    try {
+        const response = await axios.post("upload_image", fileData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            onUploadProgress: onUploadProgress,
+        });
+
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// SERVICE REQUEST FORM
+// listing function
+export async function getServiceRequests(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(SRF_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function ServiceRequestSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('srf_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// add function
+export async function addServiceRequest(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(SRF_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getServiceRequest(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(SRF_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateServiceRequest(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(SRF_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteServiceRequest(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(SRF_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
+// NABL REPORTS - LAF
+
+// listing function
+export async function getLaminarAirFlows(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(LAF_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function LaminarAirFlowSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('laf_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addLaminarAirFlow(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(LAF_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getLaminarAirFlow(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(LAF_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+// export async function updateLaminarAirFlow(id: any, data: any) {
+//     try {
+//         //console.log(data)
+//         ApiService.setHeader();
+//         const response = await ApiService.put(LAF_URL + "/" + id, data);
+//         return response.data;
+//     } catch (errors) {
+//         console.error(errors);
+//         return { error: errors };
+//     }
+// }
+
+// delete function
+export async function deleteLaminarAirFlow(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(LAF_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
+// NABL REPORTS - LAF REPORT
+
+// listing function
+export async function getLAFReports(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(LAF_REPORT_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addLAFReport(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(LAF_REPORT_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getLAFReport(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(LAF_REPORT_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateLAFReport(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(LAF_REPORT_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteLAFReport(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(LAF_REPORT_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// Download LAF Report
+export async function DownloadLAFReport(data: any) {
+    try {
+        //console.log(data)
+        const id = { "id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post("download_laf_report",id);
         return response.data;
     } catch (errors) {
         console.error(errors);

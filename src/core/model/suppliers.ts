@@ -11,6 +11,7 @@ interface ISupplier {
     supplier_category: string;
     product_service_details: string;
     status: string;
+    approval_status: string;
     company_id: string;
   }
   

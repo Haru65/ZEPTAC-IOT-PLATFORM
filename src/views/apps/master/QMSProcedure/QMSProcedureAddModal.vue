@@ -334,6 +334,7 @@ interface Document {
   storage_medium: string;
   responsible_person: string;
   document_file: string;
+  approval_status: string;
   company_id: string;
   created_by: string;
   updated_by: string;
@@ -367,6 +368,7 @@ export default defineComponent({
       storage_medium: "",
       responsible_person: "",
       document_file: "",
+      approval_status: "1",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -374,19 +376,30 @@ export default defineComponent({
     });
 
     const DocumentValidator = Yup.object().shape({
-      document_section: Yup.string().required().label("Document number with section"),
+      document_section: Yup.string()
+        .required()
+        .label("Document number with section"),
       document_name: Yup.string().required().label("Document name"),
       storage_medium: Yup.string().required().label("Storage Medium"),
       responsible_person: Yup.string().required().label("Responsible Person"),
     });
 
+    /* --------SET DATE LOGIC--------*/
     async function setDates(e, dateType) {
-      if (e != null) {
-        documentDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
-      } else {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            documentDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            documentDetails.value[dateType] = "";
+          }
+        } else {
+          documentDetails.value[dateType] = "";
+        }
+      } catch (err) {
         documentDetails.value[dateType] = "";
       }
-      console.log(dateType, " ", documentDetails.value[dateType]);
+      console.log(documentDetails.value[dateType]);
     }
 
     const handleFileChange = (event) => {
@@ -466,6 +479,7 @@ export default defineComponent({
         storage_medium: "",
         responsible_person: "",
         document_file: "",
+        approval_status: "1",
         company_id: User.company_id,
         created_by: User.id,
         updated_by: User.id,

@@ -87,6 +87,7 @@
                           >
                             <th class="col-2">No.</th>
                             <th class="col-5">Check Date</th>
+                            <th class="col-2">Approval Status</th>
                             <th>Edit</th>
                           </tr>
                         </thead>
@@ -98,14 +99,35 @@
                             :key="index"
                           >
                             <td class="align-middle">
-                              <span
-                                >{{ index + 1 }}</span
-                              >
+                              <span>{{ index + 1 }}</span>
                             </td>
                             <td class="align-middle">
                               <span
                                 class="badge py-3 px-4 fs-7 badge-light-primary"
                                 >{{ `${plan?.check_date}` }}</span
+                              >
+                            </td>
+                            <td class="align-middle">
+                              <span
+                                v-if="plan?.approval_status == '1'"
+                                class="badge py-3 px-4 fs-7 badge-light-primary"
+                                >{{
+                                  GetApprovalStatus(plan?.approval_status)
+                                }}</span
+                              >
+                              <span
+                                v-if="plan?.approval_status == '2'"
+                                class="badge py-3 px-4 fs-7 badge-light-danger"
+                                >{{
+                                  GetApprovalStatus(plan?.approval_status)
+                                }}</span
+                              >
+                              <span
+                                v-if="plan?.approval_status == '3'"
+                                class="badge py-3 px-4 fs-7 badge-light-success"
+                                >{{
+                                  GetApprovalStatus(plan?.approval_status)
+                                }}</span
                               >
                             </td>
                             <td>
@@ -120,13 +142,14 @@
                           </tr>
                           <tr
                             class="text-center"
-                            v-if="itemDetails.intermediate_check_records == null ||
+                            v-if="
+                              itemDetails.intermediate_check_records == null ||
                               itemDetails.intermediate_check_records?.length ===
-                              0
+                                0
                             "
                           >
                             <td
-                              colspan="3"
+                              colspan="4"
                               class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200 text-align-center"
                             >
                               No Intermediate Plans Yet.
@@ -159,6 +182,7 @@ import {
   getCalibrationInstrumentForIntermediate,
   getIntermediateCheckRecord,
 } from "@/stores/api";
+import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import packages from "@/core/config/PackagesConfig";
@@ -171,6 +195,7 @@ import moment from "moment";
 interface Data {
   id: string;
   check_date: string;
+  approval_status: string;
 }
 
 export default defineComponent({
@@ -198,10 +223,13 @@ export default defineComponent({
       model_no: "",
       serial_no: "",
 
-      intermediate_check_records: [{
-        id:"",
-        check_date: ""
-      }],
+      intermediate_check_records: [
+        {
+          id: "",
+          check_date: "",
+          approval_status: "",
+        },
+      ],
     });
 
     onMounted(async () => {
@@ -215,7 +243,10 @@ export default defineComponent({
         itemDetails.make = response.result.make;
         itemDetails.model_no = response.result.model_no;
         itemDetails.serial_no = response.result.serial_no;
-        itemDetails.intermediate_check_records =  response.result?.intermediate_check_records ? response.result?.intermediate_check_records : [];
+        itemDetails.intermediate_check_records = response.result
+          ?.intermediate_check_records
+          ? response.result?.intermediate_check_records
+          : [];
       } catch (error) {
         showErrorAlert("Error", "An error occurred during the API call.");
         loading.value = false;
@@ -242,6 +273,8 @@ export default defineComponent({
       loading,
       packages,
       limit,
+      ApprovalStatus,
+      GetApprovalStatus,
     };
   },
 });

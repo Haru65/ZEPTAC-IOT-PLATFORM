@@ -31,12 +31,15 @@
                       >Date</span
                     >
                     <div class="block">
+                      <!--begin::Input-->
                       <el-date-picker
-                        v-model="QuotationDetails.date"
                         type="date"
-                        placeholder="Pick a day"
+                        name="date"
+                        id="date"
+                        v-model="QuotationDetails.date"
+                        @change="setDates($event, 'date')"
                         :shortcuts="shortcuts"
-                        :disabled-date="disabledDate"
+                        placeholder="Pick a day"
                         :editable="false"
                       />
                     </div>
@@ -56,11 +59,13 @@
                     >
                     <div class="block">
                       <el-date-picker
-                        v-model="QuotationDetails.duedate"
                         type="date"
-                        placeholder="Pick a day"
+                        name="duedate"
+                        id="duedate"
+                        v-model="QuotationDetails.duedate"
+                        @change="setDates($event, 'duedate')"
                         :shortcuts="shortcuts"
-                        :disabled-date="disabledDate"
+                        placeholder="Pick a day"
                         :editable="false"
                       />
                     </div>
@@ -1016,7 +1021,7 @@ export default defineComponent({
         clientSelect.value = true;
         if (QuotationDetails.value.lead_id) {
           QuotationDetails.value.client = QuotationDetails.value.lead;
-          QuotationDetails.value.client.id = "0";
+          // QuotationDetails.value.client.id = "0";
         } else {
           QuotationDetails.value.client = {
             id: "",
@@ -1124,7 +1129,6 @@ export default defineComponent({
           equipment_wise,
         } = foundLocation;
 
-        
         QuotationDetails.value.items.id = id;
         QuotationDetails.value.items.site_location = site_location;
 
@@ -1155,24 +1159,21 @@ export default defineComponent({
           boardingRef.value = true;
 
           await calculateTotal();
-        }
-        else{
+        } else {
           QuotationDetails.value.items.per_day_charge = "";
           QuotationDetails.value.items.accommodation = 0;
           QuotationDetails.value.items.travelling = 0;
           QuotationDetails.value.items.training = 0;
           QuotationDetails.value.items.boarding = 0;
           QuotationDetails.value.items.pickup = 0;
-          QuotationDetails.value.items.number_of_days = "1"
-          ;
+          QuotationDetails.value.items.number_of_days = "1";
           equipments.value.pop();
           equipments.value = [...equipment_wise];
-          
+
           QuotationDetails.value.items.equipment_wise = [];
-          
+
           QuotationDetails.value.total = 0;
         }
-
       }
     }
 
@@ -1291,8 +1292,12 @@ export default defineComponent({
         QuotationDetails.value.items.equipment_wise[index].charge &&
         QuotationDetails.value.items.equipment_wise[index].quantity
       ) {
-        let equipValue = Number(QuotationDetails.value.items.equipment_wise[index].charge) * Number(QuotationDetails.value.items.equipment_wise[index].quantity);
-        QuotationDetails.value.items.equipment_wise[index].amount = Number(equipValue.toFixed(2));
+        let equipValue =
+          Number(QuotationDetails.value.items.equipment_wise[index].charge) *
+          Number(QuotationDetails.value.items.equipment_wise[index].quantity);
+        QuotationDetails.value.items.equipment_wise[index].amount = Number(
+          equipValue.toFixed(2)
+        );
       } else {
         QuotationDetails.value.items.equipment_wise[index].amount = 0;
       }
@@ -1300,10 +1305,11 @@ export default defineComponent({
     }
 
     const calculateTotalEquipment = () => {
-      QuotationDetails.value.total = QuotationDetails.value.items.equipment_wise.reduce(
-        (sum, item) => sum + item.amount,
-        0
-      );
+      QuotationDetails.value.total =
+        QuotationDetails.value.items.equipment_wise.reduce(
+          (sum, item) => sum + item.amount,
+          0
+        );
     };
 
     const addNewRow = () => {
@@ -1420,7 +1426,7 @@ export default defineComponent({
       Clients.value.push(
         ...response.result.map(({ created_at, ...rest }) => ({
           ...rest,
-          created_at: moment(created_at).format("MMMM Do YYYY"),
+          created_at: moment(created_at).format("DD-MM-YYYY"),
         }))
       );
       // console.log(Clients.value);
@@ -1429,7 +1435,7 @@ export default defineComponent({
     const GetUserData = async (id) => {
       if (id != " ") {
         const lead_id = id;
-        const response = await getUser(lead_id); 
+        const response = await getUser(lead_id);
         // console.log(response);
         QuotationDetails.value.lead = response.meta;
         QuotationDetails.value.lead.id = response.id;
@@ -1502,10 +1508,28 @@ export default defineComponent({
       Leads.value.push(
         ...response.result.map(({ created_at, ...rest }) => ({
           ...rest,
-          created_at: moment(created_at).format("MMMM Do YYYY"),
+          created_at: moment(created_at).format("DD-MM-YYYY"),
         }))
       );
     };
+
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            QuotationDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            QuotationDetails.value[dateType] = "";
+          }
+        } else {
+          QuotationDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        QuotationDetails.value[dateType] = "";
+      }
+      console.log(QuotationDetails.value[dateType]);
+    }
 
     function areAllPropertiesNull(array) {
       return array.some((detail) => {
@@ -1533,8 +1557,8 @@ export default defineComponent({
           items.id === "" ||
           lead.id === "" ||
           client.id === "" ||
-          date === null ||
-          duedate === null ||
+          date === "" ||
+          duedate === "" ||
           status === "" ||
           scope_of_work === "" ||
           terms_and_conditions === "" ||
@@ -1566,7 +1590,7 @@ export default defineComponent({
       equipments.value = [];
       dayWiseRef.value = value;
     };
-    
+
     // number formating remove
     const submit = async (e) => {
       e.preventDefault();
@@ -1580,23 +1604,11 @@ export default defineComponent({
           return;
         }
 
-        if (QuotationDetails.value.date && QuotationDetails.value.duedate) {
-          QuotationDetails.value.date = moment(
-            QuotationDetails.value.date
-          ).format("YYYY-MM-DD HH:mm:ss");
-          QuotationDetails.value.duedate = moment(
-            QuotationDetails.value.duedate
-          ).format("YYYY-MM-DD HH:mm:ss");
-        } else {
-          showErrorAlert(
-            "Warning",
-            "Dates cannot be empty, please fill all the required details"
-          );
-          loading.value = false;
-          return;
-        }
-
-        if(dayWiseRef.value === true && (QuotationDetails.value.items.id === "" || QuotationDetails.value.items.per_day_charge === "")){
+        if (
+          dayWiseRef.value === true &&
+          (QuotationDetails.value.items.id === "" ||
+            QuotationDetails.value.items.per_day_charge === "")
+        ) {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           loading.value = false;
           return;
@@ -1606,13 +1618,20 @@ export default defineComponent({
           QuotationDetails.value.items.equipment_wise
         );
 
-        if(dayWiseRef.value === false && (QuotationDetails.value.items.id === "" || QuotationDetails.value.items.equipment_wise.length === 0)){
-          showErrorAlert("Warning", "Please Fill at least one equipment correctly");
+        if (
+          dayWiseRef.value === false &&
+          (QuotationDetails.value.items.id === "" ||
+            QuotationDetails.value.items.equipment_wise.length === 0)
+        ) {
+          showErrorAlert(
+            "Warning",
+            "Please Fill at least one equipment correctly"
+          );
           loading.value = false;
           return;
         }
 
-        if(dayWiseRef.value === false && isEmpty){
+        if (dayWiseRef.value === false && isEmpty) {
           showErrorAlert("Warning", "Please Fill equipment details correctly");
           loading.value = false;
           return;
@@ -1810,6 +1829,7 @@ export default defineComponent({
       equipments,
       dayWiseRef,
       handleDayWiseChange,
+      setDates,
     };
   },
 });

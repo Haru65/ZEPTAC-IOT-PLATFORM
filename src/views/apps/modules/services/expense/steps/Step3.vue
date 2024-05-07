@@ -31,8 +31,8 @@
         <div class="tab-pane fade show active" aria-labelledby="home-tab">
           <div class="shadow-lg p-5 mb-7 fs-4 rounded">
             <p>Returnable Gate Pass: {{ $props.summary.rgp_no }}</p>
-            <p>Date: {{  moment($props.summary.date).format("DD-MM-YYYY") }}</p>
-            <p>Due Date: {{ moment($props.summary.duedate).format("DD-MM-YYYY") }}</p>
+            <p>Date: {{  summary.date }}</p>
+            <p>Due Date: {{ summary.duedate }}</p>
             <p>Quotation ID: {{ $props.summary.quotation_id }}</p>
             <p>Quotation Number: {{ $props.summary.quotation_no }}</p>
             <p>Engineer Name: {{ $props.summary.engineer_name }}</p>
@@ -85,7 +85,7 @@
                   <th scope="row">{{ index + 1 }}</th>
                   <th scope="row">{{ expense.type}}</th>
                   <th scope="row">₹ {{ expense.amount}}</th>
-                  <th scope="row">{{ moment(expense.date).format("DD-MM-YYYY") }}</th>
+                  <th scope="row">{{ expense.date }}</th>
                 </tr>
               </tbody>
             </table>
@@ -141,7 +141,6 @@ export default defineComponent({
   setup(props) {
     return {
       summary: props.summary,
-      moment,
     };
   },
 });

@@ -316,33 +316,13 @@ export default defineComponent({
         const response = await getValidationProcedures(
           `page=${page}&limit=${limit.value}`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
+          ({ id, created_at, ...rest }) => ({
             id,
-            company_id,
-            document_name,
-            issue_date,
-            issue_no,
-            revision_date,
-            revision_no,
-            prepared_by,
-            approved_by,
-            created_at,
-            audit_document,
-          }) => ({
-            id,
-            company_id,
-            document_name,
-            issue_date: moment(issue_date).format("MMMM Do YYYY"),
-            issue_no,
-            revision_date: moment(revision_date).format("MMMM Do YYYY"),
-            revision_no,
-            prepared_by,
-            approved_by,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-            audit_document
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -368,33 +348,13 @@ export default defineComponent({
         const response = await getValidationProcedures(
           `page=${page.value}&limit=${limit}`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
+          ({ id, created_at, ...rest }) => ({
             id,
-            company_id,
-            document_name,
-            issue_date,
-            issue_no,
-            revision_date,
-            revision_no,
-            prepared_by,
-            approved_by,
-            created_at,
-            audit_document,
-          }) => ({
-            id,
-            company_id,
-            document_name,
-            issue_date: moment(issue_date).format("MMMM Do YYYY"),
-            issue_no,
-            revision_date: moment(revision_date).format("MMMM Do YYYY"),
-            revision_no,
-            prepared_by,
-            approved_by,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-            audit_document,
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -437,33 +397,13 @@ export default defineComponent({
           `page=${page.value}&limit=${limit.value}`
         );
         tableData.value = response.result.data.map(
-          ({
+          ({ id, created_at, ...rest }) => ({
             id,
-            company_id,
-            document_name,
-            issue_date,
-            issue_no,
-            revision_date,
-            revision_no,
-            prepared_by,
-            approved_by,
-            created_at,
-            audit_document,
-          }) => ({
-            id,
-            company_id,
-            document_name,
-            issue_date: moment(issue_date).format("MMMM Do YYYY"),
-            issue_no,
-            revision_date: moment(revision_date).format("MMMM Do YYYY"),
-            revision_no,
-            prepared_by,
-            approved_by,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-            audit_document,
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+            ...rest,
           })
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
@@ -565,32 +505,12 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await ValidationProcedureSearch(search.value);
-        
+
         tableData.value = response.result.data.map(
-          ({
+          ({ id, created_at, ...rest }) => ({
             id,
-            company_id,
-            document_name,
-            issue_date,
-            issue_no,
-            revision_date,
-            revision_no,
-            prepared_by,
-            approved_by,
-            created_at,
-            audit_document,
-          }) => ({
-            id,
-            company_id,
-            document_name,
-            issue_date: moment(issue_date).format("MMMM Do YYYY"),
-            issue_no,
-            revision_date: moment(revision_date).format("MMMM Do YYYY"),
-            revision_no,
-            prepared_by,
-            approved_by,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-            audit_document,
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -629,7 +549,6 @@ export default defineComponent({
     const onItemSelect = (selectedItems: Array<number>) => {
       selectedIds.value = selectedItems;
     };
-
 
     return {
       tableData,

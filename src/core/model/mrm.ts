@@ -5,6 +5,7 @@ interface IMRM {
     meeting_date: string;
     attendees: [];
     meetings_count: number;
+    approval_status: number;
     company_id: string;
   }
   

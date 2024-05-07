@@ -304,7 +304,7 @@ export default defineComponent({
             name: first_name + " " + last_name,
             mobile,
             company_name: company_name.company_name,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
             ...rest,
           })
         );
@@ -352,7 +352,7 @@ export default defineComponent({
             name: first_name + " " + last_name,
             mobile,
             company_name: company_name.company_name,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
             ...rest,
           })
         );
@@ -412,7 +412,7 @@ export default defineComponent({
             name: first_name + " " + last_name,
             mobile,
             company_name: company_name.company_name,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
             ...rest,
           })
         );
@@ -539,7 +539,7 @@ export default defineComponent({
             name: first_name + " " + last_name,
             mobile,
             company_name: company_name.company_name,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
             ...rest,
           })
         );

@@ -15,7 +15,29 @@ interface IDocumentChange {
     effective_date: string;
     authority_comments: string;
     comments: string;
+    approval_status: string;
     company_id: string;
   }
 
 export type { IDocumentChange };
+
+export const ApprovalStatus = [
+  {
+    id:"1",
+    status: "Pending",
+  },
+  {
+    id:"2",
+    status: "Rejected",
+  },
+  {
+    id:"3",
+    status: "Approved",
+  }
+];
+
+export const GetApprovalStatus = (id) => {
+  const item = ApprovalStatus.find(item => item.id == id);
+  return item ? item.status : "";
+};
+

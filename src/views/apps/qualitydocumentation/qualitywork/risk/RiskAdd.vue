@@ -215,6 +215,7 @@ export default defineComponent({
         severity: "",
         risk_mode: "",
       }),
+      approval_status: "1",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -224,7 +225,7 @@ export default defineComponent({
     const itemDetailsValidator = Yup.object().shape({
       clause_no: Yup.string().required().label("Clause No."),
       description: Yup.string().required().label("Description"),
-      cause: Yup.string().required().email().label("Cause"),
+      cause: Yup.string().required().label("Cause"),
       effect: Yup.string().required().label("Effect"),
     });
 

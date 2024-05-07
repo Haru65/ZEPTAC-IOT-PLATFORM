@@ -87,11 +87,16 @@
       <!--end::Card toolbar-->
     </div>
     <div class="card-body pt-0">
+      <ApprovalModal
+        @reloadData="reLoadData"
+        v-bind:data="itemData"
+      ></ApprovalModal>
+
       <Datatable
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
-        :header="tableHeader"
+        :header="filteredTableHeader"
         :checkbox-enabled="true"
         :items-per-page="limit"
         :items-per-page-dropdown-enabled="false"
@@ -130,7 +135,35 @@
         <template v-slot:c_risk_mode="{ row: risk }">
           {{ risk.risk_counter.risk_mode }}
         </template>
+        <template v-slot:approval_status="{ row: risk }">
+          <span
+            v-if="risk.approval_status == 1"
+            class="badge py-3 px-4 fs-7 badge-light-primary"
+            >{{ GetApprovalStatus(risk.approval_status) }}</span
+          >
+          <span
+            v-if="risk.approval_status == 2"
+            class="badge py-3 px-4 fs-7 badge-light-danger"
+            >{{ GetApprovalStatus(risk.approval_status) }}</span
+          >
+          <span
+            v-if="risk.approval_status == 3"
+            class="badge py-3 px-4 fs-7 badge-light-success"
+            >{{ GetApprovalStatus(risk.approval_status) }}</span
+          >
+        </template>
 
+        <template v-slot:approval_button="{ row: risk }">
+          <button
+            type="button"
+            class="btn btn-sm btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#kt_modal_1"
+            @click="fillItemData(risk)"
+          >
+            Open
+          </button>
+        </template>
         <template v-slot:actions="{ row: risk }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
@@ -197,10 +230,15 @@
 </template>
   
   <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
 import type { IRisk } from "@/core/model/risk";
+import { ApprovalStatus, GetApprovalStatus } from "@/core/model/risk";
+import { hideModal } from "@/core/helpers/dom";
+import ApprovalModal from "./ApprovalModal.vue";
+import { useAuthStore } from "@/stores/auth";
+import { Identifier } from "@/core/config/WhichUserConfig";
 import {
   getRiskRegisters,
   deleteRiskRegister,
@@ -215,8 +253,12 @@ export default defineComponent({
   name: "risk-list",
   components: {
     Datatable,
+    ApprovalModal,
   },
   setup() {
+    const auth = useAuthStore();
+    const User = auth.GetUser();
+    const identifier = Identifier;
     const tableHeader = ref([
       {
         columnName: "Description",
@@ -279,12 +321,32 @@ export default defineComponent({
         columnWidth: 100,
       },
       {
+        columnName: "Approval Status",
+        columnLabel: "approval_status",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Reject/Approve",
+        columnLabel: "approval_button",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
         columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,
       },
     ]);
+
+    const itemData = ref({
+      id: "",
+      approval_status: "",
+      new_status: "",
+      company_id: "",
+      updated_by: "",
+    });
 
     // functions
     const Limits = ref({
@@ -434,6 +496,21 @@ export default defineComponent({
       }
     }
 
+    const filteredTableHeader = computed(() => {
+      const isAdmin = identifier.value === "Admin";
+      const isCompanyAdmin = identifier.value === "Company-Admin";
+
+      if (isAdmin || isCompanyAdmin) {
+        // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
+        return tableHeader.value;
+      } else {
+        // Otherwise, exclude the 'approval_button' column
+        return tableHeader.value.filter(
+          (column) => column.columnLabel !== "approval_button"
+        );
+      }
+    });
+
     onMounted(async () => {
       await replicate_report_listing();
     });
@@ -577,6 +654,24 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
+    async function reLoadData() {
+      await replicate_report_listing();
+    }
+
+    // Function
+    const fillItemData = (ncr) => {
+      const { id, approval_status, company_id } = ncr;
+
+      itemData.value = {
+        id: id,
+        approval_status: approval_status,
+        new_status: "",
+        company_id: company_id,
+        updated_by: User.id,
+      };
+      console.log("itemData are:", itemData.value);
+    };
+
     return {
       tableData,
       tableHeader,
@@ -594,6 +689,13 @@ export default defineComponent({
       page,
       Limits,
       PageLimitPoiner,
+      filteredTableHeader,
+      ApprovalStatus,
+      GetApprovalStatus,
+      itemData,
+      fillItemData,
+      identifier,
+      reLoadData,
     };
   },
 });

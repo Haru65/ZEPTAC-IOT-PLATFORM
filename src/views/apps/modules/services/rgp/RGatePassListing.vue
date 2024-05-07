@@ -87,12 +87,17 @@
       <!--end::Card toolbar-->
     </div>
     <div class="card-body pt-0">
+      <ApprovalModal
+        @reloadData="reLoadData"
+        v-bind:data="itemData"
+      ></ApprovalModal>
+
       <Datatable
         checkbox-label="id"
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
-        :header="tableHeader"
+        :header="filteredTableHeader"
         :checkbox-enabled="true"
         :items-per-page="limit"
         :items-per-page-dropdown-enabled="false"
@@ -140,6 +145,37 @@
         <template v-slot:duedate="{ row: rgps }">
           {{ rgps.duedate }}
         </template>
+
+        <template v-slot:approval_status="{ row: rgps }">
+          <span
+            v-if="rgps.approval_status == 1"
+            class="badge py-3 px-4 fs-7 badge-light-primary"
+            >{{ GetApprovalStatus(rgps.approval_status) }}</span
+          >
+          <span
+            v-if="rgps.approval_status == 2"
+            class="badge py-3 px-4 fs-7 badge-light-danger"
+            >{{ GetApprovalStatus(rgps.approval_status) }}</span
+          >
+          <span
+            v-if="rgps.approval_status == 3"
+            class="badge py-3 px-4 fs-7 badge-light-success"
+            >{{ GetApprovalStatus(rgps.approval_status) }}</span
+          >
+        </template>
+
+        <template v-slot:approval_button="{ row: rgps }">
+          <button
+            type="button"
+            class="btn btn-sm btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#kt_modal_1"
+            @click="fillItemData(rgps)"
+          >
+            Open
+          </button>
+        </template>
+
         <template v-slot:actions="{ row: rgps }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
@@ -198,7 +234,7 @@
   
   <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { IRGP } from "@/core/model/rgps";
@@ -208,8 +244,12 @@ import {
   getRGPInfo,
   gatePassSearch,
 } from "@/stores/api";
-import arraySort from "array-sort";
+import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
+import { hideModal } from "@/core/helpers/dom";
+import ApprovalModal from "./ApprovalModal.vue";
 import { useAuthStore } from "@/stores/auth";
+import { Identifier } from "@/core/config/WhichUserConfig";
+import arraySort from "array-sort";
 import { formatPrice } from "@/core/config/DataFormatter";
 import { rgpGen } from "@/core/config/GatePassGenerator";
 import moment from "moment";
@@ -219,8 +259,12 @@ export default defineComponent({
   name: "rgp_listing",
   components: {
     Datatable,
+    ApprovalModal,
   },
   setup() {
+    const auth = useAuthStore();
+    const User = auth.GetUser();
+    const identifier = Identifier;
     const tableHeader = ref([
       {
         columnName: "Id",
@@ -271,12 +315,32 @@ export default defineComponent({
         columnWidth: 125,
       },
       {
+        columnName: "Approval Status",
+        columnLabel: "approval_status",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Reject/Approve",
+        columnLabel: "approval_button",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,
       },
     ]);
+
+    const itemData = ref({
+      id: "",
+      approval_status: "",
+      new_status: "",
+      company_id: "",
+      updated_by: "",
+    });
 
     interface RGP {
       rgp_no: string;
@@ -293,8 +357,6 @@ export default defineComponent({
     }
 
     const loading = ref(true);
-    const auth = useAuthStore();
-    const User = auth.GetUser();
 
     // RGP Ref
     // const returnableGatePassDetails = ref<>
@@ -312,7 +374,7 @@ export default defineComponent({
       updated_by: User.id,
       is_active: 1,
     });
-    
+
     const selectedIds = ref<Array<number>>([]);
 
     const tableData = ref<Array<IRGP>>([]);
@@ -343,7 +405,7 @@ export default defineComponent({
         const response = await getAllRGatePass(
           `page=${page}&limit=${limit.value}`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -356,6 +418,7 @@ export default defineComponent({
             status,
             date,
             duedate,
+            ...rest
           }) => ({
             id: id,
             rgp_no: rgp_no,
@@ -364,8 +427,9 @@ export default defineComponent({
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
             status: status,
-            date: moment(date).format("DD/MM/YYYY"),
-            duedate: moment(duedate).format("DD/MM/YYYY"),
+            date,
+            duedate,
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -391,7 +455,7 @@ export default defineComponent({
         const response = await getAllRGatePass(
           `page=${page.value}&limit=${limit}`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -404,6 +468,7 @@ export default defineComponent({
             status,
             date,
             duedate,
+            ...rest
           }) => ({
             id: id,
             rgp_no: rgp_no,
@@ -412,8 +477,9 @@ export default defineComponent({
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
             status: status,
-            date: moment(date).format("DD/MM/YYYY"),
-            duedate: moment(duedate).format("DD/MM/YYYY"),
+            date,
+            duedate,
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -460,6 +526,7 @@ export default defineComponent({
             status,
             date,
             duedate,
+            ...rest
           }) => ({
             id: id,
             rgp_no: rgp_no,
@@ -468,8 +535,9 @@ export default defineComponent({
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
             status: status,
-            date: moment(date).format("DD/MM/YYYY"),
-            duedate: moment(duedate).format("DD/MM/YYYY"),
+            date,
+            duedate,
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -482,6 +550,21 @@ export default defineComponent({
         }, 100);
       }
     }
+
+    const filteredTableHeader = computed(() => {
+      const isAdmin = identifier.value === "Admin";
+      const isCompanyAdmin = identifier.value === "Company-Admin";
+
+      if (isAdmin || isCompanyAdmin) {
+        // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
+        return tableHeader.value;
+      } else {
+        // Otherwise, exclude the 'approval_button' column
+        return tableHeader.value.filter(
+          (column) => column.columnLabel !== "approval_button"
+        );
+      }
+    });
 
     onMounted(async () => {
       await rgp_listing();
@@ -646,7 +729,7 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await gatePassSearch(search.value);
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -659,6 +742,7 @@ export default defineComponent({
             status,
             date,
             duedate,
+            ...rest
           }) => ({
             id: id,
             rgp_no: rgp_no,
@@ -667,8 +751,9 @@ export default defineComponent({
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
             status: status,
-            date: moment(date).format("DD/MM/YYYY"),
-            duedate: moment(duedate).format("DD/MM/YYYY"),
+            date,
+            duedate,
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -703,6 +788,24 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
+    async function reLoadData() {
+      await rgp_listing();
+    }
+
+    // Function
+    const fillItemData = (ncr) => {
+      const { id, approval_status, company_id } = ncr;
+
+      itemData.value = {
+        id: id,
+        approval_status: approval_status,
+        new_status: "",
+        company_id: company_id,
+        updated_by: User.id,
+      };
+      console.log("itemData are:", itemData.value);
+    };
+
     return {
       tableData,
       tableHeader,
@@ -724,6 +827,13 @@ export default defineComponent({
       Limits,
       downloadRGP,
       rgpInfo,
+      filteredTableHeader,
+      ApprovalStatus,
+      GetApprovalStatus,
+      itemData,
+      fillItemData,
+      identifier,
+      reLoadData,
     };
   },
 });

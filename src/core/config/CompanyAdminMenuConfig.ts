@@ -20,85 +20,92 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
     ],
   },
   {
-    heading: "Modules",
-    route: "/modules",
+    heading: "CleanRoom Validation",
+    route: "/",
     pages: [
       {
-        sectionTitle: "CleanRoom Validation",
-        route: "/modules/cleanroom",
+        sectionTitle: "Validation Service",
+        route: "/",
         keenthemesIcon: "element-plus",
         bootstrapIcon: "bi-archive",
         sub: [
           {
-            sectionTitle: "Validation Service",
-            route: "/modules/validation",
-            keenthemesIcon: "office-bag",
-            bootstrapIcon: "bi-archive",
-            sub: [
-              {
-                heading: "Returnable Gate Pass",
-                route: "/returnablegatepasses",
-              },
-              {
-                heading: "Daily Worksheet",
-                route: "/dailyworksheets",
-              },
-              {
-                heading: "Expense Sheet",
-                route: "/expensesheets",
-              },
-            ],
+            heading: "Returnable Gate Pass",
+            route: "/returnablegatepasses",
           },
           {
-            sectionTitle: "Validation Report",
-            route: "/modules/validationreports",
-            sub: [
-              {
-                heading: "Add Reports",
-                route: "/validationreports/add",
-              },
-              {
-                heading: "List Reports",
-                route: "/validationreports/list",
-              },
-            ],
+            heading: "Daily Worksheet",
+            route: "/dailyworksheets",
           },
           {
-            sectionTitle: "Instruments",
-            route: "/modules/instruments",
-            keenthemesIcon: "office-bag",
-            bootstrapIcon: "bi-archive",
-            sub: [
-              {
-                heading: "Add Instruments",
-                route: "/instruments/add",
-              },
-              {
-                heading: "List Instruments",
-                route: "/instruments/list",
-              },
-            ],
-          },
-          {
-            sectionTitle: "External Audit",
-            route: "/modules/externalaudit",
-            keenthemesIcon: "office-bag",
-            bootstrapIcon: "bi-archive",
-            sub: [
-              {
-                heading: "Validation Procedure",
-                route: "/validation",
-              },
-              {
-                heading: "Quality Procedure",
-                route: "/quality",
-              },
-            ],
+            heading: "Expense Sheet",
+            route: "/expensesheets",
           },
         ],
       },
+
+      {
+        sectionTitle: "Non-NABL Report",
+        route: "/",
+        keenthemesIcon: "element-plus",
+        bootstrapIcon: "bi-archive",
+
+        sub: [
+          {
+            heading: "Add Non-NABL Report",
+            route: "/validationreports/add",
+          },
+          {
+            heading: "List Non-NABL Report",
+            route: "/validationreports/list",
+          },
+        ],
+      },
+
+      {
+        sectionTitle: "NABL Report",
+        route: "/",
+        keenthemesIcon: "element-plus",
+        bootstrapIcon: "bi-archive",
+
+        sub: [
+          {
+            heading: "LAF",
+            route: "/laf/list",
+          },
+          {
+            heading: "BSF",
+            route: "/bsf/list",
+          },
+        ],
+      },
+
+      /*
+
+      {
+        sectionTitle: "External Audit",
+        route: "/",
+        keenthemesIcon: "element-plus",
+        bootstrapIcon: "bi-archive",
+
+        sub: [
+          {
+            heading: "Validation Procedure",
+            route: "/validation",
+          },
+          {
+            heading: "Quality Procedure",
+            route: "/quality",
+          },
+        ],
+      }
+
+      */
+
     ],
   },
+  /*
+
   {
     heading: "Thermal Mapping",
     route: "/thermalmapping",
@@ -137,192 +144,8 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
       },
     ],
   },
-  {
-    heading: "Quality Assurance",
-    route: "/",
-    pages: [
-      {
-        sectionTitle: "Method Validation",
-        route: "/method_validation",
-        keenthemesIcon: "wrench",
-        bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Add Method Validation",
-            route: "/method_validation/add",
-          },
-          {
-            heading: "List Method Validation",
-            route: "/method_validation/list",
-          },
-        ],
-      },
-      {
-        sectionTitle: "InterLaboratory",
-        route: "/interlaboratory",
-        keenthemesIcon: "office-bag",
-        bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Add InterLaboratory",
-            route: "/interlaboratory/add",
-          },
-          {
-            heading: "List InterLaboratory",
-            route: "/interlaboratory/list",
-          },
-        ],
-      },
-      {
-        sectionTitle: "Replicate Report",
-        route: "/replicate_report",
-        keenthemesIcon: "office-bag",
-        bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Add Replicate Report",
-            route: "/replicate_report/add",
-          },
-          {
-            heading: "List Replicate Report",
-            route: "/replicate_report/list",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    heading: "Quality Documentation",
-    route: "/qualitydocumentation",
-    pages: [
-      {
-        sectionTitle: "Quality Work",
-        route: "/qualitywork",
-        keenthemesIcon: "document",
-        bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Internal Document",
-            route: "/internaldocuments",
-          },
-          {
-            heading: "External Document",
-            route: "/externaldocuments",
-          },
-          {
-            heading: "Non Conformance Record",
-            route: "/ncrs",
-          },
-          {
-            heading: "Risk Register",
-            route: "/risks",
-          },
-          {
-            heading: "Document Change",
-            route: "/document_change_request",
-          },
-          {
-            heading: "Improvement Plan",
-            route: "/improvements",
-          },
-        ],
-      },
-      {
-        sectionTitle: "Internal Audit",
-        route: "/internalaudit",
-        keenthemesIcon: "document",
-        bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Internal Audit Observation",
-            route: "/auditobservations",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    heading: "Instrument Management",
-    pages: [
-      {
-        sectionTitle: "Instrument Management",
-        keenthemesIcon: "document",
-        route: "/",
-        bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Intermediate Check Records",
-            route: "/intermediate_check_records",
-          },
-          {
-            heading: "Inspection Records",
-            route: "/inspection_records",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    heading: "Master List",
-    pages: [
-      {
-        sectionTitle: "Master List",
-        keenthemesIcon: "document",
-        route: "/masterlist",
-        bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "QMS Procedure",
-            route: "/qms_procedures",
-          },
-          {
-            heading: "Work Instruction",
-            route: "/work_instructions",
-          },
-          {
-            heading: "Forms & Formats",
-            route: "/forms_and_formats",
-          },
-          {
-            heading: "NABL Document",
-            route: "/nabl_documents",
-          },
-          {
-            heading: "National-International Document",
-            route: "/ni_documents",
-          },
-          {
-            heading: "Records",
-            route: "/records",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    heading: "Suppliers",
-    route: "/",
-    pages: [
-      {
-        heading: "Suppliers",
-        route: "/suppliers",
-        keenthemesIcon: "educare",
-        bootstrapIcon: "bi-archive",
-      },
-    ],
-  },
-  {
-    heading: "Feedback",
-    route: "/feedback",
-    pages: [
-      {
-        heading: "Customer Complaint",
-        route: "/complaint",
-        keenthemesIcon: "educare",
-        bootstrapIcon: "bi-archive",
-      },
-    ],
-  },
+
+  */
   {
     heading: "Sales",
     route: "/sales",
@@ -423,40 +246,298 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
           },
         ],
       },
+      {
+        heading: "Service Request Form",
+        route: "/srf/list",
+        keenthemesIcon: "educare",
+        bootstrapIcon: "bi-archive",
+      },
     ],
   },
   {
-    heading: "Hr",
-    route: "/hr",
+    heading: "Quality Work",
+    route: "/",
     pages: [
+
       {
-        sectionTitle: "Employees",
-        route: "/employee",
+        sectionTitle: "Master List",
+        keenthemesIcon: "document",
+        route: "/masterlist",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "QMS Procedure",
+            route: "/qms_procedures",
+          },
+          {
+            heading: "Work Instruction",
+            route: "/work_instructions",
+          },
+          {
+            heading: "Forms & Formats",
+            route: "/forms_and_formats",
+          },
+          {
+            heading: "NABL Document",
+            route: "/nabl_documents",
+          },
+          {
+            heading: "National-International Document",
+            route: "/ni_documents",
+          },
+          {
+            heading: "Records",
+            route: "/records",
+          },
+        ],
+      },
+
+
+      {
+        sectionTitle: "Instrument Management",
+        keenthemesIcon: "document",
+        route: "/",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Instrument Add",
+            route: "/instruments/add",
+          },
+          {
+            heading: "Instrument List",
+            route: "/instruments/list",
+          },
+          {
+            heading: "Intermediate Check",
+            route: "/intermediate_check_records",
+          },
+          {
+            heading: "Inspection Records",
+            route: "/inspection_records",
+          },
+        ],
+      },
+
+
+      {
+        sectionTitle: "Internal Audit",
+        route: "/internalaudit",
+        keenthemesIcon: "document",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Internal Audit Observation",
+            route: "/auditobservations",
+          },
+          {
+            heading: "Internal Audit Schedule",
+            route: "/auditschedule",
+          },
+        ],
+      },
+
+
+      {
+        sectionTitle: "Management Review",
+        route: "/",
+        keenthemesIcon: "educare",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Schedule Meeting",
+            route: "/mrm_schedule",
+          },
+          {
+            heading: "Minutes of Meeting",
+            route: "/mrm_minutes",
+          },
+        ],
+      },
+
+
+      {
+        sectionTitle: "Quality Documentation",
+        route: "/",
+        keenthemesIcon: "document",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Internal Document",
+            route: "/internaldocuments",
+          },
+          {
+            heading: "External Document",
+            route: "/externaldocuments",
+          },
+          {
+            heading: "Non Conformance Record",
+            route: "/ncrs",
+          },
+          {
+            heading: "Risk Register",
+            route: "/risks",
+          },
+          {
+            heading: "Document Change",
+            route: "/document_change_request",
+          },
+          {
+            heading: "Improvement Plan",
+            route: "/improvements",
+          },
+          {
+            heading: "Complaint Register",
+            route: "/complaint",
+          },
+
+        ],
+      },
+
+
+      {
+        heading: "Planner",
+        route: "/plan",
+        keenthemesIcon: "educare",
+        bootstrapIcon: "bi-archive",
+      },
+
+
+      {
+        heading: "CheckList",
+        route: "/checklist",
+        keenthemesIcon: "educare",
+        bootstrapIcon: "bi-archive",
+      },
+
+
+      {
+        heading: "Suppliers",
+        route: "/suppliers",
+        keenthemesIcon: "educare",
+        bootstrapIcon: "bi-archive",
+      },
+
+
+      {
+        sectionTitle: "Quality Assurance",
+        route: "/",
+        keenthemesIcon: "wrench",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            sectionTitle: "Method Validation",
+            route: "/",
+            sub: [
+              {
+                heading: "Add Method Validation",
+                route: "/method_validation/add",
+              },
+              {
+                heading: "List Method Validation",
+                route: "/method_validation/list",
+              },
+            ],
+          },
+          {
+            sectionTitle: "InterLaboratory",
+            route: "/",
+            sub: [
+              {
+                heading: "Add InterLaboratory",
+                route: "/interlaboratory/add",
+              },
+              {
+                heading: "List InterLaboratory",
+                route: "/interlaboratory/list",
+              },
+            ],
+          },
+          {
+            sectionTitle: "Replicate Report",
+            route: "/",
+            sub: [
+              {
+                heading: "Add Replicate Report",
+                route: "/replicate_report/add",
+              },
+              {
+                heading: "List Replicate Report",
+                route: "/replicate_report/list",
+              },
+            ],
+          },
+
+        ],
+      },
+
+
+    ],
+  },
+  {
+    heading: "HR",
+    route: "/",
+    pages: [
+
+      {
+        sectionTitle: "Employees Management",
+        route: "/",
         keenthemesIcon: "office-bag",
         bootstrapIcon: "bi-archive",
         sub: [
           {
-            heading: "Add Employee",
-            route: "/employee/add",
+            sectionTitle: "Employees",
+            route: "/",
+            sub: [
+              {
+                heading: "Add Employee",
+                route: "/employee/add",
+              },
+              {
+                heading: "List Employees",
+                route: "/employee/list",
+              },
+            ],
           },
+
           {
-            heading: "List Employees",
-            route: "/employee/list",
+            sectionTitle: "Trainings",
+            route: "/",
+            keenthemesIcon: "educare",
+            bootstrapIcon: "bi-archive",
+            sub: [
+              {
+                heading: "Add Training",
+                route: "/training/add",
+              },
+              {
+                heading: "List Training",
+                route: "/training/list",
+              },
+            ],
           },
+
+          {
+            sectionTitle: "Skill Matrix",
+            route: "/",
+            keenthemesIcon: "educare",
+            bootstrapIcon: "bi-archive",
+            sub: [
+              {
+                heading: "Add Skill Matrix",
+                route: "/skill_matrix/add",
+              },
+              {
+                heading: "List Skill Matrix",
+                route: "/skill_matrix/list",
+              },
+            ],
+          },
+
+
         ],
       },
-      {
-        heading: "Trainings",
-        route: "/training",
-        keenthemesIcon: "educare",
-        bootstrapIcon: "bi-archive",
-      },
-      {
-        heading: "Skill Matrix",
-        route: "/skill_matrix",
-        keenthemesIcon: "educare",
-        bootstrapIcon: "bi-archive",
-      },
+
+
     ],
   },
 ];

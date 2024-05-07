@@ -10,6 +10,7 @@ interface IRGP {
     status:string;
     date: string;
     duedate: string;
+    approval_status: string;
 }
   
 export type { IRGP };

@@ -127,7 +127,7 @@ interface IStep2 {}
 interface CreateAccount extends IStep1, IStep2 {}
 
 export default defineComponent({
-  name: "kt-horizontal-wizard",
+  name: "expensesheet-edit",
   components: {
     Step1,
     Step2,

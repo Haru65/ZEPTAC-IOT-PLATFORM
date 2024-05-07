@@ -538,8 +538,7 @@
                           <tr
                             class="text-center"
                             v-if="
-                              itemDetails.replicate_report_readings.length ===
-                              0
+                              itemDetails.replicate_report_readings.length === 0
                             "
                           >
                             <td
@@ -634,9 +633,7 @@
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref, reactive } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import {
-  addReplicateReport,
-} from "@/stores/api";
+import { addReplicateReport } from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import packages from "@/core/config/PackagesConfig";
@@ -695,6 +692,7 @@ export default defineComponent({
         },
       ]),
       review_commands: "",
+      approval_status: "1",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -716,15 +714,16 @@ export default defineComponent({
       } catch (err) {
         itemDetails[dateType] = "";
       }
+      console.log(itemDetails[dateType]);
     }
 
     const addReading = () => {
       itemDetails.replicate_report_readings.push({
         parameter: "",
-          reading_engineer_1: "",
-          reading_engineer_2: "",
-          uuc_tolerance: "",
-          remarks: "",
+        reading_engineer_1: "",
+        reading_engineer_2: "",
+        uuc_tolerance: "",
+        remarks: "",
       });
     };
 
@@ -767,25 +766,22 @@ export default defineComponent({
 
       try {
         if (validateForm(itemDetails)) {
-            const response = await addReplicateReport(itemDetails);
-            if (!response.error) {
-              showSuccessAlert(
-                "Success",
-                "Replicate Report has been successfully inserted!"
-              );
-              loading.value = false;
-              router.push({ name: "replicate-report-list" });
-            } else {
-              showErrorAlert(
-                "Warning",
-                "Please Fill the Form Fields Correctly"
-              );
-              loading.value = false;
-              return;
-            }
+          const response = await addReplicateReport(itemDetails);
+          if (!response.error) {
+            showSuccessAlert(
+              "Success",
+              "Replicate Report has been successfully inserted!"
+            );
+            loading.value = false;
+            router.push({ name: "replicate-report-list" });
           } else {
-            showErrorAlert("Warning", "Please fill in all fields.");
+            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            loading.value = false;
+            return;
           }
+        } else {
+          showErrorAlert("Warning", "Please fill in all fields.");
+        }
       } catch (error) {
         showErrorAlert("Error", "An error occurred during the API call.");
         loading.value = false;

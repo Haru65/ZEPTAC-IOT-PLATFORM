@@ -106,10 +106,10 @@
                   <!--begin::Input-->
                   <el-date-picker
                     type="date"
-                    v-model="maintenanceDetails.m_date1"
-                    @change="setDate"
                     name="m_date1"
                     id="m_date1"
+                    v-model="maintenanceDetails.m_date1"
+                    @change="setDates($event, 'm_date1')"
                     placeholder="Pick a day"
                     :editable="false"
                   />
@@ -360,27 +360,38 @@ export default defineComponent({
         maintenanceDetails.value.m_date2 = m_date2;
       } else {
         maintenanceDetails.value.m_date1 = "";
-          maintenanceDetails.value.m_date2 = "";
+        maintenanceDetails.value.m_date2 = "";
       }
     }
 
-    async function setDate(e) {
-      console.log(e);
-      if (e != null) {
-        maintenanceDetails.value.m_date1 = moment(
-          maintenanceDetails.value.m_date1
-        ).format("YYYY-MM-DD");
-        if (maintenanceDetails.value.periodicity) {
-          const [m_date2] = calculateNextDates(
-            maintenanceDetails.value.m_date1,
-            maintenanceDetails.value.periodicity
-          );
-          maintenanceDetails.value.m_date2 = m_date2;
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            maintenanceDetails.value.m_date1 = moment(e).format("YYYY-MM-DD");
+
+            if (maintenanceDetails.value.periodicity) {
+              const [m_date2] = calculateNextDates(
+                maintenanceDetails.value.m_date1,
+                maintenanceDetails.value.periodicity
+              );
+              maintenanceDetails.value.m_date2 = m_date2;
+            }
+          } else {
+            maintenanceDetails.value.m_date1 = "";
+            maintenanceDetails.value.m_date2 = "";
+          }
+        } else {
+          maintenanceDetails.value.m_date1 = "";
+          maintenanceDetails.value.m_date2 = "";
         }
-      } else {
+      } catch (err) {
         maintenanceDetails.value.m_date1 = "";
         maintenanceDetails.value.m_date2 = "";
       }
+      console.log(maintenanceDetails.value.m_date1);
+      console.log(maintenanceDetails.value.m_date2);
     }
 
     function areAllPropertiesNull(array) {
@@ -413,7 +424,7 @@ export default defineComponent({
         m_details: "",
         any_repair_detail: "",
         maintenance_done_by: props.username,
-      }
+      };
     };
 
     const showSuccessAlert = (title, message) => {
@@ -450,7 +461,6 @@ export default defineComponent({
       const result = areAllPropertiesNull([maintenanceDetails.value]);
 
       if (!result) {
-        
         await emit("addData", maintenanceDetails.value);
 
         showSuccessAlert("Success", "Maintenance Plan Added Successfully!");
@@ -471,10 +481,9 @@ export default defineComponent({
       newAddressModalRef,
       heading: props.heading,
       setPeriodicity,
-      setDate,
+      setDates,
       username: props.username,
       clear,
-
     };
   },
 });

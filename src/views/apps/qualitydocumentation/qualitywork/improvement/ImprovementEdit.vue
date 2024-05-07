@@ -181,6 +181,7 @@ interface Item {
   target: string;
   outcome: string;
   quarter: string;
+  approval_status: string;
   company_id: string;
   created_by: string;
   updated_by: string;
@@ -207,6 +208,7 @@ export default defineComponent({
       target: "",
       outcome: "",
       quarter: "",
+      approval_status: "",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -231,6 +233,7 @@ export default defineComponent({
         target: response.target,
         outcome: response.outcome,
         quarter: response.quarter,
+        approval_status: response.approval_status,
         company_id: response.company_id ? response.company_id : "",
         created_by: response.created_by,
         updated_by: response.updated_by,

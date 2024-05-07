@@ -521,9 +521,13 @@
                 <!--begin::Col-->
                 <div class="col-lg fv-row">
                   <el-date-picker
-                    v-model="profileDetails.dob"
                     type="date"
+                    name="dob"
+                    id="dob"
+                    v-model="profileDetails.dob"
+                    @change="setDates($event, 'dob')"
                     placeholder="Select Date of Birth"
+                    :editable="false"
                   />
                 </div>
                 <!--end::Col-->
@@ -776,8 +780,10 @@
               <el-date-picker
                 type="date"
                 name="date_of_joining"
-                placeholder="Pick date of joining"
+                id="date_of_joining"
                 v-model="profileDetails.date_of_joining"
+                @change="setDates($event, 'date_of_joining')"
+                placeholder="Pick date of joining"
                 :editable="false"
               />
             </div>
@@ -918,8 +924,10 @@
               :data-kt-indicator="pLoading ? 'on' : null"
               class="btn btn-primary px-6"
             >
-              <span v-if="!pLoading" class="indicator-label"> Save Permissions </span>
-              <span v-if="pLoading"  class="indicator-progress">
+              <span v-if="!pLoading" class="indicator-label">
+                Save Permissions
+              </span>
+              <span v-if="pLoading" class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
@@ -967,7 +975,12 @@ import { ErrorMessage, Field, Form as Vform } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import { c_rolesArray } from "@/core/config/PermissionsRolesConfig";
-import { getEmployee, updateEmployee, getCompanies, updatePermission } from "@/stores/api";
+import {
+  getEmployee,
+  updateEmployee,
+  getCompanies,
+  updatePermission,
+} from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import { countries, INstates } from "@/core/model/countries";
 import moment from "moment";
@@ -1060,12 +1073,13 @@ export default defineComponent({
     const permArr = ref<String[]>([]);
 
     async function addOrRemovePermission(e) {
-      if(e.target && e.target.value){
-        if(e.target.checked == true){
+      if (e.target && e.target.value) {
+        if (e.target.checked == true) {
           permArr.value.push(e.target.value);
-        }
-        else{
-          permArr.value = permArr.value.filter((permission) => permission != e.target.value);
+        } else {
+          permArr.value = permArr.value.filter(
+            (permission) => permission != e.target.value
+          );
         }
         // console.log(permArr.value)
       }
@@ -1307,6 +1321,23 @@ export default defineComponent({
       }
     );
 
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            profileDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            profileDetails.value[dateType] = "";
+          }
+        } else {
+          profileDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        profileDetails.value[dateType] = "";
+      }
+    }
+
     const onsubmit = async () => {
       loading.value = true;
       // console.warn("Nice");
@@ -1518,6 +1549,7 @@ export default defineComponent({
       handleFileChange,
       permissionsWithStatus,
       addOrRemovePermission,
+      setDates,
     };
   },
 });

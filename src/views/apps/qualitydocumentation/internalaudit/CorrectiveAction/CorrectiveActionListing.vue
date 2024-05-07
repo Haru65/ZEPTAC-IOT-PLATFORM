@@ -11,17 +11,20 @@
       <!--begin::Card toolbar-->
       <div class="card-toolbar mb-6">
         <div
-            class="d-flex justify-content-end"
-            data-kt-customer-table-toolbar="base"
+          class="d-flex justify-content-end"
+          data-kt-customer-table-toolbar="base"
+        >
+          <!--begin::Add customer-->
+          <router-link
+            :to="`/auditobservations/add/${itemId}`"
+            class="btn btn-primary"
           >
-            <!--begin::Add customer-->
-            <router-link :to="`/auditobservations/add/${itemId}`" class="btn btn-primary">
-              <KTIcon icon-name="link" icon-class="fs-2" />
-              Navigate to Observations
-            </router-link>
-            <!--end::Add customer-->
-          </div>
-          <!--end::Toolbar-->
+            <KTIcon icon-name="link" icon-class="fs-2" />
+            Navigate to Observations
+          </router-link>
+          <!--end::Add customer-->
+        </div>
+        <!--end::Toolbar-->
       </div>
       <!--end::Card toolbar-->
     </div>
@@ -36,11 +39,16 @@
         v-bind:data="correctiveActionDetails"
       ></CorrectiveActionEditModal>
 
+      <ApprovalModal
+        @reloadData="reLoadData"
+        v-bind:data="itemData"
+      ></ApprovalModal>
+
       <Datatable
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
-        :header="tableHeader"
+        :header="filteredTableHeader"
         :checkbox-enabled="false"
         :items-per-page="limit"
         :items-per-page-dropdown-enabled="false"
@@ -63,10 +71,18 @@
           {{ audit_observation.nc_observation }}
         </template>
         <template v-slot:corrective_action="{ row: audit_observation }">
-          {{ audit_observation.corrective_action ? audit_observation.corrective_action.corrective_action : "" }}
+          {{
+            audit_observation.corrective_action
+              ? audit_observation.corrective_action.corrective_action
+              : ""
+          }}
         </template>
         <template v-slot:root_cause="{ row: audit_observation }">
-          {{ audit_observation.corrective_action ? audit_observation.corrective_action.root_cause : "" }}
+          {{
+            audit_observation.corrective_action
+              ? audit_observation.corrective_action.root_cause
+              : ""
+          }}
         </template>
         <template v-slot:evidence="{ row: audit_observation }">
           <!--begin::Menu Flex-->
@@ -80,6 +96,57 @@
               >⤓ File
             </a>
           </div>
+        </template>
+
+        <template v-slot:approval_status="{ row: audit_observation }">
+          <div v-if="audit_observation.corrective_action">
+            <span
+              v-if="audit_observation.corrective_action.approval_status == 1"
+              class="badge py-3 px-4 fs-7 badge-light-primary"
+              >{{
+                GetApprovalStatus(
+                  audit_observation.corrective_action.approval_status
+                )
+              }}</span
+            >
+            <span
+              v-if="audit_observation.corrective_action.approval_status == 2"
+              class="badge py-3 px-4 fs-7 badge-light-danger"
+              >{{
+                GetApprovalStatus(
+                  audit_observation.corrective_action.approval_status
+                )
+              }}</span
+            >
+            <span
+              v-if="audit_observation.corrective_action.approval_status == 3"
+              class="badge py-3 px-4 fs-7 badge-light-success"
+              >{{
+                GetApprovalStatus(
+                  audit_observation.corrective_action.approval_status
+                )
+              }}</span
+            >
+          </div>
+          <div v-else>-</div>
+        </template>
+
+        <template v-slot:approval_button="{ row: audit_observation }">
+          <div
+            v-if="audit_observation.corrective_action"
+            class="d-flex flex-lg-row"
+          >
+            <button
+              type="button"
+              class="btn btn-sm btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#kt_modal_1"
+              @click="fillItemData(audit_observation.corrective_action)"
+            >
+              Open
+            </button>
+          </div>
+          <div v-else></div>
         </template>
         <template v-slot:actions="{ row: audit_observation }">
           <!--begin::Menu Flex-->
@@ -154,7 +221,7 @@
 </template>
     
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
 import type { IACorrectiveAction } from "@/core/model/audit_observation";
@@ -164,6 +231,11 @@ import CorrectiveActionAddModal from "./CorrectiveActionAddModal.vue";
 import CorrectiveActionEditModal from "./CorrectiveActionEditModal.vue";
 
 import { getCorrectiveActions, deleteCorrectiveAction } from "@/stores/api";
+
+import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
+import { hideModal } from "@/core/helpers/dom";
+import ApprovalModal from "./ApprovalModal.vue";
+import { Identifier } from "@/core/config/WhichUserConfig";
 import arraySort from "array-sort";
 import moment from "moment";
 import Swal from "sweetalert2";
@@ -175,8 +247,11 @@ export default defineComponent({
     Datatable,
     CorrectiveActionAddModal,
     CorrectiveActionEditModal,
+    ApprovalModal,
   },
   setup() {
+    const identifier = Identifier;
+
     const auth = useAuthStore();
     const router = useRouter();
     const route = useRoute();
@@ -221,6 +296,18 @@ export default defineComponent({
         columnWidth: 100,
       },
       {
+        columnName: "Approval Status",
+        columnLabel: "approval_status",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Reject/Approve",
+        columnLabel: "approval_button",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
@@ -228,12 +315,21 @@ export default defineComponent({
       },
     ]);
 
+    const itemData = ref({
+      id: "",
+      approval_status: "",
+      new_status: "",
+      company_id: "",
+      updated_by: "",
+    });
+
     const observationDetails = ref({
       audit_schedule_id: "",
       audit_observation_id: "",
       corrective_action: "",
       root_cause: "",
       audit_remark: "",
+      approval_status: "",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -246,6 +342,7 @@ export default defineComponent({
       corrective_action: "",
       root_cause: "",
       audit_remark: "",
+      approval_status: "1",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -351,7 +448,7 @@ export default defineComponent({
 
     const initvalues = ref<Array<IACorrectiveAction>>([]);
 
-    async function schedule_listing(): Promise<void> {
+    async function corrective_listing(): Promise<void> {
       try {
         const response = await getCorrectiveActions(
           `page=${page.value}&limit=${limit.value}&itemId=${itemId}`
@@ -376,8 +473,23 @@ export default defineComponent({
       }
     }
 
+    const filteredTableHeader = computed(() => {
+      const isAdmin = identifier.value === "Admin";
+      const isCompanyAdmin = identifier.value === "Company-Admin";
+
+      if (isAdmin || isCompanyAdmin) {
+        // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
+        return tableHeader.value;
+      } else {
+        // Otherwise, exclude the 'approval_button' column
+        return tableHeader.value.filter(
+          (column) => column.columnLabel !== "approval_button"
+        );
+      }
+    });
+
     onMounted(async () => {
-      await schedule_listing();
+      await corrective_listing();
     });
 
     const sort = (sort: Sort) => {
@@ -398,6 +510,7 @@ export default defineComponent({
         corrective_action: "",
         root_cause: "",
         audit_remark: "",
+        approval_status: "1",
         company_id: observation.company_id,
         created_by: User.id,
         updated_by: User.id,
@@ -414,6 +527,7 @@ export default defineComponent({
         corrective_action,
         root_cause,
         audit_remark,
+        approval_status,
         company_id,
         created_by,
         updated_by,
@@ -426,6 +540,7 @@ export default defineComponent({
         corrective_action: corrective_action,
         root_cause: root_cause,
         audit_remark: audit_remark,
+        approval_status: approval_status,
         company_id: company_id,
         created_by: created_by,
         updated_by: User.id,
@@ -438,8 +553,22 @@ export default defineComponent({
     };
 
     async function reLoadData() {
-      await schedule_listing();
+      await corrective_listing();
     }
+
+    // Function
+    const fillItemData = (ncr) => {
+      const { id, approval_status, company_id } = ncr;
+
+      itemData.value = {
+        id: id,
+        approval_status: approval_status,
+        new_status: "",
+        company_id: company_id,
+        updated_by: User.id,
+      };
+      console.log("itemData are:", itemData.value);
+    };
 
     return {
       tableData,
@@ -460,6 +589,12 @@ export default defineComponent({
       AddCorrecticeAction,
       EditCorrecticeAction,
       itemId,
+      filteredTableHeader,
+      ApprovalStatus,
+      GetApprovalStatus,
+      itemData,
+      fillItemData,
+      identifier,
     };
   },
 });

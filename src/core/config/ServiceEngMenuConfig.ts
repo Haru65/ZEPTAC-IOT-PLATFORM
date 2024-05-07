@@ -20,39 +20,85 @@ export interface MenuItem {
       ],
     },
     {
-      heading: "Modules",
-      route: "/modules",
+      heading: "CleanRoom Validation",
+      route: "/",
       pages: [
         {
-          sectionTitle: "CleanRoom Validation",
-          route: "/modules/cleanroom",
+          sectionTitle: "Validation Service",
+          route: "/",
           keenthemesIcon: "element-plus",
           bootstrapIcon: "bi-archive",
           sub: [
             {
-              sectionTitle: "Validation Service",
-              route: "/modules/validation",
-              keenthemesIcon: "office-bag",
-              bootstrapIcon: "bi-archive",
-              sub: [
-                {
-                  heading: "Returnable Gate Pass",
-                  route: "/returnablegatepasses",
-                },
-                {
-                  heading: "Daily Worksheet",
-                  route: "/dailyworksheets",
-                },
-                {
-                  heading: "Expense Sheet",
-                  route: "/expensesheets",
-                },
-              ],
+              heading: "Daily Worksheet",
+              route: "/dailyworksheets",
+            },
+            {
+              heading: "Expense Sheet",
+              route: "/expensesheets",
             },
           ],
         },
+  
+        /*
+  
+        {
+          sectionTitle: "External Audit",
+          route: "/",
+          keenthemesIcon: "element-plus",
+          bootstrapIcon: "bi-archive",
+  
+          sub: [
+            {
+              heading: "Validation Procedure",
+              route: "/validation",
+            },
+            {
+              heading: "Quality Procedure",
+              route: "/quality",
+            },
+          ],
+        }
+  
+        */
+  
       ],
     },
+
+
+    {
+      heading: "Quality Work",
+      route: "/",
+      pages: [
+
+        {
+          sectionTitle: "Instrument Management",
+          keenthemesIcon: "document",
+          route: "/",
+          bootstrapIcon: "bi-archive",
+          sub: [
+            {
+              heading: "Instrument Add",
+              route: "/instruments/add",
+            },
+            {
+              heading: "Instrument List",
+              route: "/instruments/list",
+            },
+            {
+              heading: "Intermediate Check",
+              route: "/intermediate_check_records",
+            },
+            {
+              heading: "Inspection Records",
+              route: "/inspection_records",
+            },
+          ],
+        },
+
+      ],
+    },
+    
 
   ];
   

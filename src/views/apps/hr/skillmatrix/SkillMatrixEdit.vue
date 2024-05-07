@@ -164,6 +164,7 @@ export default defineComponent({
     const skillMatrixDetails = ref({
       user_id: "",
       skills: [{}],
+      approval_status: "",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -245,6 +246,7 @@ export default defineComponent({
       skillMatrixDetails.value = {
         user_id: response.user_id,
         skills: JSON.parse(response.skills),
+        approval_status: response.approval_status,
         company_id: response.company_id ? response.company_id : "",
         created_by: response.created_by,
         updated_by: response.updated_by,

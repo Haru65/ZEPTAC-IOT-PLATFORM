@@ -10,9 +10,9 @@
         data-bs-original-title="Enter RGP number"
         data-kt-initialized="1"
       >
-        <h3 class="fs-2 fw-bold text-gray-800"
-          >Gate Pass # {{ rgpDetails.rgp_no }}</h3
-        >
+        <h3 class="fs-2 fw-bold text-gray-800">
+          Gate Pass # {{ rgpDetails.rgp_no }}
+        </h3>
       </div>
       <!--begin::Stepper-->
       <div
@@ -116,13 +116,13 @@
                 v-if="currentStepIndex === totalSteps - 1"
                 @click="formSubmit()"
               >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
-              <span v-if="loading" class="indicator-progress">
-                Please wait...
-                <span
-                  class="spinner-border spinner-border-sm align-middle ms-2"
-                ></span>
-              </span>
+                <span v-if="!loading" class="indicator-label"> Submit </span>
+                <span v-if="loading" class="indicator-progress">
+                  Please wait...
+                  <span
+                    class="spinner-border spinner-border-sm align-middle ms-2"
+                  ></span>
+                </span>
               </button>
 
               <button v-else type="submit" class="btn btn-lg btn-primary">
@@ -164,7 +164,7 @@ import {
   UpdateStatus,
   addRGatePass,
   getEngineers,
-getInstruments,
+  getInstruments,
 } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 
@@ -236,44 +236,90 @@ export default defineComponent({
       client_company: "",
       quotation_no: "",
       status: 1,
+      approval_status: "1",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
       is_active: 1,
     });
 
-    function setDate(date){
-        rgpDetails.value.date = date
-      
+    /* --------SET DATE LOGIC--------*/
+    async function setDate(e) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            rgpDetails.value.date = await moment(e).format("YYYY-MM-DD");
+          } else {
+            rgpDetails.value.date = await "";
+          }
+        } else {
+          rgpDetails.value.date = await "";
+        }
+      } catch (err) {
+        rgpDetails.value.date = await "";
+      }
+      console.log(rgpDetails.value.date);
     }
 
-    function setDueDate(duedate){
-        rgpDetails.value.duedate = duedate
+    /* --------SET DUE DATE LOGIC--------*/
+    async function setDueDate(e) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            rgpDetails.value.duedate = await moment(e).format("YYYY-MM-DD");
+          } else {
+            rgpDetails.value.duedate = await "";
+          }
+        } else {
+          rgpDetails.value.duedate = await "";
+        }
+      } catch (err) {
+        rgpDetails.value.duedate = await "";
+      }
+      console.log(rgpDetails.value.duedate);
     }
 
-    function setQuotation(e,address, customer_name, customer_company, client_name, client_company, quotation_no){
-      rgpDetails.value.quotation_id = e ? e : ""
-      rgpDetails.value.customer_name = customer_name ? customer_name : ""
-      rgpDetails.value.client_name = client_name ? client_name : ""
-      rgpDetails.value.customer_company = customer_company ? customer_company : ""
-      rgpDetails.value.client_company = client_company ? client_company : ""
-      rgpDetails.value.quotation_no = quotation_no ? quotation_no : ""
-      rgpDetails.value.site_address.address1 = address.address1 ? address.address1 : ""
-      rgpDetails.value.site_address.address2 = address.address2? address.address2 : ""
-      rgpDetails.value.site_address.city = address.city? address.city : ""
-      rgpDetails.value.site_address.pincode = address.pincode? address.pincode : ""
-      rgpDetails.value.site_address.states = address.states? address.states : ""
-      rgpDetails.value.site_address.country = address.country? address.country : ""
-
-    } 
-
-
-    async function setEngineers(engineers){
-      rgpDetails.value.engineers = await engineers
+    function setQuotation(
+      e,
+      address,
+      customer_name,
+      customer_company,
+      client_name,
+      client_company,
+      quotation_no
+    ) {
+      rgpDetails.value.quotation_id = e ? e : "";
+      rgpDetails.value.customer_name = customer_name ? customer_name : "";
+      rgpDetails.value.client_name = client_name ? client_name : "";
+      rgpDetails.value.customer_company = customer_company
+        ? customer_company
+        : "";
+      rgpDetails.value.client_company = client_company ? client_company : "";
+      rgpDetails.value.quotation_no = quotation_no ? quotation_no : "";
+      rgpDetails.value.site_address.address1 = address.address1
+        ? address.address1
+        : "";
+      rgpDetails.value.site_address.address2 = address.address2
+        ? address.address2
+        : "";
+      rgpDetails.value.site_address.city = address.city ? address.city : "";
+      rgpDetails.value.site_address.pincode = address.pincode
+        ? address.pincode
+        : "";
+      rgpDetails.value.site_address.states = address.states
+        ? address.states
+        : "";
+      rgpDetails.value.site_address.country = address.country
+        ? address.country
+        : "";
     }
 
-    async function setInstruments(instruments){
-      rgpDetails.value.instruments = await instruments
+    async function setEngineers(engineers) {
+      rgpDetails.value.engineers = await engineers;
+    }
+
+    async function setInstruments(instruments) {
+      rgpDetails.value.instruments = await instruments;
     }
 
     const Quotations = ref([
@@ -286,21 +332,21 @@ export default defineComponent({
           first_name: "",
           last_name: "",
           company: {
-            company_name: ""
+            company_name: "",
           },
         },
         client_data: {
           first_name: "",
           last_name: "",
           company: {
-            company_name: ""
+            company_name: "",
           },
         },
       },
     ]);
 
     const IncrRGP = (data: any) => {
-      if(data?.result){
+      if (data?.result) {
         const latest_rgp_no = data.result.split("_");
         if (parseInt(latest_rgp_no[1]) == 0) {
           // ? if no record
@@ -311,8 +357,7 @@ export default defineComponent({
           rgpDetails.value.rgp_no =
             latest_rgp_no[0] + "_" + (1 + +latest_rgp_no[1]).toString();
         }
-      }
-      else{
+      } else {
         showErrorAlert("Error", "An error occurred during the API call.");
       }
     };
@@ -335,7 +380,16 @@ export default defineComponent({
     }
 
     const AvailableInstruments = ref([
-      { id: "", instrument_id: "", name: "", model_no: "", serial_no: "", make: "", calibration_date: "", calibration_due_date: "",},
+      {
+        id: "",
+        instrument_id: "",
+        name: "",
+        model_no: "",
+        serial_no: "",
+        make: "",
+        calibration_date: "",
+        calibration_due_date: "",
+      },
     ]);
 
     async function instrument_listing(): Promise<void> {
@@ -343,19 +397,17 @@ export default defineComponent({
         const company_id = auth.GetUser().company_id;
         const response = await getInstruments(company_id);
         // console.log(response.result);
-        if(response.result){
-          AvailableInstruments.value = response.result.map(({ ...rest}) => ({
-          ...rest,
-        }));
+        if (response.result) {
+          AvailableInstruments.value = response.result.map(({ ...rest }) => ({
+            ...rest,
+          }));
         }
       } catch (error) {
         console.error(error);
       }
     }
-    
 
-    const formData = ref<CreateAccount>({
-    });
+    const formData = ref<CreateAccount>({});
 
     const GetApprovedQuotations = async () => {
       ApiService.setHeader();
@@ -436,7 +488,7 @@ export default defineComponent({
       return createAccountSchema[currentStepIndex.value];
     });
 
-    const { resetForm, handleSubmit } = useForm<IStep2 | IStep3 | IStep4 >({
+    const { resetForm, handleSubmit } = useForm<IStep2 | IStep3 | IStep4>({
       // validationSchema: currentSchema,
     });
 
@@ -449,14 +501,16 @@ export default defineComponent({
     });
 
     const handleStep = handleSubmit((values) => {
-
       // resetForm({});
 
       // formData.value = { ...values };
 
-      if(currentStepIndex.value === 0){
-        if(rgpDetails.value.date && rgpDetails.value.duedate && rgpDetails.value.quotation_id){
-
+      if (currentStepIndex.value === 0) {
+        if (
+          rgpDetails.value.date &&
+          rgpDetails.value.duedate &&
+          rgpDetails.value.quotation_id
+        ) {
           currentStepIndex.value++;
 
           if (!_stepperObj.value) {
@@ -464,17 +518,14 @@ export default defineComponent({
           }
 
           _stepperObj.value.goNext();
-
-        }
-        else{
+        } else {
           Swal.fire({
             icon: "info",
             title: "Please fill all the required fields",
           });
         }
-      }
-      else if(currentStepIndex.value === 1){
-        if(rgpDetails.value.engineers.length > 0){
+      } else if (currentStepIndex.value === 1) {
+        if (rgpDetails.value.engineers.length > 0) {
           currentStepIndex.value++;
 
           if (!_stepperObj.value) {
@@ -482,16 +533,14 @@ export default defineComponent({
           }
 
           _stepperObj.value.goNext();
-        }
-        else{
+        } else {
           Swal.fire({
             icon: "info",
             title: "Please select at least one engineer",
           });
         }
-      }
-      else if(currentStepIndex.value === 2){
-        if(rgpDetails.value.instruments.length > 0){
+      } else if (currentStepIndex.value === 2) {
+        if (rgpDetails.value.instruments.length > 0) {
           currentStepIndex.value++;
 
           if (!_stepperObj.value) {
@@ -499,20 +548,16 @@ export default defineComponent({
           }
 
           _stepperObj.value.goNext();
-        }
-        else{
+        } else {
           Swal.fire({
             icon: "info",
             title: "Please select at least one instrument",
           });
         }
       }
-
-
     });
 
     const previousStep = () => {
-      
       if (!_stepperObj.value) {
         return;
       }
@@ -523,7 +568,6 @@ export default defineComponent({
     };
 
     const formSubmit = async () => {
-
       loading.value = true;
       // console.log(rgpDetails.value);
       rgpDetails.value.date = moment(rgpDetails.value.date).format(
@@ -540,26 +584,24 @@ export default defineComponent({
           const response = await addRGatePass(rgpDetails.value);
 
           if (!response.error) {
-
             // change the availability of engineers and instruments
             const statusUpdate = await UpdateStatus(rgpDetails.value);
 
-            if(!statusUpdate.error){
-
-            showSuccessAlert(
-              "Success",
-              "Returnable Gate pass details have been successfully inserted!"
-            );
-            route.push({ name: "rgp-list" });
+            if (!statusUpdate.error) {
+              showSuccessAlert(
+                "Success",
+                "Returnable Gate pass details have been successfully inserted!"
+              );
+              route.push({ name: "rgp-list" });
             }
-          }else {
+          } else {
             // Handle API error response
             const errorData = response.error;
             // console.log("API error:", errorData);
             console.log("API error:", errorData.response.data.errors);
             showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           }
-        }else {
+        } else {
           showErrorAlert("Warning", "Bad Luck! RGP Details Already Exists");
           route.push({ name: "rgp-list" });
         }
@@ -568,8 +610,7 @@ export default defineComponent({
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
-      }
-      finally {
+      } finally {
         loading.value = false;
       }
     };

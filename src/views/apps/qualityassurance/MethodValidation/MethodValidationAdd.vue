@@ -431,6 +431,7 @@ interface itemDetails {
   }[];
   status: string;
   remark: string;
+  approval_status: string;
 
   company_id: string;
   created_by: number;
@@ -508,6 +509,7 @@ export default defineComponent({
       ],
       status: "",
       remark: "",
+      approval_status: "1",
 
       company_id: User.company_id,
       created_by: User.id,
@@ -531,7 +533,7 @@ export default defineComponent({
         itemDetails.value[dateType] = "";
       }
 
-      console.log(dateType, " ", itemDetails.value[dateType]);
+      console.log(itemDetails.value[dateType]);
     }
 
     onMounted(async () => {
@@ -570,7 +572,9 @@ export default defineComponent({
     };
 
     async function calculateOverallStatus(items) {
-      const allEnRatiosSatisfactory = items.every((item) => item.en_ratio <= EN_VALUE);
+      const allEnRatiosSatisfactory = items.every(
+        (item) => item.en_ratio <= EN_VALUE
+      );
       return allEnRatiosSatisfactory ? true : false;
     }
 
@@ -612,12 +616,11 @@ export default defineComponent({
           itemDetails.value.readings[index].en_ratio = 0;
         }
 
-        const result = await calculateOverallStatus(itemDetails.value.readings)
-        if(result){
+        const result = await calculateOverallStatus(itemDetails.value.readings);
+        if (result) {
           itemDetails.value.status = "1";
           itemDetails.value.remark = SATISFACTORY;
-        }
-        else{
+        } else {
           itemDetails.value.status = "2";
           itemDetails.value.remark = UNSATISFACTORY;
         }
@@ -697,7 +700,6 @@ export default defineComponent({
       loading.value = true;
 
       try {
-
         if (itemDetails.value.readings.length === 0) {
           showErrorAlert("Warning", "Please Fill Atleast One Reading");
           loading.value = false;
@@ -705,7 +707,6 @@ export default defineComponent({
         }
 
         if (validateForm(itemDetails)) {
-          
           const response = await addMethodValidation(itemDetails.value);
           if (!response.error) {
             showSuccessAlert(
@@ -786,6 +787,7 @@ export default defineComponent({
         ],
         status: "",
         remark: "",
+        approval_status: "1",
 
         company_id: User.company_id,
         created_by: User.id,

@@ -9,6 +9,7 @@ interface ILaboratoryComparison {
     ranges: string;
     status: string;
     remark: string;
+    approval_status: string;
     company_id: string;
   }
   

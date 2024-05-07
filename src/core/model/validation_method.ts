@@ -7,6 +7,7 @@ interface IVMethod {
     method_name: string;
     status: string;
     remark: string;
+    approval_status: string;
     company_id: string;
   }
   

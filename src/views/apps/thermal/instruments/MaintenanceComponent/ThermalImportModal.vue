@@ -312,16 +312,22 @@ export default defineComponent({
       company_id: User.company_id,
     });
 
+    /* --------SET DATE LOGIC--------*/
     async function setDates(e, dateType) {
-      if (e != null) {
-        if (e != "" && e != null) {
-          instrumentData.value[dateType] = moment(e).format("YYYY-MM-DD");
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            instrumentData.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            instrumentData.value[dateType] = "";
+          }
         } else {
           instrumentData.value[dateType] = "";
         }
-      } else {
+      } catch (err) {
         instrumentData.value[dateType] = "";
       }
+
       console.log(dateType, " ", instrumentData.value[dateType]);
       instrumentData.value.data = [];
     }

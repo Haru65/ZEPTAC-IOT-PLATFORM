@@ -119,6 +119,12 @@ export interface MenuItem {
             },
           ],
         },
+        {
+          heading: "Service Request Form",
+          route: "/srf/list",
+          keenthemesIcon: "educare",
+          bootstrapIcon: "bi-archive",
+        },
       ],
     },
   ];

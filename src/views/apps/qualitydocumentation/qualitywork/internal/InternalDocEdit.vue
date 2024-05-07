@@ -294,13 +294,22 @@ export default defineComponent({
       };
     });
 
+    /* --------SET DATE LOGIC--------*/
     async function setDates(e, dateType) {
-      if (e != null) {
-        documentDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
-      } else {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            documentDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            documentDetails.value[dateType] = "";
+          }
+        } else {
+          documentDetails.value[dateType] = "";
+        }
+      } catch (err) {
         documentDetails.value[dateType] = "";
       }
-      console.log(dateType, " ", documentDetails.value[dateType]);
+      console.log(documentDetails.value[dateType]);
     }
 
     function areAllPropertiesNull(array) {

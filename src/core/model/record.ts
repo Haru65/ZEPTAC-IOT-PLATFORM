@@ -8,6 +8,7 @@ interface IDocument {
     ammendment_date: string;
     storage_medium: string;
     responsible_person: string;
+    approval_status: string;
     company_id: string;
   }
   

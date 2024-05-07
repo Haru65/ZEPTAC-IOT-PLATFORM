@@ -128,8 +128,21 @@
         <template v-slot:company="{ row: customer }">
           {{ customer.meta.company_name }}
         </template>
-        <template v-slot:date="{ row: customer }">
+        <template v-slot:created_at="{ row: customer }">
           {{ customer.created_at }}
+        </template>
+        <template v-slot:srf_link="{ row: customer }">
+          <span
+            class="d-flex flex-lg-row text-hover-primary cursor-pointer"
+            data-toggle="tooltip"
+            title="Copy Service Request Link"
+            @click="copyUrl(customer.company_id, customer.id)"
+          >
+            <i
+              class="las la-link text-gray-600 mb-1 fs-2"
+            ></i>
+            <span class="text-gray-600 text-hover-primary"> Copy Link </span>
+          </span>
         </template>
         <template v-slot:actions="{ row: customer }">
           <!--begin::Menu Flex-->
@@ -234,9 +247,15 @@ export default defineComponent({
       },
       {
         columnName: "Created Date",
-        columnLabel: "date",
+        columnLabel: "created_at",
         sortEnabled: true,
         columnWidth: 175,
+      },
+      {
+        columnName: "Servie Request Link",
+        columnLabel: "srf_link",
+        sortEnabled: true,
+        columnWidth: 75,
       },
       {
         columnName: "Actions",
@@ -259,7 +278,7 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({ created_at, role_id, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
             role_id: get_role(role_id),
           })
         );
@@ -299,12 +318,12 @@ export default defineComponent({
         const response = await getCustomers(
           `page=${page}&limit=${limit.value}`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({ created_at, role_id, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
             role_id: get_role(role_id),
           })
         );
@@ -331,12 +350,12 @@ export default defineComponent({
         const response = await getCustomers(
           `page=${page.value}&limit=${limit}`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({ created_at, role_id, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
             role_id: get_role(role_id),
           })
         );
@@ -445,8 +464,7 @@ export default defineComponent({
             await SearchMore();
           }, 1000);
         }
-      }
-       else {
+      } else {
         page.value = 1;
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
@@ -458,12 +476,12 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await CustomerSearch(search.value);
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({ created_at, role_id, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
             role_id: get_role(role_id),
           })
         );
@@ -499,6 +517,21 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
+    const copyUrl = (companyId, customerId) => {
+      const url = `http://localhost:5173/srf/${companyId}/${customerId}`;
+      // const url = `https://zeptac.com/srf/${companyId}/${customerId}`;
+      navigator.clipboard
+        .writeText(url)
+        .then(() => {
+          console.log("URL copied to clipboard:", url);
+          // You can show a success message or perform any other action here
+        })
+        .catch((error) => {
+          console.error("Error copying URL to clipboard:", error);
+          // Handle error if copying fails
+        });
+    };
+
     return {
       tableData,
       tableHeader,
@@ -517,6 +550,7 @@ export default defineComponent({
       limit,
       PageLimitPoiner,
       Limits,
+      copyUrl,
     };
   },
 });

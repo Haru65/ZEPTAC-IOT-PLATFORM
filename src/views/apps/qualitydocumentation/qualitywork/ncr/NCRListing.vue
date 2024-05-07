@@ -63,11 +63,7 @@
             <span class="me-2">{{ selectedIds.length }}</span
             >Selected
           </div>
-          <button
-            type="button"
-            class="btn btn-danger"
-            @click="deleteFewItem()"
-          >
+          <button type="button" class="btn btn-danger" @click="deleteFewItem()">
             Delete Selected
           </button>
         </div>
@@ -96,12 +92,18 @@
       </div>
       <!--end::Card toolbar-->
     </div>
+
     <div class="card-body pt-0">
+      <ApprovalModal
+        @reloadData="reLoadData"
+        v-bind:data="itemData"
+      ></ApprovalModal>
+
       <Datatable
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
-        :header="tableHeader"
+        :header="filteredTableHeader"
         :checkbox-enabled="true"
         :items-per-page="limit"
         :items-per-page-dropdown-enabled="false"
@@ -127,16 +129,14 @@
           }}
         </template>
         <template v-slot:completion_date="{ row: ncr }">
-          <span
-            class="badge py-3 px-4 fs-7 badge-light-primary"
-            >{{ ncr.completion_date }}</span
-          >
+          <span class="badge py-3 px-4 fs-7 badge-light-primary">{{
+            ncr.completion_date
+          }}</span>
         </template>
         <template v-slot:review_date="{ row: ncr }">
-          <span
-            class="badge py-3 px-4 fs-7 badge-light-primary"
-            >{{ ncr.review_date }}</span
-          >
+          <span class="badge py-3 px-4 fs-7 badge-light-primary">{{
+            ncr.review_date
+          }}</span>
         </template>
         <template v-slot:verification_details="{ row: ncr }">
           {{
@@ -145,12 +145,37 @@
               : ncr.verification_details
           }}
         </template>
-        <template v-slot:prepared_by="{ row: ncr }">
-          {{ ncr.prepared_by }}
+
+        <template v-slot:approval_status="{ row: ncr }">
+          <span
+            v-if="ncr.approval_status == 1"
+            class="badge py-3 px-4 fs-7 badge-light-primary"
+            >{{ GetApprovalStatus(ncr.approval_status) }}</span
+          >
+          <span
+            v-if="ncr.approval_status == 2"
+            class="badge py-3 px-4 fs-7 badge-light-danger"
+            >{{ GetApprovalStatus(ncr.approval_status) }}</span
+          >
+          <span
+            v-if="ncr.approval_status == 3"
+            class="badge py-3 px-4 fs-7 badge-light-success"
+            >{{ GetApprovalStatus(ncr.approval_status) }}</span
+          >
         </template>
-        <template v-slot:approved_by="{ row: ncr }">
-          {{ ncr.approved_by }}
+
+        <template v-slot:approval_button="{ row: ncr }">
+          <button
+            type="button"
+            class="btn btn-sm btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#kt_modal_1"
+            @click="fillItemData(ncr)"
+          >
+            Open
+          </button>
         </template>
+
         <template v-slot:actions="{ row: ncr }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
@@ -209,17 +234,22 @@
 </template>
     
     <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
 import type { INCR } from "@/core/model/ncr";
+import { ApprovalStatus, GetApprovalStatus } from "@/core/model/ncr";
+import { hideModal } from "@/core/helpers/dom";
+import ApprovalModal from "./ApprovalModal.vue";
+import { Identifier } from "@/core/config/WhichUserConfig";
+
 import {
   getNonConformanceRecords,
   deleteNonConformanceRecord,
   NonConformanceRecordSearch,
-  
 } from "@/stores/api";
 import arraySort from "array-sort";
+import { useAuthStore } from "@/stores/auth";
 import moment from "moment";
 import Swal from "sweetalert2";
 import NCRModal from "./NCRModal.vue";
@@ -229,8 +259,13 @@ export default defineComponent({
   components: {
     Datatable,
     NCRModal,
+    ApprovalModal,
   },
   setup() {
+    const auth = useAuthStore();
+    const User = auth.GetUser();
+    const identifier = Identifier;
+
     const tableHeader = ref([
       {
         columnName: "NCR Detail",
@@ -263,15 +298,15 @@ export default defineComponent({
         columnWidth: 100,
       },
       {
-        columnName: "Prepared By",
-        columnLabel: "prepared_by",
-        sortEnabled: true,
+        columnName: "Approval Status",
+        columnLabel: "approval_status",
+        sortEnabled: false,
         columnWidth: 75,
       },
       {
-        columnName: "Approved By",
-        columnLabel: "approved_by",
-        sortEnabled: true,
+        columnName: "Reject/Approve",
+        columnLabel: "approval_button",
+        sortEnabled: false,
         columnWidth: 75,
       },
       {
@@ -281,6 +316,14 @@ export default defineComponent({
         columnWidth: 75,
       },
     ]);
+
+    const itemData = ref({
+      id: "",
+      approval_status: "",
+      new_status: "",
+      company_id: "",
+      updated_by: "",
+    });
 
     // functions
     const Limits = ref({
@@ -309,15 +352,10 @@ export default defineComponent({
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            ...rest
-          }) => ({
-            id,
-            ...rest
-          })
-        );
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id,
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -343,15 +381,10 @@ export default defineComponent({
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            ...rest
-          }) => ({
-            id,
-            ...rest
-          })
-        );
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id,
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -391,15 +424,10 @@ export default defineComponent({
         const response = await getNonConformanceRecords(
           `page=${page.value}&limit=${limit.value}`
         );
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            ...rest
-          }) => ({
-            id,
-            ...rest
-          })
-        );
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id,
+          ...rest,
+        }));
 
         more.value = response.result.next_page_url != null ? true : false;
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -413,8 +441,24 @@ export default defineComponent({
       }
     }
 
+    const filteredTableHeader = computed(() => {
+      const isAdmin = identifier.value === "Admin";
+      const isCompanyAdmin = identifier.value === "Company-Admin";
+
+      if (isAdmin || isCompanyAdmin) {
+        // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
+        return tableHeader.value;
+      } else {
+        // Otherwise, exclude the 'approval_button' column
+        return tableHeader.value.filter(
+          (column) => column.columnLabel !== "approval_button"
+        );
+      }
+    });
+
     onMounted(async () => {
       await ncr_listing();
+      console.log(identifier.value);
     });
 
     const deleteFewItem = () => {
@@ -503,15 +547,10 @@ export default defineComponent({
       try {
         const response = await NonConformanceRecordSearch(search.value);
 
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            ...rest
-          }) => ({
-            id,
-            ...rest
-          })
-        );
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id,
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -553,9 +592,24 @@ export default defineComponent({
       await ncr_listing();
     }
 
+    // Function
+    const fillItemData = (ncr) => {
+      const { id, approval_status, company_id } = ncr;
+
+      itemData.value = {
+        id: id,
+        approval_status: approval_status,
+        new_status: "",
+        company_id: company_id,
+        updated_by: User.id,
+      };
+      console.log("itemData are:", itemData.value);
+    };
+
     return {
       tableData,
       tableHeader,
+      filteredTableHeader,
       reLoadData,
       deleteItem,
       search,
@@ -571,6 +625,11 @@ export default defineComponent({
       page,
       Limits,
       PageLimitPoiner,
+      ApprovalStatus,
+      GetApprovalStatus,
+      itemData,
+      fillItemData,
+      identifier,
     };
   },
 });

@@ -333,7 +333,7 @@ export default defineComponent({
         const response = await getEmployees(
           `page=${page.value}&limit=${limit.value}`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({ id, role_id, ...rest }) => ({
@@ -370,7 +370,7 @@ export default defineComponent({
         const response = await getEmployees(
           `page=${page}&limit=${limit.value}`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({ id, role_id, ...rest }) => ({
@@ -406,7 +406,7 @@ export default defineComponent({
         const response = await getEmployees(
           `page=${page.value}&limit=${limit}`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({ id, role_id, ...rest }) => ({
@@ -545,7 +545,7 @@ export default defineComponent({
       try {
         ApiService.setHeader();
         const response = await EmployeeSearch(search.value);
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({ id, role_id, ...rest }) => ({
@@ -651,7 +651,11 @@ export default defineComponent({
           ? "data:image/png;base64," + res.meta?.profile_pic_data
           : "data:image/png;base64," + blank64;
 
-        downloadFileObject(userPhoto, `${first_name}_${last_name}_photo`, ".png");
+        downloadFileObject(
+          userPhoto,
+          `${first_name}_${last_name}_photo`,
+          ".png"
+        );
       } catch (error) {
         console.error("Error downloading Photo:", error);
       }

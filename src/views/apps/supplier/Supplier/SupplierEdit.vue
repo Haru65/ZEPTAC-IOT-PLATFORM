@@ -208,6 +208,7 @@
                   <el-select
                     filterable
                     placeholder="Please Select Category"
+                    disabled
                     v-model="itemDetails.supplier_category"
                   >
                     <el-option
@@ -359,6 +360,7 @@ interface Item {
   supplier_category: string;
   product_service_details: string;
   status: string;
+  approval_status: string;
 
   evaluation: {
     id: string;
@@ -398,6 +400,7 @@ export default defineComponent({
       supplier_category: "",
       product_service_details: "",
       status: "",
+      approval_status: "",
 
       evaluation: [],
 
@@ -429,6 +432,7 @@ export default defineComponent({
         supplier_category: response.supplier_category,
         product_service_details: response.product_service_details,
         status: response.status,
+        approval_status: response.approval_status,
 
         evaluation: response.evaluation ? [response.evaluation] : [],
 
@@ -455,7 +459,8 @@ export default defineComponent({
         itemDetails.value[dateType] = "";
       }
 
-      console.log(dateType, " ", itemDetails.value[dateType]);
+      console.log(itemDetails.value[dateType]);
+
     }
 
     const submit = async () => {

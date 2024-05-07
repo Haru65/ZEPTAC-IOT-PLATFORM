@@ -107,15 +107,16 @@
                     <!--begin::Input-->
                     
                   <div class="block">
+
                     <el-date-picker
-                      type="date"
-                      v-model="maintenanceDetails.m_date1"
-                      @change="setDate"
-                      name="m_date1"
-                      id="m_date1"
-                      placeholder="Pick a day"
-                      :editable="false"
-                    />
+                    type="date"
+                    name="m_date1"
+                    id="m_date1"
+                    v-model="maintenanceDetails.m_date1"
+                    @change="setDates($event, 'm_date1')"
+                    placeholder="Pick a day"
+                    :editable="false"
+                  />
                     </div>
                     <ErrorMessage class="invalid-feedback" name="m_date1" />
                     <!--end::Input-->
@@ -369,23 +370,34 @@
       }
     }
 
-    async function setDate(e) {
-      console.log(e);
-      if (e != null) {
-        maintenanceDetails.value.m_date1 = moment(
-          maintenanceDetails.value.m_date1
-        ).format("YYYY-MM-DD");
-        if (maintenanceDetails.value.periodicity) {
-          const [m_date2] = calculateNextDates(
-            maintenanceDetails.value.m_date1,
-            maintenanceDetails.value.periodicity
-          );
-          maintenanceDetails.value.m_date2 = m_date2;
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            maintenanceDetails.value.m_date1 = moment(e).format("YYYY-MM-DD");
+
+            if (maintenanceDetails.value.periodicity) {
+              const [m_date2] = calculateNextDates(
+                maintenanceDetails.value.m_date1,
+                maintenanceDetails.value.periodicity
+              );
+              maintenanceDetails.value.m_date2 = m_date2;
+            }
+          } else {
+            maintenanceDetails.value.m_date1 = "";
+            maintenanceDetails.value.m_date2 = "";
+          }
+        } else {
+          maintenanceDetails.value.m_date1 = "";
+          maintenanceDetails.value.m_date2 = "";
         }
-      } else {
+      } catch (err) {
         maintenanceDetails.value.m_date1 = "";
         maintenanceDetails.value.m_date2 = "";
       }
+      console.log(maintenanceDetails.value.m_date1);
+      console.log(maintenanceDetails.value.m_date2);
     }
   
       function areAllPropertiesNull(array) {
@@ -467,7 +479,7 @@
         planId: props.planId,
         maintenancePlan: props.maintenancePlan,
         setPeriodicity,
-        setDate,
+        setDates,
         resetTheData,
 
       };

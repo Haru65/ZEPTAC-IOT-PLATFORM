@@ -339,25 +339,41 @@ export default defineComponent({
     // Dates Emits
 
     async function setTheStartDate(e) {
-      console.log(e);
-      if (e != null) {
-        thermalReportDetails.value.val_start_date = await moment(e).format(
-          "YYYY-MM-DD"
-        );
-      } else {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            thermalReportDetails.value.val_start_date = await moment(e).format(
+              "YYYY-MM-DD"
+            );
+          } else {
+            thermalReportDetails.value.val_start_date = await "";
+          }
+        } else {
+          thermalReportDetails.value.val_start_date = await "";
+        }
+      } catch (err) {
         thermalReportDetails.value.val_start_date = await "";
       }
+      console.log(thermalReportDetails.value.val_start_date);
     }
 
     async function setTheStartTime(e) {
-      console.log(e);
-      if (e != null) {
-        thermalReportDetails.value.start_time = await moment(e).format(
-          "HH:mm:ss"
-        );
-      } else {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            thermalReportDetails.value.start_time = await moment(e).format(
+              "HH:mm:ss"
+            );
+          } else {
+            thermalReportDetails.value.start_time = await "";
+          }
+        } else {
+          thermalReportDetails.value.start_time = await "";
+        }
+      } catch (err) {
         thermalReportDetails.value.start_time = await "";
       }
+      console.log(thermalReportDetails.value.start_time);
     }
 
     // remove multiple instrument and excel file
@@ -630,7 +646,6 @@ export default defineComponent({
             })
           );
         }
-        
       } catch (error) {
         console.error(error);
       } finally {

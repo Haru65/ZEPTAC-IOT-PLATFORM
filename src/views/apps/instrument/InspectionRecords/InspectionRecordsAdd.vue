@@ -295,6 +295,7 @@ export default defineComponent({
       installation_details: "",
       training_details: "",
       remarks: "",
+      approval_status: "1",
 
       company_id: User.company_id,
       created_by: User.id,
@@ -334,6 +335,7 @@ export default defineComponent({
       } catch (err) {
         itemDetails.value[dateType] = "";
       }
+      console.log(itemDetails.value[dateType]);
     }
 
     function areAllPropertiesNull(array) {

@@ -7,6 +7,7 @@ interface IComplaint {
     corrective_action: string;
     resolution_date: string;
     complaint_status: string;
+    approval_status: string;
   }  
 
 export type { IComplaint };

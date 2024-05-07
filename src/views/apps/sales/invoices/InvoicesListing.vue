@@ -485,7 +485,7 @@ export default defineComponent({
             customer_company: customer_company.company_name,
             company_name: company_name.company_name,
             site_location: site_location,
-            date: moment(date).format("LL"),
+            date,
             total: total,
           })
         );
@@ -531,7 +531,7 @@ export default defineComponent({
             customer_company: customer_company.company_name,
             company_name: company_name.company_name,
             site_location: site_location,
-            date: moment(date).format("LL"),
+            date,
             total: total,
           })
         );
@@ -591,7 +591,7 @@ export default defineComponent({
             customer_company: customer_company.company_name,
             company_name: company_name.company_name,
             site_location: site_location,
-            date: moment(date).format("LL"),
+            date,
             total: total,
           })
         );
@@ -723,7 +723,7 @@ export default defineComponent({
             customer_company: customer_company.company_name,
             company_name: company_name.company_name,
             site_location: site_location,
-            date: moment(date).format("LL"),
+            date,
             total: total,
           })
         );
@@ -785,13 +785,13 @@ export default defineComponent({
       }).then(async (result: { [x: string]: any }) => {
         if (result["isConfirmed"]) {
           const response = await getInvoice(id);
-          // update date
-          quotationDetail.value.date = moment(
-            quotationDetail.value.date
-          ).format("YYYY-MM-DD HH:mm:ss");
-          quotationDetail.value.duedate = moment(
-            quotationDetail.value.duedate
-          ).format("YYYY-MM-DD HH:mm:ss");
+          // // update date
+          // quotationDetail.value.date = moment(
+          //   quotationDetail.value.date
+          // ).format("YYYY-MM-DD HH:mm:ss");
+          // quotationDetail.value.duedate = moment(
+          //   quotationDetail.value.duedate
+          // ).format("YYYY-MM-DD HH:mm:ss");
           quotationDetail.value = {
             invoice_no: latestinvoice_no,
             lead_id: response.customer_id,

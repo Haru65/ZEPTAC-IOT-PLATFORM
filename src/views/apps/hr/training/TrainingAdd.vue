@@ -33,6 +33,7 @@
                     name="training_date"
                     id="training_date"
                     v-model="trainingDetails.training_date"
+                    @change="setDates($event, 'training_date')"
                     placeholder="Pick Training Day"
                     :editable="false"
                   />
@@ -321,6 +322,7 @@ interface Training {
   trainees: Array<string>;
   training_mode: string;
   training_status: string;
+  approval_status: string;
   company_id: string;
   created_by: string;
   updated_by: string;
@@ -360,6 +362,7 @@ export default defineComponent({
       trainees: [],
       training_mode: "1",
       training_status: "1",
+      approval_status: "1",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -382,7 +385,7 @@ export default defineComponent({
         // Check if any property is null or empty
 
         return (
-          training_date !== null &&
+          training_date !== "" &&
           training_topic !== "" &&
           training_criteria !== "" &&
           training_desc !== "" &&
@@ -394,16 +397,30 @@ export default defineComponent({
       });
     }
 
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            trainingDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            trainingDetails.value[dateType] = "";
+          }
+        } else {
+          trainingDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        trainingDetails.value[dateType] = "";
+      }
+      console.log(trainingDetails.value[dateType]);
+    }
+
     const submit = async () => {
       // console.log(trainingDetails.value)
 
       loading.value = true;
 
       try {
-        trainingDetails.value.training_date = moment(
-          trainingDetails.value.training_date
-        ).format("YYYY-MM-DD");
-
         const result = areAllPropertiesNotNull([trainingDetails.value]);
 
         if (result) {
@@ -480,6 +497,7 @@ export default defineComponent({
       limit,
       TrainingMode,
       TrainingStatus,
+      setDates,
     };
   },
 });

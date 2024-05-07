@@ -123,7 +123,12 @@
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { addMRMMinute, addMRMSchedule, getEmployees, getMRMSchedule, getMrmWithMinutes } from "@/stores/api";
+import {
+  addMRMMinute,
+  addMRMSchedule,
+  getEmployees,
+  getMRMSchedule,
+} from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import packages from "@/core/config/PackagesConfig";
@@ -152,6 +157,7 @@ interface Item {
   meeting_date: string;
   agenda: string;
   attendees: [];
+  approval_status: string;
   agenda_points: Data[];
   company_id: string;
   created_by: string;
@@ -176,7 +182,6 @@ export default defineComponent({
     const itemId = route.params.id;
     let limit = ref(500);
 
-
     const Employees = ref([{ id: "", first_name: "", last_name: "" }]);
 
     const itemDetailsValidator = Yup.object().shape({
@@ -188,6 +193,7 @@ export default defineComponent({
       meeting_date: "",
       agenda: "",
       attendees: [],
+      approval_status: "",
       agenda_points: [],
       company_id: User.company_id,
       created_by: User.id,
@@ -196,27 +202,28 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-
-
-      let response = await getMRMSchedule(
-            itemId.toString()
-          );
-          console.log(response);
-
-
       Employees.value.pop();
-      itemDetails.value.agenda_points = Agendas.map((item) => ({
-        management_review_meeting_id: response.id,
-        point_id: item.id,
-        point: item.point,
-        outcomes: "",
-        action_required: "",
-        responsible_person: "",
-        company_id: User.company_id,
-        created_by: User.id,
-        updated_by: User.id,
-        is_active: "1",
-      }));
+
+      try {
+        let response = await getMRMSchedule(itemId.toString());
+        console.log(response);
+
+        itemDetails.value.agenda_points = Agendas.map((item) => ({
+          management_review_meeting_id: response.id,
+          point_id: item.id,
+          point: item.point,
+          outcomes: "",
+          action_required: "",
+          responsible_person: "",
+          company_id: User.company_id,
+          created_by: User.id,
+          updated_by: User.id,
+          is_active: "1",
+        }));
+      } catch (error) {
+        showErrorAlert("Error", "An error occurred during the API call.");
+        loading.value = false;
+      }
 
       try {
         ApiService.setHeader();
@@ -251,6 +258,7 @@ export default defineComponent({
       } catch (err) {
         itemDetails.value[dateType] = "";
       }
+      console.log(itemDetails.value[dateType]);
     }
 
     const validateForm = (formData) => {
@@ -282,7 +290,6 @@ export default defineComponent({
 
       console.log(itemDetails.value);
       try {
-
         if (validateForm(itemDetails.value.agenda_points)) {
           const response = await addMRMMinute(itemDetails.value);
           if (!response.error) {
@@ -316,6 +323,7 @@ export default defineComponent({
         meeting_date: "",
         agenda: "",
         attendees: [],
+        approval_status: "",
         agenda_points: itemDetails.value.agenda_points,
         company_id: User.company_id,
         created_by: User.id,

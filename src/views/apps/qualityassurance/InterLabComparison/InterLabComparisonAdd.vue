@@ -614,6 +614,7 @@ interface itemDetails {
   }[];
   status: string;
   remark: string;
+  approval_status: string;
 
   company_id: string;
   created_by: number;
@@ -652,7 +653,7 @@ export default defineComponent({
         Companies.value.push(
           ...response.result?.map(({ created_at, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
           }))
         );
         console.log(Companies);
@@ -693,6 +694,7 @@ export default defineComponent({
       ],
       status: "",
       remark: "",
+      approval_status: "1",
 
       company_id: User.company_id,
       created_by: User.id,
@@ -740,7 +742,7 @@ export default defineComponent({
         itemDetails.value[dateType] = "";
       }
 
-      console.log(dateType, " ", itemDetails.value[dateType]);
+      console.log(itemDetails.value[dateType]);
     }
 
     onMounted(async () => {
@@ -780,7 +782,9 @@ export default defineComponent({
     };
 
     async function calculateOverallStatus(items) {
-      const allEnRatiosSatisfactory = items.every((item) => item.en_ratio <= EN_VALUE);
+      const allEnRatiosSatisfactory = items.every(
+        (item) => item.en_ratio <= EN_VALUE
+      );
       return allEnRatiosSatisfactory ? true : false;
     }
 
@@ -1003,6 +1007,7 @@ export default defineComponent({
         ],
         status: "",
         remark: "",
+        approval_status: "1",
 
         company_id: User.company_id,
         created_by: User.id,

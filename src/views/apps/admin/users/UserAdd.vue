@@ -561,9 +561,13 @@
                 <!--begin::Col-->
                 <div class="col-lg fv-row">
                   <el-date-picker
-                    v-model="profileDetails.dob"
                     type="date"
+                    name="dob"
+                    id="dob"
+                    v-model="profileDetails.dob"
+                    @change="setDates($event, 'dob')"
                     placeholder="Select Date of Birth"
+                    :editable="false"
                   />
                 </div>
                 <!--end::Col-->
@@ -950,6 +954,23 @@ export default defineComponent({
       }
     );
 
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            profileDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            profileDetails.value[dateType] = "";
+          }
+        } else {
+          profileDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        profileDetails.value[dateType] = "";
+      }
+    }
+
     const onsubmit = async () => {
       // * company identification for companyid based on localstorage login
 
@@ -1125,6 +1146,7 @@ export default defineComponent({
       file_size,
       identifier,
       handleFileChange,
+      setDates,
     };
   },
 });

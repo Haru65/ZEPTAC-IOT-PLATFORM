@@ -819,6 +819,7 @@ export default defineComponent({
         },
       ]),
       review_commands: "",
+      approval_status: "1",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -857,6 +858,7 @@ export default defineComponent({
       } catch (err) {
         itemDetails[dateType] = "";
       }
+      console.log(itemDetails[dateType]);
     }
 
     const addReading = () => {

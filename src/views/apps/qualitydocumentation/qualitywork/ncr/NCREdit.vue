@@ -168,66 +168,6 @@
               <!--end::Col-->
             </div>
             <!--end::Input group-->
-
-            <!--begin::Input group-->
-            <div class="row mb-6">
-              <!--begin::Col-->
-              <div class="col-md-12 fv-row">
-                <!--begin::Label-->
-                <label
-                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                  >Prepared By</label
-                >
-                <!--end::Label-->
-
-                <!--begin::Input-->
-                <Field
-                  type="text"
-                  v-model="ncrDetails.prepared_by"
-                  name="prepared_by"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Prepared by..."
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="prepared_by" />
-                  </div>
-                </div>
-                <!--end::Input-->
-              </div>
-              <!--end::Col-->
-            </div>
-            <!--end::Input group-->
-
-            <!--begin::Input group-->
-            <div class="row mb-6">
-              <!--begin::Col-->
-              <div class="col-md-12 fv-row">
-                <!--begin::Label-->
-                <label
-                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                  >Approved By</label
-                >
-                <!--end::Label-->
-
-                <!--begin::Input-->
-                <Field
-                  type="text"
-                  v-model="ncrDetails.approved_by"
-                  name="approved_by"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Approval authority..."
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="approved_by" />
-                  </div>
-                </div>
-                <!--end::Input-->
-              </div>
-              <!--end::Col-->
-            </div>
-            <!--end::Input group-->
           </div>
 
           <div class="modal-footer flex-center w-100">
@@ -277,8 +217,7 @@ interface NCR {
   completion_date: string;
   review_date: string;
   verification_details: string;
-  prepared_by: string;
-  approved_by: string;
+  approval_status: string;
   company_id: string;
   created_by: string;
   updated_by: string;
@@ -316,8 +255,7 @@ export default defineComponent({
       completion_date: "",
       review_date: "",
       verification_details: "",
-      prepared_by: "",
-      approved_by: "",
+      approval_status: "",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -333,8 +271,7 @@ export default defineComponent({
         completion_date: response.completion_date,
         review_date: response.review_date,
         verification_details: response.verification_details,
-        prepared_by: response.prepared_by,
-        approved_by: response.approved_by,
+        approval_status: response.approval_status,
         company_id: response.company_id ? response.company_id : "",
         created_by: response.created_by,
         updated_by: response.updated_by,
@@ -342,13 +279,22 @@ export default defineComponent({
       };
     });
 
+    /* --------SET DATE LOGIC--------*/
     async function setDates(e, dateType) {
-      if (e != null) {
-        ncrDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
-      } else {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            ncrDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            ncrDetails.value[dateType] = "";
+          }
+        } else {
+          ncrDetails.value[dateType] = "";
+        }
+      } catch (err) {
         ncrDetails.value[dateType] = "";
       }
-      console.log(dateType, " ", ncrDetails.value[dateType]);
+      console.log(ncrDetails.value[dateType]);
     }
 
     function areAllPropertiesNull(array) {

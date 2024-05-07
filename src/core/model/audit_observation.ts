@@ -18,6 +18,7 @@ interface IClause {
   nc_observation: string;
   compilance_type: string;
   evidence: string;
+  approval_status: string;
   company_id: string;
 }
 

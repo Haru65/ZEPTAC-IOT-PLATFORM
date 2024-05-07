@@ -28,7 +28,7 @@
             :class="{ 'active-tab': selectedClause === index }"
             @click="selectClause(index)"
           >
-            {{ clause.clause_number }}
+            {{ clause["clause_number"] }}
           </div>
         </div>
       </div>
@@ -63,7 +63,7 @@
                       :aria-expanded="index === 0 ? 'true' : 'false'"
                       :aria-controls="`collapse_${index}`"
                     >
-                      {{ clause.clause_number }}
+                      {{ clause["clause_number"] }}
                     </button>
                   </h2>
                   <div
@@ -76,12 +76,12 @@
                       <div
                         class="form-control form-control-lg form-control-solid mb-6"
                       >
-                        {{ clause.description }}
+                        {{ clause["description"] }}
                       </div>
 
                       <div class="text-start mb-6">
                         <span
-                          v-if="clause.has_nc"
+                          v-if="clause['has_nc']"
                           type="button"
                           data-toggle="tooltip"
                           title="View NC Observation"
@@ -97,9 +97,9 @@
                       <div class="accordion" :id="`nested_accordion_${index}`">
                         <div
                           class="accordion-item"
-                          v-for="(
-                            nestedClause, nestedIndex
-                          ) in clause.hierarchies"
+                          v-for="(nestedClause, nestedIndex) in clause[
+                            'hierarchies'
+                          ]"
                           :key="nestedIndex"
                         >
                           <h2
@@ -116,7 +116,7 @@
                               "
                               :aria-controls="`nested_collapse_${index}_${nestedIndex}`"
                             >
-                              {{ nestedClause.clause_number }}
+                              {{ nestedClause["clause_number"] }}
                             </button>
                           </h2>
                           <div
@@ -129,12 +129,12 @@
                               <div
                                 class="form-control form-control-lg form-control-solid mb-6"
                               >
-                                {{ nestedClause.description }}
+                                {{ nestedClause["description"] }}
                               </div>
 
                               <div class="text-start mb-6">
                                 <span
-                                  v-if="nestedClause.has_nc"
+                                  v-if="nestedClause['has_nc']"
                                   type="button"
                                   data-toggle="tooltip"
                                   title="View NC Observation"
@@ -156,7 +156,7 @@
                                   class="accordion-item"
                                   v-for="(
                                     nestedNestedClause, nestedNestedIndex
-                                  ) in nestedClause.hierarchies"
+                                  ) in nestedClause['hierarchies']"
                                   :key="nestedNestedIndex"
                                 >
                                   <h2
@@ -386,13 +386,18 @@
 
       <!--begin::Card body-->
       <div class="card-body pt-0">
+        <ApprovalModal
+          @reloadData="reLoadData"
+          v-bind:data="itemData"
+        ></ApprovalModal>
+
         <div class="table-responsive">
           <Datatable
             checkbox-label="id"
             @on-sort="sort"
             @on-items-select="onItemSelect"
             :data="tableData"
-            :header="tableHeader"
+            :header="filteredTableHeader"
             :checkbox-enabled="true"
             :items-per-page="limit"
             :items-per-page-dropdown-enabled="false"
@@ -430,6 +435,42 @@
                 </a>
               </div>
             </template>
+            <template v-slot:approval_status="{ row: audit_observation }">
+              <span
+                v-if="audit_observation.approval_status == 1"
+                class="badge py-3 px-4 fs-7 badge-light-primary"
+                >{{
+                  GetApprovalStatus(audit_observation.approval_status)
+                }}</span
+              >
+              <span
+                v-if="audit_observation.approval_status == 2"
+                class="badge py-3 px-4 fs-7 badge-light-danger"
+                >{{
+                  GetApprovalStatus(audit_observation.approval_status)
+                }}</span
+              >
+              <span
+                v-if="audit_observation.approval_status == 3"
+                class="badge py-3 px-4 fs-7 badge-light-success"
+                >{{
+                  GetApprovalStatus(audit_observation.approval_status)
+                }}</span
+              >
+            </template>
+
+            <template v-slot:approval_button="{ row: audit_observation }">
+              <button
+                type="button"
+                class="btn btn-sm btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#kt_modal_1"
+                @click="fillItemData(audit_observation)"
+              >
+                Open
+              </button>
+            </template>
+
             <template v-slot:actions="{ row: audit_observation }">
               <!--begin::Menu Flex-->
               <div class="d-flex flex-lg-row">
@@ -486,9 +527,14 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, reactive, ref } from "vue";
+import { computed, defineComponent, onMounted, reactive, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import { getIAuditObservation, getISORule } from "@/stores/api";
+
+import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
+import { hideModal } from "@/core/helpers/dom";
+import ApprovalModal from "./ApprovalModal.vue";
+
 import * as Yup from "yup";
 import { Identifier } from "@/core/config/WhichUserConfig";
 import { useAuthStore } from "@/stores/auth";
@@ -499,10 +545,8 @@ import IAObservationAddModal from "./ObservationCustomComponent/IAObservationAdd
 
 import {
   getIAuditSchedule,
-  addIAuditObservation,
   getIAuditObservations,
   deleteIAuditObservation,
-  PlannerSearch,
 } from "@/stores/api";
 import type { IClause } from "@/core/model/audit_observation";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
@@ -514,8 +558,11 @@ export default defineComponent({
   components: {
     IAObservationAddModal,
     Datatable,
+    ApprovalModal,
   },
   setup() {
+    const identifier = Identifier;
+
     const auth = useAuthStore();
     const router = useRouter();
     const User = auth.GetUser();
@@ -555,12 +602,32 @@ export default defineComponent({
         columnWidth: 100,
       },
       {
+        columnName: "Approval Status",
+        columnLabel: "approval_status",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Reject/Approve",
+        columnLabel: "approval_button",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,
       },
     ]);
+
+    const itemData = ref({
+      id: "",
+      approval_status: "",
+      new_status: "",
+      company_id: "",
+      updated_by: "",
+    });
 
     const selectedIds = ref<Array<number>>([]);
     const tableData = ref<Array<IClause>>([]);
@@ -687,6 +754,7 @@ export default defineComponent({
       auditees: [],
       audit_area: "",
       scope: "",
+      approval_status: "",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -702,6 +770,7 @@ export default defineComponent({
       nc_observation: "",
       compilance_type: "",
       evidence: "",
+      approval_status: "1",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -713,6 +782,21 @@ export default defineComponent({
       clauses: [],
       company_id: User.company_id,
       is_active: 1,
+    });
+
+    const filteredTableHeader = computed(() => {
+      const isAdmin = identifier.value === "Admin";
+      const isCompanyAdmin = identifier.value === "Company-Admin";
+
+      if (isAdmin || isCompanyAdmin) {
+        // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
+        return tableHeader.value;
+      } else {
+        // Otherwise, exclude the 'approval_button' column
+        return tableHeader.value.filter(
+          (column) => column.columnLabel !== "approval_button"
+        );
+      }
     });
 
     onMounted(async () => {
@@ -727,6 +811,7 @@ export default defineComponent({
           auditees: JSON.parse(response.auditees),
           audit_area: response.audit_area,
           scope: response.scope,
+          approval_status: response.approval_status,
 
           company_id: response.company_id ? response.company_id : "",
           created_by: response.created_by,
@@ -740,7 +825,7 @@ export default defineComponent({
       }
 
       try {
-        let response = await getISORule(1);
+        let response = await getISORule(User.company_id);
         console.log(response);
         ISO.value = {
           id: response.id,
@@ -782,6 +867,7 @@ export default defineComponent({
         nc_observation: "",
         compilance_type: "",
         evidence: "",
+        approval_status: "1",
         company_id: User.company_id,
         created_by: User.id,
         updated_by: User.id,
@@ -886,6 +972,20 @@ export default defineComponent({
       await observation_listing();
     }
 
+    // Function
+    const fillItemData = (ncr) => {
+      const { id, approval_status, company_id } = ncr;
+
+      itemData.value = {
+        id: id,
+        approval_status: approval_status,
+        new_status: "",
+        company_id: company_id,
+        updated_by: User.id,
+      };
+      console.log("itemData are:", itemData.value);
+    };
+
     return {
       clauses,
       selectedClause,
@@ -909,6 +1009,12 @@ export default defineComponent({
       PageLimitPoiner,
       Limits,
       itemId,
+      filteredTableHeader,
+      ApprovalStatus,
+      GetApprovalStatus,
+      itemData,
+      fillItemData,
+      identifier,
     };
   },
 });

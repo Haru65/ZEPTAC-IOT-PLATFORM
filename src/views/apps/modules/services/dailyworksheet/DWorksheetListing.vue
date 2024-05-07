@@ -93,12 +93,17 @@
         <!--end::Card toolbar-->
       </div>
       <div class="card-body pt-0">
+        <ApprovalModal
+          @reloadData="reLoadData"
+          v-bind:data="itemData"
+        ></ApprovalModal>
+
         <Datatable
           checkbox-label="id"
           @on-sort="sort"
           @on-items-select="onItemSelect"
           :data="tableData"
-          :header="tableHeader"
+          :header="filteredTableHeader"
           :checkbox-enabled="true"
           :items-per-page="limit"
           :items-per-page-dropdown-enabled="false"
@@ -142,6 +147,37 @@
               >Completed</span
             >
           </template>
+
+          <template v-slot:approval_status="{ row: dailyworksheets }">
+            <span
+              v-if="dailyworksheets.approval_status == 1"
+              class="badge py-3 px-4 fs-7 badge-light-primary"
+              >{{ GetApprovalStatus(dailyworksheets.approval_status) }}</span
+            >
+            <span
+              v-if="dailyworksheets.approval_status == 2"
+              class="badge py-3 px-4 fs-7 badge-light-danger"
+              >{{ GetApprovalStatus(dailyworksheets.approval_status) }}</span
+            >
+            <span
+              v-if="dailyworksheets.approval_status == 3"
+              class="badge py-3 px-4 fs-7 badge-light-success"
+              >{{ GetApprovalStatus(dailyworksheets.approval_status) }}</span
+            >
+          </template>
+
+          <template v-slot:approval_button="{ row: dailyworksheets }">
+            <button
+              type="button"
+              class="btn btn-sm btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#kt_modal_1"
+              @click="fillItemData(dailyworksheets)"
+            >
+              Open
+            </button>
+          </template>
+
           <template v-slot:actions="{ row: dailyworksheets }">
             <!--begin::Menu Flex-->
 
@@ -210,7 +246,7 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { IWorksheet } from "@/core/model/dailyworksheets";
@@ -222,15 +258,26 @@ import {
   getDailyWorksheet,
   WorksheetSearch,
 } from "@/stores/api";
+import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
+import { hideModal } from "@/core/helpers/dom";
+import ApprovalModal from "./ApprovalModal.vue";
+import { useAuthStore } from "@/stores/auth";
+import { Identifier } from "@/core/config/WhichUserConfig";
 import Swal from "sweetalert2";
 import { worksheetGen } from "@/core/config/WorksheetGenerator";
+import ApiService from "@/core/services/ApiService";
 
 export default defineComponent({
-  name: "worksheets_listing",
+  name: "dailyworksheet-list",
   components: {
     Datatable,
+    ApprovalModal,
   },
   setup() {
+    const auth = useAuthStore();
+    const User = auth.GetUser();
+    const identifier = Identifier;
+
     const loading = ref(true);
     const tableHeader = ref([
       {
@@ -270,12 +317,32 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
+        columnName: "Approval Status",
+        columnLabel: "approval_status",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Reject/Approve",
+        columnLabel: "approval_button",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 70,
       },
     ]);
+
+    const itemData = ref({
+      id: "",
+      approval_status: "",
+      new_status: "",
+      company_id: "",
+      updated_by: "",
+    });
 
     // functions
     const Limits = ref({
@@ -302,13 +369,10 @@ export default defineComponent({
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ start_time, end_time, ...rest }) => ({
-            start_time: moment(start_time).format("MMMM Do YYYY"),
-            end_time: moment(end_time).format("MMMM Do YYYY"),
-            ...rest,
-          })
-        );
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id,
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -333,13 +397,10 @@ export default defineComponent({
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ start_time, end_time, ...rest }) => ({
-            start_time: moment(start_time).format("MMMM Do YYYY"),
-            end_time: moment(end_time).format("MMMM Do YYYY"),
-            ...rest,
-          })
-        );
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id,
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -363,15 +424,12 @@ export default defineComponent({
         const response = await getDailyWorksheets(
           `page=${page.value}&limit=${limit}`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ start_time, end_time, ...rest }) => ({
-            start_time: moment(start_time).format("MMMM Do YYYY"),
-            end_time: moment(end_time).format("MMMM Do YYYY"),
-            ...rest,
-          })
-        );
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id,
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -399,6 +457,21 @@ export default defineComponent({
         PagePointer(page.value);
       }
     };
+
+    const filteredTableHeader = computed(() => {
+      const isAdmin = identifier.value === "Admin";
+      const isCompanyAdmin = identifier.value === "Company-Admin";
+
+      if (isAdmin || isCompanyAdmin) {
+        // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
+        return tableHeader.value;
+      } else {
+        // Otherwise, exclude the 'approval_button' column
+        return tableHeader.value.filter(
+          (column) => column.columnLabel !== "approval_button"
+        );
+      }
+    });
 
     onMounted(async () => {
       //console.log("done");
@@ -489,15 +562,12 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await WorksheetSearch(search.value);
-        
+
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ start_time, end_time, ...rest }) => ({
-            start_time: moment(start_time).format("MMMM Do YYYY"),
-            end_time: moment(end_time).format("MMMM Do YYYY"),
-            ...rest,
-          })
-        );
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id,
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -585,83 +655,103 @@ export default defineComponent({
     });
 
     const downloadWorksheet = async (id: any) => {
-      const res = await getDailyWorksheet(id);
+      ApiService.setHeader();
 
-      worksheetInfo.value.id = res.result.id;
-      worksheetInfo.value.rgp_id = res.result.rgp_id;
-      worksheetInfo.value.rgp_no = res.result.rgp_no;
-      worksheetInfo.value.engineer_id = res.result.engineer_id;
-      worksheetInfo.value.company_id = res.result.company_id;
-      worksheetInfo.value.scope_of_work = res.result.scope_of_work;
-      worksheetInfo.value.problem = res.result.problem
-        ? res.result.problem
-        : "NA";
-      worksheetInfo.value.work_date = res.result.work_date;
-      worksheetInfo.value.tests = JSON.parse(res.result.tests);
-      worksheetInfo.value.other_test = res.result.other_test
-        ? res.result.other_test
-        : "NA";
-      worksheetInfo.value.start_time = res.result.start_time;
-      worksheetInfo.value.end_time = res.result.end_time;
-      worksheetInfo.value.work_status = res.result.work_status;
-      worksheetInfo.value.standard_used = res.result.standard_used;
-      worksheetInfo.value.witnessed_by = res.result.witnessed_by;
+      if (id != null) {
+        const res = await getDailyWorksheet(id);
 
-      worksheetInfo.value.client_address.address1 = res.result.client_address
-        .address1
-        ? res.result.client_address.address1
-        : "";
-      worksheetInfo.value.client_address.address2 = res.result.client_address
-        .address2
-        ? res.result.client_address.address2
-        : "";
-      worksheetInfo.value.client_address.city = res.result.client_address.city
-        ? res.result.client_address.city
-        : "";
-      worksheetInfo.value.client_address.pincode = res.result.client_address
-        .pincode
-        ? res.result.client_address.pincode
-        : "";
-      worksheetInfo.value.client_address.states = res.result.client_address
-        .states
-        ? res.result.client_address.states
-        : "";
-      worksheetInfo.value.client_address.country = res.result.client_address
-        .country
-        ? res.result.client_address.country
-        : "";
+        worksheetInfo.value.id = res.result.id;
+        worksheetInfo.value.rgp_id = res.result.rgp_id;
+        worksheetInfo.value.rgp_no = res.result.rgp_no;
+        worksheetInfo.value.engineer_id = res.result.engineer_id;
+        worksheetInfo.value.company_id = res.result.company_id;
+        worksheetInfo.value.scope_of_work = res.result.scope_of_work;
+        worksheetInfo.value.problem = res.result.problem
+          ? res.result.problem
+          : "NA";
+        worksheetInfo.value.work_date = res.result.work_date;
+        worksheetInfo.value.tests = await JSON.parse(res.result.tests);
+        worksheetInfo.value.other_test = res.result.other_test
+          ? res.result.other_test
+          : "NA";
+        worksheetInfo.value.start_time = res.result.start_time;
+        worksheetInfo.value.end_time = res.result.end_time;
+        worksheetInfo.value.work_status = res.result.work_status;
+        worksheetInfo.value.standard_used = res.result.standard_used;
+        worksheetInfo.value.witnessed_by = res.result.witnessed_by;
 
-      worksheetInfo.value.customer_data.id = res.result.customer_data.id;
-      worksheetInfo.value.customer_data.first_name =
-        res.result.customer_data.first_name;
-      worksheetInfo.value.customer_data.last_name =
-        res.result.customer_data.last_name;
+        worksheetInfo.value.client_address.address1 = res.result.client_address
+          .address1
+          ? res.result.client_address.address1
+          : "";
+        worksheetInfo.value.client_address.address2 = res.result.client_address
+          .address2
+          ? res.result.client_address.address2
+          : "";
+        worksheetInfo.value.client_address.city = res.result.client_address.city
+          ? res.result.client_address.city
+          : "";
+        worksheetInfo.value.client_address.pincode = res.result.client_address
+          .pincode
+          ? res.result.client_address.pincode
+          : "";
+        worksheetInfo.value.client_address.states = res.result.client_address
+          .states
+          ? res.result.client_address.states
+          : "";
+        worksheetInfo.value.client_address.country = res.result.client_address
+          .country
+          ? res.result.client_address.country
+          : "";
 
-      worksheetInfo.value.client_data.id = res.result.client_data.id;
-      worksheetInfo.value.client_data.first_name =
-        res.result.client_data.first_name;
-      worksheetInfo.value.client_data.last_name =
-        res.result.client_data.last_name;
-      worksheetInfo.value.client_data.mobile = res.result.client_data.mobile
-        ? res.result.client_data.mobile
-        : "";
-      worksheetInfo.value.client_data.company.company_name =
-        res.result.client_data.company.company_name;
+        worksheetInfo.value.customer_data.id = res.result.customer_data.id;
+        worksheetInfo.value.customer_data.first_name =
+          res.result.customer_data.first_name;
+        worksheetInfo.value.customer_data.last_name =
+          res.result.customer_data.last_name;
 
-      worksheetInfo.value.quotation_details = res.result.quotation_details;
+        worksheetInfo.value.client_data.id = res.result.client_data.id;
+        worksheetInfo.value.client_data.first_name =
+          res.result.client_data.first_name;
+        worksheetInfo.value.client_data.last_name =
+          res.result.client_data.last_name;
+        worksheetInfo.value.client_data.mobile = res.result.client_data.mobile
+          ? res.result.client_data.mobile
+          : "";
+        worksheetInfo.value.client_data.company.company_name =
+          res.result.client_data.company.company_name;
 
-      worksheetInfo.value.company_details.company_name =
-        res.result.company_details.company_name;
-      worksheetInfo.value.company_details.company_logo = res.result
-        .company_details.company_logo
-        ? "data: image/png;base64," + res.result.company_details.company_logo
-        : getAssetPath("media/avatars/default.png");
+        worksheetInfo.value.quotation_details = res.result.quotation_details;
 
-      console.log(worksheetInfo.value);
+        worksheetInfo.value.company_details.company_name =
+          res.result.company_details.company_name;
+        worksheetInfo.value.company_details.company_logo = res.result
+          .company_details.company_logo
+          ? "data: image/png;base64," + res.result.company_details.company_logo
+          : getAssetPath("media/avatars/default.png");
 
-      const worksheetName = `${worksheetInfo.value.quotation_details.quotation_no}_${worksheetInfo.value.rgp_no}`;
+        const worksheetName = `${worksheetInfo.value.quotation_details.quotation_no}_${worksheetInfo.value.rgp_no}`;
 
-      await worksheetGen(id, worksheetName, worksheetInfo);
+        await worksheetGen(id, worksheetName, worksheetInfo);
+      }
+    };
+
+    async function reLoadData() {
+      await worksheets_listing();
+    }
+
+    // Function
+    const fillItemData = (ncr) => {
+      const { id, approval_status, company_id } = ncr;
+
+      itemData.value = {
+        id: id,
+        approval_status: approval_status,
+        new_status: "",
+        company_id: company_id,
+        updated_by: User.id,
+      };
+      console.log("itemData are:", itemData.value);
     };
 
     return {
@@ -684,6 +774,13 @@ export default defineComponent({
       PageLimitPoiner,
       Limits,
       downloadWorksheet,
+      filteredTableHeader,
+      ApprovalStatus,
+      GetApprovalStatus,
+      itemData,
+      fillItemData,
+      identifier,
+      reLoadData,
     };
   },
 });

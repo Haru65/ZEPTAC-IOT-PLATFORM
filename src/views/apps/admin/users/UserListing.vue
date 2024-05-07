@@ -285,7 +285,7 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({ created_at, role_id, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
             role_id: get_role(role_id),
           })
         );
@@ -314,7 +314,7 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({ created_at, role_id, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
             role_id: get_role(role_id),
           })
         );
@@ -344,7 +344,7 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({ created_at, role_id, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
             role_id: get_role(role_id),
           })
         );
@@ -470,7 +470,7 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({ created_at, role_id, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
             role_id: get_role(role_id),
           })
         );

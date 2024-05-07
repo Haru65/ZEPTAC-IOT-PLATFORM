@@ -199,6 +199,7 @@
                         name="calibration_date"
                         id="calibration_date"
                         v-model="itemDetails.calibration_date"
+                        @change="setDates($event, 'calibration_date')"
                         placeholder="Pick a Day"
                         :editable="false"
                       />
@@ -231,6 +232,7 @@
                         name="calibration_due_date"
                         id="calibration_due_date"
                         v-model="itemDetails.calibration_due_date"
+                        @change="setDates($event, 'calibration_due_date')"
                         placeholder="Pick a Day"
                         :editable="false"
                       />
@@ -662,7 +664,9 @@
                                   type="date"
                                   v-model="editedDate"
                                   class="badge"
-                                  @change="setDates($event, 'editedDate')"
+                                  @change="
+                                    setPlanAndEditDates($event, 'editedDate')
+                                  "
                                   placeholder="Pick a day"
                                 ></el-date-picker>
                               </template>
@@ -714,7 +718,7 @@
                         <el-date-picker
                           type="date"
                           v-model="planDate"
-                          @change="setDates($event, 'planDate')"
+                          @change="setPlanAndEditDates($event, 'planDate')"
                           placeholder="Pick a day"
                           style="flex: 1"
                         ></el-date-picker>
@@ -818,9 +822,11 @@ interface itemDetails {
   traceability: string;
 
   maintenance_plan: boolean;
-
+  
   maintenance_history: Array<MDetails>;
   intermediate_check_plan: string[];
+  
+  approval_status: string;
 
   company_id: string;
   created_by: number;
@@ -875,30 +881,57 @@ export default defineComponent({
       itemDetails.value.intermediate_check_plan.splice(index, 1);
     };
 
+    /* --------SET DATE LOGIC--------*/
     async function setDates(e, dateType) {
-      if (dateType === "planDate") {
+      try {
         if (e != null) {
           if (e != "" && e != null) {
-            planDate.value = moment(e).format("YYYY-MM-DD");
+            itemDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            itemDetails.value[dateType] = "";
+          }
+        } else {
+          itemDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        itemDetails.value[dateType] = "";
+      }
+      console.log(itemDetails.value[dateType]);
+    }
+
+    async function setPlanAndEditDates(e, dateType) {
+      if (dateType === "planDate") {
+        try {
+          if (e != null) {
+            if (e != "" && e != null) {
+              planDate.value = moment(e).format("YYYY-MM-DD");
+            } else {
+              planDate.value = "";
+            }
           } else {
             planDate.value = "";
           }
-        } else {
+        } catch (err) {
           planDate.value = "";
         }
+        console.log(planDate.value);
       } else if (dateType === "editedDate") {
-        if (e != null) {
-          if (e != "" && e != null) {
-            editedDate.value = moment(e).format("YYYY-MM-DD");
+        try {
+          if (e != null) {
+            if (e != "" && e != null) {
+              editedDate.value = moment(e).format("YYYY-MM-DD");
+            } else {
+              editedDate.value = "";
+            }
           } else {
             editedDate.value = "";
           }
-        } else {
+        } catch (err) {
           editedDate.value = "";
         }
+        console.log(editedDate.value);
       }
     }
-
 
     const itemDetailsValidator = Yup.object().shape({
       instrument_id: Yup.string().required().label("Instrument ID"),
@@ -922,7 +955,7 @@ export default defineComponent({
         Companies.value.push(
           ...response.result?.map(({ created_at, ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
+            created_at: moment(created_at).format("DD-MM-YYYY"),
           }))
         );
         console.log(Companies);
@@ -945,10 +978,12 @@ export default defineComponent({
       calibration_certificate: "",
       traceability: "",
       maintenance_plan: true,
-
+      
       maintenance_history: [],
       intermediate_check_plan: [],
-
+      
+      approval_status: "1",
+      
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -1069,8 +1104,8 @@ export default defineComponent({
           model_no === "" ||
           serial_no === "" ||
           make === "" ||
-          calibration_date === null ||
-          calibration_due_date === null ||
+          calibration_date === "" ||
+          calibration_due_date === "" ||
           vendor_name === "" ||
           accessories_list.length === 0 ||
           maintenance_plan === false
@@ -1162,13 +1197,6 @@ export default defineComponent({
 
       //   console.warn("Nice");
       try {
-        itemDetails.value.calibration_date = moment(
-          itemDetails.value.calibration_date
-        ).format("YYYY-MM-DD");
-        itemDetails.value.calibration_due_date = moment(
-          itemDetails.value.calibration_due_date
-        ).format("YYYY-MM-DD HH:mm:ss");
-
         // Call your API here with the form values
         const response = await addInstrument(itemDetails.value);
         // console.log(response.error);
@@ -1242,9 +1270,11 @@ export default defineComponent({
         calibration_certificate: "",
         traceability: "",
         maintenance_plan: true,
-
+        
         maintenance_history: [],
         intermediate_check_plan: [],
+
+        approval_status: "1",
 
         company_id: User.company_id,
         created_by: User.id,
@@ -1269,6 +1299,7 @@ export default defineComponent({
       User,
       clear,
       setDates,
+      setPlanAndEditDates,
       editingIndex,
       editedDate,
       planDate,

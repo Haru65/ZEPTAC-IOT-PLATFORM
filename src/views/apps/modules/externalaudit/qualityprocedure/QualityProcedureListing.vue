@@ -321,28 +321,12 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({
             id,
-            company_id,
-            document_name,
-            issue_date,
-            issue_no,
-            revision_date,
-            revision_no,
-            prepared_by,
-            approved_by,
             created_at,
-            audit_document,
+            ...rest
           }) => ({
             id,
-            company_id,
-            document_name,
-            issue_date: moment(issue_date).format("MMMM Do YYYY"),
-            issue_no,
-            revision_date: moment(revision_date).format("MMMM Do YYYY"),
-            revision_no,
-            prepared_by,
-            approved_by,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-            audit_document
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+            ...rest
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -373,28 +357,12 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({
             id,
-            company_id,
-            document_name,
-            issue_date,
-            issue_no,
-            revision_date,
-            revision_no,
-            prepared_by,
-            approved_by,
             created_at,
-            audit_document,
+            ...rest
           }) => ({
             id,
-            company_id,
-            document_name,
-            issue_date: moment(issue_date).format("MMMM Do YYYY"),
-            issue_no,
-            revision_date: moment(revision_date).format("MMMM Do YYYY"),
-            revision_no,
-            prepared_by,
-            approved_by,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-            audit_document
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+            ...rest
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -439,28 +407,12 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({
             id,
-            company_id,
-            document_name,
-            issue_date,
-            issue_no,
-            revision_date,
-            revision_no,
-            prepared_by,
-            approved_by,
             created_at,
-            audit_document,
+            ...rest
           }) => ({
             id,
-            company_id,
-            document_name,
-            issue_date: moment(issue_date).format("MMMM Do YYYY"),
-            issue_no,
-            revision_date: moment(revision_date).format("MMMM Do YYYY"),
-            revision_no,
-            prepared_by,
-            approved_by,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-            audit_document
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+            ...rest
           })
         );
         
@@ -569,28 +521,12 @@ export default defineComponent({
         tableData.value = response.result.data.map(
           ({
             id,
-            company_id,
-            document_name,
-            issue_date,
-            issue_no,
-            revision_date,
-            revision_no,
-            prepared_by,
-            approved_by,
             created_at,
-            audit_document,
+            ...rest
           }) => ({
             id,
-            company_id,
-            document_name,
-            issue_date: moment(issue_date).format("MMMM Do YYYY"),
-            issue_no,
-            revision_date: moment(revision_date).format("MMMM Do YYYY"),
-            revision_no,
-            prepared_by,
-            approved_by,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-            audit_document
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+            ...rest
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);

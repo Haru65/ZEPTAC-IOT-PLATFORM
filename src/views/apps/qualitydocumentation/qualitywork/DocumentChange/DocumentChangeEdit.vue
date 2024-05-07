@@ -379,6 +379,7 @@ interface itemDetails {
   effective_date: string;
   authority_comments: string;
   comments: string;
+  approval_status: string;
 
   company_id: string;
   created_by: number;
@@ -428,6 +429,7 @@ export default defineComponent({
       effective_date: "",
       authority_comments: "",
       comments: "",
+      approval_status: "",
 
       company_id: User.company_id,
       created_by: User.id,
@@ -450,8 +452,7 @@ export default defineComponent({
       } catch (err) {
         itemDetails.value[dateType] = "";
       }
-
-      console.log(dateType, " ", itemDetails.value[dateType]);
+      console.log(itemDetails.value[dateType]);
     }
 
     onMounted(async () => {
@@ -472,6 +473,7 @@ export default defineComponent({
         effective_date: response.effective_date,
         authority_comments: response.authority_comments,
         comments: response.comments,
+        approval_status: response.approval_status,
 
         company_id: response.company_id ? response.company_id : "",
         created_by: response.created_by,

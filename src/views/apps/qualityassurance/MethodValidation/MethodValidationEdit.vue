@@ -422,6 +422,7 @@ interface itemDetails {
   }[];
   status: string;
   remark: string;
+  approval_status: string;
 
   company_id: string;
   created_by: number;
@@ -502,6 +503,7 @@ export default defineComponent({
       ],
       status: "",
       remark: "",
+      approval_status: "",
 
       company_id: User.company_id,
       created_by: User.id,
@@ -524,8 +526,7 @@ export default defineComponent({
       } catch (err) {
         itemDetails.value[dateType] = "";
       }
-
-      console.log(dateType, " ", itemDetails.value[dateType]);
+      console.log(itemDetails.value[dateType]);
     }
 
     onMounted(async () => {
@@ -547,6 +548,7 @@ export default defineComponent({
         readings: response.readings ? JSON.parse(response.readings) : [],
         status: response.status,
         remark: response.remark,
+        approval_status: response.approval_status,
 
         company_id: response.company_id ? response.company_id : "",
         created_by: response.created_by,

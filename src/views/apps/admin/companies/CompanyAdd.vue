@@ -678,6 +678,51 @@
               <!--end::Col-->
             </div>
             <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+                >Service Request Prefix & No</label
+              >
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8">
+                <!--begin::Row-->
+                <div class="row">
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row p-2">
+                    <Field
+                      type="text"
+                      name="srf_no_prefix"
+                      class="form-control form-control-lg form-control-solid"
+                      placeholder="Enter SRF Prefix"
+                      v-model="companyDetails.srf_no_prefix"
+                    />
+                  </div>
+                  <!--end::Col-->
+
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row p-2">
+                    <div>
+                      <Field
+                        type="text"
+                        name="srf_no_init"
+                        class="form-control form-control-lg form-control-solid"
+                        placeholder="Enter SRF No"
+                        v-model="companyDetails.srf_no_init"
+                      />
+                    </div>
+                  </div>
+                  <!--end::Col-->
+                </div>
+                <!--end::Row-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
           </div>
           <div class="modal-footer flex-center">
             <!--begin::Button-->
@@ -750,6 +795,8 @@ interface companyDetails {
   enquiry_no_prefix: string;
   instrument_id_init: string;
   instrument_id_prefix: string;
+  srf_no_init: string;
+  srf_no_prefix: string;
 }
 
 export default defineComponent({
@@ -807,6 +854,8 @@ export default defineComponent({
       enquiry_no_prefix: "",
       instrument_id_init: "",
       instrument_id_prefix: "",
+      srf_no_init: "",
+      srf_no_prefix: "",
     });
 
     const validGSTRef = ref(false);
