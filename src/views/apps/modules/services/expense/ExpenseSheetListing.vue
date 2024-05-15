@@ -29,8 +29,15 @@
             class="d-flex justify-content-end"
             data-kt-customer-table-toolbar="base"
           >
-
-          <router-link to="/expensesheets/approval" class="btn btn-primary">
+            <router-link
+              v-if="
+                Identifier == 'Admin' ||
+                Identifier == 'Company-Admin' ||
+                Identifier == 'Site-Incharge'
+              "
+              to="/expensesheets/approval"
+              class="btn btn-primary"
+            >
               <KTIcon icon-name="plus" icon-class="fs-2" />
               Expense Approval
             </router-link>
@@ -120,34 +127,38 @@
           </template>
           <template v-slot:customer_name="{ row: expensesheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
-                  {{ expensesheets.customer_name.company_name }}
+              {{ expensesheets.customer_name.company_name }}
             </span>
           </template>
           <template v-slot:engineer_name="{ row: expensesheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
-                  {{ expensesheets.engineer_name.first_name + " " + expensesheets.engineer_name.last_name }}
+              {{
+                expensesheets.engineer_name.first_name +
+                " " +
+                expensesheets.engineer_name.last_name
+              }}
             </span>
           </template>
           <!-- defualt data -->
           <template v-slot:total_amount="{ row: expensesheets }">
-          {{ formatPrice(expensesheets.total_amount) }}
+            {{ formatPrice(expensesheets.total_amount) }}
           </template>
           <template v-slot:status="{ row: expensesheets }">
             <span
-            v-if="expensesheets.status == 1"
-            class="badge py-3 px-4 fs-7 badge-light-primary"
-            >{{ GetExpenseStatus(expensesheets.status) }}</span
-          >
-          <span
-            v-if="expensesheets.status == 2"
-            class="badge py-3 px-4 fs-7 badge-light-danger"
-            >{{ GetExpenseStatus(expensesheets.status) }}</span
-          >
-          <span
-            v-if="expensesheets.status == 3"
-            class="badge py-3 px-4 fs-7 badge-light-success"
-            >{{ GetExpenseStatus(expensesheets.status) }}</span
-          >
+              v-if="expensesheets.status == 1"
+              class="badge py-3 px-4 fs-7 badge-light-primary"
+              >{{ GetExpenseStatus(expensesheets.status) }}</span
+            >
+            <span
+              v-if="expensesheets.status == 2"
+              class="badge py-3 px-4 fs-7 badge-light-danger"
+              >{{ GetExpenseStatus(expensesheets.status) }}</span
+            >
+            <span
+              v-if="expensesheets.status == 3"
+              class="badge py-3 px-4 fs-7 badge-light-success"
+              >{{ GetExpenseStatus(expensesheets.status) }}</span
+            >
           </template>
 
           <template v-slot:approval_status="{ row: expensesheets }">
@@ -179,7 +190,7 @@
               Open
             </button>
           </template>
-          
+
           <template v-slot:actions="{ row: expensesheets }">
             <!--begin::Menu Flex-->
             <div class="text-gray-600 text-hover-primary mb-1">
@@ -235,10 +246,17 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { computed, defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import { GetExpenseStatus, type IExpenseSheet } from "@/core/model/expensesheets";
+import {
+  GetExpenseStatus,
+  type IExpenseSheet,
+} from "@/core/model/expensesheets";
 import arraySort from "array-sort";
 import moment from "moment";
-import { deleteExpenseSheet, getExpenseSheets, ExpenseSheetSearch } from "@/stores/api";
+import {
+  deleteExpenseSheet,
+  getExpenseSheets,
+  ExpenseSheetSearch,
+} from "@/stores/api";
 import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
 import { hideModal } from "@/core/helpers/dom";
 import ApprovalModal from "./ApprovalModal.vue";
@@ -341,13 +359,11 @@ export default defineComponent({
         const response = await getExpenseSheets(
           `page=${page.value}&limit=${limit.value}`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ ...rest }) => ({
-            ...rest
-          })
-        );
+        tableData.value = response.result.data.map(({ ...rest }) => ({
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -367,14 +383,14 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getExpenseSheets(`page=${page}&limit=${limit.value}`);
+        const response = await getExpenseSheets(
+          `page=${page}&limit=${limit.value}`
+        );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ ...rest }) => ({
-            ...rest
-          })
-        );
+        tableData.value = response.result.data.map(({ ...rest }) => ({
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -395,14 +411,14 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getExpenseSheets(`page=${page.value}&limit=${limit}`);
+        const response = await getExpenseSheets(
+          `page=${page.value}&limit=${limit}`
+        );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ ...rest }) => ({
-            ...rest
-          })
-        );
+        tableData.value = response.result.data.map(({ ...rest }) => ({
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -434,8 +450,9 @@ export default defineComponent({
     const filteredTableHeader = computed(() => {
       const isAdmin = identifier.value === "Admin";
       const isCompanyAdmin = identifier.value === "Company-Admin";
+      const isSiteIncharge = identifier.value === "Site-Incharge";
 
-      if (isAdmin || isCompanyAdmin) {
+      if (isAdmin || isCompanyAdmin || isSiteIncharge) {
         // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
         return tableHeader.value;
       } else {
@@ -535,13 +552,11 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await ExpenseSheetSearch(search.value);
-        
+
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({...rest }) => ({
-            ...rest
-          })
-        );
+        tableData.value = response.result.data.map(({ ...rest }) => ({
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -592,7 +607,6 @@ export default defineComponent({
       console.log("itemData are:", itemData.value);
     };
 
-
     return {
       tableData,
       tableHeader,
@@ -619,9 +633,9 @@ export default defineComponent({
       GetApprovalStatus,
       itemData,
       fillItemData,
+      Identifier,
       identifier,
       reLoadData,
-
     };
   },
 });

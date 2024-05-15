@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { defineStore } from "pinia";
 import ApiService from "@/core/services/ApiService";
 import JwtService, { User } from "@/core/services/JwtService";
@@ -16,6 +16,18 @@ export const useAuthStore = defineStore("auth", () => {
   const errors = ref({});
   const user = ref<User>({} as User);
   const isAuthenticated = ref(JwtService.getToken());
+
+  const academicYearsCache = ref<string[]>([]); // Cache for academic years
+
+  // Load selected academic year from localStorage on store initialization
+  const selectedAcademicYear = ref<string>(
+    localStorage.getItem('selectedAcademicYear') || ''
+  );
+
+  // Watch for changes in the selected academic year and update localStorage
+  watch(selectedAcademicYear, (newValue) => {
+    localStorage.setItem('selectedAcademicYear', newValue);
+  });
 
   function setAuth(authUser: any) {
     //console.log(authUser);
@@ -56,6 +68,7 @@ export const useAuthStore = defineStore("auth", () => {
     errors.value = [];
     JwtService.destroyToken();
     JwtService.destroyUser();
+    JwtService.destroySelectedYear();
   }
 
   function login(credentials: User) {
@@ -119,6 +132,37 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
+  const academicYears = computed(() => {
+    if (academicYearsCache.value.length === 0) {
+      academicYearsCache.value = getAcademicYears(5); // Example: Get academic years for the next 5 years
+    }
+    return academicYearsCache.value;
+  });
+
+  function getAcademicYears(numYears: number): string[] {
+    const date = new Date();
+    const years: string[] = [];
+
+    for (let i = 0; i < numYears; i++) {
+        const year = date.getFullYear() - i;
+        let academicYearStart: number;
+        let academicYearEnd: number;
+
+        if (date.getMonth() >= 3) {
+            academicYearStart = year;
+            academicYearEnd = year + 1;
+        } else {
+            academicYearStart = year - 1;
+            academicYearEnd = year;
+        }
+
+        const academicYear = `${academicYearStart}-${academicYearEnd}`;
+        years.push(academicYear);
+    }
+
+    return years;
+  }
+
   return {
     errors,
     user,
@@ -131,5 +175,9 @@ export const useAuthStore = defineStore("auth", () => {
     purgeAuth,
     get_auth,
     GetUser,
+    academicYears,
+    selectedAcademicYear,
   };
 });
+
+

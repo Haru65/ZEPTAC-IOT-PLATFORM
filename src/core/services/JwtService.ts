@@ -1,5 +1,6 @@
 const ID_TOKEN_KEY = "id_token" as string;
 const USER = "user" as string;
+const SELECTED_ACADEMIC_YEAR = "selectedAcademicYear" as string;
 
 /**
  * @description get token form localStorage
@@ -71,6 +72,10 @@ export const destroyUser = (): void => {
   window.localStorage.removeItem(USER);
 };
 
+export const destroySelectedYear = (): void => {
+  window.localStorage.removeItem(SELECTED_ACADEMIC_YEAR);
+};
+
 /**
  * @description remove token form localStorage
  */
@@ -88,4 +93,5 @@ export default {
   getCookie,
   checkCookie,
   deleteCookie,
+  destroySelectedYear,
 };

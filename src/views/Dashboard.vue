@@ -1,7 +1,8 @@
 <template>
-  
-  <div v-if="User.role_id == 1 || User.role_id == 2" class="row g-5 g-xl-10 mb-5 mb-xl-10">
-
+  <div
+    v-if="User.role_id == 1 || User.role_id == 2"
+    class="row g-5 g-xl-10 mb-5 mb-xl-10"
+  >
     <!--begin::Row-->
     <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
       <!--begin::Col-->
@@ -100,15 +101,12 @@
     <div class="col-xl-8">
       <Widget10 className="h-md-100" />
     </div>
-  -->
-  
-  </div>
-
+  --></div>
 </template>
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import { useAuthStore } from "@/stores/auth";
 
 // import Widget1 from "@/components/dashboard-default-widgets/Widget1.vue";
@@ -142,8 +140,8 @@ export default defineComponent({
     Widget14,
   },
   setup() {
-    const auth = useAuthStore();
-    const User = auth.GetUser();
+    const authStore = useAuthStore();
+    const User = authStore.GetUser();
 
     return {
       getAssetPath,

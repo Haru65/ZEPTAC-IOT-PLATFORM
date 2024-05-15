@@ -427,7 +427,7 @@
               <div class="d-flex flex-lg-row">
                 <a
                   target="blank"
-                  v-bind:href="`http://localhost:8000/storage/company/${audit_observation.company_id}/audit_evidences/${audit_observation.evidence}`"
+                  v-bind:href="`https://api.zeptac.com/storage/company/${audit_observation.company_id}/audit_evidences/${audit_observation.evidence}`"
                   data-toggle="tooltip"
                   title="Download File"
                   class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
@@ -825,13 +825,13 @@ export default defineComponent({
       }
 
       try {
-        let response = await getISORule(User.company_id);
-        console.log(response);
+        let res = await getISORule(User.company_id);
+        console.log(res);
         ISO.value = {
-          id: response.id,
-          clauses: JSON.parse(response.clauses),
-          company_id: response.company_id ? response.company_id : "",
-          is_active: response.is_active,
+          id: res.id,
+          clauses: JSON.parse(res.clauses),
+          company_id: res.company_id ? res.company_id : "",
+          is_active: res.is_active,
         };
 
         Object.assign(clauses, ISO.value.clauses);

@@ -518,7 +518,7 @@ export default defineComponent({
     };
 
     const copyUrl = (companyId, customerId) => {
-      const url = `http://localhost:5173/srf/${companyId}/${customerId}`;
+      const url = `https://app.zeptac.com/srf/${companyId}/${customerId}`;
       // const url = `https://zeptac.com/srf/${companyId}/${customerId}`;
       navigator.clipboard
         .writeText(url)

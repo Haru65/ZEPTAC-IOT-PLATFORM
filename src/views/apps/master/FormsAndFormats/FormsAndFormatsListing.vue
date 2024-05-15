@@ -145,7 +145,7 @@
           <div class="d-flex flex-lg-row">
             <a
               target="blank"
-              v-bind:href="`http://localhost:8000/storage/company/${formformat.company_id}/form_format/${formformat.document_file}`"
+              v-bind:href="`https://api.zeptac.com/storage/company/${formformat.company_id}/form_format/${formformat.document_file}`"
               data-toggle="tooltip"
               title="Download File"
               class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"

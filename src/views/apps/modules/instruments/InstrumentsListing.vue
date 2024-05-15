@@ -530,8 +530,9 @@ export default defineComponent({
     const filteredTableHeader = computed(() => {
       const isAdmin = identifier.value === "Admin";
       const isCompanyAdmin = identifier.value === "Company-Admin";
+      const isComExec = identifier.value === "Commercial-Executive";
 
-      if (isAdmin || isCompanyAdmin) {
+      if (isAdmin || isCompanyAdmin || isComExec) {
         // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
         return tableHeader.value;
       } else {

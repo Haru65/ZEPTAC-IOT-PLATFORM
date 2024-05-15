@@ -663,7 +663,7 @@ export default defineComponent({
 
         ISO.value = {
           clauses: clauses,
-          company_id: User.company_id,
+          company_id: ISO.value.company_id,
           is_active: 1,
         };
 

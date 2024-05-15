@@ -10,10 +10,12 @@ export interface MenuItem {
   
   const SiteInchargeMenuConfig: Array<MenuItem> = [
     {
+      heading: "Dashboard",
+      route: "dashboard",
       pages: [
         {
           heading: "Dashboard",
-          route: "/dashboard",
+          route: "/",
           keenthemesIcon: "element-1",
           bootstrapIcon: "bi-app-indicator",
         },
@@ -21,7 +23,7 @@ export interface MenuItem {
     },
     {
       heading: "CleanRoom Validation",
-      route: "/",
+      route: "cleanroom",
       pages: [
         {
           sectionTitle: "Validation Service",

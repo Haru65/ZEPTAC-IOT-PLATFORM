@@ -10,6 +10,8 @@ export interface MenuItem {
 
 const CompanyAdminMenuConfig: Array<MenuItem> = [
   {
+    heading: "Dashboard",
+    route: "dashboard",
     pages: [
       {
         heading: "Dashboard",
@@ -21,7 +23,7 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
   },
   {
     heading: "CleanRoom Validation",
-    route: "/",
+    route: "cleanroom",
     pages: [
       {
         sectionTitle: "Validation Service",
@@ -104,11 +106,11 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
 
     ],
   },
-  /*
 
+  
   {
     heading: "Thermal Mapping",
-    route: "/thermalmapping",
+    route: "thermal",
     pages: [
       {
         sectionTitle: "Thermal Report",
@@ -145,10 +147,9 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
     ],
   },
 
-  */
   {
     heading: "Sales",
-    route: "/sales",
+    route: "sales",
     pages: [
       {
         sectionTitle: "Leads",
@@ -256,7 +257,7 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
   },
   {
     heading: "Quality Work",
-    route: "/",
+    route: "quality-work",
     pages: [
 
       {
@@ -475,7 +476,7 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
   },
   {
     heading: "HR",
-    route: "/",
+    route: "hr",
     pages: [
 
       {

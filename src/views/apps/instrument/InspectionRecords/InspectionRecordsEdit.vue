@@ -204,7 +204,7 @@
 
             <div
               class="row mb-6"
-              v-if="Identifier == 'Admin' || Identifier == 'Company-Admin'"
+              v-if="Identifier == 'Admin' || Identifier == 'Company-Admin' || Identifier == 'Commercial-Executive'"
             >
               <div class="form-group col-md-12 mb-8 mb-sd-8">
                 <label

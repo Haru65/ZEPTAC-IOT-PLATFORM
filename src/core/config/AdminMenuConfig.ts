@@ -10,6 +10,8 @@ export interface MenuItem {
 
 const AdminMenuConfig: Array<MenuItem> = [
   {
+    heading: "Dashboard",
+    route: "dashboard",
     pages: [
       {
         heading: "Dashboard",
@@ -21,7 +23,7 @@ const AdminMenuConfig: Array<MenuItem> = [
   },
   {
     heading: "CleanRoom Validation",
-    route: "/",
+    route: "cleanroom",
     pages: [
       {
         sectionTitle: "Validation Service",
@@ -102,7 +104,7 @@ const AdminMenuConfig: Array<MenuItem> = [
   },
   {
     heading: "Thermal Mapping",
-    route: "/thermalmapping",
+    route: "thermal",
     pages: [
       {
         sectionTitle: "Thermal Report",
@@ -140,7 +142,7 @@ const AdminMenuConfig: Array<MenuItem> = [
   },
   {
     heading: "Sales",
-    route: "/sales",
+    route: "sales",
     pages: [
       {
         sectionTitle: "Leads",
@@ -248,7 +250,7 @@ const AdminMenuConfig: Array<MenuItem> = [
   },
   {
     heading: "Quality Work",
-    route: "/",
+    route: "quality-work",
     pages: [
 
       {
@@ -467,7 +469,7 @@ const AdminMenuConfig: Array<MenuItem> = [
   },
   {
     heading: "HR",
-    route: "/",
+    route: "hr",
     pages: [
 
       {
@@ -534,11 +536,11 @@ const AdminMenuConfig: Array<MenuItem> = [
   },
   {
     heading: "Super Admin",
-    route: "/company",
+    route: "superadmin",
     pages: [
       {
         sectionTitle: "Company",
-        route: "/company",
+        route: "/",
         keenthemesIcon: "office-bag",
         bootstrapIcon: "bi-archive",
         sub: [
@@ -565,6 +567,18 @@ const AdminMenuConfig: Array<MenuItem> = [
           {
             heading: "List Users",
             route: "/users/list",
+          },
+        ],
+      },
+      {
+        sectionTitle: "Modules",
+        route: "/module_manager",
+        keenthemesIcon: "setting-3",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Modules Manager",
+            route: "/module_manager/list",
           },
         ],
       },

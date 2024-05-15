@@ -22,6 +22,32 @@
       <!--begin::Card title-->
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
+        
+        <!-- YEARLY WISE SELECTION  -->
+      <!--
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-semibold text-gray-400"
+            >Academic Year</span
+          >
+        </h3>
+        <div class="me-3">
+          <el-select
+            filterable
+            placeholder="Select Year"
+            v-model="selectedYearCache"
+            id="academicYear"
+            @change="handleChange"
+          >
+            <el-option
+              v-for="year in academicYears"
+              :key="year"
+              :value="year"
+              :label="year"
+            />
+          </el-select>
+        </div>
+      -->
+
         <!--begin::Toolbar-->
         <div
           v-if="selectedIds.length === 0"
@@ -234,7 +260,7 @@
   
   <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { IRGP } from "@/core/model/rgps";
@@ -509,6 +535,7 @@ export default defineComponent({
       }
     };
 
+    // TODO::LISTING
     async function rgp_listing(): Promise<void> {
       try {
         const response = await getAllRGatePass(
@@ -566,7 +593,30 @@ export default defineComponent({
       }
     });
 
+    // Academic Year Logic
+    const authStore = useAuthStore();
+    const academicYears = ref(authStore.academicYears); // Generate academic years list using the auth store function
+    const selectedYearCache = ref(
+      localStorage.getItem("selectedAcademicYear") || ""
+    );
+
+    // Fallback to default value if localStorage data is invalid or missing
+    if (!academicYears.value.includes(selectedYearCache.value)) {
+      selectedYearCache.value = academicYears.value[0];
+    }
+
+    watch(selectedYearCache, (newValue) => {
+      localStorage.setItem("selectedAcademicYear", newValue);
+    });
+
+    function handleChange() {
+      localStorage.setItem("selectedAcademicYear", selectedYearCache.value);
+    }
+
     onMounted(async () => {
+      // Save initial selected year to localStorage
+      localStorage.setItem("selectedAcademicYear", selectedYearCache.value);
+
       await rgp_listing();
     });
 
@@ -834,6 +884,10 @@ export default defineComponent({
       fillItemData,
       identifier,
       reLoadData,
+
+      selectedYearCache,
+      academicYears,
+      handleChange,
     };
   },
 });

@@ -707,7 +707,7 @@
             </div>
             <!--end::Accordion-->
 
-            <div class="row mb-6" v-if="Identifier == 'Admin' || Identifier == 'Company-Admin'">
+            <div class="row mb-6" v-if="Identifier == 'Admin' || Identifier == 'Company-Admin' || Identifier == 'Commercial-Executive'">
               <div class="form-group col-md-12 mb-8 mb-sd-8">
                 <label
                   class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"

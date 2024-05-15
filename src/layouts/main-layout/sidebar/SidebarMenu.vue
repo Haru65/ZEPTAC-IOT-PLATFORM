@@ -62,7 +62,6 @@
             </template>
             <div
               v-if="menuItem.sectionTitle && menuItem.route"
-              :class="{ show: hasActiveChildren(menuItem.route) }"
               class="menu-item menu-accordion"
               data-kt-menu-sub="accordion"
               data-kt-menu-trigger="click"
@@ -89,7 +88,6 @@
                 <span class="menu-arrow"></span>
               </span>
               <div
-                :class="{ show: hasActiveChildren(menuItem.route) }"
                 class="menu-sub menu-sub-accordion"
               >
                 <template v-for="(item2, k) in menuItem.sub" :key="k">
@@ -110,7 +108,6 @@
                   </div>
                   <div
                     v-if="item2.sectionTitle && item2.route"
-                    :class="{ show: hasActiveChildren(item2.route) }"
                     class="menu-item menu-accordion"
                     data-kt-menu-sub="accordion"
                     data-kt-menu-trigger="click"
@@ -125,7 +122,6 @@
                       <span class="menu-arrow"></span>
                     </span>
                     <div
-                      :class="{ show: hasActiveChildren(item2.route) }"
                       class="menu-sub menu-sub-accordion"
                     >
                       <template v-for="(item3, k) in item2.sub" :key="k">
@@ -181,7 +177,7 @@
         class="menu menu-column menu-rounded menu-sub-indention px-3"
         data-kt-menu="true"
       >
-        <template v-for="(item, i) in CompanyAdminMenuConfig" :key="i">
+        <template v-for="(item, i) in companyAdminMenu" :key="i">
           <div v-if="item.heading" class="menu-item pt-5">
             <div class="menu-content">
               <span class="menu-heading fw-bold text-uppercase fs-7">
@@ -221,7 +217,6 @@
             </template>
             <div
               v-if="menuItem.sectionTitle && menuItem.route"
-              :class="{ show: hasActiveChildren(menuItem.route) }"
               class="menu-item menu-accordion"
               data-kt-menu-sub="accordion"
               data-kt-menu-trigger="click"
@@ -248,7 +243,6 @@
                 <span class="menu-arrow"></span>
               </span>
               <div
-                :class="{ show: hasActiveChildren(menuItem.route) }"
                 class="menu-sub menu-sub-accordion"
               >
                 <template v-for="(item2, k) in menuItem.sub" :key="k">
@@ -269,7 +263,6 @@
                   </div>
                   <div
                     v-if="item2.sectionTitle && item2.route"
-                    :class="{ show: hasActiveChildren(item2.route) }"
                     class="menu-item menu-accordion"
                     data-kt-menu-sub="accordion"
                     data-kt-menu-trigger="click"
@@ -284,7 +277,6 @@
                       <span class="menu-arrow"></span>
                     </span>
                     <div
-                      :class="{ show: hasActiveChildren(item2.route) }"
                       class="menu-sub menu-sub-accordion"
                     >
                       <template v-for="(item3, k) in item2.sub" :key="k">
@@ -340,7 +332,7 @@
         class="menu menu-column menu-rounded menu-sub-indention px-3"
         data-kt-menu="true"
       >
-        <template v-for="(item, i) in SalesPersonMenuConfig" :key="i">
+        <template v-for="(item, i) in salesPersonMenu" :key="i">
           <div v-if="item.heading" class="menu-item pt-5">
             <div class="menu-content">
               <span class="menu-heading fw-bold text-uppercase fs-7">
@@ -500,7 +492,7 @@
         class="menu menu-column menu-rounded menu-sub-indention px-3"
         data-kt-menu="true"
       >
-        <template v-for="(item, i) in SiteInchargeMenuConfig" :key="i">
+        <template v-for="(item, i) in siteInchargeMenu" :key="i">
           <div v-if="item.heading" class="menu-item pt-5">
             <div class="menu-content">
               <span class="menu-heading fw-bold text-uppercase fs-7">
@@ -659,7 +651,7 @@
         class="menu menu-column menu-rounded menu-sub-indention px-3"
         data-kt-menu="true"
       >
-        <template v-for="(item, i) in ServiceEngMenuConfig" :key="i">
+        <template v-for="(item, i) in serviceEngineerMenu" :key="i">
           <div v-if="item.heading" class="menu-item pt-5">
             <div class="menu-content">
               <span class="menu-heading fw-bold text-uppercase fs-7">
@@ -819,7 +811,7 @@
         class="menu menu-column menu-rounded menu-sub-indention px-3"
         data-kt-menu="true"
       >
-        <template v-for="(item, i) in ExecutiveMenuConfig" :key="i">
+        <template v-for="(item, i) in executiveMenu" :key="i">
           <div v-if="item.heading" class="menu-item pt-5">
             <div class="menu-content">
               <span class="menu-heading fw-bold text-uppercase fs-7">
@@ -961,6 +953,8 @@
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import { useFilteredMenu } from "@/core/config/FilteredMenu";
 import AdminMenuConfig from "@/core/config/AdminMenuConfig";
 import CompanyAdminMenuConfig from "@/core/config/CompanyAdminMenuConfig";
 import SalesPersonMenuConfig from "@/core/config/SalesPersonMenuConfig";
@@ -971,6 +965,16 @@ import { sidebarMenuIcons } from "@/core/helpers/config";
 import { useI18n } from "vue-i18n";
 import { Identifier } from "@/core/config/WhichUserConfig";
 
+interface MenuItem {
+  heading?: string;
+  sectionTitle?: string;
+  route?: string;
+  pages?: Array<MenuItem>;
+  keenthemesIcon?: string;
+  bootstrapIcon?: string;
+  sub?: Array<MenuItem>;
+}
+
 export default defineComponent({
   name: "sidebar-menu",
   components: {},
@@ -979,12 +983,42 @@ export default defineComponent({
     const route = useRoute();
     const scrollElRef = ref<null | HTMLElement>(null);
     const sidebarIdentifier = Identifier;
+    const store = useAuthStore();
+
+    const User = store.GetUser();
 
     onMounted(() => {
       if (scrollElRef.value) {
         scrollElRef.value.scrollTop = 0;
       }
+      console.log(User);
     });
+
+    // Define your company_modules array here
+    const company_modules: string[] = User.company_modules;
+
+    const companyAdminMenu = useFilteredMenu(
+      CompanyAdminMenuConfig,
+      company_modules
+    );
+
+    const salesPersonMenu = useFilteredMenu(
+      SalesPersonMenuConfig,
+      company_modules
+    );
+
+    const siteInchargeMenu = useFilteredMenu(
+      SiteInchargeMenuConfig,
+      company_modules
+    );
+
+    const serviceEngineerMenu = useFilteredMenu(
+      ServiceEngMenuConfig,
+      company_modules
+    );
+
+    const executiveMenu = useFilteredMenu(ExecutiveMenuConfig, company_modules);
+    console.log(User.company_modules);
 
     const translate = (text: string) => {
       if (te(text)) {
@@ -1010,6 +1044,12 @@ export default defineComponent({
       translate,
       getAssetPath,
       sidebarIdentifier,
+
+      companyAdminMenu,
+      salesPersonMenu,
+      serviceEngineerMenu,
+      siteInchargeMenu,
+      executiveMenu,
     };
   },
 });

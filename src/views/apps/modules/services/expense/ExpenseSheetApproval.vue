@@ -241,6 +241,7 @@ export default defineComponent({
   name: "expensesheet-approval",
   components: {
     Datatable,
+    ApprovalModal,
   },
   setup() {
     const auth = useAuthStore();
@@ -421,8 +422,9 @@ export default defineComponent({
     const filteredTableHeader = computed(() => {
       const isAdmin = identifier.value === "Admin";
       const isCompanyAdmin = identifier.value === "Company-Admin";
+      const isSiteIncharge = identifier.value === "Site-Incharge";
 
-      if (isAdmin || isCompanyAdmin) {
+      if (isAdmin || isCompanyAdmin || isSiteIncharge) {
         // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
         return tableHeader.value;
       } else {

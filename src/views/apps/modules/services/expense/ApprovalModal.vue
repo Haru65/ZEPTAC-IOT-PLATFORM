@@ -105,9 +105,10 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import moment from "moment";
 import {
-  RecordStatus,
+  ExpenseSheetStatus,
 } from "@/stores/api";
 import Loading from "@/components/kt-datatable/table-partials/Loading.vue";
+import { ExpenseStatus } from "@/core/model/expensesheets";
 
 export default defineComponent({
   name: "new-approval-modal",
@@ -205,7 +206,7 @@ export default defineComponent({
       //   console.warn("Nice");
       try {
         if (validateForm(itemData)) {
-          const response = await RecordStatus(
+          const response = await ExpenseSheetStatus(
             itemData.value.id,
             itemData.value
           );

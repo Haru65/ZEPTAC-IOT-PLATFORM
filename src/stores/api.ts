@@ -23,6 +23,7 @@ const TRAINING_URL = "training";
 const THERMAL_INSTRUMENTS_URL = "thermalinstrument";
 const THERMAL_REPORTS_URL = "thermalreport";
 const PERMISSION_URL = "permission_manager";
+const MODULE_URL = "module_manager";
 const EXTERNAL_DOC_URL = "externaldocuments";
 const INTERNAL_DOC_URL = "internaldocuments";
 const NCR_URL = "ncrs";
@@ -2263,6 +2264,69 @@ export async function PermissionSearch(search: any) {
         return { error: errors };
     }
 }
+
+
+// PERMISSION MANAGER
+
+export async function addModule(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(MODULE_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function getModules(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(MODULE_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function assignModules(companyId: any, moduleArr: any) {
+    try {
+        //console.log(data)
+        const data = {
+            "id": companyId,
+            "moduleArr" : moduleArr
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('update_modules', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+export async function ModuleSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('modules_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
+
+
 
 
 // Quality Documentation

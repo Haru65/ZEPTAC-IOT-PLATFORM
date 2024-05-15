@@ -13,7 +13,7 @@ export interface MenuItem {
       pages: [
         {
           heading: "Dashboard",
-          route: "/dashboard",
+          route: "dashboard",
           keenthemesIcon: "element-1",
           bootstrapIcon: "bi-app-indicator",
         },
@@ -21,7 +21,7 @@ export interface MenuItem {
     },
     {
         heading: "CleanRoom Validation",
-        route: "/",
+        route: "cleanroom",
         pages: [
     
           {
@@ -88,7 +88,7 @@ export interface MenuItem {
     
       {
         heading: "Thermal Mapping",
-        route: "/thermalmapping",
+        route: "thermal",
         pages: [
           {
             sectionTitle: "Thermal Report",
@@ -130,7 +130,7 @@ export interface MenuItem {
       
       {
         heading: "Quality Work",
-        route: "/",
+        route: "quality-work",
         pages: [
     
           {
@@ -349,7 +349,7 @@ export interface MenuItem {
       },
       {
         heading: "HR",
-        route: "/",
+        route: "hr",
         pages: [
     
           {

@@ -88,6 +88,15 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/module_manager/list",
+        name: "module-manager-list",
+        component: () => import("@/views/apps/admin/ModuleManager.vue"),
+        meta: {
+          pageTitle: "Module Manager",
+          breadcrumbs: ["Module Manager"],
+        },
+      },
+      {
         path: "/iso/list",
         name: "iso-list",
         component: () => import("@/views/apps/admin/isorules/ISOClausesListing.vue"),
@@ -181,6 +190,15 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Company Settings",
           breadcrumbs: ["Company Settings"],
+        },
+      },
+      {
+        path: "/company/modules/:id",
+        name: "company-modules",
+        component: () => import("@/views/apps/admin/companies/CompanyModules.vue"),
+        meta: {
+          pageTitle: "Company Modules",
+          breadcrumbs: ["Company Modules"],
         },
       },
       {

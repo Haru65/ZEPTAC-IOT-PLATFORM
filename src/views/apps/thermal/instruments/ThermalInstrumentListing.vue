@@ -22,6 +22,32 @@
       <!--begin::Card title-->
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
+        <!-- YEAR WISE DATA -->
+
+        <!-- 
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-semibold text-gray-400"
+            >Academic Year</span
+          >
+        </h3>
+        <div class="me-3">
+          <el-select
+            filterable
+            placeholder="Select Year"
+            v-model="selectedYearCache"
+            id="academicYear"
+            @change="handleChange"
+          >
+            <el-option
+              v-for="year in academicYears"
+              :key="year"
+              :value="year"
+              :label="year"
+            />
+          </el-select>
+        </div>
+        
+        -->
         <!--begin::Toolbar-->
         <div
           v-if="selectedIds.length === 0"
@@ -254,7 +280,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
 import type { ITInstrument } from "@/core/model/thermal_instruments";
@@ -266,6 +292,8 @@ import {
   ThermalInstrumentSearch,
   GetIncrInstrumentId,
 } from "@/stores/api";
+
+import { useAuthStore } from "@/stores/auth";
 import arraySort from "array-sort";
 import moment from "moment";
 import Swal from "sweetalert2";
@@ -279,6 +307,9 @@ export default defineComponent({
     ThermalImportModal,
   },
   setup() {
+    // Academic Year Logic
+    const authStore = useAuthStore();
+
     const tableHeader = ref([
       {
         columnName: "Instrument Id",
@@ -375,12 +406,10 @@ export default defineComponent({
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, ...rest }) => ({
-            id: id,
-            ...rest,
-          })
-        );
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id: id,
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -405,12 +434,10 @@ export default defineComponent({
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, ...rest }) => ({
-            id: id,
-            ...rest,
-          })
-        );
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id: id,
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -454,12 +481,22 @@ export default defineComponent({
         const response = await getThermalInstruments(
           `page=${page.value}&limit=${limit.value}`
         );
-        tableData.value = response.result.data.map(
-          ({ id, ...rest }) => ({
-            id: id,
-            ...rest,
-          })
+
+        /*
+
+        const response = await getThermalInstruments(
+          `page=${page.value}&limit=${limit.value}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : academicYears.value[0]
+          }`
         );
+         
+        */
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id: id,
+          ...rest,
+        }));
 
         more.value = response.result.next_page_url != null ? true : false;
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -473,7 +510,29 @@ export default defineComponent({
       }
     }
 
+    const academicYears = ref(authStore.academicYears); // Generate academic years list using the auth store function
+    const selectedYearCache = ref(
+      localStorage.getItem("selectedAcademicYear") || ""
+    );
+
+    // Fallback to default value if localStorage data is invalid or missing
+    if (!academicYears.value.includes(selectedYearCache.value)) {
+      selectedYearCache.value = academicYears.value[0];
+    }
+
+    watch(selectedYearCache, (newValue) => {
+      localStorage.setItem("selectedAcademicYear", newValue);
+    });
+
+    async function handleChange() {
+      localStorage.setItem("selectedAcademicYear", selectedYearCache.value);
+      await thermal_instrument_listing();
+    }
+
     onMounted(async () => {
+      // Save initial selected year to localStorage
+      localStorage.setItem("selectedAcademicYear", selectedYearCache.value);
+
       await thermal_instrument_listing();
     });
 
@@ -562,14 +621,13 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await ThermalInstrumentSearch(search.value);
+        // const response = await ThermalInstrumentSearch(search.value, selectedYearCache.value ? selectedYearCache.value : academicYears.value[0]);
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, ...rest }) => ({
-            id: id,
-            ...rest,
-          })
-        );
+        tableData.value = response.result.data.map(({ id, ...rest }) => ({
+          id: id,
+          ...rest,
+        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -625,6 +683,10 @@ export default defineComponent({
       Limits,
       PageLimitPoiner,
       HandleDuplicate,
+
+      selectedYearCache,
+      academicYears,
+      handleChange,
     };
   },
 });
