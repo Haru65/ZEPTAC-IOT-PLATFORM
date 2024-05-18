@@ -428,6 +428,39 @@
               <!--end::Col-->
             </div>
             <!--end::Input group-->
+
+                        <!--begin::Input group-->
+                        <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6">
+                Choose Start Month of Financial Year
+              </label>
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8">
+                <!--begin::Row-->
+                <div class="row">
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row p-2">
+                    <el-select
+                      v-model="companyDetails.financial_year_type"
+                      filterable
+                      placeholder="Choose Start Month"
+                    >
+                      <el-option key="1" label="January - December" value="1" />
+                      <el-option key="2" label="April - March" value="2" />
+                    </el-select>
+                  </div>
+                  <!--end::Col-->
+                </div>
+                <!--end::Row-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
+
             <!--begin::Input group-->
             <div class="row mb-6">
               <!--begin::Label-->
@@ -745,6 +778,7 @@ interface companyDetails {
   gst_details: string;
   user_limit: number;
   selected_package: string;
+  financial_year_type: string;
   quotation_no_init: string;
   quotation_no_prefix: string;
   invoice_no_init: string;
@@ -808,6 +842,7 @@ export default defineComponent({
       gst_details: "",
       user_limit: 1,
       selected_package: "",
+      financial_year_type: "",
       quotation_no_init: "",
       quotation_no_prefix: "",
       invoice_no_init: "",
@@ -873,6 +908,7 @@ export default defineComponent({
         gst_details: response.gst_details,
         user_limit: response.user_limit,
         selected_package: response.selected_package,
+        financial_year_type: response.financial_year_type,
         quotation_no_prefix: response.quotation_no_prefix,
         quotation_no_init: response.quotation_no_init,
         invoice_no_prefix: response.invoice_no_prefix,

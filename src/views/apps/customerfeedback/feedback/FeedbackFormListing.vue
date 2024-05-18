@@ -2,7 +2,23 @@
   <div class="card">
     <div class="card-header border-0 pt-6">
       <!--begin::Card title-->
-      <div class="card-title"></div>
+      <div class="card-title">
+        <!--begin::Search-->
+        <div class="d-flex align-items-center position-relative my-1">
+          <KTIcon
+            icon-name="magnifier"
+            icon-class="fs-1 position-absolute ms-6"
+          />
+          <input
+            type="text"
+            v-model="search"
+            @input="searchItems()"
+            class="form-control form-control-solid w-250px ps-15"
+            placeholder="Search by Feedbacker name"
+          />
+        </div>
+        <!--end::Search-->
+      </div>
       <!--begin::Card title-->
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
@@ -12,15 +28,17 @@
           class="d-flex justify-content-end"
           data-kt-customer-table-toolbar="base"
         >
-          <!--begin::Add customer-->
-          <router-link
-            :to="`/laf_reports/add/${itemId}`"
-            class="btn btn-primary"
+          <!--begin::Export-->
+          <button
+            type="button"
+            class="btn btn-light-primary me-3"
+            data-bs-toggle="modal"
+            data-bs-target="#kt_customers_export_modal"
           >
-            <KTIcon icon-name="plus" icon-class="fs-2" />
-            Laminar Air Flow Report
-          </router-link>
-          <!--end::Add customer-->
+            <KTIcon icon-name="exit-up" icon-class="fs-2" />
+            Export
+          </button>
+          <!--end::Export-->
         </div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->
@@ -66,56 +84,106 @@
       </div>
       <!--end::Card toolbar-->
     </div>
+
     <div class="card-body pt-0">
       <Datatable
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
-        :header="filteredTableHeader"
+        :header="tableHeader"
         :checkbox-enabled="true"
         :items-per-page="limit"
         :items-per-page-dropdown-enabled="false"
         :loading="loading"
       >
-        <template v-slot:certificate_number="{ row: laf }">
-          {{ laf.certificate_number }}
+        <!-- img data -->
+
+        <template v-slot:id="{ row: feedbackform }">
+          {{ feedbackform.id }}
         </template>
-        <template v-slot:ulr_number="{ row: laf }">
-          {{ laf.ulr_number }}
+        <template v-slot:feedbacker_name="{ row: feedbackform }">
+          {{ feedbackform.feedbacker_name }}
         </template>
-        <template v-slot:actions="{ row: laf }">
+        <template v-slot:meta="{ row: feedbackform }">
+          <span v-if="feedbackform.meta != null">
+            {{
+              feedbackform.meta?.company_name
+                ? feedbackform.meta?.company_name
+                : ""
+            }}
+          </span>
+          <span v-else> </span>
+        </template>
+
+        <template v-slot:customer="{ row: feedbackform }">
+          <span v-if="feedbackform.customer !== null">
+            {{ feedbackform.customer.first_name }}
+            {{ feedbackform.customer.last_name }}
+          </span>
+          <span v-else>
+            {{ feedbackform.customer }}
+          </span>
+        </template>
+
+        <!-- <template v-slot:feedback_no="{ row: feedbackform }">
+          <span class="badge py-3 px-4 fs-7 badge-light-primary">{{
+            feedbackform.feedback_no
+          }}</span>
+        </template> -->
+
+        <template v-slot:avg_rating="{ row: feedbackform }">
+          <span class="badge py-3 px-4 fs-7 badge-light-primary">{{
+            feedbackform.avg_rating
+          }}</span>
+        </template>
+
+        <template v-slot:created_at="{ row: feedbackform }">
+          {{ feedbackform.created_at }}
+        </template>
+
+        <!-- <template v-slot:feedback_data="{ row: feedbackform }">
+          <span
+            data-bs-toggle="modal"
+            data-bs-target="#kt_modal_srf"
+            @click="fillItemData(feedbackform)"
+            class="border rounded badge py-3 fs-7 badge-light-primary text-hover-success cursor-pointer"
+            >View Scope of Work
+          </span>
+        </template> -->
+
+        <template v-slot:actions="{ row: feedbackform }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row my-3">
-            <!-- begin::Download -->
-
+          <div class="d-flex flex-lg-row">
             <span
-              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
+              class="menu-link px-3"
+              data-toggle="tooltip"
+              title="View feedback"
             >
-              <i
-                @click="downloadLAFReport(laf.id)"
-                class="las la-download fs-2"
-              ></i>
+              <router-link :to="`/feedbacks/edit/${feedbackform.id}`">
+                <i
+                  class="bi bi-eye text-gray-600 text-hover-primary mb-1 fs-1"
+                ></i>
+              </router-link>
             </span>
-            <!-- end::Download -->
 
-            <!--begin::Edit-->
-            <router-link :to="`/laf_reports/edit/${laf.id}`">
+            <router-link :to="`/feedbacks/edit/${feedbackform.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
               >
-                <KTIcon icon-name="pencil" icon-class="fs-2" />
+                <KTIcon icon-name="eye" icon-class="fs-2" />
               </span>
             </router-link>
-            <!--end::Edit-->
 
-            <!--begin::Delete-->
             <span
-              @click="deleteItem(laf.id, false)"
-              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              class="menu-link px-3"
+              data-toggle="tooltip"
+              title="Delete feedback"
             >
-              <KTIcon icon-name="trash" icon-class="fs-2" />
+              <i
+                @click="deleteItem(feedbackform.id, false)"
+                class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
+              ></i>
             </span>
-            <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
           <!--end::Menu-->
@@ -158,54 +226,59 @@
 </template>
   
   <script lang="ts">
-import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref, computed } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
-import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import type { ILafReport } from "@/core/model/laf";
+import type { Sort } from "@/components/kt-datatable/table-partials/models";
+import type { IFeedback } from "@/core/model/feedbackform";
+import { FeedbackServices } from "@/core/model/feedbackform";
+import { getFeedbacks, deleteFeedback, FeedbackSearch } from "@/stores/api";
 import arraySort from "array-sort";
-import ApiService from "@/core/services/ApiService";
-import { useAuthStore } from "@/stores/auth";
-import { useRoute, useRouter } from "vue-router";
-import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
 import Swal from "sweetalert2";
-import {
-  deleteLAFReport,
-  DownloadLAFReport,
-  getLAFReports,
-  LaminarAirFlowSearch,
-} from "@/stores/api";
-import { Identifier } from "@/core/config/WhichUserConfig";
-import { LAFReportGen } from "@/core/config/LAFReportGenerator";
+import { getAssetPath } from "@/core/helpers/assets";
 
 export default defineComponent({
-  name: "laf-edit",
+  name: "feedbacks-list",
   components: {
     Datatable,
   },
   setup() {
-    const loading = ref(true);
-    const identifier = Identifier;
-
-    const auth = useAuthStore();
-    const router = useRouter();
-    const User = auth.GetUser();
-    const route = useRoute();
-    const itemId = route.params.id;
-
     const tableHeader = ref([
       {
-        columnName: "Certificate Number",
-        columnLabel: "certificate_number",
+        columnName: "Feedbacker Name",
+        columnLabel: "feedbacker_name",
         sortEnabled: true,
-        columnWidth: 155,
+        columnWidth: 200,
       },
       {
-        columnName: "ULR Number",
-        columnLabel: "ulr_number",
+        columnName: "Customer Name",
+        columnLabel: "meta",
         sortEnabled: true,
-        columnWidth: 155,
+        columnWidth: 200,
+      },
+      {
+        columnName: "Contact Person",
+        columnLabel: "customer",
+        sortEnabled: true,
+        columnWidth: 200,
+      },
+      // {
+      //   columnName: "Feedback No.",
+      //   columnLabel: "feedback_no",
+      //   sortEnabled: true,
+      //   columnWidth: 175,
+      // },
+      {
+        columnName: "Average Rating %",
+        columnLabel: "avg_rating",
+        sortEnabled: true,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Created At",
+        columnLabel: "created_at",
+        sortEnabled: true,
+        columnWidth: 75,
       },
       {
         columnName: "Actions",
@@ -215,22 +288,25 @@ export default defineComponent({
       },
     ]);
 
-    const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<ILafReport>>([]);
-    const initvalues = ref<Array<ILafReport>>([]);
+    const itemDetails = ref({
+      id: "",
+      feedback_data: FeedbackServices,
+    });
 
-    // staring from 1
-    const page = ref(1);
-    const limit = ref(10);
-    // limit 10
-    const more = ref(false);
     // functions
     const Limits = ref({
       1: 10,
       2: 25,
       3: 50,
     });
-    // more
+
+    const loading = ref(true);
+    // staring from 1
+    const page = ref(1);
+    const limit = ref(10);
+    // limit 10
+    const more = ref(false);
+
     const PagePointer = async (page) => {
       // ? Truncate the tableData
       //console.log(limit.value);
@@ -239,15 +315,24 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getLAFReports(
-          `page=${page}&limit=${limit.value}&itemId=${itemId}`
+        const response = await getFeedbacks(
+          `page=${page}&limit=${limit.value}`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id,
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({ id, customer, meta, created_at, ...rest }) => ({
+            id: id,
+            customer: {
+              ...customer,
+            },
+            meta: {
+              ...meta,
+            },
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -268,15 +353,24 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getLAFReports(
-          `page=${page.value}&limit=${limit}&itemId=${itemId}`
+        const response = await getFeedbacks(
+          `page=${page.value}&limit=${limit}`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id,
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({ id, customer, meta, created_at, ...rest }) => ({
+            id: id,
+            customer: {
+              ...customer,
+            },
+            meta: {
+              ...meta,
+            },
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -291,6 +385,7 @@ export default defineComponent({
     //console.log(initvalues.value);
 
     const NextPage = () => {
+      console.log(more.value);
       if (more.value != false) {
         page.value = page.value + 1;
         PagePointer(page.value);
@@ -304,29 +399,32 @@ export default defineComponent({
       }
     };
 
-    const filteredTableHeader = computed(() => {
-      return identifier.value === "Admin"
-        ? tableHeader.value
-        : tableHeader.value.filter(
-            (column) => column.columnLabel !== "company_name"
-          );
-    });
+    const selectedIds = ref<Array<number>>([]);
 
-    // functions
-    // get users function
-    async function laf_listing(): Promise<void> {
+    const tableData = ref<Array<IFeedback>>([]);
+
+    const initvalues = ref<Array<IFeedback>>([]);
+
+    async function report_listing(): Promise<void> {
       try {
-        ApiService.setHeader();
-        const response = await getLAFReports(
-          `page=${page.value}&limit=${limit.value}&itemId=${itemId}`
+        const response = await getFeedbacks(
+          `page=${page.value}&limit=${limit.value}`
         );
-        // console.log(response);
+        tableData.value = response.result.data.map(
+          ({ id, customer, meta, created_at, ...rest }) => ({
+            id: id,
+            customer: {
+              ...customer,
+            },
+            meta: {
+              ...meta,
+            },
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+            ...rest,
+          })
+        );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id,
-          ...rest,
-        }));
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -339,7 +437,7 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      await laf_listing();
+      await report_listing();
     });
 
     const deleteFewItems = () => {
@@ -376,7 +474,7 @@ export default defineComponent({
             }).then((result: { [x: string]: any }) => {
               if (result["isConfirmed"]) {
                 // Put your function here
-                deleteLAFReport(id);
+                deleteFeedback(id);
                 tableData.value.splice(i, 1);
               }
             });
@@ -386,7 +484,7 @@ export default defineComponent({
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
             // Put your function here
-            deleteLAFReport(id);
+            deleteFeedback(id);
             tableData.value.splice(i, 1);
           }
         }
@@ -394,18 +492,20 @@ export default defineComponent({
     };
 
     const search = ref<string>("");
+    // ? debounce timer
     let debounceTimer;
+
     const searchItems = async () => {
+      console.log(search.value);
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
-      if (search.value !== "") {
-        let results: Array<ILafReport> = [];
+      if (search.value.length != 0) {
+        let results: Array<IFeedback> = [];
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
             results.push(tableData.value[j]);
           }
         }
         tableData.value.splice(0, tableData.value.length, ...results);
-
         if (tableData.value.length == 0 && search.value.length != 0) {
           loading.value = true;
           clearTimeout(debounceTimer); // Clear any existing debounce timer
@@ -417,20 +517,28 @@ export default defineComponent({
         page.value = 1;
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
-        await laf_listing();
+        await report_listing();
       }
     };
 
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await LaminarAirFlowSearch(search.value);
+        const response = await FeedbackSearch(search.value);
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id,
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({ id, customer, meta, created_at, ...rest }) => ({
+            id: id,
+            customer: {
+              ...customer,
+            },
+            meta: {
+              ...meta,
+            },
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -443,9 +551,14 @@ export default defineComponent({
     }
 
     const searchingFunc = (obj: any, value: string): boolean => {
+      console.log(obj);
       for (let key in obj) {
-        if (!Number.isInteger(obj[key]) && !(typeof obj[key] === "object")) {
-          if (obj[key].indexOf(value) != -1) {
+        if (
+          !Number.isInteger(obj[key]) &&
+          !(typeof obj[key] === "object") &&
+          typeof obj[key] === "string" // Add type check here
+        ) {
+          if (obj[key].indexOf(value) !== -1) {
             return true;
           }
         }
@@ -463,185 +576,14 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-    const itemDetails = ref({
-      id: "",
-      laf_id: "",
-      certificate_number: "NB-001",
-      ulr_number: "TC-0001",
-      d_receipt: "",
-      d_testing: "",
-      d_issue: "",
-      r_due_date: "",
-      description: "",
-      make: "",
-      model_no: "",
-      serial_no: "",
-      id_no: "",
-      testing_at: "",
-      room_name: "",
-      room_id: "",
-      temperature: 20.3,
-      humidity: 53.0,
-      differential_pressure: 10,
+    const fillItemData = (data) => {
+      const { id, feedback_data } = data;
 
-      downFlow: [
-        {
-          filter_id: "Row 1",
-          l1: "",
-          l2: "",
-          l3: "",
-          l4: "",
-          l5: "",
-          mean: 0,
-          acceptance_limit: "0.25-0.50",
-          output: "",
-        },
-      ],
-      filter: [
-        {
-          filter_id: "SH",
-          upstream: "100",
-          downstream: "",
-          acceptance_limit: "0.01",
-          output: "",
-        },
-      ],
-      particle: [
-        {
-          particle_size: "0.3",
-          l1: "",
-          l2: "",
-          l3: "",
-          l4: "",
-          l5: "",
-          mean: 0,
-          acceptance_limit: "10200",
-          output: "",
-        },
-        {
-          particle_size: "0.5",
-          l1: "",
-          l2: "",
-          l3: "",
-          l4: "",
-          l5: "",
-          mean: 0,
-          acceptance_limit: "3520",
-          output: "",
-        },
-        {
-          particle_size: "5.0",
-          l1: "",
-          l2: "",
-          l3: "",
-          l4: "",
-          l5: "",
-          mean: 0,
-          acceptance_limit: "0",
-          output: "",
-        },
-      ],
-
-      laminar: {
-        id: "",
-        service_request_id: "",
-        cleanroom_instruments: [],
-      },
-
-      cleanroom_instruments: [
-        {
-          id: "",
-          name: "",
-          make: "",
-          description: "",
-          model_no: "",
-          serial_no: "",
-          calibration_date: "",
-          calibration_due_date: "",
-        },
-      ],
-
-      meta: {
-        company_name: "",
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        states: "",
-        country: "",
-      },
-
-      service: {
-        id: "",
-        srf_no: "",
-        customer_id: "",
-        customer_name: "",
-      },
-
-      company_id: "",
-      created_by: "",
-      updated_by: "",
-
-      createdByUser: {
-        id: "",
-        first_name: "",
-        last_name: "",
-      },
-      updatedByUser: {
-        id: "",
-        first_name: "",
-        last_name: "",
-      },
-    });
-
-    // Download Laminar Air Flow Report
-    const downloadLAFReport = async (id: any) => {
-      try {
-        const res = await DownloadLAFReport(id);
-
-        itemDetails.value.id = res.result.id;
-        itemDetails.value.laf_id = res.result.laf_id;
-        itemDetails.value.certificate_number = res.result.certificate_number;
-        itemDetails.value.ulr_number = res.result.ulr_number;
-        itemDetails.value.d_receipt = res.result.d_receipt;
-        itemDetails.value.d_testing = res.result.d_testing;
-        itemDetails.value.d_issue = res.result.d_issue;
-        itemDetails.value.r_due_date = res.result.r_due_date;
-        itemDetails.value.description = res.result.description;
-        itemDetails.value.make = res.result.make;
-        itemDetails.value.model_no = res.result.model_no;
-        itemDetails.value.serial_no = res.result.serial_no;
-        itemDetails.value.id_no = res.result.id_no;
-        itemDetails.value.testing_at = res.result.testing_at;
-        itemDetails.value.room_name = res.result.room_name;
-        itemDetails.value.room_id = res.result.room_id;
-
-        itemDetails.value.temperature = res.result.temperature;
-        itemDetails.value.humidity = res.result.humidity;
-        itemDetails.value.differential_pressure =
-          res.result.differential_pressure;
-
-        itemDetails.value.downFlow = JSON.parse(res.result.downFlow);
-        itemDetails.value.filter = JSON.parse(res.result.filter);
-        itemDetails.value.particle = JSON.parse(res.result.particle);
-
-        itemDetails.value.company_id = res.result.company_id;
-        itemDetails.value.created_by = res.result.created_by;
-        itemDetails.value.updated_by = res.result.updated_by;
-
-        itemDetails.value.meta = res.result.meta;
-        itemDetails.value.service = res.result.service;
-        itemDetails.value.cleanroom_instruments =
-          res.result.cleanroom_instruments;
-
-        const reportName = `${itemDetails.value.service.srf_no}`;
-
-        await LAFReportGen(id, reportName, itemDetails);
-        console.log(itemDetails.value);
-      } catch (error) {
-        console.log(error);
-        alert("Unable to download the report. Please try again.");
-      }
+      itemDetails.value = {
+        id: id,
+        feedback_data: JSON.parse(feedback_data),
+      };
+      console.log("itemDetails are:", itemDetails.value);
     };
 
     return {
@@ -654,20 +596,18 @@ export default defineComponent({
       deleteFewItems,
       sort,
       onItemSelect,
-      getAssetPath,
       loading,
-      NextPage,
-      PrevPage,
-      page,
       limit,
-      PageLimitPoiner,
+      PrevPage,
+      NextPage,
+      page,
       Limits,
-      identifier,
-      filteredTableHeader,
-      itemId,
-      downloadLAFReport,
+      PageLimitPoiner,
+      fillItemData,
+      itemDetails,
     };
   },
 });
 </script>
+  
   

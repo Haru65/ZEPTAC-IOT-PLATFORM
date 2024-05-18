@@ -163,7 +163,7 @@
                     </li>
                     <li class="d-flex align-items-center py-2">
                       <h5>
-                        LAF Differential Pressure (ΔP) :
+                        BSC Differential Pressure (ΔP) :
                         {{ itemDetails.differential_pressure }} mm of wg
                       </h5>
                     </li>
@@ -367,13 +367,27 @@
               <li class="nav-item" role="presentation">
                 <button
                   class="nav-link active"
+                  id="inflowVelocity-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#inflowVelocity"
+                  type="button"
+                  role="tab"
+                  aria-controls="inflowVelocity"
+                  aria-selected="true"
+                >
+                  Inflow Velocity
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
                   id="downFlowVelocity-tab"
                   data-bs-toggle="tab"
                   data-bs-target="#downFlowVelocity"
                   type="button"
                   role="tab"
                   aria-controls="downFlowVelocity"
-                  aria-selected="true"
+                  aria-selected="false"
                 >
                   DownFlow Velocity
                 </button>
@@ -410,8 +424,171 @@
 
             <!-- Tabs Content -->
             <div class="tab-content" id="myTabContent">
+              <!-- Inflow Velocity Tab -->
               <div
                 class="tab-pane fade show active"
+                id="inflowVelocity"
+                role="tabpanel"
+                aria-labelledby="inflowVelocity-tab"
+              >
+                <!-- Content for Inflow Velocity Tab -->
+                <div class="row mb-6">
+                  <div class="container-fluid">
+                    <div class="alert alert-primary mt-2">
+                      <h3>Inflow Air Velocity Measurement in m/sec</h3>
+                      <h5 class="mt-6">
+                        - Mean should not be more than 0.40 m/s
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="table-responsive py-6 mb-6">
+                  <table
+                    class="table table-responsive table-bordered g-6 w-100 fw-bold text-gray-700"
+                  >
+                    <thead
+                      class="fw-semibold fs-6 text-gray-700 text-center justify-content-center"
+                    >
+                      <tr>
+                        <th class="col-1">Sr.</th>
+                        <th class="col-2">Filter ID</th>
+                        <th class="col-2">L 1</th>
+                        <th class="col-2">L 2</th>
+                        <th class="col-2">L 3</th>
+                        <th class="col-2">L 4</th>
+                        <th class="col-2">L 5</th>
+                        <th class="col-2">Mean</th>
+                        <th class="col-3">Complainance As per EN 12469:2000</th>
+                        <th class="col-2">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody class="text-center justify-content-center">
+                      <tr
+                        v-for="(data, index) in itemDetails.inFlow"
+                        :key="index"
+                      >
+                        <td>
+                          <span
+                            class="form-control form-control-lg form-control-solid"
+                          >
+                            {{ index + 1 }}
+                          </span>
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            :name="'inflow_filter_id' + index"
+                            class="form-control form-control-lg form-control-solid min-w-100px"
+                            placeholder="Row"
+                            v-model="data.filter_id"
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            :name="'l1_inflow' + index"
+                            class="form-control form-control-lg form-control-solid min-w-100px"
+                            placeholder="0"
+                            v-model="data.l1"
+                            @keyup="SetInFlowLs($event, index, 'l1')"
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            :name="'l2_inflow' + index"
+                            class="form-control form-control-lg form-control-solid min-w-100px"
+                            placeholder="0"
+                            v-model="data.l2"
+                            @keyup="SetInFlowLs($event, index, 'l2')"
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            :name="'l3_inflow' + index"
+                            class="form-control form-control-lg form-control-solid min-w-100px"
+                            placeholder="0"
+                            v-model="data.l3"
+                            @keyup="SetInFlowLs($event, index, 'l3')"
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            :name="'l4_inflow' + index"
+                            class="form-control form-control-lg form-control-solid min-w-100px"
+                            placeholder="0"
+                            v-model="data.l4"
+                            @keyup="SetInFlowLs($event, index, 'l4')"
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            :name="'l5_inflow' + index"
+                            class="form-control form-control-lg form-control-solid min-w-100px"
+                            placeholder="0"
+                            v-model="data.l5"
+                            @keyup="SetInFlowLs($event, index, 'l5')"
+                          />
+                        </td>
+                        <td>
+                          <div
+                            class="form-control form-control-lg form-control-solid min-w-100px"
+                          >
+                            {{ data.mean ? data.mean : "0" }}
+                          </div>
+                        </td>
+                        <td>
+                          <div
+                            class="form-control form-control-lg form-control-solid min-w-100px"
+                          >
+                            {{ data.output ? data.output : "" }}
+                          </div>
+                        </td>
+                        <td>
+                          <button
+                            class="btn btn-sm btn-light-danger rounded-circle fs-6"
+                            type="button"
+                            @click="removeInFlowReading(index)"
+                          >
+                            <span class="text-center">x</span>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr
+                        class="text-center"
+                        v-if="itemDetails.inFlow.length === 0"
+                      >
+                        <td
+                          colspan="8"
+                          class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200 text-align-center"
+                        >
+                          No Readings.
+                        </td>
+                      </tr>
+                    </tbody>
+                    <div class="text-start">
+                      <div class="input-group p-2 flex gap-6">
+                        <div class="input-group-append">
+                          <button
+                            class="btn btn-sm btn-light-primary rounded-circle fs-6"
+                            type="button"
+                            @click="addInFlowReading"
+                          >
+                            <span class="text-center">+</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </table>
+                </div>
+              </div>
+
+              <div
+                class="tab-pane fade"
                 id="downFlowVelocity"
                 role="tabpanel"
                 aria-labelledby="downFlowVelocity-tab"
@@ -424,6 +601,7 @@
                     </div>
                   </div>
                 </div>
+
                 <div class="table-responsive py-6 mb-6">
                   <table
                     class="table table-responsive table-bordered g-6 w-100 fw-bold text-gray-700"
@@ -898,12 +1076,12 @@
     </div>
   </div>
 </template>
-        
-        <script lang="ts">
+          
+          <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { getLaminarAirFlow, addLAFReport } from "@/stores/api";
+import { getBioSafetyCabinet, addBSCReport } from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import packages from "@/core/config/PackagesConfig";
@@ -914,7 +1092,7 @@ import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 
 export default defineComponent({
-  name: "laf-report-add",
+  name: "bsc-report-add",
   components: {
     ErrorMessage,
     Field,
@@ -954,7 +1132,7 @@ export default defineComponent({
     });
 
     const itemDetails = ref({
-      laf_id: "",
+      bsc_id: "",
       certificate_number: "NB-001",
       ulr_number: "TC-0001",
       d_receipt: "",
@@ -973,6 +1151,19 @@ export default defineComponent({
       humidity: 53.0,
       differential_pressure: 10,
 
+      inFlow: [
+        {
+          filter_id: "Row 1",
+          l1: "",
+          l2: "",
+          l3: "",
+          l4: "",
+          l5: "",
+          mean: 0,
+          acceptance_limit: "0.40",
+          output: "",
+        },
+      ],
       downFlow: [
         {
           filter_id: "Row 1",
@@ -1038,11 +1229,11 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      let response = await getLaminarAirFlow(itemId.toString());
+      let response = await getBioSafetyCabinet(itemId.toString());
       console.log(response);
 
       if (response != null) {
-        itemDetails.value.laf_id = response.id;
+        itemDetails.value.bsc_id = response.id;
       }
     });
 
@@ -1058,6 +1249,48 @@ export default defineComponent({
       const average = (L1 + L2 + L3 + L4 + L5) / 5;
       return Number(average.toFixed(2));
     }
+
+    /* InFlow Air Velocity  LOGIC*/
+
+    // GLOBAL ACCEPTANCE VARIABLE FOR INFLOW
+    const INFLOW_ACCEPTANCE = 0.4;
+    // Set Readings data
+    async function SetInFlowLs(e, index, l) {
+      itemDetails.value.inFlow[index][l] = await e.target.value;
+      const average = calculateMean(itemDetails.value.inFlow[index]);
+      itemDetails.value.inFlow[index].mean = average;
+
+      // Logic To PASS/FAIL
+      if (itemDetails.value.inFlow[index].mean < INFLOW_ACCEPTANCE) {
+        itemDetails.value.inFlow[index].output = "PASS";
+      } else if (itemDetails.value.inFlow[index].mean >= INFLOW_ACCEPTANCE) {
+        itemDetails.value.inFlow[index].output = "FAIL";
+      } else {
+        itemDetails.value.inFlow[index].output = "";
+      }
+    }
+
+    // add Inflow
+    const addInFlowReading = () => {
+      itemDetails.value.inFlow.push({
+        filter_id: "Row 1",
+        l1: "",
+        l2: "",
+        l3: "",
+        l4: "",
+        l5: "",
+        mean: 0,
+        acceptance_limit: "0.40",
+        output: "",
+      });
+    };
+
+    // remove Inflow
+    const removeInFlowReading = async (index) => {
+      if (index != null) {
+        itemDetails.value.inFlow.splice(index, 1);
+      }
+    };
 
     /* DownFlow Air Velocity LOGIC */
     // GLOBAL ACCEPTANCE VARIABLE FOR DOWNFLOW
@@ -1234,14 +1467,14 @@ export default defineComponent({
       console.log(itemDetails.value);
       try {
         if (validateForm(itemDetails.value)) {
-          const response = await addLAFReport(itemDetails.value);
+          const response = await addBSCReport(itemDetails.value);
           if (!response.error) {
             showSuccessAlert(
               "Success",
-              "LAF Report has been successfully added!"
+              "BSC Report has been successfully added!"
             );
             loading.value = false;
-            router.push({ name: "laf-list" });
+            router.push({ name: "bsc-list" });
           } else {
             showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
             loading.value = false;
@@ -1300,6 +1533,9 @@ export default defineComponent({
       limit,
       setDates,
       clear,
+      addInFlowReading,
+      removeInFlowReading,
+      SetInFlowLs,
 
       addDownFlowReading,
       removeDownFlowReading,
@@ -1316,8 +1552,8 @@ export default defineComponent({
   },
 });
 </script>
-      
-      <style>
+        
+        <style>
 .el-input__inner,
 .el-select__inner {
   font-weight: 500;

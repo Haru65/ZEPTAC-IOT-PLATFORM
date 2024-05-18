@@ -1,4 +1,4 @@
-// * This file is used to generate Thermal Report pdf
+// * This file is used to generate BSC Report pdf
 
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -10,8 +10,8 @@ const imgData = getAssetPath(
   "media/avatars/blank.png"
 );
 
-const LAFReportGen = async (id, pdfName, reportInfo) => {
-  pdfName += `_${id}_laminar_air_flow_report`;
+const BSCReportGen = async (id, pdfName, reportInfo) => {
+  pdfName += `_${id}_biosafety_cabinet_report`;
 
   const doc = new jsPDF({
     orientation: "portrait",
@@ -121,9 +121,10 @@ const LAFReportGen = async (id, pdfName, reportInfo) => {
       [{title: `Environmental Condition`, colSpan:2 }]
     ];
     const environmentBody = [
-      [{title: `Temperature °C : ${reportInfo.value.temperature} °C`}, {title: `DownFlow Velocity Test Work Instruction# : AME-L03-W13`}],
-      [{title: `Humidity %RH : ${reportInfo.value.humidity} %`}, {title: `Filter Integrity Test Work Instruction# : AME-L03-W13`}],
-      [{title: `LAF Differential Pressure (P): ${reportInfo.value.differential_pressure}`}, {title: `Particle Count Work Instruction#  : AME-L03-W13`}],
+      [{title: `Temperature °C : ${reportInfo.value.temperature} °C`}, {title: `InFlow Velocity Test Work Instruction# : AME-L03-W13`}],
+      [{title: `Humidity %RH : ${reportInfo.value.humidity} %`}, {title: `DownFlow Velocity Test Work Instruction# : AME-L03-W13`}],
+      [{title: `BSC Differential Pressure (P): ${reportInfo.value.differential_pressure}`}, {title: `Filter Integrity Test Work Instruction# : AME-L03-W13`}],
+      [{title: ``}, {title: `Particle Count Work Instruction#  : AME-L03-W13`}],
     ]
     autoTable(doc, {
       head: environmentHeader,
@@ -131,6 +132,65 @@ const LAFReportGen = async (id, pdfName, reportInfo) => {
       columnStyles: {
         '0': { cellWidth: 3.635},
         '1': { cellWidth: "auto"},
+      },
+      margin: { left: 0.5, top: 1.25 },
+      headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: "left", valign: "middle", fontSize: 9, lineColor: [0, 0, 0]},
+      bodyStyles: { halign: "left", fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
+      tableLineColor: [0, 0, 0],
+      didDrawCell: (data) => {
+        const { cell, row, column } = data;
+        doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
+      },
+    });
+
+
+    // InFlow Table
+    
+    const inFlowHeader = [
+      [
+        { title: 'InFlow Air Velocity Measurement in m/s', colSpan: 10},
+      ],
+      [
+        { title: 'Sr.No'},
+        { title: 'Filter ID'},
+        { title: 'L1'},
+        { title: 'L2'},
+        { title: 'L3'},
+        { title: 'L4'},
+        { title: 'L5'},
+        { title: 'Mean'},
+        { title: 'Acceptance Limit'},
+        { title: 'Compilance as per EN 12469:2000'},
+      ]
+    ];
+
+    const inFlowBody = reportInfo.value.inFlow.map((item, i) => [
+      i + 1,
+      item.filter_id,
+      item.l1,
+      item.l2,
+      item.l3,
+      item.l4,
+      item.l5,
+      item.mean,
+      item.acceptance_limit + " m/s",
+      item.output,
+    ]);
+
+    autoTable(doc, {
+      head: inFlowHeader,
+      body: inFlowBody,
+      columnStyles: {
+        '0': { cellWidth: 0.3},
+        '1': { cellWidth: 0.7},
+        '2': { cellWidth: 0.7},
+        '3': { cellWidth: 0.7},
+        '4': { cellWidth: 0.7},
+        '5': { cellWidth: 0.7},
+        '6': { cellWidth: 0.7},
+        '7': { cellWidth: 0.7},
+        '8': { cellWidth: 1},
+        '9': { cellWidth:  "auto"},
       },
       margin: { left: 0.5, top: 1.25 },
       headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: "left", valign: "middle", fontSize: 9, lineColor: [0, 0, 0]},
@@ -374,4 +434,4 @@ const LAFReportGen = async (id, pdfName, reportInfo) => {
 
 };
 
-export { LAFReportGen };
+export { BSCReportGen };

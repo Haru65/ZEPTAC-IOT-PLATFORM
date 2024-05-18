@@ -51,6 +51,8 @@ import {
   getISORule,
   getCorrectiveAction,
   validateUser,
+  validateFeedback,
+  getFeedback,
 
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
@@ -778,7 +780,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
 
-      // NABL Reports - Laminar Air Flow , BioSafety Cabinets
+      // NABL Reports - Laminar Air Flow
       {
         path: "/laf/list",
         name: "laf-list",
@@ -827,6 +829,59 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Laminar Air Flow Report Edit",
           breadcrumbs: ["Laminar Air Flow Report Edit"],
+        },
+      },
+
+
+      // NABL Reports - BioSafety Cabinets
+      {
+        path: "/bsc/list",
+        name: "bsc-list",
+        component: () =>
+          import("@/views/apps/modules/nablreport/BSC/BioSafetyCabinetListing.vue"),
+        meta: {
+          pageTitle: "BioSafety Cabinet Report List",
+          breadcrumbs: ["BioSafety Cabinet Report List"],
+        },
+      },
+      {
+        path: "/bsc/add",
+        name: "bsc-add",
+        component: () =>
+          import("@/views/apps/modules/nablreport/BSC/BioSafetyCabinetAdd.vue"),
+        meta: {
+          pageTitle: "BioSafety Cabinet Add",
+          breadcrumbs: ["BioSafety Cabinet Add"],
+        },
+      },
+      {
+        path: "/bsc/edit/:id",
+        name: "bsc-edit",
+        component: () =>
+          import("@/views/apps/modules/nablreport/BSC/BioSafetyCabinetEdit.vue"),
+        meta: {
+          pageTitle: "BioSafety Cabinet Reports",
+          breadcrumbs: ["BioSafety Cabinet Reports"],
+        },
+      },
+      {
+        path: "/bsc_reports/add/:id",
+        name: "bsc-report-add",
+        component: () =>
+          import("@/views/apps/modules/nablreport/BSC/BSCComponents/BSCAdd.vue"),
+        meta: {
+          pageTitle: "BioSafety Cabinet Report Add",
+          breadcrumbs: ["BioSafety Cabinet Report Add"],
+        },
+      },
+      {
+        path: "/bsc_reports/edit/:id",
+        name: "bsc-report-edit",
+        component: () =>
+          import("@/views/apps/modules/nablreport/BSC/BSCComponents/BSCEdit.vue"),
+        meta: {
+          pageTitle: "BioSafety Cabinet Report Edit",
+          breadcrumbs: ["BioSafety Cabinet Report Edit"],
         },
       },
 
@@ -926,7 +981,7 @@ const routes: Array<RouteRecordRaw> = [
       },
 
 
-      // Customer Feedback Routes
+      // Complaint Register Routes
       {
         path: "/complaint",
         name: "complaint-list",
@@ -970,6 +1025,43 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Customer Complaint Edit",
           breadcrumbs: ["Customer Complaint Edit"],
+        },
+      },
+
+      // Customer Feeback Routes
+      {
+        path: "/feedbacks/list",
+        name: "feedbacks-list",
+        component: () =>
+          import("@/views/apps/customerfeedback/feedback/FeedbackFormListing.vue"),
+        meta: {
+          pageTitle: "Customer Feedbacks List",
+          breadcrumbs: ["Customer Feedbacks List"],
+        },
+      },
+      {
+        path: "/feedbacks/edit/:id",
+        name: "feedbacks-edit",
+        beforeEnter: async (to, from, next) => {
+          const itemID = to.params.id;
+          try {
+            const response = await getFeedback(itemID.toString());
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/customerfeedback/feedback/FeedbackFormView.vue"),
+        meta: {
+          pageTitle: "Customer Feedback Edit",
+          breadcrumbs: ["Customer Feedback Edit"],
         },
       },
 
@@ -2528,6 +2620,14 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/thankyou",
+        name: "thankyou",
+        component: () => import("@/views/apps/ThankYou.vue"),
+        meta: {
+          pageTitle: "Thank You",
+        },
+      },
+      {
         path: "/password-reset/:email/:token",
         name: "password-reset-form",
         component: () =>
@@ -2564,6 +2664,36 @@ const routes: Array<RouteRecordRaw> = [
           import("@/views/apps/srf/ServiceRequestAdd.vue"),
         meta: {
           pageTitle: "Service Request Form",
+        },
+      },
+      {
+        path: "/feedbacks/:company/:customer",
+        name: "feedbacks-add",
+        beforeEnter: async (to, from, next) => {
+
+          const companyID = to.params.company;
+          const customerID = to.params.customer;
+          const data = {
+            company_id: companyID,
+            customer_id: customerID,
+          }
+          try {
+            const response = await validateFeedback(data);
+            console.log(response);
+            if (response.error || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/customerfeedback/feedback/FeedbackFormAdd.vue"),
+        meta: {
+          pageTitle: "Customer Feedback",
         },
       },
     ],

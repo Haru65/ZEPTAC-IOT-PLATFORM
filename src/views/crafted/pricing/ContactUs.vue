@@ -15,7 +15,7 @@
         <!--begin::Heading-->
         <div class="text-center mb-10">
           <!--begin::Title-->
-          <h1 class="text-dark mb-3" style="font-size: 2.3rem">Contact Us</h1>
+          <h1 class="text-white mb-3" style="font-size: 2.3rem">Contact Us</h1>
           <!--end::Title-->
         </div>
         <!--end::Heading-->

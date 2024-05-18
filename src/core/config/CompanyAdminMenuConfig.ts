@@ -76,8 +76,8 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
             route: "/laf/list",
           },
           {
-            heading: "BSF",
-            route: "/bsf/list",
+            heading: "BSC",
+            route: "/bsc/list",
           },
         ],
       },
@@ -389,6 +389,10 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
           {
             heading: "Complaint Register",
             route: "/complaint",
+          },
+          {
+            heading: "Customer Feedbacks",
+            route: "/feedbacks/list",
           },
 
         ],

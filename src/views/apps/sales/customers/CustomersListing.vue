@@ -133,13 +133,26 @@
         </template>
         <template v-slot:srf_link="{ row: customer }">
           <span
-            class="d-flex flex-lg-row text-hover-primary cursor-pointer"
+            class="d-flex flex-lg-row text-hover-primary align-center gap-2 cursor-pointer"
             data-toggle="tooltip"
             title="Copy Service Request Link"
-            @click="copyUrl(customer.company_id, customer.id)"
+            @click="copySrfUrl(customer.company_id, customer.id)"
+          >
+          <i
+              class="las la-link text-gray-600 text-hover-primary mb-1 fs-3"
+            ></i>
+            <span class="text-gray-600 text-hover-primary"> Copy Link </span>
+          </span>
+        </template>
+        <template v-slot:feedback_link="{ row: customer }">
+          <span
+            class="d-flex flex-lg-row text-hover-primary align-center gap-2 cursor-pointer"
+            data-toggle="tooltip"
+            title="Copy Feedback Link"
+            @click="copyFeedbackUrl(customer.company_id, customer.id)"
           >
             <i
-              class="las la-link text-gray-600 mb-1 fs-2"
+              class="las la-link text-gray-600 text-hover-primary mb-1 fs-3"
             ></i>
             <span class="text-gray-600 text-hover-primary"> Copy Link </span>
           </span>
@@ -254,6 +267,12 @@ export default defineComponent({
       {
         columnName: "Servie Request Link",
         columnLabel: "srf_link",
+        sortEnabled: true,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Feedback Form Link",
+        columnLabel: "feedback_link",
         sortEnabled: true,
         columnWidth: 75,
       },
@@ -517,13 +536,30 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-    const copyUrl = (companyId, customerId) => {
-      const url = `https://app.zeptac.com/srf/${companyId}/${customerId}`;
-      // const url = `https://zeptac.com/srf/${companyId}/${customerId}`;
+    const copySrfUrl = (companyId, customerId) => {
+      const srf_url = `https://app.zeptac.com/srf/${companyId}/${customerId}`;
+      // const url = `http://localhost:5173/srf/${companyId}/${customerId}`;
       navigator.clipboard
-        .writeText(url)
+        .writeText(srf_url)
         .then(() => {
-          console.log("URL copied to clipboard:", url);
+          console.log("SRF URL copied to clipboard:", srf_url);
+          alert(`SRF URL copied to clipboard: ${srf_url}`);
+          // You can show a success message or perform any other action here
+        })
+        .catch((error) => {
+          console.error("Error copying URL to clipboard:", error);
+          // Handle error if copying fails
+        });
+    };
+
+    const copyFeedbackUrl = (companyId, customerId) => {
+      const feedback_url = `https://app.zeptac.com/feedbacks/${companyId}/${customerId}`;
+      // const url = `http://localhost:5173/feedbacks/${companyId}/${customerId}`;
+      navigator.clipboard
+        .writeText(feedback_url)
+        .then(() => {
+          console.log("Feedback URL copied to clipboard:", feedback_url);
+          alert(`SRF URL copied to clipboard: ${feedback_url}`);
           // You can show a success message or perform any other action here
         })
         .catch((error) => {
@@ -550,7 +586,8 @@ export default defineComponent({
       limit,
       PageLimitPoiner,
       Limits,
-      copyUrl,
+      copySrfUrl,
+      copyFeedbackUrl,
     };
   },
 });

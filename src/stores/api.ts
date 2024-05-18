@@ -55,6 +55,9 @@ const MRM_MINUTE_URL = "mrm_minutes";
 const SRF_URL = "srf";
 const LAF_URL = "laf";
 const LAF_REPORT_URL = "laf_reports";
+const BSC_URL = "bsc";
+const BSC_REPORT_URL = "bsc_reports";
+const FEEDBACK_URL = "feedbacks";
 
 
 
@@ -88,6 +91,18 @@ export async function validateUser(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.post("validate_user", data);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        return { error: error };
+    }
+}
+
+// Validate User for Customer Feedback
+export async function validateFeedback(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.post("validate_feedback", data);
         return response.data;
     } catch (error) {
         console.error(error);
@@ -5407,6 +5422,262 @@ export async function DownloadLAFReport(data: any) {
         const id = { "id": data };
         ApiService.setHeader();
         const response = await ApiService.post("download_laf_report",id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// NABL REPORTS - BSC
+
+// listing function
+export async function getBioSafetyCabinets(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(BSC_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function BioSafetyCabinetSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('bsc_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addBioSafetyCabinet(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(BSC_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getBioSafetyCabinet(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(BSC_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+// export async function updateBioSafetyCabinet(id: any, data: any) {
+//     try {
+//         //console.log(data)
+//         ApiService.setHeader();
+//         const response = await ApiService.put(BSC_URL + "/" + id, data);
+//         return response.data;
+//     } catch (errors) {
+//         console.error(errors);
+//         return { error: errors };
+//     }
+// }
+
+// delete function
+export async function deleteBioSafetyCabinet(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(BSC_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
+// NABL REPORTS - BSC REPORT
+
+// listing function
+export async function getBSCReports(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(BSC_REPORT_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addBSCReport(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(BSC_REPORT_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getBSCReport(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(BSC_REPORT_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateBSCReport(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(BSC_REPORT_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteBSCReport(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(BSC_REPORT_URL + "/" + data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// Download LAF Report
+export async function DownloadBSCReport(data: any) {
+    try {
+        //console.log(data)
+        const id = { "id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post("download_bsc_report",id);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+
+
+
+
+
+// CUSTOMER FEEDBACK FORM
+// listing function
+export async function getFeedbacks(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(FEEDBACK_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function FeedbackSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('feedbacks_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// add function
+export async function addFeedback(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(FEEDBACK_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getFeedback(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(FEEDBACK_URL, data);
+        // console.log(response)
+        return response.data.result;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateFeedback(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(FEEDBACK_URL + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// delete function
+export async function deleteFeedback(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(FEEDBACK_URL + "/" + data);
         return response.data;
     } catch (errors) {
         console.error(errors);

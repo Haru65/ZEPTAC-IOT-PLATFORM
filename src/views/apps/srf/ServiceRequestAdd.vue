@@ -535,8 +535,8 @@ export default defineComponent({
               "Service Request Form  has been successfully added!"
             );
             loading.value = false;
-            window.location.href = "https://www.google.com";
-            // router.push('/');
+            // window.location.href = "https://www.google.com";
+            router.push({ name: "thankyou" });
           } else {
             showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
             loading.value = false;

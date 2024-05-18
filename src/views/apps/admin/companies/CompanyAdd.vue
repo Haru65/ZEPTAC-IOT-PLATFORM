@@ -461,6 +461,38 @@
               <!--end::Col-->
             </div>
             <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6">
+                Choose Start Month of Financial Year
+              </label>
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8">
+                <!--begin::Row-->
+                <div class="row">
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row p-2">
+                    <el-select
+                      v-model="companyDetails.financial_year_type"
+                      filterable
+                      placeholder="Choose Start Month"
+                    >
+                      <el-option key="1" label="January - December" value="1" />
+                      <el-option key="2" label="April - March" value="2" />
+                    </el-select>
+                  </div>
+                  <!--end::Col-->
+                </div>
+                <!--end::Row-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
             <!--begin::Input group-->
             <div class="row mb-6">
               <!--begin::Label-->
@@ -722,7 +754,6 @@
               <!--end::Col-->
             </div>
             <!--end::Input group-->
-
           </div>
           <div class="modal-footer flex-center">
             <!--begin::Button-->
@@ -797,6 +828,7 @@ interface companyDetails {
   instrument_id_prefix: string;
   srf_no_init: string;
   srf_no_prefix: string;
+  financial_year_type: string;
 }
 
 export default defineComponent({
@@ -856,6 +888,7 @@ export default defineComponent({
       instrument_id_prefix: "",
       srf_no_init: "",
       srf_no_prefix: "",
+      financial_year_type: "",
     });
 
     const validGSTRef = ref(false);

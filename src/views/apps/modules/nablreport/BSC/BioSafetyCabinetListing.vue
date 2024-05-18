@@ -2,7 +2,23 @@
   <div class="card">
     <div class="card-header border-0 pt-6">
       <!--begin::Card title-->
-      <div class="card-title"></div>
+      <div class="card-title">
+        <!--begin::Search-->
+        <div class="d-flex align-items-center position-relative my-1">
+          <KTIcon
+            icon-name="magnifier"
+            icon-class="fs-1 position-absolute ms-6"
+          />
+          <input
+            type="text"
+            v-model="search"
+            @input="searchItems()"
+            class="form-control form-control-solid w-250px ps-15"
+            placeholder="Search Service Request"
+          />
+        </div>
+        <!--end::Search-->
+      </div>
       <!--begin::Card title-->
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
@@ -12,13 +28,21 @@
           class="d-flex justify-content-end"
           data-kt-customer-table-toolbar="base"
         >
-          <!--begin::Add customer-->
-          <router-link
-            :to="`/laf_reports/add/${itemId}`"
-            class="btn btn-primary"
+          <!--begin::Export-->
+          <button
+            type="button"
+            class="btn btn-light-primary me-3"
+            data-bs-toggle="modal"
+            data-bs-target="#kt_customers_export_modal"
           >
+            <KTIcon icon-name="exit-up" icon-class="fs-2" />
+            Export
+          </button>
+          <!--end::Export-->
+          <!--begin::Add customer-->
+          <router-link to="/bsc/add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Laminar Air Flow Report
+            Bio-Safety Cabinet
           </router-link>
           <!--end::Add customer-->
         </div>
@@ -77,29 +101,28 @@
         :items-per-page-dropdown-enabled="false"
         :loading="loading"
       >
-        <template v-slot:certificate_number="{ row: laf }">
-          {{ laf.certificate_number }}
+        <template v-slot:service_request_id="{ row: bsc }">
+          {{ bsc.service_request_id }}
         </template>
-        <template v-slot:ulr_number="{ row: laf }">
-          {{ laf.ulr_number }}
+        <template v-slot:cleanroom_instruments="{ row: bsc }">
+          {{ bsc.cleanroom_instruments }}
         </template>
-        <template v-slot:actions="{ row: laf }">
+        <template v-slot:bsc_report="{ row: bsc }">
+          <span class="menu-link" data-toggle="tooltip" title="Add BSC Report">
+            <router-link :to="`/bsc_reports/add/${bsc.id}`">
+              <span
+                class="border rounded badge py-3 fs-7 badge-light-primary text-hover-success cursor-pointer"
+                >+ Add BSC Report
+              </span>
+            </router-link>
+          </span>
+        </template>
+
+        <template v-slot:actions="{ row: bsc }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row my-3">
-            <!-- begin::Download -->
-
-            <span
-              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-            >
-              <i
-                @click="downloadLAFReport(laf.id)"
-                class="las la-download fs-2"
-              ></i>
-            </span>
-            <!-- end::Download -->
-
             <!--begin::Edit-->
-            <router-link :to="`/laf_reports/edit/${laf.id}`">
+            <router-link :to="`/bsc/edit/${bsc.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
               >
@@ -110,7 +133,7 @@
 
             <!--begin::Delete-->
             <span
-              @click="deleteItem(laf.id, false)"
+              @click="deleteItem(bsc.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />
@@ -162,25 +185,21 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref, computed } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import type { ILafReport } from "@/core/model/laf";
+import type { IBsc } from "@/core/model/bsc";
 import arraySort from "array-sort";
 import ApiService from "@/core/services/ApiService";
-import { useAuthStore } from "@/stores/auth";
-import { useRoute, useRouter } from "vue-router";
 import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
 import Swal from "sweetalert2";
 import {
-  deleteLAFReport,
-  DownloadLAFReport,
-  getLAFReports,
-  LaminarAirFlowSearch,
+  deleteBioSafetyCabinet,
+  getBioSafetyCabinets,
+  BioSafetyCabinetSearch,
 } from "@/stores/api";
 import { Identifier } from "@/core/config/WhichUserConfig";
-import { LAFReportGen } from "@/core/config/LAFReportGenerator";
 
 export default defineComponent({
-  name: "laf-edit",
+  name: "bsc-list",
   components: {
     Datatable,
   },
@@ -188,24 +207,24 @@ export default defineComponent({
     const loading = ref(true);
     const identifier = Identifier;
 
-    const auth = useAuthStore();
-    const router = useRouter();
-    const User = auth.GetUser();
-    const route = useRoute();
-    const itemId = route.params.id;
-
     const tableHeader = ref([
       {
-        columnName: "Certificate Number",
-        columnLabel: "certificate_number",
+        columnName: "Srf Number",
+        columnLabel: "service_request_id",
         sortEnabled: true,
         columnWidth: 155,
       },
       {
-        columnName: "ULR Number",
-        columnLabel: "ulr_number",
+        columnName: "Instruments",
+        columnLabel: "cleanroom_instruments",
         sortEnabled: true,
         columnWidth: 155,
+      },
+      {
+        columnName: "Add Report",
+        columnLabel: "bsc_report",
+        sortEnabled: false,
+        columnWidth: 175,
       },
       {
         columnName: "Actions",
@@ -216,8 +235,8 @@ export default defineComponent({
     ]);
 
     const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<ILafReport>>([]);
-    const initvalues = ref<Array<ILafReport>>([]);
+    const tableData = ref<Array<IBsc>>([]);
+    const initvalues = ref<Array<IBsc>>([]);
 
     // staring from 1
     const page = ref(1);
@@ -239,8 +258,8 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getLAFReports(
-          `page=${page}&limit=${limit.value}&itemId=${itemId}`
+        const response = await getBioSafetyCabinets(
+          `page=${page}&limit=${limit.value}`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
@@ -268,8 +287,8 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getLAFReports(
-          `page=${page.value}&limit=${limit}&itemId=${itemId}`
+        const response = await getBioSafetyCabinets(
+          `page=${page.value}&limit=${limit}`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
@@ -314,11 +333,11 @@ export default defineComponent({
 
     // functions
     // get users function
-    async function laf_listing(): Promise<void> {
+    async function bsc_listing(): Promise<void> {
       try {
         ApiService.setHeader();
-        const response = await getLAFReports(
-          `page=${page.value}&limit=${limit.value}&itemId=${itemId}`
+        const response = await getBioSafetyCabinets(
+          `page=${page.value}&limit=${limit.value}`
         );
         // console.log(response);
 
@@ -339,7 +358,7 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      await laf_listing();
+      await bsc_listing();
     });
 
     const deleteFewItems = () => {
@@ -376,7 +395,7 @@ export default defineComponent({
             }).then((result: { [x: string]: any }) => {
               if (result["isConfirmed"]) {
                 // Put your function here
-                deleteLAFReport(id);
+                deleteBioSafetyCabinet(id);
                 tableData.value.splice(i, 1);
               }
             });
@@ -386,7 +405,7 @@ export default defineComponent({
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
             // Put your function here
-            deleteLAFReport(id);
+            deleteBioSafetyCabinet(id);
             tableData.value.splice(i, 1);
           }
         }
@@ -398,7 +417,7 @@ export default defineComponent({
     const searchItems = async () => {
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value !== "") {
-        let results: Array<ILafReport> = [];
+        let results: Array<IBsc> = [];
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
             results.push(tableData.value[j]);
@@ -417,14 +436,14 @@ export default defineComponent({
         page.value = 1;
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
-        await laf_listing();
+        await bsc_listing();
       }
     };
 
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await LaminarAirFlowSearch(search.value);
+        const response = await BioSafetyCabinetSearch(search.value);
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(({ id, ...rest }) => ({
@@ -463,187 +482,6 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-    const itemDetails = ref({
-      id: "",
-      laf_id: "",
-      certificate_number: "NB-001",
-      ulr_number: "TC-0001",
-      d_receipt: "",
-      d_testing: "",
-      d_issue: "",
-      r_due_date: "",
-      description: "",
-      make: "",
-      model_no: "",
-      serial_no: "",
-      id_no: "",
-      testing_at: "",
-      room_name: "",
-      room_id: "",
-      temperature: 20.3,
-      humidity: 53.0,
-      differential_pressure: 10,
-
-      downFlow: [
-        {
-          filter_id: "Row 1",
-          l1: "",
-          l2: "",
-          l3: "",
-          l4: "",
-          l5: "",
-          mean: 0,
-          acceptance_limit: "0.25-0.50",
-          output: "",
-        },
-      ],
-      filter: [
-        {
-          filter_id: "SH",
-          upstream: "100",
-          downstream: "",
-          acceptance_limit: "0.01",
-          output: "",
-        },
-      ],
-      particle: [
-        {
-          particle_size: "0.3",
-          l1: "",
-          l2: "",
-          l3: "",
-          l4: "",
-          l5: "",
-          mean: 0,
-          acceptance_limit: "10200",
-          output: "",
-        },
-        {
-          particle_size: "0.5",
-          l1: "",
-          l2: "",
-          l3: "",
-          l4: "",
-          l5: "",
-          mean: 0,
-          acceptance_limit: "3520",
-          output: "",
-        },
-        {
-          particle_size: "5.0",
-          l1: "",
-          l2: "",
-          l3: "",
-          l4: "",
-          l5: "",
-          mean: 0,
-          acceptance_limit: "0",
-          output: "",
-        },
-      ],
-
-      laminar: {
-        id: "",
-        service_request_id: "",
-        cleanroom_instruments: [],
-      },
-
-      cleanroom_instruments: [
-        {
-          id: "",
-          name: "",
-          make: "",
-          description: "",
-          model_no: "",
-          serial_no: "",
-          calibration_date: "",
-          calibration_due_date: "",
-        },
-      ],
-
-      meta: {
-        company_name: "",
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        states: "",
-        country: "",
-      },
-
-      service: {
-        id: "",
-        srf_no: "",
-        customer_id: "",
-        customer_name: "",
-      },
-
-      company_id: "",
-      created_by: "",
-      updated_by: "",
-
-      createdByUser: {
-        id: "",
-        first_name: "",
-        last_name: "",
-      },
-      updatedByUser: {
-        id: "",
-        first_name: "",
-        last_name: "",
-      },
-    });
-
-    // Download Laminar Air Flow Report
-    const downloadLAFReport = async (id: any) => {
-      try {
-        const res = await DownloadLAFReport(id);
-
-        itemDetails.value.id = res.result.id;
-        itemDetails.value.laf_id = res.result.laf_id;
-        itemDetails.value.certificate_number = res.result.certificate_number;
-        itemDetails.value.ulr_number = res.result.ulr_number;
-        itemDetails.value.d_receipt = res.result.d_receipt;
-        itemDetails.value.d_testing = res.result.d_testing;
-        itemDetails.value.d_issue = res.result.d_issue;
-        itemDetails.value.r_due_date = res.result.r_due_date;
-        itemDetails.value.description = res.result.description;
-        itemDetails.value.make = res.result.make;
-        itemDetails.value.model_no = res.result.model_no;
-        itemDetails.value.serial_no = res.result.serial_no;
-        itemDetails.value.id_no = res.result.id_no;
-        itemDetails.value.testing_at = res.result.testing_at;
-        itemDetails.value.room_name = res.result.room_name;
-        itemDetails.value.room_id = res.result.room_id;
-
-        itemDetails.value.temperature = res.result.temperature;
-        itemDetails.value.humidity = res.result.humidity;
-        itemDetails.value.differential_pressure =
-          res.result.differential_pressure;
-
-        itemDetails.value.downFlow = JSON.parse(res.result.downFlow);
-        itemDetails.value.filter = JSON.parse(res.result.filter);
-        itemDetails.value.particle = JSON.parse(res.result.particle);
-
-        itemDetails.value.company_id = res.result.company_id;
-        itemDetails.value.created_by = res.result.created_by;
-        itemDetails.value.updated_by = res.result.updated_by;
-
-        itemDetails.value.meta = res.result.meta;
-        itemDetails.value.service = res.result.service;
-        itemDetails.value.cleanroom_instruments =
-          res.result.cleanroom_instruments;
-
-        const reportName = `${itemDetails.value.service.srf_no}`;
-
-        await LAFReportGen(id, reportName, itemDetails);
-        console.log(itemDetails.value);
-      } catch (error) {
-        console.log(error);
-        alert("Unable to download the report. Please try again.");
-      }
-    };
-
     return {
       tableData,
       tableHeader,
@@ -664,8 +502,6 @@ export default defineComponent({
       Limits,
       identifier,
       filteredTableHeader,
-      itemId,
-      downloadLAFReport,
     };
   },
 });

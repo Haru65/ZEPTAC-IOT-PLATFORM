@@ -54,8 +54,8 @@ export interface MenuItem {
                 route: "/laf/list",
               },
               {
-                heading: "BSF",
-                route: "/bsf/list",
+                heading: "BSC",
+                route: "/bsc/list",
               },
             ],
           },
@@ -262,6 +262,10 @@ export interface MenuItem {
               {
                 heading: "Complaint Register",
                 route: "/complaint",
+              },
+              {
+                heading: "Customer Feedbacks",
+                route: "/feedbacks/list",
               },
     
             ],

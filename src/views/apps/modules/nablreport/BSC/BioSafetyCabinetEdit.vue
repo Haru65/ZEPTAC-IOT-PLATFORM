@@ -14,11 +14,11 @@
         >
           <!--begin::Add customer-->
           <router-link
-            :to="`/laf_reports/add/${itemId}`"
+            :to="`/bsc_reports/add/${itemId}`"
             class="btn btn-primary"
           >
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Laminar Air Flow Report
+            BioSafety Cabinet Report
           </router-link>
           <!--end::Add customer-->
         </div>
@@ -77,13 +77,13 @@
         :items-per-page-dropdown-enabled="false"
         :loading="loading"
       >
-        <template v-slot:certificate_number="{ row: laf }">
-          {{ laf.certificate_number }}
+        <template v-slot:certificate_number="{ row: bsc }">
+          {{ bsc.certificate_number }}
         </template>
-        <template v-slot:ulr_number="{ row: laf }">
-          {{ laf.ulr_number }}
+        <template v-slot:ulr_number="{ row: bsc }">
+          {{ bsc.ulr_number }}
         </template>
-        <template v-slot:actions="{ row: laf }">
+        <template v-slot:actions="{ row: bsc }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row my-3">
             <!-- begin::Download -->
@@ -92,14 +92,14 @@
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
             >
               <i
-                @click="downloadLAFReport(laf.id)"
+                @click="downloadLAFReport(bsc.id)"
                 class="las la-download fs-2"
               ></i>
             </span>
             <!-- end::Download -->
 
             <!--begin::Edit-->
-            <router-link :to="`/laf_reports/edit/${laf.id}`">
+            <router-link :to="`/bsc_reports/edit/${bsc.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
               >
@@ -110,7 +110,7 @@
 
             <!--begin::Delete-->
             <span
-              @click="deleteItem(laf.id, false)"
+              @click="deleteItem(bsc.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />
@@ -156,13 +156,13 @@
     </div>
   </div>
 </template>
-  
-  <script lang="ts">
+    
+    <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref, computed } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import type { ILafReport } from "@/core/model/laf";
+import type { IBscReport } from "@/core/model/bsc";
 import arraySort from "array-sort";
 import ApiService from "@/core/services/ApiService";
 import { useAuthStore } from "@/stores/auth";
@@ -171,16 +171,16 @@ import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
 import Swal from "sweetalert2";
 import {
-  deleteLAFReport,
-  DownloadLAFReport,
-  getLAFReports,
-  LaminarAirFlowSearch,
+  deleteBSCReport,
+  DownloadBSCReport,
+  getBSCReports,
+  BioSafetyCabinetSearch,
 } from "@/stores/api";
 import { Identifier } from "@/core/config/WhichUserConfig";
-import { LAFReportGen } from "@/core/config/LAFReportGenerator";
+import { BSCReportGen } from "@/core/config/BSCReportGenerator";
 
 export default defineComponent({
-  name: "laf-edit",
+  name: "bsc-edit",
   components: {
     Datatable,
   },
@@ -216,8 +216,8 @@ export default defineComponent({
     ]);
 
     const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<ILafReport>>([]);
-    const initvalues = ref<Array<ILafReport>>([]);
+    const tableData = ref<Array<IBscReport>>([]);
+    const initvalues = ref<Array<IBscReport>>([]);
 
     // staring from 1
     const page = ref(1);
@@ -239,7 +239,7 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getLAFReports(
+        const response = await getBSCReports(
           `page=${page}&limit=${limit.value}&itemId=${itemId}`
         );
 
@@ -268,7 +268,7 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getLAFReports(
+        const response = await getBSCReports(
           `page=${page.value}&limit=${limit}&itemId=${itemId}`
         );
 
@@ -317,7 +317,7 @@ export default defineComponent({
     async function laf_listing(): Promise<void> {
       try {
         ApiService.setHeader();
-        const response = await getLAFReports(
+        const response = await getBSCReports(
           `page=${page.value}&limit=${limit.value}&itemId=${itemId}`
         );
         // console.log(response);
@@ -376,7 +376,7 @@ export default defineComponent({
             }).then((result: { [x: string]: any }) => {
               if (result["isConfirmed"]) {
                 // Put your function here
-                deleteLAFReport(id);
+                deleteBSCReport(id);
                 tableData.value.splice(i, 1);
               }
             });
@@ -386,7 +386,7 @@ export default defineComponent({
         for (let i = 0; i < tableData.value.length; i++) {
           if (tableData.value[i].id === id) {
             // Put your function here
-            deleteLAFReport(id);
+            deleteBSCReport(id);
             tableData.value.splice(i, 1);
           }
         }
@@ -398,7 +398,7 @@ export default defineComponent({
     const searchItems = async () => {
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value !== "") {
-        let results: Array<ILafReport> = [];
+        let results: Array<IBscReport> = [];
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
             results.push(tableData.value[j]);
@@ -424,7 +424,7 @@ export default defineComponent({
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await LaminarAirFlowSearch(search.value);
+        const response = await BioSafetyCabinetSearch(search.value);
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(({ id, ...rest }) => ({
@@ -465,7 +465,7 @@ export default defineComponent({
 
     const itemDetails = ref({
       id: "",
-      laf_id: "",
+      bsc_id: "",
       certificate_number: "NB-001",
       ulr_number: "TC-0001",
       d_receipt: "",
@@ -484,6 +484,19 @@ export default defineComponent({
       humidity: 53.0,
       differential_pressure: 10,
 
+      inFlow: [
+        {
+          filter_id: "Row 1",
+          l1: "",
+          l2: "",
+          l3: "",
+          l4: "",
+          l5: "",
+          mean: 0,
+          acceptance_limit: "0.40",
+          output: "",
+        },
+      ],
       downFlow: [
         {
           filter_id: "Row 1",
@@ -594,13 +607,13 @@ export default defineComponent({
       },
     });
 
-    // Download Laminar Air Flow Report
+    // Download BioSafety Cabinet Report
     const downloadLAFReport = async (id: any) => {
       try {
-        const res = await DownloadLAFReport(id);
+        const res = await DownloadBSCReport(id);
 
         itemDetails.value.id = res.result.id;
-        itemDetails.value.laf_id = res.result.laf_id;
+        itemDetails.value.bsc_id = res.result.bsc_id;
         itemDetails.value.certificate_number = res.result.certificate_number;
         itemDetails.value.ulr_number = res.result.ulr_number;
         itemDetails.value.d_receipt = res.result.d_receipt;
@@ -621,6 +634,7 @@ export default defineComponent({
         itemDetails.value.differential_pressure =
           res.result.differential_pressure;
 
+        itemDetails.value.inFlow = JSON.parse(res.result.inFlow);
         itemDetails.value.downFlow = JSON.parse(res.result.downFlow);
         itemDetails.value.filter = JSON.parse(res.result.filter);
         itemDetails.value.particle = JSON.parse(res.result.particle);
@@ -636,7 +650,7 @@ export default defineComponent({
 
         const reportName = `${itemDetails.value.service.srf_no}`;
 
-        await LAFReportGen(id, reportName, itemDetails);
+        await BSCReportGen(id, reportName, itemDetails);
         console.log(itemDetails.value);
       } catch (error) {
         console.log(error);
@@ -670,4 +684,4 @@ export default defineComponent({
   },
 });
 </script>
-  
+    
