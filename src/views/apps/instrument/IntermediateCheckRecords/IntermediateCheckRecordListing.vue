@@ -54,7 +54,7 @@
         @on-items-select="onItemSelect"
         :data="tableData"
         :header="tableHeader"
-        :checkbox-enabled="true"
+        :checkbox-enabled="false"
         :items-per-page="limit"
         :items-per-page-dropdown-enabled="false"
         :loading="loading"

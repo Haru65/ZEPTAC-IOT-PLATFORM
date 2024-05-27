@@ -525,55 +525,135 @@ export default defineComponent({
       await supplier_listing();
     });
 
-    const deleteFewItem = () => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover from this !",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "red",
-        confirmButtonText: "Yes, I am sure!",
-        cancelButtonText: "No, cancel it!",
-      }).then((result: { [x: string]: any }) => {
-        if (result["isConfirmed"]) {
-          // Put your function here
-          selectedIds.value.forEach((item) => {
-            deleteItem(item, true);
-          });
+    
+    const deleteFewItem = async () => {
+      try {
+        const result = await Swal.fire({
+          title: "Are you sure?",
+          text: "You will not be able to recover from this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "red",
+          confirmButtonText: "Yes, I am sure!",
+          cancelButtonText: "No, cancel it!",
+        });
+
+        if (result.isConfirmed) {
+          let allSuccess = true;
+          let finalMessage = "Selected items deleted successfully.";
+
+          for (const id of selectedIds.value) {
+            const response = await deleteItem(id, true);
+            if (!response.success) {
+              allSuccess = false;
+              finalMessage =
+                response.message ||
+                "An error occurred while deleting some items.";
+              break;
+            }
+          }
+
           selectedIds.value.length = 0;
+
+          if (allSuccess) {
+            showSuccessAlert("Success", finalMessage);
+          } else {
+            showErrorAlert("Error", finalMessage);
+          }
         }
+      } catch (error: any) {
+        const errorMessage = error.message || "An unknown error occurred";
+        showErrorAlert("Error", errorMessage);
+      }
+    };
+
+    const deleteItem = async (id: number, mul: boolean) => {
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You will not be able to recover from this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error: any) {
+          const errorMessage = error.message || "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromTable = async (id: number) => {
+        try {
+          const response = await deleteSupplier(id);
+          if (response?.success) {
+            const index = tableData.value.findIndex((item) => item.id === id);
+            if (index !== -1) {
+              tableData.value.splice(index, 1);
+              // console.log(`Item with id ${id} deleted successfully`);
+            }
+            showSuccessAlert(
+              "Success",
+              response.message || `Item with id ${id} deleted successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(
+              response?.message || `Failed to delete the item with id ${id}`
+            );
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      if (!mul) {
+        const isConfirmed = await deleteConfirmation();
+        if (isConfirmed) {
+          return await deleteFromTable(id);
+        } else {
+          return { success: false };
+        }
+      } else {
+        return await deleteFromTable(id);
+      }
+    };
+
+    // Alert functions
+    const showSuccessAlert = (title: string, message: string) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "success",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
       });
     };
 
-    const deleteItem = (id: number, mul: boolean) => {
-      if (!mul) {
-        for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
-            Swal.fire({
-              title: "Are you sure?",
-              text: "You will not be able to recover from this !",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "red",
-              confirmButtonText: "Yes, I am sure!",
-            }).then((result: { [x: string]: any }) => {
-              if (result["isConfirmed"]) {
-                // Put your function here
-                deleteSupplier(id);
-                tableData.value.splice(i, 1);
-              }
-            });
-          }
-        }
-      } else {
-        for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
-            // Put your function here
-            deleteSupplier(id);
-            tableData.value.splice(i, 1);
-          }
-        }
-      }
+    const showErrorAlert = (title: string, message: string) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "error",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
+      });
     };
 
     const search = ref<string>("");

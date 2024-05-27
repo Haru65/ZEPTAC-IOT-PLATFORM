@@ -22,6 +22,30 @@
       <!--begin::Card title-->
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
+        <!-- YEAR WISE DATA -->
+
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-semibold text-gray-400"
+            >Financial Year</span
+          >
+        </h3>
+        <div class="me-3">
+          <el-select
+            filterable
+            placeholder="Select Year"
+            v-model="selectedYearCache"
+            id="financialYear"
+            @change="handleChange"
+          >
+            <el-option
+              v-for="year in financialYears"
+              :key="year"
+              :value="year"
+              :label="year"
+            />
+          </el-select>
+        </div>
+
         <!--begin::Toolbar-->
         <div
           v-if="selectedIds.length === 0"
@@ -66,7 +90,7 @@
           <button
             type="button"
             class="btn btn-danger"
-            @click="deleteFewDocument()"
+            @click="deleteFewItem()"
           >
             Delete Selected
           </button>
@@ -109,8 +133,8 @@
       >
         <!-- img data -->
         <template v-slot:id="{ row: documents }">
-            {{ documents.id }}
-          </template>
+          {{ documents.id }}
+        </template>
         <template v-slot:document_name="{ row: documents }">
           {{ documents.document_name }}
         </template>
@@ -118,22 +142,19 @@
           {{ documents.format_no }}
         </template>
         <template v-slot:review_date="{ row: documents }">
-          <span
-            class="badge py-3 px-4 fs-7 badge-light-primary"
-            >{{ documents.review_date }}</span
-          >
+          <span class="badge py-3 px-4 fs-7 badge-light-primary">{{
+            documents.review_date
+          }}</span>
         </template>
         <template v-slot:revision_date="{ row: documents }">
-          <span
-            class="badge py-3 px-4 fs-7 badge-light-primary"
-            >{{ documents.revision_date }}</span
-          >
+          <span class="badge py-3 px-4 fs-7 badge-light-primary">{{
+            documents.revision_date
+          }}</span>
         </template>
         <template v-slot:issue_date="{ row: documents }">
-          <span
-            class="badge py-3 px-4 fs-7 badge-light-primary"
-            >{{ documents.issue_date }}</span
-          >
+          <span class="badge py-3 px-4 fs-7 badge-light-primary">{{
+            documents.issue_date
+          }}</span>
         </template>
         <template v-slot:location="{ row: documents }">
           {{ documents.location }}
@@ -150,7 +171,7 @@
             </span>
             <span class="menu-link px-3">
               <i
-                @click="deleteDocument(documents.id, false)"
+                @click="deleteItem(documents.id, false)"
                 class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
@@ -196,10 +217,11 @@
 </template>
   
   <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
 import type { IDocument } from "@/core/model/documents";
+import { useAuthStore } from "@/stores/auth";
 import {
   getInternalDocs,
   deleteInternalDoc,
@@ -218,6 +240,9 @@ export default defineComponent({
     InternalDocModal,
   },
   setup() {
+    // Financial Year Logic
+    const authStore = useAuthStore();
+
     const tableHeader = ref([
       {
         columnName: "Document Name",
@@ -286,7 +311,11 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         const response = await getInternalDocs(
-          `page=${page}&limit=${limit.value}`
+          `page=${page}&limit=${limit.value}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
@@ -332,7 +361,11 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         const response = await getInternalDocs(
-          `page=${page.value}&limit=${limit}`
+          `page=${page.value}&limit=${limit}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
@@ -394,7 +427,11 @@ export default defineComponent({
     async function internal_doc_listing(): Promise<void> {
       try {
         const response = await getInternalDocs(
-          `page=${page.value}&limit=${limit.value}`
+          `page=${page.value}&limit=${limit.value}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
         tableData.value = response.result.data.map(
           ({
@@ -430,59 +467,162 @@ export default defineComponent({
       }
     }
 
+    const financialYears = ref(authStore.financialYears); // Generate Financial years list using the auth store function
+    const selectedYearCache = ref(
+      localStorage.getItem("selectedFinancialYear") || ""
+    );
+
+    // Fallback to default value if localStorage data is invalid or missing
+    if (!financialYears.value.includes(selectedYearCache.value)) {
+      selectedYearCache.value = financialYears.value[0];
+    }
+
+    watch(selectedYearCache, (newValue) => {
+      localStorage.setItem("selectedFinancialYear", newValue);
+    });
+
+    async function handleChange() {
+      page.value = 1;
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+      await internal_doc_listing();
+    }
+
     onMounted(async () => {
+      // Save initial selected year to localStorage
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+
       await internal_doc_listing();
     });
 
-    const deleteFewDocument = () => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover from this !",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "red",
-        confirmButtonText: "Yes, I am sure!",
-        cancelButtonText: "No, cancel it!",
-      }).then((result: { [x: string]: any }) => {
-        if (result["isConfirmed"]) {
-          // Put your function here
-          selectedIds.value.forEach((item) => {
-            deleteDocument(item, true);
-          });
+    
+    const deleteFewItem = async () => {
+      try {
+        const result = await Swal.fire({
+          title: "Are you sure?",
+          text: "You will not be able to recover from this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "red",
+          confirmButtonText: "Yes, I am sure!",
+          cancelButtonText: "No, cancel it!",
+        });
+
+        if (result.isConfirmed) {
+          let allSuccess = true;
+          let finalMessage = "Selected items deleted successfully.";
+
+          for (const id of selectedIds.value) {
+            const response = await deleteItem(id, true);
+            if (!response.success) {
+              allSuccess = false;
+              finalMessage =
+                response.message ||
+                "An error occurred while deleting some items.";
+              break;
+            }
+          }
+
           selectedIds.value.length = 0;
+
+          if (allSuccess) {
+            showSuccessAlert("Success", finalMessage);
+          } else {
+            showErrorAlert("Error", finalMessage);
+          }
         }
+      } catch (error: any) {
+        const errorMessage = error.message || "An unknown error occurred";
+        showErrorAlert("Error", errorMessage);
+      }
+    };
+
+    const deleteItem = async (id: number, mul: boolean) => {
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You will not be able to recover from this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error: any) {
+          const errorMessage = error.message || "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromTable = async (id: number) => {
+        try {
+          const response = await deleteInternalDoc(id);
+          if (response?.success) {
+            const index = tableData.value.findIndex((item) => item.id === id);
+            if (index !== -1) {
+              tableData.value.splice(index, 1);
+              // console.log(`Item with id ${id} deleted successfully`);
+            }
+            showSuccessAlert(
+              "Success",
+              response.message || `Item with id ${id} deleted successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(
+              response?.message || `Failed to delete the item with id ${id}`
+            );
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      if (!mul) {
+        const isConfirmed = await deleteConfirmation();
+        if (isConfirmed) {
+          return await deleteFromTable(id);
+        } else {
+          return { success: false };
+        }
+      } else {
+        return await deleteFromTable(id);
+      }
+    };
+
+    // Alert functions
+    const showSuccessAlert = (title: string, message: string) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "success",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
       });
     };
 
-    const deleteDocument = (id: number, mul: boolean) => {
-      if (!mul) {
-        for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
-            Swal.fire({
-              title: "Are you sure?",
-              text: "You will not be able to recover from this !",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "red",
-              confirmButtonText: "Yes, I am sure!",
-            }).then((result: { [x: string]: any }) => {
-              if (result["isConfirmed"]) {
-                // Put your function here
-                deleteInternalDoc(id);
-                tableData.value.splice(i, 1);
-              }
-            });
-          }
-        }
-      } else {
-        for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
-            // Put your function here
-            deleteInternalDoc(id);
-            tableData.value.splice(i, 1);
-          }
-        }
-      }
+    const showErrorAlert = (title: string, message: string) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "error",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
+      });
     };
 
     const search = ref<string>("");
@@ -518,7 +658,12 @@ export default defineComponent({
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await InternalDocSearch(search.value);
+        const response = await InternalDocSearch(
+          search.value,
+          selectedYearCache.value
+            ? selectedYearCache.value
+            : financialYears.value[0]
+        );
 
         tableData.value = response.result.data.map(
           ({
@@ -580,17 +725,17 @@ export default defineComponent({
 
     async function reLoadData() {
       await internal_doc_listing();
-    };
+    }
 
     return {
       tableData,
       tableHeader,
       reLoadData,
-      deleteDocument,
+      deleteItem,
       search,
       searchItems,
       selectedIds,
-      deleteFewDocument,
+      deleteFewItem,
       sort,
       onItemSelect,
       loading,
@@ -600,6 +745,10 @@ export default defineComponent({
       page,
       Limits,
       PageLimitPoiner,
+
+      selectedYearCache,
+      financialYears,
+      handleChange,
     };
   },
 });

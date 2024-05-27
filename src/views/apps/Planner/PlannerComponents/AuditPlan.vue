@@ -18,6 +18,20 @@
               <div class="card-title m-0">
                 <h3 class="fw-bold m-0">Add Internal Audit</h3>
               </div>
+              <div
+                class="card-toolbar d-flex justify-content-end"
+                data-kt-customer-table-toolbar="base"
+              >
+                <!--begin::Add customer-->
+                <router-link
+                  to="/plan"
+                  class="btn btn-light"
+                >
+                  <KTIcon icon-name="arrow-left" icon-class="fs-2" />
+                  Back
+                </router-link>
+                <!--end::Add customer-->
+              </div>
               <!--end::Card title-->
             </div>
             <!--begin::Card header-->
@@ -41,9 +55,9 @@
                       placeholder="Choose Month"
                     >
                       <el-option
-                        v-for="month in monthNames"
+                        v-for="month in months"
                         :key="month.id"
-                        :label="month.name"
+                        :label="`${month.name} - ${month.year}`"
                         :value="month.id"
                       />
                     </el-select>
@@ -86,145 +100,168 @@
         <!--end::Form-->
 
         <div class="card mb-5 mb-xl-10 pb-12">
+          <div class="card-header border-0 pt-6">
+            <!--begin::Card title-->
+            <div class="card-title">
+              <!--begin::Card title-->
+              <div class="card-title m-0">
+                <h3 class="fw-bold m-0">Internal Audit Plan List</h3>
+              </div>
+              <!--end::Card title-->
+            </div>
+            <!--begin::Card title-->
+            <!--begin::Card toolbar-->
 
-<div class="card-header border-0 pt-6">
-  <!--begin::Card title-->
-  <div class="card-title">
-    <!--begin::Card title-->
-    <div class="card-title m-0">
-      <h3 class="fw-bold m-0">Internal Audit Plan List</h3>
-    </div>
-    <!--end::Card title-->
-  </div>
-  <!--begin::Card title-->
-  <!--begin::Card toolbar-->
+            <div class="card-toolbar">
+              <!-- YEAR WISE DATA -->
 
-  <div class="card-toolbar">
-    <!--begin::Group actions-->
-    <div
-      v-if="selectedIds.length !== 0"
-      class="d-flex justify-content-end align-items-center"
-      data-kt-customer-table-toolbar="selected"
-    >
-      <div class="fw-bold me-5">
-        <span class="me-2">{{ selectedIds.length }}</span
-        >Selected
-      </div>
-      <button
-        type="button"
-        class="btn btn-danger"
-        @click="deleteFewItem()"
-      >
-        Delete Selected
-      </button>
-    </div>
-    <!--end::Group actions-->
-    <!--begin::Group actions-->
-    <div
-      class="d-flex justify-content-end align-items-center d-none"
-      data-kt-customer-table-toolbar="selected"
-    >
-      <div class="fw-bold me-5">
-        <span
-          class="me-2"
-          data-kt-customer-table-select="selected_count"
-        ></span
-        >Selected
-      </div>
-      <button
-        type="button"
-        class="btn btn-danger"
-        data-kt-customer-table-select="delete_selected"
-      >
-        Delete Selected
-      </button>
-    </div>
-    <!--end::Group actions-->
-  </div>
-  <!--end::Card toolbar-->
-</div>
+              <h3 class="card-title align-items-start flex-column">
+                <span class="card-label fw-semibold text-gray-400"
+                  >Financial Year</span
+                >
+              </h3>
+              <div class="me-3">
+                <el-select
+                  filterable
+                  placeholder="Select Year"
+                  v-model="selectedYearCache"
+                  id="financialYear"
+                  @change="handleChange"
+                >
+                  <el-option
+                    v-for="year in financialYears"
+                    :key="year"
+                    :value="year"
+                    :label="year"
+                  />
+                </el-select>
+              </div>
 
-<!--begin::Card body-->
-<div class="card-body pt-0">
-  <div class="table-responsive">
-    <Datatable
-      checkbox-label="id"
-      @on-sort="sort"
-      @on-items-select="onItemSelect"
-      :data="tableData"
-      :header="tableHeader"
-      :checkbox-enabled="true"
-      :items-per-page="limit"
-      :items-per-page-dropdown-enabled="false"
-      :loading="loading"
-    >
-      <template v-slot:id="{ row: planner }">
-        {{ planner.id }}
-      </template>
-      <template v-slot:month_id="{ row: planner }">
-        <span class="badge py-3 px-4 fs-7 badge-light-primary">{{
-          GetMonthName(planner.month_id)
-        }}</span>
-      </template>
-      <template v-slot:actions="{ row: planner }">
-        <!--begin::Menu Flex-->
-        <div class="d-flex flex-lg-row">
-          <span>
-            <i
-              @click="deleteItem(planner.id, false)"
-              class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
-            ></i>
-          </span>
+              <!--begin::Group actions-->
+              <div
+                v-if="selectedIds.length !== 0"
+                class="d-flex justify-content-end align-items-center"
+                data-kt-customer-table-toolbar="selected"
+              >
+                <div class="fw-bold me-5">
+                  <span class="me-2">{{ selectedIds.length }}</span
+                  >Selected
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  @click="deleteFewItem()"
+                >
+                  Delete Selected
+                </button>
+              </div>
+              <!--end::Group actions-->
+              <!--begin::Group actions-->
+              <div
+                class="d-flex justify-content-end align-items-center d-none"
+                data-kt-customer-table-toolbar="selected"
+              >
+                <div class="fw-bold me-5">
+                  <span
+                    class="me-2"
+                    data-kt-customer-table-select="selected_count"
+                  ></span
+                  >Selected
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  data-kt-customer-table-select="delete_selected"
+                >
+                  Delete Selected
+                </button>
+              </div>
+              <!--end::Group actions-->
+            </div>
+            <!--end::Card toolbar-->
+          </div>
+
+          <!--begin::Card body-->
+          <div class="card-body pt-0">
+            <div class="table-responsive">
+              <Datatable
+                checkbox-label="id"
+                @on-sort="sort"
+                @on-items-select="onItemSelect"
+                :data="tableData"
+                :header="tableHeader"
+                :checkbox-enabled="true"
+                :items-per-page="limit"
+                :items-per-page-dropdown-enabled="false"
+                :loading="loading"
+              >
+                <template v-slot:id="{ row: planner }">
+                  {{ planner.id }}
+                </template>
+                <template v-slot:month_id="{ row: planner }">
+                  <span class="badge py-3 px-4 fs-7 badge-light-primary">{{
+                    getMonthName(planner.month_id)
+                  }}</span>
+                </template>
+                <template v-slot:actions="{ row: planner }">
+                  <!--begin::Menu Flex-->
+                  <div class="d-flex flex-lg-row">
+                    <span>
+                      <i
+                        @click="deleteItem(planner.id, false)"
+                        class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
+                      ></i>
+                    </span>
+                  </div>
+                  <!--end::Menu FLex-->
+                  <!--end::Menu-->
+                </template>
+              </Datatable>
+              <div class="d-flex justify-content-between p-2">
+                <div>
+                  <el-select
+                    class="w-100px rounded-2"
+                    v-model="limit"
+                    filterable
+                    @change="PageLimitPoiner(limit)"
+                  >
+                    <el-option
+                      v-for="item in Limits"
+                      :key="item"
+                      :label="item"
+                      :value="item"
+                    />
+                  </el-select>
+                </div>
+                <ul class="pagination">
+                  <li class="paginate_button page-item" style="cursor: auto">
+                    <span @click="PrevPage" class="paginate_button page-link"
+                      ><i class="ki-duotone ki-left fs-2"><!--v-if--></i></span
+                    >
+                  </li>
+                  <li class="paginate_button disabled">
+                    <span class="paginate_button page-link">
+                      Page - {{ page }}
+                    </span>
+                  </li>
+                  <li class="paginate_button page-item" style="cursor: pointer">
+                    <span @click="NextPage" class="paginate_button page-link"
+                      ><i class="ki-duotone ki-right fs-2"><!--v-if--></i></span
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
-        <!--end::Menu FLex-->
-        <!--end::Menu-->
-      </template>
-    </Datatable>
-    <div class="d-flex justify-content-between p-2">
-      <div>
-        <el-select
-          class="w-100px rounded-2"
-          v-model="limit"
-          filterable
-          @change="PageLimitPoiner(limit)"
-        >
-          <el-option
-            v-for="item in Limits"
-            :key="item"
-            :label="item"
-            :value="item"
-          />
-        </el-select>
-      </div>
-      <ul class="pagination">
-        <li class="paginate_button page-item" style="cursor: auto">
-          <span @click="PrevPage" class="paginate_button page-link"
-            ><i class="ki-duotone ki-left fs-2"><!--v-if--></i></span
-          >
-        </li>
-        <li class="paginate_button disabled">
-          <span class="paginate_button page-link">
-            Page - {{ page }}
-          </span>
-        </li>
-        <li class="paginate_button page-item" style="cursor: pointer">
-          <span @click="NextPage" class="paginate_button page-link"
-            ><i class="ki-duotone ki-right fs-2"><!--v-if--></i></span
-          >
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
-</div>
       </div>
     </div>
   </div>
 </template>
         
-        <script lang="ts">
+<script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import {
   getPlan,
@@ -240,7 +277,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
-import { monthNames, GetMonthName } from "@/core/model/planner";
+import { useMonthUtils } from "@/core/model/planner";
 import type { IPlan } from "@/core/model/planner";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
@@ -249,8 +286,7 @@ import arraySort from "array-sort";
 interface Data {
   plan_id: string;
   month_id: string;
-  data: {
-  };
+  data: {};
   company_id: string;
   created_by: number;
   updated_by: number;
@@ -266,6 +302,14 @@ export default defineComponent({
     const auth = useAuthStore();
     const router = useRouter();
     const User = auth.GetUser();
+
+    // Financial Year Logic
+    const authStore = useAuthStore();
+
+    const financialYearType = Number(localStorage.getItem("financialYearType"));
+    const { months, currentYear, currentMonth, getMonthName } =
+      useMonthUtils(financialYearType);
+    const selectedMonthId = ref(currentMonth);
 
     const PLAN_ID = "6";
 
@@ -312,7 +356,11 @@ export default defineComponent({
 
         ApiService.setHeader();
         const response = await getPlanners(
-          `page=${page}&limit=${limit.value}&planId=${PLAN_ID}`
+          `page=${page}&limit=${limit.value}&planId=${PLAN_ID}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
@@ -346,7 +394,11 @@ export default defineComponent({
 
         ApiService.setHeader();
         const response = await getPlanners(
-          `page=${page.value}&limit=${limit}&planId=${PLAN_ID}`
+          `page=${page.value}&limit=${limit}&planId=${PLAN_ID}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
@@ -390,7 +442,11 @@ export default defineComponent({
       try {
         ApiService.setHeader();
         const response = await getPlanners(
-          `page=${page.value}&limit=${limit.value}&planId=${PLAN_ID}`
+          `page=${page.value}&limit=${limit.value}&planId=${PLAN_ID}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
@@ -413,21 +469,42 @@ export default defineComponent({
       }
     };
 
-    const itemValidator = Yup.object().shape({
-    });
+    const itemValidator = Yup.object().shape({});
 
     const itemDetails = ref<Data>({
       plan_id: PLAN_ID,
       month_id: "",
-      data: {
-      },
+      data: {},
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
       is_active: 1,
     });
 
+    const financialYears = ref(authStore.financialYears); // Generate Financial years list using the auth store function
+    const selectedYearCache = ref(
+      localStorage.getItem("selectedFinancialYear") || ""
+    );
+
+    // Fallback to default value if localStorage data is invalid or missing
+    if (!financialYears.value.includes(selectedYearCache.value)) {
+      selectedYearCache.value = financialYears.value[0];
+    }
+
+    watch(selectedYearCache, (newValue) => {
+      localStorage.setItem("selectedFinancialYear", newValue);
+    });
+
+    async function handleChange() {
+      page.value = 1;
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+      await planner_listing();
+    }
+
     onMounted(async () => {
+      // Save initial selected year to localStorage
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+
       try {
         await planner_listing();
         setTimeout(() => {
@@ -462,7 +539,6 @@ export default defineComponent({
       }
       return true;
     };
-
 
     const submit = async () => {
       dataLoading.value = true;
@@ -501,71 +577,111 @@ export default defineComponent({
       }
     };
 
-    // Table Data
-    const deleteItem = async (id: number, mul: boolean) => {
-      if (!mul) {
-        for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
-            Swal.fire({
-              title: "Are you sure?",
-              text: "You will not be able to recover from this !",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "red",
-              confirmButtonText: "Yes, I am sure!",
-            }).then((result: { [x: string]: any }) => {
-              if (result["isConfirmed"]) {
-                // Put your function here
-                deletePlanner(id);
-                tableData.value.splice(i, 1);
-                planner_listing();
-              }
-            });
+    
+    
+    const deleteFewItem = async () => {
+      try {
+        const result = await Swal.fire({
+          title: "Are you sure?",
+          text: "You will not be able to recover from this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "red",
+          confirmButtonText: "Yes, I am sure!",
+          cancelButtonText: "No, cancel it!",
+        });
+
+        if (result.isConfirmed) {
+          let allSuccess = true;
+          let finalMessage = "Selected items deleted successfully.";
+
+          for (const id of selectedIds.value) {
+            const response = await deleteItem(id, true);
+            if (!response.success) {
+              allSuccess = false;
+              finalMessage =
+                response.message ||
+                "An error occurred while deleting some items.";
+              break;
+            }
           }
+
+          selectedIds.value.length = 0;
+
+          if (allSuccess) {
+            showSuccessAlert("Success", finalMessage);
+          } else {
+            showErrorAlert("Error", finalMessage);
+          }
+        }
+      } catch (error: any) {
+        const errorMessage = error.message || "An unknown error occurred";
+        showErrorAlert("Error", errorMessage);
+      }
+    };
+
+    const deleteItem = async (id: number, mul: boolean) => {
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You will not be able to recover from this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error: any) {
+          const errorMessage = error.message || "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromTable = async (id: number) => {
+        try {
+          const response = await deletePlanner(id);
+          if (response?.success) {
+            const index = tableData.value.findIndex((item) => item.id === id);
+            if (index !== -1) {
+              tableData.value.splice(index, 1);
+              // console.log(`Item with id ${id} deleted successfully`);
+            }
+            showSuccessAlert(
+              "Success",
+              response.message || `Item with id ${id} deleted successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(
+              response?.message || `Failed to delete the item with id ${id}`
+            );
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      if (!mul) {
+        const isConfirmed = await deleteConfirmation();
+        if (isConfirmed) {
+          return await deleteFromTable(id);
+        } else {
+          return { success: false };
         }
       } else {
-        for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
-            // Put your function here
-            deletePlanner(id);
-            tableData.value.splice(i, 1);
-          }
-        }
+        return await deleteFromTable(id);
       }
     };
 
-    const deleteFewItem = () => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover from this !",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "red",
-        confirmButtonText: "Yes, I am sure!",
-        cancelButtonText: "No, cancel it!",
-      }).then((result: { [x: string]: any }) => {
-        if (result["isConfirmed"]) {
-          // Put your function here
-          selectedIds.value.forEach((item) => {
-            deleteItem(item, true);
-          });
-          selectedIds.value.length = 0;
-          planner_listing();
-        }
-      });
-    };
-
-    const sort = (sort: Sort) => {
-      const reverse: boolean = sort.order === "asc";
-      if (sort.label) {
-        arraySort(tableData.value, sort.label, { reverse });
-      }
-    };
-    const onItemSelect = (selectedItems: Array<number>) => {
-      selectedIds.value = selectedItems;
-    };
-
-    const showSuccessAlert = (title, message) => {
+    // Alert functions
+    const showSuccessAlert = (title: string, message: string) => {
       Swal.fire({
         title,
         text: message,
@@ -579,7 +695,7 @@ export default defineComponent({
       });
     };
 
-    const showErrorAlert = (title, message) => {
+    const showErrorAlert = (title: string, message: string) => {
       Swal.fire({
         title,
         text: message,
@@ -593,12 +709,22 @@ export default defineComponent({
       });
     };
 
+
+    const sort = (sort: Sort) => {
+      const reverse: boolean = sort.order === "asc";
+      if (sort.label) {
+        arraySort(tableData.value, sort.label, { reverse });
+      }
+    };
+    const onItemSelect = (selectedItems: Array<number>) => {
+      selectedIds.value = selectedItems;
+    };
+
     const clear = () => {
       itemDetails.value = {
         plan_id: PLAN_ID,
         month_id: "",
-        data: {
-        },
+        data: {},
         company_id: User.company_id,
         created_by: User.id,
         updated_by: User.id,
@@ -614,8 +740,8 @@ export default defineComponent({
       identifier,
       User,
       clear,
-      monthNames,
-      GetMonthName,
+      months,
+      getMonthName,
 
       tableData,
       tableHeader,
@@ -631,6 +757,10 @@ export default defineComponent({
       limit,
       PageLimitPoiner,
       Limits,
+
+      selectedYearCache,
+      financialYears,
+      handleChange,
     };
   },
 });

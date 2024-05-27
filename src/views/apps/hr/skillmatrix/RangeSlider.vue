@@ -30,7 +30,7 @@
 </template>
   
   <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watch } from "vue";
 
 export default defineComponent({
   props: {
@@ -41,7 +41,15 @@ export default defineComponent({
     title: String,
   },
   setup(props, { emit }) {
+
     const sliderValue = ref(parseInt(props.progress || "0")); // Initialize slider value with progress
+
+    watch(
+        () => props.progress,
+        (newValue) => {
+          sliderValue.value = parseInt(newValue || "0");
+        }
+    );
 
     const updateProgress = async (id, event) => {
       if (event.target != null) {

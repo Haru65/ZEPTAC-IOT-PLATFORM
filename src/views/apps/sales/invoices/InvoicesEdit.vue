@@ -771,7 +771,7 @@
             <button
               type="button"
               class="btn btn-light btn-light-danger w-sd-25 w-lg-25"
-              v-on:click="deleteQuotation"
+              v-on:click="deleteItem"
             >
               Delete
             </button>
@@ -814,7 +814,7 @@ import {
   GetCustomerClients,
   getInvoice,
   updateInvoice,
-  deleteinvoice,
+  deleteInvoice,
   getPriceList,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
@@ -1777,7 +1777,7 @@ export default defineComponent({
       }
     };
 
-    const deleteQuotation = () => {
+    const deleteItem = () => {
       Swal.fire({
         title: "Are you sure?",
         text: "You will not be able to recover from this!",
@@ -1788,7 +1788,7 @@ export default defineComponent({
       }).then((result: { [x: string]: any }) => {
         if (result["isConfirmed"]) {
           // Put your function here
-          deleteinvoice(InvoiceId);
+          deleteInvoice(InvoiceId);
           route.push({ name: "invoices-list" });
         }
       });
@@ -1859,7 +1859,7 @@ export default defineComponent({
       Customers,
       getAssetPath,
       submit,
-      deleteQuotation,
+      deleteItem,
       disabledselect,
       clientSelect,
       shortcuts,

@@ -22,6 +22,30 @@
       <!--begin::Card title-->
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
+        <!-- YEAR WISE DATA -->
+
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-semibold text-gray-400"
+            >Financial Year</span
+          >
+        </h3>
+        <div class="me-3">
+          <el-select
+            filterable
+            placeholder="Select Year"
+            v-model="selectedYearCache"
+            id="financialYear"
+            @change="handleChange"
+          >
+            <el-option
+              v-for="year in financialYears"
+              :key="year"
+              :value="year"
+              :label="year"
+            />
+          </el-select>
+        </div>
+
         <!--begin::Toolbar-->
         <div
           v-if="selectedIds.length === 0"
@@ -60,7 +84,7 @@
           <button
             type="button"
             class="btn btn-danger"
-            @click="deleteFewReport()"
+            @click="deleteFewItem()"
           >
             Delete Selected
           </button>
@@ -107,8 +131,7 @@
           {{ validationreports.id }}
         </template>
         <template v-slot:customer_name="{ row: validationreports }">
-          {{
-            validationreports.customer_name.company_name }}
+          {{ validationreports.customer_name.company_name }}
         </template>
         <template v-slot:site_location="{ row: validationreports }">
           {{
@@ -129,11 +152,7 @@
         </template>
         <template v-slot:test_sizes="{ row: validationreports }">
           <div>
-            <el-select
-              filterable
-              placeholder="Count of Reports"
-              name="rgp_id"
-            >
+            <el-select filterable placeholder="Count of Reports" name="rgp_id">
               <el-option
                 disabled="disabled"
                 v-for="test in ConductedTests"
@@ -179,7 +198,7 @@
             </span>
             <span class="menu-link px-3">
               <i
-                @click="deleteReport(validationreports.id, false)"
+                @click="deleteItem(validationreports.id, false)"
                 class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
               ></i>
             </span>
@@ -225,7 +244,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
 import type { IValidationReport } from "@/core/model/validationreports";
@@ -234,8 +253,9 @@ import {
   getAllValidationReport,
   deleteValidationReport,
   ValidationReportSearch,
-getReportinfo,
+  getReportinfo,
 } from "@/stores/api";
+import { useAuthStore } from "@/stores/auth";
 import arraySort from "array-sort";
 import moment from "moment";
 import Swal from "sweetalert2";
@@ -488,6 +508,10 @@ export default defineComponent({
     Datatable,
   },
   setup() {
+    
+    // Financial Year Logic
+    const authStore = useAuthStore();
+
     const tableHeader = ref([
       {
         columnName: "Id",
@@ -556,9 +580,13 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         const response = await getAllValidationReport(
-          `page=${page}&limit=${limit.value}`
+          `page=${page}&limit=${limit.value}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -571,10 +599,12 @@ export default defineComponent({
           }) => ({
             id: id,
             customer_name: {
-              company_name: customer_name.company_name
+              company_name: customer_name.company_name,
             },
             site_location: {
-              company_name: site_location.company_name ? site_location.company_name : "",
+              company_name: site_location.company_name
+                ? site_location.company_name
+                : "",
               address1: site_location.address1 ? site_location.address1 : "",
               address2: site_location.address2 ? site_location.address2 : "",
               city: site_location.city ? site_location.city : "",
@@ -609,9 +639,13 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         const response = await getAllValidationReport(
-          `page=${page.value}&limit=${limit}`
+          `page=${page.value}&limit=${limit}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -624,10 +658,12 @@ export default defineComponent({
           }) => ({
             id: id,
             customer_name: {
-              company_name: customer_name.company_name
+              company_name: customer_name.company_name,
             },
             site_location: {
-              company_name: site_location.company_name ? site_location.company_name : "",
+              company_name: site_location.company_name
+                ? site_location.company_name
+                : "",
               address1: site_location.address1 ? site_location.address1 : "",
               address2: site_location.address2 ? site_location.address2 : "",
               city: site_location.city ? site_location.city : "",
@@ -678,7 +714,11 @@ export default defineComponent({
     async function report_listing(): Promise<void> {
       try {
         const response = await getAllValidationReport(
-          `page=${page.value}&limit=${limit.value}`
+          `page=${page.value}&limit=${limit.value}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
         tableData.value = response.result.data.map(
           ({
@@ -691,10 +731,12 @@ export default defineComponent({
           }) => ({
             id: id,
             customer_name: {
-              company_name: customer_name.company_name
+              company_name: customer_name.company_name,
             },
             site_location: {
-              company_name: site_location.company_name ? site_location.company_name : "",
+              company_name: site_location.company_name
+                ? site_location.company_name
+                : "",
               address1: site_location.address1 ? site_location.address1 : "",
               address2: site_location.address2 ? site_location.address2 : "",
               city: site_location.city ? site_location.city : "",
@@ -708,10 +750,9 @@ export default defineComponent({
             created_at: moment(created_at).format("DD-MM-YYYY"),
           })
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
-
       } catch (error) {
         console.error(error);
       } finally {
@@ -722,59 +763,162 @@ export default defineComponent({
       }
     }
 
+    const financialYears = ref(authStore.financialYears); // Generate Financial years list using the auth store function
+    const selectedYearCache = ref(
+      localStorage.getItem("selectedFinancialYear") || ""
+    );
+
+    // Fallback to default value if localStorage data is invalid or missing
+    if (!financialYears.value.includes(selectedYearCache.value)) {
+      selectedYearCache.value = financialYears.value[0];
+    }
+
+    watch(selectedYearCache, (newValue) => {
+      localStorage.setItem("selectedFinancialYear", newValue);
+    });
+
+    async function handleChange() {
+      
+      page.value = 1;
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+      await report_listing();
+    }
+
     onMounted(async () => {
+      // Save initial selected year to localStorage
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+
       await report_listing();
     });
 
-    const deleteFewReport = () => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover from this !",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "red",
-        confirmButtonText: "Yes, I am sure!",
-        cancelButtonText: "No, cancel it!",
-      }).then((result: { [x: string]: any }) => {
-        if (result["isConfirmed"]) {
-          // Put your function here
-          selectedIds.value.forEach((item) => {
-            deleteReport(item, true);
-          });
+    const deleteFewItem = async () => {
+      try {
+        const result = await Swal.fire({
+          title: "Are you sure?",
+          text: "You will not be able to recover from this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "red",
+          confirmButtonText: "Yes, I am sure!",
+          cancelButtonText: "No, cancel it!",
+        });
+
+        if (result.isConfirmed) {
+          let allSuccess = true;
+          let finalMessage = "Selected items deleted successfully.";
+
+          for (const id of selectedIds.value) {
+            const response = await deleteItem(id, true);
+            if (!response.success) {
+              allSuccess = false;
+              finalMessage =
+                response.message ||
+                "An error occurred while deleting some items.";
+              break;
+            }
+          }
+
           selectedIds.value.length = 0;
+
+          if (allSuccess) {
+            showSuccessAlert("Success", finalMessage);
+          } else {
+            showErrorAlert("Error", finalMessage);
+          }
         }
+      } catch (error: any) {
+        const errorMessage = error.message || "An unknown error occurred";
+        showErrorAlert("Error", errorMessage);
+      }
+    };
+
+    const deleteItem = async (id: number, mul: boolean) => {
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You will not be able to recover from this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error: any) {
+          const errorMessage = error.message || "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromTable = async (id: number) => {
+        try {
+          const response = await deleteValidationReport(id);
+          if (response?.success) {
+            const index = tableData.value.findIndex((item) => item.id === id);
+            if (index !== -1) {
+              tableData.value.splice(index, 1);
+              // console.log(`Item with id ${id} deleted successfully`);
+            }
+            showSuccessAlert(
+              "Success",
+              response.message || `Item with id ${id} deleted successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(
+              response?.message || `Failed to delete the item with id ${id}`
+            );
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      if (!mul) {
+        const isConfirmed = await deleteConfirmation();
+        if (isConfirmed) {
+          return await deleteFromTable(id);
+        } else {
+          return { success: false };
+        }
+      } else {
+        return await deleteFromTable(id);
+      }
+    };
+
+    // Alert functions
+    const showSuccessAlert = (title: string, message: string) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "success",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
       });
     };
 
-    const deleteReport = (id: number, mul: boolean) => {
-      if (!mul) {
-        for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
-            Swal.fire({
-              title: "Are you sure?",
-              text: "You will not be able to recover from this !",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "red",
-              confirmButtonText: "Yes, I am sure!",
-            }).then((result: { [x: string]: any }) => {
-              if (result["isConfirmed"]) {
-                // Put your function here
-                deleteValidationReport(id);
-                tableData.value.splice(i, 1);
-              }
-            });
-          }
-        }
-      } else {
-        for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
-            // Put your function here
-            deleteValidationReport(id);
-            tableData.value.splice(i, 1);
-          }
-        }
-      }
+    const showErrorAlert = (title: string, message: string) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "error",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
+      });
     };
 
     const search = ref<string>("");
@@ -810,7 +954,7 @@ export default defineComponent({
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await ValidationReportSearch(search.value);
+        const response = await ValidationReportSearch(search.value, selectedYearCache.value ? selectedYearCache.value : financialYears.value[0]);
 
         tableData.value = response.result.data.map(
           ({
@@ -823,10 +967,12 @@ export default defineComponent({
           }) => ({
             id: id,
             customer_name: {
-              company_name: customer_name.company_name
+              company_name: customer_name.company_name,
             },
             site_location: {
-              company_name: site_location.company_name ? site_location.company_name : "",
+              company_name: site_location.company_name
+                ? site_location.company_name
+                : "",
               address1: site_location.address1 ? site_location.address1 : "",
               address2: site_location.address2 ? site_location.address2 : "",
               city: site_location.city ? site_location.city : "",
@@ -885,34 +1031,33 @@ export default defineComponent({
       quotation_no: "",
       customer_data: {
         company_id: "",
-        first_name : "",
-        last_name: ""
+        first_name: "",
+        last_name: "",
       },
       client_data: {
         company_id: "",
-        first_name : "",
-        last_name: ""
+        first_name: "",
+        last_name: "",
       },
-      customer_company:{
-        company_name: ""
+      customer_company: {
+        company_name: "",
       },
-      client_company:{
-        company_name: ""
+      client_company: {
+        company_name: "",
       },
-      client_address:{
+      client_address: {
         address1: "",
         address2: "",
         city: "",
         pincode: "",
         states: "",
-        country: ""
+        country: "",
       },
-      company_details:{
+      company_details: {
         company_name: "",
         company_logo: getAssetPath("media/avatars/default.png"),
-      }
-    })
-
+      },
+    });
 
     const downloadReport = async (id: any) => {
       // get all information of the rgp
@@ -921,33 +1066,36 @@ export default defineComponent({
       reportInfo.value.rgp_id = res.result.rgp_id;
       reportInfo.value.rgp_no = res.result.rgp_Details.rgp_no;
       reportInfo.value.tests = JSON.parse(res.result.tests);
-      reportInfo.value.customer_company.company_name = res.result.customer_company.company_name;
-      reportInfo.value.client_company.company_name = res.result.client_company.company_name;
+      reportInfo.value.customer_company.company_name =
+        res.result.customer_company.company_name;
+      reportInfo.value.client_company.company_name =
+        res.result.client_company.company_name;
       reportInfo.value.client_address = res.result.client_address;
       reportInfo.value.customer_data = res.result.customer_data;
       reportInfo.value.client_data = res.result.client_data;
       reportInfo.value.quotation_no = res.result.quotationsDetails.quotation_no;
-      reportInfo.value.company_details.company_name = res.result.company_details.company_name;
-      reportInfo.value.company_details.company_logo = res.result.company_details.company_logo
-            ? "data: image/png;base64," + res.result.company_details.company_logo
-            : getAssetPath("media/avatars/default.png")
-      
+      reportInfo.value.company_details.company_name =
+        res.result.company_details.company_name;
+      reportInfo.value.company_details.company_logo = res.result.company_details
+        .company_logo
+        ? "data: image/png;base64," + res.result.company_details.company_logo
+        : getAssetPath("media/avatars/default.png");
+
       console.log(reportInfo.value);
 
-      const reportName =  `${reportInfo.value.quotation_no}_${reportInfo.value.rgp_no}`;
+      const reportName = `${reportInfo.value.quotation_no}_${reportInfo.value.rgp_no}`;
 
       await reportGen(id, reportName, reportInfo);
-
-    }
+    };
 
     return {
       tableData,
       tableHeader,
-      deleteReport,
+      deleteItem,
       search,
       searchItems,
       selectedIds,
-      deleteFewReport,
+      deleteFewItem,
       sort,
       onItemSelect,
       loading,
@@ -960,8 +1108,10 @@ export default defineComponent({
       ConductedTests,
       downloadReport,
       GetReportStatus,
-      
-      
+
+      selectedYearCache,
+      financialYears,
+      handleChange,
     };
   },
 });

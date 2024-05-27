@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import ApiService from "@/core/services/ApiService";
 import JwtService, { User } from "@/core/services/JwtService";
 
+
 export interface User {
   name: string;
   surname: string;
@@ -10,46 +11,107 @@ export interface User {
   password: string;
   api_token: string;
   data: string;
+  company_details:[];
 }
+
 
 export const useAuthStore = defineStore("auth", () => {
   const errors = ref({});
   const user = ref<User>({} as User);
   const isAuthenticated = ref(JwtService.getToken());
 
-  const academicYearsCache = ref<string[]>([]); // Cache for academic years
+  const selectedFinancialYear = ref<string>(""); 
+  const financialYearType = ref<string>("");
 
-  // Load selected academic year from localStorage on store initialization
-  const selectedAcademicYear = ref<string>(
-    localStorage.getItem('selectedAcademicYear') || ''
-  );
+  const financialYearsCache = ref<string[]>([]); // Cache for financial years
 
-  // Watch for changes in the selected academic year and update localStorage
-  watch(selectedAcademicYear, (newValue) => {
-    localStorage.setItem('selectedAcademicYear', newValue);
-  });
 
-  function setAuth(authUser: any) {
+  function getCurrentFinancialYear(ftype) {
+    const date = new Date();
+    const currentYear = date.getFullYear();
+    const currentMonth = date.getMonth() + 1;
+
+    console.log("ftype : ",ftype);
+    console.log("month : ",currentMonth);
+
+    let startYear, endYear;
+
+
+    if (ftype == "1") { // January - December
+      startYear = currentYear;
+      endYear = startYear;
+    } else if (ftype == "2") { // April - March
+      if (currentMonth >= 4) {
+        startYear = currentYear;
+        endYear = currentYear + 1;
+      } else {
+        startYear = currentYear - 1;
+        endYear = currentYear;
+      }
+    }
+    else{
+      if (currentMonth >= 4) {
+        startYear = currentYear;
+        endYear = currentYear + 1;
+      } else {
+        startYear = currentYear - 1;
+        endYear = currentYear;
+      }
+    }
+
+
+    return `${startYear}-${endYear}`;
+  }
+
+
+  async function setAuth(authUser: any) {
     //console.log(authUser);
     isAuthenticated.value = authUser.role_id;
     user.value = authUser;
     errors.value = {};
     JwtService.saveToken(user.value.api_token);
+
+    const localFinancialYear = localStorage.getItem("financialYearType");
+    const actualFinancialYear = user.value.company_details["financial_year_type"];
+
+    // check whether actual vs local financial year
+    if(localFinancialYear != actualFinancialYear){
+
+      financialYearType.value = user.value.company_details["financial_year_type"];
+      localStorage.setItem('financialYearType', user.value.company_details["financial_year_type"]);
+
+      selectedFinancialYear.value = getCurrentFinancialYear(user.value.company_details["financial_year_type"]);
+      localStorage.setItem('selectedFinancialYear', selectedFinancialYear.value);
+
+    }
+
+    if(!localStorage.getItem('selectedFinancialYear')){
+      financialYearType.value = user.value.company_details["financial_year_type"];
+      localStorage.setItem('financialYearType', user.value.company_details["financial_year_type"]);
+
+      selectedFinancialYear.value = getCurrentFinancialYear(user.value.company_details["financial_year_type"]);
+      localStorage.setItem('selectedFinancialYear', selectedFinancialYear.value);
+    }
+
   }
+
 
   function get_auth() {
     return isAuthenticated.value;
   }
+
 
   function saveUser(user: User) {
     // //console.log(user);
     JwtService.saveUser(JSON.stringify(user));
   }
 
+
   function setError(error: any) {
     errors.value = { ...error };
     console.error(error.value);
   }
+
 
   // for login auth only custom error
   function setAuthError(error: any) {
@@ -57,10 +119,12 @@ export const useAuthStore = defineStore("auth", () => {
     // //console.log(errors);
   }
 
+
   function GetUser() {
     const data = JSON.parse(User() || "");
     return data;
   }
+
 
   function purgeAuth() {
     isAuthenticated.value = null;
@@ -69,14 +133,25 @@ export const useAuthStore = defineStore("auth", () => {
     JwtService.destroyToken();
     JwtService.destroyUser();
     JwtService.destroySelectedYear();
+    JwtService.destroyFinancialType();
   }
 
-  function login(credentials: User) {
+
+  async function login(credentials: User) {
     return ApiService.post("login", credentials)
       .then(({ data }) => {
-        // //console.log(data);
+        // console.log(data);
         setAuth(data);
         saveUser(data);
+
+        // If there is no local financial year type, initialize it with the actual value
+        financialYearType.value = user.value.company_details["financial_year_type"];
+        localStorage.setItem('financialYearType', user.value.company_details["financial_year_type"]);
+
+        // Also initialize the selected academic year
+        selectedFinancialYear.value = getCurrentFinancialYear(user.value.company_details["financial_year_type"]);
+        localStorage.setItem('selectedFinancialYear', selectedFinancialYear.value);
+
       })
       .catch(({ response }) => {
         console.error(response.data.message);
@@ -84,9 +159,11 @@ export const useAuthStore = defineStore("auth", () => {
       });
   }
 
+
   function logout() {
     purgeAuth();
   }
+
 
   function register(credentials: User) {
     return ApiService.post("register", credentials)
@@ -99,7 +176,9 @@ export const useAuthStore = defineStore("auth", () => {
       });
   }
 
+
   function forgotPassword(email: string) {
+
 
     return ApiService.post("forgot_password", email)
       .then((response) => {
@@ -109,7 +188,9 @@ export const useAuthStore = defineStore("auth", () => {
         return error.response.data
       });
 
+
   }
+
 
   // before every page a call is made with a JWT token to request user credentials
   function verifyAuth() {
@@ -132,36 +213,50 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
-  const academicYears = computed(() => {
-    if (academicYearsCache.value.length === 0) {
-      academicYearsCache.value = getAcademicYears(5); // Example: Get academic years for the next 5 years
+
+  const financialYears = computed(() => {
+    if (financialYearsCache.value.length === 0) {
+      // Get academic years for the next 5 years based on the company financial year type
+      financialYearsCache.value = getAcademicYears(5, localStorage.getItem('financialYearType') || user.value.company_details['financial_year_type']);
     }
-    return academicYearsCache.value;
+    return financialYearsCache.value;
   });
 
-  function getAcademicYears(numYears: number): string[] {
+
+  function getAcademicYears(numYears, financialYearType) {
+
+    console.log(numYears,financialYearType )
     const date = new Date();
-    const years: string[] = [];
+    const years :string[] = [];
+    const currentYear = date.getFullYear();
+    const currentMonth = date.getMonth() + 1; // JavaScript months are 0-11
+
 
     for (let i = 0; i < numYears; i++) {
-        const year = date.getFullYear() - i;
-        let academicYearStart: number;
-        let academicYearEnd: number;
+      let startYear, endYear;
 
-        if (date.getMonth() >= 3) {
-            academicYearStart = year;
-            academicYearEnd = year + 1;
+      if (financialYearType == "1") { // January - December
+        startYear = currentYear - i;
+        endYear = currentYear - i;
+      } else if (financialYearType == "2") { // April - March
+        if (currentMonth >= 4) {
+          startYear = currentYear - i;
+          endYear = startYear + 1;
         } else {
-            academicYearStart = year - 1;
-            academicYearEnd = year;
+          startYear = currentYear - i - 1;
+          endYear = startYear + 1;
         }
+      }
 
-        const academicYear = `${academicYearStart}-${academicYearEnd}`;
-        years.push(academicYear);
+      console.log(`${startYear}-${endYear}`)
+      const financialYear = `${startYear}-${endYear}`;
+      years.push(financialYear);
     }
+
 
     return years;
   }
+
 
   return {
     errors,
@@ -175,9 +270,8 @@ export const useAuthStore = defineStore("auth", () => {
     purgeAuth,
     get_auth,
     GetUser,
-    academicYears,
-    selectedAcademicYear,
+    financialYears,
+    selectedFinancialYear,
+    financialYearType,
   };
 });
-
-

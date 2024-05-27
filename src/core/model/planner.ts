@@ -6,28 +6,51 @@ interface IPlan {
     company_id: string;
   }
   
-  export type { IPlan };
+export type { IPlan };
 
+export const useMonthUtils = (financialYearType: number) => {
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth() + 1; // Adding 1 because getMonth() returns zero-based index
 
-export const monthNames = [
-    { id: 4, name: "Apr" },
-    { id: 5, name: "May" },
-    { id: 6, name: "Jun" },
-    { id: 7, name: "Jul" },
-    { id: 8, name: "Aug" },
-    { id: 9, name: "Sep" },
-    { id: 10, name: "Oct" },
-    { id: 11, name: "Nov" },
-    { id: 12, name: "Dec" },
-    { id: 1, name: "Jan" },
-    { id: 2, name: "Feb" },
-    { id: 3, name: "Mar" },
-  ];
+  const isAprilStart = financialYearType === 2;
 
-export const GetMonthName = (id) => {
-  const item = monthNames.find(item => item.id == id);
-  return item ? item.name : "";
+  const startYear = isAprilStart ? (currentMonth >= 4 ? currentYear : currentYear - 1) : currentYear;
+
+  const getMonthName = (monthId: number) => {
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    return monthNames[monthId - 1]; // Month ID starts from 1, array index starts from 0
+  };
+
+  const months: { id: number; name: string; year: number; }[] = [];
+
+  if (isAprilStart) {
+    for (let i = 4; i <= 12; i++) {
+      months.push({ id: i, name: getMonthName(i), year: startYear });
+    }
+    for (let i = 1; i <= 3; i++) {
+      months.push({ id: i, name: getMonthName(i), year: startYear + 1 });
+    }
+  } else {
+    for (let i = 1; i <= 12; i++) {
+      months.push({ id: i, name: getMonthName(i), year: startYear });
+    }
+  }
+
+  return {
+    months,
+    currentYear,
+    currentMonth,
+    getMonthName,
+  };
 };
+
+// export const GetMonthName = (id) => {
+//   const item = months.find(item => item.id == id);
+//   return item ? item.name : "";
+// };
 
 export const plans = [
   {

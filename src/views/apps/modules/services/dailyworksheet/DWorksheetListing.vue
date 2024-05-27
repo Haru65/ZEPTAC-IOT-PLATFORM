@@ -23,6 +23,30 @@
         <!--begin::Card title-->
         <!--begin::Card toolbar-->
         <div class="card-toolbar">
+          <!-- YEAR WISE DATA -->
+
+          <h3 class="card-title align-items-start flex-column">
+            <span class="card-label fw-semibold text-gray-400"
+              >Financial Year</span
+            >
+          </h3>
+          <div class="me-3">
+            <el-select
+              filterable
+              placeholder="Select Year"
+              v-model="selectedYearCache"
+              id="financialYear"
+              @change="handleChange"
+            >
+              <el-option
+                v-for="year in financialYears"
+                :key="year"
+                :value="year"
+                :label="year"
+              />
+            </el-select>
+          </div>
+
           <!--begin::Toolbar-->
           <div
             v-if="selectedIds.length === 0"
@@ -62,7 +86,7 @@
             <button
               type="button"
               class="btn btn-danger"
-              @click="deleteFewWorksheets()"
+              @click="deleteFewItem()"
             >
               Delete Selected
             </button>
@@ -198,7 +222,7 @@
                 title="Delete Worksheet"
               >
                 <i
-                  @click="deleteWorksheet(dailyworksheets.id, false)"
+                  @click="deleteItem(dailyworksheets.id, false)"
                   class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-1"
                 ></i>
               </span>
@@ -246,7 +270,7 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { IWorksheet } from "@/core/model/dailyworksheets";
@@ -274,6 +298,9 @@ export default defineComponent({
     ApprovalModal,
   },
   setup() {
+    // Academic Year Logic
+    const authStore = useAuthStore();
+
     const auth = useAuthStore();
     const User = auth.GetUser();
     const identifier = Identifier;
@@ -365,7 +392,11 @@ export default defineComponent({
     async function worksheets_listing(): Promise<void> {
       try {
         const response = await getDailyWorksheets(
-          `page=${page.value}&limit=${limit.value}`
+          `page=${page.value}&limit=${limit.value}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
@@ -393,7 +424,11 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         const response = await getDailyWorksheets(
-          `page=${page}&limit=${limit.value}`
+          `page=${page}&limit=${limit.value}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
@@ -422,7 +457,11 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         const response = await getDailyWorksheets(
-          `page=${page.value}&limit=${limit}`
+          `page=${page.value}&limit=${limit}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
@@ -473,61 +512,161 @@ export default defineComponent({
       }
     });
 
+    const financialYears = ref(authStore.financialYears); // Generate Financial years list using the auth store function
+    const selectedYearCache = ref(
+      localStorage.getItem("selectedFinancialYear") || ""
+    );
+
+    // Fallback to default value if localStorage data is invalid or missing
+    if (!financialYears.value.includes(selectedYearCache.value)) {
+      selectedYearCache.value = financialYears.value[0];
+    }
+
+    watch(selectedYearCache, (newValue) => {
+      localStorage.setItem("selectedFinancialYear", newValue);
+    });
+
+    async function handleChange() {
+      page.value = 1;
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+      await worksheets_listing();
+    }
+
     onMounted(async () => {
-      //console.log("done");
+      // Save initial selected year to localStorage
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+
       await worksheets_listing();
     });
 
-    const deleteFewWorksheets = () => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover from this !",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "red",
-        confirmButtonText: "Yes, I am sure!",
-        cancelButtonText: "No, cancel it!",
-      }).then((result: { [x: string]: any }) => {
-        if (result["isConfirmed"]) {
-          // Put your function here
-          selectedIds.value.forEach((item) => {
-            deleteWorksheet(item, true);
-          });
+    const deleteFewItem = async () => {
+      try {
+        const result = await Swal.fire({
+          title: "Are you sure?",
+          text: "You will not be able to recover from this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "red",
+          confirmButtonText: "Yes, I am sure!",
+          cancelButtonText: "No, cancel it!",
+        });
+
+        if (result.isConfirmed) {
+          let allSuccess = true;
+          let finalMessage = "Selected items deleted successfully.";
+
+          for (const id of selectedIds.value) {
+            const response = await deleteItem(id, true);
+            if (!response.success) {
+              allSuccess = false;
+              finalMessage =
+                response.message ||
+                "An error occurred while deleting some items.";
+              break;
+            }
+          }
+
           selectedIds.value.length = 0;
+
+          if (allSuccess) {
+            showSuccessAlert("Success", finalMessage);
+          } else {
+            showErrorAlert("Error", finalMessage);
+          }
         }
+      } catch (error: any) {
+        const errorMessage = error.message || "An unknown error occurred";
+        showErrorAlert("Error", errorMessage);
+      }
+    };
+
+    const deleteItem = async (id: number, mul: boolean) => {
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You will not be able to recover from this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error: any) {
+          const errorMessage = error.message || "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromTable = async (id: number) => {
+        try {
+          const response = await deleteDailyWorksheet(id);
+          if (response?.success) {
+            const index = tableData.value.findIndex((item) => item.id === id);
+            if (index !== -1) {
+              tableData.value.splice(index, 1);
+              // console.log(`Item with id ${id} deleted successfully`);
+            }
+            showSuccessAlert(
+              "Success",
+              response.message || `Item with id ${id} deleted successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(
+              response?.message || `Failed to delete the item with id ${id}`
+            );
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      if (!mul) {
+        const isConfirmed = await deleteConfirmation();
+        if (isConfirmed) {
+          return await deleteFromTable(id);
+        } else {
+          return { success: false };
+        }
+      } else {
+        return await deleteFromTable(id);
+      }
+    };
+
+    // Alert functions
+    const showSuccessAlert = (title: string, message: string) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "success",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
       });
     };
 
-    const deleteWorksheet = (id: number, mul: boolean) => {
-      if (!mul) {
-        for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
-            Swal.fire({
-              title: "Are you sure?",
-              text: "You will not be able to recover from this !",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "red",
-              confirmButtonText: "Yes, I am sure!",
-              cancelButtonText: "No, cancel it!",
-            }).then((result: { [x: string]: any }) => {
-              if (result["isConfirmed"]) {
-                // Put your function here
-                deleteDailyWorksheet(id);
-                tableData.value.splice(i, 1);
-              }
-            });
-          }
-        }
-      } else {
-        for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
-            // Put your function here
-            deleteDailyWorksheet(id);
-            tableData.value.splice(i, 1);
-          }
-        }
-      }
+    const showErrorAlert = (title: string, message: string) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "error",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
+      });
     };
 
     const search = ref<string>("");
@@ -561,7 +700,12 @@ export default defineComponent({
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await WorksheetSearch(search.value);
+        const response = await WorksheetSearch(
+          search.value,
+          selectedYearCache.value
+            ? selectedYearCache.value
+            : financialYears.value[0]
+        );
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(({ id, ...rest }) => ({
@@ -757,11 +901,11 @@ export default defineComponent({
     return {
       tableData,
       tableHeader,
-      deleteWorksheet,
+      deleteItem,
       search,
       searchItems,
       selectedIds,
-      deleteFewWorksheets,
+      deleteFewItem,
       sort,
       onItemSelect,
       getAssetPath,
@@ -781,6 +925,10 @@ export default defineComponent({
       fillItemData,
       identifier,
       reLoadData,
+
+      selectedYearCache,
+      financialYears,
+      handleChange,
     };
   },
 });

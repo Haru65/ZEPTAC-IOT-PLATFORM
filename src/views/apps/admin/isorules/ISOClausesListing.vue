@@ -31,7 +31,7 @@
           <!--begin::Add customer-->
           <router-link to="/iso/add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Observation
+            ISO Rules
           </router-link>
           <!--end::Add customer-->
         </div>

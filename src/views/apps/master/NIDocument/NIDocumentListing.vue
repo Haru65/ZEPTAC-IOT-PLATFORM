@@ -22,6 +22,31 @@
         <!--begin::Card title-->
         <!--begin::Card toolbar-->
         <div class="card-toolbar">
+          
+         <!-- YEAR WISE DATA -->
+
+         <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-semibold text-gray-400"
+            >Financial Year</span
+          >
+        </h3>
+        <div class="me-3">
+          <el-select
+            filterable
+            placeholder="Select Year"
+            v-model="selectedYearCache"
+            id="financialYear"
+            @change="handleChange"
+          >
+            <el-option
+              v-for="year in financialYears"
+              :key="year"
+              :value="year"
+              :label="year"
+            />
+          </el-select>
+        </div>
+
           <!--begin::Toolbar-->
           <div
             v-if="selectedIds.length === 0"
@@ -240,7 +265,7 @@
   </template>
       
   <script lang="ts">
-  import {computed, defineComponent, onMounted, ref } from "vue";
+  import {computed, defineComponent, onMounted, ref, watch } from "vue";
   import Datatable from "@/components/kt-datatable/KTDataTable.vue";
   import type { Sort } from "@/components/kt-datatable/table-partials/models";
   import type { IDocument } from "@/core/model/ni";
@@ -268,6 +293,9 @@ import { Identifier } from "@/core/config/WhichUserConfig";
       ApprovalModal,
     },
     setup() {
+    // Financial Year Logic
+    const authStore = useAuthStore();
+
       const auth = useAuthStore();
     const User = auth.GetUser();
     const identifier = Identifier;
@@ -359,7 +387,11 @@ import { Identifier } from "@/core/config/WhichUserConfig";
           while (initvalues.value.length != 0) initvalues.value.pop();
   
           const response = await getNIDocs(
-            `page=${page}&limit=${limit.value}`
+            `page=${page}&limit=${limit.value}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
           );
   
           more.value = response.result.next_page_url != null ? true : false;
@@ -387,7 +419,11 @@ import { Identifier } from "@/core/config/WhichUserConfig";
           while (initvalues.value.length != 0) initvalues.value.pop();
   
           const response = await getNIDocs(
-            `page=${page.value}&limit=${limit}`
+            `page=${page.value}&limit=${limit}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
           );
   
           more.value = response.result.next_page_url != null ? true : false;
@@ -431,7 +467,11 @@ import { Identifier } from "@/core/config/WhichUserConfig";
       async function ni_listing(): Promise<void> {
         try {
           const response = await getNIDocs(
-            `page=${page.value}&limit=${limit.value}`
+            `page=${page.value}&limit=${limit.value}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
           );
           tableData.value = response.result.data.map(({ ...rest }) => ({
             ...rest,
@@ -464,7 +504,31 @@ import { Identifier } from "@/core/config/WhichUserConfig";
       }
     });
     
-      onMounted(async () => {
+    const financialYears = ref(authStore.financialYears); // Generate Financial years list using the auth store function
+    const selectedYearCache = ref(
+      localStorage.getItem("selectedFinancialYear") || ""
+    );
+
+    // Fallback to default value if localStorage data is invalid or missing
+    if (!financialYears.value.includes(selectedYearCache.value)) {
+      selectedYearCache.value = financialYears.value[0];
+    }
+
+    watch(selectedYearCache, (newValue) => {
+      localStorage.setItem("selectedFinancialYear", newValue);
+    });
+
+    async function handleChange() {
+      
+      page.value = 1;
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+      await ni_listing();
+    }
+
+    onMounted(async () => {
+      // Save initial selected year to localStorage
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+
         await ni_listing();
       });
   
@@ -524,7 +588,7 @@ import { Identifier } from "@/core/config/WhichUserConfig";
       let debounceTimer;
   
       const searchItems = async () => {
-        console.log(search.value);
+        // console.log(search.value);
         tableData.value.splice(0, tableData.value.length, ...initvalues.value);
         if (search.value.length != 0) {
           let results: Array<IDocument> = [];
@@ -552,7 +616,7 @@ import { Identifier } from "@/core/config/WhichUserConfig";
       async function SearchMore() {
         // Your API call logic here
         try {
-          const response = await NIDocSearch(search.value);
+        const response = await NIDocSearch(search.value, selectedYearCache.value ? selectedYearCache.value : financialYears.value[0]);
   
           tableData.value = response.result.data.map(({ ...rest }) => ({
             ...rest,
@@ -635,6 +699,10 @@ import { Identifier } from "@/core/config/WhichUserConfig";
       itemData,
       fillItemData,
       identifier,
+      
+      selectedYearCache,
+      financialYears,
+      handleChange,
       };
     },
   });

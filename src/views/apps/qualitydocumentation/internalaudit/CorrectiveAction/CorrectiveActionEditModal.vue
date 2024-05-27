@@ -23,7 +23,7 @@
           <!--begin::Modal header-->
           <div class="modal-header" id="kt_modal_new_address_header">
             <!--begin::Modal title-->
-            <h2>Add Clause</h2>
+            <h2>Edit Clause</h2>
             <!--end::Modal title-->
 
             <!--begin::Close-->

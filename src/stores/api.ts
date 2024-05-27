@@ -259,6 +259,19 @@ export async function updateEmployee(data: any, id: any) {
     }
 }
 
+export async function deleteEmployee(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.delete(EMPLOYEE_URL + "/" + data);
+        console.log(response.data.message)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
 
 // USER
 
@@ -309,10 +322,11 @@ export async function deleteUser(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.delete(USER_URL + "/" + data);
-        return response.data.message;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+        console.log(response.data.message)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -397,10 +411,11 @@ export async function deleteClient(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.delete(CLIENTS_URL + "/" + data);
-        return response.data.message;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+        console.log(response.data.message)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -506,15 +521,16 @@ export async function updateCustomer(id: any, data: any) {
 }
 
 // delete
-export async function deletecustomer(data: any) {
+export async function deleteCustomer(data: any) {
     try {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(CUSTOMERS_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -605,21 +621,23 @@ export async function deleteLead(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(LEADS_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
 // PRICELISTS
 
 // gell all comapnies
-export async function PriceListSearch(search: any) {
+export async function PriceListSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('pricelist_search', data);
@@ -685,21 +703,23 @@ export async function deletePriceListItem(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(PRICELIST_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
 // QUOTATION
 
 // gell all comapnies
-export async function QuotationSearch(search: any) {
+export async function QuotationSearch(search: any, year: any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('quotation_search', data);
@@ -753,15 +773,16 @@ export async function getQuotationList(data: any) {
 
 
 // delete
-export async function deletequotation(data: any) {
+export async function deleteQuotation(data: any) {
     try {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(QUOTATION_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -864,11 +885,12 @@ export async function GetIncrInvoiceId(data: any) {
 
 // getlists
 
-export async function InvoiceSearch(search: any) {
+export async function InvoiceSearch(search: any, year: any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('invoice_search', data);
@@ -929,15 +951,16 @@ export async function updateInvoice(data: any, id) {
     }
 }
 
-export async function deleteinvoice(data) {
+export async function deleteInvoice(data) {
     try {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(INVOICE_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1045,10 +1068,11 @@ export async function deleteInstrument(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(INSTRUMENTS_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1208,18 +1232,20 @@ export async function deleteRGatePass(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(RGP_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
-export async function gatePassSearch(search: any) {
+export async function gatePassSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('returnablegatepass_search', data);
@@ -1291,10 +1317,11 @@ export async function deleteDailyWorksheet(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(DWSHEET_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1311,11 +1338,12 @@ export async function getOnGoingRGP(data: any) {
     }
 }
 
-export async function WorksheetSearch(search: any) {
+export async function WorksheetSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('worksheet_search', data);
@@ -1383,6 +1411,23 @@ export async function deleteExpenseSheet(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(EXPSHEET_URL + "/" + data);
+        console.log(response.data.message)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+export async function ExpenseSheetSearch(search: any, year: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search,
+            year: year
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('expensesheet_search', data);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -1390,14 +1435,15 @@ export async function deleteExpenseSheet(data: any) {
     }
 }
 
-export async function ExpenseSheetSearch(search: any) {
+export async function PendingExpenseSheetSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
-        const response = await ApiService.post('expensesheet_search', data);
+        const response = await ApiService.post('pending_expensesheet_search', data);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -1509,18 +1555,20 @@ export async function deleteValidationReport(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(VAL_REPORT_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
-export async function ValidationReportSearch(search: any) {
+export async function ValidationReportSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('validation_report_search', data);
@@ -1615,18 +1663,20 @@ export async function deleteValidationProcedure(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(VAL_PROC_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
-export async function ValidationProcedureSearch(search: any) {
+export async function ValidationProcedureSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('validation_procedure_search', data);
@@ -1696,18 +1746,20 @@ export async function deleteQualityProcedure(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(QUAL_PROC_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
-export async function QualityProcedureSearch(search: any) {
+export async function QualityProcedureSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('quality_procedure_search', data);
@@ -1794,18 +1846,20 @@ export async function deleteComplaint(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(COMPLAINT_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
-export async function ComplaintSearch(search: any) {
+export async function ComplaintSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('complaint_search', data);
@@ -1893,18 +1947,20 @@ export async function deleteTraining(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(TRAINING_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
-export async function TrainingSearch(search: any) {
+export async function TrainingSearch(search: any, year: any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('training_search', data);
@@ -2011,11 +2067,12 @@ export async function getThermalInstruments(data) {
     }
 }
 
-export async function ThermalInstrumentSearch(search: any) {
+export async function ThermalInstrumentSearch(search: any, year: any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('thermal_instrument_search', data);
@@ -2082,10 +2139,11 @@ export async function deleteThermalInstrument(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(THERMAL_INSTRUMENTS_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2164,18 +2222,20 @@ export async function deleteThermalReport(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(THERMAL_REPORTS_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
-export async function ThermalReportSearch(search: any) {
+export async function ThermalReportSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('thermal_report_search', data);
@@ -2361,11 +2421,12 @@ export async function getExternalDocs(data) {
 }
 
 // searching function
-export async function ExternalDocSearch(search: any) {
+export async function ExternalDocSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('external_doc_search', data);
@@ -2421,10 +2482,11 @@ export async function deleteExternalDoc(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(EXTERNAL_DOC_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2446,11 +2508,12 @@ export async function getInternalDocs(data) {
 }
 
 // searching function
-export async function InternalDocSearch(search: any) {
+export async function InternalDocSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('internal_doc_search', data);
@@ -2506,10 +2569,11 @@ export async function deleteInternalDoc(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(INTERNAL_DOC_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2532,11 +2596,12 @@ export async function getNonConformanceRecords(data) {
 }
 
 // searching function
-export async function NonConformanceRecordSearch(search: any) {
+export async function NonConformanceRecordSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('ncr_search', data);
@@ -2610,10 +2675,11 @@ export async function deleteNonConformanceRecord(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(NCR_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2636,11 +2702,12 @@ export async function getRiskRegisters(data) {
 }
 
 // searching function
-export async function RiskRegisterSearch(search: any) {
+export async function RiskRegisterSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('risk_search', data);
@@ -2754,10 +2821,11 @@ export async function deleteRiskRegister(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(RISK_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2780,11 +2848,12 @@ export async function getDocumentChanges(data) {
 }
 
 // searching function
-export async function DocumentChangeSearch(search: any) {
+export async function DocumentChangeSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('document_change_request_search', data);
@@ -2858,10 +2927,11 @@ export async function deleteDocumentChange(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(DOC_CHANGE_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2884,11 +2954,12 @@ export async function getImprovementPlans(data) {
 }
 
 // searching function
-export async function ImprovementPlanSearch(search: any) {
+export async function ImprovementPlanSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('improvement_search', data);
@@ -2961,10 +3032,11 @@ export async function deleteImprovementPlan(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(IMPROVEMENT_PLAN__URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3135,10 +3207,11 @@ export async function deleteIAuditObservation(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(AUDIT_OBSERVATION_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3224,10 +3297,11 @@ export async function deleteCorrectiveAction(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(CORRECTIVE_ACTION_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3250,11 +3324,12 @@ export async function getIAuditSchedules(data) {
 }
 
 // searching function
-export async function IAuditScheduleSearch(search: any) {
+export async function IAuditScheduleSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('audit_schedule_search', data);
@@ -3328,10 +3403,11 @@ export async function deleteIAuditSchedule(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(AUDIT_SCHEDULE_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3354,11 +3430,12 @@ export async function getQMSProcedures(data) {
 }
 
 // searching function
-export async function QMSProcedureSearch(search: any) {
+export async function QMSProcedureSearch(search: any, year: any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('qms_search', data);
@@ -3431,10 +3508,11 @@ export async function deleteQMSProcedure(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(QMS_PROCEDURE_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3457,11 +3535,12 @@ export async function getWorkInstructions(data) {
 }
 
 // searching function
-export async function WorkInstructionSearch(search: any) {
+export async function WorkInstructionSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('work_instruction_search', data);
@@ -3534,10 +3613,11 @@ export async function deleteWorkInstruction(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(WORK_INSTRUCTION_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3561,11 +3641,12 @@ export async function getFormAndFormats(data) {
 }
 
 // searching function
-export async function FormAndFormatSearch(search: any) {
+export async function FormAndFormatSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('form_format_search', data);
@@ -3639,10 +3720,11 @@ export async function deleteFormAndFormat(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(FORMS_AND_FORMATS_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3665,11 +3747,12 @@ export async function getNABLDocs(data) {
 }
 
 // searching function
-export async function NABLDocSearch(search: any) {
+export async function NABLDocSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('nabl_search', data);
@@ -3743,10 +3826,11 @@ export async function deleteNABLDoc(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(NABL_DOC_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3770,11 +3854,12 @@ export async function getNIDocs(data) {
 }
 
 // searching function
-export async function NIDocSearch(search: any) {
+export async function NIDocSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('ni_search', data);
@@ -3873,11 +3958,12 @@ export async function getRecords(data) {
 }
 
 // searching function
-export async function RecordSearch(search: any) {
+export async function RecordSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('records_search', data);
@@ -3951,10 +4037,11 @@ export async function deleteRecord(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(RECORDS_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3977,11 +4064,12 @@ export async function getSkillMatrixs(data) {
 }
 
 // searching function
-export async function SkillMatrixSearch(search: any) {
+export async function SkillMatrixSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('skill_matrix_search', data);
@@ -4054,10 +4142,11 @@ export async function deleteSkillMatrix(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(SKILL_MATRIX_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4172,10 +4261,11 @@ export async function deleteIntermediateCheckRecord(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(INTERMEDIATE_RECORD_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4289,10 +4379,11 @@ export async function deleteInspectionRecord(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(INSPECTION_RECORD_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4393,10 +4484,11 @@ export async function deleteSupplier(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(SUPPLIER_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4477,10 +4569,11 @@ export async function deleteSupplierEvaluation(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(SUPPLIER_EVALUATION_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4502,11 +4595,12 @@ export async function getMethodValidations(data) {
 }
 
 // searching function
-export async function MethodValidationSearch(search: any) {
+export async function MethodValidationSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('method_validation_search', data);
@@ -4579,10 +4673,11 @@ export async function deleteMethodValidation(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(METHOD_VALIDATION_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4604,11 +4699,12 @@ export async function getInterLabComparisons(data) {
 }
 
 // searching function
-export async function InterLabComparisonSearch(search: any) {
+export async function InterLabComparisonSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('interlaboratory_search', data);
@@ -4681,10 +4777,11 @@ export async function deleteInterLabComparison(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(INTER_LAB_COMPARISON_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4706,11 +4803,12 @@ export async function getReplicateReports(data) {
 }
 
 // searching function
-export async function ReplicateReportSearch(search: any) {
+export async function ReplicateReportSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('replicate_report_search', data);
@@ -4784,10 +4882,11 @@ export async function deleteReplicateReport(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(REPLICATE_REPORT_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4938,10 +5037,11 @@ export async function deletePlanner(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(PLANNER_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4962,11 +5062,14 @@ export async function getCalibratedInstruments(data:any) {
 }
 
 // add function
-export async function getPlansWithPlanner() {
+export async function getPlansWithPlanner(year:any) {
     try {
+        const data = {
+            year: year
+        }
         //console.log(data)
         ApiService.setHeader();
-        const response = await ApiService.get("plans_with_planner");
+        const response = await ApiService.post("plans_with_planner", data);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -4994,11 +5097,12 @@ export async function getMRMSchedules(data) {
 }
 
 // searching function
-export async function MRMScheduleSearch(search: any) {
+export async function MRMScheduleSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('mrm_schedule_search', data);
@@ -5071,10 +5175,11 @@ export async function deleteMRMSchedule(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(MRM_SCHEDULE_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5136,10 +5241,11 @@ export async function deleteMRMMinute(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(MRM_MINUTE_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5193,11 +5299,12 @@ export async function getServiceRequests(data) {
 }
 
 // searching function
-export async function ServiceRequestSearch(search: any) {
+export async function ServiceRequestSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('srf_search', data);
@@ -5254,10 +5361,11 @@ export async function deleteServiceRequest(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(SRF_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5279,11 +5387,12 @@ export async function getLaminarAirFlows(data) {
 }
 
 // searching function
-export async function LaminarAirFlowSearch(search: any) {
+export async function LaminarAirFlowSearch(search: any, year: any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('laf_search', data);
@@ -5339,10 +5448,11 @@ export async function deleteLaminarAirFlow(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(LAF_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5408,10 +5518,11 @@ export async function deleteLAFReport(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(LAF_REPORT_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5446,11 +5557,12 @@ export async function getBioSafetyCabinets(data) {
 }
 
 // searching function
-export async function BioSafetyCabinetSearch(search: any) {
+export async function BioSafetyCabinetSearch(search: any, year: any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('bsc_search', data);
@@ -5506,10 +5618,11 @@ export async function deleteBioSafetyCabinet(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(BSC_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5575,10 +5688,11 @@ export async function deleteBSCReport(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(BSC_REPORT_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5617,11 +5731,12 @@ export async function getFeedbacks(data) {
 }
 
 // searching function
-export async function FeedbackSearch(search: any) {
+export async function FeedbackSearch(search: any, year:any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            year: year
         }
         ApiService.setHeader();
         const response = await ApiService.post('feedbacks_search', data);
@@ -5678,9 +5793,10 @@ export async function deleteFeedback(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(FEEDBACK_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }

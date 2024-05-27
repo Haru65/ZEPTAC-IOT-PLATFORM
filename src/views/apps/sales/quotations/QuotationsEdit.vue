@@ -982,7 +982,7 @@
             <button
               type="button"
               class="btn btn-light btn-light-danger w-sd-25 w-lg-25"
-              v-on:click="deleteQuotation"
+              v-on:click="deleteItem"
             >
               Delete
             </button>
@@ -1047,7 +1047,7 @@ import {
   getClient,
   GetLeadClients,
   getQuotation,
-  deletequotation,
+  deleteQuotation,
   GetIncrInvoiceId,
   getPriceList,
   getLeadNCustomer,
@@ -2091,7 +2091,7 @@ export default defineComponent({
       }
     };
 
-    const deleteQuotation = () => {
+    const deleteItem = () => {
       Swal.fire({
         title: "Are you sure?",
         text: "You will not be able to recover from this!",
@@ -2102,7 +2102,7 @@ export default defineComponent({
       }).then((result: { [x: string]: any }) => {
         if (result["isConfirmed"]) {
           // Put your function here
-          deletequotation(QuotationId);
+          deleteQuotation(QuotationId);
           route.push({ name: "quotation-list" });
         }
       });
@@ -2308,7 +2308,7 @@ export default defineComponent({
       Leads,
       getAssetPath,
       submit,
-      deleteQuotation,
+      deleteItem,
       disabledselect,
       clientSelect,
       shortcuts,

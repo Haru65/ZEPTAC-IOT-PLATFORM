@@ -22,6 +22,30 @@
       <!--begin::Card title-->
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
+        <!-- YEAR WISE DATA -->
+
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-semibold text-gray-400"
+            >Financial Year</span
+          >
+        </h3>
+        <div class="me-3">
+          <el-select
+            filterable
+            placeholder="Select Year"
+            v-model="selectedYearCache"
+            id="financialYear"
+            @change="handleChange"
+          >
+            <el-option
+              v-for="year in financialYears"
+              :key="year"
+              :value="year"
+              :label="year"
+            />
+          </el-select>
+        </div>
+
         <!--begin::Toolbar-->
         <div
           v-if="selectedIds.length === 0"
@@ -105,11 +129,8 @@
         </template>
 
         <template v-slot:attendees="{ row: mrm }">
-            <div>
-            <el-select
-              filterable
-              placeholder="Attendees Name"
-            >
+          <div>
+            <el-select filterable placeholder="Attendees Name">
               <el-option
                 disabled="disabled"
                 v-for="(item, index) in mrm.attendees_names"
@@ -119,7 +140,7 @@
               />
             </el-select>
           </div>
-          </template>
+        </template>
         <template v-slot:meetings_count="{ row: mrm }">
           <span
             v-if="mrm.meetings_count === 0"
@@ -134,10 +155,7 @@
               </span>
             </router-link>
           </span>
-          <span
-            v-else
-          >
-          </span>
+          <span v-else> </span>
         </template>
         <template v-slot:actions="{ row: mrm }">
           <!--begin::Menu Flex-->
@@ -197,10 +215,11 @@
 </template>
   
   <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
 import type { IMRM } from "@/core/model/mrm";
+import { useAuthStore } from "@/stores/auth";
 import {
   getMRMSchedules,
   deleteMRMSchedule,
@@ -216,6 +235,9 @@ export default defineComponent({
     Datatable,
   },
   setup() {
+    // Financial Year Logic
+    const authStore = useAuthStore();
+
     const tableHeader = ref([
       {
         columnName: "Meeting Agenda",
@@ -272,7 +294,11 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         const response = await getMRMSchedules(
-          `page=${page}&limit=${limit.value}`
+          `page=${page}&limit=${limit.value}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
@@ -300,7 +326,11 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         const response = await getMRMSchedules(
-          `page=${page.value}&limit=${limit}`
+          `page=${page.value}&limit=${limit}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
@@ -344,7 +374,11 @@ export default defineComponent({
     async function mrm_listing(): Promise<void> {
       try {
         const response = await getMRMSchedules(
-          `page=${page.value}&limit=${limit.value}`
+          `page=${page.value}&limit=${limit.value}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
         tableData.value = response.result.data.map(({ ...rest }) => ({
           ...rest,
@@ -362,59 +396,161 @@ export default defineComponent({
       }
     }
 
+    const financialYears = ref(authStore.financialYears); // Generate Financial years list using the auth store function
+    const selectedYearCache = ref(
+      localStorage.getItem("selectedFinancialYear") || ""
+    );
+
+    // Fallback to default value if localStorage data is invalid or missing
+    if (!financialYears.value.includes(selectedYearCache.value)) {
+      selectedYearCache.value = financialYears.value[0];
+    }
+
+    watch(selectedYearCache, (newValue) => {
+      localStorage.setItem("selectedFinancialYear", newValue);
+    });
+
+    async function handleChange() {
+      page.value = 1;
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+      await mrm_listing();
+    }
+
     onMounted(async () => {
+      // Save initial selected year to localStorage
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+
       await mrm_listing();
     });
 
-    const deleteFewItem = () => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover from this !",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "red",
-        confirmButtonText: "Yes, I am sure!",
-        cancelButtonText: "No, cancel it!",
-      }).then((result: { [x: string]: any }) => {
-        if (result["isConfirmed"]) {
-          // Put your function here
-          selectedIds.value.forEach((item) => {
-            deleteItem(item, true);
-          });
+    const deleteFewItem = async () => {
+      try {
+        const result = await Swal.fire({
+          title: "Are you sure?",
+          text: "You will not be able to recover from this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "red",
+          confirmButtonText: "Yes, I am sure!",
+          cancelButtonText: "No, cancel it!",
+        });
+
+        if (result.isConfirmed) {
+          let allSuccess = true;
+          let finalMessage = "Selected items deleted successfully.";
+
+          for (const id of selectedIds.value) {
+            const response = await deleteItem(id, true);
+            if (!response.success) {
+              allSuccess = false;
+              finalMessage =
+                response.message ||
+                "An error occurred while deleting some items.";
+              break;
+            }
+          }
+
           selectedIds.value.length = 0;
+
+          if (allSuccess) {
+            showSuccessAlert("Success", finalMessage);
+          } else {
+            showErrorAlert("Error", finalMessage);
+          }
         }
+      } catch (error: any) {
+        const errorMessage = error.message || "An unknown error occurred";
+        showErrorAlert("Error", errorMessage);
+      }
+    };
+
+    const deleteItem = async (id: number, mul: boolean) => {
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You will not be able to recover from this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error: any) {
+          const errorMessage = error.message || "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromTable = async (id: number) => {
+        try {
+          const response = await deleteMRMSchedule(id);
+          if (response?.success) {
+            const index = tableData.value.findIndex((item) => item.id === id);
+            if (index !== -1) {
+              tableData.value.splice(index, 1);
+              // console.log(`Item with id ${id} deleted successfully`);
+            }
+            showSuccessAlert(
+              "Success",
+              response.message || `Item with id ${id} deleted successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(
+              response?.message || `Failed to delete the item with id ${id}`
+            );
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      if (!mul) {
+        const isConfirmed = await deleteConfirmation();
+        if (isConfirmed) {
+          return await deleteFromTable(id);
+        } else {
+          return { success: false };
+        }
+      } else {
+        return await deleteFromTable(id);
+      }
+    };
+
+    // Alert functions
+    const showSuccessAlert = (title: string, message: string) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "success",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
       });
     };
 
-    const deleteItem = (id: number, mul: boolean) => {
-      if (!mul) {
-        for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
-            Swal.fire({
-              title: "Are you sure?",
-              text: "You will not be able to recover from this !",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "red",
-              confirmButtonText: "Yes, I am sure!",
-            }).then((result: { [x: string]: any }) => {
-              if (result["isConfirmed"]) {
-                // Put your function here
-                deleteMRMSchedule(id);
-                tableData.value.splice(i, 1);
-              }
-            });
-          }
-        }
-      } else {
-        for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
-            // Put your function here
-            deleteMRMSchedule(id);
-            tableData.value.splice(i, 1);
-          }
-        }
-      }
+    const showErrorAlert = (title: string, message: string) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "error",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
+      });
     };
 
     const search = ref<string>("");
@@ -422,7 +558,7 @@ export default defineComponent({
     let debounceTimer;
 
     const searchItems = async () => {
-      console.log(search.value);
+      // console.log(search.value);
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value.length != 0) {
         let results: Array<IMRM> = [];
@@ -450,7 +586,12 @@ export default defineComponent({
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await MRMScheduleSearch(search.value);
+        const response = await MRMScheduleSearch(
+          search.value,
+          selectedYearCache.value
+            ? selectedYearCache.value
+            : financialYears.value[0]
+        );
 
         tableData.value = response.result.data.map(({ ...rest }) => ({
           ...rest,
@@ -467,7 +608,7 @@ export default defineComponent({
     }
 
     const searchingFunc = (obj: any, value: string): boolean => {
-      console.log(obj);
+      // console.log(obj);
       for (let key in obj) {
         if (
           !Number.isInteger(obj[key]) &&
@@ -509,6 +650,10 @@ export default defineComponent({
       page,
       Limits,
       PageLimitPoiner,
+
+      selectedYearCache,
+      financialYears,
+      handleChange,
     };
   },
 });

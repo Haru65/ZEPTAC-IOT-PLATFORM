@@ -18,6 +18,20 @@
               <div class="card-title m-0">
                 <h3 class="fw-bold m-0">Add Maintenance Plan</h3>
               </div>
+              <div
+                class="card-toolbar d-flex justify-content-end"
+                data-kt-customer-table-toolbar="base"
+              >
+                <!--begin::Add customer-->
+                <router-link
+                  to="/plan"
+                  class="btn btn-light"
+                >
+                  <KTIcon icon-name="arrow-left" icon-class="fs-2" />
+                  Back
+                </router-link>
+                <!--end::Add customer-->
+              </div>
               <!--end::Card title-->
             </div>
             <!--begin::Card header-->
@@ -168,9 +182,9 @@
                       placeholder="Choose Month"
                     >
                       <el-option
-                        v-for="month in monthNames"
+                        v-for="month in months"
                         :key="month.id"
-                        :label="month.name"
+                        :label="`${month.name} - ${month.year}`"
                         :value="month.id"
                       />
                     </el-select>
@@ -226,6 +240,30 @@
             <!--begin::Card toolbar-->
 
             <div class="card-toolbar">
+              <!-- YEAR WISE DATA -->
+
+              <h3 class="card-title align-items-start flex-column">
+                <span class="card-label fw-semibold text-gray-400"
+                  >Financial Year</span
+                >
+              </h3>
+              <div class="me-3">
+                <el-select
+                  filterable
+                  placeholder="Select Year"
+                  v-model="selectedYearCache"
+                  id="financialYear"
+                  @change="handleChange"
+                >
+                  <el-option
+                    v-for="year in financialYears"
+                    :key="year"
+                    :value="year"
+                    :label="year"
+                  />
+                </el-select>
+              </div>
+
               <!--begin::Group actions-->
               <div
                 v-if="selectedIds.length !== 0"
@@ -298,7 +336,7 @@
                 </template>
                 <template v-slot:month_id="{ row: planner }">
                   <span class="badge py-3 px-4 fs-7 badge-light-primary">{{
-                    GetMonthName(planner.month_id)
+                    getMonthName(planner.month_id)
                   }}</span>
                 </template>
                 <template v-slot:actions="{ row: planner }">
@@ -358,7 +396,7 @@
 </template>
             
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import {
   getPlan,
@@ -375,7 +413,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
-import { monthNames, GetMonthName } from "@/core/model/planner";
+import { useMonthUtils } from "@/core/model/planner";
 import type { IPlan } from "@/core/model/planner";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
@@ -408,6 +446,14 @@ export default defineComponent({
     const auth = useAuthStore();
     const router = useRouter();
     const User = auth.GetUser();
+
+    // Financial Year Logic
+    const authStore = useAuthStore();
+
+    const financialYearType = Number(localStorage.getItem("financialYearType"));
+    const { months, currentYear, currentMonth, getMonthName } =
+      useMonthUtils(financialYearType);
+    const selectedMonthId = ref(currentMonth);
 
     const PLAN_ID = "3";
 
@@ -483,7 +529,11 @@ export default defineComponent({
 
         ApiService.setHeader();
         const response = await getPlanners(
-          `page=${page}&limit=${limit.value}&planId=${PLAN_ID}`
+          `page=${page}&limit=${limit.value}&planId=${PLAN_ID}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
@@ -517,7 +567,11 @@ export default defineComponent({
 
         ApiService.setHeader();
         const response = await getPlanners(
-          `page=${page.value}&limit=${limit}&planId=${PLAN_ID}`
+          `page=${page.value}&limit=${limit}&planId=${PLAN_ID}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
@@ -561,7 +615,11 @@ export default defineComponent({
       try {
         ApiService.setHeader();
         const response = await getPlanners(
-          `page=${page.value}&limit=${limit.value}&planId=${PLAN_ID}`
+          `page=${page.value}&limit=${limit.value}&planId=${PLAN_ID}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
@@ -642,7 +700,31 @@ export default defineComponent({
       }
     };
 
+    const financialYears = ref(authStore.financialYears); // Generate Financial years list using the auth store function
+    const selectedYearCache = ref(
+      localStorage.getItem("selectedFinancialYear") || ""
+    );
+
+    // Fallback to default value if localStorage data is invalid or missing
+    if (!financialYears.value.includes(selectedYearCache.value)) {
+      selectedYearCache.value = financialYears.value[0];
+    }
+
+    watch(selectedYearCache, (newValue) => {
+      localStorage.setItem("selectedFinancialYear", newValue);
+    });
+
+    async function handleChange() {
+      
+      page.value = 1;
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+      await planner_listing();
+    }
+
     onMounted(async () => {
+      // Save initial selected year to localStorage
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+
       try {
         Instruments.value.pop();
         await getdropinstrument();
@@ -718,71 +800,111 @@ export default defineComponent({
       }
     };
 
-    // Table Data
-    const deleteItem = async (id: number, mul: boolean) => {
-      if (!mul) {
-        for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
-            Swal.fire({
-              title: "Are you sure?",
-              text: "You will not be able to recover from this !",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "red",
-              confirmButtonText: "Yes, I am sure!",
-            }).then((result: { [x: string]: any }) => {
-              if (result["isConfirmed"]) {
-                // Put your function here
-                deletePlanner(id);
-                tableData.value.splice(i, 1);
-                planner_listing();
-              }
-            });
+    
+    
+    const deleteFewItem = async () => {
+      try {
+        const result = await Swal.fire({
+          title: "Are you sure?",
+          text: "You will not be able to recover from this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "red",
+          confirmButtonText: "Yes, I am sure!",
+          cancelButtonText: "No, cancel it!",
+        });
+
+        if (result.isConfirmed) {
+          let allSuccess = true;
+          let finalMessage = "Selected items deleted successfully.";
+
+          for (const id of selectedIds.value) {
+            const response = await deleteItem(id, true);
+            if (!response.success) {
+              allSuccess = false;
+              finalMessage =
+                response.message ||
+                "An error occurred while deleting some items.";
+              break;
+            }
           }
+
+          selectedIds.value.length = 0;
+
+          if (allSuccess) {
+            showSuccessAlert("Success", finalMessage);
+          } else {
+            showErrorAlert("Error", finalMessage);
+          }
+        }
+      } catch (error: any) {
+        const errorMessage = error.message || "An unknown error occurred";
+        showErrorAlert("Error", errorMessage);
+      }
+    };
+
+    const deleteItem = async (id: number, mul: boolean) => {
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You will not be able to recover from this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error: any) {
+          const errorMessage = error.message || "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromTable = async (id: number) => {
+        try {
+          const response = await deletePlanner(id);
+          if (response?.success) {
+            const index = tableData.value.findIndex((item) => item.id === id);
+            if (index !== -1) {
+              tableData.value.splice(index, 1);
+              // console.log(`Item with id ${id} deleted successfully`);
+            }
+            showSuccessAlert(
+              "Success",
+              response.message || `Item with id ${id} deleted successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(
+              response?.message || `Failed to delete the item with id ${id}`
+            );
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      if (!mul) {
+        const isConfirmed = await deleteConfirmation();
+        if (isConfirmed) {
+          return await deleteFromTable(id);
+        } else {
+          return { success: false };
         }
       } else {
-        for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
-            // Put your function here
-            deletePlanner(id);
-            tableData.value.splice(i, 1);
-          }
-        }
+        return await deleteFromTable(id);
       }
     };
 
-    const deleteFewItem = () => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover from this !",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "red",
-        confirmButtonText: "Yes, I am sure!",
-        cancelButtonText: "No, cancel it!",
-      }).then((result: { [x: string]: any }) => {
-        if (result["isConfirmed"]) {
-          // Put your function here
-          selectedIds.value.forEach((item) => {
-            deleteItem(item, true);
-          });
-          selectedIds.value.length = 0;
-          planner_listing();
-        }
-      });
-    };
-
-    const sort = (sort: Sort) => {
-      const reverse: boolean = sort.order === "asc";
-      if (sort.label) {
-        arraySort(tableData.value, sort.label, { reverse });
-      }
-    };
-    const onItemSelect = (selectedItems: Array<number>) => {
-      selectedIds.value = selectedItems;
-    };
-
-    const showSuccessAlert = (title, message) => {
+    // Alert functions
+    const showSuccessAlert = (title: string, message: string) => {
       Swal.fire({
         title,
         text: message,
@@ -796,7 +918,7 @@ export default defineComponent({
       });
     };
 
-    const showErrorAlert = (title, message) => {
+    const showErrorAlert = (title: string, message: string) => {
       Swal.fire({
         title,
         text: message,
@@ -808,6 +930,17 @@ export default defineComponent({
           confirmButton: "btn btn-primary",
         },
       });
+    };
+
+
+    const sort = (sort: Sort) => {
+      const reverse: boolean = sort.order === "asc";
+      if (sort.label) {
+        arraySort(tableData.value, sort.label, { reverse });
+      }
+    };
+    const onItemSelect = (selectedItems: Array<number>) => {
+      selectedIds.value = selectedItems;
     };
 
     const clear = () => {
@@ -837,8 +970,8 @@ export default defineComponent({
       identifier,
       User,
       clear,
-      monthNames,
-      GetMonthName,
+      months,
+      getMonthName,
 
       tableData,
       tableHeader,
@@ -856,6 +989,10 @@ export default defineComponent({
       Limits,
       Instruments,
       setInstrument,
+      
+      selectedYearCache,
+      financialYears,
+      handleChange,
     };
   },
 });

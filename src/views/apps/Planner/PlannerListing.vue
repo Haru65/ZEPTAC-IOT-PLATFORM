@@ -9,48 +9,18 @@
         <VForm id="kt_account_profile_details_form" class="form">
           <!--begin::Card body-->
           <div class="card-body border-top p-6">
-            <div class="row mb-6">
-              <!--begin::Label-->
-              <label
-                class="col-lg-3 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
-                >Year</label
-              >
-              <!--end::Label-->
-
-              <!--begin::Col-->
-              <div class="col-lg-9 fv-row">
-                <el-select
-                  v-model="selectedYear"
-                  filterable
-                  placeholder="Please Select Year..."
-                >
-                  <el-option
-                    v-for="year in academicYears"
-                    :key="year"
-                    :value="year"
-                  />
-                </el-select>
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="selectedYear" />
-                  </div>
-                </div>
-              </div>
-              <!--end::Col-->
-            </div>
-
             <div class="container-fluid mt-6">
               <div class="row g-5 g-xl-8">
                 <div class="col-xl-4">
                   <div
                     :class="[`card-xl-stretch mb-xl-8`, `bg-light-success`]"
-                    class="card"
+                    class="card shadow"
                   >
                     <!--begin::Body-->
                     <div class="card-body my-3">
                       <span
-                        :class="`text-gray-800`"
-                        class="card-title fw-bold fs-4 mb-3 d-block text-underline"
+                        :class="`text-gray-700`"
+                        class="card-title fw-bold fs-4 mb-3 d-block"
                       >
                         Training Plan
                       </span>
@@ -70,7 +40,7 @@
                 <div class="col-xl-4">
                   <div
                     :class="[`card-xl-stretch mb-xl-8`, `bg-light-success`]"
-                    class="card"
+                    class="card shadow"
                   >
                     <!--begin::Body-->
                     <div class="card-body my-3">
@@ -96,7 +66,7 @@
                 <div class="col-xl-4">
                   <div
                     :class="[`card-xl-stretch mb-xl-8`, `bg-light-success`]"
-                    class="card"
+                    class="card shadow"
                   >
                     <!--begin::Body-->
                     <div class="card-body my-3">
@@ -122,7 +92,7 @@
                 <div class="col-xl-4">
                   <div
                     :class="[`card-xl-stretch mb-xl-8`, `bg-light-success`]"
-                    class="card"
+                    class="card shadow"
                   >
                     <!--begin::Body-->
                     <div class="card-body my-3">
@@ -148,7 +118,7 @@
                 <div class="col-xl-4">
                   <div
                     :class="[`card-xl-stretch mb-xl-8`, `bg-light-success`]"
-                    class="card"
+                    class="card shadow"
                   >
                     <!--begin::Body-->
                     <div class="card-body my-3">
@@ -174,7 +144,7 @@
                 <div class="col-xl-4">
                   <div
                     :class="[`card-xl-stretch mb-xl-8`, `bg-light-success`]"
-                    class="card"
+                    class="card shadow"
                   >
                     <!--begin::Body-->
                     <div class="card-body my-3">
@@ -200,7 +170,7 @@
                 <div class="col-xl-4">
                   <div
                     :class="[`card-xl-stretch mb-xl-8`, `bg-light-success`]"
-                    class="card"
+                    class="card shadow"
                   >
                     <!--begin::Body-->
                     <div class="card-body my-3">
@@ -225,19 +195,21 @@
               </div>
             </div>
           </div>
-          <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
-            <!--begin::Row-->
-            <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
-              <!--begin::Col-->
-              <div class="col-12">
-                <!-- Lead Conversion -->
-                <HeatMap />
+          <div class="card mb-5 mb-xl-10 pb-12">
+            <!--begin::Card body-->
+            <div class="card-body pt-0">
+              <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
+                <!--begin::Col-->
+                <div class="col-12">
+                  <!-- Lead Conversion -->
+                  <HeatMap />
+                </div>
+                <!--end::Col-->
               </div>
-              <!--end::Col-->
             </div>
           </div>
+
           <!--end::Row-->
-          
         </VForm>
         <!--end::Form-->
       </div>
@@ -247,7 +219,7 @@
 
 
 <script lang="ts">
-import { reactive, defineComponent, onMounted, ref } from "vue";
+import { reactive, defineComponent, onMounted, ref, watch } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import { Identifier } from "@/core/config/WhichUserConfig";
 import { getCompanies, addISORule } from "@/stores/api";
@@ -268,9 +240,9 @@ export default defineComponent({
   },
   setup() {
     const loading = ref(false);
-    const currentYear = new Date().getFullYear();
-    const startYear = currentYear - 1 - ((currentYear - 1) % 2); // Calculate startYear based on the current academic year
-    const academicYears = ref<string[]>([]);
+
+    // Financial Year Logic
+    const authStore = useAuthStore();
 
     const itemDetails = ref({
       training_plan: [],
@@ -281,13 +253,6 @@ export default defineComponent({
       interlab_plan: [],
       mrm_plan: [],
     });
-
-    for (let year = startYear; year <= currentYear; year++) {
-      const academicYear = `${year}-${year + 1}`;
-      academicYears.value.push(academicYear);
-    }
-
-    const selectedYear = ref<string>("");
 
     const monthNames = [
       { id: 4, name: "Apr" },
@@ -304,16 +269,6 @@ export default defineComponent({
       { id: 3, name: "Mar" },
     ];
 
-    // // Calculate the index of April (0-based)
-    // const aprilIndex = monthNames.findIndex((month) => month.name === "Apr");
-
-    // // Arrange months from April to March
-    // const months = ref<string[]>([]);
-    // for (let i = 0; i < 12; i++) {
-    //   const monthIndex = (aprilIndex + i) % 12;
-    //   months.value.push(monthNames[i]);
-    // }
-
     const plans = ref([
       { id: 1, plan: "Training Plan" },
       { id: 2, plan: "Intermediate Check Plan" },
@@ -325,8 +280,6 @@ export default defineComponent({
     ]);
 
     return {
-      academicYears,
-      selectedYear,
       loading,
       monthNames,
       plans,

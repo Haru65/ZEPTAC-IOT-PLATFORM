@@ -12,8 +12,6 @@
         >
           <!--begin::Card body-->
           <div class="card-body p-sd-2 p-lg-9">
-
-            
             <div class="row mb-6">
               <div class="container-fluid">
                 <div class="alert alert-info text-gray-700 fs-6 font-semibold">
@@ -25,7 +23,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="row mb-6">
               <!--begin::Col-->
               <div class="col-md-6 fv-row mb-8 mb-sd-8">
@@ -305,7 +303,7 @@
                       <button
                         type="button"
                         class="btn btn-danger btn-sm cursor-pointer"
-                        @click="deleteItem(item?.id)"
+                        @click="deleteItem(item?.id, false)"
                       >
                         <i class="bi bi-trash"></i> Delete
                       </button>
@@ -340,7 +338,11 @@
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { deleteSupplierEvaluation, getSupplier, updateSupplier } from "@/stores/api";
+import {
+  deleteSupplierEvaluation,
+  getSupplier,
+  updateSupplier,
+} from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import { Identifier } from "@/core/config/WhichUserConfig";
@@ -363,7 +365,7 @@ interface Item {
   approval_status: string;
 
   evaluation: {
-    id: string;
+    id: number;
     supplier_id: string;
     score: string;
     remark: string;
@@ -460,7 +462,6 @@ export default defineComponent({
       }
 
       console.log(itemDetails.value[dateType]);
-
     }
 
     const submit = async () => {
@@ -496,7 +497,66 @@ export default defineComponent({
       }
     };
 
-    const showSuccessAlert = (title, message) => {
+    const deleteItem = async (id: number, mul: boolean) => {
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You will not be able to recover from this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error: any) {
+          const errorMessage = error.message || "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromTable = async (id: number) => {
+        try {
+          const response = await deleteSupplierEvaluation(id);
+          if (response?.success) {
+            itemDetails.value.evaluation.splice(0, 1);
+            // console.log(`Item with id ${id} deleted successfully`);
+            router.push({ name: "supplier-list" });
+            showSuccessAlert(
+              "Success",
+              response.message || `Item with id ${id} deleted successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(
+              response?.message || `Failed to delete the item with id ${id}`
+            );
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      if (!mul) {
+        const isConfirmed = await deleteConfirmation();
+        if (isConfirmed) {
+          return await deleteFromTable(id);
+        } else {
+          return { success: false };
+        }
+      } else {
+        return await deleteFromTable(id);
+      }
+    };
+
+    // Alert functions
+    const showSuccessAlert = (title: string, message: string) => {
       Swal.fire({
         title,
         text: message,
@@ -510,7 +570,7 @@ export default defineComponent({
       });
     };
 
-    const showErrorAlert = (title, message) => {
+    const showErrorAlert = (title: string, message: string) => {
       Swal.fire({
         title,
         text: message,
@@ -521,24 +581,6 @@ export default defineComponent({
         customClass: {
           confirmButton: "btn btn-primary",
         },
-      });
-    };
-
-    const deleteItem = (id: string) => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover from this !",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "red",
-        confirmButtonText: "Yes, I am sure!",
-      }).then((result: { [x: string]: any }) => {
-        if (result["isConfirmed"]) {
-          // Put your function here
-          deleteSupplierEvaluation(id);
-          itemDetails.value.evaluation.splice(0, 1);
-          router.push({ name: "supplier-list" });
-        }
       });
     };
 

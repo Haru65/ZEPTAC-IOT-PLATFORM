@@ -876,71 +876,109 @@ export default defineComponent({
       console.log("Clause Details are:", clauseDetails.value);
     };
 
-    // Table Data
-    const deleteItem = async (id: number, mul: boolean) => {
-      if (!mul) {
-        for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
-            Swal.fire({
-              title: "Are you sure?",
-              text: "You will not be able to recover from this !",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "red",
-              confirmButtonText: "Yes, I am sure!",
-            }).then((result: { [x: string]: any }) => {
-              if (result["isConfirmed"]) {
-                // Put your function here
-                deleteIAuditObservation(id);
-                tableData.value.splice(i, 1);
-                observation_listing();
-              }
-            });
+    const deleteFewItem = async () => {
+      try {
+        const result = await Swal.fire({
+          title: "Are you sure?",
+          text: "You will not be able to recover from this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "red",
+          confirmButtonText: "Yes, I am sure!",
+          cancelButtonText: "No, cancel it!",
+        });
+
+        if (result.isConfirmed) {
+          let allSuccess = true;
+          let finalMessage = "Selected items deleted successfully.";
+
+          for (const id of selectedIds.value) {
+            const response = await deleteItem(id, true);
+            if (!response.success) {
+              allSuccess = false;
+              finalMessage =
+                response.message ||
+                "An error occurred while deleting some items.";
+              break;
+            }
           }
+
+          selectedIds.value.length = 0;
+
+          if (allSuccess) {
+            showSuccessAlert("Success", finalMessage);
+          } else {
+            showErrorAlert("Error", finalMessage);
+          }
+        }
+      } catch (error: any) {
+        const errorMessage = error.message || "An unknown error occurred";
+        showErrorAlert("Error", errorMessage);
+      }
+    };
+
+    const deleteItem = async (id: number, mul: boolean) => {
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You will not be able to recover from this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error: any) {
+          const errorMessage = error.message || "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromTable = async (id: number) => {
+        try {
+          const response = await deleteIAuditObservation(id);
+          if (response?.success) {
+            const index = tableData.value.findIndex((item) => item.id === id);
+            if (index !== -1) {
+              tableData.value.splice(index, 1);
+              // console.log(`Item with id ${id} deleted successfully`);
+            }
+            showSuccessAlert(
+              "Success",
+              response.message || `Item with id ${id} deleted successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(
+              response?.message || `Failed to delete the item with id ${id}`
+            );
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      if (!mul) {
+        const isConfirmed = await deleteConfirmation();
+        if (isConfirmed) {
+          return await deleteFromTable(id);
+        } else {
+          return { success: false };
         }
       } else {
-        for (let i = 0; i < tableData.value.length; i++) {
-          if (tableData.value[i].id === id) {
-            // Put your function here
-            deleteIAuditObservation(id);
-            tableData.value.splice(i, 1);
-          }
-        }
+        return await deleteFromTable(id);
       }
     };
 
-    const deleteFewItem = () => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover from this !",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "red",
-        confirmButtonText: "Yes, I am sure!",
-        cancelButtonText: "No, cancel it!",
-      }).then((result: { [x: string]: any }) => {
-        if (result["isConfirmed"]) {
-          // Put your function here
-          selectedIds.value.forEach((item) => {
-            deleteItem(item, true);
-          });
-          selectedIds.value.length = 0;
-          observation_listing();
-        }
-      });
-    };
-
-    const sort = (sort: Sort) => {
-      const reverse: boolean = sort.order === "asc";
-      if (sort.label) {
-        arraySort(tableData.value, sort.label, { reverse });
-      }
-    };
-    const onItemSelect = (selectedItems: Array<number>) => {
-      selectedIds.value = selectedItems;
-    };
-
-    const showSuccessAlert = (title, message) => {
+    // Alert functions
+    const showSuccessAlert = (title: string, message: string) => {
       Swal.fire({
         title,
         text: message,
@@ -954,7 +992,7 @@ export default defineComponent({
       });
     };
 
-    const showErrorAlert = (title, message) => {
+    const showErrorAlert = (title: string, message: string) => {
       Swal.fire({
         title,
         text: message,
@@ -966,6 +1004,16 @@ export default defineComponent({
           confirmButton: "btn btn-primary",
         },
       });
+    };
+
+    const sort = (sort: Sort) => {
+      const reverse: boolean = sort.order === "asc";
+      if (sort.label) {
+        arraySort(tableData.value, sort.label, { reverse });
+      }
+    };
+    const onItemSelect = (selectedItems: Array<number>) => {
+      selectedIds.value = selectedItems;
     };
 
     async function reLoadData() {
