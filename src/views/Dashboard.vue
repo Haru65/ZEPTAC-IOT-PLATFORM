@@ -4,6 +4,43 @@
     class="row g-5 g-xl-10 mb-5 mb-xl-10"
   >
     <!--begin::Row-->
+    <div
+      class="row g-5 g-xl-10 mb-5 mb-xl-5"
+      v-if="daysLeft <= 5 && daysLeft >= 0"
+    >
+      <!--begin::Alert-->
+      <div
+        class="notice d-flex bg-light-warning rounded border-warning border border-dashed p-6"
+      >
+        <!--begin::Icon-->
+        <KTIcon
+          icon-name="information-5"
+          icon-class="fs-2tx text-warning me-4"
+        />
+        <!--end::Icon-->
+        <div class="d-flex flex-stack flex-grow-1">
+          <!--begin::Content-->
+          <div class="fw-semobold">
+            <h4 class="text-gray-800 fw-bold">Attention Required!</h4>
+            <div class="fs-6 text-gray-600">
+              Your {{ isTrial ? "trial" : "subscription" }} will expire in
+              {{ daysLeft }} days. Please renew to avoid any interruption in
+              service.
+              <router-link
+                :to="`/subscription/${User.company_id}`"
+                class="link-primary fw-bold"
+                >Renew Now</router-link
+              >
+            </div>
+          </div>
+          <!--end::Content-->
+        </div>
+      </div>
+      <!--end::Alert-->
+    </div>
+    <!--end::Row-->
+
+    <!--begin::Row-->
     <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
       <!--begin::Col-->
       <div class="col-xl-6">
@@ -106,7 +143,7 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref, watch } from "vue";
+import { defineComponent, onMounted, ref, watch, computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
 
 // import Widget1 from "@/components/dashboard-default-widgets/Widget1.vue";
@@ -143,9 +180,24 @@ export default defineComponent({
     const authStore = useAuthStore();
     const User = authStore.GetUser();
 
+    const endDate = computed(() => {
+      return new Date(authStore.companyDetails.trial_subscription_end);
+    });
+
+    const daysLeft = computed(() => {
+      if (!endDate.value) return 0;
+      const today = new Date();
+      const timeDifference = endDate.value.getTime() - today.getTime();
+      return Math.ceil(timeDifference / (1000 * 3600 * 24));
+    });
+
+    const isTrial = computed(() => authStore.companyDetails.is_trial);
+
     return {
       getAssetPath,
       User,
+      daysLeft,
+      isTrial,
     };
   },
 });

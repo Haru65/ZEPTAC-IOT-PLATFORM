@@ -195,6 +195,19 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/subscription/:id",
+        name: "company-subscription",
+        component: () => import("@/views/apps/admin/CompanySubscription.vue"),
+        meta: {
+          pageTitle: "Subscription",
+        },
+        // beforeEnter: async (to, from, next) => {
+        //   const authStore = useAuthStore();
+        //   authStore.verifyAuth();
+        //   next();
+        // },
+      },
+      {
         path: "/company/modules/:id",
         name: "company-modules",
         component: () => import("@/views/apps/admin/companies/CompanyModules.vue"),

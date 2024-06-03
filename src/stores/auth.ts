@@ -11,14 +11,25 @@ export interface User {
   password: string;
   api_token: string;
   data: string;
-  company_details:[];
+  company_details: CompanyDetails;
 }
 
+export interface CompanyDetails {
+  company_id: number;
+  company_name: number;
+  financial_year_type: string;
+  is_active: number;
+  is_trial: boolean;
+  trial_subscription_start: string;
+  trial_subscription_end: string;
+}
 
 export const useAuthStore = defineStore("auth", () => {
   const errors = ref({});
   const user = ref<User>({} as User);
   const isAuthenticated = ref(JwtService.getToken());
+
+  const companyDetails = ref<CompanyDetails>({} as CompanyDetails);
 
   const selectedFinancialYear = ref<string>(""); 
   const financialYearType = ref<string>("");
@@ -68,6 +79,7 @@ export const useAuthStore = defineStore("auth", () => {
     //console.log(authUser);
     isAuthenticated.value = authUser.role_id;
     user.value = authUser;
+    companyDetails.value = authUser.company_details;
     errors.value = {};
     JwtService.saveToken(user.value.api_token);
 
@@ -132,6 +144,7 @@ export const useAuthStore = defineStore("auth", () => {
     errors.value = [];
     JwtService.destroyToken();
     JwtService.destroyUser();
+    companyDetails.value = {} as CompanyDetails;
     JwtService.destroySelectedYear();
     JwtService.destroyFinancialType();
   }
@@ -273,5 +286,6 @@ export const useAuthStore = defineStore("auth", () => {
     financialYears,
     selectedFinancialYear,
     financialYearType,
+    companyDetails,
   };
 });

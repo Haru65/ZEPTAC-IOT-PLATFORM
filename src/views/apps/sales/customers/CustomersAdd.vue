@@ -380,7 +380,7 @@
                     class="form-control form-control-lg form-control-solid"
                     placeholder="Enter GST Number"
                     v-model="profileDetails.gst_number"
-                    v-on:input="isValidGSTNo"
+                    v-on:keyup="debouncedValidateGST"
                   />
                   <div
                     v-if="validGSTRef === true"
@@ -453,6 +453,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import { countries, INstates } from "@/core/model/countries";
 import { rolesArray } from "@/core/config/PermissionsRolesConfig";
+import { debounce } from "@/core/helpers/debounce";
 
 interface ProfileDetails {
   first_name: string;
@@ -541,27 +542,24 @@ export default defineComponent({
       created_by: User.id,
       updated_by: User.id,
     });
+
     const validGSTRef = ref(false);
 
-    function isValidGSTNo() {
-      // Regex to check valid
-      // GST CODE
-      let regex = new RegExp(
-        /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/
-      );
+    async function isValidGSTNo() {
+      // Regex to check valid GST CODE
+      const regex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
-      let str = profileDetails.value.gst_number;
+      // Retrieve GST number from company details
+      const str = profileDetails.value.gst_number;
 
-      // GST CODE
-      // is empty return false
-      if (str == null) {
+      // Check if GST number is null or not 15 characters long
+      if (str == null || str.length !== 15) {
         validGSTRef.value = false;
         return false;
       }
 
-      // Return true if the GST_CODE
-      // matched the ReGex
-      if (regex.test(str) == true) {
+      // Check if the GST number matches the regex pattern
+      if (regex.test(str)) {
         validGSTRef.value = true;
         return true;
       } else {
@@ -569,6 +567,9 @@ export default defineComponent({
         return false;
       }
     }
+
+    const debouncedValidateGST = debounce(isValidGSTNo, 1000);
+
     const onsubmit = async () => {
       loading.value = true;
       // console.log(profileDetails.value);
@@ -682,7 +683,7 @@ export default defineComponent({
       clear,
       countries,
       state,
-      isValidGSTNo,
+      debouncedValidateGST,
       validGSTRef,
     };
   },

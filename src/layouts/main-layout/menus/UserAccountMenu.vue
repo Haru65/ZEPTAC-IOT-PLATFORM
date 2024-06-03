@@ -77,6 +77,17 @@
     </div>
     <!--end::Menu item-->
 
+    <!--begin::Menu item-->
+    <div class="menu-item px-5" v-if="Identifier == 'Admin' || Identifier == 'Company-Admin'">
+      <router-link
+        :to="`/subscription/${User.company_id}`"
+        class="menu-link px-5"
+      >
+        View Subscription
+      </router-link>
+    </div>
+    <!--end::Menu item-->
+
     <!--begin::Menu separator-->
     <div class="separator my-2"></div>
     <!--end::Menu separator-->

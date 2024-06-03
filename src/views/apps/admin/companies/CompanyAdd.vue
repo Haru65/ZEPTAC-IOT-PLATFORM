@@ -374,7 +374,7 @@
                     class="form-control form-control-lg form-control-solid"
                     placeholder="Enter GST Number"
                     v-model="companyDetails.gst_details"
-                    v-on:input="isValidGSTNo"
+                    v-on:keyup="debouncedValidateGST"
                   />
                   <div
                     v-if="validGSTRef === true"
@@ -484,6 +484,58 @@
                       <el-option key="1" label="January - December" value="1" />
                       <el-option key="2" label="April - March" value="2" />
                     </el-select>
+                  </div>
+                  <!--end::Col-->
+                </div>
+                <!--end::Row-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-4 col-form-label required fw-semobold fs-6">
+                Choose Usage Type
+              </label>
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8">
+                <!--begin::Row-->
+                <div class="row">
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row p-2">
+                    <el-select
+                      v-model="companyDetails.usage_type"
+                      filterable
+                      placeholder="Choose Usage Type"
+                      v-on:change="handleUsageType"
+                    >
+                    <el-option
+                          v-for="item in usageTypes"
+                          :key="item.id"
+                          :label="item.name"
+                          :value="item.id"
+                        />
+                    </el-select>
+                  </div>
+                  <!--end::Col-->
+                  <!--begin::Col-->
+                  <div class="col-lg-6 fv-row p-2">
+                    <div>
+                      <el-date-picker
+                        type="date"
+                        name="subscription_date"
+                        id="subscription_date"
+                        :disabled="hideSubscriptionDate"
+                        v-model="companyDetails.subscription_date"
+                        @change="setDates($event, 'subscription_date')"
+                        placeholder="Pick a day"
+                        :editable="false"
+                      />
+                    </div>
                   </div>
                   <!--end::Col-->
                 </div>
@@ -797,9 +849,11 @@ import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import packages from "@/core/config/PackagesConfig";
 import { limit } from "@/core/config/WhichUserConfig";
+import moment from "moment";
 import { useRouter } from "vue-router";
-
 import { blank64 } from "./blank";
+import { usageTypes } from "@/core/model/company";
+import { debounce } from "@/core/helpers/debounce";
 
 interface companyDetails {
   disp_avatar: string;
@@ -829,6 +883,13 @@ interface companyDetails {
   srf_no_init: string;
   srf_no_prefix: string;
   financial_year_type: string;
+  usage_type: string;
+  subscription_date: string;
+
+  is_trial: boolean;
+  trial_subscription_start: string;
+  trial_subscription_end: string;
+
 }
 
 export default defineComponent({
@@ -888,35 +949,90 @@ export default defineComponent({
       instrument_id_prefix: "",
       srf_no_init: "",
       srf_no_prefix: "",
-      financial_year_type: "",
+      financial_year_type: "2",
+      usage_type: "1",
+      subscription_date: "",
+
+      is_trial: true,
+      trial_subscription_start: "",
+      trial_subscription_end: "",
     });
 
     const validGSTRef = ref(false);
 
-    function isValidGSTNo() {
-      // Regex to check valid
-      // GST CODE
-      let regex = new RegExp(
-        /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/
-      );
+    async function isValidGSTNo() {
 
-      let str = companyDetails.value.gst_details;
+      // Regex to check valid GST CODE
+      const regex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
-      // GST CODE
-      // is empty return false
-      if (str == null) {
+      // Retrieve GST number from company details
+      const str = companyDetails.value.gst_details;
+
+      // Check if GST number is null or not 15 characters long
+      if (str == null || str.length !== 15) {
         validGSTRef.value = false;
         return false;
       }
 
-      // Return true if the GST_CODE
-      // matched the ReGex
-      if (regex.test(str) == true) {
+      // Check if the GST number matches the regex pattern
+      if (regex.test(str)) {
         validGSTRef.value = true;
         return true;
       } else {
         validGSTRef.value = false;
         return false;
+      }
+    }
+
+    const debouncedValidateGST = debounce(isValidGSTNo, 1000);
+    
+    const hideSubscriptionDate = ref(true);
+
+    /* --------SET USAGETYPE LOGIC--------*/
+    async function handleUsageType(usageTypeId) {
+      console.log(usageTypeId)
+      try {
+        if (usageTypeId != null) {
+          if (usageTypeId != "" && usageTypeId != null) {
+
+            if(usageTypeId == "2"){
+              hideSubscriptionDate.value = false;
+              companyDetails.value.subscription_date = "";
+              companyDetails.value.is_trial = false;
+
+            }
+            else{
+              hideSubscriptionDate.value = true;
+              companyDetails.value.subscription_date = "";
+              companyDetails.value.is_trial = true;
+            }
+
+          }
+          
+        } else {
+          companyDetails.value.subscription_date = "";
+          companyDetails.value.is_trial = true;
+        }
+      } catch (err) {
+        companyDetails.value.subscription_date = "";
+        companyDetails.value.is_trial = true;
+      }
+    }
+
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            companyDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+          } else {
+            companyDetails.value[dateType] = "";
+          }
+        } else {
+          companyDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        companyDetails.value[dateType] = "";
       }
     }
 
@@ -944,6 +1060,11 @@ export default defineComponent({
 
     const submit = async () => {
       // * company identification for companyid based on localstorage login
+
+      if(validGSTRef.value === false){
+        showErrorAlert("Warning", "Please enter valid GST Number");
+        return;
+      }
 
       // disp_image
       companyDetails.value.disp_avatar =
@@ -1077,7 +1198,12 @@ export default defineComponent({
       updateImage,
       file_size,
       isValidGSTNo,
+      debouncedValidateGST,
       validGSTRef,
+      setDates,
+      handleUsageType,
+      usageTypes,
+      hideSubscriptionDate,
     };
   },
 });

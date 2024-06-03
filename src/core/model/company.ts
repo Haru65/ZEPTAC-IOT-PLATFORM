@@ -8,3 +8,20 @@ interface ICompany {
 }
 
 export type { ICompany };
+
+
+export const usageTypes = [
+  {
+      id: "1",
+      name: "Free Trail (7 days)",
+  },
+  {
+      id: "2",
+      name: "Subscription",
+  },
+];
+
+export const getUsageType = (id) => {
+  const usage = usageTypes.find(item => item.id == id);
+  return usage ? usage.name : "";
+};

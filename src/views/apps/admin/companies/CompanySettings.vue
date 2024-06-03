@@ -99,7 +99,9 @@
 
               <!--begin::Col-->
               <div class="col-lg-8 fv-row">
-                <div class="form-control form-control-lg form-control-solid text-muted">
+                <div
+                  class="form-control form-control-lg form-control-solid text-muted"
+                >
                   {{ companyDetails.company_name }}
                 </div>
               </div>
@@ -216,7 +218,8 @@
                 <div
                   class="form-control form-control-lg form-control-solid text-muted"
                 >
-              {{ companyDetails.email }}</div>
+                  {{ companyDetails.email }}
+                </div>
               </div>
               <!--end::Col-->
             </div>
@@ -362,7 +365,7 @@
                     class="form-control form-control-lg form-control-solid"
                     placeholder="Enter GST Number"
                     v-model="companyDetails.gst_details"
-                    v-on:input="isValidGSTNo"
+                    v-on:keyup="debouncedValidateGST"
                   />
                   <div
                     v-if="validGSTRef === true"
@@ -410,14 +413,18 @@
                 <div class="row">
                   <!--begin::Col-->
                   <div class="col-lg-6 fv-row p-2">
-                    <div class="form-control form-control-lg form-control-solid text-muted">
+                    <div
+                      class="form-control form-control-lg form-control-solid text-muted"
+                    >
                       {{ companyDetails.user_limit }}
                     </div>
                   </div>
                   <!--end::Col-->
                   <!--begin::Col-->
                   <div class="col-lg-6 fv-row p-2">
-                    <div class="form-control form-control-lg form-control-solid text-muted">
+                    <div
+                      class="form-control form-control-lg form-control-solid text-muted"
+                    >
                       {{ companyDetails.selected_package }}
                     </div>
                   </div>
@@ -429,8 +436,8 @@
             </div>
             <!--end::Input group-->
 
-                        <!--begin::Input group-->
-                        <div class="row mb-6">
+            <!--begin::Input group-->
+            <div class="row mb-6">
               <!--begin::Label-->
               <label class="col-lg-4 col-form-label required fw-semobold fs-6">
                 Choose Start Month of Financial Year
@@ -459,7 +466,6 @@
               <!--end::Col-->
             </div>
             <!--end::Input group-->
-
 
             <!--begin::Input group-->
             <div class="row mb-6">
@@ -721,8 +727,6 @@
               <!--end::Col-->
             </div>
             <!--end::Input group-->
-
-            
           </div>
           <div class="modal-footer flex-center">
             <!--begin::Button-->
@@ -761,6 +765,7 @@ import * as Yup from "yup";
 import packages from "@/core/config/PackagesConfig";
 import { useRoute, useRouter } from "vue-router";
 import { limit } from "@/core/config/WhichUserConfig";
+import { debounce } from "@/core/helpers/debounce";
 const file_size = ref(false);
 
 interface companyDetails {
@@ -791,6 +796,10 @@ interface companyDetails {
   instrument_id_prefix: string;
   srf_no_init: string;
   srf_no_prefix: string;
+
+  is_trial: boolean;
+  trial_subscription_start: string;
+  trial_subscription_end: string;
 }
 
 export default defineComponent({
@@ -855,29 +864,30 @@ export default defineComponent({
       instrument_id_prefix: "",
       srf_no_init: "",
       srf_no_prefix: "",
+
+      is_trial: true,
+      trial_subscription_start: "",
+      trial_subscription_end: "",
     });
 
     const validGSTRef = ref(false);
 
-    function isValidGSTNo() {
-      // Regex to check valid
-      // GST CODE
-      let regex = new RegExp(
-        /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/
-      );
+    async function isValidGSTNo() {
 
-      let str = companyDetails.value.gst_details;
+      // Regex to check valid GST CODE
+      const regex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
-      // GST CODE
-      // is empty return false
-      if (str == null) {
+      // Retrieve GST number from company details
+      const str = companyDetails.value.gst_details;
+
+      // Check if GST number is null or not 15 characters long
+      if (str == null || str.length !== 15) {
         validGSTRef.value = false;
         return false;
       }
 
-      // Return true if the GST_CODE
-      // matched the ReGex
-      if (regex.test(str) == true) {
+      // Check if the GST number matches the regex pattern
+      if (regex.test(str)) {
         validGSTRef.value = true;
         return true;
       } else {
@@ -885,6 +895,9 @@ export default defineComponent({
         return false;
       }
     }
+
+    const debouncedValidateGST = debounce(isValidGSTNo, 1000);
+    
 
     onMounted(async () => {
       const response = await getCompany(CompanyId);
@@ -921,23 +934,29 @@ export default defineComponent({
         instrument_id_init: response.instrument_id_init,
         srf_no_prefix: response.srf_no_prefix,
         srf_no_init: response.srf_no_init,
+
+        is_trial: response.is_trial,
+        trial_subscription_start: response.trial_subscription_start || "",
+        trial_subscription_end: response.trial_subscription_end || "",
       };
 
-      isValidGSTNo();
-    }),
-      watch(
-        () => companyDetails.value.country,
-        (newVal) => {
-          while (state.value.length) {
-            state.value.pop();
-          }
-          if (newVal === "India") {
-            INstates.forEach((ele) => {
-              state.value.push(ele.name);
-            });
-          }
+      await debounce(isValidGSTNo, 1000);
+      
+    });
+
+    watch(
+      () => companyDetails.value.country,
+      (newVal) => {
+        while (state.value.length) {
+          state.value.pop();
         }
-      );
+        if (newVal === "India") {
+          INstates.forEach((ele) => {
+            state.value.push(ele.name);
+          });
+        }
+      }
+    );
 
     // remove file or update
     const removeImage = () => {
@@ -990,6 +1009,12 @@ export default defineComponent({
     };
 
     const submit = async () => {
+
+      if(validGSTRef.value === false){
+        showErrorAlert("Warning", "Please enter valid GST Number");
+        return;
+      }
+      
       loading.value = true;
       console.warn("Nice");
       try {
@@ -1064,7 +1089,7 @@ export default defineComponent({
       removeImage,
       updateImage,
       file_size,
-      isValidGSTNo,
+      debouncedValidateGST,
       validGSTRef,
     };
   },
