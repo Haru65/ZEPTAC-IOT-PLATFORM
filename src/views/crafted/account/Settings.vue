@@ -53,7 +53,7 @@
                 />
                 <img
                   v-else
-                  :src="`http://localhost:8000/storage/user/default.jpg`"
+                  :src="`https://api.zeptac.com/storage/user/default.jpg`"
                   class="image-input-wrapper rounded-circle"
                   alt="profile"
                 />
