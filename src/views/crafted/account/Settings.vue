@@ -46,17 +46,19 @@
               >
                 <!--begin::Preview existing avatar-->
                 <img
-                  v-if="User.meta.profile_pic_data"
-                  :src="`data:image/png;base64,` + User.meta.profile_pic_data"
+                  v-if="User.meta.profile_pic"
+                  :src="`https://api.zeptac.com/storage/company/${User.company_id}/profile_images/${User.meta.profile_pic}`"
                   class="image-input-wrapper rounded-circle"
                   alt="profile"
                 />
-                <img
-                  v-else
-                  :src="`https://api.zeptac.com/storage/user/default.jpg`"
-                  class="image-input-wrapper rounded-circle"
-                  alt="profile"
-                />
+                <div v-else class="symbol symbol-125px symbol-circle">
+                  <span
+                    :class="`bg-dark text-primary text-uppercase`"
+                    class="symbol-label fs-4tx fw-bold"
+                    >{{ User.first_name.charAt(0) || "" }}</span
+                  >
+                </div>
+
                 <!--end::Preview existing avatar-->
               </div>
               <!--end::Image input-->
@@ -325,7 +327,7 @@ import { changeUserPassword } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 
 interface ProfileDetails {
-  disp_avatar: string;
+  profile_pic: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -370,9 +372,7 @@ export default defineComponent({
     });
 
     const profileDetails = ref<ProfileDetails>({
-      disp_avatar: User
-        ? User.profile_pic
-        : getAssetPath("media/avatars/blank.png"),
+      profile_pic: User ? User.profile_pic : "",
       first_name: User ? User.first_name : "",
       last_name: User ? User.last_name : "",
       email: User ? User.email : "",

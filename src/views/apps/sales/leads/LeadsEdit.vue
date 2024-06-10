@@ -712,7 +712,7 @@ export default defineComponent({
         updated_by: User.id,
       };
       
-      await debounce(isValidGSTNo, 1000);
+      await isValidGSTNo();
       
     });
 

@@ -11,20 +11,20 @@
         data-kt-menu-attach="parent"
         data-kt-menu-placement="bottom-end"
       >
-      <KTIcon icon-name="message-text-2" icon-class="fs-2 fs-md-1" />
-        <span
-          class="position-absolute translate-middle top-0 start-50"
-        ><span class="badge rounded badge-success animation-blink">
-          {{ TotalNotification }}
-        </span></span>
+        <KTIcon icon-name="message-text-2" icon-class="fs-2 fs-md-1" />
+        <span class="position-absolute translate-middle top-0 start-50"
+          ><span class="badge rounded badge-success animation-blink">
+            {{ TotalNotification }}
+          </span></span
+        >
       </div>
-      
+
       <KTNotificationMenu
-      :TotalNotification="TotalNotification"
-      :dueCalibration="dueCalibration"
-      :dueMaintenance="dueMaintenance"
-      :calibrationNotificationCount="calibrationNotificationCount"
-      :maintenanaceNotificationCount="maintenanaceNotificationCount"
+        :TotalNotification="TotalNotification"
+        :dueCalibration="dueCalibration"
+        :dueMaintenance="dueMaintenance"
+        :calibrationNotificationCount="calibrationNotificationCount"
+        :maintenanaceNotificationCount="maintenanaceNotificationCount"
       />
       <!--end::Menu wrapper-->
     </div>
@@ -80,23 +80,24 @@
         data-kt-menu-placement="bottom-end"
       >
         <img
-            v-if="User.meta.profile_pic_data"
-            class="rounded-circle"
-            alt="user"
-            :src="`data:image/png;base64,` + User.meta.profile_pic_data"
-          />
-          <img
-            v-else
-            class="rounded-circle"
-            alt="user"
-            :src="`data:image/png;base64,` + blank64"
-          />
+          v-if="User.meta.profile_pic"
+          :src="`https://api.zeptac.com/storage/company/${User.company_id}/profile_images/${User.meta.profile_pic}`"
+          class="rounded-circle"
+          alt="user"
+        />
+        <div v-else class="symbol-circle">
+          <span
+            :class="`bg-dark text-primary text-uppercase`"
+            class="symbol-label fs-4 fw-bold"
+            >{{ User.first_name.charAt(0) || "" }}</span
+          >
+        </div>
       </div>
       <KTUserMenu />
       <!--end::Menu wrapper-->
     </div>
     <!--end::User menu-->
-<!-- 
+    <!-- 
     <div
       class="app-navbar-item d-lg-none ms-2 me-n3"
       v-tooltip
@@ -184,7 +185,9 @@ export default defineComponent({
             calibration_due_date: moment(calibration_due_date).format("D MMM"),
           })
         );
-        calibrationNotificationCount.value = dueCalibration.value ? dueCalibration.value.length : 0;
+        calibrationNotificationCount.value = dueCalibration.value
+          ? dueCalibration.value.length
+          : 0;
       } catch (error) {
         // Handle errors, e.g., show an error message
         console.error("Error fetching data:", error);
@@ -205,8 +208,10 @@ export default defineComponent({
             m_date2: moment(m_date2).format("D MMM"),
           })
         );
-        
-        maintenanaceNotificationCount.value = dueMaintenance.value ? dueMaintenance.value.length : 0;
+
+        maintenanaceNotificationCount.value = dueMaintenance.value
+          ? dueMaintenance.value.length
+          : 0;
       } catch (error) {
         // Handle errors, e.g., show an error message
         console.error("Error fetching data:", error);
@@ -217,8 +222,9 @@ export default defineComponent({
       await fetchDueCalibration();
       await fetchDueMaintenance();
 
-      TotalNotification.value = calibrationNotificationCount.value + maintenanaceNotificationCount.value;
-
+      TotalNotification.value =
+        calibrationNotificationCount.value +
+        maintenanaceNotificationCount.value;
     });
 
     return {

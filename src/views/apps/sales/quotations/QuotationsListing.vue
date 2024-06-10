@@ -22,15 +22,16 @@
       <!--begin::Card title-->
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
-                 <!-- YEAR WISE DATA -->
+        <!-- YEAR WISE DATA -->
 
-                 <h3 class="card-title align-items-start flex-column">
+        <h3 class="card-title align-items-start flex-column">
           <span class="card-label fw-semibold text-gray-400"
             >Financial Year</span
           >
         </h3>
         <div class="me-3">
           <el-select
+          class="w-150px"
             filterable
             placeholder="Select Year"
             v-model="selectedYearCache"
@@ -80,11 +81,7 @@
             <span class="me-2">{{ selectedIds.length }}</span
             >Selected
           </div>
-          <button
-            type="button"
-            class="btn btn-danger"
-            @click="deleteFewItem()"
-          >
+          <button type="button" class="btn btn-danger" @click="deleteFewItem()">
             Delete Selected
           </button>
         </div>
@@ -283,6 +280,7 @@ import {
   QuotationSearch,
   GetIncrQuotationId,
   DownloadQuotation,
+  getCompanyLogo,
 } from "@/stores/api";
 import arraySort from "array-sort";
 import { useAuthStore } from "@/stores/auth";
@@ -630,7 +628,6 @@ export default defineComponent({
     });
 
     async function handleChange() {
-      
       page.value = 1;
       localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
       await quotation_listing();
@@ -817,7 +814,6 @@ export default defineComponent({
       });
     };
 
-
     const search = ref<string>("");
     // ? debounce timer
     let debounceTimer;
@@ -852,7 +848,12 @@ export default defineComponent({
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await QuotationSearch(search.value, selectedYearCache.value ? selectedYearCache.value : financialYears.value[0]);
+        const response = await QuotationSearch(
+          search.value,
+          selectedYearCache.value
+            ? selectedYearCache.value
+            : financialYears.value[0]
+        );
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
@@ -995,6 +996,7 @@ export default defineComponent({
     const QuotationInfo = ref({
       id: "",
       quotation_no: "",
+      company_id: "",
       lead_id: "",
       client_id: "",
       items: {
@@ -1047,13 +1049,18 @@ export default defineComponent({
         last_name: "",
       },
       company_details: {
+        id: "",
         company_name: "",
-        company_logo: getAssetPath("media/avatars/default.png"),
+        company_logo: "",
+        address: "",
+        city: "",
+        state: "",
+        country: "",
+        pincode: "",
+        logo_base64: "",
       },
-      company_id: User.company_id,
       total: 0,
     });
-
 
     const downloadQuotation = async (id: any) => {
       const res = await DownloadQuotation(id);
@@ -1061,6 +1068,7 @@ export default defineComponent({
 
       if (res.result) {
         QuotationInfo.value.id = res.result.id;
+        QuotationInfo.value.company_id = res.result.company_id;
         QuotationInfo.value.quotation_no = res.result.quotation_no;
         QuotationInfo.value.lead_id = res.result.customer_id;
         QuotationInfo.value.client_id = res.result.client_id;
@@ -1078,11 +1086,15 @@ export default defineComponent({
         QuotationInfo.value.terms_and_conditions =
           res.result.terms_and_conditions;
 
-        QuotationInfo.value.company_details.company_name =
-          res.result.company_details.company_name;
-        QuotationInfo.value.company_details.company_logo = res.result
-          .company_details.company_logo
-          ? "data: image/png;base64," + res.result.company_details.company_logo
+        const res2 = await getCompanyLogo(res.result.company_id);
+
+        QuotationInfo.value.company_details.id = res2.id;
+        QuotationInfo.value.company_details.company_name = res2.company_name;
+        QuotationInfo.value.company_details.company_logo = res2.company_logo
+          ? res2.company_logo
+          : "";
+        QuotationInfo.value.company_details.logo_base64 = res2.logo_base64
+          ? "data: image/png;base64," + res2.logo_base64
           : getAssetPath("media/avatars/default.png");
 
         // console.log(QuotationInfo.value);
@@ -1123,7 +1135,7 @@ export default defineComponent({
       filteredTableHeader,
       identifier,
       downloadQuotation,
-      
+
       selectedYearCache,
       financialYears,
       handleChange,

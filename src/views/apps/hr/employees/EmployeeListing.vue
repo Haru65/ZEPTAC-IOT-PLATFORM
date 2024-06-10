@@ -121,7 +121,7 @@
           {{ employee.company_name[0].company_name }}
         </template>
 
-        <template v-slot:h_id="{ row: employee }">
+        <template v-slot:history_card="{ row: employee }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span
@@ -135,30 +135,55 @@
           <!--end::Menu FLex-->
         </template>
 
-        <template v-slot:a_id="{ row: employee }">
+        <template v-slot:profile_pic="{ row: employee }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span
-              data-toggle="tooltip"
-              title="Download Aadhar Card"
-              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
-              @click="downloadDocument(employee.id, 'aadhar_card')"
-              >⤓ Aadhar Card
-            </span>
-          </div>
-          <!--end::Menu FLex-->
-        </template>
-
-        <template v-slot:p_id="{ row: employee }">
-          <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span
+          <div class="d-flex flex-lg-row" v-if="employee.meta.profile_pic">
+            <a
+              target="blank"
+              v-bind:href="`https://api.zeptac.com/storage/company/${employee.company_id}/profile_images/${employee.meta.profile_pic}`"
               data-toggle="tooltip"
               title="Download Photo"
               class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
-              @click="downloadPhoto(employee.id)"
               >⤓ Photo
-            </span>
+            </a>
+          </div>
+          <div class="d-flex flex-lg-row">
+          </div>
+          <!--end::Menu FLex-->
+          <!--end::Menu FLex-->
+        </template>
+
+        <template v-slot:adhar="{ row: employee }">
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row" v-if="employee.meta.adhar">
+            <a
+              target="blank"
+              v-bind:href="`https://api.zeptac.com/storage/company/${employee.company_id}/aadhar_cards/${employee.meta.adhar}`"
+              data-toggle="tooltip"
+              title="Download Aadhar Card"
+              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
+              >⤓ Aadhar Card
+            </a>
+          </div>
+          <div class="d-flex flex-lg-row">
+          </div>
+          <!--end::Menu FLex-->
+          <!--end::Menu FLex-->
+        </template>
+
+        <template v-slot:pan="{ row: employee }">
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row" v-if="employee.meta.pan">
+            <a
+              target="blank"
+              v-bind:href="`https://api.zeptac.com/storage/company/${employee.company_id}/pan_cards/${employee.meta.pan}`"
+              data-toggle="tooltip"
+              title="Download Pan Card"
+              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
+              >⤓ Pan Card
+            </a>
+          </div>
+          <div class="d-flex flex-lg-row">
           </div>
           <!--end::Menu FLex-->
         </template>
@@ -280,19 +305,25 @@ export default defineComponent({
       },
       {
         columnName: "History Card",
-        columnLabel: "h_id",
-        sortEnabled: false,
-        columnWidth: 75,
-      },
-      {
-        columnName: "Aadhar Card",
-        columnLabel: "a_id",
+        columnLabel: "history_card",
         sortEnabled: false,
         columnWidth: 75,
       },
       {
         columnName: "Photo",
-        columnLabel: "p_id",
+        columnLabel: "profile_pic",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Aadhar Card",
+        columnLabel: "adhar",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Pan Card",
+        columnLabel: "pan",
         sortEnabled: false,
         columnWidth: 75,
       },
@@ -332,12 +363,10 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ id, role_id, ...rest }) => ({
+          ({ id, role_id, meta, ...rest }) => ({
             id: id,
             role_id: get_role(role_id),
-            h_id: id,
-            a_id: id,
-            p_id: id,
+            meta: {...meta},
             ...rest,
           })
         );
@@ -369,12 +398,10 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ id, role_id, ...rest }) => ({
+          ({ id, role_id, meta, ...rest }) => ({
             id: id,
             role_id: get_role(role_id),
-            h_id: id,
-            a_id: id,
-            p_id: id,
+            meta: {...meta},
             ...rest,
           })
         );
@@ -405,12 +432,10 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ id, role_id, ...rest }) => ({
+          ({ id, role_id, meta, ...rest }) => ({
             id: id,
             role_id: get_role(role_id),
-            h_id: id,
-            a_id: id,
-            p_id: id,
+            meta: {...meta},
             ...rest,
           })
         );
@@ -622,12 +647,10 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ id, role_id, ...rest }) => ({
+          ({ id, role_id, meta, ...rest }) => ({
             id: id,
             role_id: get_role(role_id),
-            h_id: id,
-            a_id: id,
-            p_id: id,
+            meta: {...meta},
             ...rest,
           })
         );
@@ -663,78 +686,6 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-    function downloadFileObject(base64String, nameOfFile, fExtension) {
-      const linkSource = base64String;
-      const downloadLink = document.createElement("a");
-      const fileName = nameOfFile + fExtension;
-      downloadLink.href = linkSource;
-      downloadLink.download = fileName;
-      downloadLink.click();
-    }
-
-    const downloadDocument = async (id: any, pdfName: string) => {
-      try {
-        const res = await getEmployee(id);
-
-        const { first_name, last_name, meta } = res;
-
-        const aadhar_card = meta?.adhar;
-        if (!aadhar_card) {
-          alert("User don't have this document.");
-          return;
-        }
-
-        let base64String = "";
-        if (pdfName === "aadhar_card") {
-          base64String = aadhar_card.replace(
-            /^data:application\/\pdf+;base64,/,
-            ""
-          );
-        }
-
-        // check whether data starts with JVB, JVB is a prefix for pdf files
-
-        if (base64String.startsWith("JVB")) {
-          base64String = "data:application/pdf;base64," + base64String;
-          downloadFileObject(
-            base64String,
-            first_name + "_" + last_name + "_" + pdfName,
-            ".pdf"
-          );
-        } else if (base64String.startsWith("data:application/pdf;base64")) {
-          downloadFileObject(
-            base64String,
-            first_name + "_" + last_name + "_" + pdfName,
-            ".pdf"
-          );
-        } else {
-          alert("Not a valid Base64 PDF string. Please check");
-        }
-      } catch (error) {
-        console.error("Error downloading Pdf:", error);
-      }
-    };
-
-    const downloadPhoto = async (id: any) => {
-      try {
-        const res = await getEmployee(id);
-
-        const { first_name, last_name, meta } = res;
-
-        const userPhoto = res.meta?.profile_pic_data
-          ? "data:image/png;base64," + res.meta?.profile_pic_data
-          : "data:image/png;base64," + blank64;
-
-        downloadFileObject(
-          userPhoto,
-          `${first_name}_${last_name}_photo`,
-          ".png"
-        );
-      } catch (error) {
-        console.error("Error downloading Photo:", error);
-      }
-    };
-
     const downloadHistoryCard = async (id: any) => {
       alert("Employee History Card");
     };
@@ -760,9 +711,7 @@ export default defineComponent({
       Limits,
       identifier,
       filteredTableHeader,
-      downloadDocument,
       downloadHistoryCard,
-      downloadPhoto,
     };
   },
 });

@@ -22,15 +22,16 @@
       <!--begin::Card title-->
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
-                 <!-- YEAR WISE DATA -->
+        <!-- YEAR WISE DATA -->
 
-                 <h3 class="card-title align-items-start flex-column">
+        <h3 class="card-title align-items-start flex-column">
           <span class="card-label fw-semibold text-gray-400"
             >Financial Year</span
           >
         </h3>
         <div class="me-3">
           <el-select
+            class="w-150px"
             filterable
             placeholder="Select Year"
             v-model="selectedYearCache"
@@ -287,7 +288,7 @@ export default defineComponent({
     const auth = useAuthStore();
     const User = auth.GetUser();
     const identifier = Identifier;
-    
+
     const authStore = useAuthStore();
 
     const tableHeader = ref([
@@ -489,7 +490,6 @@ export default defineComponent({
       }
     });
 
-
     const financialYears = ref(authStore.financialYears); // Generate Financial years list using the auth store function
     const selectedYearCache = ref(
       localStorage.getItem("selectedFinancialYear") || ""
@@ -505,7 +505,6 @@ export default defineComponent({
     });
 
     async function handleChange() {
-      
       page.value = 1;
       localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
       await method_validation_listing();
@@ -518,7 +517,6 @@ export default defineComponent({
       await method_validation_listing();
     });
 
-    
     const deleteFewItem = async () => {
       try {
         const result = await Swal.fire({
@@ -682,7 +680,12 @@ export default defineComponent({
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await MethodValidationSearch(search.value, selectedYearCache.value ? selectedYearCache.value : financialYears.value[0]);
+        const response = await MethodValidationSearch(
+          search.value,
+          selectedYearCache.value
+            ? selectedYearCache.value
+            : financialYears.value[0]
+        );
 
         tableData.value = response.result.data.map(({ ...rest }) => ({
           ...rest,
@@ -767,7 +770,7 @@ export default defineComponent({
       fillItemData,
       identifier,
       reLoadData,
-      
+
       selectedYearCache,
       financialYears,
       handleChange,

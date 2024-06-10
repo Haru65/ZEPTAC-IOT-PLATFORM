@@ -10,17 +10,18 @@
         <!--begin::Avatar-->
         <div class="symbol symbol-50px me-5">
           <img
-            v-if="User.meta.profile_pic_data"
+            v-if="User.meta.profile_pic"
+            :src="`https://api.zeptac.com/storage/company/${User.company_id}/profile_images/${User.meta.profile_pic}`"
             class="rounded-circle"
             alt="Logo"
-            :src="`data:image/png;base64,` + User.meta.profile_pic_data"
           />
-          <img
-            v-else
-            class="rounded-circle"
-            alt="Logo"
-            :src="`data:image/png;base64,` + blank64"
-          />
+          <div v-else class="symbol-circle">
+            <span
+            :class="`bg-dark text-primary text-uppercase`"
+            class="symbol-label fs-3 fw-bold"
+              >{{ User.first_name.charAt(0) || "" }}</span
+            >
+          </div>
         </div>
         <!--end::Avatar-->
 
@@ -78,7 +79,10 @@
     <!--end::Menu item-->
 
     <!--begin::Menu item-->
-    <div class="menu-item px-5" v-if="Identifier == 'Admin' || Identifier == 'Company-Admin'">
+    <div
+      class="menu-item px-5"
+      v-if="Identifier == 'Admin' || Identifier == 'Company-Admin'"
+    >
       <router-link
         :to="`/subscription/${User.company_id}`"
         class="menu-link px-5"

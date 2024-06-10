@@ -13,6 +13,7 @@
         </h3>
         <div class="me-3">
           <el-select
+          class="w-150px"
             filterable
             placeholder="Select Year"
             v-model="selectedYearCache"

@@ -34,7 +34,14 @@
                 >
                   <!--begin::Preview existing avatar-->
                   <img
-                    :src="companyDetails.disp_avatar"
+                    v-if="companyDetails.company_logo"
+                    v-bind:src="`https://api.zeptac.com/storage/temporary/${companyDetails.company_logo}`"
+                    class="image-input-wrapper"
+                    alt="company logo"
+                  />
+                  <img
+                    v-else
+                    v-bind:src="`${getAssetPath('media/avatars/default.png')}`"
                     class="image-input-wrapper"
                     alt="company logo"
                   />
@@ -52,9 +59,9 @@
                     <!--begin::Inputs-->
                     <input
                       type="file"
-                      name="avatar"
+                      name="company_logo"
                       accept=".png, .jpg, .jpeg"
-                      @change="updateImage($event)"
+                      @change="handleFileChange($event)"
                     />
                     <input max-size="1000" type="hidden" name="avatar_update" />
                     <!--end::Inputs-->
@@ -66,7 +73,7 @@
                     class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
                     data-kt-image-input-action="remove"
                     data-bs-toggle="tooltip"
-                    @click="removeImage()"
+                    @click="removeFileFromTemp"
                     title="Remove image"
                   >
                     <i class="bi bi-x fs-2"></i>
@@ -125,14 +132,14 @@
                 <Field
                   type="text"
                   as="textarea"
-                  name="company_address"
+                  name="address"
                   class="form-control form-control-lg form-control-solid"
                   placeholder="Company address"
                   v-model="companyDetails.address"
                 />
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
-                    <ErrorMessage name="company_address" />
+                    <ErrorMessage name="address" />
                   </div>
                 </div>
               </div>
@@ -183,14 +190,14 @@
               <div class="col-lg-8 fv-row">
                 <Field
                   type="tel"
-                  name="contact"
+                  name="mobile_number"
                   class="form-control form-control-lg form-control-solid"
                   placeholder="Phone number"
                   v-model="companyDetails.mobile_number"
                 />
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
-                    <ErrorMessage name="contact" />
+                    <ErrorMessage name="mobile_number" />
                   </div>
                 </div>
               </div>
@@ -206,7 +213,6 @@
               <!--begin::Label-->
               <label class="col-lg-4 col-form-label fw-semobold fs-6">
                 <span class="required">Email</span>
-
                 <i
                   class="fas fa-exclamation-circle ms-1 fs-7"
                   data-bs-toggle="tooltip"
@@ -260,6 +266,14 @@
                         :value="item.name"
                       />
                     </el-select>
+                    <div
+                      class="fv-plugins-message-container mt-0"
+                      v-if="companyDetails.country == ''"
+                    >
+                      <div class="fv-help-block">
+                        <ErrorMessage name="country" />
+                      </div>
+                    </div>
                   </div>
                   <!--end::Col-->
 
@@ -278,6 +292,14 @@
                           :value="item"
                         />
                       </el-select>
+                      <div
+                        class="fv-plugins-message-container mt-0"
+                        v-if="companyDetails.state == ''"
+                      >
+                        <div class="fv-help-block">
+                          <ErrorMessage name="state" />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -452,6 +474,14 @@
                           :value="item"
                         />
                       </el-select>
+                      <div
+                        class="fv-plugins-message-container mt-0"
+                        v-if="companyDetails.selected_package == ''"
+                      >
+                        <div class="fv-help-block">
+                          <ErrorMessage name="selected_package" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <!--end::Col-->
@@ -481,8 +511,12 @@
                       filterable
                       placeholder="Choose Start Month"
                     >
-                      <el-option key="1" label="January - December" value="1" />
-                      <el-option key="2" label="April - March" value="2" />
+                      <el-option
+                        v-for="item in financialTypes"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id"
+                      />
                     </el-select>
                   </div>
                   <!--end::Col-->
@@ -513,12 +547,12 @@
                       placeholder="Choose Usage Type"
                       v-on:change="handleUsageType"
                     >
-                    <el-option
-                          v-for="item in usageTypes"
-                          :key="item.id"
-                          :label="item.name"
-                          :value="item.id"
-                        />
+                      <el-option
+                        v-for="item in usageTypes"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id"
+                      />
                     </el-select>
                   </div>
                   <!--end::Col-->
@@ -566,6 +600,11 @@
                       placeholder="Enter Quotation Prefix"
                       v-model="companyDetails.quotation_no_prefix"
                     />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="quotation_no_prefix" />
+                      </div>
+                    </div>
                   </div>
                   <!--end::Col-->
 
@@ -579,6 +618,11 @@
                         placeholder="Enter Quotation No"
                         v-model="companyDetails.quotation_no_init"
                       />
+                      <div class="fv-plugins-message-container">
+                        <div class="fv-help-block">
+                          <ErrorMessage name="quotation_no_init" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <!--end::Col-->
@@ -609,6 +653,11 @@
                       placeholder="Enter Invoice Prefix"
                       v-model="companyDetails.invoice_no_prefix"
                     />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="invoice_no_prefix" />
+                      </div>
+                    </div>
                   </div>
                   <!--end::Col-->
 
@@ -622,6 +671,11 @@
                         placeholder="Enter Inovice No"
                         v-model="companyDetails.invoice_no_init"
                       />
+                      <div class="fv-plugins-message-container">
+                        <div class="fv-help-block">
+                          <ErrorMessage name="invoice_no_init" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <!--end::Col-->
@@ -652,6 +706,11 @@
                       placeholder="Enter RGP Prefix"
                       v-model="companyDetails.rgp_no_prefix"
                     />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="rgp_no_prefix" />
+                      </div>
+                    </div>
                   </div>
                   <!--end::Col-->
 
@@ -665,6 +724,11 @@
                         placeholder="Enter RGP No"
                         v-model="companyDetails.rgp_no_init"
                       />
+                      <div class="fv-plugins-message-container">
+                        <div class="fv-help-block">
+                          <ErrorMessage name="rgp_no_init" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <!--end::Col-->
@@ -696,6 +760,11 @@
                       placeholder="Enter Instrument Id Prefix"
                       v-model="companyDetails.instrument_id_prefix"
                     />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="instrument_id_prefix" />
+                      </div>
+                    </div>
                   </div>
                   <!--end::Col-->
 
@@ -709,6 +778,11 @@
                         placeholder="Enter initial Instrument Id"
                         v-model="companyDetails.instrument_id_init"
                       />
+                      <div class="fv-plugins-message-container">
+                        <div class="fv-help-block">
+                          <ErrorMessage name="instrument_id_init" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <!--end::Col-->
@@ -740,6 +814,11 @@
                       placeholder="Enter Enquiry Prefix"
                       v-model="companyDetails.enquiry_no_prefix"
                     />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="enquiry_no_prefix" />
+                      </div>
+                    </div>
                   </div>
                   <!--end::Col-->
 
@@ -753,6 +832,11 @@
                         placeholder="Enter Enquiry No"
                         v-model="companyDetails.enquiry_no_init"
                       />
+                      <div class="fv-plugins-message-container">
+                        <div class="fv-help-block">
+                          <ErrorMessage name="enquiry_no_init" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <!--end::Col-->
@@ -784,6 +868,11 @@
                       placeholder="Enter SRF Prefix"
                       v-model="companyDetails.srf_no_prefix"
                     />
+                    <div class="fv-plugins-message-container">
+                      <div class="fv-help-block">
+                        <ErrorMessage name="srf_no_prefix" />
+                      </div>
+                    </div>
                   </div>
                   <!--end::Col-->
 
@@ -797,6 +886,11 @@
                         placeholder="Enter SRF No"
                         v-model="companyDetails.srf_no_init"
                       />
+                      <div class="fv-plugins-message-container">
+                        <div class="fv-help-block">
+                          <ErrorMessage name="srf_no_init" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <!--end::Col-->
@@ -844,7 +938,7 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref, watch } from "vue";
 import { countries, INstates } from "@/core/model/countries";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { addCompany } from "@/stores/api";
+import { addCompany, removeImage, uploadImage } from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import packages from "@/core/config/PackagesConfig";
@@ -852,12 +946,11 @@ import { limit } from "@/core/config/WhichUserConfig";
 import moment from "moment";
 import { useRouter } from "vue-router";
 import { blank64 } from "./blank";
-import { usageTypes } from "@/core/model/company";
+import { usageTypes, financialTypes } from "@/core/model/company";
 import { debounce } from "@/core/helpers/debounce";
 
 interface companyDetails {
-  disp_avatar: string;
-  image: string;
+  company_logo: string;
   company_name: string;
   address: string;
   contact_person: string;
@@ -889,7 +982,6 @@ interface companyDetails {
   is_trial: boolean;
   trial_subscription_start: string;
   trial_subscription_end: string;
-
 }
 
 export default defineComponent({
@@ -909,22 +1001,47 @@ export default defineComponent({
     const state = ref([""]);
     const file_size = ref(false);
 
+    const data = ref({
+      file_name: "",
+      file: "",
+      file_size: 0,
+    });
+
     const companyDetailsValidator = Yup.object().shape({
       company_name: Yup.string().required().label("Company Name"),
-      company_address: Yup.string().required().label("Company Address"),
+      address: Yup.string().required().label("Company Address"),
       contact_person: Yup.string().required().label("Contact Person"),
-      contact: Yup.string().required().label("Contact"),
+      mobile_number: Yup.string().required().label("Contact"),
       email: Yup.string().required().email().label("Email"),
       country: Yup.string().required().label("Country"),
       state: Yup.string().required().label("State"),
       city: Yup.string().required().label("City"),
       pincode: Yup.string().required().label("Pincode"),
       gst_details: Yup.string().required().label("GST Number"),
+
+      selected_package: Yup.string().required().label("Package"),
+
+      quotation_no_init: Yup.string().required().label("Quotation Suffix"),
+      quotation_no_prefix: Yup.string().required().label("Quotation Prefix"),
+
+      invoice_no_init: Yup.string().required().label("Invoice Suffix"),
+      invoice_no_prefix: Yup.string().required().label("Invoice Prefix"),
+
+      rgp_no_init: Yup.string().required().label("Gate Pass Suffix"),
+      rgp_no_prefix: Yup.string().required().label("Gate Pass Prefix"),
+
+      enquiry_no_init: Yup.string().required().label("Enquiry No. Suffix"),
+      enquiry_no_prefix: Yup.string().required().label("Enquiry No. Prefix"),
+
+      instrument_id_init: Yup.string().required().label("Instrument Suffix"),
+      instrument_id_prefix: Yup.string().required().label("Instrument Prefix"),
+
+      srf_no_init: Yup.string().required().label("SRF No. Suffix"),
+      srf_no_prefix: Yup.string().required().label("SRF No. Prefix"),
     });
 
     const companyDetails = ref<companyDetails>({
-      disp_avatar: "data: image/png;base64," + blank64,
-      image: "",
+      company_logo: "",
       company_name: "",
       address: "",
       contact_person: "",
@@ -961,7 +1078,6 @@ export default defineComponent({
     const validGSTRef = ref(false);
 
     async function isValidGSTNo() {
-
       // Regex to check valid GST CODE
       const regex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
@@ -985,30 +1101,25 @@ export default defineComponent({
     }
 
     const debouncedValidateGST = debounce(isValidGSTNo, 1000);
-    
+
     const hideSubscriptionDate = ref(true);
 
     /* --------SET USAGETYPE LOGIC--------*/
     async function handleUsageType(usageTypeId) {
-      console.log(usageTypeId)
+      console.log(usageTypeId);
       try {
         if (usageTypeId != null) {
           if (usageTypeId != "" && usageTypeId != null) {
-
-            if(usageTypeId == "2"){
+            if (usageTypeId == "2") {
               hideSubscriptionDate.value = false;
               companyDetails.value.subscription_date = "";
               companyDetails.value.is_trial = false;
-
-            }
-            else{
+            } else {
               hideSubscriptionDate.value = true;
               companyDetails.value.subscription_date = "";
               companyDetails.value.is_trial = true;
             }
-
           }
-          
         } else {
           companyDetails.value.subscription_date = "";
           companyDetails.value.is_trial = true;
@@ -1058,98 +1169,197 @@ export default defineComponent({
       }
     );
 
-    const submit = async () => {
-      // * company identification for companyid based on localstorage login
+    const validateForm = (formData) => {
+      for (const key in formData) {
+        let value = formData[key];
+        if (
+          key !== "trial_subscription_start" &&
+          key !== "trial_subscription_end" &&
+          key !== "subscription_date"
+        ) {
+          if (Array.isArray(value)) {
+            for (const item of value) {
+              if (!validateForm(item)) {
+                return false;
+              }
+            }
+          } else if (typeof value === "object" && value !== null) {
+            if (!validateForm(value)) {
+              return false;
+            }
+          } else if (typeof value === "string") {
+            value = value.trim();
+            if (value === "") {
+              return false;
+            }
+          } else {
+          }
+        }
+      }
+      return true;
+    };
 
-      if(validGSTRef.value === false){
+    const submit = async () => {
+      if (validGSTRef.value === false) {
         showErrorAlert("Warning", "Please enter valid GST Number");
         return;
       }
 
-      // disp_image
-      companyDetails.value.disp_avatar =
-        companyDetails.value.disp_avatar.replace(
-          /^data:image\/\w+;base64,/,
-          ""
-        );
-      loading.value = true;
-      console.warn("Nice");
       try {
-        // Call your API here with the form values
-        const response = await addCompany(companyDetails.value);
-        // console.log(response.error);
-        if (!response.error) {
-          // Handle successful API response
-          // console.log("API response:", response);
-          showSuccessAlert(
-            "Success",
-            "Company details have been successfully inserted!"
-          );
-          router.push({ name: "company-list" });
+        loading.value = true;
+
+        if (validateForm(companyDetails.value)) {
+          // Call your API here with the form values
+          const response = await addCompany(companyDetails.value);
+          // console.log(response.error);
+          if (!response.error) {
+            // Handle successful API response
+            // console.log("API response:", response);
+            showSuccessAlert(
+              "Success",
+              "Company details have been successfully inserted!"
+            );
+            router.push({ name: "company-list" });
+          }
         } else {
-          // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          showErrorAlert("Warning", "Please fill in all fields.");
         }
       } catch (error) {
-        // Handle any other errors during API call
-        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
+        loading.value = false;
       } finally {
         loading.value = false;
       }
     };
 
-    // remove file or update
-    const removeImage = () => {
-      companyDetails.value.disp_avatar = getAssetPath(
-        "media/avatars/default.png"
-      );
-      companyDetails.value.image = "";
+    const removeFileFromTemp = async () => {
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You want to change the file!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error) {
+          const errorMessage = "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromServer = async () => {
+        try {
+          const response = await removeImage(data.value);
+
+          if (response.success) {
+            companyDetails.value.company_logo = "";
+            data.value = {
+              file_name: "",
+              file_size: 0,
+              file: "",
+            };
+
+            showSuccessAlert(
+              "Success",
+              response.message || `File removed successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(response.message || "Failed to remove the file.");
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      const isConfirmed = await deleteConfirmation();
+      if (isConfirmed) {
+        return await deleteFromServer();
+      } else {
+        return { success: false };
+      }
     };
 
-    const updateImage = (e: any) => {
-      const file = e.target.files[0];
+    const uploadProgress = ref<number>(0);
 
-      if (!file) {
-        console.error("Error: No file selected.");
+    const MAX_FILE_SIZE = 1024 ** 2; // 1 MB
+
+    const handleFileChange = async (event: any) => {
+      const selectedFile = event.target?.files?.[0];
+      const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
+
+      if (!selectedFile) {
+        alert("Please Select a file");
         return;
       }
 
-      const fileSize = file.size;
-      const fileMb = fileSize / 1024 ** 2;
-      // console.log(fileMb);
-
-      if (fileMb <= 1) {
-        file_size.value = false;
-        companyDetails.value.disp_avatar = URL.createObjectURL(file);
-        const reader = new FileReader();
-
-        reader.onload = function () {
-          try {
-            const base64Data = reader.result
-              ?.toString()
-              .replace(/^data:image\/\w+;base64,/, "");
-            if (base64Data) {
-              companyDetails.value.image = base64Data;
-              // console.log(companyDetails.value.image);
-            } else {
-              console.error("Error: Failed to read the image data.");
-            }
-          } catch (e) {
-            console.error("Error:", e);
-          }
-        };
-
-        reader.readAsDataURL(file);
-      } else {
-        file_size.value = true;
-        companyDetails.value.disp_avatar = getAssetPath(
-          "media/avatars/default.png"
-        );
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        alert("File size should be less than 1 MB");
+        return;
       }
+
+      data.value.file_size = selectedFile.size / 1024 ** 2;
+
+      if (allowedTypes.includes(selectedFile.type)) {
+        await uploadFile(selectedFile);
+      } else {
+        data.value.file = "";
+        alert("Please select a valid file");
+      }
+
+      console.log(data.value);
+    };
+
+    const uploadFile = async (file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("file_name", data.value.file_name);
+
+      const onUploadProgress = (progressEvent) => {
+        const { loaded, total } = progressEvent;
+        const percentage = Math.floor((loaded / total) * 100);
+        uploadProgress.value = percentage;
+      };
+
+      try {
+        await simulateUploadProgress();
+        const response = await uploadImage(formData, onUploadProgress);
+        companyDetails.value.company_logo = response.modifiedFileName;
+        data.value.file_name = response.modifiedFileName;
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      } finally {
+        finalizeProgress();
+      }
+
+      data.value.file = file;
+    };
+
+    const simulateUploadProgress = async () => {
+      uploadProgress.value = 0;
+      const interval = setInterval(() => {
+        if (uploadProgress.value < 100) {
+          uploadProgress.value += 10; // Adjust this value for smoother progress
+        } else {
+          clearInterval(interval);
+        }
+      }, 200); // Adjust the interval duration as needed
+    };
+
+    const finalizeProgress = () => {
+      uploadProgress.value = 100; // Ensure progress bar is complete
+      setTimeout(() => {
+        uploadProgress.value = 0; // Reset progress bar after a short delay
+      }, 100);
     };
 
     const showSuccessAlert = (title, message) => {
@@ -1194,8 +1404,6 @@ export default defineComponent({
       state,
       packages,
       limit,
-      removeImage,
-      updateImage,
       file_size,
       isValidGSTNo,
       debouncedValidateGST,
@@ -1203,7 +1411,12 @@ export default defineComponent({
       setDates,
       handleUsageType,
       usageTypes,
+      financialTypes,
       hideSubscriptionDate,
+      handleFileChange,
+      uploadProgress,
+      data,
+      removeFileFromTemp,
     };
   },
 });

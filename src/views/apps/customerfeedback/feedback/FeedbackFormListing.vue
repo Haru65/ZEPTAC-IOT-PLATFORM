@@ -34,6 +34,7 @@
             filterable
             placeholder="Select Year"
             v-model="selectedYearCache"
+            class="w-150px"
             id="financialYear"
             @change="handleChange"
           >

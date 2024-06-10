@@ -301,6 +301,7 @@ import {
   deleteInstrument,
   InstrumentSearch,
   getInstrument,
+getCompanyLogo,
 } from "@/stores/api";
 import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
 import { hideModal } from "@/core/helpers/dom";
@@ -788,6 +789,7 @@ export default defineComponent({
     const instrumentInfo = ref({
       id: "",
       instrument_id: "",
+      company_id: "",
       name: "",
       model_no: "",
       serial_no: "",
@@ -802,21 +804,24 @@ export default defineComponent({
       maintenance_history: [],
 
       company_details: {
+        id: "",
         company_name: "",
-        company_logo: getAssetPath("media/avatars/default.png"),
+        company_logo: "",
         address: "",
         city: "",
         state: "",
         country: "",
         pincode: "",
+        logo_base64: "",
       },
     });
 
     const downloadHistoryCard = async (id: any) => {
       const res = await getInstrument(id);
-
+      
       const {
         instrument_id,
+        company_id,
         name,
         model_no,
         serial_no,
@@ -826,11 +831,13 @@ export default defineComponent({
         vendor_name,
         accessories_list,
         maintenance_history,
-        company_details,
-      } = res;
+        } = res;
+        
+        const res2 = await getCompanyLogo(company_id);
 
       instrumentInfo.value.id = id;
       instrumentInfo.value.instrument_id = instrument_id;
+      instrumentInfo.value.company_id = company_id;
       instrumentInfo.value.name = name;
       instrumentInfo.value.model_no = model_no;
       instrumentInfo.value.serial_no = serial_no;
@@ -843,16 +850,17 @@ export default defineComponent({
       instrumentInfo.value.maintenance_history =
         JSON.parse(maintenance_history);
 
-      instrumentInfo.value.company_details.address = company_details.address;
-      instrumentInfo.value.company_details.city = company_details.city;
-      instrumentInfo.value.company_details.pincode = company_details.pincode;
-      instrumentInfo.value.company_details.state = company_details.state;
-      instrumentInfo.value.company_details.country = company_details.country;
+      instrumentInfo.value.company_details.address = res2.address;
+      instrumentInfo.value.company_details.city = res2.city;
+      instrumentInfo.value.company_details.pincode = res2.pincode;
+      instrumentInfo.value.company_details.state = res2.state;
+      instrumentInfo.value.company_details.country = res2.country;
       instrumentInfo.value.company_details.company_name =
-        company_details.company_name;
-      instrumentInfo.value.company_details.company_logo =
-        company_details.company_logo
-          ? "data: image/png;base64," + company_details.company_logo
+      res2.company_name;
+      instrumentInfo.value.company_details.company_logo = res2.company_logo ? res2.company_logo : "";
+      instrumentInfo.value.company_details.logo_base64 =
+      res2.logo_base64
+          ? "data: image/png;base64," + res2.logo_base64
           : getAssetPath("media/avatars/default.png");
 
       console.log(instrumentInfo.value.company_details);

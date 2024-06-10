@@ -22,15 +22,16 @@
       <!--begin::Card title-->
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
-                 <!-- YEAR WISE DATA -->
+        <!-- YEAR WISE DATA -->
 
-                 <h3 class="card-title align-items-start flex-column">
+        <h3 class="card-title align-items-start flex-column">
           <span class="card-label fw-semibold text-gray-400"
             >Financial Year</span
           >
         </h3>
         <div class="me-3">
           <el-select
+          class="w-150px"
             filterable
             placeholder="Select Year"
             v-model="selectedYearCache"
@@ -80,11 +81,7 @@
             <span class="me-2">{{ selectedIds.length }}</span
             >Selected
           </div>
-          <button
-            type="button"
-            class="btn btn-danger"
-            @click="deleteFewItem()"
-          >
+          <button type="button" class="btn btn-danger" @click="deleteFewItem()">
             Delete Selected
           </button>
         </div>
@@ -125,7 +122,6 @@
         :loading="loading"
       >
         <!-- img data -->
-
 
         <template v-slot:id="{ row: invoices }">
           <span class="text-gray-600 text-hover-primary mb-1">
@@ -280,6 +276,7 @@ import {
   GetIncrInvoiceId,
   InvoiceSearch,
   DownloadInvoice,
+  getCompanyLogo,
 } from "@/stores/api";
 import arraySort from "array-sort";
 import { useAuthStore } from "@/stores/auth";
@@ -496,7 +493,7 @@ export default defineComponent({
               : financialYears.value[0]
           }`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -546,7 +543,7 @@ export default defineComponent({
               : financialYears.value[0]
           }`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -668,7 +665,6 @@ export default defineComponent({
     });
 
     async function handleChange() {
-      
       page.value = 1;
       localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
       await invoice_listing();
@@ -844,8 +840,13 @@ export default defineComponent({
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await InvoiceSearch(search.value, selectedYearCache.value ? selectedYearCache.value : financialYears.value[0]);
-        
+        const response = await InvoiceSearch(
+          search.value,
+          selectedYearCache.value
+            ? selectedYearCache.value
+            : financialYears.value[0]
+        );
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -984,7 +985,6 @@ export default defineComponent({
       });
     };
 
-    
     const InvoiceInfo = ref({
       id: "",
       invoice_no: "",
@@ -1040,8 +1040,15 @@ export default defineComponent({
         last_name: "",
       },
       company_details: {
+        id: "",
         company_name: "",
-        company_logo: getAssetPath("media/avatars/default.png"),
+        company_logo: "",
+        address: "",
+        city: "",
+        state: "",
+        country: "",
+        pincode: "",
+        logo_base64: "",
       },
       company_id: User.company_id,
       total: 0,
@@ -1053,6 +1060,7 @@ export default defineComponent({
 
       if (res.result) {
         InvoiceInfo.value.id = res.result.id;
+        InvoiceInfo.value.company_id = res.result.company_id;
         InvoiceInfo.value.invoice_no = res.result.invoice_no;
         InvoiceInfo.value.lead_id = res.result.customer_id;
         InvoiceInfo.value.client_id = res.result.client_id;
@@ -1070,11 +1078,15 @@ export default defineComponent({
         InvoiceInfo.value.terms_and_conditions =
           res.result.terms_and_conditions;
 
-        InvoiceInfo.value.company_details.company_name =
-          res.result.company_details.company_name;
-        InvoiceInfo.value.company_details.company_logo = res.result
-          .company_details.company_logo
-          ? "data: image/png;base64," + res.result.company_details.company_logo
+        const res2 = await getCompanyLogo(res.result.company_id);
+
+        InvoiceInfo.value.company_details.id = res2.id;
+        InvoiceInfo.value.company_details.company_name = res2.company_name;
+        InvoiceInfo.value.company_details.company_logo = res2.company_logo
+          ? res2.company_logo
+          : "";
+        InvoiceInfo.value.company_details.logo_base64 = res2.logo_base64
+          ? "data: image/png;base64," + res2.logo_base64
           : getAssetPath("media/avatars/default.png");
 
         // console.log(InvoiceInfo.value);
@@ -1085,17 +1097,11 @@ export default defineComponent({
           InvoiceInfo.value.invoice_no,
           InvoiceInfo
         );
-      }
-      else{
+      } else {
         // console.log(res.message)
-        showErrorAlert(
-          "information",
-          res.message ?? "something went wrong"
-        );
+        showErrorAlert("information", res.message ?? "something went wrong");
       }
     };
-
-
 
     return {
       tableData,
@@ -1121,7 +1127,7 @@ export default defineComponent({
       filteredTableHeader,
       identifier,
       downloadInvoice,
-      
+
       selectedYearCache,
       financialYears,
       handleChange,

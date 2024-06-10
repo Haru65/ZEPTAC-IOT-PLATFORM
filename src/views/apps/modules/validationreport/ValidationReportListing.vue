@@ -31,6 +31,7 @@
         </h3>
         <div class="me-3">
           <el-select
+            class="w-150px"
             filterable
             placeholder="Select Year"
             v-model="selectedYearCache"
@@ -81,11 +82,7 @@
             <span class="me-2">{{ selectedIds.length }}</span
             >Selected
           </div>
-          <button
-            type="button"
-            class="btn btn-danger"
-            @click="deleteFewItem()"
-          >
+          <button type="button" class="btn btn-danger" @click="deleteFewItem()">
             Delete Selected
           </button>
         </div>
@@ -254,6 +251,7 @@ import {
   deleteValidationReport,
   ValidationReportSearch,
   getReportinfo,
+  getCompanyLogo,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import arraySort from "array-sort";
@@ -508,7 +506,6 @@ export default defineComponent({
     Datatable,
   },
   setup() {
-    
     // Financial Year Logic
     const authStore = useAuthStore();
 
@@ -778,7 +775,6 @@ export default defineComponent({
     });
 
     async function handleChange() {
-      
       page.value = 1;
       localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
       await report_listing();
@@ -954,7 +950,12 @@ export default defineComponent({
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await ValidationReportSearch(search.value, selectedYearCache.value ? selectedYearCache.value : financialYears.value[0]);
+        const response = await ValidationReportSearch(
+          search.value,
+          selectedYearCache.value
+            ? selectedYearCache.value
+            : financialYears.value[0]
+        );
 
         tableData.value = response.result.data.map(
           ({
@@ -1026,6 +1027,7 @@ export default defineComponent({
     const reportInfo = ref({
       id: "",
       rgp_id: "",
+      company_id: "",
       rgp_no: "",
       tests: [],
       quotation_no: "",
@@ -1054,8 +1056,15 @@ export default defineComponent({
         country: "",
       },
       company_details: {
+        id: "",
         company_name: "",
-        company_logo: getAssetPath("media/avatars/default.png"),
+        company_logo: "",
+        address: "",
+        city: "",
+        state: "",
+        country: "",
+        pincode: "",
+        logo_base64: "",
       },
     });
 
@@ -1063,6 +1072,7 @@ export default defineComponent({
       // get all information of the rgp
       const res = await getReportinfo(id);
       reportInfo.value.id = res.result.id;
+      reportInfo.value.company_id = res.result.company_id;
       reportInfo.value.rgp_id = res.result.rgp_id;
       reportInfo.value.rgp_no = res.result.rgp_Details.rgp_no;
       reportInfo.value.tests = JSON.parse(res.result.tests);
@@ -1074,11 +1084,16 @@ export default defineComponent({
       reportInfo.value.customer_data = res.result.customer_data;
       reportInfo.value.client_data = res.result.client_data;
       reportInfo.value.quotation_no = res.result.quotationsDetails.quotation_no;
-      reportInfo.value.company_details.company_name =
-        res.result.company_details.company_name;
-      reportInfo.value.company_details.company_logo = res.result.company_details
-        .company_logo
-        ? "data: image/png;base64," + res.result.company_details.company_logo
+
+      const res2 = await getCompanyLogo(res.result.company_id);
+
+      reportInfo.value.company_details.id = res2.id;
+      reportInfo.value.company_details.company_name = res2.company_name;
+      reportInfo.value.company_details.company_logo = res2.company_logo
+        ? res2.company_logo
+        : "";
+      reportInfo.value.company_details.logo_base64 = res2.logo_base64
+        ? "data: image/png;base64," + res2.logo_base64
         : getAssetPath("media/avatars/default.png");
 
       console.log(reportInfo.value);

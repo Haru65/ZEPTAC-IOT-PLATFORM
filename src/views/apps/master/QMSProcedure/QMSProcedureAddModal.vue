@@ -227,7 +227,7 @@
               </div>
               <!--end::Input group-->
 
-              <div class="row mb-6">
+              <div class="row mb-6" v-if="documentDetails.document_file == ''">
                 <div class="form-group col-md-12 mb-8 mb-sd-8">
                   <label
                     class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
@@ -275,9 +275,7 @@
                   </div>
                 </div>
               </div>
-
-              <div
-                v-if="documentDetails.document_file != ''"
+              <div v-else
                 class="notice d-flex bg-light-primary rounded border-primary border border-dashed min-w-lg-600px flex-shrink-0 p-6"
               >
                 <!--begin::Icon-->
@@ -296,7 +294,7 @@
                     <h4 class="text-gray-800 fw-bold cursor-pointer">
                       <a
                         target="blank"
-                        v-bind:href="`http://localhost:8000/storage/temporary/${documentDetails.document_file}`"
+                        v-bind:href="`https://api.zeptac.com/storage/temporary/${documentDetails.document_file}`"
                         data-toggle="tooltip"
                         title="preview file"
                         class="underline"
@@ -312,7 +310,15 @@
 
                   <!--begin::Action-->
 
-                  <KTIcon icon-name="cross" icon-class="fs-1" />
+                  <KTIcon
+                    data-toggle="tooltip"
+                    title="remove file"
+                    icon-name="cross"
+                    class="cursor-pointer fs-2tx text-danger rounded"
+                    @click="removeFileFromTemp"
+                    icon-class="fs-1"
+                  />
+
                   <!--end::Action-->
                 </div>
                 <!--end::Wrapper-->
@@ -368,7 +374,7 @@ import { useAuthStore } from "@/stores/auth";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import moment from "moment";
-import { addQMSProcedure, uploadImage } from "@/stores/api";
+import { addQMSProcedure, removeImage, uploadImage } from "@/stores/api";
 
 interface NewAddressData {}
 
@@ -525,6 +531,81 @@ export default defineComponent({
       }, 100);
     };
 
+    const removeFileFromTemp = async () => {
+      if (documentDetails.value.document_file && data.value.file_name === "") {
+        var confirmChange = confirm("Do you really want to change file?");
+        if (!confirmChange) {
+          return;
+        }
+
+        documentDetails.value.document_file = "";
+        // Continue with the rest of your code here
+        return;
+      }
+
+      if (
+        documentDetails.value.document_file === "" &&
+        data.value.file_name === ""
+      ) {
+        alert("You already removed the file. Please select a new file.");
+        return;
+      }
+
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You want to change the file!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error) {
+          const errorMessage = "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromServer = async () => {
+        try {
+          const response = await removeImage(data.value);
+
+          if (response.success) {
+            documentDetails.value.document_file = "";
+            data.value = {
+              file_name: "",
+              file_size: 0,
+              file: "",
+            };
+
+            showSuccessAlert(
+              "Success",
+              response.message || `File removed successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(response.message || "Failed to remove the file.");
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      const isConfirmed = await deleteConfirmation();
+      if (isConfirmed) {
+        return await deleteFromServer();
+      } else {
+        return { success: false };
+      }
+    };
 
     // const handleFileChange = (event) => {
     //   // Get the selected file
@@ -690,6 +771,7 @@ export default defineComponent({
       clear,
       uploadProgress,
       data,
+      removeFileFromTemp,
     };
   },
 });

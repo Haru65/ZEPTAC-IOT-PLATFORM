@@ -601,7 +601,8 @@ export default defineComponent({
       Leads.value.pop();
       await GetLeads();
       
-      await debounce(isValidGSTNo, 1000);
+
+      await isValidGSTNo();
 
     });
 

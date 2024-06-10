@@ -32,6 +32,7 @@
           </h3>
           <div class="me-3">
             <el-select
+            class="w-150px"
               filterable
               placeholder="Select Year"
               v-model="selectedYearCache"
@@ -281,6 +282,7 @@ import {
   getDailyWorksheets,
   getDailyWorksheet,
   WorksheetSearch,
+  getCompanyLogo,
 } from "@/stores/api";
 import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
 import { hideModal } from "@/core/helpers/dom";
@@ -771,8 +773,15 @@ export default defineComponent({
       },
 
       company_details: {
+        id: "",
         company_name: "",
-        company_logo: getAssetPath("media/avatars/default.png"),
+        company_logo: "",
+        address: "",
+        city: "",
+        state: "",
+        country: "",
+        pincode: "",
+        logo_base64: "",
       },
 
       customer_data: {
@@ -867,11 +876,15 @@ export default defineComponent({
 
         worksheetInfo.value.quotation_details = res.result.quotation_details;
 
-        worksheetInfo.value.company_details.company_name =
-          res.result.company_details.company_name;
-        worksheetInfo.value.company_details.company_logo = res.result
-          .company_details.company_logo
-          ? "data: image/png;base64," + res.result.company_details.company_logo
+        const res2 = await getCompanyLogo(res.result.company_id);
+
+        worksheetInfo.value.company_details.id = res2.id;
+        worksheetInfo.value.company_details.company_name = res2.company_name;
+        worksheetInfo.value.company_details.company_logo = res2.company_logo
+          ? res2.company_logo
+          : "";
+        worksheetInfo.value.company_details.logo_base64 = res2.logo_base64
+          ? "data: image/png;base64," + res2.logo_base64
           : getAssetPath("media/avatars/default.png");
 
         const worksheetName = `${worksheetInfo.value.quotation_details.quotation_no}_${worksheetInfo.value.rgp_no}`;

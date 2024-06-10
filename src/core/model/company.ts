@@ -25,3 +25,14 @@ export const getUsageType = (id) => {
   const usage = usageTypes.find(item => item.id == id);
   return usage ? usage.name : "";
 };
+
+export const financialTypes = [
+  {
+      id: "1",
+      name: "January - December",
+  },
+  {
+      id: "2",
+      name: "April - March",
+  },
+];

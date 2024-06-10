@@ -112,6 +112,22 @@ export async function validateFeedback(data: any) {
 
 // COMPANIES
 
+// custom
+export async function getCompanyLogo(data: any) {
+    try {
+        // console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('get_company_logo', id);
+        console.log(response.data.result)
+        return response.data.result;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
 // gell all comapnies
 export async function CompaniesSearch(search: any) {
     try {
@@ -145,7 +161,7 @@ export async function addCompany(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.post(COMPANY_URL, data);
-        return response.data.message;
+        return response.data;
     } catch (errors) {
         console.error(errors);
         return { error: errors };
@@ -153,14 +169,15 @@ export async function addCompany(data: any) {
 }
 
 // company delete
-export async function deletecompany(data: any) {
+export async function deleteCompany(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.delete(COMPANY_URL + "/" + data);
-        return response.data.message;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+        console.log(response.data.message)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -169,11 +186,11 @@ export async function getCompany(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get(COMPANY_URL, data);
-        //console.log(response)
+        console.log(response.data.result)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -182,8 +199,7 @@ export async function updateCompany(data: any, id: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.put(COMPANY_URL + "/" + id, data);
-        //console.log(response)
-        return response.data.result;
+        return response.data;
     } catch (errors) {
         console.error(errors);
         return { error: errors };
@@ -251,8 +267,7 @@ export async function updateEmployee(data: any, id: any) {
         ApiService.patchsetHeader();
         console.log(data);
         const response = await ApiService.put(EMPLOYEE_URL + "/" + id, data);
-        console.log(response)
-        return response.data.result;
+        return response.data;
     } catch (errors) {
         console.error(errors);
         return { error: errors };
@@ -350,8 +365,7 @@ export async function updateUser(data: any, id: any) {
         ApiService.patchsetHeader();
         console.log(data);
         const response = await ApiService.put(USER_URL + "/" + id, data);
-        console.log(response)
-        return response.data.result;
+        return response.data;
     } catch (errors) {
         console.error(errors);
         return { error: errors };
@@ -791,11 +805,11 @@ export async function getQuotation(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get(QUOTATION_URL, data);
-        //console.log(response)
+        console.log(response.data.result)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -930,11 +944,11 @@ export async function getInvoice(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get(INVOICE_URL, data);
-        //console.log(response)
+        console.log(response.data.result)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1024,11 +1038,11 @@ export async function getInstrument(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get(INSTRUMENTS_URL, data);
-        // console.log(response)
+        console.log(response.data.result)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1625,11 +1639,11 @@ export async function getValidationProcedure(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get(VAL_PROC_URL, data);
-        // console.log(response)
+        console.log(response.data.result)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1708,11 +1722,11 @@ export async function getQualityProcedure(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get(QUAL_PROC_URL, data);
-        // console.log(response)
+        console.log(response.data.result)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3162,11 +3176,11 @@ export async function getIAuditObservation(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get(AUDIT_OBSERVATION_URL, data);
-        // console.log(response)
+        console.log(response.data.result)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3358,11 +3372,11 @@ export async function getIAuditSchedule(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get(AUDIT_SCHEDULE_URL, data);
-        // console.log(response)
+        console.log(response.data.result)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3464,12 +3478,13 @@ export async function getQMSProcedure(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get(QMS_PROCEDURE_URL, data);
-        // console.log(response)
+        console.log(response.data.result)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
+
 }
 
 // update function
@@ -3569,11 +3584,11 @@ export async function getWorkInstruction(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get(WORK_INSTRUCTION_URL, data);
-        // console.log(response)
+        console.log(response.data.result)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3675,11 +3690,11 @@ export async function getFormAndFormat(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get(FORMS_AND_FORMATS_URL, data);
-        // console.log(response)
+        console.log(response.data.result)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3781,11 +3796,11 @@ export async function getNABLDoc(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get(NABL_DOC_URL, data);
-        // console.log(response)
+        console.log(response.data.result)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3888,11 +3903,11 @@ export async function getNIDoc(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get(NI_DOC_URL, data);
-        // console.log(response)
+        console.log(response.data.result)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3932,10 +3947,11 @@ export async function deleteNIDoc(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(NI_DOC_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3992,11 +4008,11 @@ export async function getRecord(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get(RECORDS_URL, data);
-        // console.log(response)
+        console.log(response.data.result)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5276,6 +5292,21 @@ export async function uploadImage(fileData: FormData, onUploadProgress: UploadPr
             onUploadProgress: onUploadProgress,
         });
 
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// image remove api
+export async function removeImage(data: any) {
+    try {
+        const response = await axios.post("remove_image", data, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        });
         return response.data;
     } catch (errors) {
         console.error(errors);

@@ -151,50 +151,121 @@
                 <!--end::Input group-->
               </div>
 
+              <!--begin::Input group-->
               <div class="row mb-6">
+                <!--begin::Label-->
                 <label
-                  for="datasheet"
-                  class="col-lg-3 col-form-label required fw-semobold text-gray-700 fs-6 text-nowrap"
+                  class="col-lg-3 col-form-label fw-semobold required fs-6 fw-bold text-gray-700 text-nowrap"
                   >Upload Evidence</label
                 >
+                <!--end::Label-->
+
                 <!--begin::Col-->
-                <div class="col-lg-9 fv-row position-relative">
-                  <Field
-                    type="file"
-                    id="evidence"
-                    name="evidence"
-                    class="form-control form-control-lg form-control-solid"
-                    @change="handleFileChange"
-                    accept=".pdf"
-                  />
-                  <div
-                    v-if="clauseDetails.evidence"
-                    class="position-absolute end-0 top-50 translate-middle-y"
-                  >
-                    <i
-                      class="fas fs-4 fa-check-circle text-success me-6"
-                      data-toggle="tooltip"
-                      title="File is selected"
-                    ></i>
-                  </div>
-                  <div
-                    v-else
-                    class="position-absolute end-0 top-50 translate-middle-y"
-                  >
-                    <i
-                      class="fas fs-4 fa-times-circle text-danger me-6"
-                      data-toggle="tooltip"
-                      title="File is not selected"
-                    ></i>
-                  </div>
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="evidence" />
+                <div class="col-lg-9">
+                  <!--begin::Row-->
+                  <div class="row">
+                    <!--begin::Col-->
+                    <div
+                      v-if="clauseDetails.evidence == ''"
+                      class="form-group col-md-12 mb-8 mb-sd-8"
+                    >
+                      <div class="position-relative">
+                        <label
+                          class="w-100 bg-gray-200 min-h-100px btn btn-outline btn-outline-dashed btn-outline-default d-flex align-items-center position-relative"
+                        >
+                          <div
+                            class="m-6 position-absolute fs-1 top-50 start-50 translate-middle"
+                          >
+                            <i class="bi bi-upload fs-1"></i>
+
+                            <p class="fs-3 text-gray-700">
+                              Browse File to upload
+                            </p>
+                          </div>
+                          <input
+                            type="file"
+                            @change="handleFileChange"
+                            accept=".pdf"
+                            class="position-absolute top-0 start-0 end-0 bottom-0 opacity-0 w-100 h-100"
+                          />
+                        </label>
+                      </div>
+                      <div
+                        v-if="
+                          uploadProgress &&
+                          uploadProgress > 0 &&
+                          uploadProgress <= 100
+                        "
+                        class="h-10px min-w-100 d-flex flex-stack py-4"
+                      >
+                        <div
+                          class="progress progress-bar bg-primary d-flex align-items-center justify-content-center"
+                          role="progressbar"
+                          :style="`width: ${uploadProgress}%`"
+                          :aria-valuenow="uploadProgress"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
+                        <div class="d-flex flex-column align-items-end ms-2">
+                          {{ `${uploadProgress}%` }}
+                        </div>
+                      </div>
                     </div>
+                    <div
+                      v-else-if="clauseDetails.evidence != ''"
+                      class="notice d-flex bg-light-primary rounded border-primary border min-w-lg-600px flex-shrink-0 p-6"
+                    >
+                      <!--begin::Icon-->
+                      <KTIcon
+                        icon-name="file"
+                        icon-class="fs-2tx text-primary me-4"
+                      />
+                      <!--end::Icon-->
+
+                      <!--begin::Wrapper-->
+                      <div
+                        class="d-flex flex-stack flex-grow-1 flex-wrap flex-md-nowrap"
+                      >
+                        <!--begin::Content-->
+                        <div class="mb-3 mb-md-0 fw-semobold">
+                          <h4 class="text-gray-800 fw-bold cursor-pointer">
+                            <a
+                              target="blank"
+                              v-bind:href="`https://api.zeptac.com/storage/temporary/${clauseDetails.evidence}`"
+                              data-toggle="tooltip"
+                              title="preview file"
+                              class="underline"
+                              >{{ clauseDetails.evidence }}
+                            </a>
+                          </h4>
+
+                          <div class="fs-6 text-gray-600 pe-7">
+                            {{ Data.file_size.toFixed(2) }} MB
+                          </div>
+                        </div>
+                        <!--end::Content-->
+
+                        <!--begin::Action-->
+
+                        <KTIcon
+                          data-toggle="tooltip"
+                          title="remove file"
+                          icon-name="cross"
+                          class="cursor-pointer fs-2tx text-danger rounded"
+                          @click="removeFileFromTemp"
+                          icon-class="fs-1"
+                        />
+                        <!--end::Action-->
+                      </div>
+                      <!--end::Wrapper-->
+                    </div>
+                    <!--end::Col-->
                   </div>
+                  <!--end::Row-->
                 </div>
                 <!--end::Col-->
               </div>
+              <!--end::Input group-->
             </div>
             <!--end::Scroll-->
           </div>
@@ -246,7 +317,7 @@ import { hideModal } from "@/core/helpers/dom";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import moment from "moment";
-import { addIAuditObservation } from "@/stores/api";
+import { addIAuditObservation, removeImage, uploadImage } from "@/stores/api";
 import Loading from "@/components/kt-datatable/table-partials/Loading.vue";
 
 interface NewAddressData {}
@@ -267,6 +338,12 @@ export default defineComponent({
     const newAddressModalRef = ref<null | HTMLElement>(null);
     const newAddressData = ref<NewAddressData>({});
     const validationSchema = Yup.object().shape({});
+
+    const Data = ref({
+      file_name: "",
+      file_size: 0,
+      file: "",
+    });
 
     const clauseDetails = ref({
       audit_schedule_id: "",
@@ -292,53 +369,156 @@ export default defineComponent({
       );
     });
 
-    const isPdfInvalid = ref(false);
     const dataLoading = ref(false);
 
-    const handleFileChange = (event) => {
-      // Get the selected file
+    const uploadProgress = ref<number>(0);
+
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
+
+    const handleFileChange = async (event) => {
       const selectedFile = event.target?.files?.[0];
 
       if (!selectedFile) {
         alert("Please Select a file");
+        return;
       }
 
-      if (selectedFile) {
-        // Check if the selected file is a PDF
-        if (selectedFile.type === "application/pdf") {
-          const reader = new FileReader();
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        alert("File size should be less than 2 MB");
+        return;
+      }
 
-          reader.onload = () => {
-            try {
-              const base64Data = reader.result
-                ?.toString()
-                .replace(/^data:application\/pdf;base64,/, "");
+      Data.value.file_size = selectedFile.size / (1024 * 1024);
 
-              if (base64Data) {
-                clauseDetails.value.evidence = base64Data;
-              } else {
-                console.error("Error: Failed to read the image data.");
-              }
-            } catch (e) {
-              console.error("Error:", e);
-            }
-          };
-
-          // Read the file as data URL (base64)
-          reader.readAsDataURL(selectedFile);
-          // Reset the invalid flag
-          isPdfInvalid.value = false;
-        } else {
-          // Clear the data and set the invalid flag
-
-          clauseDetails.value.evidence = "";
-          isPdfInvalid.value = true;
-        }
+      if (selectedFile.type === "application/pdf") {
+        await uploadPDF(selectedFile);
       } else {
-        clauseDetails.value.evidence = "";
-        isPdfInvalid.value = true;
+        Data.value.file = "";
       }
-      console.log(clauseDetails.value);
+
+      console.log(Data.value);
+    };
+
+    const uploadPDF = async (file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("file_name", Data.value.file_name);
+
+      const onUploadProgress = (progressEvent) => {
+        const { loaded, total } = progressEvent;
+        const percentage = Math.floor((loaded / total) * 100);
+        uploadProgress.value = percentage;
+      };
+
+      try {
+        await simulateUploadProgress();
+        const response = await uploadImage(formData, onUploadProgress);
+        clauseDetails.value.evidence = response.modifiedFileName;
+        Data.value.file_name = response.modifiedFileName;
+      } catch (error) {
+        console.error("Error uploading file:", error);
+      } finally {
+        finalizeProgress();
+      }
+
+      Data.value.file = file;
+    };
+
+    const simulateUploadProgress = async () => {
+      uploadProgress.value = 0;
+      const interval = setInterval(() => {
+        if (uploadProgress.value < 100) {
+          uploadProgress.value += 10; // Adjust this value for smoother progress
+        } else {
+          clearInterval(interval);
+        }
+      }, 200); // Adjust the interval duration as needed
+    };
+
+    const finalizeProgress = () => {
+      uploadProgress.value = 100; // Ensure progress bar is complete
+      setTimeout(() => {
+        uploadProgress.value = 0; // Reset progress bar after a short delay
+      }, 100);
+    };
+
+    const removeFileFromTemp = async () => {
+      if (
+        clauseDetails.value.evidence &&
+        Data.value.file_name === ""
+      ) {
+        var confirmChange = confirm("Do you really want to change file?");
+        if (!confirmChange) {
+          return;
+        }
+
+        clauseDetails.value.evidence = "";
+        // Continue with the rest of your code here
+        return;
+      }
+
+      if (
+        clauseDetails.value.evidence === "" &&
+        Data.value.file_name === ""
+      ) {
+        alert("You already removed the file. Please select a new file.");
+        return;
+      }
+
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You want to change the file!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error) {
+          const errorMessage = "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromServer = async () => {
+        try {
+          const response = await removeImage(Data.value);
+
+          if (response.success) {
+            clauseDetails.value.evidence = "";
+            Data.value = {
+              file_name: "",
+              file_size: 0,
+              file: "",
+            };
+
+            showSuccessAlert(
+              "Success",
+              response.message || `File removed successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(response.message || "Failed to remove the file.");
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      const isConfirmed = await deleteConfirmation();
+      if (isConfirmed) {
+        return await deleteFromServer();
+      } else {
+        return { success: false };
+      }
     };
 
     const validateForm = (formData) => {
@@ -415,6 +595,12 @@ export default defineComponent({
         updated_by: "",
         is_active: "1",
       };
+
+      Data.value = {
+        file_name: "",
+        file_size: 0,
+        file: "",
+      };
     };
 
     const showSuccessAlert = (title, message) => {
@@ -453,9 +639,12 @@ export default defineComponent({
       submitButtonRef,
       newAddressModalRef,
       clear,
-      handleFileChange,
       data: props.data,
       dataLoading,
+      handleFileChange,
+      uploadProgress,
+      Data,
+      removeFileFromTemp,
     };
   },
 });

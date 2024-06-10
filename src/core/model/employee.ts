@@ -6,10 +6,14 @@ interface IEmployee {
   name: string;
   mobile: string;
   role: string;
+  history_card: string;
   company_name: string;
-  h_id:number;
-  a_id:number;
-  p_id:number;
+  meta: {
+    adhar: string;
+    pan: string;
+    profile_pic: string;
+    company_name: string;
+  }
 }
 
 export type { IEmployee };

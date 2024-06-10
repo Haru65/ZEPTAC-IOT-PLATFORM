@@ -1051,6 +1051,7 @@ import {
   GetIncrInvoiceId,
   getPriceList,
   getLeadNCustomer,
+  getCompanyLogo,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import moment from "moment";
@@ -1127,7 +1128,15 @@ interface QuotationDetails {
   lead: Meta;
   client: Meta;
   company_details: {
+    id: string;
+    company_name: string;
     company_logo: string;
+    address: string;
+    city: string;
+    state: string;
+    country: string;
+    pincode: string;
+    logo_base64: string;
   };
   company_id: string;
   is_active: number;
@@ -1272,7 +1281,15 @@ export default defineComponent({
         country: "",
       },
       company_details: {
-        company_logo: getAssetPath("media/avatars/default.png"),
+        id: "",
+        company_name: "",
+        company_logo: "",
+        address: "",
+        city: "",
+        state: "",
+        country: "",
+        pincode: "",
+        logo_base64: "",
       },
       company_id: User.company_id,
       total: 0,
@@ -1452,11 +1469,7 @@ export default defineComponent({
         }
       }
 
-      // logo
-      QuotationDetails.value.company_details.company_logo = response
-        .company_details.company_logo
-        ? "data: image/png;base64," + response.company_details.company_logo
-        : getAssetPath("media/avatars/default.png");
+      QuotationDetails.value.company_id = response.company_id;
     });
 
     const GetClients = async (id: string) => {
@@ -1931,6 +1944,17 @@ export default defineComponent({
     };
 
     const generatePdf = async (pdfName: string) => {
+      const res2 = await getCompanyLogo(QuotationDetails.value.company_id);
+
+      QuotationDetails.value.company_details.id = res2.id;
+      QuotationDetails.value.company_details.company_name = res2.company_name;
+      QuotationDetails.value.company_details.company_logo = res2.company_logo
+        ? res2.company_logo
+        : "";
+      QuotationDetails.value.company_details.logo_base64 = res2.logo_base64
+        ? "data: image/png;base64," + res2.logo_base64
+        : getAssetPath("media/avatars/default.png");
+
       // console.log(QuotationDetails.value);
       await Gen("quotation", QuotationId.toString(), pdfName, QuotationDetails);
     };

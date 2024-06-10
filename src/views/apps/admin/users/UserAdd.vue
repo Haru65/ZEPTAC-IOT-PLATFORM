@@ -30,7 +30,6 @@
       >
         <!--begin::Card body-->
         <div class="card-body border-top p-9">
-          <!--begin::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6"
@@ -52,9 +51,16 @@
               >
                 <!--begin::Preview existing avatar-->
                 <img
-                  :src="profileDetails.disp_avatar"
+                  v-if="profileDetails.profile_pic"
+                  v-bind:src="`https://api.zeptac.com/storage/temporary/${profileDetails.profile_pic}`"
                   class="image-input-wrapper"
-                  alt="profile"
+                  alt="profile image"
+                />
+                <img
+                  v-else
+                  v-bind:src="`${getAssetPath('media/avatars/blank.png')}`"
+                  class="image-input-wrapper"
+                  alt="profile image"
                 />
                 <!--end::Preview existing avatar-->
 
@@ -70,9 +76,9 @@
                   <!--begin::Inputs-->
                   <input
                     type="file"
-                    name="avatar"
+                    name="profile_pic"
                     accept=".png, .jpg, .jpeg"
-                    @change="updateImage($event)"
+                    @change="handleProfileChange($event)"
                   />
                   <input max-size="1000" type="hidden" name="avatar_update" />
                   <!--end::Inputs-->
@@ -84,7 +90,7 @@
                   class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
                   data-kt-image-input-action="remove"
                   data-bs-toggle="tooltip"
-                  @click="removeImage()"
+                  @click="removeProfileFromTemp"
                   title="Remove image"
                 >
                   <i class="bi bi-x fs-2"></i>
@@ -98,9 +104,6 @@
                 Allowed file types: png, jpg, jpeg. <br />
                 Note : Max Upload limit 1 MB.
                 <br />
-                <span class="text-danger" v-if="file_size"
-                  >File Size Exceeded</span
-                >
               </div>
               <!--end::Hint-->
             </div>
@@ -621,35 +624,97 @@
               <!--begin::Row-->
               <div class="row">
                 <!--begin::Col-->
-                <div class="col-lg fv-row position-relative">
-                  <Field
-                    type="file"
-                    id="adhar"
-                    name="adhar"
-                    class="form-control form-control-lg form-control-solid"
-                    @change="handleFileChange"
-                    accept=".pdf"
+                <div
+                  v-if="profileDetails.adhar == ''"
+                  class="form-group col-md-12 mb-8 mb-sd-8"
+                >
+                  <div class="position-relative">
+                    <label
+                      class="w-100 bg-gray-200 min-h-100px btn btn-outline btn-outline-dashed btn-outline-default d-flex align-items-center position-relative"
+                    >
+                      <div
+                        class="m-6 position-absolute fs-1 top-50 start-50 translate-middle"
+                      >
+                        <i class="bi bi-upload fs-1"></i>
+
+                        <p class="fs-3 text-gray-700">Browse File to upload</p>
+                      </div>
+                      <input
+                        type="file"
+                        @change="handleAadharChange"
+                        accept=".pdf"
+                        class="position-absolute top-0 start-0 end-0 bottom-0 opacity-0 w-100 h-100"
+                      />
+                    </label>
+                  </div>
+                  <div
+                    v-if="
+                      uploadProgressForAadhar &&
+                      uploadProgressForAadhar > 0 &&
+                      uploadProgressForAadhar <= 100
+                    "
+                    class="h-10px min-w-100 d-flex flex-stack py-4"
+                  >
+                    <div
+                      class="progress progress-bar bg-primary d-flex align-items-center justify-content-center"
+                      role="progressbar"
+                      :style="`width: ${uploadProgressForAadhar}%`"
+                      :aria-valuenow="uploadProgressForAadhar"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    ></div>
+                    <div class="d-flex flex-column align-items-end ms-2">
+                      {{ `${uploadProgressForAadhar}%` }}
+                    </div>
+                  </div>
+                </div>
+                <div
+                  v-else-if="profileDetails.adhar != ''"
+                  class="notice d-flex bg-light-primary rounded border-primary border min-w-lg-600px flex-shrink-0 p-6"
+                >
+                  <!--begin::Icon-->
+                  <KTIcon
+                    icon-name="file"
+                    icon-class="fs-2tx text-primary me-4"
                   />
+                  <!--end::Icon-->
+
+                  <!--begin::Wrapper-->
                   <div
-                    v-if="profileDetails.adhar"
-                    class="position-absolute end-0 top-50 translate-middle-y"
+                    class="d-flex flex-stack flex-grow-1 flex-wrap flex-md-nowrap"
                   >
-                    <i
-                      class="fas fs-4 fa-check-circle text-success me-6"
+                    <!--begin::Content-->
+                    <div class="mb-3 mb-md-0 fw-semobold">
+                      <h4 class="text-gray-800 fw-bold cursor-pointer">
+                        <a
+                          target="blank"
+                          v-bind:href="`https://api.zeptac.com/storage/temporary/${profileDetails.adhar}`"
+                          data-toggle="tooltip"
+                          title="preview file"
+                          class="underline"
+                          >{{ profileDetails.adhar }}
+                        </a>
+                      </h4>
+
+                      <div class="fs-6 text-gray-600 pe-7">
+                        {{ aadharData.file_size.toFixed(2) }} MB
+                      </div>
+                    </div>
+                    <!--end::Content-->
+
+                    <!--begin::Action-->
+
+                    <KTIcon
                       data-toggle="tooltip"
-                      title="File is selected"
-                    ></i>
+                      title="remove file"
+                      icon-name="cross"
+                      class="cursor-pointer fs-2tx text-danger rounded"
+                      @click="removeAadharFromTemp"
+                      icon-class="fs-1"
+                    />
+                    <!--end::Action-->
                   </div>
-                  <div
-                    v-else
-                    class="position-absolute end-0 top-50 translate-middle-y"
-                  >
-                    <i
-                      class="fas fs-4 fa-times-circle text-danger me-6"
-                      data-toggle="tooltip"
-                      title="File is not selected"
-                    ></i>
-                  </div>
+                  <!--end::Wrapper-->
                 </div>
                 <!--end::Col-->
               </div>
@@ -671,37 +736,97 @@
               <!--begin::Row-->
               <div class="row">
                 <!--begin::Col-->
-                <div class="col-lg fv-row position-relative">
-                  <div>
-                    <Field
-                      type="file"
-                      id="pan"
-                      name="pan"
-                      class="form-control form-control-lg form-control-solid"
-                      @change="handleFileChange"
-                      accept=".pdf"
-                    />
-                    <div
-                      v-if="profileDetails.pan"
-                      class="position-absolute end-0 top-50 translate-middle-y"
+                <div
+                  v-if="profileDetails.pan == ''"
+                  class="form-group col-md-12 mb-8 mb-sd-8"
+                >
+                  <div class="position-relative">
+                    <label
+                      class="w-100 bg-gray-200 min-h-100px btn btn-outline btn-outline-dashed btn-outline-default d-flex align-items-center position-relative"
                     >
-                      <i
-                        class="fas fs-4 fa-check-circle text-success me-6"
-                        data-toggle="tooltip"
-                        title="File is selected"
-                      ></i>
-                    </div>
+                      <div
+                        class="m-6 position-absolute fs-1 top-50 start-50 translate-middle"
+                      >
+                        <i class="bi bi-upload fs-1"></i>
+
+                        <p class="fs-3 text-gray-700">Browse File to upload</p>
+                      </div>
+                      <input
+                        type="file"
+                        @change="handlePanChange"
+                        accept=".pdf"
+                        class="position-absolute top-0 start-0 end-0 bottom-0 opacity-0 w-100 h-100"
+                      />
+                    </label>
+                  </div>
+                  <div
+                    v-if="
+                      uploadProgressForPan &&
+                      uploadProgressForPan > 0 &&
+                      uploadProgressForPan <= 100
+                    "
+                    class="h-10px min-w-100 d-flex flex-stack py-4"
+                  >
                     <div
-                      v-else
-                      class="position-absolute end-0 top-50 translate-middle-y"
-                    >
-                      <i
-                        class="fas fs-4 fa-times-circle text-danger me-6"
-                        data-toggle="tooltip"
-                        title="File is not selected"
-                      ></i>
+                      class="progress progress-bar bg-primary d-flex align-items-center justify-content-center"
+                      role="progressbar"
+                      :style="`width: ${uploadProgressForPan}%`"
+                      :aria-valuenow="uploadProgressForPan"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    ></div>
+                    <div class="d-flex flex-column align-items-end ms-2">
+                      {{ `${uploadProgressForPan}%` }}
                     </div>
                   </div>
+                </div>
+                <div
+                  v-else-if="profileDetails.pan != ''"
+                  class="notice d-flex bg-light-primary rounded border-primary border min-w-lg-600px flex-shrink-0 p-6"
+                >
+                  <!--begin::Icon-->
+                  <KTIcon
+                    icon-name="file"
+                    icon-class="fs-2tx text-primary me-4"
+                  />
+                  <!--end::Icon-->
+
+                  <!--begin::Wrapper-->
+                  <div
+                    class="d-flex flex-stack flex-grow-1 flex-wrap flex-md-nowrap"
+                  >
+                    <!--begin::Content-->
+                    <div class="mb-3 mb-md-0 fw-semobold">
+                      <h4 class="text-gray-800 fw-bold cursor-pointer">
+                        <a
+                          target="blank"
+                          v-bind:href="`https://api.zeptac.com/storage/temporary/${profileDetails.pan}`"
+                          data-toggle="tooltip"
+                          title="preview file"
+                          class="underline"
+                          >{{ profileDetails.pan }}
+                        </a>
+                      </h4>
+
+                      <div class="fs-6 text-gray-600 pe-7">
+                        {{ panData.file_size.toFixed(2) }} MB
+                      </div>
+                    </div>
+                    <!--end::Content-->
+
+                    <!--begin::Action-->
+
+                    <KTIcon
+                      data-toggle="tooltip"
+                      title="remove file"
+                      icon-name="cross"
+                      class="cursor-pointer fs-2tx text-danger rounded"
+                      @click="removePanFromTemp"
+                      icon-class="fs-1"
+                    />
+                    <!--end::Action-->
+                  </div>
+                  <!--end::Wrapper-->
                 </div>
                 <!--end::Col-->
               </div>
@@ -749,18 +874,16 @@ import { ErrorMessage, Field, Form as Vform } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import { rolesArray } from "@/core/config/PermissionsRolesConfig";
-import { addUser, getCompanies } from "@/stores/api";
+import { addUser, getCompanies, removeImage, uploadImage } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import { countries, INstates } from "@/core/model/countries";
 import moment from "moment";
 import { Identifier } from "@/core/config/WhichUserConfig";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
-import { blank64 } from "./blank";
 
 interface ProfileDetails {
-  disp_avatar: string;
-  image: string;
+  profile_pic: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -793,20 +916,12 @@ export default defineComponent({
   setup() {
     const identifier = Identifier;
     const auth = useAuthStore();
-    const submitButton1 = ref<HTMLElement | null>(null);
-    const submitButton2 = ref<HTMLElement | null>(null);
-    const submitButton3 = ref<HTMLElement | null>(null);
-    const submitButton4 = ref<HTMLElement | null>(null);
-    const submitButton5 = ref<HTMLElement | null>(null);
-    const updateEmailButton = ref<HTMLElement | null>(null);
-    const updatePasswordButton = ref<HTMLElement | null>(null);
     const User = auth.GetUser();
     let limit = ref(500);
     const router = useRouter();
     const loading = ref(false);
     const Companies = ref([{ id: "", company_name: "" }]);
     const state = ref([""]);
-    const file_size = ref(false);
     const getdropcomp = async () => {
       ApiService.setHeader();
 
@@ -828,9 +943,6 @@ export default defineComponent({
       await getdropcomp();
     });
 
-    const emailFormDisplay = ref(false);
-    const passwordFormDisplay = ref(false);
-
     const profileDetailsValidator = Yup.object().shape({
       fname: Yup.string().required().label("First name"),
       lname: Yup.string().required().label("Last name"),
@@ -845,9 +957,26 @@ export default defineComponent({
       pan: Yup.string().required().label("Pan No"),
     });
 
+    const profileData = ref({
+      file_name: "",
+      file: "",
+      file_size: 0,
+    });
+
+    const aadharData = ref({
+      file_name: "",
+      file: "",
+      file_size: 0,
+    });
+
+    const panData = ref({
+      file_name: "",
+      file: "",
+      file_size: 0,
+    });
+
     const profileDetails = ref<ProfileDetails>({
-      disp_avatar: "data: image/png;base64," + blank64,
-      image: "",
+      profile_pic: "",
       first_name: "",
       last_name: "",
       email: "",
@@ -870,70 +999,461 @@ export default defineComponent({
       updated_by: User.id,
     });
 
-    const isPdfInvalid = ref(false);
+    // CONSTANT
+    const MAX_FILE_SIZE = 1024 ** 2; // 1 MB
 
-    const handleFileChange = (event) => {
-      // Get the selected file
+    // TODO :: optional make a single function that can handle all files
+    /* Profile Pic Logic */
+
+    const uploadProgressForProfile = ref<number>(0);
+
+    const handleProfileChange = async (event: any) => {
       const selectedFile = event.target?.files?.[0];
+      const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
 
       if (!selectedFile) {
         alert("Please Select a file");
+        return;
       }
 
-      if (selectedFile) {
-        // Check if the selected file is a PDF
-        if (selectedFile.type === "application/pdf") {
-          const reader = new FileReader();
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        alert("File size should be less than 1 MB");
+        return;
+      }
 
-          reader.onload = () => {
-            try {
-              const base64Data = reader.result
-                ?.toString()
-                .replace(/^data:application\/pdf;base64,/, "");
+      profileData.value.file_size = selectedFile.size / 1024 ** 2;
 
-              if (base64Data) {
-                if (event.target.id === "pan") {
-                  profileDetails.value.pan = base64Data;
-                } else if (event.target.id === "adhar") {
-                  profileDetails.value.adhar = base64Data;
-                }
-              } else {
-                console.error("Error: Failed to read the image data.");
-              }
-            } catch (e) {
-              console.error("Error:", e);
-            }
-          };
-
-          // Read the file as data URL (base64)
-          reader.readAsDataURL(selectedFile);
-          // Reset the invalid flag
-          isPdfInvalid.value = false;
-        } else {
-          // Clear the data and set the invalid flag
-
-          if (event.target.id === "pan") {
-            profileDetails.value.pan = "";
-
-            isPdfInvalid.value = true;
-          } else if (event.target.id === "adhar") {
-            profileDetails.value.adhar = "";
-
-            isPdfInvalid.value = true;
-          }
-        }
+      if (allowedTypes.includes(selectedFile.type)) {
+        await uploadProfileFile(selectedFile);
       } else {
-        if (event.target.id === "pan") {
-          profileDetails.value.pan = "";
-
-          isPdfInvalid.value = true;
-        } else if (event.target.id === "adhar") {
-          profileDetails.value.adhar = "";
-
-          isPdfInvalid.value = true;
-        }
+        profileData.value.file = "";
+        alert("Please select a valid file");
       }
-      // console.log(profileDetails.value);
+
+      console.log(profileData.value);
+    };
+
+    const removeProfileFromTemp = async () => {
+      if (
+        profileDetails.value.profile_pic &&
+        profileData.value.file_name === ""
+      ) {
+        var confirmChange = confirm(
+          "Do you really want to change profile image?"
+        );
+        if (!confirmChange) {
+          return;
+        }
+
+        profileDetails.value.profile_pic = "";
+        // Continue with the rest of your code here
+        return;
+      }
+
+      if (
+        profileDetails.value.profile_pic === "" &&
+        profileData.value.file_name === ""
+      ) {
+        alert("You already removed the file. Please select a new file.");
+        return;
+      }
+
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You want to change the file!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error) {
+          const errorMessage = "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromServer = async () => {
+        try {
+          const response = await removeImage(profileData.value);
+
+          if (response.success) {
+            profileDetails.value.profile_pic = "";
+            profileData.value = {
+              file_name: "",
+              file_size: 0,
+              file: "",
+            };
+
+            showSuccessAlert(
+              "Success",
+              response.message || `File removed successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(response.message || "Failed to remove the file.");
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      const isConfirmed = await deleteConfirmation();
+      if (isConfirmed) {
+        return await deleteFromServer();
+      } else {
+        return { success: false };
+      }
+    };
+
+    const uploadProfileFile = async (file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("file_name", profileData.value.file_name);
+
+      const onUploadProgress = (progressEvent) => {
+        const { loaded, total } = progressEvent;
+        const percentage = Math.floor((loaded / total) * 100);
+        uploadProgressForProfile.value = percentage;
+      };
+
+      try {
+        await simulateProfileUploadProgress();
+        const response = await uploadImage(formData, onUploadProgress);
+        profileDetails.value.profile_pic = response.modifiedFileName;
+        profileData.value.file_name = response.modifiedFileName;
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      } finally {
+        finalizeProfileProgress();
+      }
+
+      profileData.value.file = file;
+    };
+
+    const simulateProfileUploadProgress = async () => {
+      uploadProgressForProfile.value = 0;
+      const interval = setInterval(() => {
+        if (uploadProgressForProfile.value < 100) {
+          uploadProgressForProfile.value += 10; // Adjust this value for smoother progress
+        } else {
+          clearInterval(interval);
+        }
+      }, 200); // Adjust the interval duration as needed
+    };
+
+    const finalizeProfileProgress = () => {
+      uploadProgressForProfile.value = 100; // Ensure progress bar is complete
+      setTimeout(() => {
+        uploadProgressForProfile.value = 0; // Reset progress bar after a short delay
+      }, 100);
+    };
+
+    // TODO :: optional make a single function that can handle all files
+    /* Aadhar Card Logic */
+
+    const uploadProgressForAadhar = ref<number>(0);
+
+    const handleAadharChange = async (event: any) => {
+      const selectedFile = event.target?.files?.[0];
+      const allowedTypes = ["application/pdf"];
+
+      if (!selectedFile) {
+        alert("Please Select a file");
+        return;
+      }
+
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        alert("File size should be less than 1 MB");
+        return;
+      }
+
+      aadharData.value.file_size = selectedFile.size / 1024 ** 2;
+
+      if (allowedTypes.includes(selectedFile.type)) {
+        await uploadAadharFile(selectedFile);
+      } else {
+        aadharData.value.file = "";
+        alert("Please select a valid file");
+      }
+
+      console.log(aadharData.value);
+    };
+
+    const removeAadharFromTemp = async () => {
+      if (profileDetails.value.adhar && aadharData.value.file_name === "") {
+        var confirmChange = confirm(
+          "Do you really want to change aadhar card?"
+        );
+        if (!confirmChange) {
+          return;
+        }
+
+        profileDetails.value.adhar = "";
+        // Continue with the rest of your code here
+        return;
+      }
+
+      if (
+        profileDetails.value.adhar === "" &&
+        aadharData.value.file_name === ""
+      ) {
+        alert("You already removed the file. Please select a new file.");
+        return;
+      }
+
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You want to change the file!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error) {
+          const errorMessage = "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromServer = async () => {
+        try {
+          const response = await removeImage(aadharData.value);
+
+          if (response.success) {
+            profileDetails.value.adhar = "";
+            aadharData.value = {
+              file_name: "",
+              file_size: 0,
+              file: "",
+            };
+
+            showSuccessAlert(
+              "Success",
+              response.message || `File removed successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(response.message || "Failed to remove the file.");
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      const isConfirmed = await deleteConfirmation();
+      if (isConfirmed) {
+        return await deleteFromServer();
+      } else {
+        return { success: false };
+      }
+    };
+
+    const uploadAadharFile = async (file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("file_name", aadharData.value.file_name);
+
+      const onUploadProgress = (progressEvent) => {
+        const { loaded, total } = progressEvent;
+        const percentage = Math.floor((loaded / total) * 100);
+        uploadProgressForAadhar.value = percentage;
+      };
+
+      try {
+        await simulateAadharUploadProgress();
+        const response = await uploadImage(formData, onUploadProgress);
+        profileDetails.value.adhar = response.modifiedFileName;
+        aadharData.value.file_name = response.modifiedFileName;
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      } finally {
+        finalizeAadharProgress();
+      }
+
+      aadharData.value.file = file;
+    };
+
+    const simulateAadharUploadProgress = async () => {
+      uploadProgressForAadhar.value = 0;
+      const interval = setInterval(() => {
+        if (uploadProgressForAadhar.value < 100) {
+          uploadProgressForAadhar.value += 10; // Adjust this value for smoother progress
+        } else {
+          clearInterval(interval);
+        }
+      }, 200); // Adjust the interval duration as needed
+    };
+
+    const finalizeAadharProgress = () => {
+      uploadProgressForAadhar.value = 100; // Ensure progress bar is complete
+      setTimeout(() => {
+        uploadProgressForAadhar.value = 0; // Reset progress bar after a short delay
+      }, 100);
+    };
+
+    // TODO :: optional make a single function that can handle all files
+    /* Pan Card Logic */
+
+    const uploadProgressForPan = ref<number>(0);
+
+    const handlePanChange = async (event: any) => {
+      const selectedFile = event.target?.files?.[0];
+      const allowedTypes = ["application/pdf"];
+
+      if (!selectedFile) {
+        alert("Please Select a file");
+        return;
+      }
+
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        alert("File size should be less than 1 MB");
+        return;
+      }
+
+      panData.value.file_size = selectedFile.size / 1024 ** 2;
+
+      if (allowedTypes.includes(selectedFile.type)) {
+        await uploadPanFile(selectedFile);
+      } else {
+        panData.value.file = "";
+        alert("Please select a valid file");
+      }
+
+      console.log(panData.value);
+    };
+
+    const removePanFromTemp = async () => {
+      if (profileDetails.value.pan && panData.value.file_name === "") {
+        var confirmChange = confirm("Do you really want to change pan card?");
+        if (!confirmChange) {
+          return;
+        }
+
+        profileDetails.value.pan = "";
+        // Continue with the rest of your code here
+        return;
+      }
+
+      if (profileDetails.value.pan === "" && panData.value.file_name === "") {
+        alert("You already removed the file. Please select a new file.");
+        return;
+      }
+
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You want to change the file!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error) {
+          const errorMessage = "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromServer = async () => {
+        try {
+          const response = await removeImage(panData.value);
+
+          if (response.success) {
+            profileDetails.value.pan = "";
+            panData.value = {
+              file_name: "",
+              file_size: 0,
+              file: "",
+            };
+
+            showSuccessAlert(
+              "Success",
+              response.message || `File removed successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(response.message || "Failed to remove the file.");
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      const isConfirmed = await deleteConfirmation();
+      if (isConfirmed) {
+        return await deleteFromServer();
+      } else {
+        return { success: false };
+      }
+    };
+
+    const uploadPanFile = async (file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("file_name", panData.value.file_name);
+
+      const onUploadProgress = (progressEvent) => {
+        const { loaded, total } = progressEvent;
+        const percentage = Math.floor((loaded / total) * 100);
+        uploadProgressForPan.value = percentage;
+      };
+
+      try {
+        await simulatePanUploadProgress();
+        const response = await uploadImage(formData, onUploadProgress);
+        profileDetails.value.pan = response.modifiedFileName;
+        panData.value.file_name = response.modifiedFileName;
+      } catch (error) {
+        console.error("Error uploading File:", error);
+      } finally {
+        finalizePanProgress();
+      }
+
+      panData.value.file = file;
+    };
+
+    const simulatePanUploadProgress = async () => {
+      uploadProgressForPan.value = 0;
+      const interval = setInterval(() => {
+        if (uploadProgressForPan.value < 100) {
+          uploadProgressForPan.value += 10; // Adjust this value for smoother progress
+        } else {
+          clearInterval(interval);
+        }
+      }, 200); // Adjust the interval duration as needed
+    };
+
+    const finalizePanProgress = () => {
+      uploadProgressForPan.value = 100; // Ensure progress bar is complete
+      setTimeout(() => {
+        uploadProgressForPan.value = 0; // Reset progress bar after a short delay
+      }, 100);
     };
 
     watch(
@@ -972,23 +1492,9 @@ export default defineComponent({
     }
 
     const onsubmit = async () => {
-      // * company identification for companyid based on localstorage login
-
-      // disp_image
-      profileDetails.value.disp_avatar =
-        profileDetails.value.disp_avatar.replace(
-          /^data:image\/\w+;base64,/,
-          ""
-        );
-      loading.value = true;
-      // console.log(profileDetails.value);
-      // console.warn("Nice");
       try {
-        // ? form multipart form post
-        // ? Call your API here with the form values
-        // ? CUSTOMS
-        // ? const form = await CUSTOM_FORM(profileDetails);
-        // ? push form
+        loading.value = true;
+
         if (User.role_id == "2") {
           const company_id = User.company_id;
           profileDetails.value.company_id = company_id;
@@ -998,7 +1504,7 @@ export default defineComponent({
         if (!response.error) {
           // Handle successful API response
           // console.log("API response:", response);
-          showSuccessAlert("Success", "User have been successfully inserted!");
+          showSuccessAlert("Success", "User have been successfully added!");
           router.push({ name: "users-list" });
         } else {
           // Handle API error response
@@ -1008,9 +1514,8 @@ export default defineComponent({
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
         }
       } catch (error) {
-        // Handle any other errors during API call
-        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
+        loading.value = false;
       } finally {
         loading.value = false;
       }
@@ -1044,60 +1549,9 @@ export default defineComponent({
       });
     };
 
-    // remove file or update
-    const removeImage = () => {
-      profileDetails.value.disp_avatar = getAssetPath(
-        "media/avatars/blank.png"
-      );
-      profileDetails.value.image = "";
-    };
-
-    const updateImage = (e: any) => {
-      const file = e.target.files[0];
-
-      if (!file) {
-        console.error("Error: No file selected.");
-        return;
-      }
-
-      const fileSize = file.size;
-      const fileMb = fileSize / 1024 ** 2;
-      // console.log(fileMb);
-
-      if (fileMb <= 1) {
-        file_size.value = false;
-        profileDetails.value.disp_avatar = URL.createObjectURL(file);
-        const reader = new FileReader();
-
-        reader.onload = function () {
-          try {
-            const base64Data = reader.result
-              ?.toString()
-              .replace(/^data:image\/\w+;base64,/, "");
-            if (base64Data) {
-              profileDetails.value.image = base64Data;
-              // console.log(profileDetails.value.image);
-            } else {
-              console.error("Error: Failed to read the image data.");
-            }
-          } catch (e) {
-            console.error("Error:", e);
-          }
-        };
-
-        reader.readAsDataURL(file);
-      } else {
-        file_size.value = true;
-        profileDetails.value.disp_avatar = getAssetPath(
-          "media/avatars/blank.png"
-        );
-      }
-    };
-
     const clear = () => {
       profileDetails.value = {
-        disp_avatar: getAssetPath("media/avatars/blank.png"),
-        image: "",
+        profile_pic: "",
         first_name: "",
         last_name: "",
         email: "",
@@ -1122,19 +1576,8 @@ export default defineComponent({
     };
 
     return {
-      submitButton1,
-      submitButton2,
-      submitButton3,
-      submitButton4,
-      submitButton5,
       profileDetails,
-      emailFormDisplay,
-      passwordFormDisplay,
-      removeImage,
-      updateImage,
       profileDetailsValidator,
-      updateEmailButton,
-      updatePasswordButton,
       getAssetPath,
       Companies,
       rolesArray,
@@ -1143,10 +1586,23 @@ export default defineComponent({
       clear,
       state,
       countries,
-      file_size,
       identifier,
-      handleFileChange,
       setDates,
+
+      handleProfileChange,
+      uploadProgressForProfile,
+      profileData,
+      removeProfileFromTemp,
+
+      handleAadharChange,
+      uploadProgressForAadhar,
+      aadharData,
+      removeAadharFromTemp,
+
+      handlePanChange,
+      uploadProgressForPan,
+      panData,
+      removePanFromTemp,
     };
   },
 });

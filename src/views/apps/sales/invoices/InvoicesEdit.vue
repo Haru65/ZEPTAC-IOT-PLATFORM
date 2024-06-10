@@ -816,6 +816,7 @@ import {
   updateInvoice,
   deleteInvoice,
   getPriceList,
+  getCompanyLogo,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import moment from "moment";
@@ -881,7 +882,15 @@ interface InvoiceDetails {
   lead: Meta;
   client: Meta;
   company_details: {
+    id: string;
+    company_name: string;
     company_logo: string;
+    address: string;
+    city: string;
+    state: string;
+    country: string;
+    pincode: string;
+    logo_base64: string;
   };
   is_active: number;
   company_id: string;
@@ -1024,7 +1033,15 @@ export default defineComponent({
         country: "",
       },
       company_details: {
-        company_logo: getAssetPath("media/avatars/default.png"),
+        id: "",
+        company_name: "",
+        company_logo: "",
+        address: "",
+        city: "",
+        state: "",
+        country: "",
+        pincode: "",
+        logo_base64: "",
       },
       total: 0,
       day_or_equipment: "1",
@@ -1139,11 +1156,7 @@ export default defineComponent({
         GetClientData(response.client_id);
       }
 
-      // logo
-      InvoiceDetails.value.company_details.company_logo = response
-        .company_details.company_logo
-        ? "data: image/png;base64," + response.company_details.company_logo
-        : getAssetPath("media/avatars/default.png");
+      InvoiceDetails.value.company_id = response.company_id;
     });
 
     const GetClients = async (id: string) => {
@@ -1617,6 +1630,17 @@ export default defineComponent({
     };
 
     const generatePdf = async (pdfName: string) => {
+      const res2 = await getCompanyLogo(InvoiceDetails.value.company_id);
+
+      InvoiceDetails.value.company_details.id = res2.id;
+      InvoiceDetails.value.company_details.company_name = res2.company_name;
+      InvoiceDetails.value.company_details.company_logo = res2.company_logo
+        ? res2.company_logo
+        : "";
+      InvoiceDetails.value.company_details.logo_base64 = res2.logo_base64
+        ? "data: image/png;base64," + res2.logo_base64
+        : getAssetPath("media/avatars/default.png");
+
       // console.log(InvoiceDetails.value);
       await Gen("invoice", InvoiceId.toString(), pdfName, InvoiceDetails);
     };

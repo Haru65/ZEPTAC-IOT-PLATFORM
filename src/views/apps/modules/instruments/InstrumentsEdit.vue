@@ -309,140 +309,488 @@
               </div>
             </div>
 
+            <!--begin::Input group-->
             <div class="row mb-6">
-              <label
-                for="datasheet"
-                class="col-lg-3 col-form-label required fw-semobold text-gray-700 fs-6 text-nowrap"
+              <!--begin::Label-->
+              <label class="col-lg-3 col-form-label fw-semobold fs-6"
                 >Datasheet</label
               >
+              <!--end::Label-->
+
               <!--begin::Col-->
-              <div class="col-lg-9 fv-row position-relative">
-                <Field
-                  type="file"
-                  id="datasheet"
-                  name="datasheet"
-                  class="form-control form-control-lg form-control-solid"
-                  @change="handleFileChange"
-                  accept=".pdf"
-                />
-                <div
-                  v-if="itemDetails.datasheet"
-                  class="position-absolute end-0 top-50 translate-middle-y"
-                >
-                  <i
-                    class="fas fs-4 fa-check-circle text-success me-6"
-                    data-toggle="tooltip"
-                    title="File is selected"
-                  ></i>
-                </div>
-                <div
-                  v-else
-                  class="position-absolute end-0 top-50 translate-middle-y"
-                >
-                  <i
-                    class="fas fs-4 fa-times-circle text-danger me-6"
-                    data-toggle="tooltip"
-                    title="File is not selected"
-                  ></i>
-                </div>
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="datasheet" />
+              <div class="col-lg-9">
+                <!--begin::Row-->
+                <div class="row">
+                  <!--begin::Col-->
+                  <div
+                    v-if="itemDetails.datasheet == ''"
+                    class="form-group col-md-12 mb-8 mb-sd-8"
+                  >
+                    <div class="position-relative">
+                      <label
+                        class="w-100 bg-gray-200 min-h-100px btn btn-outline btn-outline-dashed btn-outline-default d-flex align-items-center position-relative"
+                      >
+                        <div
+                          class="m-6 position-absolute fs-1 top-50 start-50 translate-middle"
+                        >
+                          <i class="bi bi-upload fs-1"></i>
+
+                          <p class="fs-3 text-gray-700">
+                            Browse File to upload
+                          </p>
+                        </div>
+                        <input
+                          type="file"
+                          @change="handleDatasheetChange"
+                          accept=".pdf"
+                          class="position-absolute top-0 start-0 end-0 bottom-0 opacity-0 w-100 h-100"
+                        />
+                      </label>
+                    </div>
+                    <div
+                      v-if="
+                        uploadProgressForDatasheet &&
+                        uploadProgressForDatasheet > 0 &&
+                        uploadProgressForDatasheet <= 100
+                      "
+                      class="h-10px min-w-100 d-flex flex-stack py-4"
+                    >
+                      <div
+                        class="progress progress-bar bg-primary d-flex align-items-center justify-content-center"
+                        role="progressbar"
+                        :style="`width: ${uploadProgressForDatasheet}%`"
+                        :aria-valuenow="uploadProgressForDatasheet"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      ></div>
+                      <div class="d-flex flex-column align-items-end ms-2">
+                        {{ `${uploadProgressForDatasheet}%` }}
+                      </div>
+                    </div>
                   </div>
+                  <div
+                    v-if="
+                      itemDetails.datasheet != '' &&
+                      datasheetData.file_name == ''
+                    "
+                    class="notice d-flex bg-light-primary rounded border-primary border min-w-lg-600px flex-shrink-0 p-6"
+                  >
+                    <!--begin::Icon-->
+                    <KTIcon
+                      icon-name="file"
+                      icon-class="fs-2tx text-primary me-4"
+                    />
+                    <!--end::Icon-->
+
+                    <!--begin::Wrapper-->
+                    <div
+                      class="d-flex flex-stack flex-grow-1 flex-wrap flex-md-nowrap"
+                    >
+                      <!--begin::Content-->
+                      <div class="mb-3 mb-md-0 fw-semobold">
+                        <h4 class="text-gray-800 fw-bold cursor-pointer">
+                          <a
+                            target="blank"
+                            v-bind:href="`https://api.zeptac.com/storage/company/${itemDetails.company_id}/instruments/${itemDetails.datasheet}`"
+                            data-toggle="tooltip"
+                            title="preview file"
+                            class="underline"
+                            >{{ itemDetails.datasheet }}
+                          </a>
+                        </h4>
+                      </div>
+                      <!--end::Content-->
+
+                      <!--begin::Action-->
+
+                      <KTIcon
+                        data-toggle="tooltip"
+                        title="remove file"
+                        icon-name="cross"
+                        class="cursor-pointer fs-2tx text-danger rounded"
+                        @click="removeDatasheetFromTemp"
+                        icon-class="fs-1"
+                      />
+                      <!--end::Action-->
+                    </div>
+                    <!--end::Wrapper-->
+                  </div>
+                  <div
+                    v-else-if="datasheetData.file_name != ''"
+                    class="notice d-flex bg-light-primary rounded border-primary border min-w-lg-600px flex-shrink-0 p-6"
+                  >
+                    <!--begin::Icon-->
+                    <KTIcon
+                      icon-name="file"
+                      icon-class="fs-2tx text-primary me-4"
+                    />
+                    <!--end::Icon-->
+
+                    <!--begin::Wrapper-->
+                    <div
+                      class="d-flex flex-stack flex-grow-1 flex-wrap flex-md-nowrap"
+                    >
+                      <!--begin::Content-->
+                      <div class="mb-3 mb-md-0 fw-semobold">
+                        <h4 class="text-gray-800 fw-bold cursor-pointer">
+                          <a
+                            target="blank"
+                            v-bind:href="`https://api.zeptac.com/storage/temporary/${itemDetails.datasheet}`"
+                            data-toggle="tooltip"
+                            title="preview file"
+                            class="underline"
+                            >{{ itemDetails.datasheet }}
+                          </a>
+                        </h4>
+                        <div class="fs-6 text-gray-600 pe-7">
+                          {{ datasheetData.file_size.toFixed(2) }} MB
+                        </div>
+                      </div>
+                      <!--end::Content-->
+
+                      <!--begin::Action-->
+
+                      <KTIcon
+                        data-toggle="tooltip"
+                        title="remove file"
+                        icon-name="cross"
+                        class="cursor-pointer fs-2tx text-danger rounded"
+                        @click="removeDatasheetFromTemp"
+                        icon-class="fs-1"
+                      />
+                      <!--end::Action-->
+                    </div>
+                    <!--end::Wrapper-->
+                  </div>
+                  <!--end::Col-->
                 </div>
+                <!--end::Row-->
               </div>
               <!--end::Col-->
             </div>
+            <!--end::Input group-->
 
+            <!--begin::Input group-->
             <div class="row mb-6">
-              <label
-                for="calibration_certificate"
-                class="col-lg-3 col-form-label required fw-semobold text-gray-700 fs-6 text-nowrap"
-                >Calibration Certificate</label
-              >
-              <!--begin::Col-->
-              <div class="col-lg-9 fv-row position-relative">
-                <Field
-                  type="file"
-                  id="calibration_certificate"
-                  name="calibration_certificate"
-                  class="form-control form-control-lg form-control-solid"
-                  @change="handleFileChange"
-                  accept=".pdf"
-                />
-                <div
-                  v-if="itemDetails.calibration_certificate"
-                  class="position-absolute end-0 top-50 translate-middle-y"
-                >
-                  <i
-                    class="fas fs-4 fa-check-circle text-success me-6"
-                    data-toggle="tooltip"
-                    title="File is selected"
-                  ></i>
-                </div>
-                <div
-                  v-else
-                  class="position-absolute end-0 top-50 translate-middle-y"
-                >
-                  <i
-                    class="fas fs-4 fa-times-circle text-danger me-6"
-                    data-toggle="tooltip"
-                    title="File is not selected"
-                  ></i>
-                </div>
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="calibration_certificate" />
-                  </div>
-                </div>
-              </div>
-              <!--end::Col-->
-            </div>
-
-            <div class="row mb-6">
-              <label
-                for="traceability"
-                class="col-lg-3 col-form-label required fw-semobold text-gray-700 fs-6 text-nowrap"
+              <!--begin::Label-->
+              <label class="col-lg-3 col-form-label fw-semobold fs-6"
                 >Traceability</label
               >
+              <!--end::Label-->
+
               <!--begin::Col-->
-              <div class="col-lg-9 fv-row position-relative">
-                <Field
-                  type="file"
-                  id="traceability"
-                  name="traceability"
-                  class="form-control form-control-lg form-control-solid"
-                  @change="handleFileChange"
-                  accept=".pdf"
-                />
-                <div
-                  v-if="itemDetails.traceability"
-                  class="position-absolute end-0 top-50 translate-middle-y"
-                >
-                  <i
-                    class="fas fs-4 fa-check-circle text-success me-6"
-                    data-toggle="tooltip"
-                    title="File is selected"
-                  ></i>
-                </div>
-                <div
-                  v-else
-                  class="position-absolute end-0 top-50 translate-middle-y"
-                >
-                  <i
-                    class="fas fs-4 fa-times-circle text-danger me-6"
-                    data-toggle="tooltip"
-                    title="File is not selected"
-                  ></i>
-                </div>
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="traceability" />
+              <div class="col-lg-9">
+                <!--begin::Row-->
+                <div class="row">
+                  <!--begin::Col-->
+                  <div
+                    v-if="itemDetails.traceability == ''"
+                    class="form-group col-md-12 mb-8 mb-sd-8"
+                  >
+                    <div class="position-relative">
+                      <label
+                        class="w-100 bg-gray-200 min-h-100px btn btn-outline btn-outline-dashed btn-outline-default d-flex align-items-center position-relative"
+                      >
+                        <div
+                          class="m-6 position-absolute fs-1 top-50 start-50 translate-middle"
+                        >
+                          <i class="bi bi-upload fs-1"></i>
+
+                          <p class="fs-3 text-gray-700">
+                            Browse File to upload
+                          </p>
+                        </div>
+                        <input
+                          type="file"
+                          @change="handleTraceabilityChange"
+                          accept=".pdf"
+                          class="position-absolute top-0 start-0 end-0 bottom-0 opacity-0 w-100 h-100"
+                        />
+                      </label>
+                    </div>
+                    <div
+                      v-if="
+                        uploadProgressForTraceability &&
+                        uploadProgressForTraceability > 0 &&
+                        uploadProgressForTraceability <= 100
+                      "
+                      class="h-10px min-w-100 d-flex flex-stack py-4"
+                    >
+                      <div
+                        class="progress progress-bar bg-primary d-flex align-items-center justify-content-center"
+                        role="progressbar"
+                        :style="`width: ${uploadProgressForTraceability}%`"
+                        :aria-valuenow="uploadProgressForTraceability"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      ></div>
+                      <div class="d-flex flex-column align-items-end ms-2">
+                        {{ `${uploadProgressForTraceability}%` }}
+                      </div>
+                    </div>
                   </div>
+                  <div
+                    v-if="
+                      itemDetails.traceability != '' &&
+                      traceabilityData.file_name == ''
+                    "
+                    class="notice d-flex bg-light-primary rounded border-primary border min-w-lg-600px flex-shrink-0 p-6"
+                  >
+                    <!--begin::Icon-->
+                    <KTIcon
+                      icon-name="file"
+                      icon-class="fs-2tx text-primary me-4"
+                    />
+                    <!--end::Icon-->
+
+                    <!--begin::Wrapper-->
+                    <div
+                      class="d-flex flex-stack flex-grow-1 flex-wrap flex-md-nowrap"
+                    >
+                      <!--begin::Content-->
+                      <div class="mb-3 mb-md-0 fw-semobold">
+                        <h4 class="text-gray-800 fw-bold cursor-pointer">
+                          <a
+                            target="blank"
+                            v-bind:href="`https://api.zeptac.com/storage/company/${itemDetails.company_id}/instruments/${itemDetails.traceability}`"
+                            data-toggle="tooltip"
+                            title="preview file"
+                            class="underline"
+                            >{{ itemDetails.traceability }}
+                          </a>
+                        </h4>
+                      </div>
+                      <!--end::Content-->
+
+                      <!--begin::Action-->
+
+                      <KTIcon
+                        data-toggle="tooltip"
+                        title="remove file"
+                        icon-name="cross"
+                        class="cursor-pointer fs-2tx text-danger rounded"
+                        @click="removeTraceabilityFromTemp"
+                        icon-class="fs-1"
+                      />
+                      <!--end::Action-->
+                    </div>
+                    <!--end::Wrapper-->
+                  </div>
+                  <div
+                    v-else-if="traceabilityData.file_name != ''"
+                    class="notice d-flex bg-light-primary rounded border-primary border min-w-lg-600px flex-shrink-0 p-6"
+                  >
+                    <!--begin::Icon-->
+                    <KTIcon
+                      icon-name="file"
+                      icon-class="fs-2tx text-primary me-4"
+                    />
+                    <!--end::Icon-->
+
+                    <!--begin::Wrapper-->
+                    <div
+                      class="d-flex flex-stack flex-grow-1 flex-wrap flex-md-nowrap"
+                    >
+                      <!--begin::Content-->
+                      <div class="mb-3 mb-md-0 fw-semobold">
+                        <h4 class="text-gray-800 fw-bold cursor-pointer">
+                          <a
+                            target="blank"
+                            v-bind:href="`https://api.zeptac.com/storage/temporary/${itemDetails.traceability}`"
+                            data-toggle="tooltip"
+                            title="preview file"
+                            class="underline"
+                            >{{ itemDetails.traceability }}
+                          </a>
+                        </h4>
+                        <div class="fs-6 text-gray-600 pe-7">
+                          {{ traceabilityData.file_size.toFixed(2) }} MB
+                        </div>
+                      </div>
+                      <!--end::Content-->
+
+                      <!--begin::Action-->
+
+                      <KTIcon
+                        data-toggle="tooltip"
+                        title="remove file"
+                        icon-name="cross"
+                        class="cursor-pointer fs-2tx text-danger rounded"
+                        @click="removeTraceabilityFromTemp"
+                        icon-class="fs-1"
+                      />
+                      <!--end::Action-->
+                    </div>
+                    <!--end::Wrapper-->
+                  </div>
+                  <!--end::Col-->
                 </div>
+                <!--end::Row-->
               </div>
               <!--end::Col-->
             </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label class="col-lg-3 col-form-label fw-semobold fs-6"
+                >Calibration Certificate</label
+              >
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-9">
+                <!--begin::Row-->
+                <div class="row">
+                  <!--begin::Col-->
+                  <div
+                    v-if="itemDetails.calibration_certificate == ''"
+                    class="form-group col-md-12 mb-8 mb-sd-8"
+                  >
+                    <div class="position-relative">
+                      <label
+                        class="w-100 bg-gray-200 min-h-100px btn btn-outline btn-outline-dashed btn-outline-default d-flex align-items-center position-relative"
+                      >
+                        <div
+                          class="m-6 position-absolute fs-1 top-50 start-50 translate-middle"
+                        >
+                          <i class="bi bi-upload fs-1"></i>
+
+                          <p class="fs-3 text-gray-700">
+                            Browse File to upload
+                          </p>
+                        </div>
+                        <input
+                          type="file"
+                          @change="handleCalibrationChange"
+                          accept=".pdf"
+                          class="position-absolute top-0 start-0 end-0 bottom-0 opacity-0 w-100 h-100"
+                        />
+                      </label>
+                    </div>
+                    <div
+                      v-if="
+                        uploadProgressForCalibration &&
+                        uploadProgressForCalibration > 0 &&
+                        uploadProgressForCalibration <= 100
+                      "
+                      class="h-10px min-w-100 d-flex flex-stack py-4"
+                    >
+                      <div
+                        class="progress progress-bar bg-primary d-flex align-items-center justify-content-center"
+                        role="progressbar"
+                        :style="`width: ${uploadProgressForCalibration}%`"
+                        :aria-valuenow="uploadProgressForCalibration"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      ></div>
+                      <div class="d-flex flex-column align-items-end ms-2">
+                        {{ `${uploadProgressForCalibration}%` }}
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    v-if="
+                      itemDetails.calibration_certificate != '' &&
+                      calibrationData.file_name == ''
+                    "
+                    class="notice d-flex bg-light-primary rounded border-primary border min-w-lg-600px flex-shrink-0 p-6"
+                  >
+                    <!--begin::Icon-->
+                    <KTIcon
+                      icon-name="file"
+                      icon-class="fs-2tx text-primary me-4"
+                    />
+                    <!--end::Icon-->
+
+                    <!--begin::Wrapper-->
+                    <div
+                      class="d-flex flex-stack flex-grow-1 flex-wrap flex-md-nowrap"
+                    >
+                      <!--begin::Content-->
+                      <div class="mb-3 mb-md-0 fw-semobold">
+                        <h4 class="text-gray-800 fw-bold cursor-pointer">
+                          <a
+                            target="blank"
+                            v-bind:href="`https://api.zeptac.com/storage/company/${itemDetails.company_id}/instruments/${itemDetails.calibration_certificate}`"
+                            data-toggle="tooltip"
+                            title="preview file"
+                            class="underline"
+                            >{{ itemDetails.calibration_certificate }}
+                          </a>
+                        </h4>
+                      </div>
+                      <!--end::Content-->
+
+                      <!--begin::Action-->
+
+                      <KTIcon
+                        data-toggle="tooltip"
+                        title="remove file"
+                        icon-name="cross"
+                        class="cursor-pointer fs-2tx text-danger rounded"
+                        @click="removeCalibrationFromTemp"
+                        icon-class="fs-1"
+                      />
+                      <!--end::Action-->
+                    </div>
+                    <!--end::Wrapper-->
+                  </div>
+                  <div
+                    v-else-if="calibrationData.file_name != ''"
+                    class="notice d-flex bg-light-primary rounded border-primary border min-w-lg-600px flex-shrink-0 p-6"
+                  >
+                    <!--begin::Icon-->
+                    <KTIcon
+                      icon-name="file"
+                      icon-class="fs-2tx text-primary me-4"
+                    />
+                    <!--end::Icon-->
+
+                    <!--begin::Wrapper-->
+                    <div
+                      class="d-flex flex-stack flex-grow-1 flex-wrap flex-md-nowrap"
+                    >
+                      <!--begin::Content-->
+                      <div class="mb-3 mb-md-0 fw-semobold">
+                        <h4 class="text-gray-800 fw-bold cursor-pointer">
+                          <a
+                            target="blank"
+                            v-bind:href="`https://api.zeptac.com/storage/temporary/${itemDetails.calibration_certificate}`"
+                            data-toggle="tooltip"
+                            title="preview file"
+                            class="underline"
+                            >{{ itemDetails.calibration_certificate }}
+                          </a>
+                        </h4>
+                        <div class="fs-6 text-gray-600 pe-7">
+                          {{ calibrationData.file_size.toFixed(2) }} MB
+                        </div>
+                      </div>
+                      <!--end::Content-->
+
+                      <!--begin::Action-->
+
+                      <KTIcon
+                        data-toggle="tooltip"
+                        title="remove file"
+                        icon-name="cross"
+                        class="cursor-pointer fs-2tx text-danger rounded"
+                        @click="removeCalibrationFromTemp"
+                        icon-class="fs-1"
+                      />
+                      <!--end::Action-->
+                    </div>
+                    <!--end::Wrapper-->
+                  </div>
+                  <!--end::Col-->
+                </div>
+                <!--end::Row-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
 
             <div class="row mb-6 mt-6">
               <div
@@ -660,7 +1008,9 @@
                                   type="date"
                                   v-model="editedDate"
                                   class="badge"
-                                  @change="setPlanAndEditDates($event, 'editedDate')"
+                                  @change="
+                                    setPlanAndEditDates($event, 'editedDate')
+                                  "
                                   placeholder="Pick a day"
                                 ></el-date-picker>
                               </template>
@@ -777,6 +1127,8 @@ import {
   getInstrument,
   deleteInstrument,
   getCompanies,
+  removeImage,
+  uploadImage,
 } from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
@@ -816,10 +1168,10 @@ interface itemDetails {
   traceability: string;
 
   maintenance_plan: boolean;
-  
+
   maintenance_history: Array<MDetails>;
   intermediate_check_plan: string[];
-    
+
   approval_status: string;
 
   company_id: string;
@@ -958,6 +1310,24 @@ export default defineComponent({
       }
     };
 
+    const calibrationData = ref({
+      file_name: "",
+      file: "",
+      file_size: 0,
+    });
+
+    const datasheetData = ref({
+      file_name: "",
+      file: "",
+      file_size: 0,
+    });
+
+    const traceabilityData = ref({
+      file_name: "",
+      file: "",
+      file_size: 0,
+    });
+
     const itemDetails = ref<itemDetails>({
       instrument_id: "",
       name: "",
@@ -974,10 +1344,10 @@ export default defineComponent({
       calibration_certificate: "",
       traceability: "",
       maintenance_plan: true,
-      
+
       maintenance_history: [],
       intermediate_check_plan: [],
-      
+
       approval_status: "",
 
       company_id: User.company_id,
@@ -1015,7 +1385,7 @@ export default defineComponent({
         intermediate_check_plan: JSON.parse(response.intermediate_check_plan),
 
         approval_status: response.approval_status,
-        
+
         company_id: response.company_id ? response.company_id : "",
         created_by: response.created_by,
         updated_by: response.updated_by,
@@ -1026,80 +1396,469 @@ export default defineComponent({
       }
     });
 
-    const isPdfInvalid = ref(false);
+    // CONSTANT
+    const MAX_FILE_SIZE = 1024 ** 2; // 1 MB
 
-    const handleFileChange = (event) => {
-      // Get the selected file
+    // TODO :: optional make a single function that can handle all files
+    /* Calibration Certificate Logic */
+
+    const uploadProgressForDatasheet = ref<number>(0);
+
+    const handleDatasheetChange = async (event: any) => {
       const selectedFile = event.target?.files?.[0];
+      const allowedTypes = ["application/pdf"];
 
       if (!selectedFile) {
         alert("Please Select a file");
+        return;
       }
 
-      if (selectedFile) {
-        // Check if the selected file is a PDF
-        if (selectedFile.type === "application/pdf") {
-          const reader = new FileReader();
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        alert("File size should be less than 1 MB");
+        return;
+      }
 
-          reader.onload = () => {
-            try {
-              const base64Data = reader.result
-                ?.toString()
-                .replace(/^data:application\/pdf;base64,/, "");
+      datasheetData.value.file_size = selectedFile.size / 1024 ** 2;
 
-              if (base64Data) {
-                if (event.target.id === "datasheet") {
-                  itemDetails.value.datasheet = base64Data;
-                } else if (event.target.id === "calibration_certificate") {
-                  itemDetails.value.calibration_certificate = base64Data;
-                } else if (event.target.id === "traceability") {
-                  itemDetails.value.traceability = base64Data;
-                }
-              } else {
-                console.error("Error: Failed to read the image data.");
-              }
-            } catch (e) {
-              console.error("Error:", e);
-            }
-          };
-
-          // Read the file as data URL (base64)
-          reader.readAsDataURL(selectedFile);
-          // Reset the invalid flag
-          isPdfInvalid.value = false;
-        } else {
-          // Clear the data and set the invalid flag
-
-          if (event.target.id === "datasheet") {
-            itemDetails.value.datasheet = "";
-
-            isPdfInvalid.value = true;
-          } else if (event.target.id === "calibration_certificate") {
-            itemDetails.value.calibration_certificate = "";
-
-            isPdfInvalid.value = true;
-          } else if (event.target.id === "traceability") {
-            itemDetails.value.traceability = "";
-
-            isPdfInvalid.value = true;
-          }
-        }
+      if (allowedTypes.includes(selectedFile.type)) {
+        await uploadDatasheetFile(selectedFile);
       } else {
-        if (event.target.id === "datasheet") {
-          itemDetails.value.datasheet = "";
-
-          isPdfInvalid.value = true;
-        } else if (event.target.id === "calibration_certificate") {
-          itemDetails.value.calibration_certificate = "";
-
-          isPdfInvalid.value = true;
-        } else if (event.target.id === "traceability") {
-          itemDetails.value.traceability = "";
-
-          isPdfInvalid.value = true;
-        }
+        datasheetData.value.file = "";
+        alert("Please select a valid file");
       }
-      console.log(itemDetails.value);
+
+      console.log(datasheetData.value);
+    };
+
+    const removeDatasheetFromTemp = async () => {
+      if (itemDetails.value.datasheet && datasheetData.value.file_name === "") {
+        var confirmChange = confirm(
+          "Do you really want to change datasheet file?"
+        );
+        if (!confirmChange) {
+          return;
+        }
+
+        itemDetails.value.datasheet = "";
+        // Continue with the rest of your code here
+        return;
+      }
+
+      if (
+        itemDetails.value.datasheet === "" &&
+        datasheetData.value.file_name === ""
+      ) {
+        alert("You already removed the file. Please select a new file.");
+        return;
+      }
+
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You want to change the file!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error) {
+          const errorMessage = "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromServer = async () => {
+        try {
+          const response = await removeImage(datasheetData.value);
+
+          if (response.success) {
+            itemDetails.value.datasheet = "";
+            datasheetData.value = {
+              file_name: "",
+              file_size: 0,
+              file: "",
+            };
+
+            showSuccessAlert(
+              "Success",
+              response.message || `File removed successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(response.message || "Failed to remove the file.");
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      const isConfirmed = await deleteConfirmation();
+      if (isConfirmed) {
+        return await deleteFromServer();
+      } else {
+        return { success: false };
+      }
+    };
+
+    const uploadDatasheetFile = async (file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("file_name", datasheetData.value.file_name);
+
+      const onUploadProgress = (progressEvent) => {
+        const { loaded, total } = progressEvent;
+        const percentage = Math.floor((loaded / total) * 100);
+        uploadProgressForDatasheet.value = percentage;
+      };
+
+      try {
+        await simulateDatasheetUploadProgress();
+        const response = await uploadImage(formData, onUploadProgress);
+        itemDetails.value.datasheet = response.modifiedFileName;
+        datasheetData.value.file_name = response.modifiedFileName;
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      } finally {
+        finalizeDatasheetProgress();
+      }
+
+      datasheetData.value.file = file;
+    };
+
+    const simulateDatasheetUploadProgress = async () => {
+      uploadProgressForDatasheet.value = 0;
+      const interval = setInterval(() => {
+        if (uploadProgressForDatasheet.value < 100) {
+          uploadProgressForDatasheet.value += 10; // Adjust this value for smoother progress
+        } else {
+          clearInterval(interval);
+        }
+      }, 200); // Adjust the interval duration as needed
+    };
+
+    const finalizeDatasheetProgress = () => {
+      uploadProgressForDatasheet.value = 100; // Ensure progress bar is complete
+      setTimeout(() => {
+        uploadProgressForDatasheet.value = 0; // Reset progress bar after a short delay
+      }, 100);
+    };
+
+    // TODO :: optional make a single function that can handle all files
+    /* Calibration Certificate Logic */
+
+    const uploadProgressForCalibration = ref<number>(0);
+
+    const handleCalibrationChange = async (event: any) => {
+      const selectedFile = event.target?.files?.[0];
+      const allowedTypes = ["application/pdf"];
+
+      if (!selectedFile) {
+        alert("Please Select a file");
+        return;
+      }
+
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        alert("File size should be less than 1 MB");
+        return;
+      }
+
+      calibrationData.value.file_size = selectedFile.size / 1024 ** 2;
+
+      if (allowedTypes.includes(selectedFile.type)) {
+        await uploadCalibrationFile(selectedFile);
+      } else {
+        calibrationData.value.file = "";
+        alert("Please select a valid file");
+      }
+
+      console.log(calibrationData.value);
+    };
+
+    const removeCalibrationFromTemp = async () => {
+      if (
+        itemDetails.value.calibration_certificate &&
+        calibrationData.value.file_name === ""
+      ) {
+        var confirmChange = confirm(
+          "Do you really want to change calibration file?"
+        );
+        if (!confirmChange) {
+          return;
+        }
+
+        itemDetails.value.calibration_certificate = "";
+        // Continue with the rest of your code here
+        return;
+      }
+
+      if (
+        itemDetails.value.calibration_certificate === "" &&
+        calibrationData.value.file_name === ""
+      ) {
+        alert("You already removed the file. Please select a new file.");
+        return;
+      }
+
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You want to change the file!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error) {
+          const errorMessage = "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromServer = async () => {
+        try {
+          const response = await removeImage(calibrationData.value);
+
+          if (response.success) {
+            itemDetails.value.calibration_certificate = "";
+            calibrationData.value = {
+              file_name: "",
+              file_size: 0,
+              file: "",
+            };
+
+            showSuccessAlert(
+              "Success",
+              response.message || `File removed successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(response.message || "Failed to remove the file.");
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      const isConfirmed = await deleteConfirmation();
+      if (isConfirmed) {
+        return await deleteFromServer();
+      } else {
+        return { success: false };
+      }
+    };
+
+    const uploadCalibrationFile = async (file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("file_name", calibrationData.value.file_name);
+
+      const onUploadProgress = (progressEvent) => {
+        const { loaded, total } = progressEvent;
+        const percentage = Math.floor((loaded / total) * 100);
+        uploadProgressForCalibration.value = percentage;
+      };
+
+      try {
+        await simulateCalibrationUploadProgress();
+        const response = await uploadImage(formData, onUploadProgress);
+        itemDetails.value.calibration_certificate = response.modifiedFileName;
+        calibrationData.value.file_name = response.modifiedFileName;
+      } catch (error) {
+        console.error("Error uploading file:", error);
+      } finally {
+        finalizeCalibrationProgress();
+      }
+
+      calibrationData.value.file = file;
+    };
+
+    const simulateCalibrationUploadProgress = async () => {
+      uploadProgressForCalibration.value = 0;
+      const interval = setInterval(() => {
+        if (uploadProgressForCalibration.value < 100) {
+          uploadProgressForCalibration.value += 10; // Adjust this value for smoother progress
+        } else {
+          clearInterval(interval);
+        }
+      }, 200); // Adjust the interval duration as needed
+    };
+
+    const finalizeCalibrationProgress = () => {
+      uploadProgressForCalibration.value = 100; // Ensure progress bar is complete
+      setTimeout(() => {
+        uploadProgressForCalibration.value = 0; // Reset progress bar after a short delay
+      }, 100);
+    };
+
+    // TODO :: optional make a single function that can handle all files
+    /* Traceability Logic */
+
+    const uploadProgressForTraceability = ref<number>(0);
+
+    const handleTraceabilityChange = async (event: any) => {
+      const selectedFile = event.target?.files?.[0];
+      const allowedTypes = ["application/pdf"];
+
+      if (!selectedFile) {
+        alert("Please Select a file");
+        return;
+      }
+
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        alert("File size should be less than 1 MB");
+        return;
+      }
+
+      traceabilityData.value.file_size = selectedFile.size / 1024 ** 2;
+
+      if (allowedTypes.includes(selectedFile.type)) {
+        await uploadTraceabilityFile(selectedFile);
+      } else {
+        traceabilityData.value.file = "";
+        alert("Please select a valid file");
+      }
+
+      console.log(traceabilityData.value);
+    };
+
+    const removeTraceabilityFromTemp = async () => {
+      if (
+        itemDetails.value.traceability &&
+        traceabilityData.value.file_name === ""
+      ) {
+        var confirmChange = confirm(
+          "Do you really want to change Traceability file?"
+        );
+        if (!confirmChange) {
+          return;
+        }
+
+        itemDetails.value.traceability = "";
+        // Continue with the rest of your code here
+        return;
+      }
+
+      if (
+        itemDetails.value.traceability === "" &&
+        traceabilityData.value.file_name === ""
+      ) {
+        alert("You already removed the file. Please select a new file.");
+        return;
+      }
+
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You want to change the file!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error) {
+          const errorMessage = "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromServer = async () => {
+        try {
+          const response = await removeImage(traceabilityData.value);
+
+          if (response.success) {
+            itemDetails.value.traceability = "";
+            traceabilityData.value = {
+              file_name: "",
+              file_size: 0,
+              file: "",
+            };
+
+            showSuccessAlert(
+              "Success",
+              response.message || `File removed successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(response.message || "Failed to remove the file.");
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      const isConfirmed = await deleteConfirmation();
+      if (isConfirmed) {
+        return await deleteFromServer();
+      } else {
+        return { success: false };
+      }
+    };
+
+    const uploadTraceabilityFile = async (file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("file_name", traceabilityData.value.file_name);
+
+      const onUploadProgress = (progressEvent) => {
+        const { loaded, total } = progressEvent;
+        const percentage = Math.floor((loaded / total) * 100);
+        uploadProgressForTraceability.value = percentage;
+      };
+
+      try {
+        await simulateTraceabilityUploadProgress();
+        const response = await uploadImage(formData, onUploadProgress);
+        itemDetails.value.traceability = response.modifiedFileName;
+        traceabilityData.value.file_name = response.modifiedFileName;
+      } catch (error) {
+        console.error("Error uploading file:", error);
+      } finally {
+        finalizeTraceabilityProgress();
+      }
+
+      traceabilityData.value.file = file;
+    };
+
+    const simulateTraceabilityUploadProgress = async () => {
+      uploadProgressForTraceability.value = 0;
+      const interval = setInterval(() => {
+        if (uploadProgressForTraceability.value < 100) {
+          uploadProgressForTraceability.value += 10; // Adjust this value for smoother progress
+        } else {
+          clearInterval(interval);
+        }
+      }, 200); // Adjust the interval duration as needed
+    };
+
+    const finalizeTraceabilityProgress = () => {
+      uploadProgressForTraceability.value = 100; // Ensure progress bar is complete
+      setTimeout(() => {
+        uploadProgressForTraceability.value = 0; // Reset progress bar after a short delay
+      }, 100);
     };
 
     async function addMaintenanceData(data) {
@@ -1310,7 +2069,6 @@ export default defineComponent({
       Companies,
       deleteItem,
       identifier,
-      handleFileChange,
       addMaintenanceData,
       editMaintenanceData,
       deleteMaintenanceData,
@@ -1324,6 +2082,21 @@ export default defineComponent({
       editPlanDate,
       savePlanDate,
       deletePlanDate,
+
+      handleDatasheetChange,
+      uploadProgressForDatasheet,
+      datasheetData,
+      removeDatasheetFromTemp,
+
+      handleCalibrationChange,
+      uploadProgressForCalibration,
+      calibrationData,
+      removeCalibrationFromTemp,
+
+      handleTraceabilityChange,
+      uploadProgressForTraceability,
+      traceabilityData,
+      removeTraceabilityFromTemp,
     };
   },
 });

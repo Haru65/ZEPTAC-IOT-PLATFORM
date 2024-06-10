@@ -31,6 +31,7 @@
         </h3>
         <div class="me-3">
           <el-select
+            class="w-150px"
             filterable
             placeholder="Select Year"
             v-model="selectedYearCache"
@@ -267,6 +268,7 @@ import {
   deleteRGatePass,
   getRGPInfo,
   gatePassSearch,
+getCompanyLogo,
 } from "@/stores/api";
 import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
 import { hideModal } from "@/core/helpers/dom";
@@ -636,6 +638,7 @@ export default defineComponent({
     const rgpInfo = ref({
       id: "",
       rgp_no: "",
+      company_id: "",
       date: "",
       duedate: "",
       engineers: [],
@@ -675,15 +678,25 @@ export default defineComponent({
         country: "",
       },
       company_details: {
+        id: "",
         company_name: "",
-        company_logo: getAssetPath("media/avatars/default.png"),
+        company_logo: "",
+        address: "",
+        city: "",
+        state: "",
+        country: "",
+        pincode: "",
+        logo_base64: "",
       },
     });
 
     const downloadRGP = async (id: any) => {
       // get all information of the rgp
       const res = await getRGPInfo(id);
+
       rgpInfo.value.id = res.result.id;
+      rgpInfo.value.company_id = res.result.company_id;
+    
       rgpInfo.value.rgp_no = res.result.rgp_no;
       rgpInfo.value.date = res.result.date;
       rgpInfo.value.duedate = res.result.duedate;
@@ -698,11 +711,14 @@ export default defineComponent({
       rgpInfo.value.customer_data = res.result.customer_data;
       rgpInfo.value.client_data = res.result.client_data;
       rgpInfo.value.quotation_no = res.result.quotationsDetails.quotation_no;
-      rgpInfo.value.company_details.company_name =
-        res.result.company_details.company_name;
-      rgpInfo.value.company_details.company_logo = res.result.company_details
-        .company_logo
-        ? "data: image/png;base64," + res.result.company_details.company_logo
+
+      const res2 = await getCompanyLogo(res.result.company_id);
+
+      rgpInfo.value.company_details.id = res2.id;
+      rgpInfo.value.company_details.company_name = res2.company_name;
+      rgpInfo.value.company_details.company_logo = res2.company_logo ? res2.company_logo : "";
+      rgpInfo.value.company_details.logo_base64 = res2.logo_base64 
+        ? "data: image/png;base64," + res2.logo_base64
         : getAssetPath("media/avatars/default.png");
 
       console.log(rgpInfo.value);

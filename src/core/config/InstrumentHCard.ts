@@ -23,7 +23,7 @@ const instrumentGen = async (id, pdfName, instrumentInfo) => {
 
   // Company Logo Img
   const img = new Image()
-  img.src = instrumentInfo.value.company_details.company_logo;
+  img.src = instrumentInfo.value.company_details.logo_base64;
   doc.addImage(img, 'JPEG', 0.5, 0.7, 0.7, 0.7);
 
   // create a line under heading
