@@ -9,6 +9,7 @@
           id="kt_account_profile_details_form"
           class="form"
           :validation-schema="itemDetailsValidator"
+          @submit="submit"
         >
           <!--begin::Card body-->
           <div class="card-body border-top p-6">
@@ -38,15 +39,17 @@
                   class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6 text-nowrap"
                   >Date of Request</label
                 >
-                <el-date-picker
-                  type="date"
-                  name="request_date"
-                  id="request_date"
-                  v-model="itemDetails.request_date"
-                  @change="setDates($event, 'request_date')"
-                  placeholder="Pick a day"
-                  :editable="false"
-                />
+                <div class="block">
+                  <el-date-picker
+                    type="date"
+                    name="request_date"
+                    id="request_date"
+                    v-model="itemDetails.request_date"
+                    @change="setDates($event, 'request_date')"
+                    placeholder="Pick a day"
+                    :editable="false"
+                  />
+                </div>
               </div>
             </div>
             <!--end::Input group-->
@@ -259,33 +262,44 @@
               </div>
             </div>
 
-            <!-- extra fields -->
+            <!--begin::Input group-->
             <div class="row mb-6">
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6 text-nowrap"
-                  >Effective Date for Amendment</label
-                >
-                <el-date-picker
-                  type="date"
-                  name="effective_date"
-                  id="effective_date"
-                  v-model="itemDetails.effective_date"
-                  @change="setDates($event, 'effective_date')"
-                  placeholder="Pick a day"
-                  :editable="false"
-                />
-              </div>
-
+              <!--begin::Col-->
               <div class="col-md-6 fv-row mb-8 mb-sd-8">
                 <!--begin::Label-->
-                <label class="required fs-5 fw-bold text-gray-700 mb-2"
+                <label
+                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Effective Date for Amendment</label
+                >
+                <!--end::Label-->
+
+                <!--begin::Input-->
+                <div class="block">
+                  <el-date-picker
+                    type="date"
+                    name="effective_date"
+                    id="effective_date"
+                    v-model="itemDetails.effective_date"
+                    @change="setDates($event, 'effective_date')"
+                    placeholder="Pick a day"
+                    :editable="false"
+                  />
+                </div>
+                <!--end::Input-->
+              </div>
+              <!--end::Col-->
+
+              <!--begin::Col-->
+              <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                <!--end::Label-->
+                <label
+                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
                   >Comments for approving authority</label
                 >
                 <!--end::Label-->
 
                 <!--begin::Input-->
-                <div>
+                <div class="block">
                   <el-select
                     v-model="itemDetails.authority_comments"
                     filterable
@@ -296,18 +310,16 @@
                     <el-option label="No" value="No" />
                   </el-select>
                 </div>
-                <!--end::Col-->
-                <div
-                  class="fv-plugins-message-container mt-3"
-                  v-if="!itemDetails.authority_comments"
-                >
+                <!--end::Input-->
+                <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
                     <ErrorMessage name="authority_comments" />
                   </div>
                 </div>
+                <!--end::Input-->
               </div>
+              <!--end::Col-->
             </div>
-            <!--end::Input group-->
 
             <!-- extra fields -->
             <div class="row mb-6">
@@ -332,29 +344,33 @@
           <div class="modal-footer flex-center">
             <!--begin::Button-->
             <button
+              type="reset"
               @click="clear"
-              class="btn btn-lg btn-danger w-sd-25 w-lg-25"
+              id="kt_modal_new_address_cancel"
+              class="btn btn-light w-sd-25 w-lg-25 me-3"
             >
               Discard
             </button>
             <!--end::Button-->
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+
             <!--begin::Button-->
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click="submit()"
+            <button
+              id="kt_modal_new_address_submit"
+              type="submit"
+              ref="submitButtonRef"
+              class="btn btn-primary w-sd-25 w-lg-25 me-2 px-6"
             >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Save </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
                 ></span>
               </span>
-            </span>
+            </button>
             <!--end::Button-->
           </div>
+
           <!--end::Input group-->
         </VForm>
         <!--end::Form-->
@@ -405,6 +421,7 @@ export default defineComponent({
     VForm,
   },
   setup() {
+    const submitButtonRef = ref<null | HTMLButtonElement>(null);
     const loading = ref(false);
     const auth = useAuthStore();
     const router = useRouter();
@@ -490,33 +507,44 @@ export default defineComponent({
 
     const submit = async () => {
       loading.value = true;
+      const result = validateForm(itemDetails.value);
 
-      console.log(itemDetails.value);
+      if (result == false) {
+        loading.value = false;
+        showErrorAlert("Warning", "Please fill all the details correctly.");
+        return;
+      }
+
       try {
-        if (validateForm(itemDetails.value)) {
-          const response = await addDocumentChange(itemDetails.value);
-          if (!response.error) {
-            showSuccessAlert(
-              "Success",
+        if (submitButtonRef.value) {
+          // Activate indicator
+          submitButtonRef.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
+
+        const response = await addDocumentChange(itemDetails.value);
+        if (response?.success) {
+          showSuccessAlert(
+            "Success",
+            response.message ||
               "Document Change Request has been successfully submitted!"
-            );
-            loading.value = false;
-            router.push({ name: "document-change-list" });
-          } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            loading.value = false;
-            return;
-          }
+          );
+          loading.value = false;
+          router.push({ name: "document-change-list" });
         } else {
-          console.log(validateForm(itemDetails));
-          showErrorAlert("Warning", "Please fill in all fields.");
-          return;
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
-        // console.error("API call error:", error);
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButtonRef.value) {
+          submitButtonRef.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -573,6 +601,7 @@ export default defineComponent({
       };
     };
     return {
+      submitButtonRef,
       itemDetails,
       itemDetailsValidator,
       submit,

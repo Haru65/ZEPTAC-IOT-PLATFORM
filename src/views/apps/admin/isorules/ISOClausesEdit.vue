@@ -592,21 +592,22 @@ export default defineComponent({
           is_active: response.is_active,
         };
 
-        Object.assign(clauses, ISO.value.clauses);
-
+        clauses.splice(0, clauses.length, ...ISO.value.clauses);
+        // Object.assign(clauses, ISO.value.clauses);
       } catch (error) {
-        console.log(error)
-        showErrorAlert("Error", "An error occurred during the API call.",);
+        console.log(error);
+        showErrorAlert("Error", "An error occurred during the API call.");
         loading.value = false;
       }
-      // Watch for changes in props.data and update clauseDetails accordingly
-      watch(
-        () => ISO.value.clauses,
-        (newValue) => {
-          clauses = { ...newValue };
-        }
-      );
     });
+
+    // Watch for changes in props.data and update clauseDetails accordingly
+    watch(
+      () => ISO.value.clauses,
+      (newValue) => {
+        clauses.splice(0, clauses.length, ...newValue);
+      }
+    );
 
     const toggleAccordion = (node) => {
       node.open = !node.open;

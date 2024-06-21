@@ -139,19 +139,21 @@
 
           <div class="modal-footer flex-center w-100">
             <!--begin::Button-->
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click="submit()"
+            <button
+              id="kt_modal_new_address_submit"
+              type="button"
+              @click.prevent="submit"
+              ref="submitButton"
+              class="btn btn-primary me-2 px-6"
             >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Update </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
                 ></span>
               </span>
-            </span>
+            </button>
             <!--end::Button-->
           </div>
           <!--end::Input group-->
@@ -196,6 +198,7 @@ export default defineComponent({
     VForm,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
     const loading = ref(false);
     const auth = useAuthStore();
     const router = useRouter();
@@ -241,49 +244,70 @@ export default defineComponent({
       };
     });
 
-    function areAllPropertiesNull(array) {
-      return array.some((detail) => {
-        const { area, target, outcome, quarter } = detail;
-
-        // Check if any property is null or empty
-
-        return area === "" || target === "" || outcome === "" || quarter === "";
-      });
-    }
+    const validateForm = (formData) => {
+      for (const key in formData) {
+        let value = formData[key];
+        if (Array.isArray(value)) {
+            for (const item of value) {
+              if (!validateForm(item)) {
+                return false;
+              }
+            }
+          } else if (typeof value === "object" && value !== null) {
+            if (!validateForm(value)) {
+              return false;
+            }
+          } else if (typeof value === "string") {
+            value = value.trim();
+            if (value === "") {
+              return false;
+            }
+          } else {
+          }
+      }
+      return true;
+    };
 
     const submit = async () => {
+      loading.value = true;
+      const result = validateForm(itemDetails.value);
+
+      if (result == false) {
+        loading.value = false;
+        showErrorAlert("Warning", "Please fill all the details correctly.");
+        return;
+      }
+
       try {
-        loading.value = true;
-        console.log(itemDetails.value);
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
 
-        const result = areAllPropertiesNull([itemDetails.value]);
+        // Call your API here
 
-        if (!result) {
-          const response = await updateImprovementPlan(itemId, itemDetails.value);
-          // console.log(response.error);
-          if (!response.error) {
-            // Handle successful API response
-            //   console.log("API response:", response);
-            showSuccessAlert("Success", "Risk Regsiter has been successfully Updated!");
+        const response = await updateImprovementPlan(itemId, itemDetails.value);
+        if (response?.success) {
+          showSuccessAlert(
+            "Success",
+            response.message || "Improvement Action Plan Updated Successfully!"
+          );
 
-            router.push({ name: "improvements-list" });
-            loading.value = false;
-          } else {
-            // Handle API error response
-            //   console.log("API error:", errorData);
-            // console.log("API error:", errorData.response.data.errors);
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            loading.value = false;
-          }
-        } else {
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          router.push({ name: "improvements-list" });
           loading.value = false;
+        } else {
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
-        // console.error("API call error:", error);
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -316,6 +340,7 @@ export default defineComponent({
       });
     };
     return {
+      submitButton,
       itemDetails,
       itemDetailsValidator,
       getAssetPath,

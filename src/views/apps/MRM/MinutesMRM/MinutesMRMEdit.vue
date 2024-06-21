@@ -86,12 +86,12 @@
               <div class="card-footer d-flex justify-content-end py-6">
                 <button
                   type="button"
-                  :data-kt-indicator="loading ? 'on' : ''"
+                  ref="submitButton"
                   class="btn btn-md btn-success px-6"
                   @click="submit(item.id, item)"
                 >
-                  <span v-if="!loading" class="indicator-label"> Update</span>
-                  <span v-if="loading" class="indicator-progress">
+                  <span class="indicator-label"> Update </span>
+                  <span class="indicator-progress">
                     Please wait...
                     <span
                       class="spinner-border spinner-border-sm align-middle ms-2"
@@ -170,6 +170,7 @@ export default defineComponent({
     VForm,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
     const identifier = Identifier;
     const loading = ref(false);
     const auth = useAuthStore();
@@ -271,36 +272,47 @@ export default defineComponent({
     };
 
     const submit = async (itemID, data) => {
-      console.log(itemID, data);
-
       loading.value = true;
 
-      console.log(itemDetails.value);
+      const result = validateForm(data);
+
+      if (result == false) {
+        showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+        loading.value = false;
+        return;
+      }
+
       try {
-        if (validateForm(data)) {
-          const response = await updateMRMMinute(itemID, data);
-          if (!response.error) {
-            showSuccessAlert(
-              "Success",
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
+        const response = await updateMRMMinute(itemID, data);
+
+        if (response?.success) {
+          // Handle successful API response
+          showSuccessAlert(
+            "Success",
+            response.message ||
               "Meeting of Minutes has been successfully updated!"
-            );
-            loading.value = false;
-            router.push({ name: "mrm-minutes-list" });
-          } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            loading.value = false;
-            return;
-          }
+          );
+          loading.value = false;
+          router.push({ name: "mrm-minutes-list" });
         } else {
-          console.log(validateForm(itemDetails));
-          showErrorAlert("Warning", "Please fill in all fields.");
-          return;
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
-        // console.error("API call error:", error);
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -334,6 +346,7 @@ export default defineComponent({
     };
 
     return {
+      submitButton,
       itemDetails,
       itemDetailsValidator,
       getAssetPath,

@@ -8,6 +8,7 @@
     aria-hidden="true"
     data-bs-backdrop="static"
     data-bs-keyboard="false"
+    data-bs-focus="false"
   >
     <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered mw-1000px">
@@ -275,6 +276,7 @@
           <div class="modal-footer flex-center">
             <!--begin::Button-->
             <button
+              type="reset"
               @click="clear"
               id="kt_modal_new_address_cancel"
               class="btn btn-light me-3"
@@ -285,14 +287,13 @@
 
             <!--begin::Button-->
             <button
-              ref="submitButtonRef"
-              type="submit"
-              :data-kt-indicator="dataLoading ? 'on' : ''"
               id="kt_modal_new_address_submit"
-              class="btn btn-primary px-6"
+              type="submit"
+              ref="submitButtonRef"
+              class="btn btn-primary me-2 px-6"
             >
-              <span v-if="!dataLoading" class="indicator-label"> Submit</span>
-              <span v-if="dataLoading" class="indicator-progress">
+              <span class="indicator-label"> Save </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
@@ -546,37 +547,48 @@ export default defineComponent({
     };
 
     const submit = async () => {
-      console.log(clauseDetails.value);
       dataLoading.value = true;
+      const result = validateForm(clauseDetails);
 
-      //   console.warn("Nice");
+      if (result == false) {
+        dataLoading.value = false;
+        showErrorAlert("Warning", "Please fill all the details correctly.");
+        return;
+      }
+
       try {
-        if (validateForm(clauseDetails)) {
-          const response = await addIAuditObservation(clauseDetails.value);
-          if (!response.error) {
-            await emit("addData", clauseDetails.value);
+        if (submitButtonRef.value) {
+          // Activate indicator
+          submitButtonRef.value.setAttribute("data-kt-indicator", "on");
+        }
 
-            showSuccessAlert("Success", "Sub-Clause Added Successfully!");
-            await clear();
-            console.log(clauseDetails.value);
-            hideModal(newAddressModalRef.value);
-          } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            dataLoading.value = false;
-            return;
-          }
+        // Call your API here
+        const response = await addIAuditObservation(clauseDetails.value);
+
+        if (response?.success) {
+          await emit("addData", clauseDetails.value);
+
+          // Handle successful API response
+          dataLoading.value = false;
+          showSuccessAlert(
+            "Success",
+            response.message || "Sub-Clause Added Successfully!"
+          );
+          clear();
+          hideModal(newAddressModalRef.value);
         } else {
-          showErrorAlert("Warning", "Please fill all the details Correctly");
-          return;
+          // Handle API error response
+          dataLoading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
-        // console.error("API call error:", error);
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
-        await clear();
-        console.log(clauseDetails.value);
-        hideModal(newAddressModalRef.value);
       } finally {
+        if (submitButtonRef.value) {
+          submitButtonRef.value.removeAttribute("data-kt-indicator");
+        }
         dataLoading.value = false;
       }
     };

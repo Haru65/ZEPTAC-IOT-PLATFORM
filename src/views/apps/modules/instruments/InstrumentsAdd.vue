@@ -316,7 +316,8 @@
             <!--begin::Input group-->
             <div class="row mb-6">
               <!--begin::Label-->
-              <label class="col-lg-3 col-form-label fw-semobold required fs-6 fw-bold text-gray-700 text-nowrap"
+              <label
+                class="col-lg-3 col-form-label fw-semobold required fs-6 fw-bold text-gray-700 text-nowrap"
                 >Datasheet</label
               >
               <!--end::Label-->
@@ -431,7 +432,8 @@
             <!--begin::Input group-->
             <div class="row mb-6">
               <!--begin::Label-->
-              <label class="col-lg-3 col-form-label fw-semobold required fs-6 fw-bold text-gray-700 text-nowrap"
+              <label
+                class="col-lg-3 col-form-label fw-semobold required fs-6 fw-bold text-gray-700 text-nowrap"
                 >Calibration Certificate</label
               >
               <!--end::Label-->
@@ -546,7 +548,8 @@
             <!--begin::Input group-->
             <div class="row mb-6">
               <!--begin::Label-->
-              <label class="col-lg-3 col-form-label fw-semobold required fs-6 fw-bold text-gray-700 text-nowrap"
+              <label
+                class="col-lg-3 col-form-label fw-semobold required fs-6 fw-bold text-gray-700 text-nowrap"
                 >Traceability</label
               >
               <!--end::Label-->
@@ -952,22 +955,24 @@
           </div>
           <div class="modal-footer flex-center">
             <!--begin::Button-->
-            <button
+            <span
               @click="clear"
               class="btn btn-lg btn-danger w-sd-25 w-lg-25"
             >
               Discard
-            </button>
+            </span>
             <!--end::Button-->
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
             <!--begin::Button-->
+
+            <!--begin::Button-->
             <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click="submit()"
+              ref="submitButton"
+              class="btn btn-primary w-sd-25 w-lg-25"
+              @click="submit"
             >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Save </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
@@ -1059,6 +1064,8 @@ export default defineComponent({
     MaintenanceEditModal,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
+
     const identifier = Identifier;
     const loading = ref(false);
     const auth = useAuthStore();
@@ -1173,7 +1180,6 @@ export default defineComponent({
             created_at: moment(created_at).format("DD-MM-YYYY"),
           }))
         );
-        console.log(Companies);
       }
     };
 
@@ -1774,7 +1780,8 @@ export default defineComponent({
     }
 
     const submit = async () => {
-      loading.value = true;
+      console.log(itemDetails.value);
+        loading.value = true;
 
       const result = areAllPropertiesNull([itemDetails.value]);
 
@@ -1817,32 +1824,38 @@ export default defineComponent({
         return;
       }
 
-      //   console.warn("Nice");
       try {
-        // Call your API here with the form values
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
         const response = await addInstrument(itemDetails.value);
-        // console.log(response.error);
-        if (!response.error) {
+
+        if (response?.success) {
           // Handle successful API response
-          //   console.log("API response:", response);
+
           showSuccessAlert(
             "Success",
-            "Instrument has been successfully inserted!"
+            response.message || "Instrument has been successfully inserted!"
           );
 
           clear();
           router.push({ name: "instrument-list" });
         } else {
           // Handle API error response
-          //   console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
-        // console.error("API call error:", error);
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -1905,6 +1918,7 @@ export default defineComponent({
       };
     };
     return {
+      submitButton,
       itemDetails,
       itemDetailsValidator,
       getAssetPath,

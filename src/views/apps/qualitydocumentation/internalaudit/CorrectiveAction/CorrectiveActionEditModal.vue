@@ -8,6 +8,7 @@
     aria-hidden="true"
     data-bs-backdrop="static"
     data-bs-keyboard="false"
+    data-bs-focus="false"
   >
     <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered mw-1000px">
@@ -132,17 +133,15 @@
 
           <!--begin::Modal footer-->
           <div class="modal-footer flex-center">
-
             <!--begin::Button-->
             <button
-              ref="submitButtonRef"
-              type="submit"
-              :data-kt-indicator="dataLoading ? 'on' : ''"
               id="kt_modal_new_address_submit"
-              class="btn btn-primary px-6"
+              type="submit"
+              ref="submitButtonRef"
+              class="btn btn-primary me-2 px-6"
             >
-              <span v-if="!dataLoading" class="indicator-label"> Update</span>
-              <span v-if="dataLoading" class="indicator-progress">
+              <span class="indicator-label"> Save </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
@@ -241,43 +240,49 @@ export default defineComponent({
     };
 
     const submit = async () => {
-      console.log(correctiveActionDetails.value);
       dataLoading.value = true;
+      const result = validateForm(correctiveActionDetails);
 
-      //   console.warn("Nice");
+      if (result == false) {
+        dataLoading.value = false;
+        showErrorAlert("Warning", "Please fill all the details correctly.");
+        return;
+      }
+
       try {
-        if (validateForm(correctiveActionDetails)) {
-          const response = await updateCorrectiveAction(
+        if (submitButtonRef.value) {
+          // Activate indicator
+          submitButtonRef.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
+        const response = await updateCorrectiveAction(
             correctiveActionDetails.value.id,
             correctiveActionDetails.value
           );
-          if (!response.error) {
-            await emit("addData", correctiveActionDetails.value);
-
-            showSuccessAlert(
-              "Success",
-              "Corrective Action Added Successfully!"
-            );
-            await clear();
-            console.log(correctiveActionDetails.value);
-            hideModal(newAddressModalRef.value);
-          } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            dataLoading.value = false;
-            return;
-          }
+        if (response?.success) {
+          await emit("addData", correctiveActionDetails.value);
+          // Handle successful API response
+          dataLoading.value = false;
+          showSuccessAlert(
+            "Success",
+            response.message || "Corrective Action Added Successfully!"
+          );
+          clear();
+          hideModal(newAddressModalRef.value);
         } else {
-          showErrorAlert("Warning", "Please fill all the details Correctly");
-          return;
+          // Handle API error response
+          dataLoading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
-        // console.error("API call error:", error);
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
-        await clear();
-        console.log(correctiveActionDetails.value);
-        hideModal(newAddressModalRef.value);
       } finally {
+        if (submitButtonRef.value) {
+          submitButtonRef.value.removeAttribute("data-kt-indicator");
+        }
         dataLoading.value = false;
       }
     };

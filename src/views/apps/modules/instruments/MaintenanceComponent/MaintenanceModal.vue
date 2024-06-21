@@ -8,6 +8,7 @@
     aria-hidden="true"
     data-bs-backdrop="static"
     data-bs-keyboard="false"
+    data-bs-focus="false"
   >
     <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered mw-1000px">
@@ -51,6 +52,8 @@
               data-kt-scroll-wrappers="#kt_modal_new_address_scroll"
               data-kt-scroll-offset="auto"
             >
+
+            <input type="hidden" />
               <!--begin::Input group-->
               <div class="row mb-6">
                 <!--begin::Col-->
@@ -226,15 +229,15 @@
           <!--end::Modal body-->
 
           <!--begin::Modal footer-->
-          <div class="modal-footer flex-center">
+          <div class="modal-footer">
             <!--begin::Button-->
-            <button
+            <span
               @click="clear"
               id="kt_modal_new_address_cancel"
               class="btn btn-light me-3"
             >
               Discard
-            </button>
+          </span>
             <!--end::Button-->
 
             <!--begin::Button-->
@@ -394,6 +397,32 @@ export default defineComponent({
       console.log(maintenanceDetails.value.m_date2);
     }
 
+    const validateForm = (formData) => {
+      for (const key in formData) {
+        let value = formData[key];
+        if (key !== "any_repair_detail") {
+          if (Array.isArray(value)) {
+            for (const item of value) {
+              if (!validateForm(item)) {
+                return false;
+              }
+            }
+          } else if (typeof value === "object" && value !== null) {
+            if (!validateForm(value)) {
+              return false;
+            }
+          } else if (typeof value === "string") {
+            value = value.trim();
+            if (value === "") {
+              return false;
+            }
+          } else {
+          }
+        }
+      }
+      return true;
+    };
+
     function areAllPropertiesNull(array) {
       return array.some((detail) => {
         const {
@@ -458,17 +487,31 @@ export default defineComponent({
     const submit = async (e) => {
       console.log(maintenanceDetails.value);
 
-      const result = areAllPropertiesNull([maintenanceDetails.value]);
+      const result = validateForm(maintenanceDetails.value);
 
-      if (!result) {
+      if (result === false) {
+        showErrorAlert("Warning", "Please fill all the details correctly.");
+        return;
+      }
+
+      try {
+        if (submitButtonRef.value) {
+          // Activate indicator
+          submitButtonRef.value.setAttribute("data-kt-indicator", "on");
+        }
+
         await emit("addData", maintenanceDetails.value);
 
         showSuccessAlert("Success", "Maintenance Plan Added Successfully!");
         clear();
         hideModal(newAddressModalRef.value);
-      } else {
-        showErrorAlert("Warning", "Please fill all the details Correctly");
-        return;
+
+      } catch (error) {
+        showErrorAlert("Error", error);
+      } finally {
+        if (submitButtonRef.value) {
+          submitButtonRef.value.removeAttribute("data-kt-indicator");
+        }
       }
     };
 

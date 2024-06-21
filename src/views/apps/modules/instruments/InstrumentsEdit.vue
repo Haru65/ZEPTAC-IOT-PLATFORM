@@ -1087,21 +1087,12 @@
           <div class="modal-footer flex-center">
             <!--begin::Button-->
             <span
-              @click="deleteItem"
-              class="btn btn-lg btn-danger w-sd-25 w-lg-25"
+              ref="submitButton"
+              class="btn btn-primary w-sd-25 w-lg-25"
+              @click="submit"
             >
-              Delete
-            </span>
-            <!--end::Button-->
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-            <!--begin::Button-->
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click="submit()"
-            >
-              <span v-if="!loading" class="indicator-label"> Update</span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Update </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
@@ -1125,7 +1116,6 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import {
   updateInstrument,
   getInstrument,
-  deleteInstrument,
   getCompanies,
   removeImage,
   uploadImage,
@@ -1190,6 +1180,7 @@ export default defineComponent({
     MaintenanceEditModal,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
     const identifier = Identifier;
     const loading = ref(false);
     const auth = useAuthStore();
@@ -1940,12 +1931,13 @@ export default defineComponent({
     }
 
     const submit = async () => {
+      console.log(itemDetails.value);
       loading.value = true;
+
       const result = areAllPropertiesNull([itemDetails.value]);
 
       if (result) {
         showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-
         loading.value = false;
         return;
       }
@@ -1982,50 +1974,40 @@ export default defineComponent({
         loading.value = false;
         return;
       }
-      console.warn("Nice");
+
       try {
-        // Call your API here with the form values
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
         const response = await updateInstrument(itemId, itemDetails.value);
-        console.log(response.result.error);
-        if (!response.result.error) {
+
+        if (response?.success) {
           // Handle successful API response
-          console.log("API response:", response);
+
           showSuccessAlert(
             "Success",
-            "Instrument has been successfully updated!"
+            response.message || "Instrument has been successfully updated!"
           );
+
           router.push({ name: "instrument-list" });
         } else {
           // Handle API error response
-          const errorData = response.result.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.result.data.errors);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
-    };
-
-    const deleteItem = () => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover from this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "red",
-        confirmButtonText: "Yes, I am sure!",
-      }).then((result: { [x: string]: any }) => {
-        if (result["isConfirmed"]) {
-          // Put your function here
-          deleteInstrument(itemId);
-          router.push({ name: "instrument-list" });
-        }
-      });
     };
 
     const showSuccessAlert = (title, message) => {
@@ -2061,13 +2043,13 @@ export default defineComponent({
     };
 
     return {
+      submitButton,
       itemDetails,
       itemDetailsValidator,
       getAssetPath,
       submit,
       loading,
       Companies,
-      deleteItem,
       identifier,
       addMaintenanceData,
       editMaintenanceData,

@@ -115,7 +115,7 @@
         <div class="card-footer d-flex justify-content-end py-6 px-9">
           <button
             type="button"
-            @click="submitRiskIdentification"
+            @click.prevent="submitRiskIdentification"
             :data-kt-indicator="loading ? 'on' : ''"
             class="btn btn-primary px-6"
           >
@@ -253,7 +253,7 @@
         <div class="card-footer d-flex justify-content-end py-6 px-9">
           <button
             type="button"
-            @click="submitRiskEvaluation"
+            @click.prevent="submitRiskEvaluation"
             :data-kt-indicator="loading ? 'on' : ''"
             class="btn btn-primary px-6"
           >
@@ -421,7 +421,7 @@
         <div class="card-footer d-flex justify-content-end py-6 px-9">
           <button
             type="button"
-            @click="submitRiskCounter"
+            @click.prevent="submitRiskCounter"
             :data-kt-indicator="loading ? 'on' : ''"
             class="btn btn-primary px-6"
           >
@@ -560,15 +560,15 @@ export default defineComponent({
             itemId,
             itemDetails.value
           );
-          if (!response.error) {
+          if (response?.success) {
             showSuccessAlert(
               "Success",
-              "Risk Register has been successfully updated!"
+              response.message || "Risk Register has been successfully updated!"
             );
             loading.value = false;
             router.push({ name: "risk-list" });
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            showErrorAlert("Error", response.message || "An error occurred.");
             loading.value = false;
             return;
           }
@@ -598,15 +598,15 @@ export default defineComponent({
             itemId,
             itemDetails.value
           );
-          if (!response.error) {
+          if (response?.success) {
             showSuccessAlert(
               "Success",
-              "Risk Register has been successfully updated!"
+              response.message || "Risk Register has been successfully updated!"
             );
             loading.value = false;
             router.push({ name: "risk-list" });
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            showErrorAlert("Error", response.message || "An error occurred.");
             loading.value = false;
             return;
           }
@@ -636,15 +636,15 @@ export default defineComponent({
             itemId,
             itemDetails.value
           );
-          if (!response.error) {
+          if (response?.success) {
             showSuccessAlert(
               "Success",
-              "Risk Register has been successfully updated!"
+              response.message || "Risk Register has been successfully updated!"
             );
             loading.value = false;
             router.push({ name: "risk-list" });
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            showErrorAlert("Error", response.message || "An error occurred.");
             loading.value = false;
             return;
           }

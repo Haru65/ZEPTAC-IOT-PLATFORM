@@ -166,20 +166,23 @@
             </div>
             <!--end::Input group-->
           </div>
-          <div class="modal-footer flex-center">
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click="submit()"
+
+          <div class="modal-footer flex-center w-100">
+            <!--begin::Button-->
+            <button
+              type="button"
+              ref="submitButton"
+              class="btn btn-primary w-sd-25 w-lg-25"
+              @click.prevent="submit"
             >
-              <span v-if="!loading" class="indicator-label"> Update </span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Update </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
                 ></span>
               </span>
-            </span>
+            </button>
             <!--end::Button-->
           </div>
           <!--end::Input group-->
@@ -234,6 +237,7 @@ export default defineComponent({
     VForm,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
     const identifier = Identifier;
     const loading = ref(false);
     const auth = useAuthStore();
@@ -356,41 +360,51 @@ export default defineComponent({
     const submit = async () => {
       loading.value = true;
 
-      console.log(itemDetails.value);
+      if (itemDetails.value.auditees.length === 0) {
+        showErrorAlert("Warning", "Please Select Atleast One Auditee");
+        loading.value = false;
+        return;
+      }
+
+      const result = validateForm(itemDetails.value);
+
+      if (result == false) {
+        showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+        loading.value = false;
+        return;
+      }
+
       try {
-        if (itemDetails.value.auditees.length === 0) {
-          showErrorAlert("Warning", "Please Select Atleast One Auditee");
-          loading.value = false;
-          return;
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
         }
 
-        if (validateForm(itemDetails.value)) {
-          const response = await updateIAuditSchedule(
-            itemId,
-            itemDetails.value
-          );
-          if (!response.error) {
-            showSuccessAlert(
-              "Success",
+        // Call your API here
+        const response = await updateIAuditSchedule(itemId, itemDetails.value);
+
+        if (response?.success) {
+          // Handle successful API response
+          showSuccessAlert(
+            "Success",
+            response.message ||
               "Internal Audit Schedule has been successfully updated!"
-            );
-            loading.value = false;
-            router.push({ name: "auditschedule-list" });
-          } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            loading.value = false;
-            return;
-          }
+          );
+          loading.value = false;
+          router.push({ name: "auditschedule-list" });
         } else {
-          console.log(validateForm(itemDetails));
-          showErrorAlert("Warning", "Please fill in all fields.");
-          return;
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
-        // console.error("API call error:", error);
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -424,6 +438,7 @@ export default defineComponent({
     };
 
     return {
+      submitButton,
       itemDetails,
       itemDetailsValidator,
       getAssetPath,

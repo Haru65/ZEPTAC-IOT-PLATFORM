@@ -15,7 +15,7 @@
         <!--begin::Heading-->
         <div class="text-center mb-10">
           <!--begin::Title-->
-          <h1 class="text-dark mb-3" style="font-size: 2.3rem">
+          <h1 class="text-white mb-3" style="font-size: 2.3rem">
             Reset Password
           </h1>
           <!--end::Title-->
@@ -206,46 +206,36 @@ export default defineComponent({
         // Send login request
         const response = await resetPassword(resetFormDetails.value);
 
-        // If the response was successful
-        if (response.success) {
+        if (response?.success) {
           Swal.fire({
-            text: response.message,
+            text: response.message || `Password reset successfully.`,
             icon: "success",
+            confirmButtonText: "Ok",
             buttonsStyling: false,
-            confirmButtonText: "Ok, got it!",
             heightAuto: false,
             customClass: {
-              confirmButton: "btn fw-semobold btn-light-primary",
+              confirmButton: "btn btn-light-primary",
             },
           }).then(() => {
             submitButton.value?.removeAttribute("data-kt-indicator");
             // eslint-disable-next-line
             submitButton.value!.disabled = false;
             router.push({ name: "login" });
-            
+
+            return { success: true };
           });
         } else {
-          const errroMsg = response.error.response.data;
-          // If the response was unsuccessful
-          Swal.fire({
-            text: errroMsg.message,
-            icon: "error",
-            buttonsStyling: false,
-            confirmButtonText: "Try again!",
-            heightAuto: false,
-            customClass: {
-              confirmButton: "btn fw-semobold btn-light-danger",
-            },
-          });
-
-          submitButton.value?.removeAttribute("data-kt-indicator");
-          // eslint-disable-next-line
-          submitButton.value!.disabled = false;
+          throw new Error(response?.message || `Failed to reset password.`);
         }
-      } catch (error) {
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message ||
+          error.message ||
+          "An unknown error occurred";
+
         // Handle errors
         Swal.fire({
-          text: "Something went wrong. Please try again later",
+          text: errorMessage,
           icon: "error",
           buttonsStyling: false,
           confirmButtonText: "Try again!",
@@ -258,6 +248,8 @@ export default defineComponent({
         submitButton.value?.removeAttribute("data-kt-indicator");
         // eslint-disable-next-line
         submitButton.value!.disabled = false;
+
+        return { success: false, message: errorMessage };
       }
     };
 

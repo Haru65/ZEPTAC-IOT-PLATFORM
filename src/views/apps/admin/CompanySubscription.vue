@@ -5,40 +5,40 @@
     <div class="modal-dialog modal-dialog-centered">
       <!--begin::Modal content-->
       <div class="modal-content">
-        <div class="card-body p-9">
+        <div class="card-body">
           <!--begin::Alert-->
           <div
-            class="notice d-flex bg-light-warning rounded border-warning border border-dashed p-6"
+            class="alert bg-light-warning border border-dashed d-flex flex-column flex-sm-row p-5 mb-10"
           >
             <!--begin::Icon-->
             <KTIcon
-              icon-name="information-5"
+              icon-name="notification-bing"
               icon-class="fs-3tx text-warning me-4"
             />
             <!--end::Icon-->
-            <div class="d-flex flex-stack flex-grow-1">
-              <!--begin::Content-->
-              <div class="fw-semobold">
-                <h4 class="text-gray-800 fw-bold">Dear User,</h4>
-                <div class="fs-4 text-gray-600">
-                  Your {{ isTrial ? "trial" : "subscription" }} will expire on
-                  {{ moment(endDate).format("DD-MM-YYYY") }}
-                </div>
-                <div class="fs-4 text-gray-600">
-                  To avoid any service interuption, kindly contact us.
-                </div>
-                <div class="fs-4 text-gray-600">
-                  Email :
-                  <a
-                    v-bind:href="'mailto:' + `support@zeptac.com`"
-                    class="text-gray-600 text-hover-primary mb-1"
-                  >
-                    support@zeptac.com
-                  </a>
-                </div>
+
+            <!--begin::Wrapper-->
+            <div class="d-flex flex-column pe-0 pe-sm-10">
+              <!--begin::Title-->
+              <h4 class="text-gray-800 fw-bold">Dear User,</h4>
+              <div class="fs-4 text-gray-600">
+                Your {{ isTrial ? "trial" : "subscription" }} will expire on
+                {{ moment(endDate).format("DD-MM-YYYY") }}
               </div>
-              <!--end::Content-->
+              <div class="fs-4 text-gray-600">
+                To avoid any service interuption, kindly contact us.
+              </div>
+              <div class="fs-4 text-gray-600">
+                Email :
+                <a
+                  v-bind:href="'mailto:' + `support@zeptac.com`"
+                  class="text-gray-600 text-hover-primary mb-1"
+                >
+                  support@zeptac.com
+                </a>
+              </div>
             </div>
+            <!--end::Wrapper-->
           </div>
           <!--end::Alert-->
         </div>

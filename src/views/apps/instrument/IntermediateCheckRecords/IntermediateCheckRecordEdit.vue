@@ -770,13 +770,14 @@
           </div>
 
           <div class="modal-footer flex-center w-100">
+            <!--begin::Button-->
             <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click.prevent="submit()"
+              ref="submitButton"
+              class="btn btn-primary w-sd-25 w-lg-25"
+              @click.prevent="submit"
             >
-              <span v-if="!loading" class="indicator-label"> Update </span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Update </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
@@ -785,6 +786,7 @@
             </span>
             <!--end::Button-->
           </div>
+          <!--end::Input group-->
           <!--end::Input group-->
         </VForm>
         <!--end::Form-->
@@ -820,6 +822,8 @@ export default defineComponent({
     VForm,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
+
     const loading = ref(false);
     const auth = useAuthStore();
     const router = useRouter();
@@ -949,7 +953,7 @@ export default defineComponent({
 
     const validateForm = (formData) => {
       for (const key in formData) {
-        const value = formData[key];
+        let value = formData[key];
         if (Array.isArray(value)) {
           for (const item of value) {
             if (!validateForm(item)) {
@@ -960,8 +964,12 @@ export default defineComponent({
           if (!validateForm(value)) {
             return false;
           }
-        } else if (value === "") {
-          return false;
+        } else if (typeof value === "string") {
+          value = value.trim();
+          if (value === "") {
+            return false;
+          }
+        } else {
         }
       }
       return true;
@@ -976,40 +984,48 @@ export default defineComponent({
         return;
       }
 
+      const result = validateForm(itemDetails.value);
+
+      if (result == false) {
+        showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+        loading.value = false;
+        return;
+      }
+
       try {
-        if (itemDetails.value.instrument_id != "") {
-          if (validateForm(itemDetails.value)) {
-            const response = await updateIntermediateCheckRecord(
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
+        const response = await updateIntermediateCheckRecord(
               itemId,
               itemDetails.value
             );
-            if (!response.error) {
-              showSuccessAlert(
-                "Success",
-                "Check Record has been successfully updated!"
-              );
-              loading.value = false;
-              router.push({ name: "intermediate-check-records-list" });
-            } else {
-              showErrorAlert(
-                "Warning",
-                "Please Fill the Form Fields Correctly"
-              );
-              loading.value = false;
-              return;
-            }
-          } else {
-            showErrorAlert("Warning", "Please fill in all fields.");
-          }
-        } else {
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+
+        if (response?.success) {
+          // Handle successful API response
+
+          showSuccessAlert(
+            "Success",
+            response.message || "Check Record has been successfully updated!"
+          );
           loading.value = false;
-          return;
+          router.push({ name: "intermediate-check-records-list" });
+        } else {
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -1043,6 +1059,7 @@ export default defineComponent({
     };
 
     return {
+      submitButton,
       Identifier,
       itemDetails,
       getAssetPath,

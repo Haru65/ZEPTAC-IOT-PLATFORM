@@ -599,6 +599,18 @@ const AdminMenuConfig: Array<MenuItem> = [
         ],
       },
       {
+        sectionTitle: "Activity Logger",
+        route: "/activity_logger",
+        keenthemesIcon: "setting-4",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Activity Logger",
+            route: "/activity_logger/list",
+          },
+        ],
+      },
+      {
         sectionTitle: "ISO Rules",
         route: "/iso",
         keenthemesIcon: "setting-4",

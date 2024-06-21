@@ -200,19 +200,20 @@
           </div>
 
           <div class="modal-footer flex-center w-100">
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click.prevent="submit()"
+            <!--begin::Button-->
+            <button
+              type="button"
+              ref="submitButton"
+              class="btn btn-primary w-sd-25 w-lg-25"
             >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Save </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
                 ></span>
               </span>
-            </span>
+            </button>
             <!--end::Button-->
           </div>
           <!--end::Input group-->
@@ -253,6 +254,7 @@ export default defineComponent({
     ErrorMessage,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
     const loading = ref(false);
 
     const store = useAuthStore();
@@ -394,30 +396,45 @@ export default defineComponent({
     const submit = async () => {
       loading.value = true;
 
+      const result = validateForm(itemDetails.value);
+
+      if (result == false) {
+        showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+        loading.value = false;
+        return;
+      }
+
       try {
-        if (validateForm(itemDetails.value)) {
-          console.log(itemDetails.value);
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
           const response = await addFeedback(itemDetails.value);
-          if (!response.error) {
-            showSuccessAlert(
-              "Success",
-              "FeedBack Form Form  has been successfully submitted!"
-            );
-            loading.value = false;
+
+        if (response?.success) {
+          // Handle successful API response
+          showSuccessAlert(
+            "Success",
+            response.message || "FeedBack Form Form  has been successfully submitted!"
+          );
+          loading.value = false;
             // window.location.href = "https://www.google.com";
             router.push({ name: "thankyou" });
-          } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            loading.value = false;
-            return;
-          }
         } else {
-          showErrorAlert("Warning", "Please fill in all fields.");
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -451,6 +468,7 @@ export default defineComponent({
     };
 
     return {
+      submitButton,
       submit,
       itemDetails,
       itemValidator,

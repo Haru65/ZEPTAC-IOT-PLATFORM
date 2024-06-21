@@ -8,6 +8,7 @@
     aria-hidden="true"
     data-bs-backdrop="static"
     data-bs-keyboard="false"
+    data-bs-focus="false"
   >
     <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered mw-1000px">

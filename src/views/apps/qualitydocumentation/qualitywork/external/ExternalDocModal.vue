@@ -8,6 +8,7 @@
     aria-hidden="true"
     data-bs-backdrop="static"
     data-bs-keyboard="false"
+    data-bs-focus="false"
   >
     <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered mw-1000px">
@@ -220,7 +221,6 @@
                     v-model="documentDetails.location"
                     class="form-control form-control-lg form-control-solid"
                     placeholder="Enter location..."
-
                   />
                   <div class="fv-plugins-message-container">
                     <div class="fv-help-block">
@@ -238,22 +238,24 @@
           <!--begin::Modal footer-->
           <div class="modal-footer flex-center">
             <!--begin::Button-->
-            <span
+            <button
+              type="reset"
               @click="clear"
               id="kt_modal_new_address_cancel"
               class="btn btn-light me-3"
             >
               Discard
-          </span>
+            </button>
             <!--end::Button-->
 
             <!--begin::Button-->
             <button
-              ref="submitButtonRef"
               id="kt_modal_new_address_submit"
-              class="btn btn-primary"
+              type="submit"
+              ref="submitButtonRef"
+              class="btn btn-primary me-2 px-6"
             >
-              <span class="indicator-label"> Submit </span>
+              <span class="indicator-label"> Save </span>
               <span class="indicator-progress">
                 Please wait...
                 <span
@@ -353,29 +355,29 @@ export default defineComponent({
       console.log(documentDetails.value[dateType]);
     }
 
-    function areAllPropertiesNull(array) {
-      return array.some((detail) => {
-        const {
-          document_name,
-          format_no,
-          review_date,
-          revision_date,
-          issue_date,
-          location,
-        } = detail;
-
-        // Check if any property is null or empty
-
-        return (
-          document_name === "" ||
-          format_no === "" ||
-          review_date === "" ||
-          revision_date === "" ||
-          issue_date === "" ||
-          location === ""
-        );
-      });
-    }
+    const validateForm = (formData) => {
+      for (const key in formData) {
+        let value = formData[key];
+        if (Array.isArray(value)) {
+          for (const item of value) {
+            if (!validateForm(item)) {
+              return false;
+            }
+          }
+        } else if (typeof value === "object" && value !== null) {
+          if (!validateForm(value)) {
+            return false;
+          }
+        } else if (typeof value === "string") {
+          value = value.trim();
+          if (value === "") {
+            return false;
+          }
+        } else {
+        }
+      }
+      return true;
+    };
 
     const clear = () => {
       documentDetails.value = {
@@ -420,42 +422,50 @@ export default defineComponent({
       });
     };
 
-    const submit = async (e) => {
-      console.log(documentDetails.value);
+    const submit = async () => {
+      loading.value = true;
+      const result = validateForm(documentDetails.value);
 
-      const result = areAllPropertiesNull([documentDetails.value]);
-      if (!result) {
-        try {
-          // Call your API here with the form values
-          const response = await addExternalDoc(documentDetails.value);
-          // console.log(response.error);
-          if (!response.error) {
-            // Handle successful API response
-            //   console.log("API response:", response);
-            loading.value = false;
+      if (result == false) {
+        loading.value = false;
+        showErrorAlert("Warning", "Please fill all the details correctly.");
+        return;
+      }
 
-            showSuccessAlert("Success", "Document Added Successfully!");
-            clear();
-            await emit('document-added');
-            hideModal(newAddressModalRef.value);
-            // clear();
-          } else {
-            // Handle API error response
-            // const errorData = response.error;
-            loading.value = false;
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-          }
-        } catch (error) {
-          // Handle any other errors during API call
-          // console.error("API call error:", error);
-          showErrorAlert("Error", "An error occurred during the API call.");
-        } finally {
-          loading.value = false;
+      try {
+        if (submitButtonRef.value) {
+          // Activate indicator
+          submitButtonRef.value.setAttribute("data-kt-indicator", "on");
         }
 
-      } else {
-        showErrorAlert("Warning", "Please fill all the details Correctly");
-        return;
+        // Call your API here
+
+        const response = await addExternalDoc(documentDetails.value);
+        if (response?.success) {
+          await emit("document-added");
+          hideModal(newAddressModalRef.value);
+
+          loading.value = false;
+          showSuccessAlert(
+            "Success",
+            response.message || "Document Added Successfully!"
+          );
+          clear();
+          hideModal(newAddressModalRef.value);
+        } else {
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
+        }
+      } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
+        showErrorAlert("Error", "An error occurred during the API call.");
+      } finally {
+        if (submitButtonRef.value) {
+          submitButtonRef.value.removeAttribute("data-kt-indicator");
+        }
+        loading.value = false;
       }
     };
 

@@ -194,19 +194,21 @@
 
           <div class="modal-footer flex-center w-100">
             <!--begin::Button-->
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click="submit()"
+            <button
+              id="kt_modal_new_address_submit"
+              type="button"
+              @click.prevent="submit"
+              ref="submitButton"
+              class="btn btn-primary me-2 px-6"
             >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Update </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
                 ></span>
               </span>
-            </span>
+            </button>
             <!--end::Button-->
           </div>
           <!--end::Input group-->
@@ -251,6 +253,7 @@ export default defineComponent({
     VForm,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
     const loading = ref(false);
     const auth = useAuthStore();
     const router = useRouter();
@@ -312,69 +315,69 @@ export default defineComponent({
       console.log(documentDetails.value[dateType]);
     }
 
-    function areAllPropertiesNull(array) {
-      return array.some((detail) => {
-        const {
-          document_name,
-          format_no,
-          review_date,
-          revision_date,
-          issue_date,
-          location,
-        } = detail;
-
-        // Check if any property is null or empty
-
-        return (
-          document_name === "" ||
-          format_no === "" ||
-          review_date === "" ||
-          revision_date === "" ||
-          issue_date === "" ||
-          location === ""
-        );
-      });
-    }
-
-    const submit = async () => {
-      try {
-        loading.value = true;
-        console.log(documentDetails.value);
-
-        const result = areAllPropertiesNull([documentDetails.value]);
-
-        if (!result) {
-          const response = await updateExternalDoc(
-            itemId,
-            documentDetails.value
-          );
-          // console.log(response.error);
-          if (!response.error) {
-            // Handle successful API response
-            //   console.log("API response:", response);
-            showSuccessAlert(
-              "Success",
-              "Document has been successfully Updated!"
-            );
-
-            router.push({ name: "external-documents" });
-            loading.value = false;
-          } else {
-            // Handle API error response
-            //   console.log("API error:", errorData);
-            // console.log("API error:", errorData.response.data.errors);
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            loading.value = false;
+    const validateForm = (formData) => {
+      for (const key in formData) {
+        let value = formData[key];
+        if (Array.isArray(value)) {
+          for (const item of value) {
+            if (!validateForm(item)) {
+              return false;
+            }
+          }
+        } else if (typeof value === "object" && value !== null) {
+          if (!validateForm(value)) {
+            return false;
+          }
+        } else if (typeof value === "string") {
+          value = value.trim();
+          if (value === "") {
+            return false;
           }
         } else {
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+        }
+      }
+      return true;
+    };
+
+    const submit = async () => {
+      loading.value = true;
+      const result = validateForm(documentDetails.value);
+
+      if (result == false) {
+        loading.value = false;
+        showErrorAlert("Warning", "Please fill all the details correctly.");
+        return;
+      }
+
+      try {
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
+        const response = await updateExternalDoc(itemId, documentDetails.value);
+
+        if (response?.success) {
           loading.value = false;
+          showSuccessAlert(
+            "Success",
+            response.message || "Document Added Successfully!"
+          );
+          router.push({ name: "external-documents" });
+        } else {
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
-        // console.error("API call error:", error);
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -408,6 +411,7 @@ export default defineComponent({
     };
 
     return {
+      submitButton,
       documentDetails,
       DocumentValidator,
       getAssetPath,

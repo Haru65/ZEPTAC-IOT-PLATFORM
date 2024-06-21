@@ -712,19 +712,13 @@
 
           <div class="modal-footer flex-center w-100">
             <!--begin::Button-->
-            <button type="button" class="btn btn-lg btn-danger w-sd-25 w-lg-25">
-              Discard
-            </button>
-            <!--end::Button-->
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-            <!--begin::Button-->
             <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click.prevent="submit()"
+              ref="submitButton"
+              class="btn btn-primary w-sd-25 w-lg-25"
+              @click.prevent="submit"
             >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Save </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
@@ -766,6 +760,8 @@ export default defineComponent({
     VForm,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
+
     const identifier = Identifier;
     const loading = ref(false);
     const auth = useAuthStore();
@@ -832,11 +828,11 @@ export default defineComponent({
           itemId.toString()
         );
         console.log(response);
-        itemDetails.instrument_id = response.result.id;
-        itemDetails.instrument.name = response.result.name;
-        itemDetails.instrument.make = response.result.make;
-        itemDetails.instrument.model_no = response.result.model_no;
-        itemDetails.instrument.serial_no = response.result.serial_no;
+        itemDetails.instrument_id = response.id;
+        itemDetails.instrument.name = response.name;
+        itemDetails.instrument.make = response.make;
+        itemDetails.instrument.model_no = response.model_no;
+        itemDetails.instrument.serial_no = response.serial_no;
       } catch (error) {
         showErrorAlert("Error", "An error occurred during the API call.");
         loading.value = false;
@@ -877,7 +873,7 @@ export default defineComponent({
 
     const validateForm = (formData) => {
       for (const key in formData) {
-        const value = formData[key];
+        let value = formData[key];
         if (Array.isArray(value)) {
           for (const item of value) {
             if (!validateForm(item)) {
@@ -888,8 +884,12 @@ export default defineComponent({
           if (!validateForm(value)) {
             return false;
           }
-        } else if (value === "") {
-          return false;
+        } else if (typeof value === "string") {
+          value = value.trim();
+          if (value === "") {
+            return false;
+          }
+        } else {
         }
       }
       return true;
@@ -904,37 +904,45 @@ export default defineComponent({
         return;
       }
 
+      const result = validateForm(itemDetails);
+
+      if (result == false) {
+        showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+        loading.value = false;
+        return;
+      }
+
       try {
-        if (itemDetails.instrument_id != "") {
-          if (validateForm(itemDetails)) {
-            const response = await addIntermediateCheckRecord(itemDetails);
-            if (!response.error) {
-              showSuccessAlert(
-                "Success",
-                "Check Record has been successfully inserted!"
-              );
-              loading.value = false;
-              router.push({ name: "intermediate-check-records-list" });
-            } else {
-              showErrorAlert(
-                "Warning",
-                "Please Fill the Form Fields Correctly"
-              );
-              loading.value = false;
-              return;
-            }
-          } else {
-            showErrorAlert("Warning", "Please fill in all fields.");
-          }
-        } else {
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
+        const response = await addIntermediateCheckRecord(itemDetails);
+
+        if (response?.success) {
+          // Handle successful API response
+
+          showSuccessAlert(
+            "Success",
+            response.message || "Check Record has been successfully inserted!"
+          );
           loading.value = false;
-          return;
+          router.push({ name: "intermediate-check-records-list" });
+        } else {
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -968,6 +976,7 @@ export default defineComponent({
     };
 
     return {
+      submitButton,
       itemDetails,
       getAssetPath,
       submit,

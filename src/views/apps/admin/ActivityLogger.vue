@@ -14,7 +14,7 @@
             v-model="search"
             @input="searchItems()"
             class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search Companies"
+            placeholder="Search by user"
           />
         </div>
         <!--end::Search-->
@@ -22,6 +22,31 @@
       <!--begin::Card title-->
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
+        <!-- YEAR WISE DATA -->
+
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-semibold text-gray-400"
+            >Financial Year</span
+          >
+        </h3>
+        <div class="me-3">
+          <el-select
+            class="w-150px"
+            filterable
+            placeholder="Select Year"
+            v-model="selectedYearCache"
+            id="financialYear"
+            @change="handleChange"
+          >
+            <el-option
+              v-for="year in financialYears"
+              :key="year"
+              :value="year"
+              :label="year"
+            />
+          </el-select>
+        </div>
+
         <!--begin::Toolbar-->
         <div
           v-if="selectedIds.length === 0"
@@ -39,38 +64,16 @@
             Export
           </button>
           <!--end::Export-->
-          <!--begin::Add customer-->
-          <router-link to="./add" class="btn btn-primary">
-            <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Company
-          </router-link>
-          <!--end::Add customer-->
         </div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->
-        <div
-          v-else
-          class="d-flex justify-content-end align-items-center"
-          data-kt-customer-table-toolbar="selected"
-        >
-          <div class="fw-bold me-5">
-            <span class="me-2">{{ selectedIds.length }}</span
-            >Selected
-          </div>
-          <button
-            type="button"
-            class="btn btn-danger"
-            @click="deleteFewItem()"
-          >
-            Delete Selected
-          </button>
-        </div>
+        <!--end::Group actions-->
       </div>
       <!--end::Card toolbar-->
     </div>
+
     <div class="card-body pt-0">
       <Datatable
-        checkbox-label="id"
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
@@ -80,56 +83,38 @@
         :items-per-page-dropdown-enabled="false"
         :loading="loading"
       >
-        <template v-slot:company_name="{ row: company }">
-          {{ company.company_name }}
+        <!-- img data -->
+
+        <template v-slot:id="{ row: logger }">
+          {{ logger.id }}
         </template>
-        <template v-slot:email="{ row: company }">
-          <a
-            v-bind:href="'mailto:' + company.email"
-            class="text-gray-600 text-hover-primary mb-1"
-          >
-            {{ company.email }}
-          </a>
+        <template v-slot:user="{ row: logger }">
+          <span v-if="logger.user != null">
+            {{ logger.user?.first_name ? logger.user?.first_name : "" }}
+            {{ logger.user?.last_name ? logger.user?.last_name : "" }}
+          </span>
+          <span v-else> </span>
         </template>
-        <template v-slot:address="{ row: company }">
-          {{ company.address }}
+
+        <template v-slot:email="{ row: logger }">
+          {{ logger.email }}
         </template>
-        <template v-slot:created_at="{ row: company }">
-          {{ company.created_at }}
+
+        <template v-slot:company="{ row: logger }">
+          <span v-if="logger.company !== null">
+            {{
+              logger.company?.company_name ? logger.company?.company_name : ""
+            }}
+          </span>
+          <span v-else> </span>
         </template>
-        <template v-slot:actions="{ row: company }">
-          <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <router-link :to="`/company/apisetting/${company.id}`">
-                <i
-                  class="las la-plus text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
-            </span>
-            <span class="menu-link px-3">
-              <router-link :to="`/company/modules/${company.id}`">
-                <i
-                  class="las la-plus text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
-            </span>
-            <span class="menu-link px-3">
-              <router-link :to="`./edit/${company.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
-            </span>
-            <span>
-              <i
-                @click="deleteItem(company.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
-            </span>
-          </div>
-          <!--end::Menu FLex-->
-          <!--end::Menu-->
+
+        <template v-slot:desc="{ row: logger }">
+          {{ logger.desc }}
+        </template>
+
+        <template v-slot:created_at="{ row: logger }">
+          {{ logger.created_at }}
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -167,65 +152,60 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
+  
+  <script lang="ts">
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
-import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import type { ICompany } from "@/core/model/company";
-import arraySort from "array-sort";
-import ApiService from "@/core/services/ApiService";
-import moment from "moment";
-import Swal from "sweetalert2/dist/sweetalert2.js";
-import { deleteCompany, getCompanies, CompaniesSearch } from "@/stores/api";
+import type { Sort } from "@/components/kt-datatable/table-partials/models";
+import type { ILogger } from "@/core/model/logger";
+import { getActivityLoggers, ActivityLoggerSearch } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
+import arraySort from "array-sort";
+import moment from "moment";
+import Swal from "sweetalert2";
+import { getAssetPath } from "@/core/helpers/assets";
 
 export default defineComponent({
-  name: "company-list",
+  name: "activity-logger-list",
   components: {
     Datatable,
   },
   setup() {
-    const auth = useAuthStore();
-    const User = auth.GetUser();
+    // Academic Year Logic
+    const authStore = useAuthStore();
 
     const tableHeader = ref([
       {
-        columnName: "Company Name",
-        columnLabel: "company_name",
+        columnName: "User Name",
+        columnLabel: "user",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 200,
       },
       {
-        columnName: "Company Email",
+        columnName: "Email",
         columnLabel: "email",
         sortEnabled: true,
-        columnWidth: 230,
+        columnWidth: 200,
       },
       {
-        columnName: "Company Address",
-        columnLabel: "address",
+        columnName: "Company Name",
+        columnLabel: "company",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
-        columnName: "Created Date",
-        columnLabel: "created_at",
+        columnName: "Purpose",
+        columnLabel: "desc",
         sortEnabled: true,
-        columnWidth: 225,
+        columnWidth: 175,
       },
       {
-        columnName: "Actions",
-        columnLabel: "actions",
+        columnName: "LogIn Time",
+        columnLabel: "created_at",
         sortEnabled: false,
-        columnWidth: 75,
+        columnWidth: 175,
       },
     ]);
-
-    const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<ICompany>>([]);
-    const initvalues = ref<Array<ICompany>>([]);
 
     // functions
     const Limits = ref({
@@ -249,16 +229,26 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        ApiService.setHeader();
-        const response = await getCompanies(
-          `page=${page}&limit=${limit.value}`
+        const response = await getActivityLoggers(
+          `page=${page}&limit=${limit.value}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
+          ({ id, user, company, created_at, ...rest }) => ({
+            id: id,
+            user: {
+              ...user,
+            },
+            company: {
+              ...company,
+            },
+            created_at: moment(created_at).format("DD-MM-YYYY HH:mm:ss"),
             ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -281,16 +271,26 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        ApiService.setHeader();
-        const response = await getCompanies(
-          `page=${page.value}&limit=${limit}`
+        const response = await getActivityLoggers(
+          `page=${page.value}&limit=${limit}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
+          ({ id, user, company, created_at, ...rest }) => ({
+            id: id,
+            user: {
+              ...user,
+            },
+            company: {
+              ...company,
+            },
+            created_at: moment(created_at).format("DD-MM-YYYY HH:mm:ss"),
             ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -307,6 +307,7 @@ export default defineComponent({
     //console.log(initvalues.value);
 
     const NextPage = () => {
+      console.log(more.value);
       if (more.value != false) {
         page.value = page.value + 1;
         PagePointer(page.value);
@@ -320,139 +321,73 @@ export default defineComponent({
       }
     };
 
-    // get_compaines
-    const company_listing = async () => {
+    const selectedIds = ref<Array<number>>([]);
+
+    const tableData = ref<Array<ILogger>>([]);
+
+    const initvalues = ref<Array<ILogger>>([]);
+
+    async function report_listing(): Promise<void> {
       try {
-        ApiService.setHeader();
-        const response = await getCompanies(
-          `page=${page.value}&limit=${limit.value}`
+        const response = await getActivityLoggers(
+          `page=${page.value}&limit=${limit.value}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
+        );
+        tableData.value = response.result.data.map(
+          ({ id, user, company, created_at, ...rest }) => ({
+            id: id,
+            user: {
+              ...user,
+            },
+            company: {
+              ...company,
+            },
+            created_at: moment(created_at).format("DD-MM-YYYY HH:mm:ss"),
+            ...rest,
+          })
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-          })
-        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
       } finally {
-        ////console.log("done");
+        //console.log("done");
         setTimeout(() => {
           loading.value = false;
-        }, 250);
+        }, 100);
       }
-    };
+    }
 
-    onMounted(async () => {
-      await company_listing();
-      setTimeout(() => {
-        loading.value = false;
-      }, 250);
+    const financialYears = ref(authStore.financialYears); // Generate Financial years list using the auth store function
+    const selectedYearCache = ref(
+      localStorage.getItem("selectedFinancialYear") || ""
+    );
+
+    // Fallback to default value if localStorage data is invalid or missing
+    if (!financialYears.value.includes(selectedYearCache.value)) {
+      selectedYearCache.value = financialYears.value[0];
+    }
+
+    watch(selectedYearCache, (newValue) => {
+      localStorage.setItem("selectedFinancialYear", newValue);
     });
 
-    const deleteFewItem = async () => {
-      try {
-        const result = await Swal.fire({
-          title: "Are you sure?",
-          text: "You will not be able to recover from this!",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "red",
-          confirmButtonText: "Yes, I am sure!",
-          cancelButtonText: "No, cancel it!",
-        });
+    async function handleChange() {
+      page.value = 1;
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+      await report_listing();
+    }
 
-        if (result.isConfirmed) {
-          let allSuccess = true;
-          let finalMessage = "Selected items deleted successfully.";
+    onMounted(async () => {
+      // Save initial selected year to localStorage
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
 
-          for (const id of selectedIds.value) {
-            const response = await deleteItem(id, true);
-            if (!response.success) {
-              allSuccess = false;
-              finalMessage =
-                response.message ||
-                "An error occurred while deleting some items.";
-              break;
-            }
-          }
-
-          selectedIds.value.length = 0;
-
-          if (allSuccess) {
-            showSuccessAlert("Success", finalMessage);
-          } else {
-            showErrorAlert("Error", finalMessage);
-          }
-        }
-      } catch (error: any) {
-        const errorMessage = error.message || "An unknown error occurred";
-        showErrorAlert("Error", errorMessage);
-      }
-    };
-
-    const deleteItem = async (id: number, mul: boolean) => {
-      const deleteConfirmation = async () => {
-        try {
-          const result = await Swal.fire({
-            title: "Are you sure?",
-            text: "You will not be able to recover from this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "red",
-            confirmButtonText: "Yes, I am sure!",
-          });
-          return result.isConfirmed;
-        } catch (error: any) {
-          const errorMessage = error.message || "An unknown error occurred";
-          showErrorAlert("Error", errorMessage);
-          return false;
-        }
-      };
-
-      const deleteFromTable = async (id: number) => {
-        try {
-          const response = await deleteCompany(id);
-          if (response?.success) {
-            const index = tableData.value.findIndex((item) => item.id === id);
-            if (index !== -1) {
-              tableData.value.splice(index, 1);
-              // console.log(`Item with id ${id} deleted successfully`);
-            }
-            showSuccessAlert(
-              "Success",
-              response.message || `Item with id ${id} deleted successfully.`
-            );
-            return { success: true };
-          } else {
-            throw new Error(
-              response?.message || `Failed to delete the item with id ${id}`
-            );
-          }
-        } catch (error: any) {
-          const errorMessage =
-            error.response?.data?.message ||
-            error.message ||
-            "An unknown error occurred";
-          showErrorAlert("Error", errorMessage);
-          return { success: false, message: errorMessage };
-        }
-      };
-
-      if (!mul) {
-        const isConfirmed = await deleteConfirmation();
-        if (isConfirmed) {
-          return await deleteFromTable(id);
-        } else {
-          return { success: false };
-        }
-      } else {
-        return await deleteFromTable(id);
-      }
-    };
+      await report_listing();
+    });
 
     // Alert functions
     const showSuccessAlert = (title: string, message: string) => {
@@ -484,14 +419,14 @@ export default defineComponent({
     };
 
     const search = ref<string>("");
-
     // ? debounce timer
     let debounceTimer;
+
     const searchItems = async () => {
+      console.log(search.value);
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
-      if (search.value !== "") {
-        let results: Array<ICompany> = [];
-        // if Search
+      if (search.value.length != 0) {
+        let results: Array<ILogger> = [];
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
             results.push(tableData.value[j]);
@@ -503,27 +438,37 @@ export default defineComponent({
           clearTimeout(debounceTimer); // Clear any existing debounce timer
           debounceTimer = setTimeout(async () => {
             await SearchMore();
-          }, 1000);
+          }, 1500);
         }
       } else {
         page.value = 1;
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
-        await company_listing();
+        await report_listing();
       }
     };
 
     async function SearchMore() {
       // Your API call logic here
       try {
-        ApiService.setHeader();
-        const response = await CompaniesSearch(search.value);
+        const response = await ActivityLoggerSearch(
+          search.value,
+          selectedYearCache.value
+            ? selectedYearCache.value
+            : financialYears.value[0]
+        );
 
-        more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, ...rest }) => ({
+          ({ id, user, company, created_at, ...rest }) => ({
+            id: id,
+            user: {
+              ...user,
+            },
+            company: {
+              ...company,
+            },
+            created_at: moment(created_at).format("DD-MM-YYYY HH:mm:ss"),
             ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -538,10 +483,14 @@ export default defineComponent({
     }
 
     const searchingFunc = (obj: any, value: string): boolean => {
-      //console.log(initvalues.value);
+      console.log(obj);
       for (let key in obj) {
-        if (!Number.isInteger(obj[key]) && !(typeof obj[key] === "object")) {
-          if (obj[key].indexOf(value) != -1) {
+        if (
+          !Number.isInteger(obj[key]) &&
+          !(typeof obj[key] === "object") &&
+          typeof obj[key] === "string" // Add type check here
+        ) {
+          if (obj[key].indexOf(value) !== -1) {
             return true;
           }
         }
@@ -562,23 +511,25 @@ export default defineComponent({
     return {
       tableData,
       tableHeader,
-      deleteItem,
       search,
       searchItems,
       selectedIds,
-      deleteFewItem,
       sort,
       onItemSelect,
-      getAssetPath,
       loading,
-      NextPage,
-      PrevPage,
-      page,
       limit,
-      PageLimitPoiner,
+      PrevPage,
+      NextPage,
+      page,
       Limits,
-      User,
+      PageLimitPoiner,
+
+      selectedYearCache,
+      financialYears,
+      handleChange,
     };
   },
 });
 </script>
+  
+  

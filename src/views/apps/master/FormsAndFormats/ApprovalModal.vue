@@ -204,29 +204,32 @@ export default defineComponent({
 
       //   console.warn("Nice");
       try {
-        if (validateForm(itemData)) {
-          const response = await FormAndFormatStatus(
-            itemData.value.id,
-            itemData.value
-          );
+        const result = validateForm(itemData);
 
-          if (!response.error) {
-            await emit("reloadData", itemData.value);
-
-            showSuccessAlert(
-              "Success",
-              "Approval Status Changed Successfully!"
-            );
-            await clearItemData();
-            console.log(itemData.value);
-            hideModal(newAddressModalRef.value);
-          } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            dataLoading.value = false;
-            return;
-          }
-        } else {
+        if (result == false) {
+          dataLoading.value = true;
           showErrorAlert("Warning", "Please fill all the details Correctly");
+          return;
+        }
+
+        const response = await FormAndFormatStatus(
+          itemData.value.id,
+          itemData.value
+        );
+
+        if (response?.success) {
+          await emit("reloadData", itemData.value);
+
+          showSuccessAlert(
+            "Success",
+            response.message || "Approval Status Changed Successfully!"
+          );
+          await clearItemData();
+          console.log(itemData.value);
+          hideModal(newAddressModalRef.value);
+        } else {
+          showErrorAlert("Error", response.message || "An error occurred.");
+          dataLoading.value = false;
           return;
         }
       } catch (error) {

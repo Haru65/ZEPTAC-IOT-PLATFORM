@@ -1,143 +1,143 @@
 <template>
-    <!--begin::Modal - New Address-->
-    <div
-      class="modal fade"
-      ref="newAddressModalRef"
-      :id="'kt_modal_new_address_' + $props.planId"
-      tabindex="-1"
-      aria-hidden="true"
-      data-bs-backdrop="static"
-      data-bs-keyboard="false"
-    >
-      <!--begin::Modal dialog-->
-      <div class="modal-dialog modal-dialog-centered mw-1000px">
-        <!--begin::Modal content-->
-        <div class="modal-content">
-          <!--begin::Form-->
-          <VForm
-            class="form"
-            id="kt_modal_new_address_form"
-            @submit="submit($event)"
-            :validation-schema="validationSchema"
-          >
-            <!--begin::Modal header-->
-            <div class="modal-header" id="kt_modal_new_address_header">
-              <!--begin::Modal title-->
-              <h2>{{ $props.heading }}</h2>
-              <!--end::Modal title-->
-  
-              <!--begin::Close-->
-              <div
-                class="btn btn-sm btn-icon btn-active-color-primary"
-                data-bs-dismiss="modal"
-                @click="resetTheData"
-              >
-                <KTIcon icon-name="cross" icon-class="fs-1" />
-              </div>
-              <!--end::Close-->
-            </div>
-            <!--end::Modal header-->
-  
-            <!--begin::Modal body-->
-            <div class="modal-body py-10 px-lg-17">
-              <!--begin::Scroll-->
-              <div
-                class="scroll-y me-n7 pe-7"
-                id="kt_modal_new_address_scroll"
-                data-kt-scroll="true"
-                data-kt-scroll-activate="{default: false, lg: true}"
-                data-kt-scroll-max-height="auto"
-                style="max-height: 100% !important"
-                data-kt-scroll-dependencies="#kt_modal_new_address_scroll"
-                data-kt-scroll-wrappers="#kt_modal_new_address_scroll"
-                data-kt-scroll-offset="auto"
-              >
-                <!--begin::Input group-->
-                <div class="row mb-6">
-                  <!--begin::Col-->
-                  <div class="col-md-6 fv-row mb-8 mb-sd-8">
-                    <!--begin::Label-->
-                    <label
-                      class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                      >Select Periodicity</label
-                    >
-                    <!--end::Label-->
-  
-                    <div>
-                      <el-select
-                        filterable
-                        placeholder="Number of months"
-                        name="periodicity"
-                        v-model="maintenanceDetails.periodicity"
-                        @change="setPeriodicity"
-                      >
-                        <el-option
-                          value=""
-                          disabled="disabled"
-                          label="Number of months"
-                          key=""
-                        >
-                          Number of months</el-option
-                        >
-                        <el-option
-                          v-for="i in 12"
-                          :key="i"
-                          :value="i"
-                          :label="i"
-                        />
-                      </el-select>
-                    </div>
-  
-                    <div class="fv-help-block">
-                      <ErrorMessage class="invalid-feedback" name="periodicity" />
-                    </div>
-                    <!--end::Input-->
-                  </div>
-                  <!--end::Col-->
-  
-                  <!--begin::Col-->
-                  <div class="col-md-6 fv-row mb-8 mb-sd-8">
-                    <!--begin::Label-->
-                    <label
-                      class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                      >Maintenance Date 1</label
-                    >
-                    <!--end::Label-->
-  
-                    <!--begin::Input-->
-                    
-                  <div class="block">
+  <!--begin::Modal - New Address-->
+  <div
+    class="modal fade"
+    ref="newAddressModalRef"
+    :id="'kt_modal_new_address_' + $props.planId"
+    tabindex="-1"
+    aria-hidden="true"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    data-bs-focus="false"
+  >
+    <!--begin::Modal dialog-->
+    <div class="modal-dialog modal-dialog-centered mw-1000px">
+      <!--begin::Modal content-->
+      <div class="modal-content">
+        <!--begin::Form-->
+        <VForm
+          class="form"
+          id="kt_modal_new_address_form"
+          @submit="submit($event)"
+          :validation-schema="validationSchema"
+        >
+          <!--begin::Modal header-->
+          <div class="modal-header" id="kt_modal_new_address_header">
+            <!--begin::Modal title-->
+            <h2>{{ $props.heading }}</h2>
+            <!--end::Modal title-->
 
-                    <el-date-picker
-                    type="date"
-                    name="m_date1"
-                    id="m_date1"
-                    v-model="maintenanceDetails.m_date1"
-                    @change="setDates($event, 'm_date1')"
-                    placeholder="Pick a day"
-                    :editable="false"
-                  />
-                    </div>
-                    <ErrorMessage class="invalid-feedback" name="m_date1" />
-                    <!--end::Input-->
-                  </div>
-                  <!--end::Col-->
-                </div>
-                <!--end::Input group-->
-  
-                <!--begin::Input group-->
-                <div class="row mb-6">
-                  <!--begin::Col-->
-                  <div class="col-md-6 fv-row mb-8 mb-sd-8">
-                    <!--begin::Label-->
-                    <label
-                      class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                      >Maintenance Date 2</label
+            <!--begin::Close-->
+            <div
+              class="btn btn-sm btn-icon btn-active-color-primary"
+              data-bs-dismiss="modal"
+              @click="resetTheData"
+            >
+              <KTIcon icon-name="cross" icon-class="fs-1" />
+            </div>
+            <!--end::Close-->
+          </div>
+          <!--end::Modal header-->
+
+          <!--begin::Modal body-->
+          <div class="modal-body py-10 px-lg-17">
+            <!--begin::Scroll-->
+            <div
+              class="scroll-y me-n7 pe-7"
+              id="kt_modal_new_address_scroll"
+              data-kt-scroll="true"
+              data-kt-scroll-activate="{default: false, lg: true}"
+              data-kt-scroll-max-height="auto"
+              style="max-height: 100% !important"
+              data-kt-scroll-dependencies="#kt_modal_new_address_scroll"
+              data-kt-scroll-wrappers="#kt_modal_new_address_scroll"
+              data-kt-scroll-offset="auto"
+            >
+              <!--begin::Input group-->
+              <div class="row mb-6">
+                <!--begin::Col-->
+                <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                  <!--begin::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Select Periodicity</label
+                  >
+                  <!--end::Label-->
+
+                  <div>
+                    <el-select
+                      filterable
+                      placeholder="Number of months"
+                      name="periodicity"
+                      v-model="maintenanceDetails.periodicity"
+                      @change="setPeriodicity"
                     >
-                    <!--end::Label-->
-  
-                    <!--begin::Input-->
-                    
+                      <el-option
+                        value=""
+                        disabled="disabled"
+                        label="Number of months"
+                        key=""
+                      >
+                        Number of months</el-option
+                      >
+                      <el-option
+                        v-for="i in 12"
+                        :key="i"
+                        :value="i"
+                        :label="i"
+                      />
+                    </el-select>
+                  </div>
+
+                  <div class="fv-help-block">
+                    <ErrorMessage class="invalid-feedback" name="periodicity" />
+                  </div>
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+
+                <!--begin::Col-->
+                <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                  <!--begin::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Maintenance Date 1</label
+                  >
+                  <!--end::Label-->
+
+                  <!--begin::Input-->
+
+                  <div class="block">
+                    <el-date-picker
+                      type="date"
+                      name="m_date1"
+                      id="m_date1"
+                      v-model="maintenanceDetails.m_date1"
+                      @change="setDates($event, 'm_date1')"
+                      placeholder="Pick a day"
+                      :editable="false"
+                    />
+                  </div>
+                  <ErrorMessage class="invalid-feedback" name="m_date1" />
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Input group-->
+
+              <!--begin::Input group-->
+              <div class="row mb-6">
+                <!--begin::Col-->
+                <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                  <!--begin::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Maintenance Date 2</label
+                  >
+                  <!--end::Label-->
+
+                  <!--begin::Input-->
+
                   <div class="block">
                     <el-date-picker
                       type="date"
@@ -148,174 +148,174 @@
                       disabled
                       :editable="false"
                     />
+                  </div>
+                  <ErrorMessage class="invalid-feedback" name="m_date2" />
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Input group-->
+
+              <!--begin::Input group-->
+              <div class="row mb-6">
+                <div class="form-group col-md-12">
+                  <label
+                    class="col-lg-4 col-form-label required fw-semobold fs-6 fw-bold text-gray-700 text-nowrap"
+                    >Maintenance Details</label
+                  >
+                  <Field
+                    type="text"
+                    as="textarea"
+                    name="m_details"
+                    rows="5"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Specify maintenance details..."
+                    v-model="maintenanceDetails.m_details"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="m_details" />
                     </div>
-                    <ErrorMessage class="invalid-feedback" name="m_date2" />
-                    <!--end::Input-->
                   </div>
-                  <!--end::Col-->
-                </div>
-                <!--end::Input group-->
-  
-                <!--begin::Input group-->
-                <div class="row mb-6">
-                  <div class="form-group col-md-12">
-                    <label
-                      class="col-lg-4 col-form-label required fw-semobold fs-6 fw-bold text-gray-700 text-nowrap"
-                      >Maintenance Details</label
-                    >
-                    <Field
-                      type="text"
-                      as="textarea"
-                      name="m_details"
-                      rows="5"
-                      class="form-control form-control-lg form-control-solid"
-                      placeholder="Specify maintenance details..."
-                      v-model="maintenanceDetails.m_details"
-                    />
-                    <div class="fv-plugins-message-container">
-                      <div class="fv-help-block">
-                        <ErrorMessage name="m_details" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <!--end::Input group-->
-  
-                <!--begin::Input group-->
-                <div class="row mb-6">
-                  <div class="form-group col-md-12">
-                    <label
-                      class="col-lg-4 col-form-label fw-semobold fs-6 fw-bold text-gray-700 text-nowrap"
-                      >Any Repair Details (if any)</label
-                    >
-                    <Field
-                      type="text"
-                      as="textarea"
-                      name="any_repair_detail"
-                      rows="5"
-                      class="form-control form-control-lg form-control-solid"
-                      placeholder="Specify repair details..."
-                      v-model="maintenanceDetails.any_repair_detail"
-                    />
-                  </div>
-                </div>
-                <!--end::Input group-->
-  
-                <div class="row mb-6">
-                  <!--begin::Col-->
-                  <div class="col-md-12 fv-row">
-                    <!--begin::Label-->
-                    <label
-                      class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                      >Maintenance Done By</label
-                    >
-                    <!--end::Label-->
-  
-                    <!--begin::Input-->
-                    <Field
-                      type="text"
-                      disabled
-                      v-model="maintenanceDetails.maintenance_done_by"
-                      name="maintenance_done_by"
-                      class="form-control form-control-lg form-control-solid"
-                      placeholder="Enter the person name"
-                    />
-                    <ErrorMessage
-                      class="invalid-feedback"
-                      name="maintenance_done_by"
-                    />
-                    <!--end::Input-->
-                  </div>
-                  <!--end::Col-->
                 </div>
               </div>
-              <!--end::Scroll-->
+              <!--end::Input group-->
+
+              <!--begin::Input group-->
+              <div class="row mb-6">
+                <div class="form-group col-md-12">
+                  <label
+                    class="col-lg-4 col-form-label fw-semobold fs-6 fw-bold text-gray-700 text-nowrap"
+                    >Any Repair Details (if any)</label
+                  >
+                  <Field
+                    type="text"
+                    as="textarea"
+                    name="any_repair_detail"
+                    rows="5"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Specify repair details..."
+                    v-model="maintenanceDetails.any_repair_detail"
+                  />
+                </div>
+              </div>
+              <!--end::Input group-->
+
+              <div class="row mb-6">
+                <!--begin::Col-->
+                <div class="col-md-12 fv-row">
+                  <!--begin::Label-->
+                  <label
+                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                    >Maintenance Done By</label
+                  >
+                  <!--end::Label-->
+
+                  <!--begin::Input-->
+                  <Field
+                    type="text"
+                    disabled
+                    v-model="maintenanceDetails.maintenance_done_by"
+                    name="maintenance_done_by"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="Enter the person name"
+                  />
+                  <ErrorMessage
+                    class="invalid-feedback"
+                    name="maintenance_done_by"
+                  />
+                  <!--end::Input-->
+                </div>
+                <!--end::Col-->
+              </div>
             </div>
-            <!--end::Modal body-->
-  
-            <!--begin::Modal footer-->
-            <div class="modal-footer flex-center">  
-              <!--begin::Button-->
-              <button
-                ref="submitButtonRef"
-                type="submit"
-                id="kt_modal_new_address_submit"
-                class="btn btn-primary"
-              >
-                <span class="indicator-label"> Submit </span>
-                <span class="indicator-progress">
-                  Please wait...
-                  <span
-                    class="spinner-border spinner-border-sm align-middle ms-2"
-                  ></span>
-                </span>
-              </button>
-              <!--end::Button-->
-            </div>
-            <!--end::Modal footer-->
-          </VForm>
-          <!--end::Form-->
-        </div>
+            <!--end::Scroll-->
+          </div>
+          <!--end::Modal body-->
+
+          <!--begin::Modal footer-->
+          <div class="modal-footer flex-center">
+            <!--begin::Button-->
+            <button
+              ref="submitButtonRef"
+              type="submit"
+              id="kt_modal_new_address_submit"
+              class="btn btn-primary"
+            >
+              <span class="indicator-label"> Submit </span>
+              <span class="indicator-progress">
+                Please wait...
+                <span
+                  class="spinner-border spinner-border-sm align-middle ms-2"
+                ></span>
+              </span>
+            </button>
+            <!--end::Button-->
+          </div>
+          <!--end::Modal footer-->
+        </VForm>
+        <!--end::Form-->
       </div>
     </div>
-    <!--end::Modal - New Address-->
-  </template>
+  </div>
+  <!--end::Modal - New Address-->
+</template>
     
     <script lang="ts">
-  import { defineComponent, onMounted, onUpdated, ref } from "vue";
-  import { ErrorMessage, Field, Form as VForm } from "vee-validate";
-  import { hideModal } from "@/core/helpers/dom";
-  import Swal from "sweetalert2/dist/sweetalert2.js";
-  import * as Yup from "yup";
-  import moment from "moment";
-  
-  interface NewAddressData {}
-  
-  interface Maintenance {
-    periodicity: string;
-    m_date1: string;
-    m_date2: string;
-    m_details: string;
-    any_repair_detail: string;
-    maintenance_done_by: string;
-  }
-  
-  export default defineComponent({
-    name: "new-address-modal",
-    components: {
-      ErrorMessage,
-      Field,
-      VForm,
-    },
-  
-    emit: ["editData"],
-  
-    props: ["planId", "heading", "maintenancePlan"],
-  
-    setup(props, { emit }) {
-      const submitButtonRef = ref<null | HTMLButtonElement>(null);
-      const newAddressModalRef = ref<null | HTMLElement>(null);
-      const newAddressData = ref<NewAddressData>({});
-      const validationSchema = Yup.object().shape({});
-  
-      const maintenanceDetails = ref({
-        periodicity: "",
-        m_date1: "",
-        m_date2: "",
-        m_details: "",
-        any_repair_detail: "",
-        maintenance_done_by: "",
-      });
-  
-      async function resetTheData() {
-          maintenanceDetails.value = await { ...props.maintenancePlan };
-      }
-  
-      onMounted(async function () {
-          maintenanceDetails.value = await { ...props.maintenancePlan };
-      });
-  
-      function calculateNextDates(startDate, monthInterval) {
+import { defineComponent, onMounted, onUpdated, ref } from "vue";
+import { ErrorMessage, Field, Form as VForm } from "vee-validate";
+import { hideModal } from "@/core/helpers/dom";
+import Swal from "sweetalert2/dist/sweetalert2.js";
+import * as Yup from "yup";
+import moment from "moment";
+
+interface NewAddressData {}
+
+interface Maintenance {
+  periodicity: string;
+  m_date1: string;
+  m_date2: string;
+  m_details: string;
+  any_repair_detail: string;
+  maintenance_done_by: string;
+}
+
+export default defineComponent({
+  name: "new-address-modal",
+  components: {
+    ErrorMessage,
+    Field,
+    VForm,
+  },
+
+  emit: ["editData"],
+
+  props: ["planId", "heading", "maintenancePlan"],
+
+  setup(props, { emit }) {
+    const submitButtonRef = ref<null | HTMLButtonElement>(null);
+    const newAddressModalRef = ref<null | HTMLElement>(null);
+    const newAddressData = ref<NewAddressData>({});
+    const validationSchema = Yup.object().shape({});
+
+    const maintenanceDetails = ref({
+      periodicity: "",
+      m_date1: "",
+      m_date2: "",
+      m_details: "",
+      any_repair_detail: "",
+      maintenance_done_by: "",
+    });
+
+    async function resetTheData() {
+      maintenanceDetails.value = await { ...props.maintenancePlan };
+    }
+
+    onMounted(async function () {
+      maintenanceDetails.value = await { ...props.maintenancePlan };
+    });
+
+    function calculateNextDates(startDate, monthInterval) {
       // extracting the year, month, day
       const [year, month, day] = startDate.split("-").map(Number);
       // 0-based indexing, so -1
@@ -366,7 +366,7 @@
         maintenanceDetails.value.m_date2 = m_date2;
       } else {
         maintenanceDetails.value.m_date1 = "";
-          maintenanceDetails.value.m_date2 = "";
+        maintenanceDetails.value.m_date2 = "";
       }
     }
 
@@ -399,92 +399,129 @@
       console.log(maintenanceDetails.value.m_date1);
       console.log(maintenanceDetails.value.m_date2);
     }
-  
-      function areAllPropertiesNull(array) {
-        return array.some((detail) => {
-          const {
-            periodicity,
-            m_date1,
-            m_date2,
-            m_details,
-            maintenance_done_by,
-          } = detail;
-  
-          // Check if any property is null or empty
-  
-          return (
-            periodicity === "" ||
-            m_date1 === "" ||
-            m_date2 === "" ||
-            m_details === "" ||
-            maintenance_done_by === ""
-          );
-        });
-      }
-  
-      const showSuccessAlert = (title, message) => {
-        Swal.fire({
-          title,
-          text: message,
-          icon: "success",
-          buttonsStyling: false,
-          confirmButtonText: "Ok, got it!",
-          heightAuto: false,
-          customClass: {
-            confirmButton: "btn btn-primary",
-          },
-        });
-      };
-  
-      const showErrorAlert = (title, message) => {
-        Swal.fire({
-          title,
-          text: message,
-          icon: "error",
-          buttonsStyling: false,
-          confirmButtonText: "Ok, got it!",
-          heightAuto: false,
-          customClass: {
-            confirmButton: "btn btn-primary",
-          },
-        });
-      };
-  
-      const submit = async (e) => {
-        console.log(maintenanceDetails.value);
-  
-        const result = areAllPropertiesNull([maintenanceDetails.value]);
-  
-        if (!result) {
-          
-          await emit("editData", props.planId, maintenanceDetails.value);
-  
-          showSuccessAlert("Success", "Maintenance Plan Updated Successfully!");
-  
-          hideModal(newAddressModalRef.value);
-        } else {
-          showErrorAlert("Warning", "Please fill all the details Correctly");
-          return;
-        }
-      };
-  
-      return {
-        newAddressData,
-        maintenanceDetails,
-        validationSchema,
-        submit,
-        submitButtonRef,
-        newAddressModalRef,
-        heading: props.heading,
-        planId: props.planId,
-        maintenancePlan: props.maintenancePlan,
-        setPeriodicity,
-        setDates,
-        resetTheData,
 
-      };
-    },
-  });
-  </script>
+    function areAllPropertiesNull(array) {
+      return array.some((detail) => {
+        const {
+          periodicity,
+          m_date1,
+          m_date2,
+          m_details,
+          maintenance_done_by,
+        } = detail;
+
+        // Check if any property is null or empty
+
+        return (
+          periodicity === "" ||
+          m_date1 === "" ||
+          m_date2 === "" ||
+          m_details === "" ||
+          maintenance_done_by === ""
+        );
+      });
+    }
+
+    const showSuccessAlert = (title, message) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "success",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
+      });
+    };
+
+    const showErrorAlert = (title, message) => {
+      Swal.fire({
+        title,
+        text: message,
+        icon: "error",
+        buttonsStyling: false,
+        confirmButtonText: "Ok, got it!",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn btn-primary",
+        },
+      });
+    };
+
+    const validateForm = (formData) => {
+      for (const key in formData) {
+        let value = formData[key];
+        if (key !== "any_repair_detail") {
+          if (Array.isArray(value)) {
+            for (const item of value) {
+              if (!validateForm(item)) {
+                return false;
+              }
+            }
+          } else if (typeof value === "object" && value !== null) {
+            if (!validateForm(value)) {
+              return false;
+            }
+          } else if (typeof value === "string") {
+            value = value.trim();
+            if (value === "") {
+              return false;
+            }
+          } else {
+          }
+        }
+      }
+      return true;
+    };
+
+    const submit = async (e) => {
+      console.log(maintenanceDetails.value);
+
+      const result = validateForm(maintenanceDetails.value);
+
+      if (result === false) {
+        showErrorAlert("Warning", "Please fill all the details correctly.");
+        return;
+      }
+
+      try {
+        if (submitButtonRef.value) {
+          // Activate indicator
+          submitButtonRef.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        await emit("editData", props.planId, maintenanceDetails.value);
+
+        showSuccessAlert("Success", "Maintenance Plan Updated Successfully!");
+
+        hideModal(newAddressModalRef.value);
+      } catch (error) {
+        showErrorAlert("Error", error);
+      } finally {
+        if (submitButtonRef.value) {
+          submitButtonRef.value.removeAttribute("data-kt-indicator");
+        }
+      }
+    };
+
+    return {
+      newAddressData,
+      maintenanceDetails,
+      validationSchema,
+      submit,
+      submitButtonRef,
+      newAddressModalRef,
+      heading: props.heading,
+      planId: props.planId,
+      maintenancePlan: props.maintenancePlan,
+      setPeriodicity,
+      setDates,
+      resetTheData,
+    };
+  },
+});
+</script>
     
     

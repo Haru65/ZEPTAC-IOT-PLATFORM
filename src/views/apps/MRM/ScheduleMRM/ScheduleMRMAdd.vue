@@ -8,7 +8,7 @@
         <VForm
           id="kt_account_profile_details_form"
           class="form"
-          novalidate
+          @submit="submit"
           :validation-schema="itemDetailsValidator"
         >
           <!--begin::Card body-->
@@ -160,10 +160,10 @@
             <!--end::Accordion-->
           </div>
 
-          <div class="modal-footer flex-center w-100">
+          <div class="modal-footer flex-center mt-6">
             <!--begin::Button-->
             <button
-              type="button"
+              type="reset"
               @click="clear"
               class="btn btn-lg btn-danger w-sd-25 w-lg-25"
             >
@@ -172,19 +172,21 @@
             <!--end::Button-->
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
             <!--begin::Button-->
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click.prevent="submit()"
+
+            <!--begin::Button-->
+            <button
+              type="submit"
+              ref="submitButton"
+              class="btn btn-primary w-sd-25 w-lg-25"
             >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Save </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
                 ></span>
               </span>
-            </span>
+            </button>
             <!--end::Button-->
           </div>
           <!--end::Input group-->
@@ -230,17 +232,17 @@ export default defineComponent({
     VForm,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
     const identifier = Identifier;
     const loading = ref(false);
     const auth = useAuthStore();
     const router = useRouter();
     const User = auth.GetUser();
     let limit = ref(500);
-    
+
     const Employees = ref([{ id: "", first_name: "", last_name: "" }]);
 
     const itemDetailsValidator = Yup.object().shape({
-      meeting_date: Yup.string().required().label("Meeting Date"),
       agenda: Yup.string().required().label("Meeting Agenda"),
     });
 
@@ -260,22 +262,20 @@ export default defineComponent({
 
       try {
         ApiService.setHeader();
-      const response = await getEmployees(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Employees.value.push(
-          ...response.result?.map(({ id, first_name, last_name }) => ({
-            id,
-            first_name,
-            last_name,
-          }))
-        );
-      }
-
+        const response = await getEmployees(`fetchAll=true`);
+        if (response.result != null && response.result) {
+          Employees.value.push(
+            ...response.result?.map(({ id, first_name, last_name }) => ({
+              id,
+              first_name,
+              last_name,
+            }))
+          );
+        }
       } catch (error) {
         showErrorAlert("Error", "An error occurred during the API call.");
         loading.value = false;
       }
-
     });
 
     /* --------SET DATE LOGIC--------*/
@@ -323,40 +323,50 @@ export default defineComponent({
     const submit = async () => {
       loading.value = true;
 
-      console.log(itemDetails.value);
-      try {
+      if (itemDetails.value.attendees.length === 0) {
+        showErrorAlert("Warning", "Please Select Atleast One Attendee");
+        loading.value = false;
+        return;
+      }
 
-        if (itemDetails.value.attendees.length === 0) {
-          showErrorAlert("Warning", "Please Select Atleast One Attendee");
-          loading.value = false;
-          return;
+      const result = validateForm(itemDetails.value);
+
+      if (result == false) {
+        showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+        loading.value = false;
+        return;
+      }
+
+      try {
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
         }
 
-        if (validateForm(itemDetails.value)) {
-          
-          const response = await addMRMSchedule(itemDetails.value);
-          if (!response.error) {
-            showSuccessAlert(
-              "Success",
-              "Management Review Meeting has been successfully added!"
-            );
-            loading.value = false;
-            router.push({ name: "mrm-schedule-list" });
-          } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            loading.value = false;
-            return;
-          }
+        // Call your API here
+        const response = await addMRMSchedule(itemDetails.value);
+
+        if (response?.success) {
+          // Handle successful API response
+          showSuccessAlert(
+            "Success",
+            response.message || "Management Review Meeting Added Successfully!"
+          );
+          loading.value = false;
+          router.push({ name: "mrm-schedule-list" });
         } else {
-          console.log(validateForm(itemDetails));
-          showErrorAlert("Warning", "Please fill in all fields.");
-          return;
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
-        // console.error("API call error:", error);
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -402,6 +412,7 @@ export default defineComponent({
     };
 
     return {
+      submitButton,
       itemDetails,
       itemDetailsValidator,
       getAssetPath,

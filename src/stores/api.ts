@@ -3,6 +3,7 @@
 import ApiService from "@/core/services/ApiService";
 import axios, { type AxiosProgressEvent } from "axios";
 const COMPANY_URL = "company";
+const APISETTING_URL = "apisetting";
 const USER_URL = "users";
 const CUSTOMERS_URL = "customers";
 const PRICELIST_URL = "pricelist";
@@ -58,6 +59,7 @@ const LAF_REPORT_URL = "laf_reports";
 const BSC_URL = "bsc";
 const BSC_REPORT_URL = "bsc_reports";
 const FEEDBACK_URL = "feedbacks";
+const ACTIVITY_URL = "activity_logger";
 
 
 
@@ -66,10 +68,11 @@ export async function changeUserPassword(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.post("change_password", data);
-        return response.data.message;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+        console.log(response.data.message)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -79,10 +82,11 @@ export async function resetPassword(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.post("reset_password", data);
+        console.log(response.data.message)
         return response.data;
-    } catch (error) {
-        console.error(error);
-        return { error: error };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1028,9 +1032,9 @@ export async function addInstrument(data: any) {
         ApiService.setHeader();
         const response = await ApiService.post(INSTRUMENTS_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1058,9 +1062,9 @@ export async function InstrumentStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("instruments_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1070,9 +1074,9 @@ export async function updateInstrument(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(INSTRUMENTS_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1209,9 +1213,9 @@ export async function RGatePassStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("returnablegatepasses_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1320,9 +1324,9 @@ export async function DailyWorksheetStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("dailyworksheet_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1491,9 +1495,9 @@ export async function ExpenseSheetStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("expensesheets_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1808,9 +1812,9 @@ export async function getComplaint(data: any) {
         const response = await ApiService.get(COMPLAINT_URL, data);
         // console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1820,9 +1824,9 @@ export async function addComplaint(data: any) {
         ApiService.setHeader();
         const response = await ApiService.post(COMPLAINT_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1832,9 +1836,9 @@ export async function updateComplaint(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(COMPLAINT_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1849,9 +1853,9 @@ export async function ComplaintStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("complaint_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1949,9 +1953,9 @@ export async function TrainingStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("training_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2458,9 +2462,9 @@ export async function addExternalDoc(data) {
         ApiService.setHeader();
         const response = await ApiService.post(EXTERNAL_DOC_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2471,9 +2475,9 @@ export async function getExternalDoc(data: any) {
         const response = await ApiService.get(EXTERNAL_DOC_URL, data);
         // console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2484,9 +2488,9 @@ export async function updateExternalDoc(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(EXTERNAL_DOC_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2545,9 +2549,9 @@ export async function addInternalDoc(data) {
         ApiService.setHeader();
         const response = await ApiService.post(INTERNAL_DOC_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2558,9 +2562,9 @@ export async function getInternalDoc(data: any) {
         const response = await ApiService.get(INTERNAL_DOC_URL, data);
         // console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2571,9 +2575,9 @@ export async function updateInternalDoc(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(INTERNAL_DOC_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2633,9 +2637,9 @@ export async function addNonConformanceRecord(data) {
         ApiService.setHeader();
         const response = await ApiService.post(NCR_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2646,9 +2650,9 @@ export async function getNonConformanceRecord(data: any) {
         const response = await ApiService.get(NCR_URL, data);
         // console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2659,9 +2663,9 @@ export async function updateNonConformanceRecord(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(NCR_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2676,9 +2680,9 @@ export async function NonConformanceRecordStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("non_conformance_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2739,9 +2743,9 @@ export async function addRiskRegister(data) {
         ApiService.setHeader();
         const response = await ApiService.post(RISK_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2752,9 +2756,9 @@ export async function addUpdateRiskIdenfication(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("store_risk_identification", data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2765,9 +2769,9 @@ export async function addUpdateRiskEvaluation(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("store_risk_evaluation", data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2778,9 +2782,9 @@ export async function addUpdateRiskCounter(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("store_risk_counter", data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2793,9 +2797,9 @@ export async function getRiskRegister(data: any) {
         const response = await ApiService.get(RISK_URL, data);
         // console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2806,9 +2810,9 @@ export async function updateRiskRegister(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(RISK_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2823,9 +2827,9 @@ export async function RiskRegisterStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("risk_register_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2885,9 +2889,9 @@ export async function addDocumentChange(data) {
         ApiService.setHeader();
         const response = await ApiService.post(DOC_CHANGE_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2898,9 +2902,9 @@ export async function getDocumentChange(data: any) {
         const response = await ApiService.get(DOC_CHANGE_URL, data);
         // console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2911,9 +2915,9 @@ export async function updateDocumentChange(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(DOC_CHANGE_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2928,9 +2932,9 @@ export async function DocumentChangeStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("document_change_request_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2991,9 +2995,9 @@ export async function addImprovementPlan(data) {
         ApiService.setHeader();
         const response = await ApiService.post(IMPROVEMENT_PLAN__URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3004,9 +3008,9 @@ export async function getImprovementPlan(data: any) {
         const response = await ApiService.get(IMPROVEMENT_PLAN__URL, data);
         // console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3017,9 +3021,9 @@ export async function updateImprovementPlan(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(IMPROVEMENT_PLAN__URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3034,9 +3038,9 @@ export async function ImprovementPlanStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("improvement_plan_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3165,9 +3169,9 @@ export async function addIAuditObservation(data) {
         ApiService.setHeader();
         const response = await ApiService.post(AUDIT_OBSERVATION_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3191,9 +3195,9 @@ export async function updateIAuditObservation(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(AUDIT_OBSERVATION_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3208,9 +3212,9 @@ export async function IAuditObservationStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("auditobservations_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3255,9 +3259,9 @@ export async function addCorrectiveAction(data) {
         ApiService.setHeader();
         const response = await ApiService.post(CORRECTIVE_ACTION_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3268,9 +3272,9 @@ export async function getCorrectiveAction(data: any) {
         const response = await ApiService.get(CORRECTIVE_ACTION_URL, data);
         // console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3281,9 +3285,9 @@ export async function updateCorrectiveAction(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(CORRECTIVE_ACTION_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3296,11 +3300,11 @@ export async function CorrectiveActionStatus(id: any, data: any) {
             data: data
         }
         ApiService.setHeader();
-        const response = await ApiService.post("non_conformance_status", details);
+        const response = await ApiService.post("corrective_action_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3361,9 +3365,9 @@ export async function addIAuditSchedule(data) {
         ApiService.setHeader();
         const response = await ApiService.post(AUDIT_SCHEDULE_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3387,9 +3391,9 @@ export async function updateIAuditSchedule(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(AUDIT_SCHEDULE_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3404,9 +3408,9 @@ export async function IAuditScheduleStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("auditschedule_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3467,9 +3471,9 @@ export async function addQMSProcedure(data) {
         ApiService.setHeader();
         const response = await ApiService.post(QMS_PROCEDURE_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3494,9 +3498,9 @@ export async function updateQMSProcedure(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(QMS_PROCEDURE_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3511,9 +3515,9 @@ export async function QMSProcedureStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("qms_procedure_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3573,9 +3577,9 @@ export async function addWorkInstruction(data) {
         ApiService.setHeader();
         const response = await ApiService.post(WORK_INSTRUCTION_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3599,9 +3603,9 @@ export async function updateWorkInstruction(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(WORK_INSTRUCTION_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3616,9 +3620,9 @@ export async function WorkInstructionStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("work_instruction_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3679,9 +3683,9 @@ export async function addFormAndFormat(data) {
         ApiService.setHeader();
         const response = await ApiService.post(FORMS_AND_FORMATS_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3705,9 +3709,9 @@ export async function updateFormAndFormat(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(FORMS_AND_FORMATS_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3722,9 +3726,9 @@ export async function FormAndFormatStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("form_format_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3785,9 +3789,9 @@ export async function addNABLDoc(data) {
         ApiService.setHeader();
         const response = await ApiService.post(NABL_DOC_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3811,9 +3815,9 @@ export async function updateNABLDoc(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(NABL_DOC_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3828,9 +3832,9 @@ export async function NABLDocStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("nabl_document_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3892,9 +3896,9 @@ export async function addNIDoc(data) {
         ApiService.setHeader();
         const response = await ApiService.post(NI_DOC_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3918,9 +3922,9 @@ export async function updateNIDoc(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(NI_DOC_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3935,9 +3939,9 @@ export async function NIDocStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("ni_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3997,9 +4001,9 @@ export async function addRecord(data) {
         ApiService.setHeader();
         const response = await ApiService.post(RECORDS_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4023,9 +4027,9 @@ export async function updateRecord(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(RECORDS_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4041,9 +4045,9 @@ export async function RecordStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("quality_record_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4146,9 +4150,9 @@ export async function SkillMatrixStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("skill_matrix_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4207,10 +4211,10 @@ export async function getCalibrationInstrumentForIntermediate(data: any) {
         const id = { "id": data };
         ApiService.setHeader();
         const response = await ApiService.post('intermediate_instrument', id);
-        return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+        return response.data.result;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4221,9 +4225,9 @@ export async function addIntermediateCheckRecord(data) {
         ApiService.setHeader();
         const response = await ApiService.post(INTERMEDIATE_RECORD_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4234,9 +4238,9 @@ export async function getIntermediateCheckRecord(data: any) {
         const response = await ApiService.get(INTERMEDIATE_RECORD_URL, data);
         // console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4247,9 +4251,9 @@ export async function updateIntermediateCheckRecord(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(INTERMEDIATE_RECORD_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4325,10 +4329,10 @@ export async function getCalibrationInstrumentForInspection(data: any) {
         const id = { "id": data };
         ApiService.setHeader();
         const response = await ApiService.post('inspection_instrument', id);
-        return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+        return response.data.result;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4339,9 +4343,9 @@ export async function addInspectionRecord(data) {
         ApiService.setHeader();
         const response = await ApiService.post(INSPECTION_RECORD_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4352,9 +4356,9 @@ export async function getInspectionRecord(data: any) {
         const response = await ApiService.get(INSPECTION_RECORD_URL, data);
         // console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4365,9 +4369,9 @@ export async function updateInspectionRecord(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(INSPECTION_RECORD_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4487,9 +4491,9 @@ export async function SupplierStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("suppliers_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4677,9 +4681,9 @@ export async function MethodValidationStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("method_validation_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4781,9 +4785,9 @@ export async function InterLabComparisonStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("interlaboratory_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4886,9 +4890,9 @@ export async function ReplicateReportStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("replicate_report_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5136,9 +5140,9 @@ export async function addMRMSchedule(data) {
         ApiService.setHeader();
         const response = await ApiService.post(MRM_SCHEDULE_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5149,9 +5153,9 @@ export async function getMRMSchedule(data: any) {
         const response = await ApiService.get(MRM_SCHEDULE_URL, data);
         // console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5162,9 +5166,9 @@ export async function updateMRMSchedule(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(MRM_SCHEDULE_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5179,9 +5183,9 @@ export async function MRMScheduleStatus(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("mrm_schedule_status", details);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5219,9 +5223,9 @@ export async function addMRMMinute(data) {
         ApiService.setHeader();
         const response = await ApiService.post(MRM_MINUTE_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5232,9 +5236,9 @@ export async function getMRMMinute(data: any) {
         const response = await ApiService.get(MRM_MINUTE_URL, data);
         // console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5245,9 +5249,9 @@ export async function updateMRMMinute(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(MRM_MINUTE_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5264,20 +5268,6 @@ export async function deleteMRMMinute(data: any) {
         return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
-
-
-// // image upload api
-// export async function uploadImage(fileData: any) {
-//     try {
-//         ApiService.setHeader();
-//         const response = await ApiService.post("upload_image", fileData);
-//         // console.log(response)
-//         return response.data;
-//     } catch (errors) {
-//         console.error(errors);
-//         return { error: errors };
-//     }
-// }
 
 // Define a custom type for the onUploadProgress callback
 type UploadProgressCallback = (progressEvent: AxiosProgressEvent) => void;
@@ -5786,9 +5776,9 @@ export async function addFeedback(data) {
         ApiService.setHeader();
         const response = await ApiService.post(FEEDBACK_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5799,9 +5789,9 @@ export async function getFeedback(data: any) {
         const response = await ApiService.get(FEEDBACK_URL, data);
         // console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5812,9 +5802,9 @@ export async function updateFeedback(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(FEEDBACK_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5826,6 +5816,64 @@ export async function deleteFeedback(data: any) {
         const response = await ApiService.delete(FEEDBACK_URL + "/" + data);
         console.log(response.data.message)
         return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// ACTIVITY LOGGER
+// listing function
+export async function getActivityLoggers(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(ACTIVITY_URL, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function ActivityLoggerSearch(search: any, year:any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search,
+            year: year
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('logger_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// add function
+export async function addIndiaMartApi(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(APISETTING_URL, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// get function
+export async function getIndiaMartApi(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(APISETTING_URL, data);
+        // console.log(response)
+        return response.data.result;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
         return { success: false, message: errors?.response?.data?.message || "An error occurred" };

@@ -8,6 +8,7 @@
     aria-hidden="true"
     data-bs-backdrop="static"
     data-bs-keyboard="false"
+    data-bs-focus="false"
   >
     <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered mw-1000px">
@@ -182,24 +183,25 @@
           <!--begin::Modal footer-->
           <div class="modal-footer flex-center">
             <!--begin::Button-->
-            <span
+            <button
+              type="reset"
               @click="clear"
               id="kt_modal_new_address_cancel"
-              class="btn btn-light me-3"
+              class="btn btn-light w-sd-25 w-lg-25 me-3"
             >
               Discard
-            </span>
+            </button>
             <!--end::Button-->
 
             <!--begin::Button-->
             <button
-              :data-kt-indicator="loading2 ? 'on' : null"
-              ref="submitButtonRef"
               id="kt_modal_new_address_submit"
-              class="btn btn-primary"
+              type="submit"
+              ref="submitButtonRef"
+              class="btn btn-primary w-sd-25 w-lg-25 me-2 px-6"
             >
-              <span v-if="!loading2" class="indicator-label"> Submit </span>
-              <span v-if="loading2" class="indicator-progress">
+              <span class="indicator-label"> Save </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
@@ -286,15 +288,29 @@ export default defineComponent({
       }
     }
 
-    function areAllPropertiesNull(array) {
-      return array.some((detail) => {
-        const { area, target, outcome, quarter } = detail;
-
-        // Check if any property is null or empty
-
-        return area === "" || target === "" || outcome === "" || quarter === "";
-      });
-    }
+    const validateForm = (formData) => {
+      for (const key in formData) {
+        let value = formData[key];
+        if (Array.isArray(value)) {
+            for (const item of value) {
+              if (!validateForm(item)) {
+                return false;
+              }
+            }
+          } else if (typeof value === "object" && value !== null) {
+            if (!validateForm(value)) {
+              return false;
+            }
+          } else if (typeof value === "string") {
+            value = value.trim();
+            if (value === "") {
+              return false;
+            }
+          } else {
+          }
+      }
+      return true;
+    };
 
     const clear = () => {
       itemDetails.value = {
@@ -338,45 +354,49 @@ export default defineComponent({
       });
     };
 
-    const submit = async (e) => {
-      console.log(itemDetails.value);
+    const submit = async () => {
       loading2.value = true;
+      const result = validateForm(itemDetails.value);
 
-      const result = areAllPropertiesNull([itemDetails.value]);
-      if (!result) {
-        try {
-          // Call your API here with the form values
-          const response = await addImprovementPlan(itemDetails.value);
-          // console.log(response.error);
-          if (!response.error) {
-            // Handle successful API response
-            //   console.log("API response:", response);
-            loading.value = false;
-            showSuccessAlert(
-              "Success",
-              "Improvement Action Plan Added Successfully!"
-            );
-            clear();
-            await emit("improvement-added");
-            hideModal(newAddressModalRef.value);
-            // clear();
-          } else {
-            // Handle API error response
-            // const errorData = response.error;
-            loading2.value = false;
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-          }
-        } catch (error) {
-          // Handle any other errors during API call
-          // console.error("API call error:", error);
-          showErrorAlert("Error", "An error occurred during the API call.");
-        } finally {
-          loading2.value = false;
-        }
-      } else {
-        showErrorAlert("Warning", "Please fill all the details Correctly");
+      if (result == false) {
         loading2.value = false;
+        showErrorAlert("Warning", "Please fill all the details correctly.");
         return;
+      }
+
+      try {
+        if (submitButtonRef.value) {
+          // Activate indicator
+          submitButtonRef.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
+
+        const response = await addImprovementPlan(itemDetails.value);
+        if (response?.success) {
+          await emit("improvement-added");
+          loading2.value = false;
+          
+          showSuccessAlert(
+            "Success",
+            response.message || "Improvement Action Plan Added Successfully!"
+          );
+          clear();
+          hideModal(newAddressModalRef.value);
+        } else {
+          // Handle API error response
+          loading2.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
+        }
+      } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
+        showErrorAlert("Error", "An error occurred during the API call.");
+      } finally {
+        if (submitButtonRef.value) {
+          submitButtonRef.value.removeAttribute("data-kt-indicator");
+        }
+        loading2.value = false;
       }
     };
 

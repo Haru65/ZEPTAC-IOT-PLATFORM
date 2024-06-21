@@ -237,14 +237,13 @@ export default defineComponent({
           itemId.toString()
         );
         console.log(response);
-        itemDetails.value.instrument_id = response.result.id;
-        itemDetails.value.name = response.result.name;
-        itemDetails.value.make = response.result.make;
-        itemDetails.value.model_no = response.result.model_no;
-        itemDetails.value.serial_no = response.result.serial_no;
-        itemDetails.value.inspection_records = response.result
-          ?.inspection_records
-          ? response.result?.inspection_records
+        itemDetails.value.instrument_id = response.id;
+        itemDetails.value.name = response.name;
+        itemDetails.value.make = response.make;
+        itemDetails.value.model_no = response.model_no;
+        itemDetails.value.serial_no = response.serial_no;
+        itemDetails.value.inspection_records = response?.inspection_records
+          ? response?.inspection_records
           : [];
 
         console.log(itemDetails);

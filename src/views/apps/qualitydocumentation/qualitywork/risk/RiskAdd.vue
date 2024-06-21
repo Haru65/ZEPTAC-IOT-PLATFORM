@@ -145,7 +145,7 @@
         <div class="card-footer d-flex justify-content-end py-6 px-9">
           <button
             type="button"
-            @click="onsubmit"
+            @click="submit"
             :data-kt-indicator="loading ? 'on' : ''"
             class="btn btn-primary px-6"
           >
@@ -253,7 +253,7 @@ export default defineComponent({
       return true;
     };
 
-    const onsubmit = async () => {
+    const submit = async () => {
       loading.value = true;
 
       if (itemDetails.value.clause_no.trim() === "") {
@@ -265,15 +265,15 @@ export default defineComponent({
       try {
         if (validateForm(itemDetails.value.risk_identification)) {
           const response = await addRiskRegister(itemDetails.value);
-          if (!response.error) {
+          if (response?.success) {
             showSuccessAlert(
-              "Success",
-              "Risk Identification has been successfully inserted!"
-            );
+            "Success",
+            response.message || "Risk Identification has been successfully inserted!"
+          );
             loading.value = false;
             router.push({ name: "risk-list" });
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            showErrorAlert("Error", response.message || "An error occurred.");
             loading.value = false;
             return;
           }
@@ -320,7 +320,7 @@ export default defineComponent({
       itemDetails,
       itemDetailsValidator,
       getAssetPath,
-      onsubmit,
+      submit,
       loading,
       packages,
       limit,

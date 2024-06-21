@@ -238,15 +238,12 @@ export default defineComponent({
           itemId.toString()
         );
         console.log(response);
-        itemDetails.instrument_id = response.result.id;
-        itemDetails.name = response.result.name;
-        itemDetails.make = response.result.make;
-        itemDetails.model_no = response.result.model_no;
-        itemDetails.serial_no = response.result.serial_no;
-        itemDetails.intermediate_check_records = response.result
-          ?.intermediate_check_records
-          ? response.result?.intermediate_check_records
-          : [];
+        itemDetails.instrument_id = response.id;
+        itemDetails.name = response.name;
+        itemDetails.make = response.make;
+        itemDetails.model_no = response.model_no;
+        itemDetails.serial_no = response.serial_no;
+        itemDetails.intermediate_check_records = response?.intermediate_check_records ? response?.intermediate_check_records : [];
       } catch (error) {
         showErrorAlert("Error", "An error occurred during the API call.");
         loading.value = false;

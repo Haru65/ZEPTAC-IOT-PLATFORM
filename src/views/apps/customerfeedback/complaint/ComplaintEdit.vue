@@ -9,7 +9,7 @@
           id="kt_account_profile_details_form"
           class="form"
           novalidate
-          :validation-schema="complaintDetailsValidator"
+          :validation-schema="itemDetailsValidator"
         >
           <!--begin::Card body-->
           <div class="card-body border-top p-sd-2 p-lg-9">
@@ -30,7 +30,7 @@
                   name="customer_name"
                   class="form-control form-control-lg form-control-solid"
                   placeholder="Enter customer name"
-                  v-model="complaintDetails.customer_name"
+                  v-model="itemDetails.customer_name"
                 />
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
@@ -58,7 +58,7 @@
                     type="date"
                     name="complaint_date"
                     id="complaint_date"
-                    v-model="complaintDetails.complaint_date"
+                    v-model="itemDetails.complaint_date"
                     @change="setDates($event, 'complaint_date')"
                     placeholder="Pick Complaint Day"
                     :editable="false"
@@ -66,7 +66,7 @@
                 </div>
                 <div
                   class="fv-plugins-message-container mt-5"
-                  v-if="!complaintDetails.complaint_date"
+                  v-if="!itemDetails.complaint_date"
                 >
                   <div class="fv-help-block">
                     <ErrorMessage name="complaint_date" />
@@ -89,7 +89,7 @@
                   type="text"
                   name="complaint_no"
                   class="form-control form-control-lg form-control-solid"
-                  v-model="complaintDetails.complaint_no"
+                  v-model="itemDetails.complaint_no"
                   placeholder="Enter Complaint Number"
                 />
                 <div class="fv-plugins-message-container">
@@ -117,7 +117,7 @@
                   rows="3"
                   class="form-control form-control-lg form-control-solid"
                   placeholder="Specify the complaint..."
-                  v-model="complaintDetails.details_of_complaint"
+                  v-model="itemDetails.details_of_complaint"
                 />
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
@@ -137,7 +137,7 @@
                   rows="3"
                   class="form-control form-control-lg form-control-solid"
                   placeholder="Specify the action..."
-                  v-model="complaintDetails.corrective_action"
+                  v-model="itemDetails.corrective_action"
                 />
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
@@ -158,7 +158,7 @@
               <!--begin::Col-->
               <div class="col-lg-9 fv-row">
                 <el-select
-                  v-model="complaintDetails.source_of_complaint"
+                  v-model="itemDetails.source_of_complaint"
                   filterable
                   placeholder="Select Source of Complaint..."
                 >
@@ -178,7 +178,7 @@
                 </el-select>
                 <div
                   class="fv-plugins-message-container"
-                  v-if="!complaintDetails.source_of_complaint"
+                  v-if="!itemDetails.source_of_complaint"
                 >
                   <div class="fv-help-block">
                     <ErrorMessage name="source_of_complaint" />
@@ -202,7 +202,7 @@
                   rows="3"
                   class="form-control form-control-lg form-control-solid"
                   placeholder="Specify the action..."
-                  v-model="complaintDetails.comment_by_customer"
+                  v-model="itemDetails.comment_by_customer"
                 />
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
@@ -228,7 +228,7 @@
                         type="date"
                         name="resolution_date"
                         id="resolution_date"
-                        v-model="complaintDetails.resolution_date"
+                        v-model="itemDetails.resolution_date"
                         @change="setDates($event, 'resolution_date')"
                         placeholder="Pick Resolution Day"
                         :editable="false"
@@ -239,7 +239,7 @@
                 </label>
                 <div
                   class="fv-plugins-message-container"
-                  v-if="!complaintDetails.resolution_date"
+                  v-if="!itemDetails.resolution_date"
                 >
                   <div class="fv-help-block">
                     <ErrorMessage name="resolution_date" />
@@ -264,7 +264,7 @@
                           name="complaint_status"
                           :id="`${status.id}`"
                           :value="status.id"
-                          v-model="complaintDetails.complaint_status"
+                          v-model="itemDetails.complaint_status"
                           autocomplete="off"
                         />
                         <label
@@ -284,25 +284,21 @@
 
           <div class="modal-footer flex-center w-100">
             <!--begin::Button-->
-            <button type="reset" class="btn btn-lg btn-danger w-sd-25 w-lg-25">
-              Discard
-            </button>
-            <!--end::Button-->
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-            <!--begin::Button-->
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click="submit()"
+            <button
+              id="kt_modal_new_address_submit"
+              type="button"
+              @click.prevent="submit"
+              ref="submitButton"
+              class="btn btn-primary me-2 px-6"
             >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Update </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
                 ></span>
               </span>
-            </span>
+            </button>
             <!--end::Button-->
           </div>
           <!--end::Input group-->
@@ -353,6 +349,7 @@ export default defineComponent({
     VForm,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
     const loading = ref(false);
     const auth = useAuthStore();
     const router = useRouter();
@@ -361,20 +358,18 @@ export default defineComponent({
     let limit = ref(500);
     const itemId = route.params.id;
 
-    const complaintDetailsValidator = Yup.object().shape({
+    const itemDetailsValidator = Yup.object().shape({
       customer_name: Yup.string().required().label("Customer Name"),
-      complaint_date: Yup.string().required().label("Complaint Date"),
       complaint_no: Yup.string().required().label("Complaint No."),
       details_of_complaint: Yup.string()
         .required()
         .label("Details of Complaint"),
       corrective_action: Yup.string().required().label("Corrective Action"),
-      source_of_complaint: Yup.string().required().label("Source of Complaint"),
+      source_of_complaint: Yup.string().notRequired().label("Source of Complaint"),
       comment_by_customer: Yup.string().required().label("Comment"),
-      resolution_date: Yup.string().required().label("Resolution Date"),
     });
 
-    const complaintDetails = ref<Complaint>({
+    const itemDetails = ref<Complaint>({
       customer_name: "",
       complaint_date: "",
       complaint_no: "",
@@ -394,7 +389,7 @@ export default defineComponent({
     onMounted(async () => {
       let response = await getComplaint(itemId.toString());
       // console.log(response);
-      complaintDetails.value = {
+      itemDetails.value = {
         customer_name: response.customer_name,
         complaint_date: response.complaint_date,
         complaint_no: response.complaint_no,
@@ -412,102 +407,90 @@ export default defineComponent({
       };
     });
 
-    function areAllPropertiesNotNull(array) {
-      return array.some((data) => {
-        const {
-          customer_name,
-          complaint_date,
-          complaint_no,
-          details_of_complaint,
-          corrective_action,
-          source_of_complaint,
-          comment_by_customer,
-          resolution_date,
-          complaint_status,
-        } = data;
-
-        // Check if any property is null or empty
-
-        return (
-          customer_name !== "" &&
-          complaint_date !== "" &&
-          complaint_no !== "" &&
-          details_of_complaint !== "" &&
-          corrective_action !== "" &&
-          source_of_complaint !== "" &&
-          comment_by_customer !== "" &&
-          resolution_date !== "" &&
-          complaint_status !== ""
-        );
-      });
-    }
+    const validateForm = (formData) => {
+      for (const key in formData) {
+        let value = formData[key];
+        if (Array.isArray(value)) {
+            for (const item of value) {
+              if (!validateForm(item)) {
+                return false;
+              }
+            }
+          } else if (typeof value === "object" && value !== null) {
+            if (!validateForm(value)) {
+              return false;
+            }
+          } else if (typeof value === "string") {
+            value = value.trim();
+            if (value === "") {
+              return false;
+            }
+          } else {
+          }
+      }
+      return true;
+    };
 
     /* --------SET DATE LOGIC--------*/
     async function setDates(e, dateType) {
       try {
         if (e != null) {
           if (e != "" && e != null) {
-            complaintDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
+            itemDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
           } else {
-            complaintDetails.value[dateType] = "";
+            itemDetails.value[dateType] = "";
           }
         } else {
-          complaintDetails.value[dateType] = "";
+          itemDetails.value[dateType] = "";
         }
       } catch (err) {
-        complaintDetails.value[dateType] = "";
+        itemDetails.value[dateType] = "";
       }
-      console.log(complaintDetails.value[dateType]);
+      console.log(itemDetails.value[dateType]);
     }
 
     const submit = async () => {
       loading.value = true;
+      const result = validateForm(itemDetails.value);
+
+      if (result == false) {
+        loading.value = false;
+        showErrorAlert("Warning", "Please fill all the details correctly.");
+        return;
+      }
 
       try {
-        complaintDetails.value.complaint_date = moment(
-          complaintDetails.value.complaint_date
-        ).format("YYYY-MM-DD");
-        complaintDetails.value.resolution_date = moment(
-          complaintDetails.value.resolution_date
-        ).format("YYYY-MM-DD");
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
 
-        // console.log(complaintDetails.value);
-        const result = areAllPropertiesNotNull([complaintDetails.value]);
-
-        if (result) {
-          const response = await updateComplaint(
+        // Call your API here
+        const response = await updateComplaint(
             itemId,
-            complaintDetails.value
+            itemDetails.value
           );
-          // console.log(response)
-          // console.log(response.error);
-          if (!response.error) {
-            // Handle successful API response
-            //   console.log("API response:", response);
-            showSuccessAlert(
-              "Success",
-              "Complaint has been successfully Updated!"
-            );
-
-            router.push({ name: "complaint-list" });
-            loading.value = false;
-          } else {
-            // Handle API error response
-            //   console.log("API error:", errorData);
-            // console.log("API error:", errorData.response.data.errors);
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            loading.value = false;
-          }
-        } else {
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+        if (response?.success) {
+          showSuccessAlert(
+            "Success",
+            response.message ||
+              "Complaint has been successfully updated!"
+          );
           loading.value = false;
+          router.push({ name: "complaint-list" });
+        } else {
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
-        // console.error("API call error:", error);
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -541,8 +524,9 @@ export default defineComponent({
     };
 
     return {
-      complaintDetails,
-      complaintDetailsValidator,
+      submitButton,
+      itemDetails,
+      itemDetailsValidator,
       getAssetPath,
       submit,
       loading,

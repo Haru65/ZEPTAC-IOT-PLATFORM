@@ -8,6 +8,7 @@
     aria-hidden="true"
     data-bs-backdrop="static"
     data-bs-keyboard="false"
+    data-bs-focus="false"
   >
     <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered mw-1000px">
@@ -343,11 +344,11 @@
 
             <!--begin::Button-->
             <button
-              ref="submitButtonRef"
               id="kt_modal_new_address_submit"
-              class="btn btn-primary"
+              ref="submitButtonRef"
+              class="btn btn-primary me-2 px-6"
             >
-              <span class="indicator-label"> Submit </span>
+              <span class="indicator-label"> Save </span>
               <span class="indicator-progress">
                 Please wait...
                 <span
@@ -683,38 +684,46 @@ export default defineComponent({
       console.log(documentDetails.value);
 
       const result = areAllPropertiesNull([documentDetails.value]);
-      if (!result) {
-        try {
-          // Call your API here with the form values
-          const response = await addFormAndFormat(documentDetails.value);
-          // console.log(response.error);
-          if (!response.error) {
-            // Handle successful API response
-            //   console.log("API response:", response);
-            loading.value = false;
 
-            showSuccessAlert("Success", "Form & Format Added Successfully!");
-            clear();
-
-            await emit("document-added");
-            hideModal(newAddressModalRef.value);
-            // clear();
-          } else {
-            // Handle API error response
-            // const errorData = response.error;
-            loading.value = false;
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-          }
-        } catch (error) {
-          // Handle any other errors during API call
-          // console.error("API call error:", error);
-          showErrorAlert("Error", "An error occurred during the API call.");
-        } finally {
-          loading.value = false;
-        }
-      } else {
-        showErrorAlert("Warning", "Please fill all the details Correctly");
+      if (result) {
+        showErrorAlert("Warning", "Please fill all the details correctly.");
         return;
+      }
+
+      try {
+        if (submitButtonRef.value) {
+          // Activate indicator
+          submitButtonRef.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
+        const response = await addFormAndFormat(documentDetails.value);
+
+        if (response?.success) {
+          // Handle successful API response
+          loading.value = false;
+          showSuccessAlert(
+            "Success",
+            response.message || "Form & Format Added Successfully!"
+          );
+          clear();
+
+          await emit("document-added");
+          hideModal(newAddressModalRef.value);
+        } else {
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
+        }
+      } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
+        showErrorAlert("Error", "An error occurred during the API call.");
+      } finally {
+        if (submitButtonRef.value) {
+          submitButtonRef.value.removeAttribute("data-kt-indicator");
+        }
+        loading.value = false;
       }
     };
 

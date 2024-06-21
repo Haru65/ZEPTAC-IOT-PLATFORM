@@ -396,14 +396,13 @@ export default defineComponent({
           console.log(passwordDetails.value);
 
           const response = await changeUserPassword(passwordDetails.value);
-          console.log(response);
 
-          if (!response.error) {
+          if (response?.success) {
             setTimeout(() => {
               updatePasswordButton.value?.removeAttribute("data-kt-indicator");
 
               Swal.fire({
-                text: "Password changesd successfully",
+                text: response.message || `Password changed successfully.`,
                 icon: "success",
                 confirmButtonText: "Ok",
                 buttonsStyling: false,
@@ -415,38 +414,36 @@ export default defineComponent({
                 passwordFormDisplay.value = false;
               });
             }, 2000);
-          } else {
-            setTimeout(() => {
-              updatePasswordButton.value?.removeAttribute("data-kt-indicator");
 
-              Swal.fire({
-                text: "Please enter correct password",
-                icon: "error",
-                confirmButtonText: "Ok",
-                buttonsStyling: false,
-                heightAuto: false,
-                customClass: {
-                  confirmButton: "btn btn-light-danger",
-                },
-              }).then(() => {
-                passwordFormDisplay.value = false;
-              });
-            }, 2000);
+            return { success: true };
+          } else {
+            throw new Error(response?.message || `Failed to change password.`);
           }
         }
-      } catch (error) {
-        Swal.fire({
-          text: "Something went wrong during API call",
-          icon: "error",
-          confirmButtonText: "Ok",
-          buttonsStyling: false,
-          heightAuto: false,
-          customClass: {
-            confirmButton: "btn btn-light-primary",
-          },
-        });
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message ||
+          error.message ||
+          "An unknown error occurred";
 
-        passwordFormDisplay.value = false;
+        setTimeout(() => {
+          updatePasswordButton.value?.removeAttribute("data-kt-indicator");
+
+          Swal.fire({
+            text: errorMessage,
+            icon: "error",
+            confirmButtonText: "Ok",
+            buttonsStyling: false,
+            heightAuto: false,
+            customClass: {
+              confirmButton: "btn btn-light-danger",
+            },
+          }).then(() => {
+            passwordFormDisplay.value = false;
+          });
+        }, 2000);
+
+        return { success: false, message: errorMessage };
       }
     };
 

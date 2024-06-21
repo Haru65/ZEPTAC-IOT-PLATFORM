@@ -2,6 +2,7 @@ const ID_TOKEN_KEY = "id_token" as string;
 const USER = "user" as string;
 const SELECTED_ACADEMIC_YEAR = "selectedAcademicYear" as string;
 const FINANCIAL_YEAR_TYPE = "financialYearType" as string;
+const ALERT = "alertDismissed" as string;
 
 /**
  * @description get token form localStorage
@@ -81,6 +82,10 @@ export const destroyFinancialType = (): void => {
   window.localStorage.removeItem(FINANCIAL_YEAR_TYPE);
 };
 
+export const destroyAlert = (): void => {
+  window.localStorage.removeItem(ALERT);
+};
+
 /**
  * @description remove token form localStorage
  */
@@ -100,4 +105,5 @@ export default {
   deleteCookie,
   destroySelectedYear,
   destroyFinancialType,
+  destroyAlert,
 };

@@ -1,40 +1,48 @@
 <template>
-  <div
-    v-if="User.role_id == 1 || User.role_id == 2"
-    class="row g-5 g-xl-10 mb-5 mb-xl-10"
-  >
+  <div v-if="User.role_id == 1 || User.role_id == 2" class="">
     <!--begin::Row-->
-    <div
-      class="row g-5 g-xl-10 mb-5 mb-xl-5"
-      v-if="daysLeft <= 5 && daysLeft >= 0"
-    >
+    <div class="row p-6" v-if="daysLeft <= 5 && daysLeft >= 0">
       <!--begin::Alert-->
       <div
-        class="notice d-flex bg-light-warning rounded border-warning border border-dashed p-6"
+        class="alert alert-dismissible bg-light-warning border border-dashed d-flex flex-column flex-sm-row p-5 mb-10"
       >
         <!--begin::Icon-->
-        <KTIcon
-          icon-name="information-5"
-          icon-class="fs-2tx text-warning me-4"
-        />
+        <i
+          class="ki-duotone ki-notification-bing fs-2hx text-success me-4 mb-5 mb-sm-0"
+          ><span class="path1"></span><span class="path2"></span
+          ><span class="path3"></span
+        ></i>
         <!--end::Icon-->
-        <div class="d-flex flex-stack flex-grow-1">
-          <!--begin::Content-->
-          <div class="fw-semobold">
-            <h4 class="text-gray-800 fw-bold">Attention Required!</h4>
-            <div class="fs-6 text-gray-600">
-              Your {{ isTrial ? "trial" : "subscription" }} will expire in
-              {{ daysLeft }} days. Please renew to avoid any interruption in
-              service.
-              <router-link
-                :to="`/subscription/${User.company_id}`"
-                class="link-primary fw-bold"
-                >Renew Now</router-link
-              >
-            </div>
+
+        <!--begin::Wrapper-->
+        <div class="d-flex flex-column pe-0 pe-sm-10">
+          <!--begin::Title-->
+          <h4 class="text-gray-800 fw-bold">Attention Required!</h4>
+          <!--end::Title-->
+          <div class="fs-6 text-gray-600">
+            Your {{ isTrial ? "trial" : "subscription" }} will expire in
+            {{ daysLeft }} days. Please renew to avoid any interruption in
+            service.
+            <router-link
+              :to="`/subscription/${User.company_id}`"
+              class="link-primary fw-bold"
+              >Renew Now</router-link
+            >
           </div>
-          <!--end::Content-->
         </div>
+        <!--end::Wrapper-->
+
+        <!--begin::Close-->
+        <button
+          type="button"
+          class="position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto"
+          data-bs-dismiss="alert"
+        >
+          <i class="ki-duotone ki-cross fs-1 text-success"
+            ><span class="path1"></span><span class="path2"></span
+          ></i>
+        </button>
+        <!--end::Close-->
       </div>
       <!--end::Alert-->
     </div>
@@ -180,10 +188,12 @@ export default defineComponent({
     const authStore = useAuthStore();
     const User = authStore.GetUser();
 
+    // Computed property to get end date
     const endDate = computed(() => {
       return new Date(authStore.companyDetails.trial_subscription_end);
     });
 
+    // Computed property to calculate days left
     const daysLeft = computed(() => {
       if (!endDate.value) return 0;
       const today = new Date();
@@ -191,6 +201,7 @@ export default defineComponent({
       return Math.ceil(timeDifference / (1000 * 3600 * 24));
     });
 
+    // Computed property to check if it is a trial
     const isTrial = computed(() => authStore.companyDetails.is_trial);
 
     return {

@@ -1,13 +1,14 @@
 <template>
   <!--begin::Modal - New Address-->
   <div
-    class="modal fade"
+    class="modal fade focus"
     ref="newAddressModalRef"
     id="kt_modal_internal_doc"
     tabindex="-1"
     aria-hidden="true"
     data-bs-backdrop="static"
     data-bs-keyboard="false"
+    data-bs-focus="false"
   >
     <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered mw-1000px">
@@ -17,8 +18,8 @@
         <VForm
           class="form"
           id="kt_modal_new_address_form"
-          :validation-schema="DocumentValidator"
           @submit="submit"
+          :validation-schema="DocumentValidator"
         >
           <!--begin::Modal header-->
           <div class="modal-header" id="kt_modal_new_address_header">
@@ -47,7 +48,7 @@
               data-kt-scroll-activate="{default: false, lg: true}"
               data-kt-scroll-max-height="auto"
               style="max-height: 100% !important"
-              data-kt-scroll-dependencies="#kt_modal_new_address_scroll"
+              data-kt-scroll-dependencies="#kt_modal_new_address_header"
               data-kt-scroll-wrappers="#kt_modal_new_address_scroll"
               data-kt-scroll-offset="auto"
             >
@@ -275,7 +276,8 @@
                   </div>
                 </div>
               </div>
-              <div v-else
+              <div
+                v-else
                 class="notice d-flex bg-light-primary rounded border-primary border border-dashed min-w-lg-600px flex-shrink-0 p-6"
               >
                 <!--begin::Icon-->
@@ -331,22 +333,24 @@
           <!--begin::Modal footer-->
           <div class="modal-footer flex-center">
             <!--begin::Button-->
-            <span
+            <button
+              type="reset"
               @click="clear"
               id="kt_modal_new_address_cancel"
               class="btn btn-light me-3"
             >
               Discard
-            </span>
+            </button>
             <!--end::Button-->
 
             <!--begin::Button-->
             <button
-              ref="submitButtonRef"
               id="kt_modal_new_address_submit"
-              class="btn btn-primary"
+              type="submit"
+              ref="submitButtonRef"
+              class="btn btn-primary me-2 px-6"
             >
-              <span class="indicator-label"> Submit </span>
+              <span class="indicator-label"> Save </span>
               <span class="indicator-progress">
                 Please wait...
                 <span
@@ -607,48 +611,6 @@ export default defineComponent({
       }
     };
 
-    // const handleFileChange = (event) => {
-    //   // Get the selected file
-    //   const selectedFile = event.target?.files?.[0];
-
-    //   if (!selectedFile) {
-    //     alert("Please Select a file");
-    //   }
-
-    //   if (selectedFile) {
-    //     // Check if the selected file is a PDF
-    //     if (selectedFile.type === "application/pdf") {
-    //       const reader = new FileReader();
-
-    //       reader.onload = () => {
-    //         try {
-    //           const base64Data = reader.result
-    //             ?.toString()
-    //             .replace(/^data:application\/pdf;base64,/, "");
-
-    //           if (base64Data) {
-    //             documentDetails.value.document_file = base64Data;
-    //           } else {
-    //             console.error("Error: Failed to read the image data.");
-    //           }
-    //         } catch (e) {
-    //           console.error("Error:", e);
-    //         }
-    //       };
-
-    //       // Read the file as data URL (base64)
-    //       reader.readAsDataURL(selectedFile);
-    //     } else {
-    //       // Clear the data and set the invalid flag
-
-    //       documentDetails.value.document_file = "";
-    //     }
-    //   } else {
-    //     documentDetails.value.document_file = "";
-    //   }
-    //   console.log(documentDetails.value);
-    // };
-
     function areAllPropertiesNull(array) {
       return array.some((detail) => {
         const {
@@ -720,42 +682,50 @@ export default defineComponent({
       });
     };
 
-    const submit = async (e) => {
+    const submit = async () => {
       console.log(documentDetails.value);
 
       const result = areAllPropertiesNull([documentDetails.value]);
-      if (!result) {
-        try {
-          // Call your API here with the form values
-          const response = await addQMSProcedure(documentDetails.value);
-          // console.log(response.error);
-          if (!response.error) {
-            // Handle successful API response
-            //   console.log("API response:", response);
-            loading.value = false;
 
-            showSuccessAlert("Success", "QMS Procedure Added Successfully!");
-            clear();
-
-            await emit("document-added");
-            hideModal(newAddressModalRef.value);
-            // clear();
-          } else {
-            // Handle API error response
-            // const errorData = response.error;
-            loading.value = false;
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-          }
-        } catch (error) {
-          // Handle any other errors during API call
-          // console.error("API call error:", error);
-          showErrorAlert("Error", "An error occurred during the API call.");
-        } finally {
-          loading.value = false;
-        }
-      } else {
-        showErrorAlert("Warning", "Please fill all the details Correctly");
+      if (result) {
+        showErrorAlert("Warning", "Please fill all the details correctly.");
         return;
+      }
+
+      try {
+        if (submitButtonRef.value) {
+          // Activate indicator
+          submitButtonRef.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
+        const response = await addQMSProcedure(documentDetails.value);
+
+        if (response?.success) {
+          // Handle successful API response
+          loading.value = false;
+          showSuccessAlert(
+            "Success",
+            response.message || "QMS Procedure Added Successfully!"
+          );
+          clear();
+
+          await emit("document-added");
+          hideModal(newAddressModalRef.value);
+        } else {
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
+        }
+      } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
+        showErrorAlert("Error", "An error occurred during the API call.");
+      } finally {
+        if (submitButtonRef.value) {
+          submitButtonRef.value.removeAttribute("data-kt-indicator");
+        }
+        loading.value = false;
       }
     };
 

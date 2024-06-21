@@ -8,6 +8,7 @@
     aria-hidden="true"
     data-bs-backdrop="static"
     data-bs-keyboard="false"
+    data-bs-focus="false"
   >
     <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered mw-1000px">
@@ -333,7 +334,7 @@ export default defineComponent({
     }
 
     const handleChange = async (e) => {
-      console.log(User);
+      console.log(e);
       let fileInput = e.target;
       const file = e.target.files[0];
       console.log(file.type);

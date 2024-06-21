@@ -8,6 +8,7 @@
         <VForm
           id="kt_account_profile_details_form"
           class="form"
+          @submit="submit"
           novalidate
           :validation-schema="itemDetailsValidator"
         >
@@ -84,10 +85,11 @@
             </div>
           </div>
 
-          <div class="modal-footer flex-center w-100">
+
+          <div class="modal-footer flex-center mt-6">
             <!--begin::Button-->
             <button
-              type="button"
+              type="reset"
               @click="clear"
               class="btn btn-lg btn-danger w-sd-25 w-lg-25"
             >
@@ -96,19 +98,21 @@
             <!--end::Button-->
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
             <!--begin::Button-->
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click.prevent="submit()"
+
+            <!--begin::Button-->
+            <button
+              type="submit"
+              ref="submitButton"
+              class="btn btn-primary w-sd-25 w-lg-25"
             >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Save </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
                 ></span>
               </span>
-            </span>
+            </button>
             <!--end::Button-->
           </div>
           <!--end::Input group-->
@@ -173,6 +177,7 @@ export default defineComponent({
     VForm,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
     const identifier = Identifier;
     const loading = ref(false);
     const auth = useAuthStore();
@@ -288,32 +293,44 @@ export default defineComponent({
     const submit = async () => {
       loading.value = true;
 
-      console.log(itemDetails.value);
+      const result = validateForm(itemDetails.value.agenda_points);
+
+      if (result == false) {
+        showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+        loading.value = false;
+        return;
+      }
+
       try {
-        if (validateForm(itemDetails.value.agenda_points)) {
-          const response = await addMRMMinute(itemDetails.value);
-          if (!response.error) {
-            showSuccessAlert(
-              "Success",
-              "Meeting of Minutes has been successfully added!"
-            );
-            loading.value = false;
-            router.push({ name: "mrm-minutes-list" });
-          } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            loading.value = false;
-            return;
-          }
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
+        const response = await addMRMMinute(itemDetails.value);
+
+        if (response?.success) {
+          // Handle successful API response
+          showSuccessAlert(
+            "Success",
+            response.message || "Meeting of Minutes has been successfully added!"
+          );
+          loading.value = false;
+          router.push({ name: "mrm-minutes-list" });
         } else {
-          console.log(validateForm(itemDetails));
-          showErrorAlert("Warning", "Please fill in all fields.");
-          return;
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
-        // console.error("API call error:", error);
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -360,6 +377,7 @@ export default defineComponent({
     };
 
     return {
+      submitButton,
       itemDetails,
       itemDetailsValidator,
       getAssetPath,
