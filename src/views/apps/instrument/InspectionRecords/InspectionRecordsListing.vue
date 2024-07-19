@@ -20,32 +20,6 @@
         <!--end::Search-->
       </div>
       <!--begin::Card title-->
-      <!--begin::Card toolbar-->
-      <div class="card-toolbar">
-        <!--begin::Toolbar-->
-        <div
-          v-if="selectedIds.length === 0"
-          class="d-flex justify-content-end"
-          data-kt-customer-table-toolbar="base"
-        >
-          <!--begin::Export-->
-          <button
-            type="button"
-            class="btn btn-light-primary me-3"
-            data-bs-toggle="modal"
-            data-bs-target="#kt_customers_export_modal"
-          >
-            <KTIcon icon-name="exit-up" icon-class="fs-2" />
-            Export
-          </button>
-          <!--end::Export-->
-        </div>
-        <!--end::Toolbar-->
-        <!--begin::Group actions-->
-        <!--end::Group actions-->
-        <!--begin::Group actions-->
-      </div>
-      <!--end::Card toolbar-->
     </div>
     <div class="card-body pt-0">
       <Datatable
@@ -84,7 +58,7 @@
               :to="`/inspection_records/add/${inspection_instrument.id}`"
             >
               <span
-                class="border rounded badge py-3 fs-7 badge-light-primary text-hover-success cursor-pointer"
+                class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
                 >+ inspection
               </span>
             </router-link>
@@ -103,7 +77,7 @@
                 :to="`/inspection_records/view/${inspection_instrument.id}`"
               >
                 <span
-                  class="border rounded badge py-3 fs-7 badge-light-primary text-hover-success cursor-pointer"
+                  class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
                   >View Inspections
                 </span>
               </router-link>

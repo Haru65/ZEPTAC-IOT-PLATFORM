@@ -1,7 +1,18 @@
+
+/* 
+
+RGP STATUS (status)
+1 : In Process
+2 : Completed
+
+*/
+
 interface IRGP {
     id: number;
     rgp_no: string;
-    customer_name:{
+    customer: {
+        id: string;
+        name: string;
         company_name: string;
     };
     quotation_id:string;
@@ -11,6 +22,7 @@ interface IRGP {
     date: string;
     duedate: string;
     approval_status: string;
+    company_id:string;
 }
   
 export type { IRGP };

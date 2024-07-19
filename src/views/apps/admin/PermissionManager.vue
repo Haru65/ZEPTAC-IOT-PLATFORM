@@ -101,21 +101,27 @@
         :items-per-page-dropdown-enabled="false"
         :loading="loading"
       >
+        <template v-slot:id="{ row: permissions }">
+          {{ permissions.id }}
+        </template>
         <template v-slot:name="{ row: permissions }">
           {{ permissions.name }}
         </template>
         <template v-slot:actions="{ row: permissions }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span>
-              <i
-                @click="deletepermission(permissions.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
+          <div class="d-flex flex-lg-row my-3">
+            <!--begin::Delete-->
+            <span
+              @click="deletepermission(permissions.id, false)"
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete Permission"
+            >
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
+            <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -200,10 +206,16 @@ export default defineComponent({
 
     const tableHeader = ref([
       {
+        columnName: "Permission Id",
+        columnLabel: "id",
+        sortEnabled: true,
+        columnWidth: 75,
+      },
+      {
         columnName: "Permission Name",
         columnLabel: "name",
         sortEnabled: true,
-        columnWidth: 275,
+        columnWidth: 400,
       },
       {
         columnName: "Actions",

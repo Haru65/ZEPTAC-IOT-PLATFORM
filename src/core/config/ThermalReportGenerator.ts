@@ -28,12 +28,12 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
   // functions
   function drawHeader(titleName){
 
-    const customerAddress = `${reportInfo.value.customer_address.address1} ${reportInfo.value.customer_address.address2} ${reportInfo.value.customer_address.city} ${reportInfo.value.customer_address.pincode} ${reportInfo.value.customer_address.states} ${reportInfo.value.customer_address.country}`;
+    const customerAddress = `${reportInfo.value.rgp.quotation.customer.address1 || ""} ${reportInfo.value.rgp.quotation.customer.address2 || ""} ${reportInfo.value.rgp.quotation.customer.city || ""} ${reportInfo.value.rgp.quotation.customer.pincode || ""} ${reportInfo.value.rgp.quotation.customer.state || ""} ${reportInfo.value.rgp.quotation.customer.country || ""}`;
 
     const Info = [
       [{ title: "TEMPERATURE & RH MAPPING REPORT", colSpan:2, halign: "center"}],
       [{ title: `${titleName}`, colSpan:2, halign: "center"}],
-      [{ title: "Customer Name & Address", rowSpan:2}, { title:`${reportInfo.value.customer_name}`}],
+      [{ title: "Customer Name & Address", rowSpan:2}, { title:`${reportInfo.value.rgp.quotation.customer.company_name || ""}`}],
       [`${customerAddress}`]
     ];
 
@@ -133,8 +133,8 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
           `\n`,`\n`,`\n`
         ],
         [
-          { title: `For, ${reportInfo.value.client_name}`, colSpan:2},
-          { title: `For,${reportInfo.value.customer_name}`, colSpan: 2},
+          { title: `For, ${reportInfo.value?.rgp.quotation.clientx.company_name || ""}`, colSpan:2},
+          { title: `For,${reportInfo.value.rgp.quotation.customer.company_name || ""}`, colSpan: 2},
         ],
       ];
 
@@ -251,8 +251,8 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
           `\n`,`\n`,`\n`
         ],
         [
-          { title: `For, ${reportInfo.value.client_name}`, colSpan:2},
-          { title: `For,${reportInfo.value.customer_name}`, colSpan: 2},
+          { title: `For, ${reportInfo.value.rgp.quotation.clientx.company_name || ""}`, colSpan:2},
+          { title: `For,${reportInfo.value.rgp.quotation.customer.company_name || ""}`, colSpan: 2},
         ],
       ];
 
@@ -385,8 +385,8 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
         `\n`,`\n`,`\n`
       ],
       [
-        { title: `For, ${reportInfo.value.client_name}`, colSpan:2},
-        { title: `For,${reportInfo.value.customer_name}`, colSpan: 2},
+        { title: `For, ${reportInfo.value.rgp.quotation.clientx.company_name || ""}`, colSpan:2},
+        { title: `For,${reportInfo.value.rgp.quotation.customer.company_name || ""}`, colSpan: 2},
       ],
     ];
 
@@ -532,8 +532,8 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
         `\n`,`\n`,`\n`
       ],
       [
-        { title: `For, ${reportInfo.value.client_name}`, colSpan:2},
-        { title: `For,${reportInfo.value.customer_name}`, colSpan: 2},
+        { title: `For, ${reportInfo.value.rgp.quotation.clientx.company_name || ""}`, colSpan:2},
+        { title: `For,${reportInfo.value.rgp.quotation.customer.company_name || ""}`, colSpan: 2},
       ],
     ];
 
@@ -665,8 +665,8 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
         `\n`,`\n`,`\n`
       ],
       [
-        { title: `For, ${reportInfo.value.client_name}`, colSpan:2},
-        { title: `For,${reportInfo.value.customer_name}`, colSpan: 2},
+        { title: `For, ${reportInfo.value.rgp.quotation.clientx.company_name || ""}`, colSpan:2},
+        { title: `For,${reportInfo.value.rgp.quotation.customer.company_name || ""}`, colSpan: 2},
       ],
     ];
 
@@ -744,7 +744,7 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
     
     // Chart Table
     const reportChartData = [
-      [{title: `Area Diagram` }],
+      [{title: `Chart` }],
       [{title: "", minCellHeight: imgHeight}],
     ];
 
@@ -779,8 +779,8 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
         `\n`,`\n`,`\n`
       ],
       [
-        { title: `For, ${reportInfo.value.client_name}`, colSpan:2},
-        { title: `For,${reportInfo.value.customer_name}`, colSpan: 2},
+        { title: `For, ${reportInfo.value.rgp.quotation.clientx.company_name || ""}`, colSpan:2},
+        { title: `For,${reportInfo.value.rgp.quotation.customer.company_name || ""}`, colSpan: 2},
       ],
     ];
 
@@ -892,8 +892,8 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
         `\n`,`\n`,`\n`
       ],
       [
-        { title: `For, ${reportInfo.value.client_name}`, colSpan:2},
-        { title: `For,${reportInfo.value.customer_name}`, colSpan: 2},
+        { title: `For, ${reportInfo.value.rgp.quotation.clientx.company_name || ""}`, colSpan:2},
+        { title: `For,${reportInfo.value.rgp.quotation.customer.company_name || ""}`, colSpan: 2},
       ],
     ];
 
@@ -944,12 +944,20 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
 
         const instrumentsChunk = logger.slice(i, i + instrumentsPerPage);
 
+        const getLoggerData = (index) => {
+          if (index < logger.length) {
+              const { logger_id, MIN_TEMP, MAX_TEMP, MIN_RH, MAX_RH, AVG_TEMP, AVG_RH } = logger[index];
+              return { logger_id, MIN_TEMP, MAX_TEMP, MIN_RH, MAX_RH, AVG_TEMP, AVG_RH };
+          }
+          return { logger_id: '', MIN_TEMP: '', MAX_TEMP: '', MIN_RH: '', MAX_RH: '', AVG_TEMP: '', AVG_RH: '' };
+        };
+
         console.log(instrumentsChunk);
-        const {logger_id :LoggerId1, MIN_TEMP: MIN_TEMP1, MAX_TEMP : MAX_TEMP1, MIN_RH : MIN_RH1, MAX_RH : MAX_RH1, AVG_TEMP: AVG_TEMP1, AVG_RH: AVG_RH1 } = logger[i];
-        const {logger_id :LoggerId2, MIN_TEMP: MIN_TEMP2, MAX_TEMP : MAX_TEMP2, MIN_RH : MIN_RH2, MAX_RH : MAX_RH2, AVG_TEMP: AVG_TEMP2, AVG_RH: AVG_RH2 } = logger[(i+1)];
-        const {logger_id :LoggerId3, MIN_TEMP: MIN_TEMP3, MAX_TEMP : MAX_TEMP3, MIN_RH : MIN_RH3, MAX_RH : MAX_RH3, AVG_TEMP: AVG_TEMP3, AVG_RH: AVG_RH3 } = logger[(i+2)];
-        const {logger_id :LoggerId4, MIN_TEMP: MIN_TEMP4, MAX_TEMP : MAX_TEMP4, MIN_RH : MIN_RH4, MAX_RH : MAX_RH4, AVG_TEMP: AVG_TEMP4, AVG_RH: AVG_RH4 } = logger[(i+3)];
-        const {logger_id :LoggerId5, MIN_TEMP: MIN_TEMP5, MAX_TEMP : MAX_TEMP5, MIN_RH : MIN_RH5, MAX_RH : MAX_RH5, AVG_TEMP: AVG_TEMP5, AVG_RH: AVG_RH5 } = logger[(i+4)];
+        const {logger_id :LoggerId1, MIN_TEMP: MIN_TEMP1, MAX_TEMP : MAX_TEMP1, MIN_RH : MIN_RH1, MAX_RH : MAX_RH1, AVG_TEMP: AVG_TEMP1, AVG_RH: AVG_RH1 } = getLoggerData(i);
+        const {logger_id :LoggerId2, MIN_TEMP: MIN_TEMP2, MAX_TEMP : MAX_TEMP2, MIN_RH : MIN_RH2, MAX_RH : MAX_RH2, AVG_TEMP: AVG_TEMP2, AVG_RH: AVG_RH2 } = getLoggerData(i+1);
+        const {logger_id :LoggerId3, MIN_TEMP: MIN_TEMP3, MAX_TEMP : MAX_TEMP3, MIN_RH : MIN_RH3, MAX_RH : MAX_RH3, AVG_TEMP: AVG_TEMP3, AVG_RH: AVG_RH3 } = getLoggerData(i+2);
+        const {logger_id :LoggerId4, MIN_TEMP: MIN_TEMP4, MAX_TEMP : MAX_TEMP4, MIN_RH : MIN_RH4, MAX_RH : MAX_RH4, AVG_TEMP: AVG_TEMP4, AVG_RH: AVG_RH4 } = getLoggerData(i+3);
+        const {logger_id :LoggerId5, MIN_TEMP: MIN_TEMP5, MAX_TEMP : MAX_TEMP5, MIN_RH : MIN_RH5, MAX_RH : MAX_RH5, AVG_TEMP: AVG_TEMP5, AVG_RH: AVG_RH5 } = getLoggerData(i+4);
 
         const headers = [
             [                
@@ -1021,18 +1029,20 @@ const thermalReportGen = async (id, pdfName, reportInfo) => {
           {title: `${MAX_RH5}`},
         ];
 
+        const formatNumber = (num) => (typeof num === 'number' ? num.toFixed(2) : '');
+
         const avgData = [
-          {title: `AVG`, colSpan:2},
-          {title: `${AVG_TEMP1.toFixed(2)}`},
-          {title: `${AVG_RH1.toFixed(2)}`},
-          {title: `${AVG_TEMP2.toFixed(2)}`},
-          {title: `${AVG_RH2.toFixed(2)}`},
-          {title: `${AVG_TEMP3.toFixed(2)}`},
-          {title: `${AVG_RH3.toFixed(2)}`},
-          {title: `${AVG_TEMP4.toFixed(2)}`},
-          {title: `${AVG_RH4.toFixed(2)}`},
-          {title: `${AVG_TEMP5.toFixed(2)}`},
-          {title: `${AVG_RH5.toFixed(2)}`},
+            { title: 'AVG', colSpan: 2 },
+            { title: `${formatNumber(AVG_TEMP1)}` },
+            { title: `${formatNumber(AVG_RH1)}` },
+            { title: `${formatNumber(AVG_TEMP2)}` },
+            { title: `${formatNumber(AVG_RH2)}` },
+            { title: `${formatNumber(AVG_TEMP3)}` },
+            { title: `${formatNumber(AVG_RH3)}` },
+            { title: `${formatNumber(AVG_TEMP4)}` },
+            { title: `${formatNumber(AVG_RH4)}` },
+            { title: `${formatNumber(AVG_TEMP5)}` },
+            { title: `${formatNumber(AVG_RH5)}` },
         ];
 
         tableData.value.push(blankData);

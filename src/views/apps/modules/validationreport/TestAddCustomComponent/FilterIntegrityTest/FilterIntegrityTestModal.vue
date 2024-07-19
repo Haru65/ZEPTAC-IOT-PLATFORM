@@ -649,14 +649,18 @@ export default defineComponent({
     });
 
     const setInstrument = (id) => {
-      const instrumentUsedArray = Object.values([...props.instruments]);
+      // Ensure props.instruments is correctly accessed
+      const instrumentUsedArray = Array.isArray(props.instruments)
+        ? props.instruments
+        : Object.values(props.instruments);
+
+      // Check if instrumentUsedArray is valid
       if (instrumentUsedArray) {
         const foundInstrument = instrumentUsedArray.find(
           (instrument) => id === instrument.id
         );
         if (foundInstrument) {
-          filterIntegrityTestDetails.value.instrument_used.id =
-            foundInstrument.id;
+          filterIntegrityTestDetails.value.instrument_used.id = foundInstrument.id;
           filterIntegrityTestDetails.value.instrument_used.instrument_id =
             foundInstrument.instrument_id;
           filterIntegrityTestDetails.value.instrument_used.name =
@@ -671,25 +675,32 @@ export default defineComponent({
             foundInstrument.calibration_date;
           filterIntegrityTestDetails.value.instrument_used.calibration_due_date =
             foundInstrument.calibration_due_date;
+        } else {
+          console.warn("Instrument not found for id:", id);
         }
       }
     };
+
     const setEngineer = (id) => {
-      const engineerArray = Object.values([...props.engineers]);
-      if (engineerArray) {
-        const foundEngineer = engineerArray.find(
-          (engineer) => id === engineer.id
-        );
-        if (foundEngineer) {
-          filterIntegrityTestDetails.value.test_carried_by.id =
-            foundEngineer.id;
-          filterIntegrityTestDetails.value.test_carried_by.first_name =
-            foundEngineer.first_name;
-          filterIntegrityTestDetails.value.test_carried_by.last_name =
-            foundEngineer.last_name;
-        }
+      // Check if props.engineers is a Proxy and get the underlying array
+      const engineersArray = Array.isArray(props.engineers)
+        ? props.engineers
+        : Object.values(props.engineers);
+
+      const foundEngineer = engineersArray.find(
+        (engineer) => id === engineer.id
+      );
+      if (foundEngineer) {
+        filterIntegrityTestDetails.value.test_carried_by.id = foundEngineer.id;
+        filterIntegrityTestDetails.value.test_carried_by.first_name =
+          foundEngineer.first_name;
+        filterIntegrityTestDetails.value.test_carried_by.last_name =
+          foundEngineer.last_name;
+      } else {
+        console.warn("Engineer not found for id:", id);
       }
     };
+    
     const setAcceptanceCriteria = (id) => {
       const foundAcceptanceCriteria = AcceptanceCriteria.find(
         (criteria) => id == criteria.id

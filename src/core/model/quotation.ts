@@ -1,21 +1,20 @@
 interface IQuotations {
   id: number;
-  customer_name:{
+  customer:{
+    name: string;
     company_name: string;
   };
-  customer_company:{
-    company_name: string;
-  };
-  site_location: {
+  client:{
     city: string;
-    states: string;
+    state: string;
   };
-  company_name: {
+  company_details: {
     company_name: string;
   };
   date: string;
   status: string;
   total: string;
+  company_id: string;
 }
 
 export type { IQuotations };

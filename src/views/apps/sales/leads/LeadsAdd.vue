@@ -31,6 +31,34 @@
         <!--begin::Card body-->
         <div class="card-body border-top p-9">
           <!--begin::Input group-->
+          <div class="row mb-6" v-if="identifier == 'Admin'">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
+              >Company</label
+            >
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <el-select
+                name="company_id"
+                v-model="profileDetails.company_id"
+                filterable
+                placeholder="Please Select Company..."
+              >
+                <el-option
+                  v-for="item in Companies"
+                  :key="item.id"
+                  :label="item.company_name"
+                  :value="item.id"
+                />
+              </el-select>
+            </div>
+            <!--end::Col-->
+          </div>
+          <!-- extra fields -->
+
+          <!--begin::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6">
@@ -60,50 +88,25 @@
           <!--begin::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
-            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-              >Contact Person</label
-            >
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span class="required">Contact Person</span>
+            </label>
             <!--end::Label-->
 
             <!--begin::Col-->
-            <div class="col-lg-8">
-              <!--begin::Row-->
-              <div class="row">
-                <!--begin::Col-->
-                <div class="col-lg-6 fv-row">
-                  <Field
-                    type="text"
-                    name="fname"
-                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
-                    placeholder="First name"
-                    v-model="profileDetails.first_name"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="fname" />
-                    </div>
-                  </div>
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="name"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Contact Person Name"
+                v-model="profileDetails.name"
+              />
+              <div class="fv-plugins-message-container">
+                <div class="fv-help-block">
+                  <ErrorMessage name="name" />
                 </div>
-                <!--end::Col-->
-
-                <!--begin::Col-->
-                <div class="col-lg-6 fv-row">
-                  <Field
-                    type="text"
-                    name="lname"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Last name"
-                    v-model="profileDetails.last_name"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="lname" />
-                    </div>
-                  </div>
-                </div>
-                <!--end::Col-->
               </div>
-              <!--end::Row-->
             </div>
             <!--end::Col-->
           </div>
@@ -154,14 +157,14 @@
             <div class="col-lg-8 fv-row">
               <Field
                 type="tel"
-                name="phone"
+                name="mobile"
                 class="form-control form-control-lg form-control-solid"
                 placeholder="Phone number"
-                v-model="profileDetails.phone"
+                v-model="profileDetails.mobile"
               />
               <div class="fv-plugins-message-container">
                 <div class="fv-help-block">
-                  <ErrorMessage name="phone" />
+                  <ErrorMessage name="mobile" />
                 </div>
               </div>
             </div>
@@ -305,8 +308,7 @@
           <!--end::Accordion-->
           <div class="separator my-10"></div>
 
-          <div class="row mb-6">
-            <!--begin::Label-->
+          <!-- <div class="row mb-6">
             <label class="col-lg-4 col-form-label fw-semobold fs-6">
               <span>Enquiry Number</span>
 
@@ -316,8 +318,6 @@
                 title="Enquiry Number Required"
               ></i>
             </label>
-            <!--begin::Col-->
-            <!--begin::Col-->
             <div class="col-lg-8 fv-row">
               <Field
                 type="text"
@@ -333,19 +333,12 @@
                 </div>
               </div>
             </div>
-            <!--end::Col-->
-          </div>
+          </div> -->
 
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6">
               <span>Address 1</span>
-
-              <i
-                class="fas fa-exclamation-circle ms-1 fs-7"
-                data-bs-toggle="tooltip"
-                title="Address Required"
-              ></i>
             </label>
             <!--begin::Col-->
             <!--begin::Col-->
@@ -372,12 +365,6 @@
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6">
               <span>Address 2</span>
-
-              <i
-                class="fas fa-exclamation-circle ms-1 fs-7"
-                data-bs-toggle="tooltip"
-                title="Address Required"
-              ></i>
             </label>
             <!--begin::Col-->
             <!--begin::Col-->
@@ -449,7 +436,7 @@
                 <div v-if="state.length" class="col-lg fv-row">
                   <div>
                     <el-select
-                      v-model="profileDetails.states"
+                      v-model="profileDetails.state"
                       filterable
                       placeholder="Select Your State..."
                     >
@@ -470,7 +457,7 @@
                       name="state"
                       class="form-control form-control-lg form-control-solid"
                       placeholder="Enter State Name"
-                      v-model="profileDetails.states"
+                      v-model="profileDetails.state"
                     />
                     <div class="fv-plugins-message-container">
                       <div class="fv-help-block">
@@ -591,19 +578,25 @@
         </div>
         <div class="modal-footer flex-center">
           <!--begin::Button-->
-          <button @click="clear" class="btn btn-lg btn-danger w-sd-25 w-lg-25">
+          <button
+            type="button"
+            @click="clear"
+            class="btn btn-lg btn-danger w-sd-25 w-lg-25"
+          >
             Clear
           </button>
           <!--end::Button-->
           &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
           <!--begin::Button-->
+
+          <!--begin::Button-->
           <button
-            :data-kt-indicator="loading ? 'on' : null"
-            class="btn btn-lg btn-primary w-sd-25 w-lg-25"
+            ref="submitButton"
             type="submit"
+            class="btn btn-primary w-sd-25 w-lg-25"
           >
-            <span v-if="!loading" class="indicator-label"> Submit </span>
-            <span v-if="loading" class="indicator-progress">
+            <span class="indicator-label"> Save </span>
+            <span class="indicator-progress">
               Please wait...
               <span
                 class="spinner-border spinner-border-sm align-middle ms-2"
@@ -638,6 +631,7 @@ import { rolesArray } from "@/core/config/PermissionsRolesConfig";
 import LeadModal from "./CustomComponent/LeadModal.vue";
 import LeadEditModal from "./CustomComponent/LeadEditModal.vue";
 import { debounce } from "@/core/helpers/debounce";
+import { Identifier } from "@/core/config/WhichUserConfig";
 
 interface LDetails {
   name: string;
@@ -646,22 +640,21 @@ interface LDetails {
 }
 
 interface ProfileDetails {
-  first_name: string;
-  last_name: string;
+  name: string;
   email: string;
-  phone: string;
-  password: string;
-  confpassword: string;
-  role_id: string;
+  mobile: string;
   extra_leads: Array<LDetails>;
   enquiry_no: string;
   address1: string;
   address2: string;
-  country: string;
-  states: string;
-  pincode: string;
   city: string;
+  pincode: string;
+  state: string;
+  country: string;
   gst_number: string;
+  source: string;
+  is_converted: boolean;
+  is_active: number;
   company_id: string;
   company_name: string;
   created_by: string;
@@ -669,7 +662,7 @@ interface ProfileDetails {
 }
 
 export default defineComponent({
-  name: "account-settings",
+  name: "leads-add",
   components: {
     ErrorMessage,
     Field,
@@ -678,86 +671,62 @@ export default defineComponent({
     LeadEditModal,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
+    const identifier = Identifier;
     const auth = useAuthStore();
     const router = useRouter();
-    let limit = ref(500);
     const loading = ref(false);
     const Companies = ref([{ id: "", company_name: "" }]);
     const state = ref([""]);
     const User = auth.GetUser();
-
-    const enqNumber = ref("");
 
     const getdropcomp = async () => {
       ApiService.setHeader();
       const response = await getCompanies(`fetchAll=true`);
       if (response.result != null && response.result) {
         Companies.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
+          ...response.result?.map(({ ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
           }))
         );
-        // console.log(Companies);
       }
     };
-
-    const IncrEnquiry = (data: any) => {
-      const latest_enquiry_no = data.result.split("_");
-      if (parseInt(latest_enquiry_no[1]) == 0) {
-        // ? if no record
-        profileDetails.value.enquiry_no =
-          latest_enquiry_no[0] + "_" + latest_enquiry_no[1].toString();
-        enqNumber.value = profileDetails.value.enquiry_no;
-      } else {
-        // ? if record exisit inc 1
-        profileDetails.value.enquiry_no =
-          latest_enquiry_no[0] + "_" + (1 + +latest_enquiry_no[1]).toString();
-        enqNumber.value = profileDetails.value.enquiry_no;
-      }
-    };
-
-    onMounted(async () => {
-      const res = await GetIncrEnquiry(User.company_id);
-      IncrEnquiry(res);
-
-      state.value.pop();
-      Companies.value.pop();
-      // await getdropcomp();
-    });
-
-    const emailFormDisplay = ref(false);
-    const passwordFormDisplay = ref(false);
 
     const profileDetailsValidator = Yup.object().shape({
-      fname: Yup.string().required().label("First name"),
-      lname: Yup.string().required().label("Last name"),
+      name: Yup.string().required().label("Contact Person Name"),
       email: Yup.string().required().email().label("Email"),
-      phone: Yup.string().required().label("Phone"),
+      mobile: Yup.string().required().label("Phone"),
       company_name: Yup.string().required().label("Company Name"),
     });
 
     const profileDetails = ref<ProfileDetails>({
-      first_name: "",
-      last_name: "",
+      name: "",
       email: "",
-      phone: "",
-      password: "decodedemo",
-      confpassword: "",
-      role_id: "8",
+      mobile: "",
       extra_leads: [],
       enquiry_no: "",
       address1: "",
       address2: "",
       country: "",
-      states: "",
+      state: "",
       city: "",
       pincode: "",
       gst_number: "",
-      company_id: User.company_id,
+      source: "webapp",
+      is_converted: false,
       company_name: "",
+      is_active: 1,
+      company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
+    });
+
+    onMounted(async () => {
+      state.value.pop();
+      Companies.value.pop();
+      if (User.role_id === 1) {
+        await getdropcomp();
+      }
     });
 
     async function addLeadData(data) {
@@ -812,34 +781,38 @@ export default defineComponent({
     const debouncedValidateGST = debounce(isValidGSTNo, 1000);
 
     const onsubmit = async () => {
-      loading.value = true;
-      // console.log(profileDetails.value);
-      console.warn("Nice");
       try {
-        // Call your API here with the form values
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+        loading.value = true;
+
+        // Call your API here
         const response = await addLead(profileDetails.value);
-        // console.log(response.error);
-        if (!response.error) {
+
+        if (response?.success) {
           // Handle successful API response
-          // console.log("API response:", response);
-          showSuccessAlert("Success", "User have been successfully inserted!");
+          loading.value = false;
+          showSuccessAlert(
+            "Success",
+            response.message || "Lead Added Successfully!"
+          );
           router.push({ name: "leads-list" });
           clear();
         } else {
           // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert(
-            "Warning",
-            "Please Fill the Form Fields Correctly" + errorData
-          );
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -879,47 +852,46 @@ export default defineComponent({
           state.value.pop();
         }
         if (newVal === "India") {
-          profileDetails.value.states = "";
+          profileDetails.value.state = "";
           INstates.forEach((ele) => {
             state.value.push(ele.name);
           });
           //console.log(state);
         } else {
-          profileDetails.value.states = "";
+          profileDetails.value.state = "";
         }
       }
     );
 
     const clear = () => {
       profileDetails.value = {
-        first_name: "",
-        last_name: "",
+        name: "",
         email: "",
-        phone: "",
-        password: "decodedemo",
-        confpassword: "",
-        role_id: "8",
+        mobile: "",
         extra_leads: [],
-        enquiry_no: enqNumber.value,
+        enquiry_no: "",
         address1: "",
         address2: "",
-        country: "",
-        states: "",
         city: "",
         pincode: "",
+        state: "",
+        country: "",
         gst_number: "",
-        company_id: "",
+        source: "webapp",
+        is_converted: false,
+        company_id: User.company_id,
         company_name: "",
         created_by: User.id,
         updated_by: User.id,
+        is_active: 1,
       };
     };
 
     return {
-      IncrEnquiry,
+      submitButton,
+      Companies,
+      identifier,
       profileDetails,
-      emailFormDisplay,
-      passwordFormDisplay,
       profileDetailsValidator,
       getAssetPath,
       onsubmit,

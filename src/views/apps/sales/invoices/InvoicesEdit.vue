@@ -5,7 +5,12 @@
       <!--begin::Modal content-->
       <div class="modal-content">
         <!--begin::Form-->
-        <VForm id="kt_account_profile_details_form" class="form" novalidate>
+        <VForm
+          id="kt_account_profile_details_form"
+          @submit="onsubmit"
+          class="form"
+          novalidate
+        >
           <!--begin::Card body-->
           <div class="card-body border-top p-sd-2 p-lg-9">
             <!--begin::Input group-->
@@ -76,97 +81,56 @@
               </div>
             </div>
 
+            <!--begin::Input group-->
             <div class="row mb-6">
-              <div
-                class="form-check form-switch form-check-custom form-check-primary form-check-solid"
-              >
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  :value="qNsiteSameAsBilling"
-                  name="qNsiteSameAsBilling"
-                  id="qNsiteSameAsBilling"
-                  v-model="qNsiteSameAsBilling"
-                  @change="ToggleClient"
-                />
-                <label
-                  class="form-check-label fw-bold text-primary fw-semobold fs-5"
-                  for="qNsiteSameAsBilling"
+              <!--begin::Col-->
+              <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                <!--begin::Label-->
+                <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Customer :</label
                 >
-                  Want this service for you then kindly check it.
-                  <i class="text-gray-700"
-                    >( site address same as billing address)</i
-                  >
-                </label>
-              </div>
-            </div>
+                <!--end::Label-->
 
-            <div class="row mb-6">
-              <div class="d-flex flex-grow-1 gap-lg-3 gap-sm-5 gap-5">
-                <!--begin::Row-->
-                <div class="w-50">
-                  <div class="py-3">
-                    <h6 class="fs-6">Customer :</h6>
-                  </div>
-                  <div id="lead " class="row gx-10">
-                    <el-select
-                      v-model="InvoiceDetails.lead_id"
-                      placeholder="Please Select Customer"
-                      filterable
-                      v-on:change="GetUserData(InvoiceDetails.lead_id)"
-                    >
-                      <el-option
-                        v-for="item in Customers"
-                        :key="item.id"
-                        :label="`${item.first_name} ${item.last_name}`"
-                        :value="item.id"
-                      />
-                      <el-option
-                        value=""
-                        disabled="disabled"
-                        label="Please Select Customer..."
-                        key=""
-                        >Please Select Customer...</el-option
-                      >
-                    </el-select>
-                  </div>
-                  <!--end::Row-->
-
+                <!--begin::Input-->
+                <div class="form-control form-control-lg form-control-solid">
+                  <div>{{ InvoiceDetails.customer.company_name }}</div>
                   <div class="mt-2 pt-4">
-                    <h6 class="fw-bold mt-5">Billing Address:</h6>
+                    <h6 class="mt-5">Billing Address:</h6>
                     <div class="mt-2">
-                      <div class="mb-1" v-show="InvoiceDetails.lead_id">
+                      <div class="mb-1">
+                        <br />
+                        <span v-show="InvoiceDetails.customer.company_name">
+                          {{ `${InvoiceDetails.customer.company_name || ""}` }}
+                        </span>
                         <br />
                         <span>
-                          {{
-                            `${InvoiceDetails.lead.first_name} ${InvoiceDetails.lead.last_name}`
-                          }}
-                        </span>
-                        <br />
-                        <span v-show="InvoiceDetails.lead.company_name">
-                          {{ `${InvoiceDetails.lead.company_name}` }}
+                          {{ `${InvoiceDetails.customer.name}` }}
                         </span>
                         <!-- v-if company_data present -->
-                        <div v-show="InvoiceDetails.lead.company_name">
+                        <div v-show="InvoiceDetails.customer.company_name">
                           <br />
                           <span>
-                            {{ `${InvoiceDetails.lead.address1}` }}
+                            {{ `${InvoiceDetails.customer.address1 || ""}` }}
                           </span>
                           <br />
                           <span>
-                            {{ `${InvoiceDetails.lead.address2}` }}
+                            {{ `${InvoiceDetails.customer.address2 || ""}` }}
                           </span>
                         </div>
-                        <div v-show="InvoiceDetails.lead.country">
+                        <div v-show="InvoiceDetails.customer.country">
                           <span>
                             {{
-                              `${InvoiceDetails.lead.city} - ${InvoiceDetails.lead.pincode}`
+                              `${InvoiceDetails.customer.city || ""} - ${
+                                InvoiceDetails.customer.pincode || ""
+                              }`
                             }}
                           </span>
                           <br />
                           <span>
                             {{
-                              `${InvoiceDetails.lead.states} ${InvoiceDetails.lead.country}`
+                              `${InvoiceDetails.customer.state || ""} ${
+                                InvoiceDetails.customer.country || ""
+                              }`
                             }}
                           </span>
                           <br />
@@ -174,9 +138,9 @@
                         <br />
                         <!-- firstname as a flag -->
                         <a
-                          v-show="InvoiceDetails.lead.first_name"
+                          v-show="InvoiceDetails.customer.name"
                           target="blank"
-                          v-bind:href="`/customers/edit/${InvoiceDetails.lead_id}`"
+                          v-bind:href="`/leads/edit/${InvoiceDetails.customer_id}`"
                         >
                           <span class="fs-5"> Edit</span>
                           <!-- <i
@@ -189,69 +153,57 @@
                   </div>
                 </div>
 
-                <div class="w-50">
-                  <div class="row gx-10">
-                    <div class="py-3">
-                      <h6 class="fs-6">Client :</h6>
-                    </div>
-                    <el-select
-                      v-model="InvoiceDetails.client.id"
-                      filterable
-                      :disabled="clientSelect"
-                      v-on:change="GetClientData(InvoiceDetails.client.id)"
-                    >
-                      <el-option
-                        v-for="item in Clients"
-                        :key="item.client_data.id"
-                        :label="`${item.client_data.first_name} ${item.client_data.last_name}`"
-                        :value="item.client_data.id"
-                      />
-                      <el-option
-                        value=""
-                        disabled="disabled"
-                        label="Please Select Client..."
-                        key=""
-                        >Please Select Client...</el-option
-                      >
-                    </el-select>
-                  </div>
-                  <!--end::Row-->
+                <!--end::Input-->
+              </div>
+              <!--end::Col-->
+              <!--begin::Col-->
+              <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                <!--begin::Label-->
+                <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Client :</label
+                >
+                <!--end::Label-->
 
+                <!--begin::Input-->
+                <div class="form-control form-control-lg form-control-solid">
+                  <div>{{ InvoiceDetails.client.company_name }}</div>
                   <div class="mt-2 pt-4">
-                    <h6 class="fw-bold mt-5">Site Address:</h6>
+                    <h6 class="mt-5">Site Address:</h6>
                     <div class="mt-2">
                       <div class="mb-1" v-show="InvoiceDetails.client">
                         <br />
-                        <span>
-                          {{
-                            `${InvoiceDetails.client.first_name} ${InvoiceDetails.client.last_name}`
-                          }}
+                        <span v-show="InvoiceDetails.client.company_name">
+                          {{ `${InvoiceDetails.client.company_name || ""}` }}
                         </span>
                         <br />
-                        <span v-show="InvoiceDetails.client.company_name">
-                          {{ `${InvoiceDetails.client.company_name}` }}
+                        <span>
+                          {{ `${InvoiceDetails.client.name || ""}` }}
                         </span>
                         <!-- v-if company_data present -->
                         <div v-show="InvoiceDetails.client.company_name">
                           <br />
                           <span>
-                            {{ `${InvoiceDetails.client.address1}` }}
+                            {{ `${InvoiceDetails.client.address1 || ""}` }}
                           </span>
                           <br />
                           <span>
-                            {{ `${InvoiceDetails.client.address2}` }}
+                            {{ `${InvoiceDetails.client.address2 || ""}` }}
                           </span>
                         </div>
                         <div v-show="InvoiceDetails.client.country">
                           <span>
                             {{
-                              `${InvoiceDetails.client.city} - ${InvoiceDetails.client.pincode}`
+                              `${InvoiceDetails.client.city || ""} - ${
+                                InvoiceDetails.client.pincode || ""
+                              }`
                             }}
                           </span>
                           <br />
                           <span>
                             {{
-                              `${InvoiceDetails.client.states} ${InvoiceDetails.client.country}`
+                              `${InvoiceDetails.client.state || ""} ${
+                                InvoiceDetails.client.country || ""
+                              }`
                             }}
                           </span>
                           <br />
@@ -261,8 +213,8 @@
                         <a
                           v-show="
                             InvoiceDetails.client.id &&
-                            InvoiceDetails.client.first_name &&
-                            !qNsiteSameAsBilling
+                            InvoiceDetails.client.name &&
+                            !isSiteSameAsBilling
                           "
                           target="blank"
                           v-bind:href="`/clients/edit/${InvoiceDetails.client.id}`"
@@ -277,8 +229,12 @@
                     </div>
                   </div>
                 </div>
+
+                <!--end::Input-->
               </div>
+              <!--end::Col-->
             </div>
+            <!--end::Input group-->
 
             <div class="row mb-6">
               <label
@@ -778,19 +734,19 @@
             <!--end::Button-->
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
             <!--begin::Button-->
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
+            <button
+              type="submit"
+              ref="submitButtonRef"
               class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              v-on:click="submit"
             >
-              <span v-if="!loading" class="indicator-label"> Update </span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Update </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
                 ></span>
               </span>
-            </span>
+            </button>
             <!--end::Button-->
           </div>
           <!--end::Input group-->
@@ -805,6 +761,7 @@
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
+import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import {
@@ -830,15 +787,14 @@ import {
 
 import CustomInvoiceItems from "./CustomComponents/CustomInvoiceItems.vue";
 
-interface Meta {
+interface Data {
   id: string;
-  first_name: string;
-  last_name: string;
+  name: string;
   company_name: string;
   address1: string;
   address2: string;
   city: string;
-  states: string;
+  state: string;
   pincode: string;
   country: string;
 }
@@ -853,7 +809,8 @@ interface EDetails {
 
 interface InvoiceDetails {
   invoice_no: string;
-  lead_id: string;
+  customer_id: string;
+  client_id: string;
   items: {
     id: string;
     site_location: string;
@@ -879,8 +836,8 @@ interface InvoiceDetails {
   terms_and_conditions: string;
   total: number;
   day_or_equipment: string;
-  lead: Meta;
-  client: Meta;
+  customer: Data;
+  client: Data;
   company_details: {
     id: string;
     company_name: string;
@@ -901,30 +858,45 @@ interface InvoiceDetails {
 export default defineComponent({
   name: "invoice-edit",
   components: {
+    ErrorMessage,
+    Field,
+    VForm,
     CustomInvoiceItems,
   },
   setup() {
+    const submitButtonRef = ref<null | HTMLButtonElement>(null);
     const auth = useAuthStore();
-    const disabledselect = ref(true);
-    const clientSelect = ref(true);
     const Total = ref(0);
     const route = useRouter();
     const router = useRoute();
     const User = auth.GetUser();
     const InvoiceId = router.params.id;
     const loading = ref(false);
+
     const Customers = ref([
-      { id: "", first_name: "", last_name: "", meta: { company_name: "" } },
+      {
+        id: "",
+        name: "",
+        company_name: "",
+        address1: "",
+        address2: "",
+        city: "",
+        pincode: "",
+        state: "",
+        country: "",
+      },
     ]);
     const Clients = ref([
       {
         id: "",
-        client_data: {
-          id: "",
-          first_name: "",
-          last_name: "",
-          meta: { company_name: "" },
-        },
+        name: "",
+        company_name: "",
+        address1: "",
+        address2: "",
+        city: "",
+        pincode: "",
+        state: "",
+        country: "",
       },
     ]);
 
@@ -984,7 +956,8 @@ export default defineComponent({
 
     const InvoiceDetails = ref<InvoiceDetails>({
       invoice_no: "",
-      lead_id: " ",
+      customer_id: "",
+      client_id: "",
       items: {
         id: "",
         site_location: "",
@@ -1008,27 +981,25 @@ export default defineComponent({
       status: "",
       scope_of_work: "",
       terms_and_conditions: "",
-      lead: {
+      customer: {
         id: "",
         company_name: "",
-        first_name: "",
-        last_name: "",
+        name: "",
         address1: "",
         address2: "",
         city: "",
-        states: "",
+        state: "",
         pincode: "",
         country: "",
       },
       client: {
         id: "",
         company_name: "",
-        first_name: "",
-        last_name: "",
+        name: "",
         address1: "",
         address2: "",
         city: "",
-        states: "",
+        state: "",
         pincode: "",
         country: "",
       },
@@ -1051,212 +1022,76 @@ export default defineComponent({
       updated_by: User.id,
     });
 
-    const globalLocation = ref(false);
-
-    // refs for handling when quotation is not approved
-    const qNsiteSameAsBilling = ref(false);
+    const isItemApproved = ref(false);
+    const isSiteSameAsBilling = ref(false);
 
     onMounted(async () => {
-      // todo: quotation check if pres get last incr 1
-
+      // clear all the dropdowns
       Customers.value.pop();
       Clients.value.pop();
       locations.value.pop();
       equipments.value.pop();
-      await GetCustomers();
+
+      // Function that get all PriceLists
       await getSelects();
 
-      //? get the quotaion details from id
+      // get the invoice details
       const response = await getInvoice(InvoiceId);
-      // console.log(response);
 
-      const items = JSON.parse(response.items);
+      if (response) {
+        const items = JSON.parse(response.items);
+        InvoiceDetails.value.status = response.status;
 
-      InvoiceDetails.value.invoice_no = response.invoice_no;
-      InvoiceDetails.value.date = response.date;
-      InvoiceDetails.value.duedate = response.duedate;
-      InvoiceDetails.value.enquiry_no = response.enquiry_no;
-      InvoiceDetails.value.items = await items;
+        InvoiceDetails.value.invoice_no = response.invoice_no;
+        InvoiceDetails.value.customer_id = response.customer_id;
+        InvoiceDetails.value.client_id = response.client_id;
+        InvoiceDetails.value.date = response.date;
+        InvoiceDetails.value.duedate = response.duedate;
+        InvoiceDetails.value.items = await items;
+        InvoiceDetails.value.company_id = response.company_id;
 
-      InvoiceDetails.value.status = response.status;
+        InvoiceDetails.value.customer = { ...response.customer };
+        InvoiceDetails.value.client = { ...response.client };
+        InvoiceDetails.value.enquiry_no = response.enquiry_no;
 
-      dayWiseRef.value =
-        InvoiceDetails.value.items.equipment_wise.length === 0 ? true : false;
-      InvoiceDetails.value.day_or_equipment =
-        InvoiceDetails.value.items.equipment_wise.length === 0 ? "1" : "2";
+        // check whether daywise or equipment
+        dayWiseRef.value =
+          InvoiceDetails.value.items.equipment_wise.length === 0 ? true : false;
+        InvoiceDetails.value.day_or_equipment =
+          InvoiceDetails.value.items.equipment_wise.length === 0 ? "1" : "2";
 
-      // globalLocation.value = response.client_id === 0 ? true : false;
-      globalLocation.value =
-        response.client_id === response.customer_id ? true : false;
+        InvoiceDetails.value.total = parseFloat(response.total);
+        InvoiceDetails.value.scope_of_work = response.scope_of_work;
+        InvoiceDetails.value.terms_and_conditions =
+          response.terms_and_conditions;
+        InvoiceDetails.value.created_by = response.created_by;
+        InvoiceDetails.value.updated_by = User.id;
 
-      // console.log(globalLocation.value);
-      qNsiteSameAsBilling.value = globalLocation.value;
+        // check approved or not
+        isItemApproved.value =
+          response.status === 3 || response.status === 4 ? true : false;
 
-      InvoiceDetails.value.total = parseFloat(response.total);
-      InvoiceDetails.value.scope_of_work = response.scope_of_work;
-      InvoiceDetails.value.terms_and_conditions = response.terms_and_conditions;
+        // check service want for itself
+        isSiteSameAsBilling.value =
+          response.client_id == null || response.client_id == "" ? true : false;
 
-      const foundLocation = await locations.value.find((item) => {
-        return item.id === InvoiceDetails.value.items.id;
-      });
+        const foundLocation = await locations.value.find((item) => {
+          return item.id === InvoiceDetails.value.items.id;
+        });
 
-      if (foundLocation) {
-        const { equipment_wise } = foundLocation;
+        if (foundLocation) {
+          const { equipment_wise } = foundLocation;
 
-        equipments.value = [...equipment_wise];
-      }
-
-      accommodationRef.value = InvoiceDetails.value.items.accomm;
-      travellingRef.value = InvoiceDetails.value.items.travel;
-      trainingRef.value = InvoiceDetails.value.items.train;
-      pickupRef.value = InvoiceDetails.value.items.pick;
-      boardingRef.value = InvoiceDetails.value.items.board;
-
-      if (globalLocation.value) {
-        qNsiteSameAsBilling.value = true;
-        clientSelect.value = true;
-        InvoiceDetails.value.lead_id = response.customer_id;
-
-        if (response.customer_id != "") {
-          const customer_id = response.customer_id;
-          const res = await getUser(customer_id);
-          // console.log(res);
-          InvoiceDetails.value.lead = res.meta;
-          InvoiceDetails.value.lead.id = res.id;
-
-          InvoiceDetails.value.client = InvoiceDetails.value.lead;
-          InvoiceDetails.value.client.id = response.client_id;
+          equipments.value = [...equipment_wise];
         }
-      } else {
-        qNsiteSameAsBilling.value = false;
-        clientSelect.value = false;
 
-        InvoiceDetails.value.lead_id = response.customer_id;
-        if (response.customer_id != "") {
-          const customer_id = response.customer_id;
-          const res = await getUser(customer_id);
-          // console.log(res);
-          InvoiceDetails.value.lead = res.meta;
-          InvoiceDetails.value.lead.id = res.id;
-          GetClients(customer_id);
-        } else {
-          InvoiceDetails.value.lead = {
-            id: "",
-            company_name: "",
-            first_name: "",
-            last_name: "",
-            address1: "",
-            address2: "",
-            city: "",
-            states: "",
-            pincode: "",
-            country: "",
-          };
-        }
-        GetClientData(response.client_id);
+        accommodationRef.value = InvoiceDetails.value.items.accomm;
+        travellingRef.value = InvoiceDetails.value.items.travel;
+        trainingRef.value = InvoiceDetails.value.items.train;
+        pickupRef.value = InvoiceDetails.value.items.pick;
+        boardingRef.value = InvoiceDetails.value.items.board;
       }
-
-      InvoiceDetails.value.company_id = response.company_id;
     });
-
-    const GetClients = async (id: string) => {
-      // ? empty clients
-      // console.log(Clients.value);
-      Clients.value = [];
-      Clients.value.length = 0;
-
-      // * empty clents data
-      InvoiceDetails.value.client.id = "";
-      InvoiceDetails.value.client.company_name = "";
-      InvoiceDetails.value.client.address1 = "";
-      InvoiceDetails.value.client.address2 = "";
-      InvoiceDetails.value.client.city = "";
-      InvoiceDetails.value.client.pincode = "";
-      InvoiceDetails.value.client.states = "";
-      InvoiceDetails.value.client.country = "";
-      InvoiceDetails.value.client.first_name = "";
-      InvoiceDetails.value.client.last_name = "";
-
-      ApiService.setHeader();
-      const response = await GetCustomerClients(id);
-      // console.log(response);
-      Clients.value.push(
-        ...response.result.map(({ created_at, ...rest }) => ({
-          ...rest,
-          created_at: moment(created_at).format("MMMM Do YYYY"),
-        }))
-      );
-      // console.log(Clients.value);
-    };
-
-    const GetUserData = async (id) => {
-      if (id != " ") {
-        const lead_id = id;
-        const response = await getUser(lead_id);
-        // console.log(response);
-        InvoiceDetails.value.lead = response.meta;
-        InvoiceDetails.value.enquiry_no = response.meta.enquiry_no;
-        InvoiceDetails.value.lead.id = response.id;
-        if (qNsiteSameAsBilling.value) {
-          ToggleClient();
-        } else {
-          clientSelect.value = false;
-          GetClients(lead_id);
-        }
-      } else {
-        InvoiceDetails.value.enquiry_no = "";
-        InvoiceDetails.value.lead = {
-          id: "",
-          company_name: "",
-          first_name: "",
-          last_name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          states: "",
-          pincode: "",
-          country: "",
-        };
-      }
-    };
-
-    const GetClientData = async (id) => {
-      if (id != " ") {
-        const customer_id = id;
-        const response = await getClient(customer_id);
-        // console.log(response);
-
-        // ? set client details
-        InvoiceDetails.value.client.id = response.id;
-        InvoiceDetails.value.client.address1 = response.meta.address1;
-        InvoiceDetails.value.client.company_name = response.meta.company_name;
-        InvoiceDetails.value.client.address2 = response.meta.address2;
-        InvoiceDetails.value.client.city = response.meta.city;
-        InvoiceDetails.value.client.pincode = response.meta.pincode;
-        InvoiceDetails.value.client.states = response.meta.states;
-        InvoiceDetails.value.client.country = response.meta.country;
-        InvoiceDetails.value.client.first_name = response.first_name;
-        InvoiceDetails.value.client.last_name = response.last_name;
-        disabledselect.value = false;
-        /* *
-         TODO : get customer_id and from meta get client ids get customer_id and from meta get client ids and put into Ref object
-         ? Problem of getting clients;
-        */
-      } else {
-        InvoiceDetails.value.lead = {
-          id: "",
-          company_name: "",
-          first_name: "",
-          last_name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          states: "",
-          pincode: "",
-          country: "",
-        };
-      }
-    };
 
     /* --------DAY WISE LOGIC--------*/
 
@@ -1548,86 +1383,7 @@ export default defineComponent({
       calculateTotalEquipment();
     };
 
-    /* --------CUSTOMER-CLIENT LOGIC--------*/
-
-    const ToggleClient = () => {
-      if (qNsiteSameAsBilling.value) {
-        qNsiteSameAsBilling.value = true;
-        clientSelect.value = true;
-        if (InvoiceDetails.value.lead_id) {
-          InvoiceDetails.value.client = InvoiceDetails.value.lead;
-          // InvoiceDetails.value.client.id = "0";
-        } else {
-          InvoiceDetails.value.client = {
-            id: "",
-            company_name: "",
-            first_name: "",
-            last_name: "",
-            address1: "",
-            address2: "",
-            city: "",
-            states: "",
-            pincode: "",
-            country: "",
-          };
-          InvoiceDetails.value.lead = {
-            id: "",
-            company_name: "",
-            first_name: "",
-            last_name: "",
-            address1: "",
-            address2: "",
-            city: "",
-            states: "",
-            pincode: "",
-            country: "",
-          };
-        }
-      } else {
-        qNsiteSameAsBilling.value = false;
-        clientSelect.value = true;
-
-        InvoiceDetails.value.lead_id = "";
-        InvoiceDetails.value.lead = {
-          id: "",
-          company_name: "",
-          first_name: "",
-          last_name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          states: "",
-          pincode: "",
-          country: "",
-        };
-
-        InvoiceDetails.value.client = {
-          id: "",
-          company_name: "",
-          first_name: "",
-          last_name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          states: "",
-          pincode: "",
-          country: "",
-        };
-      }
-    };
-
-    const GetCustomers = async () => {
-      ApiService.setHeader();
-      const response = await getCustomers(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Customers.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-          }))
-        );
-      }
-    };
+    /* -------- GENERATE PDF LOGIC --------*/
 
     const generatePdf = async (pdfName: string) => {
       const res2 = await getCompanyLogo(InvoiceDetails.value.company_id);
@@ -1648,11 +1404,7 @@ export default defineComponent({
     function areAllPropertiesNull(array) {
       return array.some((detail) => {
         const {
-          quotation_no,
-          lead_id,
-          enquiry_no,
-          lead,
-          client,
+          customer_id,
           items,
           date,
           duedate,
@@ -1665,12 +1417,8 @@ export default defineComponent({
         // Check if any property is null or empty
 
         return (
-          quotation_no === "" ||
-          lead_id === "" ||
-          enquiry_no === "" ||
+          customer_id === "" ||
           items.id === "" ||
-          lead.id === "" ||
-          client.id === "" ||
           date === "" ||
           duedate === "" ||
           status === "" ||
@@ -1724,11 +1472,9 @@ export default defineComponent({
     }
 
     // number formating remove
-    const submit = async (e) => {
-      e.preventDefault();
-
-      // console.log(InvoiceDetails.value);
+    const onsubmit = async () => {
       try {
+        loading.value = true;
         const result = areAllPropertiesNull([InvoiceDetails.value]);
 
         if (result) {
@@ -1770,33 +1516,37 @@ export default defineComponent({
           return;
         }
 
-        // Call your API here with the form values
+        if (submitButtonRef.value) {
+          // Activate indicator
+          submitButtonRef.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
         const response = await updateInvoice(InvoiceDetails.value, InvoiceId);
-        // console.log(response.error);
-        if (!response.error) {
+
+        if (response?.success) {
           // Handle successful API response
-          // console.log("API response:", response);
+          loading.value = false;
           showSuccessAlert(
             "Success",
-            "Invoice have been successfully Updated!"
+            response.message || "Invoice Updated Successfully!"
           );
 
           route.push({ name: "invoices-list" });
+          loading.value = false;
         } else {
           // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
       } finally {
-        disabledselect.value = false;
+        if (submitButtonRef.value) {
+          submitButtonRef.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -1878,18 +1628,15 @@ export default defineComponent({
     };
 
     return {
+      submitButtonRef,
       Clients,
       InvoiceDetails,
       Customers,
       getAssetPath,
-      submit,
+      onsubmit,
       deleteItem,
-      disabledselect,
-      clientSelect,
       shortcuts,
       disabledDate,
-      GetUserData,
-      GetClientData,
       InvoiceStatusArray,
       GetInvoiceStatus,
       Total,
@@ -1914,9 +1661,6 @@ export default defineComponent({
       ToggleTravelling,
       TogglePickUp,
       ToggleBoarding,
-      qNsiteSameAsBilling,
-      globalLocation,
-      ToggleClient,
       RemoveRow,
       addNewRow,
       SetEquipment,
@@ -1926,6 +1670,8 @@ export default defineComponent({
       dayWiseRef,
       handleDayWiseChange,
       setDates,
+      isSiteSameAsBilling,
+      isItemApproved,
     };
   },
 });

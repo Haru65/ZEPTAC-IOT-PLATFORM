@@ -37,9 +37,10 @@ const toWords = new ToWords({
 
 const Gen = async (
     pdftype: string,
-    id: string,
+    id: any,
     pdfName: string,
-    invoiceDetials: any
+    invoiceDetials: any,
+    companyDetails: any
 ) => {
     pdfName += "_" + id + (pdftype == "quotation" ? "_quotation" : "_invoice");
 
@@ -61,7 +62,7 @@ const Gen = async (
     
       // Company Logo Img
       const img = new Image()
-      img.src = invoiceDetials.value.company_details.logo_base64;
+      img.src = companyDetails.value.logo_base64;
       doc.addImage(img, 'JPEG', 0.5, 0.7, 0.7, 0.7);
     
       // create a line under heading
@@ -96,8 +97,8 @@ const Gen = async (
 
       const LocationData = [
         [
-          `Customer Name : ${invoiceDetials.value.lead.company_name} \nContact Person : ${invoiceDetials.value.customer_name.first_name} ${invoiceDetials.value.customer_name.last_name} \n\nBilling Address : ${invoiceDetials.value.lead.address1 ? invoiceDetials.value.lead.address1 : ""} ${invoiceDetials.value.lead.address2 ? invoiceDetials.value.lead.address2 : ""} ${invoiceDetials.value.lead.city ? invoiceDetials.value.lead.city : ""} - ${invoiceDetials.value.lead.pincode ? invoiceDetials.value.lead.pincode : ""}, ${invoiceDetials.value.lead.states ? invoiceDetials.value.lead.states : ""}, ${invoiceDetials.value.lead.country ? invoiceDetials.value.lead.country : ""}`,
-          `Client Name : ${invoiceDetials.value.client.company_name} \nContact Person : ${invoiceDetials.value.client_name.first_name} ${invoiceDetials.value.client_name.last_name} \n\nSite Address : ${invoiceDetials.value.client.address1 ? invoiceDetials.value.client.address1 : ""} ${invoiceDetials.value.client.address2 ? invoiceDetials.value.client.address2 : ""} ${invoiceDetials.value.client.city ? invoiceDetials.value.client.city : ""} - ${invoiceDetials.value.client.pincode ? invoiceDetials.value.client.pincode : ""}, ${invoiceDetials.value.client.states ? invoiceDetials.value.client.states : ""}, ${invoiceDetials.value.client.country ? invoiceDetials.value.client.country : ""}`
+          `Customer Name : ${invoiceDetials.value.customer.company_name} \nContact Person : ${invoiceDetials.value.customer.name} \n\nBilling Address : ${invoiceDetials.value.customer.address1 || ""} \n${invoiceDetials.value.customer.address2 || ""} \n${invoiceDetials.value.customer.city || ""} ${invoiceDetials.value.customer.pincode || ""} \n${invoiceDetials.value.customer.state || ""} ${invoiceDetials.value.customer.country || ""}`,
+          `Client Name : ${invoiceDetials.value.clientx.company_name} \nContact Person : ${invoiceDetials.value.clientx.name} \n\nSite Address : ${invoiceDetials.value.clientx.address1 || ""} \n${invoiceDetials.value.clientx.address2 || ""} \n${invoiceDetials.value.clientx.city || ""} ${invoiceDetials.value.clientx.pincode || ""} \n${invoiceDetials.value.clientx.state || ""} ${invoiceDetials.value.clientx.country || ""}`
         ]
       ];
 

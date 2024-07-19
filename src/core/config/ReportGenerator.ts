@@ -47,7 +47,7 @@ interface TestReport {
 }
 
 
-const reportGen = async (id, pdfName, reportInfo) => {
+const reportGen = async (id, pdfName, reportInfo, companyDetails) => {
   pdfName += `_${id}_validation_report`;
 
   const doc = new jsPDF({
@@ -66,14 +66,11 @@ const reportGen = async (id, pdfName, reportInfo) => {
 
   // Company Logo Img
   const img = new Image()
-  img.src = reportInfo.value.company_details.logo_base64;
+  img.src = companyDetails.value.logo_base64;
   doc.addImage(img, 'JPEG', 0.5, 0.7, 0.7, 0.7);
 
   // create a line under heading
   doc.setLineWidth(0.01).line(0.5, 1.5, 7.75, 1.5);
-
-  // Site Address - To
-  const clientAddress = reportInfo.value.client_address;
 
   const header = [];
   const body = [];
@@ -409,8 +406,8 @@ const reportGen = async (id, pdfName, reportInfo) => {
       ];
 
       const SiteInfo = [
-        [`Company Name : ${reportInfo.value.client_company.company_name}`],
-        [`ADD : ${clientAddress.address1 || ""} ${clientAddress.address2 || ""} ${clientAddress.city || ""} ${clientAddress.pincode || ""} ${clientAddress.states || ""} ${clientAddress.country || ""}`]
+        [`Company Name : ${reportInfo.value.rgp.quotation.clientx.company_name || ""}`],
+        [`ADD : ${reportInfo.value.rgp.quotation.clientx.address1 || ""} ${reportInfo.value.rgp.quotation.clientx.address2 || ""} ${reportInfo.value.rgp.quotation.clientx.city || ""} ${reportInfo.value.rgp.quotation.clientx.pincode || ""} ${reportInfo.value.rgp.quotation.clientx.state || ""} ${reportInfo.value.rgp.quotation.clientx.country || ""}`]
       ];
   
       autoTable(doc, {

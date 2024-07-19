@@ -31,7 +31,7 @@
         </h3>
         <div class="me-3">
           <el-select
-          class="w-150px"
+            class="w-150px"
             filterable
             placeholder="Select Year"
             v-model="selectedYearCache"
@@ -68,11 +68,7 @@
             <span class="me-2">{{ selectedIds.length }}</span
             >Selected
           </div>
-          <button
-            type="button"
-            class="btn btn-danger"
-            @click="deleteFewItem()"
-          >
+          <button type="button" class="btn btn-danger" @click="deleteFewItem()">
             Delete Selected
           </button>
         </div>
@@ -103,6 +99,7 @@
     </div>
     <div class="card-body pt-0">
       <Datatable
+        checkbox-label="id"
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
@@ -113,7 +110,9 @@
         :loading="loading"
       >
         <!-- img data -->
-
+        <template v-slot:id="{ row: thermal_reports }">
+          {{ thermal_reports.id }}
+        </template>
         <template v-slot:room_name="{ row: thermal_reports }">
           {{ thermal_reports.room_name }}
         </template>
@@ -136,39 +135,36 @@
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="View Report"
-            >
-              <router-link :to="`./edit/${thermal_reports.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
-            </span>
-            <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="Download Report"
+              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Download Thermal Report"
               @click="downloadReport(thermal_reports.id)"
             >
-              <i
-                class="las la-download text-gray-600 text-hover-success mb-1 fs-1"
-              ></i>
+              <KTIcon icon-name="file-down" icon-class="fs-2" />
             </span>
+
+            <!--begin::Edit-->
+            <router-link :to="`/thermalreport/edit/${thermal_reports.id}`">
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View Thermal Report"
+              >
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
             <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="Delete Report"
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete Thermal Report"
+              @click="deleteItem(thermal_reports.id, false)"
             >
-              <i
-                @click="deleteItem(thermal_reports.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-1"
-              ></i>
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -712,28 +708,7 @@ export default defineComponent({
 
     const thermalReportDetails = ref({
       id: "",
-      rgp_no: "",
-      company_id: "",
-      customer_name: "",
-      client_name: "",
-      customer_address: {
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        states: "",
-        country: "",
-      },
-
-      client_address: {
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        states: "",
-        country: "",
-      },
-
+      rgp_id: "",
       instruments: [
         {
           id: "",
@@ -802,130 +777,185 @@ export default defineComponent({
 
       sensor_location_chart: "",
       sensor_location_chart_data: "",
+
+      rgp: {
+        id: "",
+        rgp_no: "",
+        quotation_id: "",
+        quotation: {
+          id: "",
+          quotation_no: "",
+          customer: {
+            id: "",
+            name: "",
+            mobile: "",
+            company_name: "",
+            address1: "",
+            address2: "",
+            city: "",
+            pincode: "",
+            state: "",
+            country: "",
+          },
+          client: {
+            id: "",
+            name: "",
+            mobile: "",
+            company_name: "",
+            address1: "",
+            address2: "",
+            city: "",
+            pincode: "",
+            state: "",
+            country: "",
+          },
+          clientx: {
+            id: "",
+            name: "",
+            mobile: "",
+            company_name: "",
+            address1: "",
+            address2: "",
+            city: "",
+            pincode: "",
+            state: "",
+            country: "",
+          },
+        },
+      },
+
+      company_id: "",
+      created_by: "",
+      updated_by: "",
+      is_active: "",
     });
 
-    const downloadReport = async (id: any) => {
-      // get all information of the rgp
+    const downloadReport = async (id) => {
+      let timerInterval;
 
       try {
+        // Show initial loading Swal with generic progress messages
+        Swal.fire({
+          title: "Downloading Thermal Report",
+          html: `<div class="swal-animation">
+        <p class="swal-text">Please wait...</p>
+        <div class="swal-progress">
+          <div class="swal-progress-bar"></div>
+        </div>
+      </div>`,
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          willClose: () => {
+            clearInterval(timerInterval);
+          },
+        });
+
+        // Fetch RGP information
         const res = await DownloadThermalReport(id);
+        if (res?.success != false) {
+          const res = await DownloadThermalReport(id);
 
-        thermalReportDetails.value.id = res.result.id;
-        thermalReportDetails.value.room_name = res.result.room_name;
-        thermalReportDetails.value.acc_for_temp = res.result.acc_for_temp;
-        thermalReportDetails.value.acc_for_rh = res.result.acc_for_rh;
-        thermalReportDetails.value.val_start_date = res.result.val_start_date;
-        thermalReportDetails.value.start_time = res.result.start_time;
-        thermalReportDetails.value.mapping_duration =
-          res.result.mapping_duration;
-        thermalReportDetails.value.logging_interval =
-          res.result.logging_interval;
-        thermalReportDetails.value.logger_used = res.result.logger_used;
+          thermalReportDetails.value.id = res.result.id;
+          thermalReportDetails.value.rgp_id = res.result.rgp_id;
+          thermalReportDetails.value.room_name = res.result.room_name;
+          thermalReportDetails.value.acc_for_temp = res.result.acc_for_temp;
+          thermalReportDetails.value.acc_for_rh = res.result.acc_for_rh;
+          thermalReportDetails.value.val_start_date = res.result.val_start_date;
+          thermalReportDetails.value.start_time = res.result.start_time;
+          thermalReportDetails.value.mapping_duration =
+            res.result.mapping_duration;
+          thermalReportDetails.value.logging_interval =
+            res.result.logging_interval;
+          thermalReportDetails.value.logger_used = res.result.logger_used;
 
-        thermalReportDetails.value.rgp_no = res.result.rgp_no;
+          thermalReportDetails.value.company_id = res.result.company_id;
+          thermalReportDetails.value.created_by = res.result.created_by;
+          thermalReportDetails.value.updated_by = res.result.updated_by;
+          thermalReportDetails.value.is_active = res.result.is_active;
 
-        thermalReportDetails.value.customer_name = res.result.customer_address
-          .company_name
-          ? res.result.customer_address.company_name
-          : "";
-        thermalReportDetails.value.client_name = res.result.client_address
-          .company_name
-          ? res.result.client_address.company_name
-          : "";
-        thermalReportDetails.value.company_id = res.result.company_id;
+          thermalReportDetails.value.instruments = JSON.parse(
+            res.result.instruments
+          );
+          thermalReportDetails.value.excel_data = JSON.parse(
+            res.result.excel_data
+          );
 
-        thermalReportDetails.value.instruments = JSON.parse(
-          res.result.instruments
-        );
-        thermalReportDetails.value.excel_data = JSON.parse(
-          res.result.excel_data
-        );
+          thermalReportDetails.value.dates = JSON.parse(res.result.dates);
 
-        thermalReportDetails.value.dates = JSON.parse(res.result.dates);
+          thermalReportDetails.value.min_temp = JSON.parse(res.result.min_temp);
+          thermalReportDetails.value.max_temp = JSON.parse(res.result.max_temp);
 
-        thermalReportDetails.value.min_temp = JSON.parse(res.result.min_temp);
-        thermalReportDetails.value.max_temp = JSON.parse(res.result.max_temp);
+          thermalReportDetails.value.min_rh = JSON.parse(res.result.min_rh);
+          thermalReportDetails.value.max_rh = JSON.parse(res.result.max_rh);
 
-        thermalReportDetails.value.min_rh = JSON.parse(res.result.min_rh);
-        thermalReportDetails.value.max_rh = JSON.parse(res.result.max_rh);
+          thermalReportDetails.value.avg_temp = res.result.avg_temp;
+          thermalReportDetails.value.avg_rh = res.result.avg_rh;
 
-        thermalReportDetails.value.avg_temp = res.result.avg_temp;
-        thermalReportDetails.value.avg_rh = res.result.avg_rh;
+          thermalReportDetails.value.sensor_location_diagram = res.result
+            .sensor_location_diagram
+            ? res.result.sensor_location_diagram
+            : "";
+          thermalReportDetails.value.sensor_location_diagram_data = res.result
+            .sensor_location_diagram_data
+            ? "data: image/png;base64," +
+              res.result.sensor_location_diagram_data
+            : "";
 
-        thermalReportDetails.value.sensor_location_diagram = res.result
-          .sensor_location_diagram
-          ? res.result.sensor_location_diagram
-          : "";
-        thermalReportDetails.value.sensor_location_diagram_data = res.result
-          .sensor_location_diagram_data
-          ? "data: image/png;base64," + res.result.sensor_location_diagram_data
-          : "";
+          thermalReportDetails.value.sensor_location_chart = res.result
+            .sensor_location_chart
+            ? res.result.sensor_location_chart
+            : "";
+          thermalReportDetails.value.sensor_location_chart_data = res.result
+            .sensor_location_chart_data
+            ? "data: image/png;base64," + res.result.sensor_location_chart_data
+            : "";
 
-        thermalReportDetails.value.sensor_location_chart = res.result
-          .sensor_location_chart
-          ? res.result.sensor_location_chart
-          : "";
-        thermalReportDetails.value.sensor_location_chart_data = res.result
-          .sensor_location_chart_data
-          ? "data: image/png;base64," + res.result.sensor_location_chart_data
-          : "";
+          thermalReportDetails.value.rgp = { ...res.result.rgp };
+        } else {
+          showErrorAlert("Error", res.message || "Error Occured");
+          return;
+        }
 
-        thermalReportDetails.value.customer_address.address1 = res.result
-          .customer_address.address1
-          ? res.result.customer_address.address1
-          : "";
-        thermalReportDetails.value.customer_address.address2 = res.result
-          .customer_address.address2
-          ? res.result.customer_address.address2
-          : "";
-        thermalReportDetails.value.customer_address.city = res.result
-          .customer_address.city
-          ? res.result.customer_address.city
-          : "";
-        thermalReportDetails.value.customer_address.pincode = res.result
-          .customer_address.pincode
-          ? res.result.customer_address.pincode
-          : "";
-        thermalReportDetails.value.customer_address.states = res.result
-          .customer_address.states
-          ? res.result.customer_address.states
-          : "";
-        thermalReportDetails.value.customer_address.country = res.result
-          .customer_address.country
-          ? res.result.customer_address.country
-          : "";
+        // Update Swal message for PDF generation
+        Swal.update({
+          title: "Generating PDF",
+          html: `<div class="swal-animation">
+        <p class="swal-text">Please wait...</p>
+        <div class="swal-progress">
+          <div class="swal-progress-bar"></div>
+        </div>
+      </div>`,
+        });
 
-        thermalReportDetails.value.client_address.address1 = res.result
-          .client_address.address1
-          ? res.result.client_address.address1
-          : "";
-        thermalReportDetails.value.client_address.address2 = res.result
-          .client_address.address2
-          ? res.result.client_address.address2
-          : "";
-        thermalReportDetails.value.client_address.city = res.result
-          .client_address.city
-          ? res.result.client_address.city
-          : "";
-        thermalReportDetails.value.client_address.pincode = res.result
-          .client_address.address1
-          ? res.result.client_address.pincode
-          : "";
-        thermalReportDetails.value.client_address.states = res.result
-          .client_address.address1
-          ? res.result.client_address.states
-          : "";
-        thermalReportDetails.value.client_address.country = res.result
-          .client_address.address1
-          ? res.result.client_address.country
-          : "";
-
-        const reportName = `${thermalReportDetails.value.rgp_no}`;
-
+        const reportName = `${thermalReportDetails.value.rgp.rgp_no}`;
         await thermalReportGen(id, reportName, thermalReportDetails);
+
+        // Close Swal on success
+        Swal.fire({
+          title: "Download Complete",
+          text: "Thermal Report PDF generated successfully",
+          icon: "success",
+          timer: 2000, // Show success message for 2 seconds
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
       } catch (error) {
-        console.log(error);
-        alert("Unable to download the report. Please try again.");
+        console.error("Error downloading Thermal Report:", error);
+
+        // Close Swal on success
+        Swal.fire({
+          title: "Error Complete",
+          text: "Failed to download Thermal Report",
+          icon: "error",
+          timer: 2000,
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } finally {
+        // Clear interval if still running
+        clearInterval(timerInterval);
       }
     };
 

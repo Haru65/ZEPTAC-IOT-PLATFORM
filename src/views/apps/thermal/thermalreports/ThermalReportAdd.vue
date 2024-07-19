@@ -1,159 +1,719 @@
 <template>
-  <!--begin::Card-->
-  <div class="card">
-    <!--begin::Card body-->
-    <div class="card-body">
-      <!--begin::Stepper-->
-      <div
-        class="stepper stepper-links d-flex flex-column"
-        id="kt_create_account_stepper"
-        ref="horizontalWizardRef"
-      >
+  <!--begin::Stepper-->
+  <div
+    class="stepper stepper-pills stepper-column d-flex flex-column flex-xl-row flex-row-fluid"
+    id="kt_modal_create_app_stepper"
+    ref="createAppStepperRef"
+  >
+    <!--begin::Aside-->
+    <div
+      class="card d-flex justify-content-center justify-content-xl-start flex-row-auto w-100 w-xl-300px w-xxl-400px me-9"
+    >
+      <!--begin::Wrapper-->
+      <div class="card-body px-6 px-lg-10 px-xxl-15 py-20">
         <!--begin::Nav-->
-        <div class="stepper-nav py-5 mt-5">
+        <div class="stepper-nav">
           <!--begin::Step 1-->
           <div class="stepper-item current" data-kt-stepper-element="nav">
-            <h3 class="stepper-title">Report Details</h3>
+            <div class="stepper-wrapper">
+              <!--begin::Icon-->
+              <div class="stepper-icon w-40px h-40px">
+                <i class="stepper-check fas fa-check"></i>
+                <span class="stepper-number">1</span>
+              </div>
+              <!--end::Icon-->
+
+              <!--begin::Label-->
+              <div class="stepper-label">
+                <h3 class="stepper-title">Report Details</h3>
+
+                <div class="stepper-desc fw-semobold">fill report details</div>
+              </div>
+              <!--end::Label-->
+            </div>
+
+            <!--begin::Line-->
+            <div class="stepper-line h-40px"></div>
+            <!--end::Line-->
           </div>
           <!--end::Step 1-->
 
           <!--begin::Step 2-->
           <div class="stepper-item" data-kt-stepper-element="nav">
-            <h3 class="stepper-title">Instrument Selection</h3>
+            <div class="stepper-wrapper">
+              <!--begin::Icon-->
+              <div class="stepper-icon w-40px h-40px">
+                <i class="stepper-check fas fa-check"></i>
+                <span class="stepper-number">2</span>
+              </div>
+              <!--end::Icon-->
+
+              <!--begin::Label-->
+              <div class="stepper-label">
+                <h3 class="stepper-title">Thermal Instrument Selection</h3>
+                <div class="stepper-desc fw-semobold text-wrap">
+                  pick unique instruments based on testo CSV files
+                </div>
+              </div>
+              <!--end::Label-->
+            </div>
+            <!--begin::Line-->
+            <div class="stepper-line h-40px"></div>
+            <!--end::Line-->
           </div>
           <!--end::Step 2-->
 
           <!--begin::Step 3-->
           <div class="stepper-item" data-kt-stepper-element="nav">
-            <h3 class="stepper-title">Summary</h3>
+            <div class="stepper-wrapper">
+              <!--begin::Icon-->
+              <div class="stepper-icon w-40px h-40px">
+                <i class="stepper-check fas fa-check"></i>
+                <span class="stepper-number">3</span>
+              </div>
+              <!--end::Icon-->
+
+              <!--begin::Label-->
+              <div class="stepper-label">
+                <h3 class="stepper-title">Files</h3>
+                <div class="stepper-desc fw-semobold">
+                  provide testo CSV files based on instrument selected
+                </div>
+              </div>
+              <!--end::Label-->
+            </div>
           </div>
           <!--end::Step 3-->
         </div>
         <!--end::Nav-->
-
-        <!--begin::Form-->
-        <form
-          class="mx-auto w-100 p-10"
-          novalidate
-          id="kt_create_account_form"
-          @submit="handleStep"
-        >
-          <!--begin::Step 1-->
-          <div class="current" data-kt-stepper-element="content">
-            <Step1
-              v-bind:ongoingRGPS="RGPS"
-              @rgp-Selected="setRGPDetails"
-              v-on:setStartDate="setTheStartDate"
-              v-on:setStartTime="setTheStartTime"
-            ></Step1>
-          </div>
-          <!--end::Step 1-->
-
-          <!--begin::Step 2-->
-          <div data-kt-stepper-element="content">
-            <Step2
-              v-bind:instruments="thermalReportDetails.instruments"
-              v-on:store-instrument="storeInstrument"
-              v-on:remove-instrument="removeInstrument"
-              v-on:remove-all-instrument="removeAllInstrument"
-            ></Step2>
-          </div>
-          <!--end::Step 2-->
-
-          <!--begin::Step 3-->
-          <div data-kt-stepper-element="content">
-            <Step3
-              v-bind:allFilesData="thermalReportDetails.excel_data"
-              v-on:store-excel-file="storeExcelFile"
-              v-on:deleteExcel="deleteExcelFile"
-            ></Step3>
-          </div>
-          <!--end::Step 3-->
-
-          <!--begin::Actions-->
-          <div class="d-flex flex-stack pt-15">
-            <!--begin::Wrapper-->
-            <div class="mr-2">
-              <button
-                type="button"
-                class="btn btn-lg btn-light-primary me-3"
-                data-kt-stepper-action="previous"
-                @click="previousStep"
-              >
-                <KTIcon icon-name="arrow-left" icon-class="fs-4 me-1" />
-                Back
-              </button>
-            </div>
-            <!--end::Wrapper-->
-
-            <!--begin::Wrapper-->
-            <div>
-              <button
-                type="button"
-                class="btn btn-lg btn-primary me-3"
-                data-kt-stepper-action="submit"
-                :data-kt-indicator="loading ? 'on' : null"
-                v-if="currentStepIndex === totalSteps - 1"
-                @click="formSubmit()"
-              >
-                <span v-if="!loading" class="indicator-label"> Submit </span>
-                <span v-if="loading" class="indicator-progress">
-                  Please wait...
-                  <span
-                    class="spinner-border spinner-border-sm align-middle ms-2"
-                  ></span>
-                </span>
-              </button>
-
-              <button v-else type="submit" class="btn btn-lg btn-primary">
-                Continue
-                <KTIcon icon-name="arrow-right" icon-class="fs-4 ms-2 me-0" />
-              </button>
-            </div>
-            <!--end::Wrapper-->
-          </div>
-          <!--end::Actions-->
-        </form>
-        <!--end::Form-->
       </div>
-      <!--end::Stepper-->
+      <!--end::Wrapper-->
     </div>
-    <!--end::Card body-->
+    <!--begin::Aside-->
+
+    <!--begin::Content-->
+    <div class="card d-flex flex-row-fluid flex-center">
+      <!--begin::Form-->
+      <form
+        class="py-20 w-100 w-xl-100 px-9"
+        novalidate
+        id="kt_create_account_form"
+        @submit="handleStep"
+      >
+        <!--begin::Step 1-->
+        <div class="current" data-kt-stepper-element="content">
+          <!--begin::Wrapper-->
+          <div class="w-100">
+            <!--begin::Heading-->
+            <div class="pb-10 pb-lg-10">
+              <!--begin::Title-->
+              <h2 class="fw-bold d-flex align-items-center text-dark">
+                <span class="badge-light-primary rounded p-3">
+                  Thermal Mapping Report Details
+                </span>
+              </h2>
+              <!--end::Title-->
+            </div>
+            <!--end::Heading-->
+
+            <div class="row mb-6">
+              <div class="form-group col-12">
+                <label
+                  class="d-flex align-items-center fs-5 fw-semobold mb-4 col-lg-4 col-form-label required text-gray-700 text-nowrap"
+                >
+                  <span>Returnable Gate Pass</span>
+                  <i
+                    class="fas fa-exclamation-circle ms-2 fs-7"
+                    v-tooltip
+                    title="Select at least one engineer"
+                  ></i>
+                </label>
+                <div>
+                  <el-select
+                    v-model="itemDetails.rgp_id"
+                    filterable
+                    placeholder="Please Select GatePass"
+                    @change="fetchRGP(itemDetails.rgp_id)"
+                  >
+                    <el-option
+                      value=""
+                      disabled="disabled"
+                      label="Please Select GatePass"
+                      key=""
+                    >
+                      Please Select GatePass</el-option
+                    >
+                    <el-option
+                      v-for="item in RGatePasses"
+                      :key="item.id"
+                      :value="item.id"
+                      :label="item.rgp_no"
+                    />
+                  </el-select>
+                </div>
+              </div>
+            </div>
+
+            <!--begin::Input group-->
+            <div class="row mb-6" v-if="itemDetails.rgp_id">
+              <!--begin::Col-->
+              <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                <!--begin::Label-->
+                <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Customer :</label
+                >
+                <!--end::Label-->
+
+                <!--begin::Input-->
+                <div class="form-control form-control-lg form-control-solid">
+                  <div>
+                    {{ RgpData?.quotation.customer.company_name || "" }}
+                  </div>
+                  <div class="mt-2 pt-4">
+                    <h6 class="mt-5">Billing Address:</h6>
+                    <div class="mt-2">
+                      <div class="mb-1">
+                        <br />
+                        <span v-show="RgpData?.quotation.customer.company_name">
+                          {{
+                            `${RgpData?.quotation.customer.company_name || ""}`
+                          }}
+                        </span>
+                        <br />
+                        <span>
+                          {{ `${RgpData?.quotation.customer.name || ""}` }}
+                        </span>
+                        <!-- v-if company_data present -->
+                        <div v-show="RgpData?.quotation.customer.company_name">
+                          <br />
+                          <span>
+                            {{
+                              `${RgpData?.quotation.customer.address1 || ""}`
+                            }}
+                          </span>
+                          <br />
+                          <span>
+                            {{
+                              `${RgpData?.quotation.customer.address2 || ""}`
+                            }}
+                          </span>
+                        </div>
+                        <div v-show="RgpData?.quotation.customer.country">
+                          <span>
+                            {{
+                              `${RgpData?.quotation.customer.city || ""} - ${
+                                RgpData?.quotation.customer.pincode || ""
+                              }`
+                            }}
+                          </span>
+                          <br />
+                          <span>
+                            {{
+                              `${RgpData?.quotation.customer.state || ""} ${
+                                RgpData?.quotation.customer.country || ""
+                              }`
+                            }}
+                          </span>
+                          <br />
+                        </div>
+                      </div>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+
+                <!--end::Input-->
+              </div>
+              <!--end::Col-->
+              <!--begin::Col-->
+              <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                <!--begin::Label-->
+                <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Client :</label
+                >
+                <!--end::Label-->
+
+                <!--begin::Input-->
+                <div class="form-control form-control-lg form-control-solid">
+                  <div>{{ RgpData?.quotation.client.company_name || "" }}</div>
+                  <div class="mt-2 pt-4">
+                    <h6 class="mt-5">Site Address:</h6>
+                    <div class="mt-2">
+                      <div class="mb-1" v-show="RgpData?.quotation.client">
+                        <br />
+                        <span v-show="RgpData?.quotation.client.company_name">
+                          {{
+                            `${RgpData?.quotation.client.company_name || ""}`
+                          }}
+                        </span>
+                        <br />
+                        <span>
+                          {{ `${RgpData?.quotation.client.name || ""}` }}
+                        </span>
+                        <!-- v-if company_data present -->
+                        <div v-show="RgpData?.quotation.client.company_name">
+                          <br />
+                          <span>
+                            {{ `${RgpData?.quotation.client.address1 || ""}` }}
+                          </span>
+                          <br />
+                          <span>
+                            {{ `${RgpData?.quotation.client.address2 || ""}` }}
+                          </span>
+                        </div>
+                        <div v-show="RgpData?.quotation.client.country">
+                          <span>
+                            {{
+                              `${RgpData?.quotation.client.city || ""} - ${
+                                RgpData?.quotation.client.pincode || ""
+                              }`
+                            }}
+                          </span>
+                          <br />
+                          <span>
+                            {{
+                              `${RgpData?.quotation.client.state || ""} ${
+                                RgpData?.quotation.client.country || ""
+                              }`
+                            }}
+                          </span>
+                          <br />
+                        </div>
+                      </div>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+
+                <!--end::Input-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
+            <!--begin::Input group-->
+            <div class="row mb-6">
+              <!--begin::Col-->
+              <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                <!--begin::Label-->
+                <label
+                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Validation Start Date</label
+                >
+                <!--end::Label-->
+
+                <!--begin::Input-->
+                <el-date-picker
+                  type="date"
+                  name="val_start_date"
+                  id="val_start_date"
+                  placeholder="Pick a Day"
+                  @change="setDates($event, 'val_start_date')"
+                  v-model="itemDetails.val_start_date"
+                  :editable="false"
+                />
+                <!--end::Input-->
+              </div>
+              <!--end::Col-->
+              <!--begin::Col-->
+              <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                <!--begin::Label-->
+                <label
+                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Start Time</label
+                >
+                <!--end::Label-->
+                <!--begin::Input-->
+                <el-time-picker
+                  name="start_time"
+                  id="start_time"
+                  v-model="itemDetails.start_time"
+                  placeholder="Pick a Day"
+                  @change="setTimes($event)"
+                />
+                <!--end::Input-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
+            <!-- extra fields -->
+            <div class="row mb-6">
+              <div class="form-group col-md-6">
+                <label
+                  class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
+                  >AcceptanceCriteria for Temperature</label
+                >
+                <Field
+                  type="text"
+                  name="acc_for_temp"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Enter Criteria for Temperature"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="acc_for_temp" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group col-md-6">
+                <label
+                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
+                  >AcceptanceCriteria for Humidity</label
+                >
+                <Field
+                  type="text"
+                  name="acc_for_rh"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Enter Criteria for Humidity"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="acc_for_rh" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--end::Input group-->
+
+            <!-- extra fields -->
+            <div class="row mb-6">
+              <div class="form-group col-md-6">
+                <label
+                  class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
+                  >Room Name</label
+                >
+                <Field
+                  type="text"
+                  name="room_name"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Enter Room Name"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="room_name" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group col-md-6">
+                <label
+                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
+                  >Mapping Duration</label
+                >
+                <Field
+                  type="number"
+                  name="mapping_duration"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Enter Mapping Duraction (in hours)"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="mapping_duration" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--end::Input group-->
+
+            <!-- extra fields -->
+            <div class="row mb-6">
+              <div class="form-group col-md-6">
+                <label
+                  class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
+                  >Data Logging Interval</label
+                >
+                <Field
+                  type="number"
+                  name="logging_interval"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Enter logging interval (in minutes)"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="logging_interval" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group col-md-6">
+                <label
+                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
+                  >Data Logger Used</label
+                >
+                <Field
+                  type="text"
+                  name="logger_used"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Number of data loggers used"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="logger_used" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--end::Input group-->
+          </div>
+          <!--end::Wrapper-->
+        </div>
+        <!--end::Step 1-->
+
+        <!--begin::Step 2-->
+        <div data-kt-stepper-element="content">
+          <!--begin::Wrapper-->
+          <div class="w-100">
+            <!--begin::Heading-->
+            <div class="pb-10 pb-lg-10">
+              <!--begin::Title-->
+              <h2 class="fw-bold d-flex align-items-center text-dark">
+                <span class="badge-light-primary rounded p-3">
+                  Instrument Selection
+                </span>
+              </h2>
+              <!--end::Title-->
+            </div>
+            <!--end::Heading-->
+
+            <div class="card-header border-0 pt-6">
+              <!--begin::Card title-->
+              <div class="card-title d-flex gap-4">
+                <div class="d-flex align-items-center position-relative my-3">
+                  <el-select
+                    name="fromInstrumentId"
+                    v-model="fromInstrumentId"
+                    placeholder="From Instrument ID"
+                    @change="handleFrom"
+                  >
+                    <el-option
+                      v-for="instrument in instrumentsFrom"
+                      :key="instrument.id"
+                      :value="instrument.id"
+                      :label="instrument.instrument_id"
+                    />
+                  </el-select>
+                </div>
+
+                <div class="d-flex align-items-center position-relative my-3">
+                  <el-select
+                    name="toInstrumentId"
+                    filterable
+                    placeholder="To Instrument ID"
+                    v-model="toInstrumentId"
+                    :disabled="disabelRef"
+                    @change="handleTo"
+                  >
+                    <el-option
+                      v-for="instrument in instrumentsTo"
+                      :key="instrument.id"
+                      :value="instrument.id"
+                      :label="instrument.instrument_id"
+                    />
+                  </el-select>
+                </div>
+              </div>
+              <!--begin::Card title-->
+            </div>
+
+            <div class="card-body pt-0">
+              <TableContent
+                :data="tableData"
+                :header="tableHeader"
+                :items-per-page-dropdown-enabled="false"
+                :loading="loading"
+              >
+                <template v-slot:checked="{ row: thermal_instruments }">
+                  <div
+                    class="form-check form-switch form-check-custom form-check-success form-check-solid"
+                  >
+                    <input
+                      class="form-check-input w-60px"
+                      type="checkbox"
+                      v-model="thermal_instruments.checked"
+                      @click="
+                        toggleInstrument(
+                          $event,
+                          thermal_instruments.id,
+                          thermal_instruments.instrument_id,
+                          thermal_instruments.name,
+                          thermal_instruments.serial_no,
+                          thermal_instruments.calibration_date,
+                          thermal_instruments.calibration_due_date
+                        )
+                      "
+                    />
+                  </div>
+                </template>
+                <template v-slot:instrument_id="{ row: thermal_instruments }">
+                  {{ thermal_instruments.instrument_id }}
+                </template>
+                <template v-slot:name="{ row: thermal_instruments }">
+                  {{ thermal_instruments.name }}
+                </template>
+                <template v-slot:model_no="{ row: thermal_instruments }">
+                  {{ thermal_instruments.model_no }}
+                </template>
+                <template v-slot:ranges="{ row: thermal_instruments }">
+                  {{ thermal_instruments.ranges }}
+                </template>
+                <template v-slot:accuracy="{ row: thermal_instruments }">
+                  {{ thermal_instruments.accuracy }}
+                </template>
+                <template v-slot:serial_no="{ row: thermal_instruments }">
+                  {{ thermal_instruments.serial_no }}
+                </template>
+                <!-- defualt data -->
+                <template v-slot:make="{ row: thermal_instruments }">
+                  {{ thermal_instruments.make }}
+                </template>
+                <template
+                  v-slot:calibration_date="{ row: thermal_instruments }"
+                >
+                  {{ thermal_instruments.calibration_date }}
+                </template>
+                <template
+                  v-slot:calibration_due_date="{ row: thermal_instruments }"
+                >
+                  {{ thermal_instruments.calibration_due_date }}
+                </template>
+              </TableContent>
+            </div>
+          </div>
+          <!--end::Wrapper-->
+        </div>
+        <!--end::Step 2-->
+
+        <!--begin::Step 3-->
+        <div data-kt-stepper-element="content">
+          <!--begin::Wrapper-->
+          <div class="w-100">
+            <!--begin::Heading-->
+            <div class="pb-10 pb-lg-15">
+              <!--begin::Title-->
+              <h2 class="fw-bold d-flex align-items-center text-dark">
+                Import CSV File
+              </h2>
+              <!--end::Title-->
+            </div>
+            <!--end::Heading-->
+
+            <div class="row mb-6">
+              <div class="form-group col-md-12 mb-8 mb-sd-8">
+                <label
+                  class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
+                  >Upload File
+                </label>
+                <label
+                  class="btn btn-outline btn-outline-dashed btn-outline-default p-10 d-flex align-items-center position-relative"
+                >
+                  <i
+                    class="bi bi-upload position-absolute fs-1 top-50 start-50 translate-middle"
+                  ></i>
+                  <input
+                    type="file"
+                    accept=".xls"
+                    @change="handleChange"
+                    class="position-absolute top-0 start-0 end-0 bottom-0 opacity-0 w-100 h-100"
+                  />
+                </label>
+              </div>
+            </div>
+            <ExcelFiles
+              v-bind:filesData="itemDetails.excel_data"
+              v-on:deleteFile="deleteTheFile"
+            />
+          </div>
+          <!--end::Wrapper-->
+        </div>
+        <!--end::Step 3-->
+
+        <!--begin::Actions-->
+        <div class="d-flex flex-stack pt-10">
+          <!--begin::Wrapper-->
+          <div class="mr-2">
+            <button
+              type="button"
+              class="btn btn-lg btn-light-primary me-3"
+              data-kt-stepper-action="previous"
+              @click="previousStep"
+            >
+              <KTIcon icon-name="arrow-left" icon-class="fs-4 me-1" />
+              Back
+            </button>
+          </div>
+          <!--end::Wrapper-->
+
+          <!--begin::Wrapper-->
+          <div>
+            <button
+              type="button"
+              class="btn btn-lg btn-primary me-3"
+              data-kt-stepper-action="submit"
+              v-if="currentStepIndex === totalSteps - 1"
+              @click="formSubmit()"
+            >
+              <span class="indicator-label">
+                Submit
+                <KTIcon icon-name="arrow-right" icon-class="fs-3 ms-2 me-0" />
+              </span>
+              <span class="indicator-progress">
+                Please wait...
+                <span
+                  class="spinner-border spinner-border-sm align-middle ms-2"
+                ></span>
+              </span>
+            </button>
+
+            <button v-else type="submit" class="btn btn-lg btn-primary">
+              Continue
+              <KTIcon icon-name="arrow-right" icon-class="fs-4 ms-2 me-0" />
+            </button>
+          </div>
+          <!--end::Wrapper-->
+        </div>
+        <!--end::Actions-->
+      </form>
+      <!--end::Form-->
+    </div>
+    <!--end::Content-->
   </div>
-  <!--end::Card-->
+  <!--end::Stepper-->
 </template>
   
   <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { computed, defineComponent, onMounted, ref } from "vue";
+import {
+  computed,
+  defineComponent,
+  nextTick,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
 import { StepperComponent } from "@/assets/ts/components";
 import { useForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
-import Step1 from "./steps/Step1.vue";
-import Step2 from "./steps/Step2.vue";
-import Step3 from "./steps/Step3.vue";
 import moment from "moment";
+import * as xlsx from "xlsx";
+import ExcelFiles from "./steps/ExcelFiles.vue";
+
+import TableContent from "@/components/kt-datatable/table-partials/table-content/TableContent.vue";
+import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import {
   addThermalReport,
-  getOnGoingCompletedRGP,
+  getOnGoingCompletedRGPTherm,
+  getRGatePass,
   getThermalInstruments,
 } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 
-interface IStep1 {
-  room_name: string;
-  acc_for_temp: string;
-  acc_for_rh: string;
-  mapping_duration: number;
-  logging_interval: number;
-  logger_used: number;
-  val_start_date: string;
-  start_time: string;
-}
+interface IStep1 {}
 
 interface IStep2 {}
 
@@ -161,13 +721,59 @@ interface IStep3 {}
 
 interface CreateAccount extends IStep1, IStep2, IStep3 {}
 
+interface Inst {
+  id: number;
+  instrument_id: string;
+}
+
+interface Instrument {
+  id: number;
+  instrument_id: string;
+  name: string;
+  model_no: string;
+  ranges: string;
+  accuracy: string;
+  serial_no: string;
+  make: string;
+  calibration_date: string;
+  calibration_due_date: string;
+  checked: boolean;
+}
+
 interface readingsData {
   id: string;
-  temp: string;
-  rh: string;
+  temp: number;
+  rh: number;
+}
+
+interface Data {
+  id: string;
+  name: string;
+  company_name: string;
+  address1: string;
+  address2: string;
+  city: string;
+  state: string;
+  pincode: string;
+  country: string;
+}
+
+interface Quotation {
+  id: string;
+  quotation_no: string;
+  customer: Data;
+  client: Data;
+  clientx: Data;
+}
+
+interface RGP {
+  id: string;
+  rgp_no: string;
+  quotation_id: string;
 }
 
 interface Logger {
+  id: string;
   file_name: string;
   file_size: number;
   instrument_name: string;
@@ -182,16 +788,27 @@ interface Logger {
   AVG_RH: number;
 }
 
+interface RGPInformation {
+  id: string;
+  rgp_no: string;
+  quotation_id: string;
+  quotation: Quotation;
+}
+
 export default defineComponent({
-  name: "kt-horizontal-wizard",
+  name: "thermal-report-add",
   components: {
-    Step1,
-    Step2,
-    Step3,
+    ErrorMessage,
+    Field,
+    VForm,
+    TableContent,
+    ExcelFiles,
   },
+  props: [],
+  // emits: ["store-excel-file", "deleteExcel"],
   setup() {
+    const createAppStepperRef = ref<HTMLElement | null>(null);
     const _stepperObj = ref<StepperComponent | null>(null);
-    const horizontalWizardRef = ref<HTMLElement | null>(null);
     const currentStepIndex = ref(0);
     const loading = ref(false);
 
@@ -199,37 +816,52 @@ export default defineComponent({
     const route = useRouter();
     const User = auth.GetUser();
 
-    const thermalInstruments = ref([
-      {
-        id: "",
-        instrument_name: "",
-        instrument_id: "",
-        serial_no: "",
-      },
-    ]);
-    const selectedInstruments = ref([
-      {
-        id: "",
-        instrument_name: "",
-        instrument_id: "",
-        serial_no: "",
-      },
-    ]);
-
-    const thermalReportDetails = ref({
-      rgp_id: "",
+    const RGatePasses = ref<RGP[]>([]);
+    const RgpData = ref<RGPInformation>({
+      id: "",
       rgp_no: "",
-      site_address: {
-        company_name: "",
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        states: "",
-        country: "",
+      quotation_id: "",
+      quotation: {
+        id: "",
+        quotation_no: "",
+        customer: {
+          id: "",
+          name: "",
+          company_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          pincode: "",
+          state: "",
+          country: "",
+        },
+        client: {
+          id: "",
+          name: "",
+          company_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          pincode: "",
+          state: "",
+          country: "",
+        },
+        clientx: {
+          id: "",
+          name: "",
+          company_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          pincode: "",
+          state: "",
+          country: "",
+        },
       },
-      customer_name: "",
+    });
 
+    const itemDetails = ref({
+      rgp_id: "",
       sensor_location_diagram: "",
       sensor_location_chart: "",
 
@@ -305,24 +937,27 @@ export default defineComponent({
       is_active: 1,
     });
 
+    /* --------STEP 1 DATA LOGIC--------*/
+
     // Ref to Store Date-Time
     const dates = ref<string[]>([]);
 
     // Number of reading === Number of records
-    const numberOfDates = 432;
+    const NUMBER_OF_DATES = 432;
 
     // Generate dates by using specific interval
     function generateDatesWithInterval(
       startDate: string,
       startTime: string,
       intervalMinutes: number,
-      numberOfDates: number
+      NUMBER_OF_DATES: number
     ) {
       dates.value.splice(0);
 
-      let currentDateTime = new Date(startDate + " " + startTime);
+      const timePart = moment(startTime).format("HH:mm:ss");
+      let currentDateTime = new Date(startDate + " " + timePart);
 
-      for (let i = 0; i < numberOfDates; i++) {
+      for (let i = 0; i < NUMBER_OF_DATES; i++) {
         const formattedDate = moment(currentDateTime).format(
           "YYYY-MM-DD HH:mm:ss"
         );
@@ -336,121 +971,437 @@ export default defineComponent({
       return dates.value;
     }
 
-    // Dates Emits
-
-    async function setTheStartDate(e) {
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
       try {
         if (e != null) {
           if (e != "" && e != null) {
-            thermalReportDetails.value.val_start_date = await moment(e).format(
-              "YYYY-MM-DD"
-            );
+            itemDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
           } else {
-            thermalReportDetails.value.val_start_date = await "";
+            itemDetails.value[dateType] = "";
           }
         } else {
-          thermalReportDetails.value.val_start_date = await "";
+          itemDetails.value[dateType] = "";
         }
       } catch (err) {
-        thermalReportDetails.value.val_start_date = await "";
+        itemDetails.value[dateType] = "";
       }
-      console.log(thermalReportDetails.value.val_start_date);
+      console.log(itemDetails.value[dateType]);
     }
 
-    async function setTheStartTime(e) {
+    /* --------SET TIME LOGIC--------*/
+    async function setTimes(e) {
       try {
         if (e != null) {
           if (e != "" && e != null) {
-            thermalReportDetails.value.start_time = await moment(e).format(
-              "HH:mm:ss"
+            itemDetails.value.start_time = await moment(e).format(
+              "YYYY-MM-DD HH:mm:ss"
             );
           } else {
-            thermalReportDetails.value.start_time = await "";
+            itemDetails.value.start_time = await "";
           }
         } else {
-          thermalReportDetails.value.start_time = await "";
+          itemDetails.value.start_time = await "";
         }
       } catch (err) {
-        thermalReportDetails.value.start_time = await "";
+        itemDetails.value.start_time = await "";
       }
-      console.log(thermalReportDetails.value.start_time);
+      console.log(itemDetails.value.start_time);
     }
+
+    /* STEP 2 DATA LOGIC */
+    const instrumentsFrom = ref<Inst[]>([]);
+    const instrumentsTo = ref<Inst[]>([]);
+
+    const selectedIds = ref<Array<number>>([]);
+
+    const tableHeader = ref([
+      {
+        columnName: "Add",
+        columnLabel: "checked",
+        sortEnabled: false,
+        columnWidth: 80,
+      },
+      {
+        columnName: "Instrument Id",
+        columnLabel: "instrument_id",
+        sortEnabled: false,
+        columnWidth: 35,
+      },
+      {
+        columnName: "Instrument Name",
+        columnLabel: "name",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Model No",
+        columnLabel: "model_no",
+        sortEnabled: false,
+        columnWidth: 80,
+      },
+      {
+        columnName: "Range",
+        columnLabel: "ranges",
+        sortEnabled: false,
+        columnWidth: 80,
+      },
+      {
+        columnName: "Accuray",
+        columnLabel: "accuracy",
+        sortEnabled: false,
+        columnWidth: 80,
+      },
+      {
+        columnName: "Serial No",
+        columnLabel: "serial_no",
+        sortEnabled: false,
+        columnWidth: 80,
+      },
+      {
+        columnName: "Make",
+        columnLabel: "make",
+        sortEnabled: false,
+        columnWidth: 125,
+      },
+      {
+        columnName: "Calibration Date",
+        columnLabel: "calibration_date",
+        sortEnabled: false,
+        columnWidth: 125,
+      },
+      {
+        columnName: "Calibration Due Date",
+        columnLabel: "calibration_due_date",
+        sortEnabled: false,
+        columnWidth: 125,
+      },
+    ]);
+
+    const disabelRef = ref(true);
+
+    const fromInstrumentId = ref();
+    const toInstrumentId = ref();
+
+    const mainData = ref<Instrument[]>([]);
+    const tableData = ref<Instrument[]>([]);
+
+    async function thermal_instrument_listing(): Promise<void> {
+      try {
+        const response = await getThermalInstruments(`fetchAll=true`);
+
+        if (response.result != null && response.result) {
+          mainData.value = response.result?.map(
+            ({ id, calibration_date, calibration_due_date, ...rest }) => ({
+              id: id,
+              calibration_date,
+              calibration_due_date,
+              ...rest,
+              checked: false,
+            })
+          );
+
+          instrumentsFrom.value.splice(0);
+          instrumentsFrom.value = mainData.value.map(
+            ({ id, instrument_id }) => ({
+              id,
+              instrument_id,
+            })
+          );
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        //console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 100);
+      }
+    }
+
+    const toggleInstrument = (
+      event,
+      id,
+      inst_id,
+      inst_name,
+      inst_srno,
+      inst_calib_date,
+      inst_calib_due
+    ) => {
+      console.log(event.target.checked);
+
+      const data = {
+        id: id,
+        instrument_id: inst_id,
+        instrument_name: inst_name,
+        serial_no: inst_srno,
+        calibration_date: inst_calib_date,
+        calibration_due_date: inst_calib_due,
+      };
+
+      if (event.target.checked === true) {
+        // store the instrument
+        // emit("store-instrument", data);
+        storeInstrument(data);
+      } else {
+        // remove the instrument
+        // emit("remove-instrument", id);
+        removeInstrument(id);
+      }
+    };
+
+    const handleFrom = async (id: any) => {
+      toInstrumentId.value = "";
+      disabelRef.value = false;
+      console.log(fromInstrumentId.value);
+
+      const indexOfFrom = instrumentsFrom.value.findIndex(
+        (item) => item.id == id
+      );
+      console.log(indexOfFrom);
+
+      instrumentsTo.value = [];
+      tableData.value = [];
+      selectedIds.value = [];
+
+      instrumentsTo.value = instrumentsFrom.value.slice(indexOfFrom + 1);
+
+      console.log(instrumentsTo.value);
+
+      await removeAllInstrument(selectedIds.value);
+    };
+
+    const handleTo = async (id: any) => {
+      console.log(toInstrumentId.value);
+
+      tableData.value = await [];
+      selectedIds.value = [];
+
+      const indexOfFrom = instrumentsFrom.value.findIndex(
+        (item) => item.id == fromInstrumentId.value
+      );
+
+      const indexOfTo = instrumentsFrom.value.findIndex(
+        (item) => item.id == toInstrumentId.value
+      );
+
+      console.log(indexOfFrom);
+      console.log(indexOfTo);
+
+      console.log(tableData.value);
+      tableData.value = mainData.value
+        .slice(indexOfFrom, indexOfTo + 1)
+        .map((item) => ({ ...item, checked: false }));
+      console.log(tableData.value);
+
+      await removeAllInstrument(selectedIds.value);
+      // await emit("remove-all-instrument", selectedIds.value);
+    };
 
     // remove multiple instrument and excel file
     async function removeAllInstrument(selectedIds) {
       // remove the instrument
-      thermalReportDetails.value.instruments = selectedIds;
-      thermalReportDetails.value.excel_data = [];
+      itemDetails.value.instruments = selectedIds;
+      itemDetails.value.excel_data = [];
 
-      console.log(thermalReportDetails.value.instruments);
+      console.log(itemDetails.value.instruments);
 
-      thermalReportDetails.value.min_temp = {
+      itemDetails.value.min_temp = {
         instrument_id: "",
         logger_id: "",
         reading: Number.MAX_VALUE,
       };
 
-      thermalReportDetails.value.max_temp = {
+      itemDetails.value.max_temp = {
         instrument_id: "",
         logger_id: "",
         reading: Number.MIN_VALUE,
       };
 
-      thermalReportDetails.value.min_rh = {
+      itemDetails.value.min_rh = {
         instrument_id: "",
         logger_id: "",
         reading: Number.MAX_VALUE,
       };
 
-      thermalReportDetails.value.max_rh = {
+      itemDetails.value.max_rh = {
         instrument_id: "",
         logger_id: "",
         reading: Number.MIN_VALUE,
       };
 
-      thermalReportDetails.value.avg_temp = 0;
-      thermalReportDetails.value.avg_rh = 0;
+      itemDetails.value.avg_temp = 0;
+      itemDetails.value.avg_rh = 0;
     }
 
     // remove single instrument and excel file
     async function removeInstrument(id) {
       // remove the instrument
-      thermalReportDetails.value.instruments =
-        thermalReportDetails.value.instruments.filter(
-          (instrument) => instrument.id != id
-        );
+      itemDetails.value.instruments = itemDetails.value.instruments.filter(
+        (instrument) => instrument.id != id
+      );
 
-      if (thermalReportDetails.value.excel_data.length > 0) {
-        thermalReportDetails.value.excel_data =
-          thermalReportDetails.value.excel_data.filter(
-            (data) => data.id !== id
-          );
+      if (itemDetails.value.excel_data.length > 0) {
+        itemDetails.value.excel_data = itemDetails.value.excel_data.filter(
+          (data) => data.id !== id
+        );
       }
 
-      calculateTemperatureAndHumidity();
+      await calculateTemperatureAndHumidity;
 
-      console.log(thermalReportDetails.value.instruments);
-      console.log(thermalReportDetails.value.excel_data);
+      console.log(itemDetails.value.instruments);
+      console.log(itemDetails.value.excel_data);
     }
 
     // add single instrument
     async function storeInstrument(data) {
       // store the instrument
-      thermalReportDetails.value.instruments.push(data);
-
-      console.log(thermalReportDetails.value.instruments);
-      console.log(thermalReportDetails.value.excel_data);
+      itemDetails.value.instruments.push(data);
     }
+
+    /* STEP 3 DATA LOGIC */
+
+    // Global attributes
+    // 432 records are present in the excel
+    const range = "A12:D455";
+    const instrumentNameCell = "A1";
+    const loggerIdCell = "A6";
+
+    const exportToExcel = () => {
+      // const worksheet = xlsx.utils.json_to_sheet(ReadingsData.value);
+      // const workbook = xlsx.utils.book_new();
+      // xlsx.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+      // xlsx.writeFile(workbook, "exported_data.xlsx");
+    };
+
+    const handleChange = async (e) => {
+      let fileInput = e.target;
+      const file = e.target.files[0];
+
+      try {
+        if (file && file.type == "application/vnd.ms-excel") {
+          const rows = ref([]);
+          const ReadingsData = ref<readingsData[]>([]);
+
+          const tempData = ref<Logger>({
+            id: "",
+            file_name: "",
+            instrument_name: "",
+            instrument_id: "",
+            logger_id: "",
+            file_size: 0,
+            data: [],
+            MAX_TEMP: 0,
+            MIN_TEMP: 0,
+            MAX_RH: 0,
+            MIN_RH: 0,
+            AVG_TEMP: 0,
+            AVG_RH: 0,
+          });
+
+          // Read the file as an ArrayBuffer
+          const arrayBuffer = await file.arrayBuffer();
+
+          // Parse the workbook using xlsx.read
+          const wb = xlsx.read(arrayBuffer, { type: "array" });
+
+          console.log(wb);
+
+          /* Update data with records from the specified range */
+          rows.value = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
+            range,
+          });
+
+          // store instrument name
+          const instrumentName =
+            wb.Sheets[wb.SheetNames[0]][instrumentNameCell]?.v;
+          console.log(instrumentName);
+
+          // store Logger ID
+          let loggerId = wb.Sheets[wb.SheetNames[0]][loggerIdCell]?.v;
+          console.log(loggerId);
+
+          // store file name
+          const fileName = file.name;
+
+          // store file size
+          const fileSize = file.size;
+
+          // maaping the data in particular format
+          ReadingsData.value = rows.value.map(
+            (item: { [key: string]: any }) => {
+              return {
+                id: item["id"],
+                temp: parseFloat(item["CH 1[°C]"]),
+                rh: parseFloat(item["CH 2[%rH]"]),
+              };
+            }
+          );
+
+          // finally push this data
+
+          tempData.value.file_name = fileName;
+          tempData.value.file_size = fileSize;
+          tempData.value.instrument_name = instrumentName;
+          tempData.value.logger_id = Number(loggerId).toString();
+          tempData.value.data = ReadingsData.value;
+
+          // calculate MAX, MIN of TEMP/RH
+          const tempValues = ReadingsData.value.map((data) => data.temp);
+          const rhValues = ReadingsData.value.map((data) => data.rh);
+
+          tempData.value.MAX_TEMP = Math.max(...tempValues);
+          tempData.value.MIN_TEMP = Math.min(...tempValues);
+
+          tempData.value.MAX_RH = Math.max(...rhValues);
+          tempData.value.MIN_RH = Math.min(...rhValues);
+
+          // Calculate average temperature
+          const sumTemp = tempValues.reduce(
+            (acc, currentValue) => acc + currentValue,
+            0
+          );
+          tempData.value.AVG_TEMP = Number(
+            (sumTemp / tempValues.length).toFixed(2)
+          );
+
+          // Calculate average relative humidity
+          const sumRH = rhValues.reduce(
+            (acc, currentValue) => acc + currentValue,
+            0
+          );
+          tempData.value.AVG_RH = Number((sumRH / rhValues.length).toFixed(2));
+
+          console.log(tempData.value);
+
+          storeExcelFile(tempData);
+          // await emit("store-excel-file", tempData);
+
+          fileInput.value = "";
+        } else {
+          alert("Please select .xls file");
+        }
+      } catch (error) {
+        console.error("Error reading the file:", error);
+        alert(
+          "Error occured during api call. Please reload the page and try again."
+        );
+      }
+    };
+
+    const deleteTheFile = async (index) => {
+      deleteExcelFile(index);
+    };
 
     // store excel data if the serial number matches
     async function storeExcelFile(excelData) {
       if (excelData.value) {
-        const foundInstrument = thermalReportDetails.value.instruments.find(
+        const foundInstrument = itemDetails.value.instruments.find(
           (item) => item.serial_no === excelData.value.logger_id
         );
         if (foundInstrument) {
-          if (thermalReportDetails.value.excel_data) {
-            const alreadyExist = thermalReportDetails.value.excel_data.find(
+          if (itemDetails.value.excel_data) {
+            const alreadyExist = itemDetails.value.excel_data.find(
               (data) => data["logger_id"] === excelData.value.logger_id
             );
             if (!alreadyExist) {
@@ -458,70 +1409,56 @@ export default defineComponent({
               excelData.value.instrument_name = foundInstrument.instrument_name;
               excelData.value.id = foundInstrument.id;
 
-              thermalReportDetails.value.excel_data.push(excelData.value);
+              itemDetails.value.excel_data.push(excelData.value);
 
               // calculate the MIN TEMP
               if (
-                thermalReportDetails.value.min_temp.reading >
-                excelData.value.MIN_TEMP
+                itemDetails.value.min_temp.reading > excelData.value.MIN_TEMP
               ) {
-                thermalReportDetails.value.min_temp.reading =
-                  excelData.value.MIN_TEMP;
-                thermalReportDetails.value.min_temp.instrument_id =
+                itemDetails.value.min_temp.reading = excelData.value.MIN_TEMP;
+                itemDetails.value.min_temp.instrument_id =
                   excelData.value.instrument_id;
-                thermalReportDetails.value.min_temp.logger_id =
+                itemDetails.value.min_temp.logger_id =
                   excelData.value.logger_id;
               }
 
               // calculate the MAX TEMP
               if (
-                thermalReportDetails.value.max_temp.reading <
-                excelData.value.MAX_TEMP
+                itemDetails.value.max_temp.reading < excelData.value.MAX_TEMP
               ) {
-                thermalReportDetails.value.max_temp.reading =
-                  excelData.value.MAX_TEMP;
-                thermalReportDetails.value.max_temp.instrument_id =
+                itemDetails.value.max_temp.reading = excelData.value.MAX_TEMP;
+                itemDetails.value.max_temp.instrument_id =
                   excelData.value.instrument_id;
-                thermalReportDetails.value.max_temp.logger_id =
+                itemDetails.value.max_temp.logger_id =
                   excelData.value.logger_id;
               }
 
               // calculate the MIN RH
-              if (
-                thermalReportDetails.value.min_rh.reading >
-                excelData.value.MIN_RH
-              ) {
-                thermalReportDetails.value.min_rh.reading =
-                  excelData.value.MIN_RH;
-                thermalReportDetails.value.min_rh.instrument_id =
+              if (itemDetails.value.min_rh.reading > excelData.value.MIN_RH) {
+                itemDetails.value.min_rh.reading = excelData.value.MIN_RH;
+                itemDetails.value.min_rh.instrument_id =
                   excelData.value.instrument_id;
-                thermalReportDetails.value.min_rh.logger_id =
-                  excelData.value.logger_id;
+                itemDetails.value.min_rh.logger_id = excelData.value.logger_id;
               }
 
               // calculate the MAX RH
-              if (
-                thermalReportDetails.value.max_rh.reading <
-                excelData.value.MAX_RH
-              ) {
-                thermalReportDetails.value.max_rh.reading =
-                  excelData.value.MAX_RH;
-                thermalReportDetails.value.max_rh.instrument_id =
+              if (itemDetails.value.max_rh.reading < excelData.value.MAX_RH) {
+                itemDetails.value.max_rh.reading = excelData.value.MAX_RH;
+                itemDetails.value.max_rh.instrument_id =
                   excelData.value.instrument_id;
-                thermalReportDetails.value.max_rh.logger_id =
-                  excelData.value.logger_id;
+                itemDetails.value.max_rh.logger_id = excelData.value.logger_id;
               }
 
               // calculate average temperature
-              thermalReportDetails.value.avg_temp =
-                (thermalReportDetails.value.min_temp.reading +
-                  thermalReportDetails.value.max_temp.reading) /
+              itemDetails.value.avg_temp =
+                (itemDetails.value.min_temp.reading +
+                  itemDetails.value.max_temp.reading) /
                 2;
 
               // calculate average humidity
-              thermalReportDetails.value.avg_rh =
-                (thermalReportDetails.value.min_rh.reading +
-                  thermalReportDetails.value.max_rh.reading) /
+              itemDetails.value.avg_rh =
+                (itemDetails.value.min_rh.reading +
+                  itemDetails.value.max_rh.reading) /
                 2;
             } else {
               Swal.fire({
@@ -540,131 +1477,48 @@ export default defineComponent({
         }
       }
 
-      console.log(thermalReportDetails.value.excel_data);
+      console.log(itemDetails.value.excel_data);
     }
 
-    function setRGPDetails(rgp_id, rgp_no, address, customer_name) {
-      thermalReportDetails.value.rgp_id = rgp_id ? rgp_id : "";
-      thermalReportDetails.value.rgp_no = rgp_no ? rgp_no : "";
-      thermalReportDetails.value.site_address.company_name =
-        address.company_name ? address.company_name : "";
-      thermalReportDetails.value.site_address.address1 = address.address1
-        ? address.address1
-        : "";
-      thermalReportDetails.value.site_address.address2 = address.address2
-        ? address.address2
-        : "";
-      thermalReportDetails.value.site_address.city = address.city
-        ? address.city
-        : "";
-      thermalReportDetails.value.site_address.pincode = address.pincode
-        ? address.pincode
-        : "";
-      thermalReportDetails.value.site_address.states = address.states
-        ? address.states
-        : "";
-      thermalReportDetails.value.site_address.country = address.country
-        ? address.country
-        : "";
-      thermalReportDetails.value.customer_name = customer_name
-        ? customer_name
-        : "";
-    }
-
-    const RGPS = ref([
-      {
-        id: "",
-        rgp_no: "",
-        site_address: {
-          company_name: "",
-          address1: "",
-          address2: "",
-          country: "",
-          city: "",
-          pincode: "",
-          states: "",
-        },
-        customer_data: {
-          id: "",
-          first_name: "",
-          last_name: "",
-          company: {
-            company_name: "",
-          },
-        },
-      },
-    ]);
-
-    // const formData = ref<CreateAccount>({});
-
-    const fillDetails = (response) => {
-      if (Array.isArray(response.result)) {
-        RGPS.value.push(
-          ...response.result.map((result) => {
-            return {
-              id: result.id,
-              rgp_no: result.rgp_no,
-              site_address: {
-                company_name: result.site_address.company_name,
-                address1: result.site_address.address1,
-                address2: result.site_address.address2,
-                country: result.site_address.country,
-                city: result.site_address.city,
-                pincode: result.site_address.pincode,
-                states: result.site_address.states,
-              },
-              customer_data: result.customer_data,
-            };
-          })
-        );
+    /* --------HANDLE RGP SELECTION LOGIC--------*/
+    const fetchRGP = async (rgpId: any) => {
+      if (rgpId !== "") {
+        const response = await getRGatePass(rgpId);
+        if (response) {
+          itemDetails.value.rgp_id = rgpId;
+          RgpData.value = { ...response };
+        }
       } else {
       }
     };
 
-    const GetOnGoingRGP = async () => {
-      ApiService.setHeader();
-
-      const company_ID = auth.GetUser().company_id;
-      const response = await getOnGoingCompletedRGP(company_ID);
-
-      if (response) {
-        await fillDetails(response);
-      }
-    };
-
-    async function thermal_instrument_listing(): Promise<void> {
-      try {
-        const response = await getThermalInstruments(`fetchAll=true`);
-
-        if (response.result != null && response.result) {
-          thermalInstruments.value = response.result?.map(
-            ({ id, name, instrument_id, serial_no }) => ({
-              id: id,
-              instrument_name: name,
-              instrument_id: instrument_id,
-              serial_no: serial_no,
-            })
-          );
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        //console.log("done");
-        setTimeout(() => {
-          loading.value = false;
-        }, 100);
-      }
-    }
-
     onMounted(async () => {
-      RGPS.value.pop();
-      thermalReportDetails.value.excel_data.pop();
-      await GetOnGoingRGP();
+      itemDetails.value.excel_data.pop();
+
+      try {
+        /* --------GET ALL IN PROCESS AND COMPLETED RGP LOGIC--------*/
+        const response = await getOnGoingCompletedRGPTherm(User.company_id);
+        if (response) {
+          RGatePasses.value = response.result.map(({ id, ...rest }) => ({
+            id: id,
+            ...rest,
+          }));
+        } else {
+          console.error(`Error Occured in getOnGoingCompletedRGPTherm`);
+        }
+      } catch (err) {
+        console.error(`Error Occured in getOnGoingCompletedRGPTherm : ${err}`);
+      }
+
+      try {
+        await thermal_instrument_listing();
+      } catch (err) {
+        console.error(`Error Occured in getOnGoingCompletedRGPTherm : ${err}`);
+      }
 
       _stepperObj.value = StepperComponent.createInsance(
-        horizontalWizardRef.value as HTMLElement
+        createAppStepperRef.value as HTMLElement
       );
-      thermal_instrument_listing();
     });
 
     const createAccountSchema = [
@@ -687,7 +1541,7 @@ export default defineComponent({
     });
 
     const { handleSubmit } = useForm<IStep1 | IStep2 | IStep3>({
-      validationSchema: currentSchema,
+      // validationSchema: currentSchema,
     });
 
     const totalSteps = computed(() => {
@@ -698,23 +1552,21 @@ export default defineComponent({
       }
     });
 
-    const handleStep = handleSubmit((values) => {
+    const handleStep = handleSubmit(async (values) => {
       // resetForm({});
 
       if (currentStepIndex.value === 0) {
-        thermalReportDetails.value.room_name = values["room_name"];
-        thermalReportDetails.value.acc_for_temp = values["acc_for_temp"];
-        thermalReportDetails.value.acc_for_rh = values["acc_for_rh"];
-        thermalReportDetails.value.mapping_duration =
-          values["mapping_duration"];
-        thermalReportDetails.value.logging_interval =
-          values["logging_interval"];
-        thermalReportDetails.value.logger_used = values["logger_used"];
+        itemDetails.value.room_name = values["room_name"];
+        itemDetails.value.acc_for_temp = values["acc_for_temp"];
+        itemDetails.value.acc_for_rh = values["acc_for_rh"];
+        itemDetails.value.mapping_duration = values["mapping_duration"];
+        itemDetails.value.logging_interval = values["logging_interval"];
+        itemDetails.value.logger_used = values["logger_used"];
 
         // generate the array of date-time
         if (
-          thermalReportDetails.value.val_start_date == "" ||
-          thermalReportDetails.value.start_time == ""
+          itemDetails.value.val_start_date == "" ||
+          itemDetails.value.start_time == ""
         ) {
           Swal.fire({
             icon: "info",
@@ -725,9 +1577,9 @@ export default defineComponent({
 
         // check fields are numeric
         if (
-          isNaN(thermalReportDetails.value.logging_interval) ||
-          isNaN(thermalReportDetails.value.mapping_duration) ||
-          isNaN(thermalReportDetails.value.logger_used)
+          isNaN(itemDetails.value.logging_interval) ||
+          isNaN(itemDetails.value.mapping_duration) ||
+          isNaN(itemDetails.value.logger_used)
         ) {
           Swal.fire({
             icon: "info",
@@ -737,16 +1589,16 @@ export default defineComponent({
           return;
         }
 
-        const generatedDates = generateDatesWithInterval(
-          thermalReportDetails.value.val_start_date,
-          thermalReportDetails.value.start_time,
-          thermalReportDetails.value.logging_interval,
-          numberOfDates
+        const generatedDates = await generateDatesWithInterval(
+          itemDetails.value.val_start_date,
+          itemDetails.value.start_time,
+          itemDetails.value.logging_interval,
+          NUMBER_OF_DATES
         );
 
-        thermalReportDetails.value.dates = generatedDates;
+        itemDetails.value.dates = generatedDates;
 
-        if (thermalReportDetails.value.rgp_id) {
+        if (itemDetails.value.rgp_id) {
           currentStepIndex.value++;
 
           console.log(_stepperObj.value);
@@ -764,7 +1616,7 @@ export default defineComponent({
         }
       } else if (currentStepIndex.value === 1) {
         // Atleat 2 instruments needed (for analysis)
-        if (thermalReportDetails.value.instruments.length > 1) {
+        if (itemDetails.value.instruments.length > 1) {
           currentStepIndex.value++;
 
           if (!_stepperObj.value) {
@@ -797,8 +1649,8 @@ export default defineComponent({
 
       // check whether selected instruments length and excel files length are same
       if (
-        thermalReportDetails.value.excel_data.length !=
-        thermalReportDetails.value.instruments.length
+        itemDetails.value.excel_data.length !=
+        itemDetails.value.instruments.length
       ) {
         Swal.fire({
           icon: "info",
@@ -810,7 +1662,7 @@ export default defineComponent({
       }
 
       try {
-        const response = await addThermalReport(thermalReportDetails.value);
+        const response = await addThermalReport(itemDetails.value);
         if (!response.error) {
           showSuccessAlert(
             "Success",
@@ -846,7 +1698,7 @@ export default defineComponent({
 
     // function associated with calculating MIN, MAX, AVG values for Temperature and Humidity
     const calculateTemperatureAndHumidity = () => {
-      const excelData = thermalReportDetails.value.excel_data;
+      const excelData = itemDetails.value.excel_data;
 
       if (excelData.length > 0) {
         const result = excelData.reduce(
@@ -897,43 +1749,43 @@ export default defineComponent({
         );
 
         // MIN TEMP
-        thermalReportDetails.value.min_temp = {
+        itemDetails.value.min_temp = {
           reading: result.minTemp,
           instrument_id: result.minTempInstrumentId,
           logger_id: result.minTempLoggerId,
         };
 
         // MAX TEMP
-        thermalReportDetails.value.max_temp = {
+        itemDetails.value.max_temp = {
           reading: result.maxTemp,
           instrument_id: result.maxTempInstrumentId,
           logger_id: result.maxTempLoggerId,
         };
 
         // MIN RH
-        thermalReportDetails.value.min_rh = {
+        itemDetails.value.min_rh = {
           reading: result.minRh,
           instrument_id: result.minRhInstrumentId,
           logger_id: result.minRhLoggerId,
         };
 
         // MAX RH
-        thermalReportDetails.value.max_rh = {
+        itemDetails.value.max_rh = {
           reading: result.maxRh,
           instrument_id: result.maxRhInstrumentId,
           logger_id: result.maxRhLoggerId,
         };
 
         // Average Temperature
-        thermalReportDetails.value.avg_temp =
-          (thermalReportDetails.value.min_temp.reading +
-            thermalReportDetails.value.max_temp.reading) /
+        itemDetails.value.avg_temp =
+          (itemDetails.value.min_temp.reading +
+            itemDetails.value.max_temp.reading) /
           2;
 
         // Average Humidity
-        thermalReportDetails.value.avg_rh =
-          (thermalReportDetails.value.min_rh.reading +
-            thermalReportDetails.value.max_rh.reading) /
+        itemDetails.value.avg_rh =
+          (itemDetails.value.min_rh.reading +
+            itemDetails.value.max_rh.reading) /
           2;
       } else {
       }
@@ -945,8 +1797,8 @@ export default defineComponent({
       NOTE : it require whole traversal of all files in order to calculate the MIN, MAX, AVG values for Temperature and Humidity
     */
     const deleteExcelFile = async (index) => {
-      thermalReportDetails.value.excel_data = await removeObjectWithId(
-        thermalReportDetails.value.excel_data,
+      itemDetails.value.excel_data = await removeObjectWithId(
+        itemDetails.value.excel_data,
         index
       );
       await calculateTemperatureAndHumidity;
@@ -982,28 +1834,44 @@ export default defineComponent({
     };
 
     return {
-      horizontalWizardRef,
+      createAppStepperRef,
       previousStep,
       handleStep,
       formSubmit,
       totalSteps,
       currentStepIndex,
       getAssetPath,
-      thermalReportDetails,
-      GetOnGoingRGP,
+      itemDetails,
       showErrorAlert,
       showSuccessAlert,
-      RGPS,
+      RGatePasses,
+      fetchRGP,
+      RgpData,
       loading,
-      setRGPDetails,
-      setTheStartDate,
-      setTheStartTime,
+      setDates,
+      setTimes,
       storeInstrument,
       removeInstrument,
-      thermalInstruments,
       storeExcelFile,
       deleteExcelFile,
       removeAllInstrument,
+
+      selectedIds,
+      tableData,
+      tableHeader,
+      instrumentsFrom,
+      instrumentsTo,
+      handleFrom,
+      handleTo,
+      fromInstrumentId,
+      toInstrumentId,
+      disabelRef,
+      toggleInstrument,
+
+      handleChange,
+      // allFilesData: props.allFilesData,
+      exportToExcel,
+      deleteTheFile,
     };
   },
 });

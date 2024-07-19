@@ -29,7 +29,7 @@ const BSCReportGen = async (id, pdfName, reportInfo) => {
       align: "center",
     });
 
-    const customerAddress = `${reportInfo.value.meta.address1} ${reportInfo.value.meta.address2} ${reportInfo.value.meta.city} ${reportInfo.value.meta.pincode} ${reportInfo.value.meta.states} ${reportInfo.value.meta.country}`;
+    const customerAddress = `${reportInfo.value.meta.address1} ${reportInfo.value.meta.address2} ${reportInfo.value.meta.city} ${reportInfo.value.meta.pincode} ${reportInfo.value.meta.state} ${reportInfo.value.meta.country}`;
 
     const CustomerDetails = [
       [{ title: `Customer Name & Address\n\n${reportInfo.value.meta.company_name}\n${customerAddress}`, rowSpan: 7}, { title:`Certificate Number : ${reportInfo.value.certificate_number}`}],

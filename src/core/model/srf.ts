@@ -8,15 +8,12 @@ interface ISrf {
     due_date: string;
     customer: {
       id: string;
-      first_name: string;
-      last_name: string;
-    };
-    meta: {
+      name: string;
       company_name: string;
       address1: string;
       address2: string;
       city: string;
-      states: string;
+      state: string;
       pincode: string;
       country: string;
     };

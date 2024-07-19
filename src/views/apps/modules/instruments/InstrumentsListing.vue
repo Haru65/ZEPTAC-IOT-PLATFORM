@@ -14,7 +14,7 @@
             v-model="search"
             @input="searchItems()"
             class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search quotations"
+            placeholder="Search instrument name"
           />
         </div>
         <!--end::Search-->
@@ -57,11 +57,7 @@
             <span class="me-2">{{ selectedIds.length }}</span
             >Selected
           </div>
-          <button
-            type="button"
-            class="btn btn-danger"
-            @click="deleteFewItem()"
-          >
+          <button type="button" class="btn btn-danger" @click="deleteFewItem()">
             Delete Selected
           </button>
         </div>
@@ -146,8 +142,9 @@
               v-bind:href="`https://api.zeptac.com/storage/company/${instruments.company_id}/instruments/${instruments.calibration_certificate}`"
               data-toggle="tooltip"
               title="Download Calibration Certificate"
-              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
-              >⤓ Calibration
+              class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+            >
+              <KTIcon icon-name="file-down" icon-class="fs-2" />
             </a>
           </div>
           <!--end::Menu FLex-->
@@ -161,8 +158,9 @@
               v-bind:href="`https://api.zeptac.com/storage/company/${instruments.company_id}/instruments/${instruments.datasheet}`"
               data-toggle="tooltip"
               title="Download Datasheet"
-              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
-              >⤓ Datasheet
+              class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+            >
+              <KTIcon icon-name="file-down" icon-class="fs-2" />
             </a>
           </div>
           <!--end::Menu FLex-->
@@ -174,25 +172,12 @@
             <a
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${instruments.company_id}/instruments/${instruments.traceability}`"
-              data-toggle="tooltip"
+              class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
               title="Download Traceability"
-              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
-              >⤓ Traceability
+            >
+              <KTIcon icon-name="file-down" icon-class="fs-2" />
             </a>
-          </div>
-          <!--end::Menu FLex-->
-        </template>
-
-        <template v-slot:card="{ row: instruments }">
-          <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span
-              data-toggle="tooltip"
-              title="Download Instrument History Card"
-              class="border rounded badge py-3 fs-7 badge-light-primary text-hover-success cursor-pointer"
-              @click="downloadHistoryCard(instruments.id)"
-              >⤓ History Card
-            </span>
           </div>
           <!--end::Menu FLex-->
         </template>
@@ -229,29 +214,36 @@
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="View Instrument"
+              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Download Instrument"
+              @click="downloadHistoryCard(instruments.id)"
             >
-              <router-link :to="`./edit/${instruments.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
+              <KTIcon icon-name="file-down" icon-class="fs-2" />
             </span>
+
+            <!--begin::Edit-->
+            <router-link :to="`/instruments/edit/${instruments.id}`">
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View Instrument"
+              >
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
             <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
               title="Delete Instrument"
+              @click="deleteItem(instruments.id, false)"
             >
-              <i
-                @click="deleteItem(instruments.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-1"
-              ></i>
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -300,8 +292,8 @@ import {
   getAllInstrument,
   deleteInstrument,
   InstrumentSearch,
-  getInstrument,
-getCompanyLogo,
+  getInstrumentInfo,
+  getCompanyLogo,
 } from "@/stores/api";
 import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
 import { hideModal } from "@/core/helpers/dom";
@@ -312,6 +304,47 @@ import arraySort from "array-sort";
 import moment from "moment";
 import Swal from "sweetalert2";
 import { getAssetPath } from "@/core/helpers/assets";
+
+interface MDetails {
+  periodicity: string;
+  m_date1: string;
+  m_date2: string;
+  m_details: string;
+  any_repair_detail: string;
+  maintenance_done_by: string;
+}
+
+interface DownloadData {
+  id: string;
+  instrument_id: string;
+  name: string;
+  description: string;
+  availability: string;
+  model_no: string;
+  serial_no: string;
+  make: string;
+
+  calibration_date: string;
+  calibration_due_date: string;
+  vendor_name: string;
+
+  accessories_list: Array<string>;
+  datasheet: string;
+  calibration_certificate: string;
+  traceability: string;
+
+  maintenance_plan: boolean;
+
+  maintenance_history: Array<MDetails>;
+  intermediate_check_plan: string[];
+
+  approval_status: string;
+
+  company_id: string;
+  created_by: string;
+  updated_by: string;
+  is_active: string;
+}
 
 export default defineComponent({
   name: "instrument-listing",
@@ -325,12 +358,6 @@ export default defineComponent({
     const identifier = Identifier;
 
     const tableHeader = ref([
-      {
-        columnName: "Id",
-        columnLabel: "id",
-        sortEnabled: true,
-        columnWidth: 35,
-      },
       {
         columnName: "Model No",
         columnLabel: "model_no",
@@ -376,12 +403,6 @@ export default defineComponent({
       {
         columnName: "Traceability",
         columnLabel: "traceability",
-        sortEnabled: false,
-        columnWidth: 75,
-      },
-      {
-        columnName: "History Card",
-        columnLabel: "card",
         sortEnabled: false,
         columnWidth: 75,
       },
@@ -678,7 +699,6 @@ export default defineComponent({
       });
     };
 
-
     const search = ref<string>("");
     // ? debounce timer
     let debounceTimer;
@@ -786,86 +806,145 @@ export default defineComponent({
       }
     };
 
-    const instrumentInfo = ref({
+    const companyInfo = ref({
+      id: "",
+      company_name: "",
+      company_logo: "",
+      address: "",
+      city: "",
+      state: "",
+      country: "",
+      pincode: "",
+      logo_base64: "",
+    });
+
+    const instrumentInfo = ref<DownloadData>({
       id: "",
       instrument_id: "",
-      company_id: "",
       name: "",
+      description: "",
+      availability: "",
       model_no: "",
       serial_no: "",
       make: "",
-
-      accessories_list: [],
-
       calibration_date: "",
       calibration_due_date: "",
       vendor_name: "",
+      accessories_list: [],
+      datasheet: "",
+      calibration_certificate: "",
+      traceability: "",
+      maintenance_plan: false,
 
       maintenance_history: [],
+      intermediate_check_plan: [],
 
-      company_details: {
-        id: "",
-        company_name: "",
-        company_logo: "",
-        address: "",
-        city: "",
-        state: "",
-        country: "",
-        pincode: "",
-        logo_base64: "",
-      },
+      approval_status: "",
+      company_id: "",
+      created_by: "",
+      updated_by: "",
+      is_active: "",
     });
 
-    const downloadHistoryCard = async (id: any) => {
-      const res = await getInstrument(id);
-      
-      const {
-        instrument_id,
-        company_id,
-        name,
-        model_no,
-        serial_no,
-        make,
-        calibration_date,
-        calibration_due_date,
-        vendor_name,
-        accessories_list,
-        maintenance_history,
-        } = res;
-        
-        const res2 = await getCompanyLogo(company_id);
+    const downloadHistoryCard = async (id) => {
+      let timerInterval;
 
-      instrumentInfo.value.id = id;
-      instrumentInfo.value.instrument_id = instrument_id;
-      instrumentInfo.value.company_id = company_id;
-      instrumentInfo.value.name = name;
-      instrumentInfo.value.model_no = model_no;
-      instrumentInfo.value.serial_no = serial_no;
-      instrumentInfo.value.make = make;
-      instrumentInfo.value.calibration_date = calibration_date;
-      instrumentInfo.value.calibration_due_date = calibration_due_date;
+      try {
+        // Show initial loading Swal with generic progress messages
+        Swal.fire({
+          title: "Downloading History Card",
+          html: `<div class="swal-animation">
+        <p class="swal-text">Please wait...</p>
+        <div class="swal-progress">
+          <div class="swal-progress-bar"></div>
+        </div>
+      </div>`,
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          willClose: () => {
+            clearInterval(timerInterval);
+          },
+        });
 
-      instrumentInfo.value.vendor_name = vendor_name;
-      instrumentInfo.value.accessories_list = JSON.parse(accessories_list);
-      instrumentInfo.value.maintenance_history =
-        JSON.parse(maintenance_history);
+        // Fetch RGP information
+        const res = await getInstrumentInfo(id);
+        if (res?.success != false) {
+          instrumentInfo.value = { ...res.result };
+          instrumentInfo.value.accessories_list =
+            JSON.parse(res.result.accessories_list) || [];
+          instrumentInfo.value.maintenance_history =
+            JSON.parse(res.result.maintenance_history) || [];
+        } else {
+          showErrorAlert("Error", res.message || "Error Occured");
+          return;
+        }
 
-      instrumentInfo.value.company_details.address = res2.address;
-      instrumentInfo.value.company_details.city = res2.city;
-      instrumentInfo.value.company_details.pincode = res2.pincode;
-      instrumentInfo.value.company_details.state = res2.state;
-      instrumentInfo.value.company_details.country = res2.country;
-      instrumentInfo.value.company_details.company_name =
-      res2.company_name;
-      instrumentInfo.value.company_details.company_logo = res2.company_logo ? res2.company_logo : "";
-      instrumentInfo.value.company_details.logo_base64 =
-      res2.logo_base64
-          ? "data: image/png;base64," + res2.logo_base64
-          : getAssetPath("media/avatars/default.png");
+        // Fetch company logo details
+        const res2 = await getCompanyLogo(res.result.company_id);
 
-      console.log(instrumentInfo.value.company_details);
+        if (res2?.success != false) {
+          // Update local reactive state (assuming Vue 3 Composition API syntax)
+          companyInfo.value.id = res2.result.id;
+          companyInfo.value.company_name = res2.result.company_name;
+          companyInfo.value.company_logo = res2.result.company_logo
+            ? res2.result.company_logo
+            : "";
+          companyInfo.value.logo_base64 = res2.result.logo_base64
+            ? "data: image/png;base64," + res2.result.logo_base64
+            : getAssetPath("media/avatars/default.png");
 
-      await instrumentGen(id, "instrument", instrumentInfo);
+          companyInfo.value.address = res2.result.address || "";
+          companyInfo.value.city = res2.result.city || "";
+          companyInfo.value.pincode = res2.result.pincode || "";
+          companyInfo.value.state = res2.result.state || "";
+          companyInfo.value.country = res2.result.country || "";
+        } else {
+          showErrorAlert("Error", res2.message || "Error Occured");
+          return;
+        }
+        // Update Swal message for PDF generation
+        Swal.update({
+          title: "Generating PDF",
+          html: `<div class="swal-animation">
+        <p class="swal-text">Please wait...</p>
+        <div class="swal-progress">
+          <div class="swal-progress-bar"></div>
+        </div>
+      </div>`,
+        });
+
+        // Simulate delay for PDF generation (replace with actual function)
+        const pdfName = `instrument`;
+
+        await instrumentGen(id, pdfName, instrumentInfo, companyInfo);
+
+        // Close Swal on success
+        Swal.fire({
+          title: "Download Complete",
+          text: "Instrument History Card PDF generated successfully",
+          icon: "success",
+          timer: 2000, // Show success message for 2 seconds
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } catch (error) {
+        console.error("Error downloading History Card:", error);
+
+        // Close Swal on success
+        Swal.fire({
+          title: "Error Complete",
+          text: "Failed to download Worksheet",
+          icon: "error",
+          timer: 2000,
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } finally {
+        // Clear interval if still running
+        clearInterval(timerInterval);
+      }
     };
 
     async function reLoadData() {

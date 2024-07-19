@@ -508,7 +508,7 @@
                 <div v-if="state.length" class="col-lg fv-row">
                   <div>
                     <el-select
-                      v-model="profileDetails.states"
+                      v-model="profileDetails.state"
                       filterable
                       placeholder="Select Your State..."
                     >
@@ -529,7 +529,7 @@
                       name="state"
                       class="form-control form-control-lg form-control-solid"
                       placeholder="Enter State Name"
-                      v-model="profileDetails.states"
+                      v-model="profileDetails.state"
                     />
                     <div class="fv-plugins-message-container">
                       <div class="fv-help-block">
@@ -1172,7 +1172,7 @@ interface ProfileDetails {
   address1: string;
   address2: string;
   country: string;
-  states: string;
+  state: string;
   pincode: string;
   city: string;
   dob: string;
@@ -1182,6 +1182,8 @@ interface ProfileDetails {
   company_id: string;
   created_by: string;
   updated_by: string;
+  is_active: string;
+  availability: string;
 }
 
 export default defineComponent({
@@ -1281,7 +1283,7 @@ export default defineComponent({
       address1: "",
       address2: "",
       country: "",
-      states: "",
+      state: "",
       city: "",
       pincode: "",
       dob: "",
@@ -1291,6 +1293,8 @@ export default defineComponent({
       company_id: "",
       created_by: User.id,
       updated_by: User.id,
+      is_active: "1",
+      availability: "1",
     });
 
     async function ToggleLicense() {
@@ -1770,13 +1774,13 @@ export default defineComponent({
           state.value.pop();
         }
         if (newVal === "India") {
-          profileDetails.value.states = "";
+          profileDetails.value.state = "";
           INstates.forEach((ele) => {
             state.value.push(ele.name);
           });
           //console.log(state);
         } else {
-          profileDetails.value.states = "";
+          profileDetails.value.state = "";
         }
       }
     );

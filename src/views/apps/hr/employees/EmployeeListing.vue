@@ -122,34 +122,36 @@
         </template>
 
         <template v-slot:history_card="{ row: employee }">
+          
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span
-              data-toggle="tooltip"
+              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
               title="Download Employee History Card"
-              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
               @click="downloadHistoryCard(employee.id)"
-              >⤓ History Card
+            >
+              <KTIcon icon-name="file-down" icon-class="fs-2" />
             </span>
           </div>
           <!--end::Menu FLex-->
         </template>
 
         <template v-slot:profile_pic="{ row: employee }">
+
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row" v-if="employee.meta.profile_pic">
             <a
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${employee.company_id}/profile_images/${employee.meta.profile_pic}`"
-              data-toggle="tooltip"
+              class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
               title="Download Photo"
-              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
-              >⤓ Photo
+            >
+              <KTIcon icon-name="profile-circle" icon-class="fs-1" />
             </a>
           </div>
-          <div class="d-flex flex-lg-row">
-          </div>
-          <!--end::Menu FLex-->
+          <div v-else class="d-flex flex-lg-row"></div>
           <!--end::Menu FLex-->
         </template>
 
@@ -159,54 +161,61 @@
             <a
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${employee.company_id}/aadhar_cards/${employee.meta.adhar}`"
-              data-toggle="tooltip"
-              title="Download Aadhar Card"
-              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
-              >⤓ Aadhar Card
+              class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+               title="Download Aadhar Card"
+            >
+              <KTIcon icon-name="fingerprint-scanning" icon-class="fs-1" />
             </a>
           </div>
-          <div class="d-flex flex-lg-row">
-          </div>
-          <!--end::Menu FLex-->
+          <div v-else class="d-flex flex-lg-row"></div>
           <!--end::Menu FLex-->
         </template>
 
         <template v-slot:pan="{ row: employee }">
-          <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row" v-if="employee.meta.pan">
+           <!--begin::Menu Flex-->
+           <div class="d-flex flex-lg-row" v-if="employee.meta.pan">
             <a
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${employee.company_id}/pan_cards/${employee.meta.pan}`"
-              data-toggle="tooltip"
+              class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
               title="Download Pan Card"
-              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
-              >⤓ Pan Card
+            >
+              <KTIcon icon-name="badge" icon-class="fs-1" />
             </a>
           </div>
-          <div class="d-flex flex-lg-row">
-          </div>
+          <div v-else class="d-flex flex-lg-row"></div>
           <!--end::Menu FLex-->
         </template>
 
         <template v-slot:actions="{ row: employee }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <router-link :to="`/employee/edit/${employee.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
-            </span>
-            <span>
-              <i
+          <div class="d-flex flex-lg-row my-3">
+            <!--begin::Edit-->
+            <router-link :to="`/employee/edit/${employee.id}`">
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View Employee"
+              >
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
+            <!--begin::Delete-->
+            <span
                 @click="deleteItem(employee.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete Employee"
+            >
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
+            <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -316,13 +325,13 @@ export default defineComponent({
         columnWidth: 75,
       },
       {
-        columnName: "Aadhar Card",
+        columnName: "Aadhar",
         columnLabel: "adhar",
         sortEnabled: false,
         columnWidth: 75,
       },
       {
-        columnName: "Pan Card",
+        columnName: "Pan",
         columnLabel: "pan",
         sortEnabled: false,
         columnWidth: 75,
@@ -366,7 +375,7 @@ export default defineComponent({
           ({ id, role_id, meta, ...rest }) => ({
             id: id,
             role_id: get_role(role_id),
-            meta: {...meta},
+            meta: { ...meta },
             ...rest,
           })
         );
@@ -401,7 +410,7 @@ export default defineComponent({
           ({ id, role_id, meta, ...rest }) => ({
             id: id,
             role_id: get_role(role_id),
-            meta: {...meta},
+            meta: { ...meta },
             ...rest,
           })
         );
@@ -435,7 +444,7 @@ export default defineComponent({
           ({ id, role_id, meta, ...rest }) => ({
             id: id,
             role_id: get_role(role_id),
-            meta: {...meta},
+            meta: { ...meta },
             ...rest,
           })
         );
@@ -650,7 +659,7 @@ export default defineComponent({
           ({ id, role_id, meta, ...rest }) => ({
             id: id,
             role_id: get_role(role_id),
-            meta: {...meta},
+            meta: { ...meta },
             ...rest,
           })
         );

@@ -31,7 +31,7 @@
         </h3>
         <div class="me-3">
           <el-select
-          class="w-150px"
+            class="w-150px"
             filterable
             placeholder="Select Year"
             v-model="selectedYearCache"
@@ -112,6 +112,7 @@
     </div>
     <div class="card-body pt-0">
       <Datatable
+        checkbox-label="id"
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
@@ -133,23 +134,30 @@
             {{ invoices.invoice_no }}
           </span>
         </template>
-        <template v-slot:customer_company="{ row: invoices }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ invoices.customer_company }}
+        <template v-slot:customer="{ row: invoices }">
+          <span
+            v-if="invoices.customer != null"
+            class="text-gray-600 text-hover-primary mb-1"
+          >
+            {{ invoices?.customer?.company_name || "" }}
           </span>
+          <span v-else> </span>
         </template>
-        <template v-slot:site_location="{ row: invoices }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ invoices.site_location?.city }}
-            {{ invoices.site_location?.states }}
+        <template v-slot:client="{ row: invoices }">
+          <span
+            v-if="invoices.client != null"
+            class="text-gray-600 text-hover-primary mb-1"
+          >
+            {{ invoices.client?.city || "" }} {{ invoices.client?.state || "" }}
           </span>
+          <span v-else> </span>
         </template>
         <!-- defualt data -->
         <template
-          v-slot:company_name="{ row: invoices }"
+          v-slot:company_details="{ row: invoices }"
           v-if="identifier == 'Admin'"
         >
-          {{ invoices.company_name }}
+          {{ invoices.company_details.company_name }}
         </template>
         <template v-slot:date="{ row: invoices }">
           {{ invoices.date }}
@@ -189,41 +197,45 @@
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="Download Quotation"
+              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Download Invoice"
+              @click="downloadInvoice(invoices.id)"
             >
-              <i
-                @click="downloadInvoice(invoices.id)"
-                class="las la-download text-gray-600 text-hover-success mb-1 fs-1"
-              ></i>
+              <KTIcon icon-name="file-down" icon-class="fs-2" />
             </span>
+
             <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="View Quotation"
+              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Clone Invoice"
+              @click="dupInvoice(invoices.id)"
             >
-              <router-link :to="`./edit/${invoices.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
+              <KTIcon icon-name="copy" icon-class="fs-2" />
             </span>
-            <span class="menu-link px-3">
-              <i
-                @click="deleteItem(invoices.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
-            </span>
-            <span class="menu-link px-3">
-              <i
-                @click="dupInvoice(invoices.id)"
-                class="las la-copy text-gray-600 text-hover-warning mb-1 fs-2"
-              ></i>
+
+            <!--begin::Edit-->
+            <router-link :to="`/invoices/edit/${invoices.id}`">
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View Invoice"
+              >
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
+            <span
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete Invoice"
+              @click="deleteItem(invoices.id, false)"
+            >
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -275,7 +287,7 @@ import {
   addInvoice,
   GetIncrInvoiceId,
   InvoiceSearch,
-  DownloadInvoice,
+  getInvoiceInfo,
   getCompanyLogo,
 } from "@/stores/api";
 import arraySort from "array-sort";
@@ -305,19 +317,19 @@ export default defineComponent({
       },
       {
         columnName: "Customer Name",
-        columnLabel: "customer_company",
+        columnLabel: "customer",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
         columnName: "Site Location",
-        columnLabel: "site_location",
+        columnLabel: "client",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
-        columnName: "Company Name",
-        columnLabel: "company_name",
+        columnName: "Main Company",
+        columnLabel: "company_details",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -363,14 +375,15 @@ export default defineComponent({
       address1: string;
       address2: string;
       city: string;
-      states: string;
+      state: string;
       pincode: string;
       country: string;
     }
 
     interface invoiceDetails {
       invoice_no: string;
-      lead_id: string;
+      customer_id: string;
+      client_id: string;
       items: {
         id: string;
         site_location: string;
@@ -423,7 +436,8 @@ export default defineComponent({
     const User = auth.GetUser();
     const quotationDetail = ref<invoiceDetails>({
       invoice_no: "",
-      lead_id: " ",
+      customer_id: "",
+      client_id: "",
       items: {
         id: "",
         site_location: "",
@@ -455,7 +469,7 @@ export default defineComponent({
         address1: "",
         address2: "",
         city: "",
-        states: "",
+        state: "",
         pincode: "",
         country: "",
       },
@@ -467,7 +481,7 @@ export default defineComponent({
         address1: "",
         address2: "",
         city: "",
-        states: "",
+        state: "",
         pincode: "",
         country: "",
       },
@@ -496,24 +510,12 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
-            date,
-            total,
-            customer_company,
-            site_location,
-            company_name,
-            status,
-            id,
-            invoice_no,
-          }) => ({
-            status: status,
+          ({ id, customer, client, company_details, ...rest }) => ({
             id: id,
-            invoice_no: invoice_no,
-            customer_company: customer_company.company_name,
-            company_name: company_name.company_name,
-            site_location: site_location,
-            date,
-            total: total,
+            customer: { ...customer },
+            client: { ...client },
+            company_details: { ...company_details },
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -546,24 +548,12 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
-            date,
-            total,
-            customer_company,
-            site_location,
-            company_name,
-            status,
-            id,
-            invoice_no,
-          }) => ({
-            status: status,
+          ({ id, customer, client, company_details, ...rest }) => ({
             id: id,
-            invoice_no: invoice_no,
-            customer_company: customer_company.company_name,
-            company_name: company_name.company_name,
-            site_location: site_location,
-            date,
-            total: total,
+            customer: { ...customer },
+            client: { ...client },
+            company_details: { ...company_details },
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -610,24 +600,12 @@ export default defineComponent({
         );
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
-            date,
-            total,
-            customer_company,
-            site_location,
-            company_name,
-            status,
-            id,
-            invoice_no,
-          }) => ({
-            status: status,
+          ({ id, customer, client, company_details, ...rest }) => ({
             id: id,
-            invoice_no: invoice_no,
-            customer_company: customer_company.company_name,
-            company_name: company_name.company_name,
-            site_location: site_location,
-            date,
-            total: total,
+            customer: { ...customer },
+            client: { ...client },
+            company_details: { ...company_details },
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -646,7 +624,7 @@ export default defineComponent({
       return identifier.value === "Admin"
         ? tableHeader.value
         : tableHeader.value.filter(
-            (column) => column.columnLabel !== "company_name"
+            (column) => column.columnLabel !== "company_details"
           );
     });
 
@@ -849,24 +827,12 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
-            date,
-            total,
-            customer_company,
-            site_location,
-            company_name,
-            status,
-            id,
-            invoice_no,
-          }) => ({
-            status: status,
+          ({ id, customer, client, company_details, ...rest }) => ({
             id: id,
-            invoice_no: invoice_no,
-            customer_company: customer_company.company_name,
-            company_name: company_name.company_name,
-            site_location: site_location,
-            date,
-            total: total,
+            customer: { ...customer },
+            client: { ...client },
+            company_details: { ...company_details },
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -907,18 +873,9 @@ export default defineComponent({
     };
 
     const dupInvoice = async (id) => {
-      // ? incr quotation no
-      const res = await GetIncrInvoiceId(User.company_id);
-      let latestinvoice_no = res.result.split("_");
-      latestinvoice_no =
-        latestinvoice_no[0] +
-        "_" +
-        (parseInt(latestinvoice_no[1]) + 1).toString();
-
-      // * option
       Swal.fire({
         title: "Are you sure?",
-        text: "Clone the Quotation !",
+        text: "Clone the Invoice !",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "red",
@@ -927,16 +884,11 @@ export default defineComponent({
       }).then(async (result: { [x: string]: any }) => {
         if (result["isConfirmed"]) {
           const response = await getInvoice(id);
-          // // update date
-          // quotationDetail.value.date = moment(
-          //   quotationDetail.value.date
-          // ).format("YYYY-MM-DD HH:mm:ss");
-          // quotationDetail.value.duedate = moment(
-          //   quotationDetail.value.duedate
-          // ).format("YYYY-MM-DD HH:mm:ss");
+
           quotationDetail.value = {
-            invoice_no: latestinvoice_no,
-            lead_id: response.customer_id,
+            invoice_no: "",
+            customer_id: response.customer_id,
+            client_id: response.client_id,
             items: JSON.parse(response.items),
             date: response.date,
             duedate: response.duedate,
@@ -953,7 +905,7 @@ export default defineComponent({
               address1: "",
               address2: "",
               city: "",
-              states: "",
+              state: "",
               pincode: "",
               country: "",
             },
@@ -965,7 +917,7 @@ export default defineComponent({
               address1: "",
               address2: "",
               city: "",
-              states: "",
+              state: "",
               pincode: "",
               country: "",
             },
@@ -985,10 +937,22 @@ export default defineComponent({
       });
     };
 
+    const companyInfo = ref({
+      id: "",
+      company_name: "",
+      company_logo: "",
+      address: "",
+      city: "",
+      state: "",
+      country: "",
+      pincode: "",
+      logo_base64: "",
+    });
+
     const InvoiceInfo = ref({
       id: "",
       invoice_no: "",
-      lead_id: "",
+      customer_id: "",
       client_id: "",
       items: {
         id: "",
@@ -1013,93 +977,157 @@ export default defineComponent({
       status: "",
       scope_of_work: "",
       terms_and_conditions: "",
-      lead: {
+      customer: {
+        id: "",
+        name: "",
+        mobile: "",
         company_name: "",
         address1: "",
         address2: "",
         city: "",
-        states: "",
+        state: "",
         pincode: "",
         country: "",
       },
       client: {
+        id: "",
+        name: "",
+        mobile: "",
         company_name: "",
         address1: "",
         address2: "",
         city: "",
-        states: "",
+        state: "",
         pincode: "",
         country: "",
       },
-      customer_name: {
-        first_name: "",
-        last_name: "",
-      },
-      client_name: {
-        first_name: "",
-        last_name: "",
-      },
-      company_details: {
+      clientx: {
         id: "",
+        name: "",
+        mobile: "",
         company_name: "",
-        company_logo: "",
-        address: "",
+        address1: "",
+        address2: "",
         city: "",
         state: "",
-        country: "",
         pincode: "",
-        logo_base64: "",
+        country: "",
       },
-      company_id: User.company_id,
       total: 0,
+      company_id: "",
     });
 
     const downloadInvoice = async (id: any) => {
-      const res = await DownloadInvoice(id);
-      // console.log(res);
+      let timerInterval;
 
-      if (res.result) {
-        InvoiceInfo.value.id = res.result.id;
-        InvoiceInfo.value.company_id = res.result.company_id;
-        InvoiceInfo.value.invoice_no = res.result.invoice_no;
-        InvoiceInfo.value.lead_id = res.result.customer_id;
-        InvoiceInfo.value.client_id = res.result.client_id;
-        InvoiceInfo.value.customer_name = res.result.customer_data;
-        InvoiceInfo.value.client_name = res.result.client_data;
-        InvoiceInfo.value.items = JSON.parse(res.result.items);
-        InvoiceInfo.value.lead = res.result.lead;
-        InvoiceInfo.value.client = res.result.client;
-        InvoiceInfo.value.total = res.result.total;
-        InvoiceInfo.value.date = res.result.date;
-        InvoiceInfo.value.duedate = res.result.duedate;
-        InvoiceInfo.value.enquiry_no = res.result.enquiry_no;
-        InvoiceInfo.value.status = res.result.status;
-        InvoiceInfo.value.scope_of_work = res.result.scope_of_work;
-        InvoiceInfo.value.terms_and_conditions =
-          res.result.terms_and_conditions;
+      try {
+        // Show initial loading Swal with generic progress messages
+        Swal.fire({
+          title: "Downloading Invoice",
+          html: `<div class="swal-animation">
+            <p class="swal-text">Please wait...</p>
+            <div class="swal-progress">
+              <div class="swal-progress-bar"></div>
+            </div>
+          </div>`,
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          willClose: () => {
+            clearInterval(timerInterval);
+          },
+        });
 
+        // Fetch information
+        const res = await getInvoiceInfo(id);
+
+        if (res?.success != false) {
+          InvoiceInfo.value.id = res.result.id;
+          InvoiceInfo.value.company_id = res.result.company_id;
+          InvoiceInfo.value.invoice_no = res.result.invoice_no;
+          InvoiceInfo.value.customer_id = res.result.customer_id;
+          InvoiceInfo.value.client_id = res.result.client_id;
+
+          InvoiceInfo.value.items = JSON.parse(res.result.items);
+
+          InvoiceInfo.value.customer = { ...res.result.customer };
+          InvoiceInfo.value.client = { ...res.result.client };
+          InvoiceInfo.value.clientx = { ...res.result.clientx };
+
+          InvoiceInfo.value.date = res.result.date;
+          InvoiceInfo.value.duedate = res.result.duedate;
+          InvoiceInfo.value.enquiry_no = res.result.enquiry_no;
+          InvoiceInfo.value.status = res.result.status;
+          InvoiceInfo.value.scope_of_work = res.result.scope_of_work;
+          InvoiceInfo.value.total = res.result.total;
+          InvoiceInfo.value.terms_and_conditions =
+            res.result.terms_and_conditions;
+        } else {
+          showErrorAlert("Error", res.message || "Error Occured");
+          return;
+        }
+
+        // Fetch company logo details
         const res2 = await getCompanyLogo(res.result.company_id);
 
-        InvoiceInfo.value.company_details.id = res2.id;
-        InvoiceInfo.value.company_details.company_name = res2.company_name;
-        InvoiceInfo.value.company_details.company_logo = res2.company_logo
-          ? res2.company_logo
-          : "";
-        InvoiceInfo.value.company_details.logo_base64 = res2.logo_base64
-          ? "data: image/png;base64," + res2.logo_base64
-          : getAssetPath("media/avatars/default.png");
-
-        // console.log(InvoiceInfo.value);
+        if (res2?.success != false) {
+          // Update local reactive state (assuming Vue 3 Composition API syntax)
+          companyInfo.value.id = res2.result.id;
+          companyInfo.value.company_name = res2.result.company_name;
+          companyInfo.value.company_logo = res2.result.company_logo
+            ? res2.result.company_logo
+            : "";
+          companyInfo.value.logo_base64 = res2.result.logo_base64
+            ? "data: image/png;base64," + res2.result.logo_base64
+            : getAssetPath("media/avatars/default.png");
+        } else {
+          showErrorAlert("Error", res2.message || "Error Occured");
+          return;
+        }
+        // Update Swal message for PDF generation
+        Swal.update({
+          title: "Generating PDF",
+          html: `<div class="swal-animation">
+  <p class="swal-text">Please wait...</p>
+  <div class="swal-progress">
+    <div class="swal-progress-bar"></div>
+  </div>
+</div>`,
+        });
 
         await Gen(
           "invoice",
-          id.toString(),
+          id,
           InvoiceInfo.value.invoice_no,
-          InvoiceInfo
+          InvoiceInfo,
+          companyInfo
         );
-      } else {
-        // console.log(res.message)
-        showErrorAlert("information", res.message ?? "something went wrong");
+
+        // Close Swal on success
+        Swal.fire({
+          title: "Download Complete",
+          text: "Invoice PDF generated successfully",
+          icon: "success",
+          timer: 2000, // Show success message for 2 seconds
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } catch (error) {
+        console.error("Error downloading Non-NABL Report:", error);
+
+        // Close Swal on success
+        Swal.fire({
+          title: "Error Complete",
+          text: "Failed to download Invoice",
+          icon: "error",
+          timer: 2000,
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } finally {
+        // Clear interval if still running
+        clearInterval(timerInterval);
       }
     };
 

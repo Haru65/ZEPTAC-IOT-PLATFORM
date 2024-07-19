@@ -4,8 +4,7 @@
       <!--begin::Card title-->
       <div class="card-title">
         <!--begin::Search-->
-        <div class="d-flex align-items-center position-relative my-1">
-        </div>
+        <div class="d-flex align-items-center position-relative my-1"></div>
         <!--end::Search-->
       </div>
       <!--begin::Card title-->
@@ -127,14 +126,13 @@
                 </tr>
               </thead>
               <tbody class="fw-semibold text-gray-600">
-                <tr v-for="(clause, index) in iso_rule.clauses"
-                    :key="index">
-                    <td class="text-start">
-                      {{ clause.clause_number }}
-                    </td>
-                    <td class="text-start">
-                      {{ clause.description }}
-                    </td>
+                <tr v-for="(clause, index) in iso_rule.clauses" :key="index">
+                  <td class="text-start">
+                    {{ clause.clause_number }}
+                  </td>
+                  <td class="text-start">
+                    {{ clause.description }}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -143,33 +141,31 @@
 
         <template v-slot:actions="{ row: iso_rule }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="View Audit Observation"
-            >
-              <router-link
-                :to="`/iso/edit/${iso_rule.id}`"
+          <div class="d-flex flex-lg-row my-3">
+            <!--begin::Edit-->
+            <router-link :to="`/iso/edit/${iso_rule.id}`">
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View Clause"
               >
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
-            </span>
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
+            <!--begin::Delete-->
             <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="Delete Audit Observation"
+              @click="deleteItem(iso_rule.id, false)"
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete Clause"
             >
-              <i
-                @click="deleteItem(iso_rule.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-1"
-              ></i>
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
+            <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -213,10 +209,7 @@ import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
 import type { ISORule } from "@/core/model/iso_rule";
-import {
-  getISORules,
-  deleteISORule,
-} from "@/stores/api";
+import { getISORules, deleteISORule } from "@/stores/api";
 import arraySort from "array-sort";
 import moment from "moment";
 import Swal from "sweetalert2";
@@ -265,9 +258,7 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getISORules(
-          `page=${page}&limit=${limit.value}`
-        );
+        const response = await getISORules(`page=${page}&limit=${limit.value}`);
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
@@ -296,9 +287,7 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getISORules(
-          `page=${page.value}&limit=${limit}`
-        );
+        const response = await getISORules(`page=${page.value}&limit=${limit}`);
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
@@ -421,7 +410,6 @@ export default defineComponent({
         }
       }
     };
-
 
     const sort = (sort: Sort) => {
       const reverse: boolean = sort.order === "asc";

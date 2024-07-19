@@ -31,7 +31,7 @@
         </h3>
         <div class="me-3">
           <el-select
-          class="w-150px"
+            class="w-150px"
             filterable
             placeholder="Select Year"
             v-model="selectedYearCache"
@@ -82,11 +82,7 @@
             <span class="me-2">{{ selectedIds.length }}</span
             >Selected
           </div>
-          <button
-            type="button"
-            class="btn btn-danger"
-            @click="deleteFewItem()"
-          >
+          <button type="button" class="btn btn-danger" @click="deleteFewItem()">
             Delete Selected
           </button>
         </div>
@@ -177,31 +173,31 @@
 
         <template v-slot:actions="{ row: audit_schedule }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
+          <div class="d-flex flex-lg-row my-3">
+            <!--begin::Edit-->
+            <router-link :to="`/auditschedule/edit/${audit_schedule.id}`">
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View Audit Schedule"
+              >
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
+            <!--begin::Delete-->
             <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="View Audit Observation"
-            >
-              <router-link :to="`/auditschedule/edit/${audit_schedule.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
-            </span>
-            <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
+              @click="deleteItem(audit_schedule.id, false)"
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
               title="Delete Audit Schedule"
             >
-              <i
-                @click="deleteItem(audit_schedule.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-1"
-              ></i>
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
+            <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">

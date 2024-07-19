@@ -11,7 +11,7 @@
 
           <div class="row">
             <div
-              class="col-lg-4 col-xl-3 col-md-6 col-sm-12"
+              class="col-lg-6 col-xl-6 col-md-12 col-sm-12"
               v-for="(fileItem, index) in $props.filesData"
               :key="index"
             >

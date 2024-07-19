@@ -6,7 +6,7 @@ import { ConductedTests } from "@/core/model/conductedtests";
 import { AcceptanceCriteria } from "@/core/model/dailyworksheets";
 import moment from "moment";
 
-const worksheetGen = async (id, pdfName, worksheetInfo) => {
+const worksheetGen = async (id, pdfName, worksheetInfo, companyDetails) => {
   pdfName += `_${id}_daily_worksheet`;
 
   const doc = new jsPDF({
@@ -25,7 +25,7 @@ const worksheetGen = async (id, pdfName, worksheetInfo) => {
 
   // Company Logo Img
   const img = new Image()
-  img.src = worksheetInfo.value.company_details.logo_base64;
+  img.src = companyDetails.value.logo_base64;
   doc.addImage(img, 'JPEG', 0.5, 0.7, 0.7, 0.7);
 
   // create a line under heading
@@ -34,8 +34,8 @@ const worksheetGen = async (id, pdfName, worksheetInfo) => {
   // const date = moment(worksheetInfo.date, "YYYY-MM-DD").format("LL");
 
   const Info = [
-    [`Customer ID : ${worksheetInfo.value.customer_data.id}`,{ title: "", rowSpan:2}],
-    [`Quotation No. : ${worksheetInfo.value.quotation_details.quotation_no}`]
+    ["Quotation No.", { title: `${worksheetInfo.value.rgp.quotation.quotation_no || ""}`}],
+    ["Customer Name.", { title: `${worksheetInfo.value.rgp.quotation.customer.company_name || ""}`}],
   ];
 
   autoTable(doc, {
@@ -54,20 +54,17 @@ const worksheetGen = async (id, pdfName, worksheetInfo) => {
     },
   });
 
-  const workingDate = moment(worksheetInfo.value.work_date, "YYYY-MM-DD").format("YYYY-MM-DD");
-  const startTime = moment(worksheetInfo.value.start_time).format("YYYY-MM-DD HH:mm:ss")
-  const EndTime = moment(worksheetInfo.value.end_time).format("YYYY-MM-DD HH:mm:ss")
+  const client_address = `${worksheetInfo.value.rgp.quotation.clientx.address1 || ""} ${worksheetInfo.value.rgp.quotation.clientx.address2 || ""} ${worksheetInfo.value.rgp.quotation.clientx.city || ""} ${worksheetInfo.value.rgp.quotation.clientx.pincode || ""} ${worksheetInfo.value.rgp.quotation.clientx.state || ""} ${worksheetInfo.value.rgp.quotation.clientx.country || ""}`;
 
-  const client_address = `${worksheetInfo.value.client_address.address1} ${worksheetInfo.value.client_address.address2} ${worksheetInfo.value.client_address.city} ${worksheetInfo.value.client_address.pincode} ${worksheetInfo.value.client_address.states} ${worksheetInfo.value.client_address.country}`
   const data = [
-    ['Client Name', `${worksheetInfo.value.client_data.company.company_name}`],
+    ['Client Name', `${worksheetInfo.value.rgp.quotation.clientx.company_name}`],
     ['Address', client_address],
-    ['Phone / Mobile No.', `${worksheetInfo.value.client_data.mobile}`],
-    ['Contact Person', `${worksheetInfo.value.client_data.first_name} ${worksheetInfo.value.client_data.last_name}`],
+    ['Phone / Mobile No.', `${worksheetInfo.value.rgp.quotation.clientx.mobile}`],
+    ['Contact Person', `${worksheetInfo.value.rgp.quotation.clientx.name}`],
     ['Witnessed By', worksheetInfo.value.witnessed_by],
-    ['Actual Working Date', workingDate],
-    ['Work Start Time', startTime],
-    ['Work Finished Time', EndTime],
+    ['Actual Working Date', `${worksheetInfo.value.work_date || ""}`],
+    ['Work Start Time',  `${worksheetInfo.value.start_time || ""}`],
+    ['Work Finished Time',  `${worksheetInfo.value.end_time || ""}`],
   ];
 
   data.push([{
@@ -122,7 +119,7 @@ const worksheetGen = async (id, pdfName, worksheetInfo) => {
         title: `Any Other Test`,
       },
       {
-      title: `${worksheetInfo.value.other_test}`,
+      title: `${worksheetInfo.value.other_test || ""}`,
       colSpan: 3,
     }]
   ];
@@ -170,7 +167,7 @@ const worksheetGen = async (id, pdfName, worksheetInfo) => {
         title: `Problem Faced If Any`,
       },
       {
-        title: `${worksheetInfo.value.problem}`,
+        title: `${worksheetInfo.value.problem || ""}`,
         colSpan: 3,
       }
     ]

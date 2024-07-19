@@ -598,7 +598,7 @@ export default defineComponent({
         address2: "",
         city: "",
         pincode: "",
-        states: "",
+        state: "",
         country: "",
       },
 

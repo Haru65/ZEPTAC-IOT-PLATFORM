@@ -113,6 +113,7 @@
     </div>
     <div class="card-body pt-0">
       <Datatable
+        checkbox-label="id"
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
@@ -127,25 +128,24 @@
         <template v-slot:id="{ row: validationreports }">
           {{ validationreports.id }}
         </template>
-        <template v-slot:customer_name="{ row: validationreports }">
-          {{ validationreports.customer_name.company_name }}
+
+        <template v-slot:customer="{ row: validationreports }">
+          <span v-if="validationreports.customer != null">
+            {{ validationreports.customer?.company_name || "" }}
+          </span>
+          <span v-else> </span>
         </template>
-        <template v-slot:site_location="{ row: validationreports }">
-          {{
-            validationreports.site_location.company_name +
-            " " +
-            validationreports.site_location.address1 +
-            " " +
-            validationreports.site_location.address2 +
-            " " +
-            validationreports.site_location.city +
-            " " +
-            validationreports.site_location.pincode +
-            " " +
-            validationreports.site_location.states +
-            " " +
-            validationreports.site_location.country
-          }}
+
+        <template v-slot:clientx="{ row: validationreports }">
+          <span v-if="validationreports.clientx != null">
+            {{ validationreports.clientx.address1 || "" }}
+            {{ validationreports.clientx.address2 || "" }}
+            {{ validationreports.clientx.city || "" }}
+            {{ validationreports.clientx.pincode || "" }}
+            {{ validationreports.clientx.state || "" }}
+            {{ validationreports.clientx.country || "" }}
+          </span>
+          <span v-else> </span>
         </template>
         <template v-slot:test_sizes="{ row: validationreports }">
           <div>
@@ -177,31 +177,39 @@
         <template v-slot:created_at="{ row: validationreports }">
           {{ validationreports.created_at }}
         </template>
+
         <template v-slot:actions="{ row: validationreports }">
-          <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <i
-                @click="downloadReport(validationreports.id)"
-                class="cursor-pointer bi bi-download text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
+            <span
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Download Non-NABL Report"
+              @click="downloadReport(validationreports.id)"
+            >
+              <KTIcon icon-name="file-down" icon-class="fs-2" />
             </span>
-            <span class="menu-link px-3">
-              <router-link :to="`./edit/${validationreports.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
-            </span>
-            <span class="menu-link px-3">
-              <i
-                @click="deleteItem(validationreports.id, false)"
-                class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
+            <!--begin::Edit-->
+            <router-link
+              :to="`/validationreports/edit/${validationreports.id}`"
+            >
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="Edit Non-NABL Report"
+              >
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+            <span
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete Non-NABL Report"
+              @click="deleteItem(validationreports.id, false)"
+            >
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
           </div>
-          <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -250,8 +258,8 @@ import {
   getAllValidationReport,
   deleteValidationReport,
   ValidationReportSearch,
-  getReportinfo,
   getCompanyLogo,
+  getValidationReportInfo,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import arraySort from "array-sort";
@@ -471,7 +479,7 @@ interface ValidationReport {
     address2: string;
     city: string;
     pincode: string;
-    states: string;
+    state: string;
     country: string;
   };
   tests: [
@@ -511,20 +519,14 @@ export default defineComponent({
 
     const tableHeader = ref([
       {
-        columnName: "Id",
-        columnLabel: "id",
-        sortEnabled: true,
-        columnWidth: 35,
-      },
-      {
         columnName: "Customer Name",
-        columnLabel: "customer_name",
+        columnLabel: "customer",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
         columnName: "Site Location",
-        columnLabel: "site_location",
+        columnLabel: "clientx",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -586,33 +588,14 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
-            id,
-            customer_name,
-            site_location,
-            test_sizes,
-            report_status,
-            created_at,
-          }) => ({
+          ({ id, rgp, test_sizes, report_status, created_at, ...rest }) => ({
             id: id,
-            customer_name: {
-              company_name: customer_name.company_name,
-            },
-            site_location: {
-              company_name: site_location.company_name
-                ? site_location.company_name
-                : "",
-              address1: site_location.address1 ? site_location.address1 : "",
-              address2: site_location.address2 ? site_location.address2 : "",
-              city: site_location.city ? site_location.city : "",
-              pincode: site_location.pincode ? site_location.pincode : "",
-              states: site_location.states ? site_location.states : "",
-              country: site_location.country ? site_location.country : "",
-            },
+            customer: { ...rgp.quotation.customer },
+            clientx: { ...rgp.quotation.clientx },
             test_sizes: { ...test_sizes },
-
             report_status: report_status,
             created_at: moment(created_at).format("DD-MM-YYYY"),
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -645,33 +628,14 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
-            id,
-            customer_name,
-            site_location,
-            test_sizes,
-            report_status,
-            created_at,
-          }) => ({
+          ({ id, rgp, test_sizes, report_status, created_at, ...rest }) => ({
             id: id,
-            customer_name: {
-              company_name: customer_name.company_name,
-            },
-            site_location: {
-              company_name: site_location.company_name
-                ? site_location.company_name
-                : "",
-              address1: site_location.address1 ? site_location.address1 : "",
-              address2: site_location.address2 ? site_location.address2 : "",
-              city: site_location.city ? site_location.city : "",
-              pincode: site_location.pincode ? site_location.pincode : "",
-              states: site_location.states ? site_location.states : "",
-              country: site_location.country ? site_location.country : "",
-            },
+            customer: { ...rgp.quotation.customer },
+            clientx: { ...rgp.quotation.clientx },
             test_sizes: { ...test_sizes },
-
             report_status: report_status,
             created_at: moment(created_at).format("DD-MM-YYYY"),
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -718,33 +682,14 @@ export default defineComponent({
           }`
         );
         tableData.value = response.result.data.map(
-          ({
-            id,
-            customer_name,
-            site_location,
-            test_sizes,
-            report_status,
-            created_at,
-          }) => ({
+          ({ id, rgp, test_sizes, report_status, created_at, ...rest }) => ({
             id: id,
-            customer_name: {
-              company_name: customer_name.company_name,
-            },
-            site_location: {
-              company_name: site_location.company_name
-                ? site_location.company_name
-                : "",
-              address1: site_location.address1 ? site_location.address1 : "",
-              address2: site_location.address2 ? site_location.address2 : "",
-              city: site_location.city ? site_location.city : "",
-              pincode: site_location.pincode ? site_location.pincode : "",
-              states: site_location.states ? site_location.states : "",
-              country: site_location.country ? site_location.country : "",
-            },
+            customer: { ...rgp.quotation.customer },
+            clientx: { ...rgp.quotation.clientx },
             test_sizes: { ...test_sizes },
-
             report_status: report_status,
             created_at: moment(created_at).format("DD-MM-YYYY"),
+            ...rest,
           })
         );
 
@@ -958,33 +903,14 @@ export default defineComponent({
         );
 
         tableData.value = response.result.data.map(
-          ({
-            id,
-            customer_name,
-            site_location,
-            test_sizes,
-            report_status,
-            created_at,
-          }) => ({
+          ({ id, rgp, test_sizes, report_status, created_at, ...rest }) => ({
             id: id,
-            customer_name: {
-              company_name: customer_name.company_name,
-            },
-            site_location: {
-              company_name: site_location.company_name
-                ? site_location.company_name
-                : "",
-              address1: site_location.address1 ? site_location.address1 : "",
-              address2: site_location.address2 ? site_location.address2 : "",
-              city: site_location.city ? site_location.city : "",
-              pincode: site_location.pincode ? site_location.pincode : "",
-              states: site_location.states ? site_location.states : "",
-              country: site_location.country ? site_location.country : "",
-            },
+            customer: { ...rgp.quotation.customer },
+            clientx: { ...rgp.quotation.clientx },
             test_sizes: { ...test_sizes },
-
             report_status: report_status,
             created_at: moment(created_at).format("DD-MM-YYYY"),
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -1024,83 +950,174 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
+    const companyInfo = ref({
+      id: "",
+      company_name: "",
+      company_logo: "",
+      address: "",
+      city: "",
+      state: "",
+      country: "",
+      pincode: "",
+      logo_base64: "",
+    });
+
     const reportInfo = ref({
       id: "",
       rgp_id: "",
-      company_id: "",
-      rgp_no: "",
       tests: [],
-      quotation_no: "",
-      customer_data: {
-        company_id: "",
-        first_name: "",
-        last_name: "",
-      },
-      client_data: {
-        company_id: "",
-        first_name: "",
-        last_name: "",
-      },
-      customer_company: {
-        company_name: "",
-      },
-      client_company: {
-        company_name: "",
-      },
-      client_address: {
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        states: "",
-        country: "",
-      },
-      company_details: {
+      company_id: "",
+      report_status: "",
+      created_by: "",
+      updated_by: "",
+      is_active: "",
+
+      rgp: {
         id: "",
-        company_name: "",
-        company_logo: "",
-        address: "",
-        city: "",
-        state: "",
-        country: "",
-        pincode: "",
-        logo_base64: "",
+        rgp_no: "",
+        quotation_id: "",
+        quotation: {
+          id: "",
+          quotation_no: "",
+          customer: {
+            id: "",
+            name: "",
+            mobile: "",
+            company_name: "",
+            address1: "",
+            address2: "",
+            city: "",
+            pincode: "",
+            state: "",
+            country: "",
+          },
+          client: {
+            id: "",
+            name: "",
+            mobile: "",
+            company_name: "",
+            address1: "",
+            address2: "",
+            city: "",
+            pincode: "",
+            state: "",
+            country: "",
+          },
+          clientx: {
+            id: "",
+            name: "",
+            mobile: "",
+            company_name: "",
+            address1: "",
+            address2: "",
+            city: "",
+            pincode: "",
+            state: "",
+            country: "",
+          },
+        },
       },
     });
 
     const downloadReport = async (id: any) => {
-      // get all information of the rgp
-      const res = await getReportinfo(id);
-      reportInfo.value.id = res.result.id;
-      reportInfo.value.company_id = res.result.company_id;
-      reportInfo.value.rgp_id = res.result.rgp_id;
-      reportInfo.value.rgp_no = res.result.rgp_Details.rgp_no;
-      reportInfo.value.tests = JSON.parse(res.result.tests);
-      reportInfo.value.customer_company.company_name =
-        res.result.customer_company.company_name;
-      reportInfo.value.client_company.company_name =
-        res.result.client_company.company_name;
-      reportInfo.value.client_address = res.result.client_address;
-      reportInfo.value.customer_data = res.result.customer_data;
-      reportInfo.value.client_data = res.result.client_data;
-      reportInfo.value.quotation_no = res.result.quotationsDetails.quotation_no;
+      let timerInterval;
 
-      const res2 = await getCompanyLogo(res.result.company_id);
+      try {
+        // Show initial loading Swal with generic progress messages
+        Swal.fire({
+          title: "Downloading Non-NABL Report",
+          html: `<div class="swal-animation">
+            <p class="swal-text">Please wait...</p>
+            <div class="swal-progress">
+              <div class="swal-progress-bar"></div>
+            </div>
+          </div>`,
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          willClose: () => {
+            clearInterval(timerInterval);
+          },
+        });
 
-      reportInfo.value.company_details.id = res2.id;
-      reportInfo.value.company_details.company_name = res2.company_name;
-      reportInfo.value.company_details.company_logo = res2.company_logo
-        ? res2.company_logo
-        : "";
-      reportInfo.value.company_details.logo_base64 = res2.logo_base64
-        ? "data: image/png;base64," + res2.logo_base64
-        : getAssetPath("media/avatars/default.png");
+        // Fetch RGP information
+        const res = await getValidationReportInfo(id);
 
-      console.log(reportInfo.value);
+        if (res?.success != false) {
+          reportInfo.value.id = res.result.id;
+          reportInfo.value.rgp_id = res.result.rgp_id;
+          reportInfo.value.tests = JSON.parse(res.result.tests);
+          reportInfo.value.report_status = res.result.report_status;
+          reportInfo.value.company_id = res.result.company_id;
+          reportInfo.value.created_by = res.result.created_by;
+          reportInfo.value.updated_by = res.result.updated_by;
+          reportInfo.value.is_active = res.result.is_active;
 
-      const reportName = `${reportInfo.value.quotation_no}_${reportInfo.value.rgp_no}`;
+          reportInfo.value.rgp = {...res.result.rgp};
+        } else {
+          showErrorAlert("Error", res.message || "Error Occured");
+          return;
+        }
 
-      await reportGen(id, reportName, reportInfo);
+        // Fetch company logo details
+        const res2 = await getCompanyLogo(res.result.company_id);
+
+        if (res2?.success != false) {
+          // Update local reactive state (assuming Vue 3 Composition API syntax)
+          companyInfo.value.id = res2.result.id;
+          companyInfo.value.company_name = res2.result.company_name;
+          companyInfo.value.company_logo = res2.result.company_logo
+            ? res2.result.company_logo
+            : "";
+          companyInfo.value.logo_base64 = res2.result.logo_base64
+            ? "data: image/png;base64," + res2.result.logo_base64
+            : getAssetPath("media/avatars/default.png");
+        } else {
+          showErrorAlert("Error", res2.message || "Error Occured");
+          return;
+        }
+        // Update Swal message for PDF generation
+        Swal.update({
+          title: "Generating PDF",
+          html: `<div class="swal-animation">
+  <p class="swal-text">Please wait...</p>
+  <div class="swal-progress">
+    <div class="swal-progress-bar"></div>
+  </div>
+</div>`,
+        });
+
+        // Simulate delay for PDF generation (replace with actual function)
+        const pdfName = `${reportInfo.value.rgp.quotation.quotation_no}_${reportInfo.value.rgp.rgp_no}`;
+
+        await reportGen(id, pdfName, reportInfo, companyInfo);
+
+        // Close Swal on success
+        Swal.fire({
+          title: "Download Complete",
+          text: "Non-NABL Report PDF generated successfully",
+          icon: "success",
+          timer: 2000, // Show success message for 2 seconds
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } catch (error) {
+        console.error("Error downloading Non-NABL Report:", error);
+
+        // Close Swal on success
+        Swal.fire({
+          title: "Error Complete",
+          text: "Failed to download Non-NABL Report",
+          icon: "error",
+          timer: 2000,
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } finally {
+        // Clear interval if still running
+        clearInterval(timerInterval);
+      }
     };
 
     return {

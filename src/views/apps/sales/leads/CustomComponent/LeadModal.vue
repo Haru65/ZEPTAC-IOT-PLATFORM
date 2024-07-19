@@ -18,7 +18,7 @@
         <VForm
           class="form"
           id="kt_modal_new_address_form"
-          @submit="submit($event)"
+          @submit="submit"
           :validation-schema="validationSchema"
         >
           <!--begin::Modal header-->
@@ -132,6 +132,7 @@
           <div class="modal-footer flex-center">
             <!--begin::Button-->
             <button
+            type="button"
               @click="clear"
               id="kt_modal_new_address_cancel"
               class="btn btn-light me-3"
@@ -200,16 +201,6 @@ export default defineComponent({
       phone: "",
     });
 
-    function areAllPropertiesNull(array) {
-      return array.some((detail) => {
-        const { name, email, phone } = detail;
-
-        // Check if any property is null or empty
-
-        return name === "" || email === "" || phone === "";
-      });
-    }
-
     const clear = () => {
       leadDetails.value = {
         name: "",
@@ -246,19 +237,58 @@ export default defineComponent({
       });
     };
 
-    const submit = async (e) => {
-      console.log(leadDetails.value);
+    const validateForm = (formData) => {
+      for (const key in formData) {
+        let value = formData[key];
+        if (Array.isArray(value)) {
+          for (const item of value) {
+            if (!validateForm(item)) {
+              return false;
+            }
+          }
+        } else if (typeof value === "object" && value !== null) {
+          if (!validateForm(value)) {
+            return false;
+          }
+        } else if (typeof value === "string") {
+          value = value.trim();
+          if (value === "") {
+            return false;
+          }
+        } else {
+        }
+      }
+      return true;
+    };
 
-      const result = areAllPropertiesNull([leadDetails.value]);
+    const submit = async () => {
+      const result = validateForm(leadDetails.value);
 
-      if (!result) {
+      if (result == false) {
+        showErrorAlert("Warning", "Please fill all the details correctly.");
+        return;
+      }
+
+      try {
+
+        if (submitButtonRef.value) {
+          // Activate indicator
+          submitButtonRef.value.setAttribute("data-kt-indicator", "on");
+        }
+
         await emit("addData", leadDetails.value);
         showSuccessAlert("Success", "Lead Added Successfully!");
         clear();
         hideModal(newAddressModalRef.value);
-      } else {
-        showErrorAlert("Warning", "Please fill all the details Correctly");
-        return;
+
+      } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
+        showErrorAlert("Error", "Failed to add data. Try again later.");
+      } finally {
+        if (submitButtonRef.value) {
+          submitButtonRef.value.removeAttribute("data-kt-indicator");
+        }
       }
     };
 

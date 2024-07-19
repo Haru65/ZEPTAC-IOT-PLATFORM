@@ -162,14 +162,13 @@ export default defineComponent({
       try {
         let response = await getIndiaMartApi(CompanyId.toString());
         if (response?.success) {
-          console.log(response);
-          apiDetails.value.indiamart_key = response.indiamart_key;
-          apiDetails.value.last_fetch_time = response.last_fetch_time;
-          apiDetails.value.company_id = response.company_id;
+          apiDetails.value.indiamart_key = response.result.indiamart_key;
+          apiDetails.value.last_fetch_time = response.result.last_fetch_time;
+          apiDetails.value.company_id = response.result.company_id;
 
-          itemDetails.value.indiamart_key = response.indiamart_key;
-          itemDetails.value.last_fetch_time = response.last_fetch_time;
-          itemDetails.value.company_id = response.company_id;
+          itemDetails.value.indiamart_key = response.result.indiamart_key;
+          itemDetails.value.last_fetch_time = response.result.last_fetch_time;
+          itemDetails.value.company_id = response.result.company_id;
         }
       } catch (error) {
         showErrorAlert("Error", "An error occurred during the API call.");

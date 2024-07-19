@@ -31,7 +31,7 @@
         </h3>
         <div class="me-3">
           <el-select
-          class="w-150px"
+            class="w-150px"
             filterable
             placeholder="Select Year"
             v-model="selectedYearCache"
@@ -121,6 +121,7 @@
       ></ApprovalModal>
 
       <Datatable
+        checkbox-label="id"
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
@@ -197,25 +198,33 @@
         </template>
         <template v-slot:actions="{ row: document_change }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <router-link
-                :to="`/document_change_request/edit/${document_change.id}`"
+          <div class="d-flex flex-lg-row my-3">
+            <!--begin::Edit-->
+            <router-link
+              :to="`/document_change_request/edit/${document_change.id}`"
+            >
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View Document"
               >
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
+            <!--begin::Delete-->
+            <span
+              @click="deleteItem(document_change.id, false)"
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete Document"
+            >
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
-            <span class="menu-link px-3">
-              <i
-                @click="deleteItem(document_change.id, false)"
-                class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
-            </span>
+            <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">

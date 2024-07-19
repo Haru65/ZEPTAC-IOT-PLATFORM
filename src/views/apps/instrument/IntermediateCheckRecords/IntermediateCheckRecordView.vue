@@ -131,13 +131,24 @@
                               >
                             </td>
                             <td>
-                              <router-link
-                                :to="`/intermediate_check_records/edit/${plan?.id}`"
-                              >
-                                <span class="text-hover-primary cursor-pointer"
-                                  >view
-                                </span>
-                              </router-link>
+                              <div class="d-flex flex-lg-row my-3">
+                                <!--begin::Edit-->
+                                <router-link
+                                  :to="`/intermediate_check_records/edit/${plan?.id}`"
+                                >
+                                  <span
+                                    class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                                    data-bs-toggle="tooltip"
+                                    title="View Intermediate Record"
+                                  >
+                                    <KTIcon
+                                      icon-name="pencil"
+                                      icon-class="fs-2"
+                                    />
+                                  </span>
+                                </router-link>
+                                <!--end::Edit-->
+                              </div>
                             </td>
                           </tr>
                           <tr
@@ -243,7 +254,10 @@ export default defineComponent({
         itemDetails.make = response.make;
         itemDetails.model_no = response.model_no;
         itemDetails.serial_no = response.serial_no;
-        itemDetails.intermediate_check_records = response?.intermediate_check_records ? response?.intermediate_check_records : [];
+        itemDetails.intermediate_check_records =
+          response?.intermediate_check_records
+            ? response?.intermediate_check_records
+            : [];
       } catch (error) {
         showErrorAlert("Error", "An error occurred during the API call.");
         loading.value = false;

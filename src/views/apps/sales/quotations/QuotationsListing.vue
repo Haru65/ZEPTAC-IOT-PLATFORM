@@ -31,7 +31,7 @@
         </h3>
         <div class="me-3">
           <el-select
-          class="w-150px"
+            class="w-150px"
             filterable
             placeholder="Select Year"
             v-model="selectedYearCache"
@@ -134,23 +134,31 @@
             {{ quotations.quotation_no }}
           </span>
         </template>
-        <template v-slot:customer_company="{ row: quotations }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ quotations.customer_company }}
+        <template v-slot:customer="{ row: quotations }">
+          <span
+            v-if="quotations.customer != null"
+            class="text-gray-600 text-hover-primary mb-1"
+          >
+            {{ quotations?.customer?.company_name || "" }}
           </span>
+          <span v-else> </span>
         </template>
-        <template v-slot:site_location="{ row: quotations }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ quotations.site_location?.city }}
-            {{ quotations.site_location?.states }}
+        <template v-slot:client="{ row: quotations }">
+          <span
+            v-if="quotations.client != null"
+            class="text-gray-600 text-hover-primary mb-1"
+          >
+            {{ quotations.client?.city || "" }}
+            {{ quotations.client?.state || "" }}
           </span>
+          <span v-else> </span>
         </template>
         <!-- defualt data -->
         <template
-          v-slot:company_name="{ row: quotations }"
+          v-slot:company_details="{ row: quotations }"
           v-if="identifier == 'Admin'"
         >
-          {{ quotations.company_name }}
+          {{ quotations.company_details.company_name }}
         </template>
         <template v-slot:date="{ row: quotations }">
           {{ quotations.date }}
@@ -185,49 +193,45 @@
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
+              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
               title="Download Quotation"
+              @click="downloadQuotation(quotations.id)"
             >
-              <i
-                @click="downloadQuotation(quotations.id)"
-                class="las la-download text-gray-600 text-hover-success mb-1 fs-1"
-              ></i>
+              <KTIcon icon-name="file-down" icon-class="fs-2" />
             </span>
+
             <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="View Quotation"
+              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Clone Quotation"
+              @click="dupQuotation(quotations.id)"
             >
-              <router-link :to="`./edit/${quotations.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
+              <KTIcon icon-name="copy" icon-class="fs-2" />
             </span>
+
+            <!--begin::Edit-->
+            <router-link :to="`/quotations/edit/${quotations.id}`">
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View Quotation"
+              >
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
             <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
               title="Delete Quotation"
+              @click="deleteItem(quotations.id, false)"
             >
-              <i
-                @click="deleteItem(quotations.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-1"
-              ></i>
-            </span>
-            <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="Duplicate Quotation"
-            >
-              <i
-                @click="dupQuotation(quotations.id)"
-                class="las la-copy text-gray-600 text-hover-warning mb-1 fs-1"
-              ></i>
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -279,7 +283,7 @@ import {
   addQuotation,
   QuotationSearch,
   GetIncrQuotationId,
-  DownloadQuotation,
+  getQuotationInfo,
   getCompanyLogo,
 } from "@/stores/api";
 import arraySort from "array-sort";
@@ -309,19 +313,19 @@ export default defineComponent({
       },
       {
         columnName: "Customer Name",
-        columnLabel: "customer_company",
+        columnLabel: "customer",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
         columnName: "Site Location",
-        columnLabel: "site_location",
+        columnLabel: "client",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
-        columnName: "Company Name",
-        columnLabel: "company_name",
+        columnName: "Main Company",
+        columnLabel: "company_details",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -359,22 +363,22 @@ export default defineComponent({
       amount: number;
     }
 
-    interface Meta {
+    interface Data {
       id: string;
-      first_name: string;
-      last_name: string;
+      name: string;
       company_name: string;
       address1: string;
       address2: string;
       city: string;
-      states: string;
+      state: string;
       pincode: string;
       country: string;
     }
 
     interface quotationDetails {
       quotation_no: string;
-      lead_id: string;
+      customer_id: string;
+      client_id: string;
       items: {
         id: string;
         site_location: string;
@@ -400,8 +404,8 @@ export default defineComponent({
       scope_of_work: string;
       terms_and_conditions: string;
       total: number;
-      lead: Meta;
-      client: Meta;
+      lead: Data;
+      client: Data;
       is_active: number;
       company_id: string;
       created_by: string;
@@ -414,7 +418,8 @@ export default defineComponent({
     const User = auth.GetUser();
     const quotationDetail = ref<quotationDetails>({
       quotation_no: "",
-      lead_id: "",
+      customer_id: "",
+      client_id: "",
       items: {
         id: "",
         site_location: "",
@@ -441,24 +446,22 @@ export default defineComponent({
       lead: {
         id: "",
         company_name: "",
-        first_name: "",
-        last_name: "",
+        name: "",
         address1: "",
         address2: "",
         city: "",
-        states: "",
+        state: "",
         pincode: "",
         country: "",
       },
       client: {
         id: "",
         company_name: "",
-        first_name: "",
-        last_name: "",
+        name: "",
         address1: "",
         address2: "",
         city: "",
-        states: "",
+        state: "",
         pincode: "",
         country: "",
       },
@@ -507,24 +510,12 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
-            date,
-            total,
-            customer_company,
-            site_location,
-            company_name,
-            status,
-            id,
-            quotation_no,
-          }) => ({
-            status: status,
+          ({ id, customer, client, company_details, ...rest }) => ({
             id: id,
-            quotation_no: quotation_no,
-            customer_company: customer_company.company_name,
-            company_name: company_name.company_name,
-            site_location: site_location,
-            date,
-            total: total,
+            customer: { ...customer },
+            client: { ...client },
+            company_details: { ...company_details },
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -557,24 +548,12 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
-            date,
-            total,
-            customer_company,
-            site_location,
-            company_name,
-            status,
-            id,
-            quotation_no,
-          }) => ({
-            status: status,
+          ({ id, customer, client, company_details, ...rest }) => ({
             id: id,
-            quotation_no: quotation_no,
-            customer_company: customer_company.company_name,
-            company_name: company_name.company_name,
-            site_location: site_location,
-            date,
-            total: total,
+            customer: { ...customer },
+            client: { ...client },
+            company_details: { ...company_details },
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -609,7 +588,7 @@ export default defineComponent({
       return identifier.value === "Admin"
         ? tableHeader.value
         : tableHeader.value.filter(
-            (column) => column.columnLabel !== "company_name"
+            (column) => column.columnLabel !== "company_details"
           );
     });
 
@@ -653,24 +632,12 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
-            date,
-            total,
-            customer_company,
-            site_location,
-            company_name,
-            status,
-            id,
-            quotation_no,
-          }) => ({
-            status: status,
+          ({ id, customer, client, company_details, ...rest }) => ({
             id: id,
-            quotation_no: quotation_no,
-            customer_company: customer_company.company_name,
-            company_name: company_name.company_name,
-            site_location: site_location,
-            date,
-            total: total,
+            customer: { ...customer },
+            client: { ...client },
+            company_details: { ...company_details },
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -857,24 +824,12 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
-            date,
-            total,
-            customer_company,
-            site_location,
-            company_name,
-            status,
-            id,
-            quotation_no,
-          }) => ({
-            status: status,
+          ({ id, customer, client, company_details, ...rest }) => ({
             id: id,
-            quotation_no: quotation_no,
-            customer_company: customer_company.company_name,
-            company_name: company_name.company_name,
-            site_location: site_location,
-            date,
-            total: total,
+            customer: { ...customer },
+            client: { ...client },
+            company_details: { ...company_details },
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -915,15 +870,6 @@ export default defineComponent({
     };
 
     const dupQuotation = async (id) => {
-      // ? incr quotation no
-      const res = await GetIncrQuotationId(User.company_id);
-      let latestquotation_no = res.result.split("_");
-      latestquotation_no =
-        latestquotation_no[0] +
-        "_" +
-        (parseInt(latestquotation_no[1]) + 1).toString();
-
-      // * option
       Swal.fire({
         title: "Are you sure?",
         text: "Clone the Quotation !",
@@ -935,16 +881,11 @@ export default defineComponent({
       }).then(async (result: { [x: string]: any }) => {
         if (result["isConfirmed"]) {
           const response = await getQuotation(id);
-          // update date
-          // quotationDetail.value.date = moment(
-          //   quotationDetail.value.date
-          // ).format("YYYY-MM-DD HH:mm:ss");
-          // quotationDetail.value.duedate = moment(
-          //   quotationDetail.value.duedate
-          // ).format("YYYY-MM-DD HH:mm:ss");
+
           quotationDetail.value = {
-            quotation_no: latestquotation_no,
-            lead_id: response.customer_id,
+            quotation_no: "",
+            customer_id: response.customer_id,
+            client_id: response.client_id,
             items: JSON.parse(response.items),
             date: response.date,
             duedate: response.duedate,
@@ -955,25 +896,23 @@ export default defineComponent({
             total: response.total,
             lead: {
               id: response.customer_id,
-              first_name: "",
-              last_name: "",
+              name: "",
               company_name: "",
               address1: "",
               address2: "",
               city: "",
-              states: "",
+              state: "",
               pincode: "",
               country: "",
             },
             client: {
               id: response.client_id,
-              first_name: "",
-              last_name: "",
+              name: "",
               company_name: "",
               address1: "",
               address2: "",
               city: "",
-              states: "",
+              state: "",
               pincode: "",
               country: "",
             },
@@ -993,11 +932,22 @@ export default defineComponent({
       });
     };
 
+    const companyInfo = ref({
+      id: "",
+      company_name: "",
+      company_logo: "",
+      address: "",
+      city: "",
+      state: "",
+      country: "",
+      pincode: "",
+      logo_base64: "",
+    });
+
     const QuotationInfo = ref({
       id: "",
       quotation_no: "",
-      company_id: "",
-      lead_id: "",
+      customer_id: "",
       client_id: "",
       items: {
         id: "",
@@ -1022,92 +972,157 @@ export default defineComponent({
       status: "",
       scope_of_work: "",
       terms_and_conditions: "",
-      lead: {
+      customer: {
+        id: "",
+        name: "",
+        mobile: "",
         company_name: "",
         address1: "",
         address2: "",
         city: "",
-        states: "",
+        state: "",
         pincode: "",
         country: "",
       },
       client: {
+        id: "",
+        name: "",
+        mobile: "",
         company_name: "",
         address1: "",
         address2: "",
         city: "",
-        states: "",
+        state: "",
         pincode: "",
         country: "",
       },
-      customer_name: {
-        first_name: "",
-        last_name: "",
-      },
-      client_name: {
-        first_name: "",
-        last_name: "",
-      },
-      company_details: {
+      clientx: {
         id: "",
+        name: "",
+        mobile: "",
         company_name: "",
-        company_logo: "",
-        address: "",
+        address1: "",
+        address2: "",
         city: "",
         state: "",
-        country: "",
         pincode: "",
-        logo_base64: "",
+        country: "",
       },
       total: 0,
+      company_id: "",
     });
 
     const downloadQuotation = async (id: any) => {
-      const res = await DownloadQuotation(id);
-      // console.log(res);
+      let timerInterval;
 
-      if (res.result) {
-        QuotationInfo.value.id = res.result.id;
-        QuotationInfo.value.company_id = res.result.company_id;
-        QuotationInfo.value.quotation_no = res.result.quotation_no;
-        QuotationInfo.value.lead_id = res.result.customer_id;
-        QuotationInfo.value.client_id = res.result.client_id;
-        QuotationInfo.value.customer_name = res.result.customer_data;
-        QuotationInfo.value.client_name = res.result.client_data;
-        QuotationInfo.value.items = JSON.parse(res.result.items);
-        QuotationInfo.value.lead = res.result.lead;
-        QuotationInfo.value.client = res.result.client;
-        QuotationInfo.value.total = res.result.total;
-        QuotationInfo.value.date = res.result.date;
-        QuotationInfo.value.duedate = res.result.duedate;
-        QuotationInfo.value.enquiry_no = res.result.enquiry_no;
-        QuotationInfo.value.status = res.result.status;
-        QuotationInfo.value.scope_of_work = res.result.scope_of_work;
-        QuotationInfo.value.terms_and_conditions =
-          res.result.terms_and_conditions;
+      try {
+        // Show initial loading Swal with generic progress messages
+        Swal.fire({
+          title: "Downloading Quotation",
+          html: `<div class="swal-animation">
+            <p class="swal-text">Please wait...</p>
+            <div class="swal-progress">
+              <div class="swal-progress-bar"></div>
+            </div>
+          </div>`,
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          willClose: () => {
+            clearInterval(timerInterval);
+          },
+        });
 
+        // Fetch RGP information
+        const res = await getQuotationInfo(id);
+
+        if (res?.success != false) {
+          QuotationInfo.value.id = res.result.id;
+          QuotationInfo.value.company_id = res.result.company_id;
+          QuotationInfo.value.quotation_no = res.result.quotation_no;
+          QuotationInfo.value.customer_id = res.result.customer_id;
+          QuotationInfo.value.client_id = res.result.client_id;
+
+          QuotationInfo.value.items = JSON.parse(res.result.items);
+
+          QuotationInfo.value.customer = { ...res.result.customer };
+          QuotationInfo.value.client = { ...res.result.client };
+          QuotationInfo.value.clientx = { ...res.result.clientx };
+
+          QuotationInfo.value.date = res.result.date;
+          QuotationInfo.value.duedate = res.result.duedate;
+          QuotationInfo.value.enquiry_no = res.result.enquiry_no;
+          QuotationInfo.value.status = res.result.status;
+          QuotationInfo.value.scope_of_work = res.result.scope_of_work;
+          QuotationInfo.value.total = res.result.total;
+          QuotationInfo.value.terms_and_conditions =
+            res.result.terms_and_conditions;
+        } else {
+          showErrorAlert("Error", res.message || "Error Occured");
+          return;
+        }
+
+        // Fetch company logo details
         const res2 = await getCompanyLogo(res.result.company_id);
 
-        QuotationInfo.value.company_details.id = res2.id;
-        QuotationInfo.value.company_details.company_name = res2.company_name;
-        QuotationInfo.value.company_details.company_logo = res2.company_logo
-          ? res2.company_logo
-          : "";
-        QuotationInfo.value.company_details.logo_base64 = res2.logo_base64
-          ? "data: image/png;base64," + res2.logo_base64
-          : getAssetPath("media/avatars/default.png");
-
-        // console.log(QuotationInfo.value);
+        if (res2?.success != false) {
+          // Update local reactive state (assuming Vue 3 Composition API syntax)
+          companyInfo.value.id = res2.result.id;
+          companyInfo.value.company_name = res2.result.company_name;
+          companyInfo.value.company_logo = res2.result.company_logo
+            ? res2.result.company_logo
+            : "";
+          companyInfo.value.logo_base64 = res2.result.logo_base64
+            ? "data: image/png;base64," + res2.result.logo_base64
+            : getAssetPath("media/avatars/default.png");
+        } else {
+          showErrorAlert("Error", res2.message || "Error Occured");
+          return;
+        }
+        // Update Swal message for PDF generation
+        Swal.update({
+          title: "Generating PDF",
+          html: `<div class="swal-animation">
+  <p class="swal-text">Please wait...</p>
+  <div class="swal-progress">
+    <div class="swal-progress-bar"></div>
+  </div>
+</div>`,
+        });
 
         await Gen(
           "quotation",
-          id.toString(),
+          id,
           QuotationInfo.value.quotation_no,
-          QuotationInfo
+          QuotationInfo,
+          companyInfo
         );
-      } else {
-        // console.log(res.message)
-        showErrorAlert("information", res.message ?? "something went wrong");
+
+        // Close Swal on success
+        Swal.fire({
+          title: "Download Complete",
+          text: "Quotation PDF generated successfully",
+          icon: "success",
+          timer: 2000, // Show success message for 2 seconds
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } catch (error) {
+        console.error("Error downloading Non-NABL Report:", error);
+
+        // Close Swal on success
+        Swal.fire({
+          title: "Error Complete",
+          text: "Failed to download Quotation",
+          icon: "error",
+          timer: 2000,
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } finally {
+        // Clear interval if still running
+        clearInterval(timerInterval);
       }
     };
 

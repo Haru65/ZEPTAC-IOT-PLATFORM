@@ -177,7 +177,6 @@ const routes: Array<RouteRecordRaw> = [
           //console.log(companyId);
           try {
             const response = await getCompany(companyId);
-            console.log(response);
             if (response.success == false || response.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
@@ -334,7 +333,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getLead(LeadId);
             console.log(response);
-            if (response.error) {
+            if (response.success == false || response.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -382,7 +381,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getCustomer(customerId);
             console.log(response);
-            if (response.error) {
+            if (response.success == false || response.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -430,7 +429,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getClient(clientId);
             console.log(response);
-            if (response.error) {
+            if (response.success == false || response.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -701,7 +700,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getDailyWorksheet(worksheetID.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.success == false || response.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -743,23 +742,27 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/expensesheets/edit/:id",
         name: "expensesheet-edit",
+        beforeEnter: async (to, from, next) => {
+          const itemID = to.params.id;
+          //console.log(companyId);
+          try {
+            const response = await getExpenseSheet(itemID.toString());
+            console.log(response);
+            if (response.success == false || response.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
         component: () =>
           import("@/views/apps/modules/services/expense/ExpenseSheetEdit.vue"),
         meta: {
           pageTitle: "Expense Sheet Edit",
           breadcrumbs: ["Expense Sheet Edit"],
-        },
-      },
-
-      // Expense Sheet Routes
-      {
-        path: "/expensesheets/approval",
-        name: "expensesheet-approval",
-        component: () =>
-          import("@/views/apps/modules/services/expense/ExpenseSheetApproval.vue"),
-        meta: {
-          pageTitle: "Expense Approval",
-          breadcrumbs: ["Expense Approval"],
         },
       },
 
@@ -788,12 +791,11 @@ const routes: Array<RouteRecordRaw> = [
         path: "/validationreports/edit/:id",
         name: "validationreport-edit",
         beforeEnter: async (to, from, next) => {
-          const validationReportID = to.params.id;
+          const itemID = to.params.id;
           //console.log(companyId);
           try {
-            const response = await getValidationReport(validationReportID.toString());
-            console.log(response);
-            if (response.error || response.is_active == 0) {
+            const response = await getValidationReport(itemID.toString());
+            if (response.success == false || response.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1219,8 +1221,7 @@ const routes: Array<RouteRecordRaw> = [
           const reportID = to.params.id;
           try {
             const response = await getThermalReport(reportID.toString());
-            console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.success == false || response.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1287,7 +1288,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/thermalinstrument/cloneinstrument/:id",
+        path: "/cloneinstrument/:id",
         name: "thermal-instrument-clone",
         beforeEnter: async (to, from, next) => {
           const instrumentId = to.params.id;
@@ -2643,6 +2644,14 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/icons-page",
+        name: "icons-page",
+        component: () => import("@/views/crafted/pages/IconsPage.vue"),
+        meta: {
+          pageTitle: "Icons",
+        },
+      },
+      {
         path: "/contactus",
         name: "contactus",
         component: () => import("@/views/crafted/pricing/ContactUs.vue"),
@@ -2681,7 +2690,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await validateUser(data);
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.success == false || response.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route

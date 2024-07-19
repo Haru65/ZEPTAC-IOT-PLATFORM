@@ -76,11 +76,7 @@
             <span class="me-2">{{ selectedIds.length }}</span
             >Selected
           </div>
-          <button
-            type="button"
-            class="btn btn-danger"
-            @click="deleteFewItem()"
-          >
+          <button type="button" class="btn btn-danger" @click="deleteFewItem()">
             Delete Selected
           </button>
         </div>
@@ -114,6 +110,7 @@
       <DataModal v-bind:data="itemDetails"></DataModal>
 
       <Datatable
+        checkbox-label="id"
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
@@ -128,20 +125,18 @@
         <template v-slot:id="{ row: srf }">
           {{ srf.id }}
         </template>
-        <template v-slot:meta="{ row: srf }">
-          <span v-if="srf.meta != null">
-            {{ srf.meta?.company_name ? srf.meta?.company_name : "" }}
+        <template v-slot:customer_company="{ row: srf }">
+          <span v-if="srf.customer != null">
+            {{ srf.customer?.company_name || "" }}
           </span>
           <span v-else> </span>
         </template>
 
         <template v-slot:customer="{ row: srf }">
-          <span v-if="srf.customer !== null">
-            {{ srf.customer.first_name }} {{ srf.customer.last_name }}
+          <span v-if="srf.customer != null">
+            {{ srf.customer?.name || "" }}
           </span>
-          <span v-else>
-            {{ srf.customer }}
-          </span>
+          <span v-else> </span>
         </template>
 
         <template v-slot:srf_no="{ row: srf }">
@@ -155,27 +150,34 @@
         </template>
 
         <template v-slot:srf_data="{ row: srf }">
-          <span
-            data-bs-toggle="modal"
-            data-bs-target="#kt_modal_srf"
-            @click="fillItemData(srf)"
-            class="border rounded badge py-3 fs-7 badge-light-primary text-hover-success cursor-pointer"
-            >View Scope of Work
-          </span>
+          <div class="d-flex flex-lg-row">
+            <span
+              class="menu-link px-3"
+              data-bs-toggle="modal"
+              data-bs-target="#kt_modal_srf"
+              data-toggle="tooltip"
+              title="View Scope of Work"
+              @click="fillItemData(srf)"
+            >
+              <span
+                class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
+                >View Scope of Work
+              </span>
+            </span>
+          </div>
         </template>
 
         <template v-slot:actions="{ row: srf }">
-          <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <i
-                @click="deleteItem(srf.id, false)"
-                class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
+            <span
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete SRF"
+              @click="deleteItem(srf.id, false)"
+            >
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
           </div>
-          <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -245,7 +247,7 @@ export default defineComponent({
     const tableHeader = ref([
       {
         columnName: "Customer Name",
-        columnLabel: "meta",
+        columnLabel: "customer_company",
         sortEnabled: true,
         columnWidth: 200,
       },
@@ -320,13 +322,10 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ id, customer, meta, created_at, ...rest }) => ({
+          ({ id, customer, created_at, ...rest }) => ({
             id: id,
             customer: {
               ...customer,
-            },
-            meta: {
-              ...meta,
             },
             created_at: moment(created_at).format("DD-MM-YYYY"),
             ...rest,
@@ -362,13 +361,10 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ id, customer, meta, created_at, ...rest }) => ({
+          ({ id, customer, created_at, ...rest }) => ({
             id: id,
             customer: {
               ...customer,
-            },
-            meta: {
-              ...meta,
             },
             created_at: moment(created_at).format("DD-MM-YYYY"),
             ...rest,
@@ -418,13 +414,10 @@ export default defineComponent({
           }`
         );
         tableData.value = response.result.data.map(
-          ({ id, customer, meta, created_at, ...rest }) => ({
+          ({ id, customer, created_at, ...rest }) => ({
             id: id,
             customer: {
               ...customer,
-            },
-            meta: {
-              ...meta,
             },
             created_at: moment(created_at).format("DD-MM-YYYY"),
             ...rest,
@@ -641,13 +634,10 @@ export default defineComponent({
         );
 
         tableData.value = response.result.data.map(
-          ({ id, customer, meta, created_at, ...rest }) => ({
+          ({ id, customer, created_at, ...rest }) => ({
             id: id,
             customer: {
               ...customer,
-            },
-            meta: {
-              ...meta,
             },
             created_at: moment(created_at).format("DD-MM-YYYY"),
             ...rest,

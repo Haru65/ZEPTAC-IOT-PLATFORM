@@ -2,17 +2,20 @@
 
 interface IClients {
   id: number;
-  client_company: string;
-  customer_company: string;
-  location: {
-    city: string;
-    states: string;
+  company_name: string;
+  customer: {
+    id: string;
+    name: string;
+    company_name: string;
   };
+  city: string;
+  state: string;
   name: string;
-  company_name: {
+  company_details: {
     company_name: string;
   };
   mobile: string;
+  company_id: number;
 }
 
 

@@ -20,33 +20,6 @@
         <!--end::Search-->
       </div>
       <!--begin::Card title-->
-      <!--begin::Card toolbar-->
-      <div class="card-toolbar">
-        <!--begin::Toolbar-->
-        <div
-          v-if="selectedIds.length === 0"
-          class="d-flex justify-content-end"
-          data-kt-customer-table-toolbar="base"
-        >
-          <!--begin::Export-->
-          <button
-            type="button"
-            class="btn btn-light-primary me-3"
-            data-bs-toggle="modal"
-            data-bs-target="#kt_customers_export_modal"
-          >
-            <KTIcon icon-name="exit-up" icon-class="fs-2" />
-            Export
-          </button>
-          <!--end::Export-->
-        </div>
-        <!--end::Toolbar-->
-        <!--begin::Group actions-->
-        <!--end::Group actions-->
-        <!--begin::Group actions-->
-        <!--end::Group actions-->
-      </div>
-      <!--end::Card toolbar-->
     </div>
     <div class="card-body pt-0">
       <Datatable
@@ -77,19 +50,19 @@
 
         <template v-slot:intermediate_record="{ row: intermediate_instrument }">
           <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="Add Intermediate Check Plan"
+            class="menu-link px-3"
+            data-toggle="tooltip"
+            title="Add Intermediate Check Plan"
+          >
+            <router-link
+              :to="`/intermediate_check_records/add/${intermediate_instrument.id}`"
             >
-              <router-link
-                :to="`/intermediate_check_records/add/${intermediate_instrument.id}`"
-              >
-                <span
-                  class="border rounded badge py-3 fs-7 badge-light-primary text-hover-success cursor-pointer"
-                  >+ Check Plan
-                </span>
-              </router-link>
-            </span>
+              <span
+                class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
+                >+ Check Plan
+              </span>
+            </router-link>
+          </span>
         </template>
 
         <template v-slot:actions="{ row: intermediate_instrument }">
@@ -101,10 +74,10 @@
               title="View Intermediate Check Plan"
             >
               <router-link
-              :to="`/intermediate_check_records/view/${intermediate_instrument.id}`"
+                :to="`/intermediate_check_records/view/${intermediate_instrument.id}`"
               >
                 <span
-                  class="border rounded badge py-3 fs-7 badge-light-primary text-hover-success cursor-pointer"
+                  class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
                   >View Intermediate Checks
                 </span>
               </router-link>

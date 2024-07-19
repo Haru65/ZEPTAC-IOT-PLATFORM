@@ -95,10 +95,10 @@ export async function validateUser(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.post("validate_user", data);
-        return response.data;
-    } catch (error) {
-        console.error(error);
-        return { error: error };
+        return response.data.result;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -107,10 +107,10 @@ export async function validateFeedback(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.post("validate_feedback", data);
-        return response.data;
-    } catch (error) {
-        console.error(error);
-        return { error: error };
+        return response.data.result;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -124,7 +124,7 @@ export async function getCompanyLogo(data: any) {
         ApiService.setHeader();
         const response = await ApiService.post('get_company_logo', id);
         console.log(response.data.result)
-        return response.data.result;
+        return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
         return { success: false, message: errors?.response?.data?.message || "An error occurred" };
@@ -417,19 +417,6 @@ export async function addClient(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.post(CLIENTS_URL, data);
-        return response.data.message;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
-    }
-}
-
-// Delete A Client
-export async function deleteClient(data: any) {
-    try {
-        ApiService.setHeader();
-        const response = await ApiService.delete(CLIENTS_URL + "/" + data);
-        console.log(response.data.message)
         return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
@@ -444,9 +431,9 @@ export async function getClient(data: any) {
         const response = await ApiService.get(CLIENTS_URL, data);
         //console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -456,10 +443,23 @@ export async function updateClient(data: any, id: any) {
         ApiService.setHeader();
         const response = await ApiService.put(CLIENTS_URL + "/" + id, data);
         //console.log(response)
-        return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// Delete A Client
+export async function deleteClient(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.delete(CLIENTS_URL + "/" + data);
+        console.log(response.data.message)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -508,9 +508,9 @@ export async function addCustomer(data: any) {
         console.log(data);
         const response = await ApiService.post(CUSTOMERS_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -520,9 +520,9 @@ export async function getCustomer(data: any) {
         const response = await ApiService.get(CUSTOMERS_URL, data);
         //console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -532,9 +532,9 @@ export async function updateCustomer(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(CUSTOMERS_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -555,11 +555,12 @@ export async function deleteCustomer(data: any) {
 // LEADS
 
 // gell all comapnies
-export async function LeadsSearch(search: any) {
+export async function LeadsSearch(search: any, sourcesString: any) {
     try {
         //console.log(data)
         const data = {
-            search: search
+            search: search,
+            sources: sourcesString
         }
         ApiService.setHeader();
         const response = await ApiService.post('leads_search', data);
@@ -603,9 +604,9 @@ export async function addLead(data: any) {
         console.log(data);
         const response = await ApiService.post(LEADS_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -615,9 +616,9 @@ export async function getLead(data: any) {
         const response = await ApiService.get(LEADS_URL, data);
         //console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -627,9 +628,9 @@ export async function updateLead(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(LEADS_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -752,13 +753,13 @@ export async function QuotationSearch(search: any, year: any) {
 export async function GetLeadClients(data: any) {
     try {
         //console.log(data)
-        const id = { "leadid": data };
+        const id = { "customer_id": data };
         ApiService.setHeader();
         const response = await ApiService.post('/get_lead_clients', id);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -823,9 +824,9 @@ export async function addQuotation(data) {
         ApiService.setHeader();
         const response = await ApiService.post(QUOTATION_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -835,14 +836,14 @@ export async function updateQuotation(data: any, id) {
         ApiService.setHeader();
         const response = await ApiService.put(QUOTATION_URL + "/" + id, data);
         //console.log(response)
-        return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
-export async function DownloadQuotation(data: any) {
+export async function getQuotationInfo(data: any) {
     try {
         //console.log(data)
         const id = { "id": data };
@@ -862,9 +863,9 @@ export async function getLeadNCustomer(data: any) {
         ApiService.setHeader();
         const response = await ApiService.post("get_lead_and_customer",id);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -882,9 +883,9 @@ export async function GetCustomerClients(data: any) {
         ApiService.setHeader();
         const response = await ApiService.post('/get_customer_clients', id);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -937,9 +938,9 @@ export async function addInvoice(data) {
         ApiService.setHeader();
         const response = await ApiService.post(INVOICE_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -962,10 +963,10 @@ export async function updateInvoice(data: any, id) {
         ApiService.setHeader();
         const response = await ApiService.put(INVOICE_URL + "/" + id, data);
         //console.log(response)
-        return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -982,7 +983,7 @@ export async function deleteInvoice(data) {
     }
 }
 
-export async function DownloadInvoice(data: any) {
+export async function getInvoiceInfo(data: any) {
     try {
         //console.log(data)
         const id = { "id": data };
@@ -1031,6 +1032,18 @@ export async function addInstrument(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.post(INSTRUMENTS_URL, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+export async function getInstrumentInfo(data: any) {
+    try {
+        const id = { "id": data };
+        ApiService.setHeader();
+        const response = await axios.post("get_information_of_instrument", id);
         return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
@@ -1103,53 +1116,54 @@ export async function deleteInstrument(data: any) {
 export async function GetAppovedQuotationsList(data: any) {
     try {
         // console.log(data)
-        const id = { "company_id": data };
+        const opt = { "company_id": data };
         ApiService.setHeader();
-        const response = await ApiService.post('get_approved_quotations', id);
+        const response = await ApiService.post('get_approved_quotations', opt);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
-export async function getEngineers(data: any) {
+export async function getAvailableEngineers(data: any) {
     try {
         //console.log(data)
         const id = { "company_id": data };
         ApiService.setHeader();
         const response = await ApiService.post('get_service_engineers', id);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
-export async function getInstruments(data: any) {
+export async function getAvailableInstruments(data: any) {
     try {
         //console.log(data)
         const id = { "company_id": data };
         ApiService.setHeader();
         const response = await ApiService.post('get_instruments', id);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
-export async function getSiteAddress(data: any) {
+export async function checkEngineerAndInstrument(data: any) {
     try {
+        //console.log(data)
         ApiService.setHeader();
-        const id = { "id": data };
-        const response = await ApiService.post('get_site_address', id);
+        const response = await ApiService.post('check_engineer_instrument', data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
+
 
 export async function GetIncrReturnableGatePassId(data: any) {
     try {
@@ -1184,21 +1198,22 @@ export async function addRGatePass(data: object) {
         ApiService.setHeader();
         const response = await ApiService.post(RGP_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
-export async function UpdateStatus(data: object) {
+export async function UpdateStatus(rgpId: any) {
     try {
         //console.log(data)
+        const id = { "rgp_id": rgpId };
         ApiService.setHeader();
-        const response = await ApiService.post('update_status', data);
+        const response = await ApiService.post('update_status', id);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1224,23 +1239,22 @@ export async function getRGatePass(data: string) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.get(RGP_URL, data);
-        return response.data.result[0];
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+        return response.data.result;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
 export async function getRGPInfo(data: any) {
     try {
-        //console.log(data)
         const id = { "id": data };
         ApiService.setHeader();
-        const response = await ApiService.post("get_information_of_rgp",id);
+        const response = await axios.post("get_information_of_rgp", id);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1277,15 +1291,56 @@ export async function gatePassSearch(search: any, year:any) {
 
 // DAILY WORKSHEET
 
+export async function getOnGoingRGP(data: any) {
+    try {
+        // console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('get_ongoing_rgps', id);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+export async function WorksheetSearch(search: any, year:any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search,
+            year: year
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('worksheet_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
 export async function getDailyWorksheet(data: string) {
     try {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.get(DWSHEET_URL, data);
+        return response.data.result;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+export async function getWorksheetInfo(data: any) {
+    try {
+        const id = { "id": data };
+        ApiService.setHeader();
+        const response = await axios.post("get_information_of_worksheet", id);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1295,9 +1350,9 @@ export async function addDailyWorksheet(data) {
         ApiService.setHeader();
         const response = await ApiService.post(DWSHEET_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1343,35 +1398,6 @@ export async function deleteDailyWorksheet(data: any) {
     }
 }
 
-export async function getOnGoingRGP(data: any) {
-    try {
-        // console.log(data)
-        const id = { "company_id": data };
-        ApiService.setHeader();
-        const response = await ApiService.post('get_ongoing_rgps', id);
-        return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
-    }
-}
-
-export async function WorksheetSearch(search: any, year:any) {
-    try {
-        //console.log(data)
-        const data = {
-            search: search,
-            year: year
-        }
-        ApiService.setHeader();
-        const response = await ApiService.post('worksheet_search', data);
-        return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
-    }
-}
-
 
 // EXPENSE SHEET
 
@@ -1382,17 +1408,22 @@ export async function getOnGoingCompletedRGP(data: any) {
         ApiService.setHeader();
         const response = await ApiService.post('get_ongoing_completed_rgps', id);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
-export async function addExpenseSheet(data) {
+export async function ExpenseSheetSearch(search: any, year: any, statusString: any) {
     try {
         //console.log(data)
+        const data = {
+            search: search,
+            year: year,
+            status: statusString
+        }
         ApiService.setHeader();
-        const response = await ApiService.post(EXPSHEET_URL, data);
+        const response = await ApiService.post('expensesheet_search', data);
         return response.data;
     } catch (errors) {
         console.error(errors);
@@ -1406,81 +1437,9 @@ export async function getExpenseSheets(data) {
         ApiService.setHeader();
         const response = await ApiService.listingget(EXPSHEET_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
-    }
-}
-
-export async function getPendingExpenseSheets(data) {
-    try {
-        //console.log(data)
-        ApiService.setHeader();
-        const response = await ApiService.listingget(EXPSHEET_URL + "/approval", data);
-        return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
-    }
-}
-
-export async function deleteExpenseSheet(data: any) {
-    try {
-        //console.log(data)
-        ApiService.setHeader();
-        const response = await ApiService.delete(EXPSHEET_URL + "/" + data);
-        console.log(response.data.message)
-        return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
         return { success: false, message: errors?.response?.data?.message || "An error occurred" };
-    }
-}
-
-export async function ExpenseSheetSearch(search: any, year: any) {
-    try {
-        //console.log(data)
-        const data = {
-            search: search,
-            year: year
-        }
-        ApiService.setHeader();
-        const response = await ApiService.post('expensesheet_search', data);
-        return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
-    }
-}
-
-export async function PendingExpenseSheetSearch(search: any, year:any) {
-    try {
-        //console.log(data)
-        const data = {
-            search: search,
-            year: year
-        }
-        ApiService.setHeader();
-        const response = await ApiService.post('pending_expensesheet_search', data);
-        return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
-    }
-}
-
-export async function getExpenseSheet(id: any) {
-    try {
-        ApiService.setHeader();
-        const data = {
-            id : id,
-        }
-        const response = await ApiService.post("get_expense_sheet", data);
-        // console.log(response)
-        return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
     }
 }
 
@@ -1501,6 +1460,43 @@ export async function ExpenseSheetStatus(id: any, data: any) {
     }
 }
 
+export async function addExpenseSheet(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(EXPSHEET_URL, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+export async function deleteExpenseSheet(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(EXPSHEET_URL + "/" + data);
+        console.log(response.data.message)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+export async function getExpenseSheet(data: string) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.get(EXPSHEET_URL, data);
+        return response.data.result;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
 export async function updateExpenseSheet(id: any, data: any) {
     try {
         //console.log(data)
@@ -1515,17 +1511,16 @@ export async function updateExpenseSheet(id: any, data: any) {
 
 // VALIDATION REPORT
 
-
-export async function getAllRGP(data: any) {
+export async function getOnGoingCompletedRGPVal(data: any) {
     try {
         // console.log(data)
         const id = { "company_id": data };
         ApiService.setHeader();
-        const response = await ApiService.post('get_all_rgps', id);
+        const response = await ApiService.post('get_ongoing_completed_rgps_val', id);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1535,9 +1530,9 @@ export async function addValidationReport(data) {
         ApiService.setHeader();
         const response = await ApiService.post(VAL_REPORT_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1548,9 +1543,9 @@ export async function getAllValidationReport(data) {
         ApiService.setHeader();
         const response = await ApiService.listingget(VAL_REPORT_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1561,9 +1556,9 @@ export async function getValidationReport(data: any) {
         const response = await ApiService.get(VAL_REPORT_URL, data);
         // console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1598,16 +1593,16 @@ export async function ValidationReportSearch(search: any, year:any) {
 }
 
 
-export async function getReportinfo(data: any) {
+export async function getValidationReportInfo(data: any) {
     try {
         //console.log(data)
         const id = { "id": data };
         ApiService.setHeader();
-        const response = await ApiService.post("get_information_of_report",id);
+        const response = await ApiService.post("get_information_of_validation_report",id);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -2263,6 +2258,20 @@ export async function ThermalReportSearch(search: any, year:any) {
         return { error: errors };
     }
 }
+
+export async function getOnGoingCompletedRGPTherm(data: any) {
+    try {
+        // console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('get_ongoing_completed_rgps_therm', id);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
 
 export async function DownloadThermalReport(data: any) {
     try {
@@ -5344,9 +5353,9 @@ export async function addServiceRequest(data) {
         ApiService.setHeader();
         const response = await ApiService.post(SRF_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5357,9 +5366,9 @@ export async function getServiceRequest(data: any) {
         const response = await ApiService.get(SRF_URL, data);
         // console.log(response)
         return response.data.result;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5370,9 +5379,9 @@ export async function updateServiceRequest(id: any, data: any) {
         ApiService.setHeader();
         const response = await ApiService.put(SRF_URL + "/" + id, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -5873,7 +5882,7 @@ export async function getIndiaMartApi(data: any) {
         ApiService.setHeader();
         const response = await ApiService.get(APISETTING_URL, data);
         // console.log(response)
-        return response.data.result;
+        return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
         return { success: false, message: errors?.response?.data?.message || "An error occurred" };

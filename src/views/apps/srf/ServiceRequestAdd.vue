@@ -5,7 +5,12 @@
       <!--begin::Modal content-->
       <div class="modal-content">
         <!--begin::Form-->
-        <VForm id="kt_account_profile_details_form" class="form" novalidate>
+        <VForm
+          id="kt_account_profile_details_form"
+          class="form"
+          @submit="submit"
+          novalidate
+        >
           <!--begin::Card body-->
           <div class="card-body p-sd-2 p-lg-9">
             <!--begin::Input group-->
@@ -27,7 +32,7 @@
                   >Customer Name</label
                 >
                 <div class="form-control form-control-lg form-control-solid">
-                  {{ itemDetails.meta.company_name }}
+                  {{ customerData.company_name }}
                 </div>
               </div>
 
@@ -37,10 +42,12 @@
                   >Address</label
                 >
                 <div class="form-control form-control-lg form-control-solid">
-                  {{ itemDetails.meta.address1 }}
-                  {{ itemDetails.meta.address2 }} {{ itemDetails.meta.city }}
-                  {{ itemDetails.meta.pincode }} {{ itemDetails.meta.states }}
-                  {{ itemDetails.meta.country }}
+                  {{ customerData.address1 || "" }}
+                  {{ customerData.address2 || "" }}
+                  {{ customerData.city || "" }}
+                  {{ customerData.pincode || "" }}
+                  {{ customerData.state || "" }}
+                  {{ customerData.country || "" }}
                 </div>
               </div>
             </div>
@@ -54,7 +61,7 @@
                   >Contact person</label
                 >
                 <div class="form-control form-control-lg form-control-solid">
-                  {{ itemDetails.first_name }} {{ itemDetails.last_name }}
+                  {{ customerData.name }}
                 </div>
               </div>
             </div>
@@ -296,19 +303,20 @@
           </div>
 
           <div class="modal-footer flex-center w-100">
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click.prevent="submit()"
+            <!--begin::Button-->
+            <button
+              type="submit"
+              ref="submitButton"
+              class="btn btn-primary w-sd-25 w-lg-25"
             >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Save </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
                 ></span>
               </span>
-            </span>
+            </button>
             <!--end::Button-->
           </div>
           <!--end::Input group-->
@@ -349,6 +357,7 @@ export default defineComponent({
     ErrorMessage,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
     const loading = ref(false);
 
     // Toggle Conformity Based on yes/no
@@ -374,7 +383,7 @@ export default defineComponent({
       if (e.target.checked === true) {
         customerNameRef.value = true;
 
-        itemDetails.value.customer_name = itemDetails.value.meta.company_name;
+        itemDetails.value.customer_name = customerData.value.company_name;
       } else {
         customerNameRef.value = false;
 
@@ -400,20 +409,21 @@ export default defineComponent({
       customer_id: customerID,
     });
 
+    const customerData = ref({
+      id: customerID,
+      name: "",
+      company_name: "",
+      address1: "",
+      address2: "",
+      country: "",
+      state: "",
+      city: "",
+      pincode: "",
+    });
+
     const itemDetails = ref({
       srf_no: "",
       customer_id: customerID,
-      first_name: "",
-      last_name: "",
-      meta: {
-        company_name: "",
-        address1: "",
-        address2: "",
-        country: "",
-        states: "",
-        city: "",
-        pincode: "",
-      },
       srf_data: Array.from({ length: SrfTests.length }, () =>
         Array.from({ length: SrfItems.length }, () => false)
       ),
@@ -425,7 +435,7 @@ export default defineComponent({
       company_id: companyID,
       created_by: customerID,
       updated_by: customerID,
-      is_active: "1",
+      is_active: 1,
     });
 
     onMounted(async () => {
@@ -436,15 +446,21 @@ export default defineComponent({
         let response = await validateUser(data.value);
         console.log(response);
 
-        if (response !== null) {
-          itemDetails.value.first_name = response.result.first_name
-            ? response.result.first_name
+        if (response) {
+          customerData.value.name = response.name ? response.name : "";
+          customerData.value.company_name = response.company_name
+            ? response.company_name
             : "";
-          itemDetails.value.last_name = response.result.last_name
-            ? response.result.last_name
+          customerData.value.address1 = response.address1
+            ? response.address1
             : "";
-          itemDetails.value.meta = response.result.meta;
-          itemDetails.value.meta = response.result.meta;
+          customerData.value.address2 = response.address2
+            ? response.address2
+            : "";
+          customerData.value.city = response.city ? response.city : "";
+          customerData.value.pincode = response.pincode ? response.pincode : "";
+          customerData.value.state = response.state ? response.state : "";
+          customerData.value.country = response.country ? response.country : "";
         }
       } catch (error) {
         showErrorAlert("Error", "An error occurred during the API call.");
@@ -523,32 +539,47 @@ export default defineComponent({
     };
 
     const submit = async () => {
-      loading.value = true;
-
       try {
-        if (validateForm(itemDetails.value)) {
-          console.log(itemDetails.value);
-          const response = await addServiceRequest(itemDetails.value);
-          if (!response.error) {
-            showSuccessAlert(
-              "Success",
-              "Service Request Form  has been successfully added!"
-            );
-            loading.value = false;
-            // window.location.href = "https://www.google.com";
-            router.push({ name: "thankyou" });
-          } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            loading.value = false;
-            return;
-          }
+        loading.value = true;
+
+        const result = validateForm(itemDetails.value);
+
+        if (result == false) {
+          showErrorAlert("Warning", "Please fill all the details correctly.");
+          loading.value = false;
+          return;
+        }
+
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
+        const response = await addServiceRequest(itemDetails.value);
+
+        if (response?.success) {
+          // Handle successful API response
+          loading.value = false;
+          showSuccessAlert(
+            "Success",
+            response.message || "Service Request Form  has been successfully added!"
+          );
+          // window.location.href = "https://www.google.com";
+          router.push({ name: "thankyou" });
         } else {
-          showErrorAlert("Warning", "Please fill in all fields.");
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -582,7 +613,9 @@ export default defineComponent({
     };
 
     return {
+      submitButton,
       submit,
+      customerData,
       itemDetails,
       itemValidator,
       getAssetPath,

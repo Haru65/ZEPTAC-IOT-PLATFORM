@@ -673,7 +673,6 @@ export default defineComponent({
           );
 
           router.push({ name: "qms-procedures" });
-          loading.value = false;
         } else {
           // Handle API error response
           loading.value = false;

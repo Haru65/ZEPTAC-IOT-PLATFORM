@@ -18,7 +18,6 @@
     </div>
     <!--begin::Card header-->
 
-    <!--begin::Content-->
     <div id="kt_account_profile_details" class="collapse show">
       <!--begin::Form-->
       <VForm
@@ -30,8 +29,6 @@
       >
         <!--begin::Card body-->
         <div class="card-body border-top p-9">
-          <!--begin::Input group-->
-
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label required fw-semobold fs-6"
@@ -44,22 +41,21 @@
               <div class="col-lg fv-row">
                 <div>
                   <el-select
-                    v-model="profileDetails.lead_id"
+                    v-model="profileDetails.customer_id"
                     filterable
-                    placeholder="Please Select Customer..."
-                    v-on:change="SetLeadCompany(profileDetails.lead_id)"
+                    placeholder="Please Select Lead..."
                   >
                     <el-option
                       disabled
                       key=""
-                      label="Please Select Customer..."
+                      label="Please Select Lead..."
                       value=""
                       >Please Select Customer...</el-option
                     >
                     <el-option
                       v-for="item in Leads"
                       :key="item.id"
-                      :label="`${item.meta.company_name}`"
+                      :label="`${item.company_name}`"
                       :value="item.id"
                     />
                   </el-select>
@@ -96,52 +92,28 @@
           </div>
           <!--end::Input group-->
 
+          <!--begin::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
-            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-              >Full Name</label
-            >
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span class="required">Full Name</span>
+            </label>
             <!--end::Label-->
 
             <!--begin::Col-->
-            <div class="col-lg-8">
-              <!--begin::Row-->
-              <div class="row">
-                <!--begin::Col-->
-                <div class="col-lg-6 fv-row">
-                  <Field
-                    type="text"
-                    name="fname"
-                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
-                    placeholder="First name"
-                    v-model="profileDetails.first_name"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="fname" />
-                    </div>
-                  </div>
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="name"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Enter Person Name"
+                v-model="profileDetails.name"
+              />
+              <div class="fv-plugins-message-container">
+                <div class="fv-help-block">
+                  <ErrorMessage name="name" />
                 </div>
-                <!--end::Col-->
-
-                <!--begin::Col-->
-                <div class="col-lg-6 fv-row">
-                  <Field
-                    type="text"
-                    name="lname"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Last name"
-                    v-model="profileDetails.last_name"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="lname" />
-                    </div>
-                  </div>
-                </div>
-                <!--end::Col-->
               </div>
-              <!--end::Row-->
             </div>
             <!--end::Col-->
           </div>
@@ -192,14 +164,14 @@
             <div class="col-lg-8 fv-row">
               <Field
                 type="tel"
-                name="phone"
+                name="mobile"
                 class="form-control form-control-lg form-control-solid"
                 placeholder="Phone number"
-                v-model="profileDetails.phone"
+                v-model="profileDetails.mobile"
               />
               <div class="fv-plugins-message-container">
                 <div class="fv-help-block">
-                  <ErrorMessage name="phone" />
+                  <ErrorMessage name="mobile" />
                 </div>
               </div>
             </div>
@@ -207,7 +179,6 @@
           </div>
           <!--end::Input group-->
 
-          <!--end::Input group-->
           <div class="separator my-10"></div>
 
           <div class="row mb-6">
@@ -311,7 +282,7 @@
                 <div v-if="state.length" class="col-lg fv-row">
                   <div>
                     <el-select
-                      v-model="profileDetails.states"
+                      v-model="profileDetails.state"
                       filterable
                       placeholder="Select Your State..."
                     >
@@ -332,7 +303,7 @@
                       name="state"
                       class="form-control form-control-lg form-control-solid"
                       placeholder="Enter State Name"
-                      v-model="profileDetails.states"
+                      v-model="profileDetails.state"
                     />
                     <div class="fv-plugins-message-container">
                       <div class="fv-help-block">
@@ -453,17 +424,25 @@
         </div>
         <div class="modal-footer flex-center">
           <!--begin::Button-->
-          <button type="reset" class="btn btn-lg btn-danger w-25">Clear</button>
+          <button
+            type="button"
+            @click="clear"
+            class="btn btn-lg btn-danger w-sd-25 w-lg-25"
+          >
+            Clear
+          </button>
           <!--end::Button-->
           &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
           <!--begin::Button-->
+
+          <!--begin::Button-->
           <button
-            :data-kt-indicator="loading ? 'on' : null"
-            class="btn btn-lg btn-primary w-25"
+            ref="submitButton"
             type="submit"
+            class="btn btn-primary w-sd-25 w-lg-25"
           >
-            <span v-if="!loading" class="indicator-label"> Submit </span>
-            <span v-if="loading" class="indicator-progress">
+            <span class="indicator-label"> Save </span>
+            <span class="indicator-progress">
               Please wait...
               <span
                 class="spinner-border spinner-border-sm align-middle ms-2"
@@ -476,7 +455,6 @@
       </VForm>
       <!--end::Form-->
     </div>
-    <!--end::Content-->
   </div>
   <!--end::Basic info-->
 </template>
@@ -487,63 +465,104 @@ import { defineComponent, onMounted, ref, watch } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
-import { addClient, getLeads, getLead } from "@/stores/api";
+import { addClient, getLeads, getLead, getCompanies } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import { countries, INstates } from "@/core/model/countries";
 import { debounce } from "@/core/helpers/debounce";
-
-interface LeadData {
-  lead_id: string;
-  first_name: string;
-  last_name: string;
-}
+import { Identifier } from "@/core/config/WhichUserConfig";
 
 interface ProfileDetails {
-  first_name: string;
-  last_name: string;
+  customer_id: string;
+  name: string;
   email: string;
-  phone: string;
-  password: string;
-  confpassword: string;
-  role_id: string;
+  mobile: string;
   address1: string;
   address2: string;
-  country: string;
-  states: string;
-  pincode: string;
   city: string;
+  pincode: string;
+  state: string;
+  country: string;
   gst_number: string;
+  is_active: number;
   company_id: string;
   company_name: string;
   created_by: string;
   updated_by: string;
-  lead_id: string;
-  lead_first_name: string;
-  lead_last_name: string;
 }
 
 export default defineComponent({
-  name: "account-settings",
+  name: "clients-add",
   components: {
     ErrorMessage,
     Field,
     VForm,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
+    const identifier = Identifier;
     const auth = useAuthStore();
     const User = auth.GetUser();
     const router = useRouter();
-    const disabledselect = ref(true);
-    let limit = ref(500);
     const loading = ref(false);
-    // const Leads = ref([{ id: "", first_name: "", last_name: "" }]);
-    const Leads = ref([
-      { id: "", company_name: "", meta: { company_name: "" } },
-    ]);
+
+    const Companies = ref([{ id: "", company_name: "" }]);
+    const Leads = ref([{ id: "", company_name: "" }]);
+
     const state = ref([""]);
+
+    const getdropcomp = async () => {
+      ApiService.setHeader();
+      const response = await getCompanies(`fetchAll=true`);
+      if (response.result != null && response.result) {
+        Companies.value.push(
+          ...response.result?.map(({ ...rest }) => ({
+            ...rest,
+          }))
+        );
+      }
+    };
+
+    const GetLeads = async () => {
+      ApiService.setHeader();
+      const response = await getLeads(`fetchAll=true`);
+      if (response.result != null && response.result) {
+        Leads.value.push(
+          ...response.result?.map(({ id, ...rest }) => ({
+            id,
+            ...rest,
+          }))
+        );
+      }
+    };
+
+    const profileDetailsValidator = Yup.object().shape({
+      name: Yup.string().required().label("Person Name"),
+      email: Yup.string().required().email().label("Email"),
+      mobile: Yup.string().required().label("Phone"),
+      company_name: Yup.string().required().label("Company Name"),
+    });
+
+    const profileDetails = ref<ProfileDetails>({
+      customer_id: "",
+      name: "",
+      email: "",
+      mobile: "",
+      address1: "",
+      address2: "",
+      country: "",
+      state: "",
+      city: "",
+      pincode: "",
+      gst_number: "",
+      company_name: "",
+      is_active: 1,
+      company_id: User.company_id,
+      created_by: User.id,
+      updated_by: User.id,
+    });
 
     onMounted(async () => {
       state.value.pop();
@@ -551,136 +570,74 @@ export default defineComponent({
       await GetLeads();
     });
 
-    const GetLeads = async () => {
-      ApiService.setHeader();
-      const response = await getLeads(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Leads.value.push(
-          ...response.result?.map(({ id, meta }) => ({
-            id: id,
-            company_name: meta.company_name,
-            meta: meta,
-          }))
-        );
+    const validGSTRef = ref(false);
+
+    async function isValidGSTNo() {
+      // Regex to check valid GST CODE
+      const regex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+
+      // Retrieve GST number from company details
+      const str = profileDetails.value.gst_number;
+
+      // Check if GST number is null or not 15 characters long
+      if (str == null || str.length !== 15) {
+        validGSTRef.value = false;
+        return false;
       }
-    };
 
-    async function SetLeadCompany(id) {
-      const foundLead = await Leads.value.find((lead) => id == lead.id);
-
-      if (foundLead) {
-        profileDetails.value.lead_id = await foundLead.id;
+      // Check if the GST number matches the regex pattern
+      if (regex.test(str)) {
+        validGSTRef.value = true;
+        return true;
+      } else {
+        validGSTRef.value = false;
+        return false;
       }
     }
 
-    const GetClientData = async (id) => {
-      if (id != " ") {
-        const response = await getLead(id);
-        // console.log("->", response);
-        profileDetails.value.lead_id = response.id;
-        profileDetails.value.lead_first_name = response.first_name;
-        profileDetails.value.lead_last_name = response.last_name;
-        disabledselect.value = false;
-        // console.log(profileDetails.value);
-      }
-    };
-
-    const emailFormDisplay = ref(false);
-    const passwordFormDisplay = ref(false);
-
-    const profileDetailsValidator = Yup.object().shape({
-      fname: Yup.string().required().label("First name"),
-      lname: Yup.string().required().label("Last name"),
-      email: Yup.string().required().email().label("Email"),
-      phone: Yup.string().required().label("Phone"),
-      company_name: Yup.string().required().label("Company Name"),
-    });
-
-    const lead = ref<LeadData>({
-      lead_id: "",
-      first_name: "",
-      last_name: "",
-    });
-    const profileDetails = ref<ProfileDetails>({
-      first_name: "",
-      last_name: "",
-      email: "",
-      phone: "",
-      password: "decodedemo",
-      confpassword: "",
-      role_id: "9",
-      address1: "",
-      address2: "",
-      country: "",
-      states: "",
-      city: "",
-      pincode: "",
-      gst_number: "",
-      company_id: User.company_id,
-      company_name: "",
-      created_by: User.id,
-      updated_by: User.id,
-      lead_id: "",
-      lead_first_name: "",
-      lead_last_name: "",
-    });
-
-    const validGSTRef = ref(false);
-
-async function isValidGSTNo() {
-
-  // Regex to check valid GST CODE
-  const regex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
-
-  // Retrieve GST number from company details
-  const str = profileDetails.value.gst_number;
-
-  // Check if GST number is null or not 15 characters long
-  if (str == null || str.length !== 15) {
-    validGSTRef.value = false;
-    return false;
-  }
-
-  // Check if the GST number matches the regex pattern
-  if (regex.test(str)) {
-    validGSTRef.value = true;
-    return true;
-  } else {
-    validGSTRef.value = false;
-    return false;
-  }
-}
-
-const debouncedValidateGST = debounce(isValidGSTNo, 1000);
-
+    const debouncedValidateGST = debounce(isValidGSTNo, 1000);
 
     const onsubmit = async () => {
+      if (
+        profileDetails.value.customer_id == "" ||
+        profileDetails.value.customer_id == null
+      ) {
+        showErrorAlert("Error", "Please Select Lead.");
+        return;
+      }
+
       try {
-        // Call your API here with the form values
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+        loading.value = true;
+
+        // Call your API here
         const response = await addClient(profileDetails.value);
-        // console.log(response.error);
-        if (!response.error) {
+
+        if (response?.success) {
           // Handle successful API response
-          // console.log("API response:", response);
-          showSuccessAlert("Success", "User have been successfully inserted!");
-          
+          loading.value = false;
+          showSuccessAlert(
+            "Success",
+            response.message || "Client Added Successfully!"
+          );
           router.push({ name: "clients-list" });
           clear();
         } else {
           // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert(
-            "Warning",
-            "Please Fill the Form Fields Correctly" + errorData
-          );
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -720,48 +677,43 @@ const debouncedValidateGST = debounce(isValidGSTNo, 1000);
           state.value.pop();
         }
         if (newVal === "India") {
-          profileDetails.value.states = "";
+          profileDetails.value.state = "";
           INstates.forEach((ele) => {
             state.value.push(ele.name);
           });
           //console.log(state);
         } else {
-          profileDetails.value.states = "";
+          profileDetails.value.state = "";
         }
       }
     );
 
     const clear = () => {
       profileDetails.value = {
-        first_name: "",
-        last_name: "",
+        customer_id: "",
+        name: "",
         email: "",
-        phone: "",
-        password: "decodedemo",
-        confpassword: "",
-        role_id: "9",
+        mobile: "",
         address1: "",
         address2: "",
-        country: "",
-        states: "",
         city: "",
         pincode: "",
+        state: "",
+        country: "",
         gst_number: "",
-        company_id: "",
+        company_id: User.company_id,
         company_name: "",
         created_by: User.id,
         updated_by: User.id,
-        lead_id: "",
-        lead_first_name: "",
-        lead_last_name: "",
+        is_active: 1,
       };
     };
 
     return {
+      submitButton,
+      Companies,
+      identifier,
       profileDetails,
-      lead,
-      emailFormDisplay,
-      passwordFormDisplay,
       profileDetailsValidator,
       getAssetPath,
       onsubmit,
@@ -769,9 +721,7 @@ const debouncedValidateGST = debounce(isValidGSTNo, 1000);
       clear,
       countries,
       state,
-      GetClientData,
       Leads,
-      SetLeadCompany,
       validGSTRef,
       debouncedValidateGST,
     };

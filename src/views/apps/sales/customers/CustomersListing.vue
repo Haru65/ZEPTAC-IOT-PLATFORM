@@ -40,7 +40,7 @@
           </button>
           <!--end::Export-->
           <!--begin::Add customer-->
-          <router-link to="./add" class="btn btn-primary">
+          <router-link to="/customers/add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
             Add Customer
           </router-link>
@@ -92,22 +92,17 @@
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
-        :header="tableHeader"
+        :header="filteredTableHeader"
         :checkbox-enabled="true"
         :items-per-page="limit"
         :items-per-page-dropdown-enabled="false"
         :loading="loading"
       >
-        <!-- img data -->
+        <template v-slot:id="{ row: customer }">
+          {{ customer.id }}
+        </template>
         <template v-slot:name="{ row: customer }">
-          <div class="d-flex justify-content-start align-items-center">
-            <!-- <img :src="user.name" class="w-45px rounded-circle" alt="" /> -->
-            <span style="margin-left: 5.5%">
-              <span class="text-gray-600 text-hover-primary mb-1">
-                {{ customer.first_name + " " + customer.last_name }}
-              </span>
-            </span>
-          </div>
+          {{ customer.name }}
         </template>
         <!-- defualt data -->
         <template v-slot:email="{ row: customer }">
@@ -121,11 +116,17 @@
         <template v-slot:mobile="{ row: customer }">
           {{ customer.mobile }}
         </template>
-        <template v-slot:company="{ row: customer }">
-          {{ customer.meta.company_name }}
+        <template v-slot:company_name="{ row: customer }">
+          {{ customer.company_name }}
         </template>
         <template v-slot:created_at="{ row: customer }">
           {{ customer.created_at }}
+        </template>
+        <template
+          v-slot:company_details="{ row: customer }"
+          v-if="identifier == 'Admin'"
+        >
+          {{ customer.company_details.company_name }}
         </template>
         <template v-slot:srf_link="{ row: customer }">
           <span
@@ -155,23 +156,31 @@
         </template>
         <template v-slot:actions="{ row: customer }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <router-link :to="`./edit/${customer.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
+          <div class="d-flex flex-lg-row my-3">
+            <!--begin::Edit-->
+            <router-link :to="`/customers/edit/${customer.id}`">
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View Customer"
+              >
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
+            <!--begin::Delete-->
+            <span
+              @click="deleteItem(customer.id, false)"
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete Customer"
+            >
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
-            <span>
-              <i
-                @click="deleteItem(customer.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
-            </span>
+            <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -212,7 +221,7 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { ICustomers } from "@/core/model/customers";
@@ -221,6 +230,7 @@ import ApiService from "@/core/services/ApiService";
 import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
 import Swal from "sweetalert2";
+import { Identifier } from "@/core/config/WhichUserConfig";
 import { deleteCustomer, CustomerSearch, getCustomers } from "@/stores/api";
 export default defineComponent({
   name: "customers-list",
@@ -229,6 +239,7 @@ export default defineComponent({
   },
   setup() {
     const loading = ref(true);
+    const identifier = Identifier;
     const tableHeader = ref([
       {
         columnName: "Name",
@@ -250,13 +261,19 @@ export default defineComponent({
       },
       {
         columnName: "Company Name",
-        columnLabel: "company",
+        columnLabel: "company_name",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
         columnName: "Created Date",
         columnLabel: "created_at",
+        sortEnabled: true,
+        columnWidth: 175,
+      },
+      {
+        columnName: "Main Company",
+        columnLabel: "company_details",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -291,10 +308,11 @@ export default defineComponent({
         // console.log(response);
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
-            ...rest,
+          ({ id, created_at, company_details, ...rest }) => ({
+            id,
             created_at: moment(created_at).format("DD-MM-YYYY"),
-            role_id: get_role(role_id),
+            company_details: { ...company_details },
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -336,10 +354,11 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
-            ...rest,
+          ({ id, created_at, company_details, ...rest }) => ({
+            id,
             created_at: moment(created_at).format("DD-MM-YYYY"),
-            role_id: get_role(role_id),
+            company_details: { ...company_details },
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -368,10 +387,11 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
-            ...rest,
+          ({ id, created_at, company_details, ...rest }) => ({
+            id,
             created_at: moment(created_at).format("DD-MM-YYYY"),
-            role_id: get_role(role_id),
+            company_details: { ...company_details },
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -400,6 +420,14 @@ export default defineComponent({
         PagePointer(page.value);
       }
     };
+
+    const filteredTableHeader = computed(() => {
+      return identifier.value === "Admin"
+        ? tableHeader.value
+        : tableHeader.value.filter(
+            (column) => column.columnLabel !== "company_details"
+          );
+    });
 
     onMounted(async () => {
       await customer_listing();
@@ -573,10 +601,11 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
-            ...rest,
+          ({ id, created_at, company_details, ...rest }) => ({
+            id,
             created_at: moment(created_at).format("DD-MM-YYYY"),
-            role_id: get_role(role_id),
+            company_details: { ...company_details },
+            ...rest,
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
@@ -663,6 +692,8 @@ export default defineComponent({
       Limits,
       copySrfUrl,
       copyFeedbackUrl,
+      identifier,
+      filteredTableHeader,
     };
   },
 });

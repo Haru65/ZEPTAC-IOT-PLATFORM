@@ -32,7 +32,7 @@
           </h3>
           <div class="me-3">
             <el-select
-            class="w-150px"
+              class="w-150px"
               filterable
               placeholder="Select Year"
               v-model="selectedYearCache"
@@ -53,19 +53,6 @@
             class="d-flex justify-content-end"
             data-kt-customer-table-toolbar="base"
           >
-            <router-link
-              v-if="
-                Identifier == 'Admin' ||
-                Identifier == 'Company-Admin' ||
-                Identifier == 'Site-Incharge'
-              "
-              to="/expensesheets/approval"
-              class="btn btn-primary"
-            >
-              <KTIcon icon-name="plus" icon-class="fs-2" />
-              Expense Approval
-            </router-link>
-            <!--begin::Export-->
             <button
               type="button"
               class="btn btn-light-primary me-3"
@@ -79,7 +66,7 @@
             <!--begin::Add customer-->
             <router-link to="/expensesheets/add" class="btn btn-primary">
               <KTIcon icon-name="plus" icon-class="fs-2" />
-              Add Expense Sheet
+              Expense Sheet
             </router-link>
             <!--end::Add customer-->
           </div>
@@ -124,6 +111,86 @@
             </button>
           </div>
           <!--end::Group actions-->
+
+          <div>
+            <button
+              type="button"
+              id="kt-menu-filter-button"
+              class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
+              data-kt-menu-target="#kt_menu_filter"
+              data-kt-menu-trigger="click"
+              data-kt-menu-placement="bottom-end"
+              data-kt-menu-flip="top-end"
+            >
+              <KTIcon icon-name="filter" icon-class="fs-2" />
+            </button>
+
+            <!--begin::Menu 1-->
+            <div
+              id="kt_menu_filter"
+              class="menu menu-sub menu-sub-dropdown w-250px w-md-300px"
+              data-kt-menu="true"
+              data-kt-menu-attach="#kt-menu-filter-button"
+            >
+              <!--begin::Header-->
+              <div class="px-7 py-5">
+                <div class="fs-5 text-dark fw-bold">Filter Options</div>
+              </div>
+              <!--end::Header-->
+
+              <!--begin::Menu separator-->
+              <div class="separator border-gray-200"></div>
+              <!--end::Menu separator-->
+
+              <!--begin::Form-->
+              <div class="px-7 py-5">
+                <!--begin::Input group-->
+                <div class="mb-10">
+                  <!--begin::Label-->
+                  <label class="form-label fw-semobold">Expense status:</label>
+                  <!--end::Label-->
+
+                  <!--begin::Options-->
+                  <div class="d-flex flex-wrap gap-6">
+                    <!--begin::Options-->
+                    <label
+                      class="form-check form-check-sm form-check-custom form-check-solid me-5"
+                      v-for="(expense, index) in ExpenseStatus"
+                      :key="index"
+                    >
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        :value="expense.id"
+                        v-model="selectedStatus"
+                      />
+                      <span class="form-check-label user-select-none">{{
+                        expense.status
+                      }}</span>
+                    </label>
+                    <!--end::Options-->
+                  </div>
+                  <!--end::Options-->
+                </div>
+                <!--end::Input group-->
+
+                <!--begin::Actions-->
+                <div class="d-flex justify-content-end">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-primary"
+                    @click="applyFilters"
+                    data-kt-menu-dismiss="true"
+                  >
+                    Apply
+                  </button>
+                </div>
+                <!--end::Actions-->
+              </div>
+              <!--end::Form-->
+            </div>
+            <!--end::Menu 1-->
+          </div>
         </div>
         <!--end::Card toolbar-->
       </div>
@@ -144,23 +211,23 @@
           :items-per-page-dropdown-enabled="false"
           :loading="loading"
         >
-          <template v-slot:rgp_no="{ row: expensesheets }">
+          <template v-slot:id="{ row: expensesheets }">
+            {{ expensesheets.id }}
+          </template>
+          <template v-slot:rgp="{ row: expensesheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
-              {{ expensesheets.rgp_no.rgp_no }}
+              {{ expensesheets.rgp.rgp_no }}
             </span>
           </template>
-          <template v-slot:customer_name="{ row: expensesheets }">
+          <template v-slot:customer="{ row: expensesheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
-              {{ expensesheets.customer_name.company_name }}
+              {{ expensesheets?.customer?.company_name || "" }}
             </span>
           </template>
-          <template v-slot:engineer_name="{ row: expensesheets }">
+          <template v-slot:engineer="{ row: expensesheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
-              {{
-                expensesheets.engineer_name.first_name +
-                " " +
-                expensesheets.engineer_name.last_name
-              }}
+              {{ expensesheets?.engineer?.first_name || "" }}
+              {{ expensesheets?.engineer?.last_name || "" }}
             </span>
           </template>
           <!-- defualt data -->
@@ -217,13 +284,29 @@
 
           <template v-slot:actions="{ row: expensesheets }">
             <!--begin::Menu Flex-->
-            <div class="text-gray-600 text-hover-primary mb-1">
-              <span>
-                <i
-                  @click="deleteItem(expensesheets.id, false)"
-                  class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
-                ></i>
+            <div class="d-flex flex-lg-row my-3">
+              <!--begin::Edit-->
+              <router-link :to="`/expensesheets/edit/${expensesheets.id}`">
+                <span
+                  class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                  data-bs-toggle="tooltip"
+                  title="View Expense Sheet"
+                >
+                  <KTIcon icon-name="pencil" icon-class="fs-2" />
+                </span>
+              </router-link>
+              <!--end::Edit-->
+
+              <!--begin::Delete-->
+              <span
+                @click="deleteItem(expensesheets.id, false)"
+                class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="Delete Expense Sheet"
+              >
+                <KTIcon icon-name="trash" icon-class="fs-2" />
               </span>
+              <!--end::Delete-->
             </div>
             <!--end::Menu FLex-->
           </template>
@@ -271,6 +354,7 @@ import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import {
+  ExpenseStatus,
   GetExpenseStatus,
   type IExpenseSheet,
 } from "@/core/model/expensesheets";
@@ -307,19 +391,19 @@ export default defineComponent({
     const tableHeader = ref([
       {
         columnName: "RGP No.",
-        columnLabel: "rgp_no",
+        columnLabel: "rgp",
         sortEnabled: true,
         columnWidth: 125,
       },
       {
         columnName: "Customer Name",
-        columnLabel: "customer_name",
+        columnLabel: "customer",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
         columnName: "Engineer Name",
-        columnLabel: "engineer_name",
+        columnLabel: "engineer",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -376,6 +460,20 @@ export default defineComponent({
     // limit 10
     const more = ref(false);
 
+    // Filters Logic
+
+    const selectedStatus = ref([]);
+
+    const applyFilters = async () => {
+      try {
+        page.value = 1;
+        await expensesheets_listing();
+      } catch (error) {
+        console.error("Error fetching expensesheets:", error);
+        // Handle error
+      }
+    };
+
     const selectedIds = ref<Array<number>>([]);
     const tableData = ref<Array<IExpenseSheet>>([]);
     const initvalues = ref<Array<IExpenseSheet>>([]);
@@ -383,18 +481,26 @@ export default defineComponent({
     // get users function
     async function expensesheets_listing(): Promise<void> {
       try {
+        const statusString = selectedStatus.value.join(",");
+
         const response = await getExpenseSheets(
           `page=${page.value}&limit=${limit.value}&year=${
             selectedYearCache.value
               ? selectedYearCache.value
               : financialYears.value[0]
-          }`
+          }&status=${statusString}`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({ id, engineer, rgp, ...rest }) => ({
+            id,
+            rgp: { ...rgp },
+            engineer: { ...engineer },
+            customer: { ...rgp.quotation.customer },
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -414,18 +520,25 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
+        const statusString = selectedStatus.value.join(",");
         const response = await getExpenseSheets(
           `page=${page}&limit=${limit.value}&year=${
             selectedYearCache.value
               ? selectedYearCache.value
               : financialYears.value[0]
-          }`
+          }&status=${statusString}`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({ id, engineer, rgp, ...rest }) => ({
+            id,
+            rgp: { ...rgp },
+            engineer: { ...engineer },
+            customer: { ...rgp.quotation.customer },
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -446,18 +559,25 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
+        const statusString = selectedStatus.value.join(",");
         const response = await getExpenseSheets(
           `page=${page.value}&limit=${limit}&year=${
             selectedYearCache.value
               ? selectedYearCache.value
               : financialYears.value[0]
-          }`
+          }&status=${statusString}`
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({ id, engineer, rgp, ...rest }) => ({
+            id,
+            rgp: { ...rgp },
+            engineer: { ...engineer },
+            customer: { ...rgp.quotation.customer },
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -690,17 +810,25 @@ export default defineComponent({
     async function SearchMore() {
       // Your API call logic here
       try {
+        const statusString = selectedStatus.value.join(",");
         const response = await ExpenseSheetSearch(
           search.value,
           selectedYearCache.value
             ? selectedYearCache.value
-            : financialYears.value[0]
+            : financialYears.value[0],
+          statusString
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({ id, engineer, rgp, ...rest }) => ({
+            id,
+            rgp: { ...rgp },
+            engineer: { ...engineer },
+            customer: { ...rgp.quotation.customer },
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -784,6 +912,10 @@ export default defineComponent({
       selectedYearCache,
       financialYears,
       handleChange,
+
+      selectedStatus,
+      ExpenseStatus,
+      applyFilters,
     };
   },
 });

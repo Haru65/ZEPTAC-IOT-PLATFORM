@@ -30,8 +30,6 @@
       >
         <!--begin::Card body-->
         <div class="card-body border-top p-9">
-          <!--begin::Input group-->
-          <!--end::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label required fw-semobold fs-6"
@@ -44,22 +42,21 @@
               <div class="col-lg fv-row">
                 <div>
                   <el-select
-                    v-model="profileDetails.lead_id"
+                    v-model="profileDetails.customer_id"
                     filterable
-                    placeholder="Please Select Customer..."
-                    :change="SetLeadCompany(profileDetails.lead_id)"
+                    placeholder="Please Select Lead..."
                   >
                     <el-option
                       disabled
                       key=""
-                      label="Please Select Customer..."
+                      label="Please Select Lead..."
                       value=""
                       >Please Select Customer...</el-option
                     >
                     <el-option
                       v-for="item in Leads"
                       :key="item.id"
-                      :label="`${item.meta.company_name}`"
+                      :label="`${item.company_name}`"
                       :value="item.id"
                     />
                   </el-select>
@@ -68,6 +65,7 @@
               <!--end::Row-->
             </div>
           </div>
+
           <!--begin::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
@@ -95,52 +93,28 @@
           </div>
           <!--end::Input group-->
 
+          <!--begin::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
-            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-              >Full Name</label
-            >
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span class="required">Full Name</span>
+            </label>
             <!--end::Label-->
 
             <!--begin::Col-->
-            <div class="col-lg-8">
-              <!--begin::Row-->
-              <div class="row">
-                <!--begin::Col-->
-                <div class="col-lg-6 fv-row">
-                  <Field
-                    type="text"
-                    name="fname"
-                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
-                    placeholder="First name"
-                    v-model="profileDetails.first_name"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="fname" />
-                    </div>
-                  </div>
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="name"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Enter Person Name"
+                v-model="profileDetails.name"
+              />
+              <div class="fv-plugins-message-container">
+                <div class="fv-help-block">
+                  <ErrorMessage name="name" />
                 </div>
-                <!--end::Col-->
-
-                <!--begin::Col-->
-                <div class="col-lg-6 fv-row">
-                  <Field
-                    type="text"
-                    name="lname"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Last name"
-                    v-model="profileDetails.last_name"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="lname" />
-                    </div>
-                  </div>
-                </div>
-                <!--end::Col-->
               </div>
-              <!--end::Row-->
             </div>
             <!--end::Col-->
           </div>
@@ -191,20 +165,21 @@
             <div class="col-lg-8 fv-row">
               <Field
                 type="tel"
-                name="phone"
+                name="mobile"
                 class="form-control form-control-lg form-control-solid"
                 placeholder="Phone number"
-                v-model="profileDetails.phone"
+                v-model="profileDetails.mobile"
               />
               <div class="fv-plugins-message-container">
                 <div class="fv-help-block">
-                  <ErrorMessage name="phone" />
+                  <ErrorMessage name="mobile" />
                 </div>
               </div>
             </div>
             <!--end::Col-->
           </div>
           <!--end::Input group-->
+
           <div class="separator my-10"></div>
 
           <div class="row mb-6">
@@ -274,7 +249,7 @@
                   <el-select
                     v-model="profileDetails.country"
                     filterable
-                    placeholder="Select Your State..."
+                    placeholder="Select Your Country..."
                   >
                     <el-option
                       v-for="item in countries"
@@ -308,7 +283,7 @@
                 <div v-if="state.length" class="col-lg fv-row">
                   <div>
                     <el-select
-                      v-model="profileDetails.states"
+                      v-model="profileDetails.state"
                       filterable
                       placeholder="Select Your State..."
                     >
@@ -329,7 +304,7 @@
                       name="state"
                       class="form-control form-control-lg form-control-solid"
                       placeholder="Enter State Name"
-                      v-model="profileDetails.states"
+                      v-model="profileDetails.state"
                     />
                     <div class="fv-plugins-message-container">
                       <div class="fv-help-block">
@@ -372,7 +347,6 @@
             </div>
             <!--end::Col-->
           </div>
-          <!--end::Input group-->
           <!--end::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
@@ -451,17 +425,13 @@
         </div>
         <div class="modal-footer flex-center">
           <!--begin::Button-->
-          <button type="reset" class="btn btn-lg btn-danger w-25">Clear</button>
-          <!--end::Button-->
-          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-          <!--begin::Button-->
           <button
-            :data-kt-indicator="loading ? 'on' : null"
-            class="btn btn-lg btn-primary w-25"
+            ref="submitButton"
             type="submit"
+            class="btn btn-primary w-sd-25 w-lg-25"
           >
-            <span v-if="!loading" class="indicator-label"> Update </span>
-            <span v-if="loading" class="indicator-progress">
+            <span class="indicator-label"> Update </span>
+            <span class="indicator-progress">
               Please wait...
               <span
                 class="spinner-border spinner-border-sm align-middle ms-2"
@@ -485,12 +455,7 @@ import { defineComponent, onMounted, ref, watch } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
-import {
-  updateClient,
-  getLeads,
-  getClient,
-  getLeadNCustomer,
-} from "@/stores/api";
+import { updateClient, getLeads, getClient, getCompanies } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import { useAuthStore } from "@/stores/auth";
@@ -498,55 +463,59 @@ import { useRoute, useRouter } from "vue-router";
 import { countries, INstates } from "@/core/model/countries";
 import { debounce } from "@/core/helpers/debounce";
 
-interface CustomerData {
-  lead_id: string;
-  first_name: string;
-  last_name: string;
-}
-
 interface ProfileDetails {
-  first_name: string;
-  last_name: string;
+  customer_id: string;
+  name: string;
   email: string;
-  phone: string;
-  password: string;
-  confpassword: string;
-  role_id: string;
+  mobile: string;
   address1: string;
   address2: string;
-  country: string;
-  states: string;
-  pincode: string;
   city: string;
+  pincode: string;
+  state: string;
+  country: string;
   gst_number: string;
+  is_active: number;
   company_id: string;
   company_name: string;
   created_by: string;
   updated_by: string;
-  lead_id: string;
-  lead_first_name: string;
-  lead_last_name: string;
 }
 
 export default defineComponent({
-  name: "account-settings",
+  name: "clients-edit",
   components: {
     ErrorMessage,
     Field,
     VForm,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
     const auth = useAuthStore();
     const User = auth.GetUser();
     const router = useRouter();
     const route = useRoute();
-    const disabledselect = ref(true);
-    let limit = ref(500);
     const loading = ref(false);
-    // const Leads = ref([{ id: "", first_name: "", last_name: "" }]);
-    const Leads = ref([{ id: "", meta: { company_name: "" } }]);
+
+    const Companies = ref([{ id: "", company_name: "" }]);
+    const Leads = ref([{ id: "", company_name: "" }]);
+
     const state = ref([""]);
-    const LeadId = route.params.id;
+    const clientId = route.params.id;
+
+    const getdropcomp = async () => {
+      ApiService.setHeader();
+      const response = await getCompanies(`fetchAll=true`);
+      if (response.result != null && response.result) {
+        Companies.value.push(
+          ...response.result?.map(({ created_at, ...rest }) => ({
+            ...rest,
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+          }))
+        );
+        // console.log(Companies);
+      }
+    };
 
     const validGSTRef = ref(false);
 
@@ -576,122 +545,116 @@ export default defineComponent({
     const debouncedValidateGST = debounce(isValidGSTNo, 1000);
 
     onMounted(async () => {
-      const response = await getClient(LeadId);
-      // console.log(response);
-      profileDetails.value.first_name = response.first_name;
-      profileDetails.value.last_name = response.last_name;
-      profileDetails.value.company_name = response.meta.company_name;
-      profileDetails.value.lead_id = response.meta.customer_id;
-      profileDetails.value.email = response.email;
-      profileDetails.value.phone = response.mobile;
-      // meta
-      profileDetails.value.address1 = response.meta.address1
-        ? response.meta.address1
-        : "";
-      profileDetails.value.address2 = response.meta.address2
-        ? response.meta.address2
-        : "";
-      profileDetails.value.country = response.meta.country;
-      profileDetails.value.states = response.meta.states;
-      profileDetails.value.city = response.meta.city;
-      profileDetails.value.pincode = response.meta.pincode;
-      profileDetails.value.gst_number = response.meta.gst_number;
-
       state.value.pop();
       Leads.value.pop();
+      Companies.value.pop();
       await GetLeads();
-      
 
+      try {
+        const response = await getClient(clientId);
+
+        profileDetails.value = {
+          customer_id: response.customer_id,
+          name: response.name,
+          email: response.email,
+          mobile: response.mobile,
+          address1: response.address1,
+          address2: response.address2,
+          country: response.country,
+          state: response.state,
+          city: response.city,
+          pincode: response.pincode,
+          gst_number: response.gst_number,
+          company_name: response.company_name,
+          is_active: response.is_active,
+          company_id: response.company_id,
+          created_by: response.created_by,
+          updated_by: User.id,
+        };
+      } catch (error) {
+        console.log(`Error occured: ${error}`);
+      }
       await isValidGSTNo();
-
     });
 
     const GetLeads = async () => {
-      const companyId = User.company_id;
       ApiService.setHeader();
-      const response = await getLeadNCustomer(companyId);
-      Leads.value.push(
-        ...response.result.map(({ id, meta }) => ({
-          id: id,
-          meta: meta,
-        }))
-      );
+      const response = await getLeads(`fetchAll=true`);
+      if (response.result != null && response.result) {
+        Leads.value.push(
+          ...response.result?.map(({ id, ...rest }) => ({
+            id,
+            ...rest,
+          }))
+        );
+      }
     };
 
-    const emailFormDisplay = ref(false);
-    const passwordFormDisplay = ref(false);
-
     const profileDetailsValidator = Yup.object().shape({
-      fname: Yup.string().required().label("First name"),
-      lname: Yup.string().required().label("Last name"),
+      name: Yup.string().required().label("Person Name"),
       email: Yup.string().required().email().label("Email"),
-      phone: Yup.string().required().label("Phone"),
+      mobile: Yup.string().required().label("Phone"),
       company_name: Yup.string().required().label("Company Name"),
     });
 
-    const lead = ref<CustomerData>({
-      lead_id: "",
-      first_name: "",
-      last_name: "",
-    });
+
     const profileDetails = ref<ProfileDetails>({
-      first_name: "",
-      last_name: "",
+      customer_id: "",
+      name: "",
       email: "",
-      phone: "",
-      password: "decodedemo",
-      confpassword: "",
-      role_id: "9",
+      mobile: "",
       address1: "",
       address2: "",
       country: "",
-      states: "",
+      state: "",
       city: "",
       pincode: "",
       gst_number: "",
-      company_id: User.company_id,
       company_name: "",
+      company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
-      lead_id: "",
-      lead_first_name: "",
-      lead_last_name: "",
+      is_active: 1,
     });
 
-    async function SetLeadCompany(id) {
-      const foundLead = await Leads.value.find((lead) => id == lead.id);
-
-      if (foundLead) {
-        profileDetails.value.lead_id = await foundLead.id;
-      }
-    }
-
     const onsubmit = async () => {
+
+      if(profileDetails.value.customer_id == "" || profileDetails.value.customer_id == null){
+        showErrorAlert("Error", "Please Select Lead.");
+        return;
+      }
+      
       try {
-        // Call your API here with the form values
-        const response = await updateClient(profileDetails.value, LeadId);
-        // console.log(response.error);
-        if (!response.error) {
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+        loading.value = true;
+
+        // Call your API here
+        const response = await updateClient(profileDetails.value, clientId);
+
+        if (response?.success) {
           // Handle successful API response
-          // console.log("API response:", response);
-          showSuccessAlert("Success", "User have been successfully inserted!");
-          clear();
+          loading.value = false;
+          showSuccessAlert(
+            "Success",
+            response.message || "Client Updated Successfully!"
+          );
+          router.push({name: "clients-list"});
         } else {
           // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert(
-            "Warning",
-            "Please Fill the Form Fields Correctly" + errorData
-          );
-          router.push({ name: "clients-list" });
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -736,51 +699,21 @@ export default defineComponent({
           });
           //console.log(state);
         } else {
-          // profileDetails.value.states = "";
+          // profileDetails.value.state = "";
         }
       }
     );
 
-    const clear = () => {
-      profileDetails.value = {
-        first_name: "",
-        last_name: "",
-        email: "",
-        phone: "",
-        password: "decodedemo",
-        confpassword: "",
-        role_id: "9",
-        address1: "",
-        address2: "",
-        country: "",
-        states: "",
-        city: "",
-        pincode: "",
-        gst_number: "",
-        company_id: "",
-        company_name: "",
-        created_by: User.id,
-        updated_by: User.id,
-        lead_id: "",
-        lead_first_name: "",
-        lead_last_name: "",
-      };
-    };
-
     return {
+      submitButton,
       profileDetails,
-      lead,
-      emailFormDisplay,
-      passwordFormDisplay,
       profileDetailsValidator,
       getAssetPath,
       onsubmit,
       loading,
-      clear,
       countries,
       state,
       Leads,
-      SetLeadCompany,
       validGSTRef,
       debouncedValidateGST,
     };

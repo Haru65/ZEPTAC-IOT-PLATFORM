@@ -37,11 +37,12 @@
           </button>
           <!--end::Export-->
           <!--begin::Add customer-->
-          <router-link to="./add" class="btn btn-primary">
+          <router-link to="/leads/add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Lead
+            Lead
           </router-link>
           <!--end::Add customer-->
+          <!--end::Menu 1-->
         </div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->
@@ -80,6 +81,86 @@
           </button>
         </div>
         <!--end::Group actions-->
+
+        <div>
+          <button
+            type="button"
+            id="kt-menu-filter-button"
+            class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary ms-3"
+            data-kt-menu-target="#kt_menu_filter"
+            data-kt-menu-trigger="click"
+            data-kt-menu-placement="bottom-end"
+            data-kt-menu-flip="top-end"
+          >
+            <KTIcon icon-name="category" icon-class="fs-2" />
+          </button>
+
+          <!--begin::Menu 1-->
+          <div
+            id="kt_menu_filter"
+            class="menu menu-sub menu-sub-dropdown w-250px w-md-300px"
+            data-kt-menu="true"
+            data-kt-menu-attach="#kt-menu-filter-button"
+          >
+            <!--begin::Header-->
+            <div class="px-7 py-5">
+              <div class="fs-5 text-dark fw-bold">Filter Options</div>
+            </div>
+            <!--end::Header-->
+
+            <!--begin::Menu separator-->
+            <div class="separator border-gray-200"></div>
+            <!--end::Menu separator-->
+
+            <!--begin::Form-->
+            <div class="px-7 py-5">
+              <!--begin::Input group-->
+              <div class="mb-10">
+                <!--begin::Label-->
+                <label class="form-label fw-semobold">Leads Source:</label>
+                <!--end::Label-->
+
+                <!--begin::Options-->
+                <div class="d-flex flex-wrap">
+                  <!--begin::Options-->
+                  <label
+                    class="form-check form-check-sm form-check-custom form-check-solid me-5"
+                    v-for="(source, index) in SourcesList"
+                    :key="index"
+                  >
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      :value="source.source"
+                      v-model="selectedSources"
+                    />
+                    <span class="form-check-label user-select-none">{{
+                      source.labelValue
+                    }}</span>
+                  </label>
+                  <!--end::Options-->
+                </div>
+                <!--end::Options-->
+              </div>
+              <!--end::Input group-->
+
+              <!--begin::Actions-->
+              <div class="d-flex justify-content-end">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary"
+                  @click="applyFilters"
+                  data-kt-menu-dismiss="true"
+                >
+                  Apply
+                </button>
+              </div>
+              <!--end::Actions-->
+            </div>
+            <!--end::Form-->
+          </div>
+          <!--end::Menu 1-->
+        </div>
       </div>
       <!--end::Card toolbar-->
     </div>
@@ -95,16 +176,19 @@
         :items-per-page-dropdown-enabled="false"
         :loading="loading"
       >
+        <template v-slot:id="{ row: leads }">
+          {{ leads.id }}
+        </template>
         <template v-slot:enquiry_no="{ row: leads }">
           {{ leads.enquiry_no }}
         </template>
-        <template v-slot:lead_company="{ row: leads }">
-          {{ leads.lead_company }}
+        <template v-slot:company_name="{ row: leads }">
+          {{ leads.company_name }}
         </template>
         <template v-slot:location="{ row: leads }">
           <span class="text-gray-600 text-hover-primary mb-1">
-            {{ leads.location?.city }}
-            {{ leads.location?.states }}
+            {{ leads?.city || "" }}
+            {{ leads?.state || "" }}
           </span>
         </template>
         <!-- img data -->
@@ -114,34 +198,45 @@
         <template v-slot:mobile="{ row: leads }">
           {{ leads.mobile }}
         </template>
+        <template v-slot:source="{ row: leads }">
+          {{ leads.source }}
+        </template>
         <template v-slot:created_at="{ row: leads }">
           {{ leads.created_at }}
         </template>
         <template
-          v-slot:company_name="{ row: leads }"
+          v-slot:company_details="{ row: leads }"
           v-if="identifier == 'Admin'"
         >
-          {{ leads.company_name }}
+          {{ leads.company_details.company_name }}
         </template>
         <template v-slot:actions="{ row: leads }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <router-link :to="`./edit/${leads.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
+          <div class="d-flex flex-lg-row my-3">
+            <!--begin::Edit-->
+            <router-link :to="`/leads/edit/${leads.id}`">
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View Lead"
+              >
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
+            <!--begin::Delete-->
+            <span
+              @click="deleteItem(leads.id, false)"
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete Lead"
+            >
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
-            <span>
-              <i
-                @click="deleteItem(leads.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
-            </span>
+            <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -186,6 +281,7 @@ import { defineComponent, onMounted, ref, computed } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { ILeads } from "@/core/model/leads";
+import { SourcesList } from "@/core/model/leads";
 import arraySort from "array-sort";
 import { deleteLead, getLeads, LeadsSearch } from "@/stores/api";
 import { get_role } from "@/core/config/PermissionsRolesConfig";
@@ -194,7 +290,7 @@ import Swal from "sweetalert2";
 import { Identifier } from "@/core/config/WhichUserConfig";
 
 export default defineComponent({
-  name: "leads-listing",
+  name: "leads-list",
   components: {
     Datatable,
   },
@@ -208,7 +304,7 @@ export default defineComponent({
       },
       {
         columnName: "Company Name",
-        columnLabel: "lead_company",
+        columnLabel: "company_name",
         sortEnabled: true,
         columnWidth: 155,
       },
@@ -231,6 +327,12 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
+        columnName: "Source",
+        columnLabel: "source",
+        sortEnabled: true,
+        columnWidth: 175,
+      },
+      {
         columnName: "Added On",
         columnLabel: "created_at",
         sortEnabled: true,
@@ -238,7 +340,7 @@ export default defineComponent({
       },
       {
         columnName: "Main Company",
-        columnLabel: "company_name",
+        columnLabel: "company_details",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -268,6 +370,20 @@ export default defineComponent({
     // limit 10
     const more = ref(false);
 
+    // Filters Logic
+
+    const selectedSources = ref([]);
+
+    const applyFilters = async () => {
+      try {
+        page.value = 1;
+        await leads_listing();
+      } catch (error) {
+        console.error("Error fetching leads:", error);
+        // Handle error
+      }
+    };
+
     const PagePointer = async (page) => {
       // ? Truncate the tableData
       //console.log(limit.value);
@@ -276,31 +392,17 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getLeads(`page=${page}&limit=${limit.value}`);
+        const sourcesString = selectedSources.value.join(",");
+        const response = await getLeads(
+          `page=${page}&limit=${limit.value}&sources=${sourcesString}`
+        );
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
+          ({ id, created_at, company_details, ...rest }) => ({
             id,
-            first_name,
-            last_name,
-            mobile,
-            company_name,
-            meta,
-            created_at,
-            ...rest
-          }) => ({
-            id,
-            enquiry_no: meta.enquiry_no,
-            lead_company: meta.company_name,
-            location: {
-              city: meta.city ?? "",
-              states: meta.states ?? "",
-            },
-            name: first_name + " " + last_name,
-            mobile,
-            company_name: company_name.company_name,
             created_at: moment(created_at).format("DD-MM-YYYY"),
+            company_details: { ...company_details },
             ...rest,
           })
         );
@@ -324,31 +426,17 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getLeads(`page=${page.value}&limit=${limit}`);
+        const sourcesString = selectedSources.value.join(",");
+        const response = await getLeads(
+          `page=${page.value}&limit=${limit}&sources=${sourcesString}`
+        );
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
+          ({ id, created_at, company_details, ...rest }) => ({
             id,
-            first_name,
-            last_name,
-            mobile,
-            company_name,
-            meta,
-            created_at,
-            ...rest
-          }) => ({
-            id,
-            enquiry_no: meta.enquiry_no,
-            lead_company: meta.company_name,
-            location: {
-              city: meta.city ?? "",
-              states: meta.states ?? "",
-            },
-            name: first_name + " " + last_name,
-            mobile,
-            company_name: company_name.company_name,
             created_at: moment(created_at).format("DD-MM-YYYY"),
+            company_details: { ...company_details },
             ...rest,
           })
         );
@@ -381,34 +469,19 @@ export default defineComponent({
 
     async function leads_listing(): Promise<void> {
       try {
+        const sourcesString = selectedSources.value.join(",");
+
         const response = await getLeads(
-          `page=${page.value}&limit=${limit.value}`
+          `page=${page.value}&limit=${limit.value}&sources=${sourcesString}`
         );
-        // console.log(response);
+        // // console.log(response);
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
+          ({ id, created_at, company_details, ...rest }) => ({
             id,
-            first_name,
-            last_name,
-            mobile,
-            company_name,
-            meta,
-            created_at,
-            ...rest
-          }) => ({
-            id,
-            enquiry_no: meta.enquiry_no,
-            lead_company: meta.company_name,
-            location: {
-              city: meta.city ?? "",
-              states: meta.states ?? "",
-            },
-            name: first_name + " " + last_name,
-            mobile,
-            company_name: company_name.company_name,
             created_at: moment(created_at).format("DD-MM-YYYY"),
+            company_details: { ...company_details },
             ...rest,
           })
         );
@@ -427,7 +500,7 @@ export default defineComponent({
       return identifier.value === "Admin"
         ? tableHeader.value
         : tableHeader.value.filter(
-            (column) => column.columnLabel !== "company_name"
+            (column) => column.columnLabel !== "company_details"
           );
     });
 
@@ -590,31 +663,15 @@ export default defineComponent({
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await LeadsSearch(search.value);
+        const sourcesString = selectedSources.value.join(",");
+        const response = await LeadsSearch(search.value, sourcesString);
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
+          ({ id, created_at, company_details, ...rest }) => ({
             id,
-            first_name,
-            last_name,
-            mobile,
-            company_name,
-            meta,
-            created_at,
-            ...rest
-          }) => ({
-            id,
-            enquiry_no: meta.enquiry_no,
-            lead_company: meta.company_name,
-            location: {
-              city: meta.city ?? "",
-              states: meta.states ?? "",
-            },
-            name: first_name + " " + last_name,
-            mobile,
-            company_name: company_name.company_name,
             created_at: moment(created_at).format("DD-MM-YYYY"),
+            company_details: { ...company_details },
             ...rest,
           })
         );
@@ -671,6 +728,10 @@ export default defineComponent({
       Limits,
       identifier,
       filteredTableHeader,
+
+      selectedSources,
+      SourcesList,
+      applyFilters,
     };
   },
 });

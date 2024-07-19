@@ -1,14 +1,19 @@
 interface IValidationReport {
     id: number;
-    customer_name:{
+    customer:{
+        id: string;
+        name: string;
         company_name: string;
     };
-    site_location:{
+    clientx:{
+        id: string;
+        name: string;
+        company_name: string;
         address1: string;
         address2: string;
         city: string;
         pincode: string;
-        states: string;
+        state: string;
         country: string;
 
     };

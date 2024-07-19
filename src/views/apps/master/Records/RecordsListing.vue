@@ -22,10 +22,9 @@
       <!--begin::Card title-->
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
-        
-         <!-- YEAR WISE DATA -->
+        <!-- YEAR WISE DATA -->
 
-         <h3 class="card-title align-items-start flex-column">
+        <h3 class="card-title align-items-start flex-column">
           <span class="card-label fw-semibold text-gray-400"
             >Financial Year</span
           >
@@ -89,11 +88,7 @@
             <span class="me-2">{{ selectedIds.length }}</span
             >Selected
           </div>
-          <button
-            type="button"
-            class="btn btn-danger"
-            @click="deleteFewItem()"
-          >
+          <button type="button" class="btn btn-danger" @click="deleteFewItem()">
             Delete Selected
           </button>
         </div>
@@ -197,23 +192,31 @@
 
         <template v-slot:actions="{ row: record }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <router-link :to="`/records/edit/${record.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
+          <div class="d-flex flex-lg-row my-3">
+            <!--begin::Edit-->
+            <router-link :to="`/records/edit/${record.id}`">
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View Record"
+              >
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
+            <!--begin::Delete-->
+            <span
+              @click="deleteItem(record.id, false)"
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete Record"
+            >
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
-            <span class="menu-link px-3">
-              <i
-                @click="deleteItem(record.id, false)"
-                class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
-            </span>
+            <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -283,7 +286,7 @@ export default defineComponent({
     const auth = useAuthStore();
     const User = auth.GetUser();
     const identifier = Identifier;
-    
+
     const tableHeader = ref([
       {
         columnName: "Document Number with Section",
@@ -371,11 +374,13 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getRecords(`page=${page}&limit=${limit.value}&year=${
+        const response = await getRecords(
+          `page=${page}&limit=${limit.value}&year=${
             selectedYearCache.value
               ? selectedYearCache.value
               : financialYears.value[0]
-          }`);
+          }`
+        );
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(({ ...rest }) => ({
@@ -401,11 +406,13 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getRecords(`page=${page.value}&limit=${limit}&year=${
+        const response = await getRecords(
+          `page=${page.value}&limit=${limit}&year=${
             selectedYearCache.value
               ? selectedYearCache.value
               : financialYears.value[0]
-          }`);
+          }`
+        );
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(({ ...rest }) => ({
@@ -500,7 +507,6 @@ export default defineComponent({
     });
 
     async function handleChange() {
-      
       page.value = 1;
       localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
       await record_listing();
@@ -676,7 +682,12 @@ export default defineComponent({
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await RecordSearch(search.value, selectedYearCache.value ? selectedYearCache.value : financialYears.value[0]);
+        const response = await RecordSearch(
+          search.value,
+          selectedYearCache.value
+            ? selectedYearCache.value
+            : financialYears.value[0]
+        );
 
         tableData.value = response.result.data.map(({ ...rest }) => ({
           ...rest,
@@ -760,7 +771,7 @@ export default defineComponent({
       itemData,
       fillItemData,
       identifier,
-      
+
       selectedYearCache,
       financialYears,
       handleChange,

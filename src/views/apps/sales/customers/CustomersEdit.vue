@@ -33,50 +33,52 @@
           <!--begin::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
-            <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-              >Full Name</label
-            >
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span class="required">Company Name</span>
+            </label>
             <!--end::Label-->
 
             <!--begin::Col-->
-            <div class="col-lg-8">
-              <!--begin::Row-->
-              <div class="row">
-                <!--begin::Col-->
-                <div class="col-lg-6 fv-row">
-                  <Field
-                    type="text"
-                    name="fname"
-                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
-                    placeholder="First name"
-                    v-model="profileDetails.first_name"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="fname" />
-                    </div>
-                  </div>
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="company_name"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Company Name"
+                v-model="profileDetails.company_name"
+              />
+              <div class="fv-plugins-message-container">
+                <div class="fv-help-block">
+                  <ErrorMessage name="company_name" />
                 </div>
-                <!--end::Col-->
-
-                <!--begin::Col-->
-                <div class="col-lg-6 fv-row">
-                  <Field
-                    type="text"
-                    name="lname"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Last name"
-                    v-model="profileDetails.last_name"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="lname" />
-                    </div>
-                  </div>
-                </div>
-                <!--end::Col-->
               </div>
-              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span class="required">Full Name</span>
+            </label>
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="name"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Enter Person Name"
+                v-model="profileDetails.name"
+              />
+              <div class="fv-plugins-message-container">
+                <div class="fv-help-block">
+                  <ErrorMessage name="name" />
+                </div>
+              </div>
             </div>
             <!--end::Col-->
           </div>
@@ -127,59 +129,27 @@
             <div class="col-lg-8 fv-row">
               <Field
                 type="tel"
-                name="phone"
+                name="mobile"
                 class="form-control form-control-lg form-control-solid"
                 placeholder="Phone number"
-                v-model="profileDetails.phone"
+                v-model="profileDetails.mobile"
               />
               <div class="fv-plugins-message-container">
                 <div class="fv-help-block">
-                  <ErrorMessage name="phone" />
+                  <ErrorMessage name="mobile" />
                 </div>
               </div>
             </div>
             <!--end::Col-->
           </div>
           <!--end::Input group-->
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6">
-              <span class="required">Company Name</span>
-            </label>
-            <!--end::Label-->
 
-            <!--begin::Col-->
-            <div class="col-lg-8 fv-row">
-              <Field
-                type="text"
-                name="company_name"
-                class="form-control form-control-lg form-control-solid"
-                placeholder="Company Name"
-                v-model="profileDetails.company_name"
-              />
-              <div class="fv-plugins-message-container">
-                <div class="fv-help-block">
-                  <ErrorMessage name="company_name" />
-                </div>
-              </div>
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--end::Input group-->
-          <!--end::Input group-->
           <div class="separator my-10"></div>
 
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6">
               <span>Address 1</span>
-
-              <i
-                class="fas fa-exclamation-circle ms-1 fs-7"
-                data-bs-toggle="tooltip"
-                title="Address Required"
-              ></i>
             </label>
             <!--begin::Col-->
             <!--begin::Col-->
@@ -206,12 +176,6 @@
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6">
               <span>Address 2</span>
-
-              <i
-                class="fas fa-exclamation-circle ms-1 fs-7"
-                data-bs-toggle="tooltip"
-                title="Address Required"
-              ></i>
             </label>
             <!--begin::Col-->
             <!--begin::Col-->
@@ -283,7 +247,7 @@
                 <div v-if="state.length" class="col-lg fv-row">
                   <div>
                     <el-select
-                      v-model="profileDetails.states"
+                      v-model="profileDetails.state"
                       filterable
                       placeholder="Select Your State..."
                     >
@@ -304,7 +268,7 @@
                       name="state"
                       class="form-control form-control-lg form-control-solid"
                       placeholder="Enter State Name"
-                      v-model="profileDetails.states"
+                      v-model="profileDetails.state"
                     />
                     <div class="fv-plugins-message-container">
                       <div class="fv-help-block">
@@ -348,7 +312,6 @@
             <!--end::Col-->
           </div>
           <!--end::Input group-->
-          <!--end::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6">City</label>
@@ -374,6 +337,7 @@
             </div>
             <!--end::Col-->
           </div>
+          <!--end::Input group-->
           <div class="row mb-6">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6"
@@ -425,17 +389,13 @@
         </div>
         <div class="modal-footer flex-center">
           <!--begin::Button-->
-          <button type="reset" class="btn btn-lg btn-danger w-25">Clear</button>
-          <!--end::Button-->
-          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-          <!--begin::Button-->
           <button
-            :data-kt-indicator="loading ? 'on' : null"
-            class="btn btn-lg btn-primary w-25"
+            ref="submitButton"
             type="submit"
+            class="btn btn-primary w-sd-25 w-lg-25"
           >
-            <span v-if="!loading" class="indicator-label"> Update </span>
-            <span v-if="loading" class="indicator-progress">
+            <span class="indicator-label"> Update </span>
+            <span class="indicator-progress">
               Please wait...
               <span
                 class="spinner-border spinner-border-sm align-middle ms-2"
@@ -467,43 +427,53 @@ import { useRoute, useRouter } from "vue-router";
 import { countries, INstates } from "@/core/model/countries";
 import { debounce } from "@/core/helpers/debounce";
 
-interface ProfileDetails {
-  first_name: string;
-  last_name: string;
+interface LDetails {
+  name: string;
   email: string;
   phone: string;
-  password: string;
-  confpassword: string;
-  role_id: string;
+}
+
+interface ProfileDetails {
+  name: string;
+  email: string;
+  mobile: string;
+  extra_leads: Array<LDetails>;
+  enquiry_no: string;
   address1: string;
   address2: string;
-  country: string;
-  states: string;
-  pincode: string;
   city: string;
+  pincode: string;
+  state: string;
+  country: string;
   gst_number: string;
+  source: string;
+  is_converted: boolean;
+  is_active: number;
+  company_id: string;
   company_name: string;
+  created_by: string;
   updated_by: string;
 }
 
 export default defineComponent({
-  name: "account-settings",
+  name: "customers-edit",
   components: {
     ErrorMessage,
     Field,
     VForm,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
     const auth = useAuthStore();
     const router = useRouter();
     const route = useRoute();
 
-    let limit = ref(500);
     const loading = ref(false);
     const User = auth.GetUser();
     const Companies = ref([{ id: "", company_name: "" }]);
     const state = ref([""]);
     const customerId = route.params.id;
+
     const getdropcomp = async () => {
       ApiService.setHeader();
       const response = await getCompanies(`fetchAll=true`);
@@ -521,61 +491,68 @@ export default defineComponent({
     onMounted(async () => {
       state.value.pop();
       Companies.value.pop();
-      // await getdropcomp();
-      // add customer details
-      const res = await getCustomer(customerId);
-      // console.log(res);
-      profileDetails.value = {
-        first_name: res.first_name,
-        last_name: res.last_name,
-        email: res.email,
-        phone: res.mobile,
-        password: "",
-        confpassword: "",
-        role_id: res.role_id,
-        address1: res.meta.address1,
-        address2: res.meta.address2,
-        country: res.meta.country,
-        states: res.meta.states,
-        city: res.meta.city,
-        pincode: res.meta.pincode,
-        gst_number: res.meta.gst_number,
-        company_name: res.meta.company_name,
-        updated_by: User.id,
-      };
+      try {
+        const response = await getCustomer(customerId);
+        
+        if(response.is_converted == 0){
+          router.push({ name: "customers-list" });
+          return;
+        }
 
+        profileDetails.value = {
+          name: response.name,
+          email: response.email,
+          mobile: response.mobile,
+          enquiry_no: response.enquiry_no,
+          extra_leads: response.extra_leads ? JSON.parse(response.extra_leads) : [],
+          address1: response.address1,
+          address2: response.address2,
+          country: response.country,
+          state: response.state,
+          city: response.city,
+          pincode: response.pincode,
+          gst_number: response.gst_number,
+          source: response.source,
+          is_converted: response.is_converted,
+          company_name: response.company_name,
+          is_active: response.is_active,
+          company_id: response.company_id,
+          created_by: response.created_by,
+          updated_by: User.id,
+        };
+      } catch (error) {
+        console.log(`Error occured: ${error}`);
+      }
       await isValidGSTNo();
-      
     });
 
-    const emailFormDisplay = ref(false);
-    const passwordFormDisplay = ref(false);
-
     const profileDetailsValidator = Yup.object().shape({
-      fname: Yup.string().required().label("First name"),
-      lname: Yup.string().required().label("Last name"),
+      name: Yup.string().required().label("Person Name"),
       email: Yup.string().required().email().label("Email"),
-      phone: Yup.string().required().label("Phone"),
+      mobile: Yup.string().required().label("Phone"),
       company_name: Yup.string().required().label("Company Name"),
     });
 
     const profileDetails = ref<ProfileDetails>({
-      first_name: "",
-      last_name: "",
+      name: "",
       email: "",
-      phone: "",
-      password: "",
-      confpassword: "",
-      role_id: "7",
+      mobile: "",
+      extra_leads: [],
+      enquiry_no: "",
       address1: "",
       address2: "",
       country: "",
-      states: "",
+      state: "",
       city: "",
       pincode: "",
       gst_number: "",
+      source: "",
+      is_converted: true,
       company_name: "",
+      company_id: User.company_id,
+      created_by: User.id,
       updated_by: User.id,
+      is_active: 1,
     });
     const validGSTRef = ref(false);
 
@@ -604,38 +581,39 @@ export default defineComponent({
 
     const debouncedValidateGST = debounce(isValidGSTNo, 1000);
 
+
     const onsubmit = async () => {
-      loading.value = true;
-      // console.log(profileDetails.value);
-      console.warn("Nice");
       try {
-        // Call your API here with the form values
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+        loading.value = true;
+
+        // Call your API here
         const response = await updateCustomer(customerId, profileDetails.value);
-        // console.log(response.error);
-        if (!response.error) {
+
+        if (response?.success) {
           // Handle successful API response
-          // console.log("API response:", response);
+          loading.value = false;
           showSuccessAlert(
             "Success",
-            "Customer Information successfully Updated!"
+            response.message || "Customer Updated Successfully!"
           );
-
           router.push({ name: "customers-list" });
         } else {
           // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert(
-            "Warning",
-            "Please Fill the Form Fields Correctly" + errorData
-          );
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -680,41 +658,18 @@ export default defineComponent({
           });
           //console.log(state);
         } else {
-          // profileDetails.value.states = "";
+          // profileDetails.value.state = "";
         }
       }
     );
 
-    const clear = () => {
-      profileDetails.value = {
-        first_name: "",
-        last_name: "",
-        email: "",
-        phone: "",
-        password: "decodedemo",
-        confpassword: "",
-        role_id: "7",
-        address1: "",
-        address2: "",
-        country: "",
-        states: "",
-        city: "",
-        pincode: "",
-        gst_number: "",
-        company_name: "",
-        updated_by: User.id,
-      };
-    };
-
     return {
+      submitButton,
       profileDetails,
-      emailFormDisplay,
-      passwordFormDisplay,
       profileDetailsValidator,
       getAssetPath,
       onsubmit,
       loading,
-      clear,
       countries,
       state,
       debouncedValidateGST,

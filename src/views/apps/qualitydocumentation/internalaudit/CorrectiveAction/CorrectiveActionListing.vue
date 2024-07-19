@@ -161,7 +161,7 @@
               @click="AddCorrecticeAction(audit_observation)"
             >
               <span
-                class="border rounded badge p-3 fs-7 badge-light-primary text-hover-success cursor-pointer"
+                class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
                 >+ corrective action
               </span>
             </span>
@@ -175,8 +175,8 @@
               @click="EditCorrecticeAction(audit_observation.corrective_action)"
             >
               <span
-                class="border rounded badge p-3 fs-7 badge-light-primary text-hover-success cursor-pointer"
-                >View corrective action
+                class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
+                >view corrective action
               </span>
             </span>
           </div>

@@ -32,7 +32,7 @@
           </h3>
           <div class="me-3">
             <el-select
-            class="w-150px"
+              class="w-150px"
               filterable
               placeholder="Select Year"
               v-model="selectedYearCache"
@@ -134,23 +134,23 @@
           :items-per-page-dropdown-enabled="false"
           :loading="loading"
         >
+          <template v-slot:id="{ row: dailyworksheets }">
+            {{ dailyworksheets.id }}
+          </template>
           <template v-slot:rgp_no="{ row: dailyworksheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
               {{ dailyworksheets.rgp_no }}
             </span>
           </template>
-          <template v-slot:customer_name="{ row: dailyworksheets }">
+          <template v-slot:customer="{ row: dailyworksheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
-              {{ dailyworksheets.customer_name.company_name }}
+              {{ dailyworksheets?.customer?.company_name || "" }}
             </span>
           </template>
-          <template v-slot:engineer_name="{ row: dailyworksheets }">
+          <template v-slot:engineer="{ row: dailyworksheets }">
             <span class="text-gray-600 text-hover-primary mb-1">
-              {{
-                dailyworksheets.engineer_name.first_name +
-                " " +
-                dailyworksheets.engineer_name.last_name
-              }}
+              {{ dailyworksheets?.engineer?.first_name || "" }}
+              {{ dailyworksheets?.engineer?.last_name || "" }}
             </span>
           </template>
           <!-- defualt data -->
@@ -205,30 +205,24 @@
 
           <template v-slot:actions="{ row: dailyworksheets }">
             <!--begin::Menu Flex-->
-
             <div class="d-flex flex-lg-row">
               <span
-                class="menu-link px-3"
-                data-toggle="tooltip"
+                class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
                 title="Download Worksheet"
+                @click="downloadWorksheet(dailyworksheets.id)"
               >
-                <i
-                  @click="downloadWorksheet(dailyworksheets.id)"
-                  class="las la-download text-gray-600 text-hover-success mb-1 fs-1"
-                ></i>
+                <KTIcon icon-name="file-down" icon-class="fs-2" />
               </span>
               <span
-                class="menu-link px-3"
-                data-toggle="tooltip"
+                class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
                 title="Delete Worksheet"
+                @click="deleteItem(dailyworksheets.id, false)"
               >
-                <i
-                  @click="deleteItem(dailyworksheets.id, false)"
-                  class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-1"
-                ></i>
+                <KTIcon icon-name="trash" icon-class="fs-2" />
               </span>
             </div>
-
             <!--end::Menu FLex-->
           </template>
         </Datatable>
@@ -280,7 +274,7 @@ import moment from "moment";
 import {
   deleteDailyWorksheet,
   getDailyWorksheets,
-  getDailyWorksheet,
+  getWorksheetInfo,
   WorksheetSearch,
   getCompanyLogo,
 } from "@/stores/api";
@@ -292,6 +286,63 @@ import { Identifier } from "@/core/config/WhichUserConfig";
 import Swal from "sweetalert2";
 import { worksheetGen } from "@/core/config/WorksheetGenerator";
 import ApiService from "@/core/services/ApiService";
+
+interface Engineer {
+  id: string;
+  first_name: string;
+  last_name: string;
+  mobile: string;
+}
+
+interface Data {
+  id: string;
+  name: string;
+  mobile: string;
+  company_name: string;
+  address1: string;
+  address2: string;
+  city: string;
+  state: string;
+  pincode: string;
+  country: string;
+}
+
+interface Quotation {
+  id: string;
+  quotation_no: string;
+  customer: Data;
+  client: Data;
+  clientx: Data;
+}
+
+interface DownloadData {
+  id: string;
+  rgp_id: string;
+  engineer_id: string;
+  scope_of_work: string;
+  problem: string;
+  work_date: string;
+  start_time: string;
+  end_time: string;
+  tests: [];
+  other_test: string;
+  standard_used: string;
+  witnessed_by: string;
+  engineer: Engineer;
+  rgp: {
+    id: string;
+    rgp_no: string;
+    quotation_id: string;
+    quotation: Quotation;
+  };
+
+  work_status: string;
+  approval_status: string;
+  company_id: string;
+  created_by: string;
+  updated_by: string;
+  is_active: string;
+}
 
 export default defineComponent({
   name: "dailyworksheet-list",
@@ -317,13 +368,13 @@ export default defineComponent({
       },
       {
         columnName: "Customer Name",
-        columnLabel: "customer_name",
+        columnLabel: "customer",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
         columnName: "Engineer Name",
-        columnLabel: "engineer_name",
+        columnLabel: "engineer",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -402,10 +453,14 @@ export default defineComponent({
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id,
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({ id, engineer, rgp, ...rest }) => ({
+            id,
+            engineer: { ...engineer },
+            customer: { ...rgp.quotation.customer },
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -434,10 +489,14 @@ export default defineComponent({
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id,
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({ id, engineer, rgp, ...rest }) => ({
+            id,
+            engineer: { ...engineer },
+            customer: { ...rgp.quotation.customer },
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -467,10 +526,14 @@ export default defineComponent({
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id,
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({ id, engineer, rgp, ...rest }) => ({
+            id,
+            engineer: { ...engineer },
+            customer: { ...rgp.quotation.customer },
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -710,10 +773,14 @@ export default defineComponent({
         );
 
         more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id,
-          ...rest,
-        }));
+        tableData.value = response.result.data.map(
+          ({ id, engineer, rgp, ...rest }) => ({
+            id,
+            engineer: { ...engineer },
+            customer: { ...rgp.quotation.customer },
+            ...rest,
+          })
+        );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
       } catch (error) {
         console.error(error);
@@ -746,150 +813,180 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-    const worksheetInfo = ref({
+    const companyInfo = ref({
+      id: "",
+      company_name: "",
+      company_logo: "",
+      address: "",
+      city: "",
+      state: "",
+      country: "",
+      pincode: "",
+      logo_base64: "",
+    });
+
+    const worksheetInfo = ref<DownloadData>({
       id: "",
       rgp_id: "",
-      rgp_no: "",
       engineer_id: "",
-      company_id: "",
       scope_of_work: "",
       problem: "",
       work_date: "",
-      tests: [],
-      other_test: "",
       start_time: "",
       end_time: "",
-      work_status: "",
+      tests: [],
+      other_test: "",
       standard_used: "",
       witnessed_by: "",
-
-      client_address: {
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        states: "",
-        country: "",
-      },
-
-      company_details: {
-        id: "",
-        company_name: "",
-        company_logo: "",
-        address: "",
-        city: "",
-        state: "",
-        country: "",
-        pincode: "",
-        logo_base64: "",
-      },
-
-      customer_data: {
-        id: "",
-        first_name: "",
-        last_name: "",
-      },
-
-      client_data: {
+      engineer: {
         id: "",
         first_name: "",
         last_name: "",
         mobile: "",
-        company: {
-          company_name: "",
+      },
+      rgp: {
+        id: "",
+        rgp_no: "",
+        quotation_id: "",
+        quotation: {
+          id: "",
+          quotation_no: "",
+          customer: {
+            id: "",
+            name: "",
+            mobile: "",
+            company_name: "",
+            address1: "",
+            address2: "",
+            city: "",
+            pincode: "",
+            state: "",
+            country: "",
+          },
+          client: {
+            id: "",
+            name: "",
+            mobile: "",
+            company_name: "",
+            address1: "",
+            address2: "",
+            city: "",
+            pincode: "",
+            state: "",
+            country: "",
+          },
+          clientx: {
+            id: "",
+            name: "",
+            mobile: "",
+            company_name: "",
+            address1: "",
+            address2: "",
+            city: "",
+            pincode: "",
+            state: "",
+            country: "",
+          },
         },
       },
-
-      quotation_details: {
-        id: "",
-        customer_id: "",
-        quotation_no: "",
-      },
+      work_status: "",
+      approval_status: "",
+      company_id: "",
+      created_by: "",
+      updated_by: "",
+      is_active: "",
     });
 
-    const downloadWorksheet = async (id: any) => {
-      ApiService.setHeader();
+    const downloadWorksheet = async (id) => {
+      let timerInterval;
 
-      if (id != null) {
-        const res = await getDailyWorksheet(id);
+      try {
+        // Show initial loading Swal with generic progress messages
+        Swal.fire({
+          title: "Downloading Worksheet",
+          html: `<div class="swal-animation">
+        <p class="swal-text">Please wait...</p>
+        <div class="swal-progress">
+          <div class="swal-progress-bar"></div>
+        </div>
+      </div>`,
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          willClose: () => {
+            clearInterval(timerInterval);
+          },
+        });
 
-        worksheetInfo.value.id = res.result.id;
-        worksheetInfo.value.rgp_id = res.result.rgp_id;
-        worksheetInfo.value.rgp_no = res.result.rgp_no;
-        worksheetInfo.value.engineer_id = res.result.engineer_id;
-        worksheetInfo.value.company_id = res.result.company_id;
-        worksheetInfo.value.scope_of_work = res.result.scope_of_work;
-        worksheetInfo.value.problem = res.result.problem
-          ? res.result.problem
-          : "NA";
-        worksheetInfo.value.work_date = res.result.work_date;
-        worksheetInfo.value.tests = await JSON.parse(res.result.tests);
-        worksheetInfo.value.other_test = res.result.other_test
-          ? res.result.other_test
-          : "NA";
-        worksheetInfo.value.start_time = res.result.start_time;
-        worksheetInfo.value.end_time = res.result.end_time;
-        worksheetInfo.value.work_status = res.result.work_status;
-        worksheetInfo.value.standard_used = res.result.standard_used;
-        worksheetInfo.value.witnessed_by = res.result.witnessed_by;
+        // Fetch RGP information
+        const res = await getWorksheetInfo(id);
+        if (res?.success != false) {
+          worksheetInfo.value = { ...res.result };
+          worksheetInfo.value.tests = JSON.parse(res.result.tests);
 
-        worksheetInfo.value.client_address.address1 = res.result.client_address
-          .address1
-          ? res.result.client_address.address1
-          : "";
-        worksheetInfo.value.client_address.address2 = res.result.client_address
-          .address2
-          ? res.result.client_address.address2
-          : "";
-        worksheetInfo.value.client_address.city = res.result.client_address.city
-          ? res.result.client_address.city
-          : "";
-        worksheetInfo.value.client_address.pincode = res.result.client_address
-          .pincode
-          ? res.result.client_address.pincode
-          : "";
-        worksheetInfo.value.client_address.states = res.result.client_address
-          .states
-          ? res.result.client_address.states
-          : "";
-        worksheetInfo.value.client_address.country = res.result.client_address
-          .country
-          ? res.result.client_address.country
-          : "";
+        } else {
+          showErrorAlert("Error", res.message || "Error Occured");
+          return;
+        }
 
-        worksheetInfo.value.customer_data.id = res.result.customer_data.id;
-        worksheetInfo.value.customer_data.first_name =
-          res.result.customer_data.first_name;
-        worksheetInfo.value.customer_data.last_name =
-          res.result.customer_data.last_name;
-
-        worksheetInfo.value.client_data.id = res.result.client_data.id;
-        worksheetInfo.value.client_data.first_name =
-          res.result.client_data.first_name;
-        worksheetInfo.value.client_data.last_name =
-          res.result.client_data.last_name;
-        worksheetInfo.value.client_data.mobile = res.result.client_data.mobile
-          ? res.result.client_data.mobile
-          : "";
-        worksheetInfo.value.client_data.company.company_name =
-          res.result.client_data.company.company_name;
-
-        worksheetInfo.value.quotation_details = res.result.quotation_details;
-
+        // Fetch company logo details
         const res2 = await getCompanyLogo(res.result.company_id);
 
-        worksheetInfo.value.company_details.id = res2.id;
-        worksheetInfo.value.company_details.company_name = res2.company_name;
-        worksheetInfo.value.company_details.company_logo = res2.company_logo
-          ? res2.company_logo
-          : "";
-        worksheetInfo.value.company_details.logo_base64 = res2.logo_base64
-          ? "data: image/png;base64," + res2.logo_base64
-          : getAssetPath("media/avatars/default.png");
+        if (res2?.success != false) {
+          // Update local reactive state (assuming Vue 3 Composition API syntax)
+          companyInfo.value.id = res2.result.id;
+          companyInfo.value.company_name = res2.result.company_name;
+          companyInfo.value.company_logo = res2.result.company_logo
+            ? res2.result.company_logo
+            : "";
+          companyInfo.value.logo_base64 = res2.result.logo_base64
+            ? "data: image/png;base64," + res2.result.logo_base64
+            : getAssetPath("media/avatars/default.png");
+        } else {
+          showErrorAlert("Error", res2.message || "Error Occured");
+          return;
+        }
+        // Update Swal message for PDF generation
+        Swal.update({
+          title: "Generating PDF",
+          html: `<div class="swal-animation">
+        <p class="swal-text">Please wait...</p>
+        <div class="swal-progress">
+          <div class="swal-progress-bar"></div>
+        </div>
+      </div>`,
+        });
 
-        const worksheetName = `${worksheetInfo.value.quotation_details.quotation_no}_${worksheetInfo.value.rgp_no}`;
+        // Simulate delay for PDF generation (replace with actual function)
+        const pdfName = `${worksheetInfo.value.rgp.quotation.quotation_no}_${worksheetInfo.value.rgp.rgp_no}`;
 
-        await worksheetGen(id, worksheetName, worksheetInfo);
+        await worksheetGen(id, pdfName, worksheetInfo, companyInfo);
+
+        // Close Swal on success
+        Swal.fire({
+          title: "Download Complete",
+          text: "daily Worksheet PDF generated successfully",
+          icon: "success",
+          timer: 2000, // Show success message for 2 seconds
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } catch (error) {
+        console.error("Error downloading Worksheet:", error);
+
+        // Close Swal on success
+        Swal.fire({
+          title: "Error Complete",
+          text: "Failed to download Worksheet",
+          icon: "error",
+          timer: 2000,
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } finally {
+        // Clear interval if still running
+        clearInterval(timerInterval);
       }
     };
 

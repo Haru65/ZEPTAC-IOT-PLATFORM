@@ -12,7 +12,7 @@
           :validation-schema="itemDetailsValidator"
         >
           <!--begin::Card body-->
-          <div class="card-body border-top p-sd-2 p-lg-9">
+          <div class="card-body p-sd-2 p-lg-9">
             <!--begin::Input group-->
 
             <!--begin::Table-->

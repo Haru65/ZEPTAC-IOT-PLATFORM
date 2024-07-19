@@ -4,7 +4,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import moment from "moment";
 
-const instrumentGen = async (id, pdfName, instrumentInfo) => {
+const instrumentGen = async (id, pdfName, instrumentInfo, companyDetails) => {
   pdfName += `_${id}`;
 
   const doc = new jsPDF({
@@ -23,7 +23,7 @@ const instrumentGen = async (id, pdfName, instrumentInfo) => {
 
   // Company Logo Img
   const img = new Image()
-  img.src = instrumentInfo.value.company_details.logo_base64;
+  img.src = companyDetails.value.logo_base64;
   doc.addImage(img, 'JPEG', 0.5, 0.7, 0.7, 0.7);
 
   // create a line under heading
@@ -31,10 +31,10 @@ const instrumentGen = async (id, pdfName, instrumentInfo) => {
 
   // const date = moment(instrumentInfo.date, "YYYY-MM-DD").format("LL");
 
-  const company_address = `${instrumentInfo.value.company_details.address} ${instrumentInfo.value.company_details.city} ${instrumentInfo.value.company_details.pincode} ${instrumentInfo.value.company_details.state} ${instrumentInfo.value.company_details.country} `
+  const company_address = `${companyDetails.value.address || ""} ${companyDetails.value.city || ""} ${companyDetails.value.pincode || ""} ${companyDetails.value.state || ""} ${companyDetails.value.country || ""} `
 
   const Info = [
-    ['Company Name', `${instrumentInfo.value.company_details.company_name}`],
+    ['Company Name', `${companyDetails.value.company_name}`],
     ['Company Address', `${company_address}`],
   ];
 

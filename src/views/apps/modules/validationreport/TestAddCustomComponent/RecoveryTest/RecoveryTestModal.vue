@@ -568,28 +568,28 @@ export default defineComponent({
 
     const EquipmentRef = ref(false);
 
-const handleChange = () => {
-  if (EquipmentRef.value === true) {
-    // if it is true it means report has to be filled using equipment id
-    EquipmentRef.value = true;
+    const handleChange = () => {
+      if (EquipmentRef.value === true) {
+        // if it is true it means report has to be filled using equipment id
+        EquipmentRef.value = true;
 
-    // clear room_name,  area_name, ahu_no
-    recoveryTestDetails.value.room_name = "";
-    recoveryTestDetails.value.area_name = "";
-    recoveryTestDetails.value.ahu_no = "";
+        // clear room_name,  area_name, ahu_no
+        recoveryTestDetails.value.room_name = "";
+        recoveryTestDetails.value.area_name = "";
+        recoveryTestDetails.value.ahu_no = "";
 
-    recoveryTestDetails.value.report_name = "";
-  } else {
-    // if it is false it means report has to be filled using room name
-    EquipmentRef.value = false;
+        recoveryTestDetails.value.report_name = "";
+      } else {
+        // if it is false it means report has to be filled using room name
+        EquipmentRef.value = false;
 
-    // clear equipment_id,  equipment_name field
-    recoveryTestDetails.value.equipment_id = "";
-    recoveryTestDetails.value.equipment_name = "";
+        // clear equipment_id,  equipment_name field
+        recoveryTestDetails.value.equipment_id = "";
+        recoveryTestDetails.value.equipment_name = "";
 
-    recoveryTestDetails.value.report_name = "";
-  }
-};
+        recoveryTestDetails.value.report_name = "";
+      }
+    };
 
     const validationSchema = Yup.object().shape({
       // firstName: Yup.string().required().label("First name"),
@@ -650,7 +650,12 @@ const handleChange = () => {
     });
 
     const setInstrument = (id) => {
-      const instrumentUsedArray = Object.values([...props.instruments]);
+      // Ensure props.instruments is correctly accessed
+      const instrumentUsedArray = Array.isArray(props.instruments)
+        ? props.instruments
+        : Object.values(props.instruments);
+
+      // Check if instrumentUsedArray is valid
       if (instrumentUsedArray) {
         const foundInstrument = instrumentUsedArray.find(
           (instrument) => id === instrument.id
@@ -669,24 +674,32 @@ const handleChange = () => {
             foundInstrument.calibration_date;
           recoveryTestDetails.value.instrument_used.calibration_due_date =
             foundInstrument.calibration_due_date;
+        } else {
+          console.warn("Instrument not found for id:", id);
         }
       }
     };
+
     const setEngineer = (id) => {
-      const engineerArray = Object.values([...props.engineers]);
-      if (engineerArray) {
-        const foundEngineer = engineerArray.find(
-          (engineer) => id === engineer.id
-        );
-        if (foundEngineer) {
-          recoveryTestDetails.value.test_carried_by.id = foundEngineer.id;
-          recoveryTestDetails.value.test_carried_by.first_name =
-            foundEngineer.first_name;
-          recoveryTestDetails.value.test_carried_by.last_name =
-            foundEngineer.last_name;
-        }
+      // Check if props.engineers is a Proxy and get the underlying array
+      const engineersArray = Array.isArray(props.engineers)
+        ? props.engineers
+        : Object.values(props.engineers);
+
+      const foundEngineer = engineersArray.find(
+        (engineer) => id === engineer.id
+      );
+      if (foundEngineer) {
+        recoveryTestDetails.value.test_carried_by.id = foundEngineer.id;
+        recoveryTestDetails.value.test_carried_by.first_name =
+          foundEngineer.first_name;
+        recoveryTestDetails.value.test_carried_by.last_name =
+          foundEngineer.last_name;
+      } else {
+        console.warn("Engineer not found for id:", id);
       }
     };
+
     const setAcceptanceCriteria = (id) => {
       const foundAcceptanceCriteria = AcceptanceCriteria.find(
         (criteria) => id == criteria.id
@@ -712,12 +725,11 @@ const handleChange = () => {
 
     async function SetTime(e, index) {
       console.log(e);
-      if(e != null){
+      if (e != null) {
         recoveryTestDetails.value.details[index].time = await moment(e).format(
           "YYYY-MM-DD HH:mm:ss"
-          );
-      }
-      else{
+        );
+      } else {
         recoveryTestDetails.value.details[index].time = await "";
       }
     }
@@ -924,8 +936,8 @@ const handleChange = () => {
       });
     };
 
-        /* --------SET DATE LOGIC--------*/
-        async function setDates(e, dateType) {
+    /* --------SET DATE LOGIC--------*/
+    async function setDates(e, dateType) {
       try {
         if (e != null) {
           if (e != "" && e != null) {
@@ -961,7 +973,7 @@ const handleChange = () => {
           showErrorAlert("Warning", "Please fill all the details Correctly");
           return;
         }
-      } else if(EquipmentRef.value === false){
+      } else if (EquipmentRef.value === false) {
         if (
           !recoveryTestDetails.value.room_name ||
           !recoveryTestDetails.value.ahu_no ||

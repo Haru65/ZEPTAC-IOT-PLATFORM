@@ -23,10 +23,7 @@
                 data-kt-customer-table-toolbar="base"
               >
                 <!--begin::Add customer-->
-                <router-link
-                  to="/plan"
-                  class="btn btn-light"
-                >
+                <router-link to="/plan" class="btn btn-light">
                   <KTIcon icon-name="arrow-left" icon-class="fs-2" />
                   Back
                 </router-link>
@@ -206,16 +203,19 @@
                 </template>
                 <template v-slot:actions="{ row: planner }">
                   <!--begin::Menu Flex-->
-                  <div class="d-flex flex-lg-row">
-                    <span>
-                      <i
-                        @click="deleteItem(planner.id, false)"
-                        class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
-                      ></i>
+                  <div class="d-flex flex-lg-row my-3">
+                    <!--begin::Delete-->
+                    <span
+                      @click="deleteItem(planner.id, false)"
+                      class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+                      data-bs-toggle="tooltip"
+                      title="Delete Plan"
+                    >
+                      <KTIcon icon-name="trash" icon-class="fs-2" />
                     </span>
+                    <!--end::Delete-->
                   </div>
-                  <!--end::Menu FLex-->
-                  <!--end::Menu-->
+                  <!--end::Menu Flex-->
                 </template>
               </Datatable>
               <div class="d-flex justify-content-between p-2">
@@ -578,8 +578,6 @@ export default defineComponent({
       }
     };
 
-    
-    
     const deleteFewItem = async () => {
       try {
         const result = await Swal.fire({
@@ -709,7 +707,6 @@ export default defineComponent({
         },
       });
     };
-
 
     const sort = (sort: Sort) => {
       const reverse: boolean = sort.order === "asc";

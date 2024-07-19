@@ -48,38 +48,6 @@
     </div>
     <!--end::Row-->
 
-    <!--begin::Row-->
-    <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
-      <!--begin::Col-->
-      <div class="col-xl-6">
-        <!-- Enquiries  -->
-        <Widget9 className="h-lg-100" :height="300" />
-      </div>
-      <div class="col-xl-6">
-        <!-- Quotations -->
-        <Widget12 className="h-lg-100" :height="300" />
-      </div>
-      <!--end::Col-->
-
-      <!--begin::Col-->
-      <!--end::Col-->
-    </div>
-    <!--end::Row-->
-
-    <!--begin::Row-->
-    <div class="row g-5 g-xl-10 mb-5 mb-xl-10">
-      <!--begin::Col-->
-      <div class="col-xxl-6">
-        <!-- Lead Conversion -->
-        <Widget13 />
-      </div>
-      <div class="col-xxl-6">
-        <!-- Sales Done -->
-        <Widget14 />
-      </div>
-      <!--end::Col-->
-    </div>
-
     <!-- 
 
     <div class="col-md-6 col-lg-6 col-xl-6 col-xxl-3 mb-md-5 mb-xl-10">
@@ -162,11 +130,11 @@ import { useAuthStore } from "@/stores/auth";
 // import Widget6 from "@/components/dashboard-default-widgets/Widget6.vue";
 // import Widget7 from "@/components/dashboard-default-widgets/Widget7.vue";
 // import Widget8 from "@/components/dashboard-default-widgets/Widget8.vue";
-import Widget9 from "@/components/dashboard-default-widgets/Widget9.vue";
+// import Widget9 from "@/components/dashboard-default-widgets/Widget9.vue";
 // import Widget10 from "@/components/dashboard-default-widgets/Widget10.vue";
-import Widget12 from "@/components/dashboard-default-widgets/Widget12.vue";
-import Widget13 from "@/components/dashboard-default-widgets/Widget13.vue";
-import Widget14 from "@/components/dashboard-default-widgets/Widget14.vue";
+// import Widget12 from "@/components/dashboard-default-widgets/Widget12.vue";
+// import Widget13 from "@/components/dashboard-default-widgets/Widget13.vue";
+// import Widget14 from "@/components/dashboard-default-widgets/Widget14.vue";
 // import MixedWidget5 from "@/components/widgets/mixed/Widget5.vue";
 
 interface Instrument {
@@ -179,10 +147,10 @@ interface Instrument {
 export default defineComponent({
   name: "main-dashboard",
   components: {
-    Widget9,
-    Widget12,
-    Widget13,
-    Widget14,
+    // Widget9,
+    // Widget12,
+    // Widget13,
+    // Widget14,
   },
   setup() {
     const authStore = useAuthStore();

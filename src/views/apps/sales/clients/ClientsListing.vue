@@ -88,6 +88,7 @@
     </div>
     <div class="card-body pt-0">
       <Datatable
+        checkbox-label="id"
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
@@ -97,16 +98,19 @@
         :items-per-page-dropdown-enabled="false"
         :loading="loading"
       >
-        <template v-slot:client_company="{ row: clients }">
-          {{ clients.client_company }}
+        <template v-slot:id="{ row: clients }">
+          {{ clients.id }}
         </template>
-        <template v-slot:customer_company="{ row: clients }">
-          {{ clients.customer_company }}
+        <template v-slot:company_name="{ row: clients }">
+          {{ clients.company_name }}
+        </template>
+        <template v-slot:customer="{ row: clients }">
+          {{ clients?.customer?.company_name || "" }}
         </template>
         <template v-slot:location="{ row: clients }">
           <span class="text-gray-600 text-hover-primary mb-1">
-            {{ clients.location?.city }}
-            {{ clients.location?.states }}
+            {{ clients?.city }}
+            {{ clients?.state }}
           </span>
         </template>
         <!-- img data -->
@@ -117,30 +121,39 @@
           {{ clients.mobile }}
         </template>
         <template
-          v-slot:company_name="{ row: clients }"
+          v-slot:company_details="{ row: clients }"
           v-if="identifier == 'Admin'"
         >
-          {{ clients.company_name }}
+          {{ clients.company_details.company_name }}
         </template>
         <template v-slot:actions="{ row: clients }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <router-link :to="`./edit/${clients.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
+          <div class="d-flex flex-lg-row my-3">
+            <!--begin::Edit-->
+            <router-link :to="`/clients/edit/${clients.id}`">
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View Client"
+              >
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
+            <!--begin::Delete-->
+            <span
+              @click="deleteItem(clients.id, false)"
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete Client"
+            >
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
-            <span>
-              <i
-                @click="deleteItem(clients.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
-            </span>
+            <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
+
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -187,14 +200,13 @@ import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import type { IClients } from "@/core/model/clients";
 import arraySort from "array-sort";
 import ApiService from "@/core/services/ApiService";
-import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
 import Swal from "sweetalert2";
 import { deleteClient, getClients, ClientSearch } from "@/stores/api";
 import { Identifier } from "@/core/config/WhichUserConfig";
 
 export default defineComponent({
-  name: "customers-listing",
+  name: "clients-list",
   components: {
     Datatable,
   },
@@ -205,13 +217,13 @@ export default defineComponent({
     const tableHeader = ref([
       {
         columnName: "Client Name",
-        columnLabel: "client_company",
+        columnLabel: "company_name",
         sortEnabled: true,
         columnWidth: 155,
       },
       {
         columnName: "Lead Company",
-        columnLabel: "customer_company",
+        columnLabel: "customer",
         sortEnabled: true,
         columnWidth: 155,
       },
@@ -235,7 +247,7 @@ export default defineComponent({
       },
       {
         columnName: "Main Company",
-        columnLabel: "company_name",
+        columnLabel: "company_details",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -275,25 +287,11 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
+          ({ id, created_at, customer, company_details, ...rest }) => ({
             id,
-            first_name,
-            last_name,
-            mobile,
-            company_name,
-            meta,
-            ...rest
-          }) => ({
-            id,
-            client_company: meta.company_name,
-            customer_company: meta.customer_company.company_name ?? "",
-            location: {
-              city: meta.city ?? "",
-              states: meta.states ?? "",
-            },
-            name: first_name + " " + last_name,
-            mobile,
-            company_name: company_name.company_name,
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+            customer: { ...customer },
+            company_details: { ...company_details },
             ...rest,
           })
         );
@@ -321,25 +319,11 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
+          ({ id, created_at, customer, company_details, ...rest }) => ({
             id,
-            first_name,
-            last_name,
-            mobile,
-            company_name,
-            meta,
-            ...rest
-          }) => ({
-            id,
-            client_company: meta.company_name,
-            customer_company: meta.customer_company.company_name ?? "",
-            location: {
-              city: meta.city ?? "",
-              states: meta.states ?? "",
-            },
-            name: first_name + " " + last_name,
-            mobile,
-            company_name: company_name.company_name,
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+            customer: { ...customer },
+            company_details: { ...company_details },
             ...rest,
           })
         );
@@ -390,25 +374,11 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
+          ({ id, created_at, customer, company_details, ...rest }) => ({
             id,
-            first_name,
-            last_name,
-            mobile,
-            company_name,
-            meta,
-            ...rest
-          }) => ({
-            id,
-            client_company: meta.company_name,
-            customer_company: meta.customer_company.company_name ?? "",
-            location: {
-              city: meta.city ?? "",
-              states: meta.states ?? "",
-            },
-            name: first_name + " " + last_name,
-            mobile,
-            company_name: company_name.company_name,
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+            customer: { ...customer },
+            company_details: { ...company_details },
             ...rest,
           })
         );
@@ -592,25 +562,11 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({
+          ({ id, created_at, customer, company_details, ...rest }) => ({
             id,
-            first_name,
-            last_name,
-            mobile,
-            company_name,
-            meta,
-            ...rest
-          }) => ({
-            id,
-            client_company: meta.company_name,
-            customer_company: meta.customer_company.company_name ?? "",
-            location: {
-              city: meta.city ?? "",
-              states: meta.states ?? "",
-            },
-            name: first_name + " " + last_name,
-            mobile,
-            company_name: company_name.company_name,
+            created_at: moment(created_at).format("DD-MM-YYYY"),
+            customer: { ...customer },
+            company_details: { ...company_details },
             ...rest,
           })
         );

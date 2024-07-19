@@ -14,116 +14,248 @@
 
                 <!--begin::Card body-->
                 <div class="card p-2 w-100">
-                  <div class="shadow-lg p-2 m-auto fs-4 rounded w-100 border">
-                    <div class="row mb-2">
-                      <div class="form-group col-md-12 mb-8 mb-sd-8">
-                        <label
-                          class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
-                          >Gate Pass
-                        </label>
-                        <div>
-                          <el-select
-                            v-model="validationReportDetails.rgp_id"
-                            filterable
-                            placeholder="Please Select GatePass"
-                            name="rgp_id"
-                            @change="SetDetails(validationReportDetails.rgp_id)"
+                  <!-- extra fields -->
+                  <div class="row mb-6">
+                    <div class="form-group col-md-6 mb-8 mb-sd-8">
+                      <label
+                        class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
+                        >Gate Pass
+                      </label>
+                      <div>
+                        <el-select
+                          v-model="validationReportDetails.rgp_id"
+                          filterable
+                          placeholder="Please Select GatePass"
+                          name="rgp_id"
+                          @change="fetchRGP(validationReportDetails.rgp_id)"
+                        >
+                          <el-option
+                            value=""
+                            disabled="disabled"
+                            label="Please Select GatePass"
+                            key=""
                           >
-                            <el-option
-                              value=""
-                              disabled="disabled"
-                              label="Please Select GatePass"
-                              key=""
-                            >
-                              Please Select GatePass</el-option
-                            >
-                            <el-option
-                              v-for="item in RGPS"
-                              :key="item.id"
-                              :value="item.id"
-                              :label="item.rgp_no"
-                            />
-                          </el-select>
-                          <div
-                            class="fv-plugins-message-container"
-                            v-if="!validationReportDetails.rgp_id"
+                            Please Select GatePass</el-option
                           >
-                            <div class="fv-help-block">
-                              <ErrorMessage name="rgp_id" />
-                            </div>
+                          <el-option
+                            v-for="item in RGatePasses"
+                            :key="item.id"
+                            :value="item.id"
+                            :label="item.rgp_no"
+                          />
+                        </el-select>
+                        <div
+                          class="fv-plugins-message-container"
+                          v-if="!validationReportDetails.rgp_id"
+                        >
+                          <div class="fv-help-block">
+                            <ErrorMessage name="rgp_id" />
                           </div>
-                        </div>
-                      </div>
-                      <!--end::Input group-->
-                    </div>
-
-                    <div class="row mb-2" v-if="validationReportDetails.rgp_id">
-                      <div class="form-group col-md-6 mb-8 mb-sd-8">
-                        <label
-                          class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
-                          >Customer Name</label
-                        >
-                        <div class="form-control form-control-solid">
-                          <span class="fs-5 fw-bold text-gray-700">
-                            {{ CustomerData.company.company_name }}
-                          </span>
-                        </div>
-                      </div>
-                      <div class="form-group col-md-6 mb-8 mb-sd-8">
-                        <label
-                          class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
-                          >Customer Address</label
-                        >
-                        <div class="form-control form-control-solid">
-                          <span class="fs-5 fw-bold text-gray-700">
-                            {{ CustomerAddress.company_name }}
-                            {{ CustomerAddress.address1 }}
-                            {{ CustomerAddress.address2 }}
-                            {{ CustomerAddress.city }} -
-                            {{ CustomerAddress.pincode }}
-                            {{ CustomerAddress.states }}
-                            {{ CustomerAddress.country }}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row mb-2" v-if="validationReportDetails.rgp_id">
-                      <div class="form-group col-md-6 mb-8 mb-sd-8">
-                        <label
-                          class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
-                          >Client Name</label
-                        >
-                        <div class="form-control form-control-solid">
-                          <span class="fs-5 fw-bold text-gray-700">
-                            {{ ClientData.company.company_name }}
-                          </span>
-                        </div>
-                      </div>
-                      <div class="form-group col-md-6 mb-8 mb-sd-8">
-                        <label
-                          class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
-                          >Client Address</label
-                        >
-                        <div class="form-control form-control-solid">
-                          <span class="fs-5 fw-bold text-gray-700">
-                            {{ ClientAddress.company_name }}
-                            {{ ClientAddress.address1 }}
-                            {{ ClientAddress.address2 }}
-                            {{ ClientAddress.city }} -
-                            {{ ClientAddress.pincode }}
-                            {{ ClientAddress.states }}
-                            {{ ClientAddress.country }}
-                          </span>
                         </div>
                       </div>
                     </div>
                   </div>
+                  <!--end::Input group-->
+
+                  <!--begin::Input group-->
+                  <div class="row mb-6" v-if="validationReportDetails.rgp_id">
+                    <!--begin::Col-->
+                    <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                      <!--begin::Label-->
+                      <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                        >Customer :</label
+                      >
+                      <!--end::Label-->
+
+                      <!--begin::Input-->
+                      <div
+                        class="form-control form-control-lg form-control-solid"
+                      >
+                        <div>
+                          {{ RgpData?.quotation?.customer.company_name || "" }}
+                        </div>
+                        <div class="mt-2 pt-4">
+                          <h6 class="mt-5">Billing Address:</h6>
+                          <div class="mt-2">
+                            <div class="mb-1">
+                              <br />
+                              <span
+                                v-show="
+                                  RgpData?.quotation?.customer.company_name
+                                "
+                              >
+                                {{
+                                  `${
+                                    RgpData?.quotation?.customer.company_name ||
+                                    ""
+                                  }`
+                                }}
+                              </span>
+                              <br />
+                              <span>
+                                {{ `${RgpData?.quotation?.customer.name}` }}
+                              </span>
+                              <!-- v-if company_data present -->
+                              <div
+                                v-show="
+                                  RgpData?.quotation?.customer.company_name
+                                "
+                              >
+                                <br />
+                                <span>
+                                  {{
+                                    `${
+                                      RgpData?.quotation?.customer.address1 ||
+                                      ""
+                                    }`
+                                  }}
+                                </span>
+                                <br />
+                                <span>
+                                  {{
+                                    `${
+                                      RgpData?.quotation?.customer.address2 ||
+                                      ""
+                                    }`
+                                  }}
+                                </span>
+                              </div>
+                              <div
+                                v-show="RgpData?.quotation?.customer.country"
+                              >
+                                <span>
+                                  {{
+                                    `${
+                                      RgpData?.quotation?.customer.city || ""
+                                    } - ${
+                                      RgpData?.quotation?.customer.pincode || ""
+                                    }`
+                                  }}
+                                </span>
+                                <br />
+                                <span>
+                                  {{
+                                    `${
+                                      RgpData?.quotation?.customer.state || ""
+                                    } ${
+                                      RgpData?.quotation?.customer.country || ""
+                                    }`
+                                  }}
+                                </span>
+                                <br />
+                              </div>
+                            </div>
+                            <br />
+                          </div>
+                        </div>
+                      </div>
+
+                      <!--end::Input-->
+                    </div>
+                    <!--end::Col-->
+                    <!--begin::Col-->
+                    <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                      <!--begin::Label-->
+                      <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                        >Client :</label
+                      >
+                      <!--end::Label-->
+
+                      <!--begin::Input-->
+                      <div
+                        class="form-control form-control-lg form-control-solid"
+                      >
+                        <div>
+                          {{ RgpData?.quotation?.clientx.company_name }}
+                        </div>
+                        <div class="mt-2 pt-4">
+                          <h6 class="mt-5">Site Address:</h6>
+                          <div class="mt-2">
+                            <div
+                              class="mb-1"
+                              v-show="RgpData?.quotation?.clientx"
+                            >
+                              <br />
+                              <span
+                                v-show="
+                                  RgpData?.quotation?.clientx.company_name
+                                "
+                              >
+                                {{
+                                  `${
+                                    RgpData?.quotation?.clientx.company_name ||
+                                    ""
+                                  }`
+                                }}
+                              </span>
+                              <br />
+                              <span>
+                                {{
+                                  `${RgpData?.quotation?.clientx.name || ""}`
+                                }}
+                              </span>
+                              <!-- v-if company_data present -->
+                              <div
+                                v-show="
+                                  RgpData?.quotation?.clientx.company_name
+                                "
+                              >
+                                <br />
+                                <span>
+                                  {{
+                                    `${
+                                      RgpData?.quotation?.clientx.address1 || ""
+                                    }`
+                                  }}
+                                </span>
+                                <br />
+                                <span>
+                                  {{
+                                    `${
+                                      RgpData?.quotation?.clientx.address2 || ""
+                                    }`
+                                  }}
+                                </span>
+                              </div>
+                              <div v-show="RgpData?.quotation?.clientx.country">
+                                <span>
+                                  {{
+                                    `${
+                                      RgpData?.quotation?.clientx.city || ""
+                                    } - ${
+                                      RgpData?.quotation?.clientx.pincode || ""
+                                    }`
+                                  }}
+                                </span>
+                                <br />
+                                <span>
+                                  {{
+                                    `${
+                                      RgpData?.quotation?.clientx.state || ""
+                                    } ${
+                                      RgpData?.quotation?.clientx.country || ""
+                                    }`
+                                  }}
+                                </span>
+                                <br />
+                              </div>
+                            </div>
+                            <br />
+                          </div>
+                        </div>
+                      </div>
+
+                      <!--end::Input-->
+                    </div>
+                    <!--end::Col-->
+                  </div>
+                  <!--end::Input group-->
                 </div>
                 <!--end::Card body-->
 
                 <div
                   v-if="
-                    validationReportDetails.worksheet_filled_count === 0 &&
+                    validationReportDetails.worksheet_filled_count !== 0 &&
                     validationReportDetails.rgp_id
                   "
                 >
@@ -385,7 +517,11 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
 import ApiService from "@/core/services/ApiService";
-import { addValidationReport, getAllRGP } from "@/stores/api";
+import {
+  addValidationReport,
+  getOnGoingCompletedRGPVal,
+  getRGatePass,
+} from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import { useRouter } from "vue-router";
@@ -646,6 +782,42 @@ interface ValidationReport {
   worksheet_filled_count: number;
 }
 
+interface Data {
+  id: string;
+  name: string;
+  company_name: string;
+  address1: string;
+  address2: string;
+  city: string;
+  state: string;
+  pincode: string;
+  country: string;
+}
+
+interface Quotation {
+  id: string;
+  quotation_no: string;
+  customer: Data;
+  client: Data;
+  clientx: Data;
+}
+
+interface RGP {
+  id: string;
+  rgp_no: string;
+  quotation_id: string;
+}
+
+interface RGPInformation {
+  id: string;
+  rgp_no: string;
+  quotation_id: string;
+  Engineers: Array<Engineer>;
+  Instruments: Array<Instrument>;
+  quotation: Quotation;
+  worksheet_filled_count: number;
+}
+
 export default defineComponent({
   name: "validationreport-add",
   components: {
@@ -669,6 +841,53 @@ export default defineComponent({
 
     const selectedTests = ref([]);
     const loading = ref(false);
+
+    const RGatePasses = ref<RGP[]>([]);
+    const RgpData = ref<RGPInformation>({
+      id: "",
+      rgp_no: "",
+      quotation_id: "",
+      Engineers: [],
+      Instruments: [],
+      quotation: {
+        id: "",
+        quotation_no: "",
+        customer: {
+          id: "",
+          name: "",
+          company_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          pincode: "",
+          state: "",
+          country: "",
+        },
+        client: {
+          id: "",
+          name: "",
+          company_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          pincode: "",
+          state: "",
+          country: "",
+        },
+        clientx: {
+          id: "",
+          name: "",
+          company_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          pincode: "",
+          state: "",
+          country: "",
+        },
+      },
+      worksheet_filled_count: 0,
+    });
 
     const validationReportDetails = ref<ValidationReport>({
       rgp_id: "",
@@ -711,8 +930,8 @@ export default defineComponent({
         test_code,
         report_name,
         instrument_used,
-  equipment_name,
-  equipment_id,
+        equipment_name,
+        equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -742,8 +961,8 @@ export default defineComponent({
           calibration_date: instrument_used.calibration_date,
           calibration_due_date: instrument_used.calibration_due_date,
         },
-  equipment_name,
-  equipment_id,
+        equipment_name,
+        equipment_id,
         area_name,
         ahu_no,
         validation_date,
@@ -791,7 +1010,7 @@ export default defineComponent({
         report_name,
         instrument_used,
         equipment_name,
-  equipment_id,
+        equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -819,7 +1038,7 @@ export default defineComponent({
           calibration_due_date: instrument_used.calibration_due_date,
         },
         equipment_name,
-  equipment_id,
+        equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -858,7 +1077,7 @@ export default defineComponent({
         report_name,
         instrument_used,
         equipment_name,
-  equipment_id,
+        equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -886,7 +1105,7 @@ export default defineComponent({
           calibration_due_date: instrument_used.calibration_due_date,
         },
         equipment_name,
-  equipment_id,
+        equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -926,7 +1145,7 @@ export default defineComponent({
         report_name,
         instrument_used,
         equipment_name,
-  equipment_id,
+        equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -954,7 +1173,7 @@ export default defineComponent({
           calibration_due_date: instrument_used.calibration_due_date,
         },
         equipment_name,
-  equipment_id,
+        equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -1087,7 +1306,7 @@ export default defineComponent({
         report_name,
         instrument_used,
         equipment_name,
-  equipment_id,
+        equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -1118,7 +1337,7 @@ export default defineComponent({
           calibration_due_date: instrument_used.calibration_due_date,
         },
         equipment_name,
-  equipment_id,
+        equipment_id,
         area_name,
         ahu_no,
         validation_date,
@@ -1167,8 +1386,8 @@ export default defineComponent({
         test_code,
         report_name,
         instrument_used,
-          equipment_name,
-  equipment_id,
+        equipment_name,
+        equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -1196,7 +1415,7 @@ export default defineComponent({
           calibration_due_date: instrument_used.calibration_due_date,
         },
         equipment_name,
-  equipment_id,
+        equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -1238,7 +1457,7 @@ export default defineComponent({
         report_name,
         instrument_used,
         equipment_name,
-  equipment_id,
+        equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -1266,7 +1485,7 @@ export default defineComponent({
           calibration_due_date: instrument_used.calibration_due_date,
         },
         equipment_name,
-  equipment_id,
+        equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -1309,7 +1528,7 @@ export default defineComponent({
         report_name,
         instrument_used,
         equipment_name,
-  equipment_id,
+        equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -1337,7 +1556,7 @@ export default defineComponent({
           calibration_due_date: instrument_used.calibration_due_date,
         },
         equipment_name,
-  equipment_id,
+        equipment_id,
         area_name,
         room_name,
         ahu_no,
@@ -1393,283 +1612,6 @@ export default defineComponent({
           return;
       }
     }
-
-    const RGPS = ref([
-      {
-        id: "",
-        rgp_no: "",
-        quotation_id: "",
-        quotation_no: "",
-        instruments: [],
-        engineers: [],
-        client_id: "",
-        customer_id: "",
-        date: "",
-        duedate: "",
-        status: "",
-        customer_address: {
-          company_name: "",
-          address1: "",
-          address2: "",
-          country: "",
-          city: "",
-          pincode: "",
-          states: "",
-        },
-        client_address: {
-          company_name: "",
-          address1: "",
-          address2: "",
-          country: "",
-          city: "",
-          pincode: "",
-          states: "",
-        },
-        customer_data: {
-          id: "",
-          first_name: "",
-          last_name: "",
-          company: {
-            company_name: "",
-          }
-        },
-        client_data: {
-          id: "",
-          first_name: "",
-          last_name: "",
-          company: {
-            company_name: "",
-          }
-        },
-        worksheet_filled_count: 0,
-      },
-    ]);
-
-    const CustomerAddress = ref({
-      company_name: "",
-      address1: "",
-      address2: "",
-      country: "",
-      city: "",
-      pincode: "",
-      states: "",
-    });
-
-    const ClientAddress = ref({
-      company_name: "",
-      address1: "",
-      address2: "",
-      country: "",
-      city: "",
-      pincode: "",
-      states: "",
-    });
-
-    const CustomerData = ref({
-      id: "",
-      first_name: "",
-      last_name: "",
-      company: {
-        company_name: "",
-      }
-    });
-
-    const ClientData = ref({
-      id: "",
-      first_name: "",
-      last_name: "",
-      company: {
-        company_name: "",
-      }
-    });
-
-    // set the details when rgp is selected
-    const SetDetails = async (id) => {
-      if (id) {
-        try {
-          // console.log("Before",validationReportDetails.value.rgp_no);
-
-          if (validationReportDetails.value.rgp_no == "") {
-            // Find the rgp
-            const foundRGP = RGPS.value.find((rgp) => rgp.id === id);
-
-            // If not found, return early
-            if (!foundRGP) {
-              return;
-            }
-
-            // Destructure and assign rgp details
-            const {
-              rgp_no,
-              worksheet_filled_count,
-              instruments,
-              engineers,
-              client_address,
-              customer_address,
-              customer_data,
-              client_data,
-            } = await foundRGP;
-            validationReportDetails.value.rgp_id = id;
-            validationReportDetails.value.rgp_no = rgp_no;
-            validationReportDetails.value.worksheet_filled_count =
-              worksheet_filled_count;
-
-            validationReportDetails.value.engineers = [];
-            validationReportDetails.value.instruments = [];
-            validationReportDetails.value.instruments = [...instruments];
-            validationReportDetails.value.engineers = [...engineers];
-            ClientAddress.value = client_address;
-            CustomerAddress.value = customer_address;
-            CustomerData.value = customer_data;
-            ClientData.value = client_data;
-
-            return;
-          }
-
-          if (validationReportDetails.value.rgp_no) {
-            const rgpNumber = validationReportDetails.value.rgp_no;
-
-            console.log("rgp_no", rgpNumber);
-            // Find the previous rgp
-            const prevRGP = await RGPS.value.find(
-              (rgp) => rgp.rgp_no === rgpNumber
-            );
-
-            // If not found, return early
-            if (!prevRGP) {
-              return;
-            }
-
-            Swal.fire({
-              title: "Are you sure?",
-              text: "This Action will reset all your Test Reports!",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "red",
-              confirmButtonText: "Yes, I am sure!",
-            }).then((result: { [x: string]: any }) => {
-              if (result["isConfirmed"]) {
-                // Put your function here
-                // validationReportDetails.value.engineers = [];
-                // validationReportDetails.value.instruments = [];
-
-                validationReportDetails.value.tests = [
-                  {
-                    air_velocity_test_reports: [],
-                  },
-                  {
-                    filter_integrity_test_reports: [],
-                  },
-                  {
-                    particle_count_test_reports: [],
-                  },
-                  {
-                    recovery_test_reports: [],
-                  },
-                ];
-
-                // Find the rgp
-                const foundRGP = RGPS.value.find((rgp) => rgp.id === id);
-
-                // If not found, return early
-                if (!foundRGP) {
-                  return;
-                }
-
-                // Destructure and assign rgp details
-                const {
-                  rgp_no,
-                  worksheet_filled_count,
-                  instruments,
-                  engineers,
-                  client_address,
-                  customer_address,
-                  customer_data,
-                  client_data,
-                } = foundRGP;
-                validationReportDetails.value.rgp_id = id;
-                validationReportDetails.value.rgp_no = rgp_no;
-                validationReportDetails.value.worksheet_filled_count =
-                  worksheet_filled_count;
-
-                validationReportDetails.value.engineers = [];
-                validationReportDetails.value.instruments = [];
-                validationReportDetails.value.instruments = [...instruments];
-                validationReportDetails.value.engineers = [...engineers];
-                ClientAddress.value = client_address;
-                CustomerAddress.value = customer_address;
-                CustomerData.value = customer_data;
-                ClientData.value = client_data;
-              } else {
-                validationReportDetails.value.rgp_id = prevRGP.id;
-                validationReportDetails.value.rgp_no = prevRGP.rgp_no;
-                validationReportDetails.value.worksheet_filled_count =
-                  prevRGP.worksheet_filled_count;
-              }
-            });
-          }
-        } catch (error) {
-          console.error("An error occurred:", error);
-        }
-      }
-    };
-
-    // fill the details when response is received
-    const fillDetails = (response) => {
-      if (Array.isArray(response.result)) {
-        RGPS.value.push(
-          ...response.result.map((result) => {
-            return {
-              id: result.id,
-              rgp_no: result.rgp_no,
-              worksheet_filled_count: result.worksheet_filled_count,
-              quotation_id: result.quotation_id,
-              quotation_no: result.quotation_no,
-              instruments: JSON.parse(result.instruments),
-              engineers: JSON.parse(result.engineers),
-              client_id: result.client_id,
-              customer_id: result.customer_id,
-              client_address: {
-                company_name: result.client_address.company_name,
-                address1: result.client_address.address1,
-                address2: result.client_address.address2,
-                country: result.client_address.country,
-                city: result.client_address.city,
-                pincode: result.client_address.pincode,
-                states: result.client_address.states,
-              },
-              customer_address: {
-                company_name: result.customer_address.company_name,
-                address1: result.customer_address.address1,
-                address2: result.customer_address.address2,
-                country: result.customer_address.country,
-                city: result.customer_address.city,
-                pincode: result.customer_address.pincode,
-                states: result.customer_address.states,
-              },
-              customer_data: {
-                id: result.customer_data.id,
-                first_name: result.customer_data.first_name,
-                last_name: result.customer_data.last_name,
-                company: {
-                  company_name : result.customer_data.company.company_name,
-                }
-              },
-              client_data: {
-                id: result.client_data.id,
-                first_name: result.client_data.first_name,
-                last_name: result.client_data.last_name,
-                company: {
-                  company_name : result.client_data.company.company_name,
-                }
-              },
-              // Add other properties like 'date' and 'duedate' here if needed
-            };
-          })
-        );
-      } else {
-      }
-    };
 
     const removeObjectWithId = (arr, id) => {
       if (id !== -1) {
@@ -1742,19 +1684,108 @@ export default defineComponent({
       }
     }
 
+    // RGP Change Warning
+    const rgpChangeConfirmation = async () => {
+      try {
+        const result = await Swal.fire({
+          title: "Are you sure?",
+          text: "You want to change gate pass. This Action will reset all your Test Reports!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "red",
+          confirmButtonText: "Yes, I am sure!",
+        });
+        return result.isConfirmed;
+      } catch (error: any) {
+        const errorMessage = error.message || "An unknown error occurred";
+        showErrorAlert("Error", errorMessage);
+        return false;
+      }
+    };
+
+    /* --------HANDLE RGP SELECTION LOGIC--------*/
+    const fetchRGP = async (rgpId: any) => {
+      if (rgpId !== "") {
+        if (validationReportDetails.value.rgp_no) {
+          const oldRgpId = RgpData.value?.id;
+          const oldRgpNumber = RgpData.value?.rgp_no;
+
+          const isConfirmed = await rgpChangeConfirmation();
+
+          if (isConfirmed) {
+            validationReportDetails.value.rgp_id = rgpId;
+            const response = await getRGatePass(rgpId);
+            if (response) {
+              validationReportDetails.value.rgp_no = response.rgp_no;
+              RgpData.value = { ...response };
+
+              validationReportDetails.value.engineers = {
+                ...response?.Engineers,
+              };
+              validationReportDetails.value.instruments = {
+                ...response?.Instruments,
+              };
+
+              validationReportDetails.value.tests = [
+                {
+                  air_velocity_test_reports: [],
+                },
+                {
+                  filter_integrity_test_reports: [],
+                },
+                {
+                  particle_count_test_reports: [],
+                },
+                {
+                  recovery_test_reports: [],
+                },
+              ];
+            } else {
+            }
+          } else {
+            validationReportDetails.value.rgp_id = RgpData.value?.id;
+            validationReportDetails.value.rgp_no = RgpData.value?.rgp_no;
+            validationReportDetails.value.worksheet_filled_count = RgpData.value?.worksheet_filled_count;
+
+            validationReportDetails.value.engineers = RgpData.value?.Engineers;
+            validationReportDetails.value.instruments =
+              RgpData.value?.Instruments;
+          }
+        } else {
+          validationReportDetails.value.rgp_id = rgpId;
+          const response = await getRGatePass(rgpId);
+          if (response) {
+            validationReportDetails.value.rgp_no = response.rgp_no;
+            RgpData.value = { ...response };
+            validationReportDetails.value.engineers = {
+              ...response?.Engineers,
+            };
+            validationReportDetails.value.instruments = {
+              ...response?.Instruments,
+            };
+          } else {
+          }
+        }
+      } else {
+      }
+    };
+
     onMounted(async () => {
-      // get all the rgp
-      const response = await getAllRGP(User.company_id);
-
-      validationReportDetails.value.engineers = [];
-      validationReportDetails.value.instruments = [];
-      RGPS.value.pop();
-
-      if (response) {
-        await fillDetails(response);
+      try {
+        /* --------GET ALL IN PROCESS AND COMPLETED RGP LOGIC--------*/
+        const response = await getOnGoingCompletedRGPVal(User.company_id);
+        if (response) {
+          RGatePasses.value = response.result.map(({ id, ...rest }) => ({
+            id: id,
+            ...rest,
+          }));
+        } else {
+          console.error(`Error Occured in getOnGoingCompletedRGPVal`);
+        }
+      } catch (err) {
+        console.error(`Error Occured in getOnGoingCompletedRGPVal : ${err}`);
       }
 
-      console.log(validationReportDetails.value);
     });
 
     const onsubmit = async () => {
@@ -1829,19 +1860,12 @@ export default defineComponent({
     };
 
     return {
-      RGPS,
       validationReportDetails,
-      fillDetails,
-      SetDetails,
-      CustomerData,
-      ClientData,
       ConductedTests,
       selectedTests,
       validationReportDetailsValidator,
       loading,
       onsubmit,
-      CustomerAddress,
-      ClientAddress,
       deleteReport,
       getAdditionalProps,
       getTestComponent,
@@ -1849,6 +1873,9 @@ export default defineComponent({
       getTestEditComponent,
       updateReportData,
       ReportStatus,
+      RGatePasses,
+      fetchRGP,
+      RgpData,
     };
   },
 });

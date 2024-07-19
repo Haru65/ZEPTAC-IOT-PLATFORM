@@ -21,12 +21,6 @@ const Identifier = computed(() => {
             return "Service-Engineer";
         case "6":
             return "Commercial-Executive";
-        case "7":
-            return "Customer";
-        case "8":
-            return "Lead";
-        case "9":
-            return "Client";
         default:
             return false;
     }

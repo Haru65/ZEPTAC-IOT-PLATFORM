@@ -1,10 +1,26 @@
+
+/* 
+
+EXPENSESHEET STATUS (status)
+1 : Pending
+2 : Reject
+3: Approve
+
+
+*/
+
 interface IExpenseSheet {
     id: number;
-    rgp_no: string;
-    customer_name:{
+    rgp: {
+        rgp_no: string;
+    };
+    customer: {
+        id: string;
+        name: string;
         company_name: string;
     };
-    engineer_name:{
+    engineer: {
+        id: string;
         first_name: string;
         last_name: string;
     };

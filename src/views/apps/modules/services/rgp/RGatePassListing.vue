@@ -131,18 +131,16 @@
         <!-- img data -->
 
         <template v-slot:id="{ row: rgps }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ rgps.id }}
-          </span>
+          {{ rgps.id }}
         </template>
         <template v-slot:rgp_no="{ row: rgps }">
           <span class="text-gray-600 text-hover-primary mb-1">
             {{ rgps.rgp_no }}
           </span>
         </template>
-        <template v-slot:customer_name="{ row: rgps }">
+        <template v-slot:customer="{ row: rgps }">
           <span class="text-gray-600 text-hover-primary mb-1">
-            {{ rgps.customer_name }}
+            {{ rgps?.customer?.company_name || "" }}
           </span>
         </template>
         <!-- defualt data -->
@@ -202,23 +200,32 @@
         </template>
 
         <template v-slot:actions="{ row: rgps }">
-          <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <i
-                @click="downloadRGP(rgps.id)"
-                class="cursor-pointer bi bi-download text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
+            <span
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Download RGP"
+              @click="downloadRGP(rgps.id)"
+            >
+              <KTIcon icon-name="file-down" icon-class="fs-2" />
             </span>
-            <span class="menu-link px-3">
-              <i
-                @click="deleteItem(rgps.id, false)"
-                class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
+            <span
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Free Up Resources Taken"
+              @click="ReleaseResources(rgps.id)"
+            >
+              <KTIcon icon-name="arrows-circle" icon-class="fs-2" />
+            </span>
+            <span
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete RGP"
+              @click="deleteItem(rgps.id, false)"
+            >
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
           </div>
-          <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -268,7 +275,8 @@ import {
   deleteRGatePass,
   getRGPInfo,
   gatePassSearch,
-getCompanyLogo,
+  getCompanyLogo,
+  UpdateStatus,
 } from "@/stores/api";
 import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
 import { hideModal } from "@/core/helpers/dom";
@@ -280,6 +288,64 @@ import { formatPrice } from "@/core/config/DataFormatter";
 import { rgpGen } from "@/core/config/GatePassGenerator";
 import moment from "moment";
 import Swal from "sweetalert2";
+
+interface Engineer {
+  id: string;
+  first_name: string;
+  last_name: string;
+  mobile: string;
+}
+
+interface Instrument {
+  id: string;
+  instrument_id: string;
+  name: string;
+  make: string;
+  model_no: string;
+  serial_no: string;
+  calibration_date: string;
+  calibration_due_date: string;
+  accessories_list: [];
+}
+
+interface Data {
+  id: string;
+  name: string;
+  company_name: string;
+  address1: string;
+  address2: string;
+  city: string;
+  state: string;
+  pincode: string;
+  country: string;
+}
+
+interface Quotation {
+  id: string;
+  quotation_no: string;
+  customer: Data;
+  client: Data;
+  clientx: Data;
+}
+
+interface DownloadData {
+  id: string;
+  rgp_no: string;
+  date: string;
+  duedate: string;
+  quotation_id: string;
+  instruments: string[];
+  engineers: string[];
+  Engineers: Array<Engineer>;
+  Instruments: Array<Instrument>;
+  quotation: Quotation;
+  status: string;
+  approval_status: string;
+  company_id: string;
+  created_by: string;
+  updated_by: string;
+  is_active: string;
+}
 
 export default defineComponent({
   name: "rgp_listing",
@@ -296,12 +362,6 @@ export default defineComponent({
     const identifier = Identifier;
     const tableHeader = ref([
       {
-        columnName: "Id",
-        columnLabel: "id",
-        sortEnabled: true,
-        columnWidth: 35,
-      },
-      {
         columnName: "RGP No.",
         columnLabel: "rgp_no",
         sortEnabled: true,
@@ -309,7 +369,7 @@ export default defineComponent({
       },
       {
         columnName: "Customer Name",
-        columnLabel: "customer_name",
+        columnLabel: "customer",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -444,7 +504,7 @@ export default defineComponent({
           ({
             id,
             rgp_no,
-            customer_name,
+            customer,
             quotation_id,
             engineers,
             instruments,
@@ -455,7 +515,7 @@ export default defineComponent({
           }) => ({
             id: id,
             rgp_no: rgp_no,
-            customer_name: customer_name.company_name,
+            customer: { ...customer },
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
@@ -498,7 +558,7 @@ export default defineComponent({
           ({
             id,
             rgp_no,
-            customer_name,
+            customer,
             quotation_id,
             engineers,
             instruments,
@@ -509,7 +569,7 @@ export default defineComponent({
           }) => ({
             id: id,
             rgp_no: rgp_no,
-            customer_name: customer_name.company_name,
+            customer: { ...customer },
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
@@ -561,7 +621,7 @@ export default defineComponent({
           ({
             id,
             rgp_no,
-            customer_name,
+            customer,
             quotation_id,
             engineers,
             instruments,
@@ -572,7 +632,7 @@ export default defineComponent({
           }) => ({
             id: id,
             rgp_no: rgp_no,
-            customer_name: customer_name.company_name,
+            customer: { ...customer },
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
@@ -635,95 +695,160 @@ export default defineComponent({
       await rgp_listing();
     });
 
-    const rgpInfo = ref({
+    const companyInfo = ref({
       id: "",
-      rgp_no: "",
-      company_id: "",
-      date: "",
-      duedate: "",
-      engineers: [],
-      instruments: [],
-      status: "",
-      quotation_no: "",
-      customer_data: {
-        company_id: "",
-        first_name: "",
-        last_name: "",
-      },
-      client_data: {
-        company_id: "",
-        first_name: "",
-        last_name: "",
-      },
-      customer_company: {
-        company_name: "",
-      },
-      client_company: {
-        company_name: "",
-      },
-      customer_address: {
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        states: "",
-        country: "",
-      },
-      client_address: {
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        states: "",
-        country: "",
-      },
-      company_details: {
-        id: "",
-        company_name: "",
-        company_logo: "",
-        address: "",
-        city: "",
-        state: "",
-        country: "",
-        pincode: "",
-        logo_base64: "",
-      },
+      company_name: "",
+      company_logo: "",
+      address: "",
+      city: "",
+      state: "",
+      country: "",
+      pincode: "",
+      logo_base64: "",
     });
 
-    const downloadRGP = async (id: any) => {
-      // get all information of the rgp
-      const res = await getRGPInfo(id);
+    const rgpInfo = ref<DownloadData>({
+      id: "",
+      rgp_no: "",
+      date: "",
+      duedate: "",
+      quotation_id: "",
+      engineers: [],
+      Engineers: [],
+      instruments: [],
+      Instruments: [],
+      quotation: {
+        id: "",
+        quotation_no: "",
+        customer: {
+          id: "",
+          name: "",
+          company_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          pincode: "",
+          state: "",
+          country: "",
+        },
+        client: {
+          id: "",
+          name: "",
+          company_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          pincode: "",
+          state: "",
+          country: "",
+        },
+        clientx: {
+          id: "",
+          name: "",
+          company_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          pincode: "",
+          state: "",
+          country: "",
+        },
+      },
+      status: "",
+      approval_status: "",
+      company_id: "",
+      created_by: "",
+      updated_by: "",
+      is_active: "",
+    });
 
-      rgpInfo.value.id = res.result.id;
-      rgpInfo.value.company_id = res.result.company_id;
-    
-      rgpInfo.value.rgp_no = res.result.rgp_no;
-      rgpInfo.value.date = res.result.date;
-      rgpInfo.value.duedate = res.result.duedate;
-      rgpInfo.value.engineers = await res.result.engData;
-      rgpInfo.value.instruments = await res.result.instData;
-      rgpInfo.value.customer_company.company_name =
-        res.result.customer_company.company_name;
-      rgpInfo.value.client_company.company_name =
-        res.result.client_company.company_name;
-      rgpInfo.value.customer_address = res.result.customer_address;
-      rgpInfo.value.client_address = res.result.client_address;
-      rgpInfo.value.customer_data = res.result.customer_data;
-      rgpInfo.value.client_data = res.result.client_data;
-      rgpInfo.value.quotation_no = res.result.quotationsDetails.quotation_no;
+    const downloadRGP = async (id) => {
+      let timerInterval;
 
-      const res2 = await getCompanyLogo(res.result.company_id);
+      try {
+        // Show initial loading Swal with generic progress messages
+        Swal.fire({
+          title: "Downloading RGP...",
+          html: `<div class="swal-animation">
+        <p class="swal-text">Downloading RGP...</p>
+        <div class="swal-progress">
+          <div class="swal-progress-bar"></div>
+        </div>
+      </div>`,
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          willClose: () => {
+            clearInterval(timerInterval);
+          },
+        });
 
-      rgpInfo.value.company_details.id = res2.id;
-      rgpInfo.value.company_details.company_name = res2.company_name;
-      rgpInfo.value.company_details.company_logo = res2.company_logo ? res2.company_logo : "";
-      rgpInfo.value.company_details.logo_base64 = res2.logo_base64 
-        ? "data: image/png;base64," + res2.logo_base64
-        : getAssetPath("media/avatars/default.png");
+        // Fetch RGP information
+        const res = await getRGPInfo(id);
+        if (res?.success != false) {
+          rgpInfo.value = { ...res.result };
+        } else {
+          showErrorAlert("Error", res.message || "Error Occured");
+          return;
+        }
 
-      console.log(rgpInfo.value);
+        // Fetch company logo details
+        const res2 = await getCompanyLogo(res.result.company_id);
 
-      await rgpGen(id, rgpInfo.value.rgp_no, rgpInfo);
+        if (res2?.success != false) {
+          // Update local reactive state (assuming Vue 3 Composition API syntax)
+          companyInfo.value.id = res2.result.id;
+          companyInfo.value.company_name = res2.result.company_name;
+          companyInfo.value.company_logo = res2.result.company_logo
+            ? res2.result.company_logo
+            : "";
+          companyInfo.value.logo_base64 = res2.result.logo_base64
+            ? "data: image/png;base64," + res2.result.logo_base64
+            : getAssetPath("media/avatars/default.png");
+        } else {
+          showErrorAlert("Error", res2.message || "Error Occured");
+          return;
+        }
+        // Update Swal message for PDF generation
+        Swal.update({
+          title: "Generating PDF",
+          html: `<div class="swal-animation">
+        <p class="swal-text">Generating PDF...</p>
+        <div class="swal-progress">
+          <div class="swal-progress-bar"></div>
+        </div>
+      </div>`,
+        });
+
+        // Simulate delay for PDF generation (replace with actual function)
+        await rgpGen(id, rgpInfo.value.rgp_no, rgpInfo, companyInfo);
+
+        // Close Swal on success
+        Swal.fire({
+          title: "Download Complete",
+          text: "RGP PDF generated successfully",
+          icon: "success",
+          timer: 2000, // Show success message for 2 seconds
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } catch (error) {
+        console.error("Error downloading RGP:", error);
+
+        // Close Swal on success
+        Swal.fire({
+          title: "Error Complete",
+          text: "Failed to download RGP",
+          icon: "error",
+          timer: 2000,
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } finally {
+        // Clear interval if still running
+        clearInterval(timerInterval);
+      }
     };
 
     const deleteFewItem = async () => {
@@ -764,6 +889,57 @@ export default defineComponent({
       } catch (error: any) {
         const errorMessage = error.message || "An unknown error occurred";
         showErrorAlert("Error", errorMessage);
+      }
+    };
+
+    const ReleaseResources = async (id: number) => {
+      const releaseConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You want to free all engineers & cleanroom instruments which are included in the RGP.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error: any) {
+          const errorMessage = error.message || "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const relaseResource = async (id: number) => {
+        try {
+          const response = await UpdateStatus(id);
+          if (response?.success) {
+            showSuccessAlert(
+              "Success",
+              response.message || `Resources are free`
+            );
+            return { success: true };
+          } else {
+            throw new Error(
+              response?.message || `Failed to release the resources`
+            );
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      const isConfirmed = await releaseConfirmation();
+      if (isConfirmed) {
+        return await relaseResource(id);
+      } else {
+        return { success: false };
       }
     };
 
@@ -899,7 +1075,7 @@ export default defineComponent({
           ({
             id,
             rgp_no,
-            customer_name,
+            customer,
             quotation_id,
             engineers,
             instruments,
@@ -910,7 +1086,7 @@ export default defineComponent({
           }) => ({
             id: id,
             rgp_no: rgp_no,
-            customer_name: customer_name.company_name,
+            customer: { ...customer },
             quotation_id: quotation_id,
             engineers: JSON.parse(engineers).length,
             instruments: JSON.parse(instruments).length,
@@ -998,6 +1174,7 @@ export default defineComponent({
       fillItemData,
       identifier,
       reLoadData,
+      ReleaseResources,
 
       selectedYearCache,
       financialYears,

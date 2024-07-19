@@ -31,7 +31,7 @@
         </h3>
         <div class="me-3">
           <el-select
-          class="w-150px"
+            class="w-150px"
             filterable
             placeholder="Select Year"
             v-model="selectedYearCache"
@@ -56,14 +56,13 @@
           <!--begin::Import-->
           <button
             type="button"
-            class="btn btn-light-success me-3"
+            id="kt-menu-filter-button"
+            class="btn btn-md btn-icon btn-color-success btn-active-light-success me-3"
             data-bs-toggle="modal"
             data-bs-target="#kt_modal_thermal_instrument"
           >
-            <KTIcon icon-name="add-item" icon-class="fs-2" />
-            Import
+            <KTIcon icon-name="add-item" icon-class="fs-1" />
           </button>
-          <!--end::Import-->
 
           <ThermalImportModal></ThermalImportModal>
           <!--begin::Export-->
@@ -78,9 +77,9 @@
           </button>
           <!--end::Export-->
           <!--begin::Add customer-->
-          <router-link to="./add" class="btn btn-primary">
+          <router-link to="/thermalinstrument/add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Thermal Instrument
+            Thermal Instrument
           </router-link>
           <!--end::Add customer-->
         </div>
@@ -188,54 +187,60 @@
               :heading="thermal_instruments.name"
               @handleDuplicate="HandleDuplicate"
             ></DuplicateInstrumentModal>
+
+            <!--begin::Clone-->
             <span
-              class="menu-link px-3"
+              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
               data-toggle="tooltip"
-              title="View Instrument"
-            >
-              <router-link :to="`./edit/${thermal_instruments.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
-            </span>
-            <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="Delete Instrument"
-            >
-              <i
-                @click="deleteItem(thermal_instruments.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-1"
-              ></i>
-            </span>
-            <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="Duplicate this instrument"
+              title="Clone Instrument"
               data-bs-toggle="modal"
               :data-bs-target="
                 '#kt_modal_new_address_' + thermal_instruments.id
               "
             >
-              <i
-                class="las la-copy text-gray-600 text-hover-warning mb-1 fs-1"
-              ></i>
+              <KTIcon icon-name="copy" icon-class="fs-2" />
             </span>
-            <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="Duplicate this instrument"
+
+            <!--end::Clone-->
+
+            <!--begin::Clone-->
+            <router-link :to="`/cloneinstrument/${thermal_instruments.id}`">
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="Clone Instrument"
+              >
+                <KTIcon icon-name="copy" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Clone-->
+
+            <!--begin::Edit-->
+            <router-link
+              :to="`/thermalinstrument/edit/${thermal_instruments.id}`"
             >
-              <router-link :to="`./cloneinstrument/${thermal_instruments.id}`">
-                <i
-                  class="las la-copy text-gray-600 text-hover-success mb-1 fs-1"
-                ></i>
-              </router-link>
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View Instrument"
+              >
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
+            <!--end::Delete-->
+            <span
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete Instrument"
+              @click="deleteItem(thermal_instruments.id, false)"
+            >
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
+            <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">

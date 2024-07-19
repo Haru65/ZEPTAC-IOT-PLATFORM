@@ -31,52 +31,82 @@
         <!--begin::Card body-->
         <div class="card-body border-top p-9">
           <!--begin::Input group-->
-          <div class="row mb-6">
+          <div class="row mb-6" v-if="identifier == 'Admin'">
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label required fw-semobold fs-6"
-              >Full Name</label
+              >Company</label
             >
             <!--end::Label-->
 
             <!--begin::Col-->
-            <div class="col-lg-8">
-              <!--begin::Row-->
-              <div class="row">
-                <!--begin::Col-->
-                <div class="col-lg-6 fv-row">
-                  <Field
-                    type="text"
-                    name="fname"
-                    class="form-control form-control-lg form-control-solid mb-3 mb-lg-0"
-                    placeholder="First name"
-                    v-model="profileDetails.first_name"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="fname" />
-                    </div>
-                  </div>
-                </div>
-                <!--end::Col-->
+            <div class="col-lg-8 fv-row">
+              <el-select
+                name="company_id"
+                v-model="profileDetails.company_id"
+                filterable
+                placeholder="Please Select Company..."
+              >
+                <el-option
+                  v-for="item in Companies"
+                  :key="item.id"
+                  :label="item.company_name"
+                  :value="item.id"
+                />
+              </el-select>
+            </div>
+            <!--end::Col-->
+          </div>
+          <!-- extra fields -->
 
-                <!--begin::Col-->
-                <div class="col-lg-6 fv-row">
-                  <Field
-                    type="text"
-                    name="lname"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Last name"
-                    v-model="profileDetails.last_name"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="lname" />
-                    </div>
-                  </div>
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span class="required">Company Name</span>
+            </label>
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="company_name"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Company Name"
+                v-model="profileDetails.company_name"
+              />
+              <div class="fv-plugins-message-container">
+                <div class="fv-help-block">
+                  <ErrorMessage name="company_name" />
                 </div>
-                <!--end::Col-->
               </div>
-              <!--end::Row-->
+            </div>
+            <!--end::Col-->
+          </div>
+          <!--end::Input group-->
+
+          <!--begin::Input group-->
+          <div class="row mb-6">
+            <!--begin::Label-->
+            <label class="col-lg-4 col-form-label fw-semobold fs-6">
+              <span class="required">Full Name</span>
+            </label>
+            <!--end::Label-->
+
+            <!--begin::Col-->
+            <div class="col-lg-8 fv-row">
+              <Field
+                type="text"
+                name="name"
+                class="form-control form-control-lg form-control-solid"
+                placeholder="Enter Person Name"
+                v-model="profileDetails.name"
+              />
+              <div class="fv-plugins-message-container">
+                <div class="fv-help-block">
+                  <ErrorMessage name="name" />
+                </div>
+              </div>
             </div>
             <!--end::Col-->
           </div>
@@ -127,47 +157,21 @@
             <div class="col-lg-8 fv-row">
               <Field
                 type="tel"
-                name="phone"
+                name="mobile"
                 class="form-control form-control-lg form-control-solid"
                 placeholder="Phone number"
-                v-model="profileDetails.phone"
+                v-model="profileDetails.mobile"
               />
               <div class="fv-plugins-message-container">
                 <div class="fv-help-block">
-                  <ErrorMessage name="phone" />
+                  <ErrorMessage name="mobile" />
                 </div>
               </div>
             </div>
             <!--end::Col-->
           </div>
           <!--end::Input group-->
-          <!--begin::Input group-->
-          <div class="row mb-6">
-            <!--begin::Label-->
-            <label class="col-lg-4 col-form-label fw-semobold fs-6">
-              <span class="required">Company Name</span>
-            </label>
-            <!--end::Label-->
 
-            <!--begin::Col-->
-            <div class="col-lg-8 fv-row">
-              <Field
-                type="text"
-                name="company_name"
-                class="form-control form-control-lg form-control-solid"
-                placeholder="Company Name"
-                v-model="profileDetails.company_name"
-              />
-              <div class="fv-plugins-message-container">
-                <div class="fv-help-block">
-                  <ErrorMessage name="company_name" />
-                </div>
-              </div>
-            </div>
-            <!--end::Col-->
-          </div>
-          <!--end::Input group-->
-          <!--end::Input group-->
           <div class="separator my-10"></div>
 
           <div class="row mb-6">
@@ -237,7 +241,7 @@
                   <el-select
                     v-model="profileDetails.country"
                     filterable
-                    placeholder="Select Your County..."
+                    placeholder="Select Your Country..."
                   >
                     <el-option
                       v-for="item in countries"
@@ -271,7 +275,7 @@
                 <div v-if="state.length" class="col-lg fv-row">
                   <div>
                     <el-select
-                      v-model="profileDetails.states"
+                      v-model="profileDetails.state"
                       filterable
                       placeholder="Select Your State..."
                     >
@@ -292,7 +296,7 @@
                       name="state"
                       class="form-control form-control-lg form-control-solid"
                       placeholder="Enter State Name"
-                      v-model="profileDetails.states"
+                      v-model="profileDetails.state"
                     />
                     <div class="fv-plugins-message-container">
                       <div class="fv-help-block">
@@ -340,6 +344,7 @@
             <!--begin::Label-->
             <label class="col-lg-4 col-form-label fw-semobold fs-6">City</label>
             <!--end::Label-->
+
             <!--begin::Col-->
             <div class="col-lg">
               <!--begin::Row-->
@@ -412,17 +417,25 @@
         </div>
         <div class="modal-footer flex-center">
           <!--begin::Button-->
-          <button type="reset" class="btn btn-lg btn-danger w-25">Clear</button>
+          <button
+            type="button"
+            @click="clear"
+            class="btn btn-lg btn-danger w-sd-25 w-lg-25"
+          >
+            Clear
+          </button>
           <!--end::Button-->
           &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
           <!--begin::Button-->
+
+          <!--begin::Button-->
           <button
-            :data-kt-indicator="loading ? 'on' : null"
-            class="btn btn-lg btn-primary w-25"
+            ref="submitButton"
             type="submit"
+            class="btn btn-primary w-sd-25 w-lg-25"
           >
-            <span v-if="!loading" class="indicator-label"> Submit </span>
-            <span v-if="loading" class="indicator-progress">
+            <span class="indicator-label"> Save </span>
+            <span class="indicator-progress">
               Please wait...
               <span
                 class="spinner-border spinner-border-sm align-middle ms-2"
@@ -454,22 +467,30 @@ import { useRouter } from "vue-router";
 import { countries, INstates } from "@/core/model/countries";
 import { rolesArray } from "@/core/config/PermissionsRolesConfig";
 import { debounce } from "@/core/helpers/debounce";
+import { Identifier } from "@/core/config/WhichUserConfig";
 
-interface ProfileDetails {
-  first_name: string;
-  last_name: string;
+interface LDetails {
+  name: string;
   email: string;
   phone: string;
-  password: string;
-  confpassword: string;
-  role_id: string;
+}
+
+interface ProfileDetails {
+  name: string;
+  email: string;
+  mobile: string;
+  extra_leads: Array<LDetails>;
+  enquiry_no: string;
   address1: string;
   address2: string;
-  country: string;
-  states: string;
-  pincode: string;
   city: string;
+  pincode: string;
+  state: string;
+  country: string;
   gst_number: string;
+  source: string;
+  is_converted: boolean;
+  is_active: number;
   company_id: string;
   company_name: string;
   created_by: string;
@@ -477,70 +498,69 @@ interface ProfileDetails {
 }
 
 export default defineComponent({
-  name: "account-settings",
+  name: "customers-add",
   components: {
     ErrorMessage,
     Field,
     VForm,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
+    const identifier = Identifier;
     const auth = useAuthStore();
     const router = useRouter();
-    let limit = ref(500);
     const loading = ref(false);
     const Companies = ref([{ id: "", company_name: "" }]);
     const state = ref([""]);
     const User = auth.GetUser();
+    
     const getdropcomp = async () => {
       ApiService.setHeader();
       const response = await getCompanies(`fetchAll=true`);
       if (response.result != null && response.result) {
         Companies.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
+          ...response.result?.map(({ ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
           }))
         );
-        // console.log(Companies);
       }
     };
 
-    onMounted(async () => {
-      state.value.pop();
-      Companies.value.pop();
-      // await getdropcomp();
-    });
-
-    const emailFormDisplay = ref(false);
-    const passwordFormDisplay = ref(false);
-
     const profileDetailsValidator = Yup.object().shape({
-      fname: Yup.string().required().label("First name"),
-      lname: Yup.string().required().label("Last name"),
+      name: Yup.string().required().label("Person Name"),
       email: Yup.string().required().email().label("Email"),
-      phone: Yup.string().required().label("Phone"),
+      mobile: Yup.string().required().label("Phone"),
       company_name: Yup.string().required().label("Company Name"),
     });
 
     const profileDetails = ref<ProfileDetails>({
-      first_name: "",
-      last_name: "",
+      name: "",
       email: "",
-      phone: "",
-      password: "decodedemo",
-      confpassword: "",
-      role_id: "7",
+      mobile: "",
+      extra_leads: [],
+      enquiry_no: "",
       address1: "",
       address2: "",
       country: "",
-      states: "",
+      state: "",
       city: "",
       pincode: "",
       gst_number: "",
-      company_id: User.company_id,
+      source: "webapp",
+      is_converted: true,
       company_name: "",
+      is_active: 1,
+      company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
+    });
+
+    onMounted(async () => {
+      state.value.pop();
+      Companies.value.pop();
+      if (User.role_id === 1) {
+        await getdropcomp();
+      }
     });
 
     const validGSTRef = ref(false);
@@ -571,34 +591,38 @@ export default defineComponent({
     const debouncedValidateGST = debounce(isValidGSTNo, 1000);
 
     const onsubmit = async () => {
-      loading.value = true;
-      // console.log(profileDetails.value);
-      console.warn("Nice");
       try {
-        // Call your API here with the form values
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+        loading.value = true;
+
+        // Call your API here
         const response = await addCustomer(profileDetails.value);
-        // console.log(response.error);
-        if (!response.error) {
+
+        if (response?.success) {
           // Handle successful API response
-          // console.log("API response:", response);
-          showSuccessAlert("Success", "User have been successfully inserted!");
+          loading.value = false;
+          showSuccessAlert(
+            "Success",
+            response.message || "Customer Added Successfully!"
+          );
           router.push({ name: "customers-list" });
           clear();
         } else {
           // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert(
-            "Warning",
-            "Please Fill the Form Fields Correctly" + errorData
-          );
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -638,44 +662,46 @@ export default defineComponent({
           state.value.pop();
         }
         if (newVal === "India") {
-          profileDetails.value.states = "";
+          profileDetails.value.state = "";
           INstates.forEach((ele) => {
             state.value.push(ele.name);
           });
           //console.log(state);
         } else {
-          profileDetails.value.states = "";
+          profileDetails.value.state = "";
         }
       }
     );
 
     const clear = () => {
       profileDetails.value = {
-        first_name: "",
-        last_name: "",
+        name: "",
         email: "",
-        phone: "",
-        password: "decodedemo",
-        confpassword: "",
-        role_id: "7",
+        mobile: "",
+        extra_leads: [],
+        enquiry_no: "",
         address1: "",
         address2: "",
-        country: "",
-        states: "",
         city: "",
         pincode: "",
+        state: "",
+        country: "",
         gst_number: "",
-        company_id: "",
+        source: "webapp",
+        is_converted: true,
+        company_id: User.company_id,
         company_name: "",
         created_by: User.id,
         updated_by: User.id,
+        is_active: 1,
       };
     };
 
     return {
+      submitButton,
+      Companies,
+      identifier,
       profileDetails,
-      emailFormDisplay,
-      passwordFormDisplay,
       profileDetailsValidator,
       getAssetPath,
       onsubmit,

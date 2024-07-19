@@ -10,7 +10,7 @@
           class="form"
           novalidate
           :validation-schema="itemValidator"
-          @keydown.enter.prevent
+          @submit=submit
         >
           <!--begin::Card body-->
           <div class="card-body p-sd-2 p-lg-9">
@@ -33,7 +33,7 @@
                   >Customer Name</label
                 >
                 <div class="form-control form-control-lg form-control-solid">
-                  {{ informationData.meta.company_name }}
+                  {{ informationData.company_name }}
                 </div>
               </div>
 
@@ -43,12 +43,12 @@
                   >Address</label
                 >
                 <div class="form-control form-control-lg form-control-solid">
-                  {{ informationData.meta.address1 }}
-                  {{ informationData.meta.address2 }}
-                  {{ informationData.meta.city }}
-                  {{ informationData.meta.pincode }}
-                  {{ informationData.meta.states }}
-                  {{ informationData.meta.country }}
+                  {{ informationData.address1 || "" }}
+                  {{ informationData.address2 || "" }}
+                  {{ informationData.city || "" }}
+                  {{ informationData.pincode || "" }}
+                  {{ informationData.state || "" }}
+                  {{ informationData.country || "" }}
                 </div>
               </div>
             </div>
@@ -62,8 +62,7 @@
                   >Contact person</label
                 >
                 <div class="form-control form-control-lg form-control-solid">
-                  {{ informationData.first_name }}
-                  {{ informationData.last_name }}
+                  {{ informationData.name }}
                 </div>
               </div>
               <div class="form-group col-md-6">
@@ -202,7 +201,7 @@
           <div class="modal-footer flex-center w-100">
             <!--begin::Button-->
             <button
-              type="button"
+              type="submit"
               ref="submitButton"
               class="btn btn-primary w-sd-25 w-lg-25"
             >
@@ -278,34 +277,28 @@ export default defineComponent({
     });
 
     const informationData = ref({
-      customer_id: customerID,
-      first_name: "",
-      last_name: "",
+      id: customerID,
+      name: "",
       mobile: "",
-      meta: {
-        company_name: "",
-        address1: "",
-        address2: "",
-        country: "",
-        states: "",
-        city: "",
-        pincode: "",
-      },
+      company_name: "",
+      address1: "",
+      address2: "",
+      country: "",
+      state: "",
+      city: "",
+      pincode: "",
     });
 
     const itemDetails = ref({
-      feedback_no: "",
       customer_id: customerID,
       feedback_data: [...FeedbackServices],
       suggestion_remark: "",
       avg_rating: "",
-      approval_status: "1",
-      approval_comment: "",
       feedbacker_name: "",
       company_id: companyID,
       created_by: customerID,
       updated_by: customerID,
-      is_active: "1",
+      is_active: 1,
     });
 
     const updateRating = async (itemId, value) => {
@@ -343,16 +336,23 @@ export default defineComponent({
         console.log(response);
 
         if (response !== null) {
-          informationData.value.first_name = response.result.first_name
-            ? response.result.first_name
+          if (response) {
+          informationData.value.name = response.name ? response.name : "";
+          informationData.value.mobile = response.mobile ? response.mobile : "";
+          informationData.value.company_name = response.company_name
+            ? response.company_name
             : "";
-          informationData.value.last_name = response.result.last_name
-            ? response.result.last_name
+          informationData.value.address1 = response.address1
+            ? response.address1
             : "";
-          informationData.value.mobile = response.result.mobile
-            ? response.result.mobile
+          informationData.value.address2 = response.address2
+            ? response.address2
             : "";
-          informationData.value.meta = response.result.meta;
+          informationData.value.city = response.city ? response.city : "";
+          informationData.value.pincode = response.pincode ? response.pincode : "";
+          informationData.value.state = response.state ? response.state : "";
+          informationData.value.country = response.country ? response.country : "";
+        }
         }
       } catch (error) {
         showErrorAlert("Error", "An error occurred during the API call.");
@@ -367,8 +367,6 @@ export default defineComponent({
       for (const key in formData) {
         let value = formData[key];
         if (
-          key !== "feedback_no" &&
-          key !== "approval_comment" &&
           key !== "suggestion_remark"
         ) {
           if (Array.isArray(value)) {
@@ -411,17 +409,18 @@ export default defineComponent({
         }
 
         // Call your API here
-          const response = await addFeedback(itemDetails.value);
+        const response = await addFeedback(itemDetails.value);
 
         if (response?.success) {
           // Handle successful API response
           showSuccessAlert(
             "Success",
-            response.message || "FeedBack Form Form  has been successfully submitted!"
+            response.message ||
+              "FeedBack Form Form  has been successfully submitted!"
           );
           loading.value = false;
-            // window.location.href = "https://www.google.com";
-            router.push({ name: "thankyou" });
+          // window.location.href = "https://www.google.com";
+          router.push({ name: "thankyou" });
         } else {
           // Handle API error response
           loading.value = false;

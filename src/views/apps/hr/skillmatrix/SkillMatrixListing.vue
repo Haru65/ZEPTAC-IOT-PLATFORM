@@ -181,23 +181,31 @@
 
         <template v-slot:actions="{ row: skillmatrix }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <router-link :to="`/skill_matrix/edit/${skillmatrix.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
+          <div class="d-flex flex-lg-row my-3">
+            <!--begin::Edit-->
+            <router-link :to="`/skill_matrix/edit/${skillmatrix.id}`">
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View SkillMatrix"
+              >
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
+            <!--begin::Delete-->
+            <span
+              @click="deleteItem(skillmatrix.id, false)"
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete SkillMatrix"
+            >
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
-            <span class="menu-link px-3">
-              <i
-                @click="deleteItem(skillmatrix.id, false)"
-                class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
-            </span>
+            <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -271,12 +279,6 @@ export default defineComponent({
     const authStore = useAuthStore();
 
     const tableHeader = ref([
-      {
-        columnName: "Id",
-        columnLabel: "id",
-        sortEnabled: true,
-        columnWidth: 35,
-      },
       {
         columnName: "Employee Name",
         columnLabel: "user",
@@ -498,7 +500,7 @@ export default defineComponent({
 
       await skill_matrix_listing();
     });
-    
+
     const deleteFewItem = async () => {
       try {
         const result = await Swal.fire({

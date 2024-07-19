@@ -5,20 +5,10 @@
       <!--begin::Modal content-->
       <div class="modal-content">
         <!--begin::Form-->
-        <VForm id="kt_account_profile_details_form" class="form" novalidate>
+        <VForm class="form" novalidate @submit="onsubmit">
           <!--begin::Card body-->
           <div class="card-body border-top p-sd-2 p-lg-9">
             <!--begin::Input group-->
-
-            <div class="col-lg-12 col-md-12 col-sd-12 fv-row m-auto mb-6">
-              <div class="card mb-3 p-6">
-                <div class="row mb-6 text-center">
-                  <span class="fs-3 fw-bold text-muted"
-                    >Quotation # {{ QuotationDetails.quotation_no }}</span
-                  >
-                </div>
-              </div>
-            </div>
 
             <div class="row mb-6">
               <div class="form-group col-md-6 mb-8 mb-sd-8">
@@ -75,12 +65,27 @@
               </div>
             </div>
 
-            <div class="row mb-6">
-              <div
-                class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+            <!--begin::Input group-->
+            <div class="d-flex flex-stack">
+              <!--begin::Label-->
+              <div class="me-5">
+                <label class="fw-semobold text-gray-700 fs-5 form-label"
+                  >Want this service for you? Then kindly check it.</label
+                >
+                <div class="fw-semobold fs-5 text-gray-700">
+                  <i class="text-gray-700"
+                    >( site address same as billing address )</i
+                  >
+                </div>
+              </div>
+              <!--end::Label-->
+
+              <!--begin::Switch-->
+              <label
+                class="form-check form-switch form-check-custom form-check-solid"
               >
                 <input
-                  class="form-check-input"
+                  class="form-check-input min-w-100px"
                   type="checkbox"
                   :value="false"
                   name="siteSameAsBilling"
@@ -88,16 +93,8 @@
                   v-on:change="ToggleClient"
                   v-model="siteSameAsBilling"
                 />
-                <label
-                  class="form-check-label fw-bold text-primary fw-semobold fs-5"
-                  for="maintenance_plan"
-                >
-                  Want this service for you then kindly check it.
-                  <i class="text-gray-700"
-                    >( site address same as billing address )</i
-                  >
-                </label>
-              </div>
+              </label>
+              <!--end::Switch-->
             </div>
 
             <div class="row mb-6">
@@ -107,17 +104,17 @@
                   <div class="py-3">
                     <h6 class="fs-6">Customer :</h6>
                   </div>
-                  <div id="lead " class="row gx-10">
+                  <div id="customer " class="row gx-10">
                     <el-select
-                      v-model="QuotationDetails.lead_id"
+                      v-model="QuotationDetails.customer_id"
                       placeholder="Please Select Customer"
                       filterable
-                      v-on:change="GetUserData(QuotationDetails.lead_id)"
+                      v-on:change="GetUserData(QuotationDetails.customer_id)"
                     >
                       <el-option
-                        v-for="item in Leads"
+                        v-for="item in Customers"
                         :key="item.id"
-                        :label="`${item.meta.company_name} (${item.first_name} ${item.last_name})`"
+                        :label="`${item.company_name} (${item.name})`"
                         :value="item.id"
                       />
                       <el-option
@@ -134,38 +131,40 @@
                   <div class="mt-2 pt-4">
                     <h6 class="fw-bold mt-5">Billing Address:</h6>
                     <div class="mt-2">
-                      <div class="mb-1" v-show="QuotationDetails.lead">
+                      <div class="mb-1" v-show="QuotationDetails.customer">
                         <br />
-                        <span v-show="QuotationDetails.lead.company_name">
-                          {{ `${QuotationDetails.lead.company_name}` }}
+                        <span v-show="QuotationDetails.customer.company_name">
+                          {{ `${QuotationDetails.customer.company_name}` }}
                         </span>
                         <br />
                         <span>
-                          {{
-                            `${QuotationDetails.lead.first_name} ${QuotationDetails.lead.last_name}`
-                          }}
+                          {{ `${QuotationDetails.customer.name}` }}
                         </span>
                         <!-- v-if company_data present -->
-                        <div v-show="QuotationDetails.lead.company_name">
+                        <div v-show="QuotationDetails.customer.company_name">
                           <br />
                           <span>
-                            {{ `${QuotationDetails.lead.address1}` }}
+                            {{ `${QuotationDetails.customer.address1 || ""}` }}
                           </span>
                           <br />
                           <span>
-                            {{ `${QuotationDetails.lead.address2}` }}
+                            {{ `${QuotationDetails.customer.address2 || ""}` }}
                           </span>
                         </div>
-                        <div v-show="QuotationDetails.lead.country">
+                        <div v-show="QuotationDetails.customer.country">
                           <span>
                             {{
-                              `${QuotationDetails.lead.city} - ${QuotationDetails.lead.pincode}`
+                              `${QuotationDetails.customer.city || ""} - ${
+                                QuotationDetails.customer.pincode || ""
+                              }`
                             }}
                           </span>
                           <br />
                           <span>
                             {{
-                              `${QuotationDetails.lead.states} ${QuotationDetails.lead.country}`
+                              `${QuotationDetails.customer.state || ""} ${
+                                QuotationDetails.customer.country || ""
+                              }`
                             }}
                           </span>
                           <br />
@@ -173,9 +172,9 @@
                         <br />
                         <!-- firstname as a flag -->
                         <a
-                          v-show="QuotationDetails.lead.first_name"
+                          v-show="QuotationDetails.customer.name"
                           target="blank"
-                          v-bind:href="`/leads/edit/${QuotationDetails.lead_id}`"
+                          v-bind:href="`/leads/edit/${QuotationDetails.customer_id}`"
                         >
                           <span class="fs-5"> Edit</span>
                           <!-- <i
@@ -201,9 +200,9 @@
                     >
                       <el-option
                         v-for="item in Clients"
-                        :key="item.client_data.id"
-                        :label="`${item.client_data.meta.company_name} (${item.client_data.first_name} ${item.client_data.last_name})`"
-                        :value="item.client_data.id"
+                        :key="item.id"
+                        :label="`${item.company_name} (${item.name})`"
+                        :value="item.id"
                       />
                       <el-option
                         value=""
@@ -226,31 +225,33 @@
                         </span>
                         <br />
                         <span>
-                          {{
-                            `${QuotationDetails.client.first_name} ${QuotationDetails.client.last_name}`
-                          }}
+                          {{ `${QuotationDetails.client.name}` }}
                         </span>
                         <!-- v-if company_data present -->
                         <div v-show="QuotationDetails.client.company_name">
                           <br />
                           <span>
-                            {{ `${QuotationDetails.client.address1}` }}
+                            {{ `${QuotationDetails.client.address1 || ""}` }}
                           </span>
                           <br />
                           <span>
-                            {{ `${QuotationDetails.client.address2}` }}
+                            {{ `${QuotationDetails.client.address2 || ""}` }}
                           </span>
                         </div>
                         <div v-show="QuotationDetails.client.country">
                           <span>
                             {{
-                              `${QuotationDetails.client.city} - ${QuotationDetails.client.pincode}`
+                              `${QuotationDetails.client.city || ""} - ${
+                                QuotationDetails.client.pincode || ""
+                              }`
                             }}
                           </span>
                           <br />
                           <span>
                             {{
-                              `${QuotationDetails.client.states} ${QuotationDetails.client.country}`
+                              `${QuotationDetails.client.state || ""} ${
+                                QuotationDetails.client.country || ""
+                              }`
                             }}
                           </span>
                           <br />
@@ -260,7 +261,7 @@
                         <a
                           v-show="
                             QuotationDetails.client.id &&
-                            QuotationDetails.client.first_name &&
+                            QuotationDetails.client.name &&
                             !siteSameAsBilling
                           "
                           target="blank"
@@ -769,19 +770,26 @@
           </div>
 
           <div class="modal-footer flex-center w-100">
-            <span
-              v-on:click="submit"
+            <button
               type="submit"
-              href="#"
+              ref="submitButtonRef"
               class="btn btn-primary w-lg-50"
               id="kt_Quotation_submit_button"
             >
-              <i class="ki-duotone ki-triangle fs-3"
-                ><span class="path1"></span><span class="path2"></span
-                ><span class="path3"></span
-              ></i>
-              Add Quotation
-            </span>
+              <span class="indicator-label">
+                <i class="ki-duotone ki-triangle fs-3"
+                  ><span class="path1"></span><span class="path2"></span
+                  ><span class="path3"></span
+                ></i>
+                Add Quotation
+              </span>
+              <span class="indicator-progress">
+                Please wait...
+                <span
+                  class="spinner-border spinner-border-sm align-middle ms-2"
+                ></span>
+              </span>
+            </button>
           </div>
           <!--end::Input group-->
         </VForm>
@@ -794,6 +802,7 @@
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
+import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import {
@@ -805,6 +814,7 @@ import {
   GetIncrQuotationId,
   getPriceList,
   getLeadNCustomer,
+  getCustomer,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import moment from "moment";
@@ -817,15 +827,14 @@ import {
 
 import CustomQuotationItems from "./CustomComponents/CustomQuotationItems.vue";
 
-interface Meta {
+interface Data {
   id: string;
-  first_name: string;
-  last_name: string;
+  name: string;
   company_name: string;
   address1: string;
   address2: string;
   city: string;
-  states: string;
+  state: string;
   pincode: string;
   country: string;
 }
@@ -840,7 +849,8 @@ interface EDetails {
 
 interface QuotationDetails {
   quotation_no: string;
-  lead_id: string;
+  customer_id: string;
+  client_id: string;
   items: {
     id: string;
     site_location: string;
@@ -866,8 +876,8 @@ interface QuotationDetails {
   terms_and_conditions: string;
   total: number;
   day_or_equipment: string;
-  lead: Meta;
-  client: Meta;
+  customer: Data;
+  client: Data;
   is_active: number;
   company_id: string;
   created_by: string;
@@ -875,11 +885,15 @@ interface QuotationDetails {
 }
 
 export default defineComponent({
-  name: "company-add",
+  name: "quotation-add",
   components: {
+    ErrorMessage,
+    Field,
+    VForm,
     CustomQuotationItems,
   },
   setup() {
+    const submitButtonRef = ref<null | HTMLButtonElement>(null);
     const auth = useAuthStore();
     const disabledselect = ref(true);
     const clientSelect = ref(true);
@@ -887,18 +901,30 @@ export default defineComponent({
     const route = useRouter();
     const User = auth.GetUser();
     const loading = ref(false);
-    const Leads = ref([
-      { id: "", first_name: "", last_name: "", meta: { company_name: "" } },
+    const Customers = ref([
+      {
+        id: "",
+        name: "",
+        company_name: "",
+        address1: "",
+        address2: "",
+        city: "",
+        pincode: "",
+        state: "",
+        country: "",
+      },
     ]);
     const Clients = ref([
       {
         id: "",
-        client_data: {
-          id: "",
-          first_name: "",
-          last_name: "",
-          meta: { company_name: "" },
-        },
+        name: "",
+        company_name: "",
+        address1: "",
+        address2: "",
+        city: "",
+        pincode: "",
+        state: "",
+        country: "",
       },
     ]);
 
@@ -959,7 +985,8 @@ export default defineComponent({
 
     const QuotationDetails = ref<QuotationDetails>({
       quotation_no: "",
-      lead_id: "",
+      customer_id: "",
+      client_id: "",
       items: {
         id: "",
         site_location: "",
@@ -983,27 +1010,25 @@ export default defineComponent({
       status: "",
       scope_of_work: "",
       terms_and_conditions: "",
-      lead: {
+      customer: {
         id: "",
         company_name: "",
-        first_name: "",
-        last_name: "",
+        name: "",
         address1: "",
         address2: "",
         city: "",
-        states: "",
+        state: "",
         pincode: "",
         country: "",
       },
       client: {
         id: "",
         company_name: "",
-        first_name: "",
-        last_name: "",
+        name: "",
         address1: "",
         address2: "",
         city: "",
-        states: "",
+        state: "",
         pincode: "",
         country: "",
       },
@@ -1016,65 +1041,66 @@ export default defineComponent({
     });
 
     const ToggleClient = () => {
+      // if site address is same as billing address
       if (siteSameAsBilling.value) {
         siteSameAsBilling.value = true;
         clientSelect.value = true;
-        if (QuotationDetails.value.lead_id) {
-          QuotationDetails.value.client = QuotationDetails.value.lead;
-          // QuotationDetails.value.client.id = "0";
+        if (QuotationDetails.value.customer_id) {
+          QuotationDetails.value.client = QuotationDetails.value.customer;
+          QuotationDetails.value.client_id = "";
+          QuotationDetails.value.client.id = "";
         } else {
           QuotationDetails.value.client = {
             id: "",
             company_name: "",
-            first_name: "",
-            last_name: "",
+            name: "",
             address1: "",
             address2: "",
             city: "",
-            states: "",
+            state: "",
             pincode: "",
             country: "",
           };
-          QuotationDetails.value.lead = {
+          QuotationDetails.value.customer = {
             id: "",
             company_name: "",
-            first_name: "",
-            last_name: "",
+            name: "",
             address1: "",
             address2: "",
             city: "",
-            states: "",
+            state: "",
             pincode: "",
             country: "",
           };
+          QuotationDetails.value.client_id = "";
         }
       } else {
+        // if site address is not as billing address
         siteSameAsBilling.value = false;
         clientSelect.value = true;
 
-        QuotationDetails.value.lead_id = "";
-        QuotationDetails.value.lead = {
+        QuotationDetails.value.customer_id = "";
+        QuotationDetails.value.customer = {
           id: "",
           company_name: "",
-          first_name: "",
-          last_name: "",
+          name: "",
           address1: "",
           address2: "",
           city: "",
-          states: "",
+          state: "",
           pincode: "",
           country: "",
         };
 
+        QuotationDetails.value.client_id = "";
         QuotationDetails.value.client = {
           id: "",
           company_name: "",
-          first_name: "",
-          last_name: "",
+          name: "",
           address1: "",
           address2: "",
           city: "",
-          states: "",
+          state: "",
           pincode: "",
           country: "",
         };
@@ -1082,11 +1108,7 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      // todo: quotation check if pres get last incr 1
-      const res = await GetIncrQuotationId(User.company_id);
-      IncrQuotation(res);
-      // * basic fetch
-      Leads.value.pop();
+      Customers.value.pop();
       Clients.value.pop();
       locations.value.pop();
       await GetLeads();
@@ -1411,53 +1433,51 @@ export default defineComponent({
       // * empty clents data
       QuotationDetails.value.client.id = "";
       QuotationDetails.value.client.company_name = "";
+      QuotationDetails.value.client.name = "";
       QuotationDetails.value.client.address1 = "";
       QuotationDetails.value.client.address2 = "";
       QuotationDetails.value.client.city = "";
       QuotationDetails.value.client.pincode = "";
-      QuotationDetails.value.client.states = "";
+      QuotationDetails.value.client.state = "";
       QuotationDetails.value.client.country = "";
-      QuotationDetails.value.client.first_name = "";
-      QuotationDetails.value.client.last_name = "";
 
       ApiService.setHeader();
       const response = await GetLeadClients(id);
       // console.log(response);
       Clients.value.push(
-        ...response.result.map(({ created_at, ...rest }) => ({
+        ...response.result.map(({ ...rest }) => ({
           ...rest,
-          created_at: moment(created_at).format("DD-MM-YYYY"),
         }))
       );
       // console.log(Clients.value);
     };
 
     const GetUserData = async (id) => {
-      if (id != " ") {
-        const lead_id = id;
-        const response = await getUser(lead_id);
+      if (id != "") {
+        const customer_id = id;
+        const response = await getCustomer(customer_id);
         // console.log(response);
-        QuotationDetails.value.lead = response.meta;
-        QuotationDetails.value.lead.id = response.id;
-        QuotationDetails.value.enquiry_no = response.meta.enquiry_no;
+        QuotationDetails.value.customer = { ...response };
+        QuotationDetails.value.customer_id = response.id;
+        QuotationDetails.value.customer.id = response.id;
+        QuotationDetails.value.enquiry_no = response.enquiry_no;
 
         if (siteSameAsBilling.value) {
           ToggleClient();
         } else {
           clientSelect.value = false;
-          GetClients(lead_id);
+          await GetClients(customer_id);
         }
       } else {
         QuotationDetails.value.enquiry_no = "";
-        QuotationDetails.value.lead = {
+        QuotationDetails.value.customer = {
           id: "",
           company_name: "",
-          first_name: "",
-          last_name: "",
+          name: "",
           address1: "",
           address2: "",
           city: "",
-          states: "",
+          state: "",
           pincode: "",
           country: "",
         };
@@ -1465,34 +1485,34 @@ export default defineComponent({
     };
 
     const GetClientData = async (id) => {
-      if (id != " ") {
-        const lead_id = id;
-        const response = await getClient(lead_id);
+      if (id != "") {
+        const customer_id = id;
+        const response = await getClient(customer_id);
         // console.log(response);
-        QuotationDetails.value.client.address1 = response.meta.address1;
-        QuotationDetails.value.client.company_name = response.meta.company_name;
-        QuotationDetails.value.client.address2 = response.meta.address2;
-        QuotationDetails.value.client.city = response.meta.city;
-        QuotationDetails.value.client.pincode = response.meta.pincode;
-        QuotationDetails.value.client.states = response.meta.states;
-        QuotationDetails.value.client.country = response.meta.country;
-        QuotationDetails.value.client.first_name = response.first_name;
-        QuotationDetails.value.client.last_name = response.last_name;
+        QuotationDetails.value.client_id = response.id;
+        QuotationDetails.value.client.id = response.id;
+        QuotationDetails.value.client.name = response.name;
+        QuotationDetails.value.client.company_name = response.company_name;
+        QuotationDetails.value.client.address1 = response.address1;
+        QuotationDetails.value.client.address2 = response.address2;
+        QuotationDetails.value.client.city = response.city;
+        QuotationDetails.value.client.pincode = response.pincode;
+        QuotationDetails.value.client.state = response.state;
+        QuotationDetails.value.client.country = response.country;
         disabledselect.value = false;
         /* *
-         TODO : get lead_id and from meta get client ids get lead_id and from meta get client ids and put into Ref object
+         TODO : get customer_id and from meta get client ids get customer_id and from meta get client ids and put into Ref object
          ? Problem of getting clients;
         */
       } else {
-        QuotationDetails.value.lead = {
+        QuotationDetails.value.customer = {
           id: "",
           company_name: "",
-          first_name: "",
-          last_name: "",
+          name: "",
           address1: "",
           address2: "",
           city: "",
-          states: "",
+          state: "",
           pincode: "",
           country: "",
         };
@@ -1504,13 +1524,13 @@ export default defineComponent({
       const companyId = User.company_id;
       ApiService.setHeader();
       const response = await getLeadNCustomer(companyId);
-
-      Leads.value.push(
-        ...response.result.map(({ created_at, ...rest }) => ({
-          ...rest,
-          created_at: moment(created_at).format("DD-MM-YYYY"),
-        }))
-      );
+      if (response.result != null && response.result) {
+        Customers.value.push(
+          ...response.result.map(({ ...rest }) => ({
+            ...rest,
+          }))
+        );
+      }
     };
 
     /* --------SET DATE LOGIC--------*/
@@ -1534,11 +1554,7 @@ export default defineComponent({
     function areAllPropertiesNull(array) {
       return array.some((detail) => {
         const {
-          quotation_no,
-          lead_id,
-          enquiry_no,
-          lead,
-          client,
+          customer_id,
           items,
           date,
           duedate,
@@ -1551,12 +1567,8 @@ export default defineComponent({
         // Check if any property is null or empty
 
         return (
-          quotation_no === "" ||
-          lead_id === "" ||
-          enquiry_no === "" ||
+          customer_id === "" ||
           items.id === "" ||
-          lead.id === "" ||
-          client.id === "" ||
           date === "" ||
           duedate === "" ||
           status === "" ||
@@ -1591,15 +1603,14 @@ export default defineComponent({
       dayWiseRef.value = value;
     };
 
-    // number formating remove
-    const submit = async (e) => {
-      e.preventDefault();
-
+    const onsubmit = async () => {
       try {
+        loading.value = true;
+
         const result = areAllPropertiesNull([QuotationDetails.value]);
 
         if (result) {
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          showErrorAlert("Warning", "Please fill all the details correctly.");
           loading.value = false;
           return;
         }
@@ -1637,30 +1648,48 @@ export default defineComponent({
           return;
         }
 
-        // Call your API here with the form values
+        if (siteSameAsBilling.value == false) {
+          if (
+            QuotationDetails.value.client_id == "" ||
+            QuotationDetails.value.client_id == null
+          ) {
+            showErrorAlert("Warning", "Please Fill form fields correctly");
+            loading.value = false;
+            return;
+          }
+        }
+
+        if (submitButtonRef.value) {
+          // Activate indicator
+          submitButtonRef.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
         const response = await addQuotation(QuotationDetails.value);
-        // console.log(response.error);
-        if (!response.error) {
+
+        if (response?.success) {
           // Handle successful API response
-          // console.log("API response:", response);
+          loading.value = false;
           showSuccessAlert(
             "Success",
-            "Quotation have been successfully inserted!"
+            response.message || "Quotation Added Successfully!"
           );
+
           route.push({ name: "quotation-list" });
+          loading.value = false;
         } else {
           // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButtonRef.value) {
+          submitButtonRef.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -1726,8 +1755,9 @@ export default defineComponent({
 
     const clear = () => {
       QuotationDetails.value = {
-        quotation_no: "******",
-        lead_id: " ",
+        quotation_no: "",
+        customer_id: "",
+        client_id: "",
         items: {
           id: "",
           site_location: "",
@@ -1753,27 +1783,25 @@ export default defineComponent({
         terms_and_conditions: "",
         total: 0,
         day_or_equipment: "1",
-        lead: {
+        customer: {
           id: "",
           company_name: "",
-          first_name: "",
-          last_name: "",
+          name: "",
           address1: "",
           address2: "",
           city: "",
-          states: "",
+          state: "",
           pincode: "",
           country: "",
         },
         client: {
           id: "",
           company_name: "",
-          first_name: "",
-          last_name: "",
+          name: "",
           address1: "",
           address2: "",
           city: "",
-          states: "",
+          state: "",
           pincode: "",
           country: "",
         },
@@ -1785,11 +1813,12 @@ export default defineComponent({
     };
 
     return {
+      submitButtonRef,
       Clients,
       QuotationDetails,
-      Leads,
+      Customers,
       getAssetPath,
-      submit,
+      onsubmit,
       disabledselect,
       clientSelect,
       shortcuts,

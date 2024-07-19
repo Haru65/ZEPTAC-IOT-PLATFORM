@@ -32,7 +32,7 @@
                   >Customer Name</label
                 >
                 <div class="form-control form-control-lg form-control-solid">
-                  {{ informationData.meta.company_name }}
+                  {{ informationData.company_name }}
                 </div>
               </div>
 
@@ -42,12 +42,12 @@
                   >Address</label
                 >
                 <div class="form-control form-control-lg form-control-solid">
-                  {{ informationData.meta.address1 }}
-                  {{ informationData.meta.address2 }}
-                  {{ informationData.meta.city }}
-                  {{ informationData.meta.pincode }}
-                  {{ informationData.meta.states }}
-                  {{ informationData.meta.country }}
+                  {{ informationData.address1 || "" }}
+                  {{ informationData.address2 || "" }}
+                  {{ informationData.city || "" }}
+                  {{ informationData.pincode || "" }}
+                  {{ informationData.state || "" }}
+                  {{ informationData.country || "" }}
                 </div>
               </div>
             </div>
@@ -61,8 +61,7 @@
                   >Contact person</label
                 >
                 <div class="form-control form-control-lg form-control-solid">
-                  {{ informationData.customer.first_name }}
-                  {{ informationData.customer.last_name }}
+                  {{ informationData.name }}
                 </div>
               </div>
               <div class="form-group col-md-6">
@@ -71,7 +70,7 @@
                   >Mobile Number</label
                 >
                 <div class="form-control form-control-lg form-control-solid">
-                  {{ informationData.customer.mobile }}
+                  {{ informationData.mobile }}
                 </div>
               </div>
             </div>
@@ -238,33 +237,25 @@ export default defineComponent({
     });
 
     const informationData = ref({
-      customer: {
-        id: "",
-        first_name: "",
-        last_name: "",
-        mobile: "",
-      },
-      meta: {
-        company_name: "",
-        address1: "",
-        address2: "",
-        country: "",
-        states: "",
-        city: "",
-        pincode: "",
-      },
+      id: "",
+      name: "",
+      mobile: "",
+      company_name: "",
+      address1: "",
+      address2: "",
+      country: "",
+      state: "",
+      city: "",
+      pincode: "",
     });
 
     const itemDetails = ref({
       id: "",
-      feedback_no: "",
       customer_id: "",
       feedback_data: [...FeedbackServices],
       suggestion_remark: "",
       avg_rating: "",
       feedbacker_name: "",
-      approval_status: "",
-      approval_comment: "",
       company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
@@ -277,17 +268,13 @@ export default defineComponent({
         console.log(response);
 
         if (response !== null) {
-
           itemDetails.value = {
             id: response.id,
             customer_id: response.customer_id,
-            feedback_no: response.feedback_no,
             feedbacker_name: response.feedbacker_name,
             feedback_data: JSON.parse(response.feedback_data),
             avg_rating: response.avg_rating,
             suggestion_remark: response.suggestion_remark,
-            approval_status: response.approval_status,
-            approval_comment: response.approval_comment,
 
             company_id: response.company_id ? response.company_id : "",
             created_by: response.created_by,
@@ -295,11 +282,7 @@ export default defineComponent({
             is_active: response.is_active,
           };
 
-          informationData.value = {
-            customer: response.customer,
-            meta: response.meta,
-          }
-
+          informationData.value = {...response.customer};
         }
       } catch (error) {
         showErrorAlert("Error", "An error occurred during the API call.");
@@ -313,11 +296,7 @@ export default defineComponent({
     const validateForm = (formData) => {
       for (const key in formData) {
         let value = formData[key];
-        if (
-          key !== "feedback_no" &&
-          key !== "approval_comment" &&
-          key !== "suggestion_remark"
-        ) {
+        if (key !== "suggestion_remark") {
           if (Array.isArray(value)) {
             for (const item of value) {
               if (!validateForm(item)) {

@@ -5,20 +5,11 @@
       <!--begin::Modal content-->
       <div class="modal-content">
         <!--begin::Form-->
-        <VForm id="kt_account_profile_details_form" class="form" novalidate>
+
+        <VForm class="form" novalidate @submit="onsubmit">
           <!--begin::Card body-->
           <div class="card-body border-top p-sd-2 p-lg-9">
             <!--begin::Input group-->
-
-            <div class="col-lg-12 col-md-12 col-sd-12 fv-row m-auto mb-6">
-              <div class="card mb-3 p-6">
-                <div class="row mb-6 text-center">
-                  <span class="fs-3 fw-bold text-muted"
-                    >Invoice # {{ InvoiceDetails.invoice_no }}</span
-                  >
-                </div>
-              </div>
-            </div>
 
             <div class="row mb-6">
               <div class="form-group col-md-6 mb-8 mb-sd-8">
@@ -76,12 +67,27 @@
               </div>
             </div>
 
-            <div class="row mb-6">
-              <div
-                class="form-check form-switch form-check-custom form-check-primary form-check-solid"
+            <!--begin::Input group-->
+            <div class="d-flex flex-stack">
+              <!--begin::Label-->
+              <div class="me-5">
+                <label class="fw-semobold text-gray-700 fs-5 form-label"
+                  >Want this service for you? Then kindly check it.</label
+                >
+                <div class="fw-semobold fs-5 text-gray-700">
+                  <i class="text-gray-700"
+                    >( site address same as billing address )</i
+                  >
+                </div>
+              </div>
+              <!--end::Label-->
+
+              <!--begin::Switch-->
+              <label
+                class="form-check form-switch form-check-custom form-check-solid"
               >
                 <input
-                  class="form-check-input"
+                  class="form-check-input min-w-100px"
                   type="checkbox"
                   :value="false"
                   name="siteSameAsBilling"
@@ -89,16 +95,8 @@
                   v-on:change="ToggleClient"
                   v-model="siteSameAsBilling"
                 />
-                <label
-                  class="form-check-label fw-bold text-primary fw-semobold fs-5"
-                  for="maintenance_plan"
-                >
-                  Want this service for you then kindly check it.
-                  <i class="text-gray-700"
-                    >( site address same as billing address)</i
-                  >
-                </label>
-              </div>
+              </label>
+              <!--end::Switch-->
             </div>
 
             <div class="row mb-6">
@@ -108,17 +106,17 @@
                   <div class="py-3">
                     <h6 class="fs-6">Customer :</h6>
                   </div>
-                  <div id="lead " class="row gx-10">
+                  <div id="customer " class="row gx-10">
                     <el-select
-                      v-model="InvoiceDetails.lead_id"
+                      v-model="InvoiceDetails.customer_id"
                       placeholder="Please Select Customer"
                       filterable
-                      v-on:change="GetUserData(InvoiceDetails.lead_id)"
+                      v-on:change="GetUserData(InvoiceDetails.customer_id)"
                     >
                       <el-option
                         v-for="item in Customers"
                         :key="item.id"
-                        :label="`${item.first_name} ${item.last_name}`"
+                        :label="`${item.company_name} (${item.name})`"
                         :value="item.id"
                       />
                       <el-option
@@ -135,38 +133,40 @@
                   <div class="mt-2 pt-4">
                     <h6 class="fw-bold mt-5">Billing Address:</h6>
                     <div class="mt-2">
-                      <div class="mb-1" v-show="InvoiceDetails.lead">
+                      <div class="mb-1" v-show="InvoiceDetails.customer">
+                        <br />
+                        <span v-show="InvoiceDetails.customer.company_name">
+                          {{ `${InvoiceDetails.customer.company_name}` }}
+                        </span>
                         <br />
                         <span>
-                          {{
-                            `${InvoiceDetails.lead.first_name} ${InvoiceDetails.lead.last_name}`
-                          }}
-                        </span>
-                        <br />
-                        <span v-show="InvoiceDetails.lead.company_name">
-                          {{ `${InvoiceDetails.lead.company_name}` }}
+                          {{ `${InvoiceDetails.customer.name}` }}
                         </span>
                         <!-- v-if company_data present -->
-                        <div v-show="InvoiceDetails.lead.company_name">
+                        <div v-show="InvoiceDetails.customer.company_name">
                           <br />
                           <span>
-                            {{ `${InvoiceDetails.lead.address1}` }}
+                            {{ `${InvoiceDetails.customer.address1 || ""}` }}
                           </span>
                           <br />
                           <span>
-                            {{ `${InvoiceDetails.lead.address2}` }}
+                            {{ `${InvoiceDetails.customer.address2 || ""}` }}
                           </span>
                         </div>
-                        <div v-show="InvoiceDetails.lead.country">
+                        <div v-show="InvoiceDetails.customer.country">
                           <span>
                             {{
-                              `${InvoiceDetails.lead.city} - ${InvoiceDetails.lead.pincode}`
+                              `${InvoiceDetails.customer.city || ""} - ${
+                                InvoiceDetails.customer.pincode || ""
+                              }`
                             }}
                           </span>
                           <br />
                           <span>
                             {{
-                              `${InvoiceDetails.lead.states} ${InvoiceDetails.lead.country}`
+                              `${InvoiceDetails.customer.state || ""} ${
+                                InvoiceDetails.customer.country || ""
+                              }`
                             }}
                           </span>
                           <br />
@@ -174,9 +174,9 @@
                         <br />
                         <!-- firstname as a flag -->
                         <a
-                          v-show="InvoiceDetails.lead.first_name"
+                          v-show="InvoiceDetails.customer.name"
                           target="blank"
-                          v-bind:href="`/customers/edit/${InvoiceDetails.lead_id}`"
+                          v-bind:href="`/leads/edit/${InvoiceDetails.customer_id}`"
                         >
                           <span class="fs-5"> Edit</span>
                           <!-- <i
@@ -202,9 +202,9 @@
                     >
                       <el-option
                         v-for="item in Clients"
-                        :key="item.client_data.id"
-                        :label="`${item.client_data.first_name} ${item.client_data.last_name}`"
-                        :value="item.client_data.id"
+                        :key="item.id"
+                        :label="`${item.company_name} (${item.name})`"
+                        :value="item.id"
                       />
                       <el-option
                         value=""
@@ -222,36 +222,38 @@
                     <div class="mt-2">
                       <div class="mb-1" v-show="InvoiceDetails.client">
                         <br />
-                        <span>
-                          {{
-                            `${InvoiceDetails.client.first_name} ${InvoiceDetails.client.last_name}`
-                          }}
-                        </span>
-                        <br />
                         <span v-show="InvoiceDetails.client.company_name">
                           {{ `${InvoiceDetails.client.company_name}` }}
+                        </span>
+                        <br />
+                        <span>
+                          {{ `${InvoiceDetails.client.name}` }}
                         </span>
                         <!-- v-if company_data present -->
                         <div v-show="InvoiceDetails.client.company_name">
                           <br />
                           <span>
-                            {{ `${InvoiceDetails.client.address1}` }}
+                            {{ `${InvoiceDetails.client.address1 || ""}` }}
                           </span>
                           <br />
                           <span>
-                            {{ `${InvoiceDetails.client.address2}` }}
+                            {{ `${InvoiceDetails.client.address2 || ""}` }}
                           </span>
                         </div>
                         <div v-show="InvoiceDetails.client.country">
                           <span>
                             {{
-                              `${InvoiceDetails.client.city} - ${InvoiceDetails.client.pincode}`
+                              `${InvoiceDetails.client.city || ""} - ${
+                                InvoiceDetails.client.pincode || ""
+                              }`
                             }}
                           </span>
                           <br />
                           <span>
                             {{
-                              `${InvoiceDetails.client.states} ${InvoiceDetails.client.country}`
+                              `${InvoiceDetails.client.state || ""} ${
+                                InvoiceDetails.client.country || ""
+                              }`
                             }}
                           </span>
                           <br />
@@ -261,7 +263,7 @@
                         <a
                           v-show="
                             InvoiceDetails.client.id &&
-                            InvoiceDetails.client.first_name &&
+                            InvoiceDetails.client.name &&
                             !siteSameAsBilling
                           "
                           target="blank"
@@ -767,19 +769,26 @@
           </div>
 
           <div class="modal-footer flex-center w-100">
-            <span
-              v-on:click="submit"
+            <button
               type="submit"
-              href="#"
+              ref="submitButtonRef"
               class="btn btn-primary w-lg-50"
               id="kt_Quotation_submit_button"
             >
-              <i class="ki-duotone ki-triangle fs-3"
-                ><span class="path1"></span><span class="path2"></span
-                ><span class="path3"></span
-              ></i>
-              Add Invoice
-            </span>
+              <span class="indicator-label">
+                <i class="ki-duotone ki-triangle fs-3"
+                  ><span class="path1"></span><span class="path2"></span
+                  ><span class="path3"></span
+                ></i>
+                Add Invoice
+              </span>
+              <span class="indicator-progress">
+                Please wait...
+                <span
+                  class="spinner-border spinner-border-sm align-middle ms-2"
+                ></span>
+              </span>
+            </button>
           </div>
           <!--end::Input group-->
         </VForm>
@@ -792,6 +801,7 @@
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
+import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import {
@@ -802,6 +812,7 @@ import {
   GetCustomerClients,
   GetIncrInvoiceId,
   getPriceList,
+  getCustomer,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import moment from "moment";
@@ -813,15 +824,14 @@ import {
 } from "@/core/config/InvoiceStatusConfig";
 import CustomInvoiceItems from "./CustomComponents/CustomInvoiceItems.vue";
 
-interface Meta {
+interface Data {
   id: string;
-  first_name: string;
-  last_name: string;
+  name: string;
   company_name: string;
   address1: string;
   address2: string;
   city: string;
-  states: string;
+  state: string;
   pincode: string;
   country: string;
 }
@@ -836,7 +846,8 @@ interface EDetails {
 
 interface InvoiceDetails {
   invoice_no: string;
-  lead_id: string;
+  customer_id: string;
+  client_id: string;
   items: {
     id: string;
     site_location: string;
@@ -862,8 +873,8 @@ interface InvoiceDetails {
   terms_and_conditions: string;
   total: number;
   day_or_equipment: string;
-  lead: Meta;
-  client: Meta;
+  customer: Data;
+  client: Data;
   is_active: number;
   company_id: string;
   created_by: string;
@@ -871,11 +882,15 @@ interface InvoiceDetails {
 }
 
 export default defineComponent({
-  name: "company-add",
+  name: "invoice-add",
   components: {
+    ErrorMessage,
+    Field,
+    VForm,
     CustomInvoiceItems,
   },
   setup() {
+    const submitButtonRef = ref<null | HTMLButtonElement>(null);
     const auth = useAuthStore();
     const disabledselect = ref(true);
     const clientSelect = ref(true);
@@ -885,17 +900,29 @@ export default defineComponent({
     const loading = ref(false);
 
     const Customers = ref([
-      { id: "", first_name: "", last_name: "", meta: { company_name: "" } },
+      {
+        id: "",
+        name: "",
+        company_name: "",
+        address1: "",
+        address2: "",
+        city: "",
+        pincode: "",
+        state: "",
+        country: "",
+      },
     ]);
     const Clients = ref([
       {
         id: "",
-        client_data: {
-          id: "",
-          first_name: "",
-          last_name: "",
-          meta: { company_name: "" },
-        },
+        name: "",
+        company_name: "",
+        address1: "",
+        address2: "",
+        city: "",
+        pincode: "",
+        state: "",
+        country: "",
       },
     ]);
 
@@ -957,7 +984,8 @@ export default defineComponent({
 
     const InvoiceDetails = ref<InvoiceDetails>({
       invoice_no: "",
-      lead_id: "",
+      customer_id: "",
+      client_id: "",
       items: {
         id: "",
         site_location: "",
@@ -981,27 +1009,25 @@ export default defineComponent({
       status: "",
       scope_of_work: "",
       terms_and_conditions: "",
-      lead: {
+      customer: {
         id: "",
         company_name: "",
-        first_name: "",
-        last_name: "",
+        name: "",
         address1: "",
         address2: "",
         city: "",
-        states: "",
+        state: "",
         pincode: "",
         country: "",
       },
       client: {
         id: "",
         company_name: "",
-        first_name: "",
-        last_name: "",
+        name: "",
         address1: "",
         address2: "",
         city: "",
-        states: "",
+        state: "",
         pincode: "",
         country: "",
       },
@@ -1017,62 +1043,61 @@ export default defineComponent({
       if (siteSameAsBilling.value) {
         siteSameAsBilling.value = true;
         clientSelect.value = true;
-        if (InvoiceDetails.value.lead_id) {
-          InvoiceDetails.value.client = InvoiceDetails.value.lead;
-          InvoiceDetails.value.client.id = "0";
+        if (InvoiceDetails.value.customer_id) {
+          InvoiceDetails.value.client = InvoiceDetails.value.customer;
+          InvoiceDetails.value.client_id = "";
+          InvoiceDetails.value.client.id = "";
         } else {
           InvoiceDetails.value.client = {
             id: "",
             company_name: "",
-            first_name: "",
-            last_name: "",
+            name: "",
             address1: "",
             address2: "",
             city: "",
-            states: "",
+            state: "",
             pincode: "",
             country: "",
           };
-          InvoiceDetails.value.lead = {
+          InvoiceDetails.value.customer = {
             id: "",
             company_name: "",
-            first_name: "",
-            last_name: "",
+            name: "",
             address1: "",
             address2: "",
             city: "",
-            states: "",
+            state: "",
             pincode: "",
             country: "",
           };
+          InvoiceDetails.value.client_id = "";
         }
       } else {
         siteSameAsBilling.value = false;
         clientSelect.value = true;
 
-        InvoiceDetails.value.lead_id = "";
-        InvoiceDetails.value.lead = {
+        InvoiceDetails.value.customer_id = "";
+        InvoiceDetails.value.customer = {
           id: "",
           company_name: "",
-          first_name: "",
-          last_name: "",
+          name: "",
           address1: "",
           address2: "",
           city: "",
-          states: "",
+          state: "",
           pincode: "",
           country: "",
         };
 
+        InvoiceDetails.value.client_id = "";
         InvoiceDetails.value.client = {
           id: "",
           company_name: "",
-          first_name: "",
-          last_name: "",
+          name: "",
           address1: "",
           address2: "",
           city: "",
-          states: "",
+          state: "",
           pincode: "",
           country: "",
         };
@@ -1080,10 +1105,6 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      // todo: quotation check if pres get last incr 1
-      const res = await GetIncrInvoiceId(User.company_id);
-      IncrInvoice(res);
-      // * basic fetch
       Customers.value.pop();
       Clients.value.pop();
       locations.value.pop();
@@ -1409,35 +1430,34 @@ export default defineComponent({
       // * empty clents data
       InvoiceDetails.value.client.id = "";
       InvoiceDetails.value.client.company_name = "";
+      InvoiceDetails.value.client.name = "";
       InvoiceDetails.value.client.address1 = "";
       InvoiceDetails.value.client.address2 = "";
       InvoiceDetails.value.client.city = "";
       InvoiceDetails.value.client.pincode = "";
-      InvoiceDetails.value.client.states = "";
+      InvoiceDetails.value.client.state = "";
       InvoiceDetails.value.client.country = "";
-      InvoiceDetails.value.client.first_name = "";
-      InvoiceDetails.value.client.last_name = "";
 
       ApiService.setHeader();
       const response = await GetCustomerClients(id);
       // console.log(response);
       Clients.value.push(
-        ...response.result.map(({ created_at, ...rest }) => ({
+        ...response.result.map(({ ...rest }) => ({
           ...rest,
-          created_at: moment(created_at).format("DD-MM-YYYY"),
         }))
       );
       // console.log(Clients.value);
     };
 
     const GetUserData = async (id) => {
-      if (id != " ") {
+      if (id != "") {
         const customer_id = id;
-        const response = await getUser(customer_id);
+        const response = await getCustomer(customer_id);
         // console.log(response);
-        InvoiceDetails.value.lead = response.meta;
-        InvoiceDetails.value.lead.id = response.id;
-        InvoiceDetails.value.enquiry_no = response.meta.enquiry_no;
+        InvoiceDetails.value.customer = { ...response };
+        InvoiceDetails.value.customer_id = response.id;
+        InvoiceDetails.value.customer.id = response.id;
+        InvoiceDetails.value.enquiry_no = response.enquiry_no;
 
         if (siteSameAsBilling.value) {
           ToggleClient();
@@ -1447,15 +1467,14 @@ export default defineComponent({
         }
       } else {
         InvoiceDetails.value.enquiry_no = "";
-        InvoiceDetails.value.lead = {
+        InvoiceDetails.value.customer = {
           id: "",
           company_name: "",
-          first_name: "",
-          last_name: "",
+          name: "",
           address1: "",
           address2: "",
           city: "",
-          states: "",
+          state: "",
           pincode: "",
           country: "",
         };
@@ -1463,34 +1482,34 @@ export default defineComponent({
     };
 
     const GetClientData = async (id) => {
-      if (id != " ") {
+      if (id != "") {
         const customer_id = id;
         const response = await getClient(customer_id);
         // console.log(response);
-        InvoiceDetails.value.client.address1 = response.meta.address1;
-        InvoiceDetails.value.client.company_name = response.meta.company_name;
-        InvoiceDetails.value.client.address2 = response.meta.address2;
-        InvoiceDetails.value.client.city = response.meta.city;
-        InvoiceDetails.value.client.pincode = response.meta.pincode;
-        InvoiceDetails.value.client.states = response.meta.states;
-        InvoiceDetails.value.client.country = response.meta.country;
-        InvoiceDetails.value.client.first_name = response.first_name;
-        InvoiceDetails.value.client.last_name = response.last_name;
+        InvoiceDetails.value.client_id = response.id;
+        InvoiceDetails.value.client.id = response.id;
+        InvoiceDetails.value.client.name = response.name;
+        InvoiceDetails.value.client.company_name = response.company_name;
+        InvoiceDetails.value.client.address1 = response.address1;
+        InvoiceDetails.value.client.address2 = response.address2;
+        InvoiceDetails.value.client.city = response.city;
+        InvoiceDetails.value.client.pincode = response.pincode;
+        InvoiceDetails.value.client.state = response.state;
+        InvoiceDetails.value.client.country = response.country;
         disabledselect.value = false;
         /* *
          TODO : get customer_id and from meta get client ids get customer_id and from meta get client ids and put into Ref object
          ? Problem of getting clients;
         */
       } else {
-        InvoiceDetails.value.lead = {
+        InvoiceDetails.value.customer = {
           id: "",
           company_name: "",
-          first_name: "",
-          last_name: "",
+          name: "",
           address1: "",
           address2: "",
           city: "",
-          states: "",
+          state: "",
           pincode: "",
           country: "",
         };
@@ -1502,9 +1521,8 @@ export default defineComponent({
       const response = await getCustomers(`fetchAll=true`);
       if (response.result != null && response.result) {
         Customers.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
+          ...response.result.map(({ ...rest }) => ({
             ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
           }))
         );
       }
@@ -1513,11 +1531,7 @@ export default defineComponent({
     function areAllPropertiesNull(array) {
       return array.some((detail) => {
         const {
-          invoice_no,
-          lead_id,
-          enquiry_no,
-          lead,
-          client,
+          customer_id,
           items,
           date,
           duedate,
@@ -1530,12 +1544,8 @@ export default defineComponent({
         // Check if any property is null or empty
 
         return (
-          invoice_no === "" ||
-          lead_id === "" ||
-          enquiry_no === "" ||
+          customer_id === "" ||
           items.id === "" ||
-          lead.id === "" ||
-          client.id === "" ||
           date === "" ||
           duedate === "" ||
           status === "" ||
@@ -1589,8 +1599,8 @@ export default defineComponent({
     }
 
     // number formating remove
-    const submit = async (e) => {
-      e.preventDefault();
+    const onsubmit = async () => {
+      loading.value = true;
 
       // console.log(InvoiceDetails.value);
       try {
@@ -1635,31 +1645,48 @@ export default defineComponent({
           return;
         }
 
-        // Call your API here with the form values
+        if (siteSameAsBilling.value == false) {
+          if (
+            InvoiceDetails.value.client_id == "" ||
+            InvoiceDetails.value.client_id == null
+          ) {
+            showErrorAlert("Warning", "Please Fill form fields correctly");
+            loading.value = false;
+            return;
+          }
+        }
+
+        if (submitButtonRef.value) {
+          // Activate indicator
+          submitButtonRef.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
         const response = await addInvoice(InvoiceDetails.value);
-        // console.log(response.error);
-        if (!response.error) {
+
+        if (response?.success) {
           // Handle successful API response
-          // console.log("API response:", response);
+          loading.value = false;
           showSuccessAlert(
             "Success",
-            "Invoice have been successfully created!"
+            response.message || "Invoice Added Successfully!"
           );
+
           route.push({ name: "invoices-list" });
+          loading.value = false;
         } else {
           // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          console.log("API error:", errorData.response.data.errors);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
-        loading.value = false;
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
       } finally {
+        if (submitButtonRef.value) {
+          submitButtonRef.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -1726,7 +1753,8 @@ export default defineComponent({
     const clear = () => {
       InvoiceDetails.value = {
         invoice_no: "",
-        lead_id: " ",
+        customer_id: " ",
+        client_id: "",
         items: {
           id: "",
           site_location: "",
@@ -1752,27 +1780,25 @@ export default defineComponent({
         terms_and_conditions: "",
         total: 0,
         day_or_equipment: "1",
-        lead: {
+        customer: {
           id: "",
           company_name: "",
-          first_name: "",
-          last_name: "",
+          name: "",
           address1: "",
           address2: "",
           city: "",
-          states: "",
+          state: "",
           pincode: "",
           country: "",
         },
         client: {
           id: "",
           company_name: "",
-          first_name: "",
-          last_name: "",
+          name: "",
           address1: "",
           address2: "",
           city: "",
-          states: "",
+          state: "",
           pincode: "",
           country: "",
         },
@@ -1784,11 +1810,12 @@ export default defineComponent({
     };
 
     return {
+      submitButtonRef,
       Clients,
       InvoiceDetails,
       Customers,
       getAssetPath,
-      submit,
+      onsubmit,
       disabledselect,
       clientSelect,
       shortcuts,

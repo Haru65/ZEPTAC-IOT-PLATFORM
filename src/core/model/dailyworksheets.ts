@@ -1,10 +1,22 @@
+
+/* 
+
+DAILY WORKSHEET STATUS (work_status)
+1 : Ongoing
+2 : Completed
+
+*/
+
 interface IWorksheet {
     id: number;
     rgp_no: string;
-    customer_name:{
+    customer: {
+        id: string;
+        name: string;
         company_name: string;
     };
-    engineer_name:{
+    engineer: {
+        id: string;
         first_name: string;
         last_name: string;
     };

@@ -300,13 +300,18 @@
                       }}</span>
                     </td>
                     <td>
-                      <button
-                        type="button"
-                        class="btn btn-danger btn-sm cursor-pointer"
-                        @click="deleteItem(item?.id, false)"
-                      >
-                        <i class="bi bi-trash"></i> Delete
-                      </button>
+                      <div class="d-flex flex-lg-row my-3">
+                        <!--begin::Delete-->
+                        <span
+                          @click="deleteItem(item?.id, false)"
+                          class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+                          data-bs-toggle="tooltip"
+                          title="Delete Evaluation"
+                        >
+                          <KTIcon icon-name="trash" icon-class="fs-2" />
+                        </span>
+                        <!--end::Delete-->
+                      </div>
                     </td>
                   </tr>
                   <tr

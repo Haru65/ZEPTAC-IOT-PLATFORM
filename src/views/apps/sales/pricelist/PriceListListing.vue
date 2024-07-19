@@ -22,16 +22,16 @@
       <!--begin::Card title-->
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
-                 <!-- YEAR WISE DATA -->
+        <!-- YEAR WISE DATA -->
 
-                 <h3 class="card-title align-items-start flex-column">
+        <h3 class="card-title align-items-start flex-column">
           <span class="card-label fw-semibold text-gray-400"
             >Financial Year</span
           >
         </h3>
         <div class="me-3">
           <el-select
-          class="w-150px"
+            class="w-150px"
             filterable
             placeholder="Select Year"
             v-model="selectedYearCache"
@@ -122,7 +122,9 @@
         :items-per-page-dropdown-enabled="false"
         :loading="loading"
       >
-        <!-- img data -->
+        <template v-slot:id="{ row: pricelist }">
+          {{ pricelist.id }}
+        </template>
         <template v-slot:customer_type="{ row: pricelist }">
           {{ pricelist.customer_type }}
         </template>
@@ -160,23 +162,31 @@
         </template>
         <template v-slot:actions="{ row: pricelist }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <router-link :to="`./edit/${pricelist.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
+          <div class="d-flex flex-lg-row my-3">
+            <!--begin::Edit-->
+            <router-link :to="`/pricelist/edit/${pricelist.id}`">
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View PriceList"
+              >
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
+            <!--begin::Delete-->
+            <span
+              @click="deleteItem(pricelist.id, false)"
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete PriceList"
+            >
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
-            <span class="menu-link px-3" data-toggle="tooltip" title="Delete PriceList">
-              <i
-                @click="deleteItem(pricelist.id, false)"
-                class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-1"
-              ></i>
-            </span>
+            <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -334,7 +344,7 @@ export default defineComponent({
               : financialYears.value[0]
           }`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -387,7 +397,7 @@ export default defineComponent({
               : financialYears.value[0]
           }`
         );
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -451,7 +461,7 @@ export default defineComponent({
           }`
         );
         // console.log(response);
-        
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -502,7 +512,6 @@ export default defineComponent({
     });
 
     async function handleChange() {
-      
       page.value = 1;
       localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
       await pricelist_listing();
@@ -645,7 +654,6 @@ export default defineComponent({
       });
     };
 
-
     const search = ref<string>("");
     let debounceTimer;
 
@@ -679,8 +687,13 @@ export default defineComponent({
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await PriceListSearch(search.value, selectedYearCache.value ? selectedYearCache.value : financialYears.value[0]);
-        
+        const response = await PriceListSearch(
+          search.value,
+          selectedYearCache.value
+            ? selectedYearCache.value
+            : financialYears.value[0]
+        );
+
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -761,7 +774,7 @@ export default defineComponent({
       limit,
       PageLimitPoiner,
       Limits,
-      
+
       selectedYearCache,
       financialYears,
       handleChange,

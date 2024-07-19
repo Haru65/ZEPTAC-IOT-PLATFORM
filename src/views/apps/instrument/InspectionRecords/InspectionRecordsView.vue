@@ -131,13 +131,24 @@
                               >
                             </td>
                             <td>
-                              <router-link
-                                :to="`/inspection_records/edit/${plan?.id}`"
-                              >
-                                <span class="text-hover-primary cursor-pointer"
-                                  >view
-                                </span>
-                              </router-link>
+                              <div class="d-flex flex-lg-row my-3">
+                                <!--begin::Edit-->
+                                <router-link
+                                  :to="`/inspection_records/edit/${plan?.id}`"
+                                >
+                                  <span
+                                    class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                                    data-bs-toggle="tooltip"
+                                    title="View Inspection Record"
+                                  >
+                                    <KTIcon
+                                      icon-name="pencil"
+                                      icon-class="fs-2"
+                                    />
+                                  </span>
+                                </router-link>
+                                <!--end::Edit-->
+                              </div>
                             </td>
                           </tr>
                           <tr

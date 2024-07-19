@@ -104,10 +104,11 @@
           :items-per-page-dropdown-enabled="false"
           :loading="loading"
         >
-          <!-- img data -->
+          <template v-slot:id="{ row: user }">
+            {{ user.id }}
+          </template>
           <template v-slot:name="{ row: user }">
             <div class="d-flex justify-content-start align-items-center">
-              <!-- <img :src="user.name" class="w-45px rounded-circle" alt="" /> -->
               <span style="margin-left: 5.5%">
                 <span class="text-gray-600 text-hover-primary mb-1">
                   {{ user.first_name + " " + user.last_name }}
@@ -138,20 +139,29 @@
           </template>
           <template v-slot:actions="{ row: user }">
             <!--begin::Menu Flex-->
-            <div class="d-flex flex-lg-row">
-              <span class="menu-link px-3">
-                <router-link :to="`./edit/${user.id}`">
-                  <i
-                    class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                  ></i>
-                </router-link>
+            <div class="d-flex flex-lg-row my-3">
+              <!--begin::Edit-->
+              <router-link :to="`/users/edit/${user.id}`">
+                <span
+                  class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                  data-bs-toggle="tooltip"
+                  title="View User"
+                >
+                  <KTIcon icon-name="pencil" icon-class="fs-2" />
+                </span>
+              </router-link>
+              <!--end::Edit-->
+
+              <!--begin::Delete-->
+              <span
+                @click="deleteItem(user.id, false)"
+                class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="Delete User"
+              >
+                <KTIcon icon-name="trash" icon-class="fs-2" />
               </span>
-              <span>
-                <i
-                  @click="deleteItem(user.id, false)"
-                  class="las la-minus-circle text-gray-600 text-hover-danger mb-1 fs-2"
-                ></i>
-              </span>
+              <!--end::Delete-->
             </div>
             <!--end::Menu FLex-->
           </template>

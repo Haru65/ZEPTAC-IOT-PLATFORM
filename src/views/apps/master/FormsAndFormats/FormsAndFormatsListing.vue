@@ -22,10 +22,9 @@
       <!--begin::Card title-->
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
-        
-         <!-- YEAR WISE DATA -->
+        <!-- YEAR WISE DATA -->
 
-         <h3 class="card-title align-items-start flex-column">
+        <h3 class="card-title align-items-start flex-column">
           <span class="card-label fw-semibold text-gray-400"
             >Financial Year</span
           >
@@ -91,11 +90,7 @@
             <span class="me-2">{{ selectedIds.length }}</span
             >Selected
           </div>
-          <button
-            type="button"
-            class="btn btn-danger"
-            @click="deleteFewItem()"
-          >
+          <button type="button" class="btn btn-danger" @click="deleteFewItem()">
             Delete Selected
           </button>
         </div>
@@ -213,23 +208,31 @@
 
         <template v-slot:actions="{ row: formformat }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <router-link :to="`/forms_and_formats/edit/${formformat.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
+          <div class="d-flex flex-lg-row my-3">
+            <!--begin::Edit-->
+            <router-link :to="`/forms_and_formats/edit/${formformat.id}`">
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View Form Format"
+              >
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
+            <!--begin::Delete-->
+            <span
+              @click="deleteItem(formformat.id, false)"
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete Form Format"
+            >
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
-            <span class="menu-link px-3">
-              <i
-                @click="deleteItem(formformat.id, false)"
-                class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
-            </span>
+            <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -529,7 +532,6 @@ export default defineComponent({
     });
 
     async function handleChange() {
-      
       page.value = 1;
       localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
       await formformat_listing();
@@ -705,7 +707,12 @@ export default defineComponent({
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await FormAndFormatSearch(search.value, selectedYearCache.value ? selectedYearCache.value : financialYears.value[0]);
+        const response = await FormAndFormatSearch(
+          search.value,
+          selectedYearCache.value
+            ? selectedYearCache.value
+            : financialYears.value[0]
+        );
 
         tableData.value = response.result.data.map(({ ...rest }) => ({
           ...rest,
@@ -788,7 +795,7 @@ export default defineComponent({
       itemData,
       fillItemData,
       identifier,
-      
+
       selectedYearCache,
       financialYears,
       handleChange,

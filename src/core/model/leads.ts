@@ -1,18 +1,31 @@
 interface ILeads {
   id: number;
   enquiry_no: string;
-  lead_company: string;
-  location: {
-    city: string;
-    states: string;
-  };
+  company_name: string;
+  city: string;
+  state: string;
   name: string;
-  company_name: {
+  source: string;
+  company_details: {
     company_name: string;
   };
   mobile: string;
   created_at: string;
+  company_id: number;
 }
 
 
 export type { ILeads };
+
+export const SourcesList = [
+  {
+      id: "1",
+      source: "webapp",
+      labelValue: "Web App"
+  },
+  {
+      id: "2",
+      source: "indiamart",
+      labelValue: "India Mart"
+  }
+];

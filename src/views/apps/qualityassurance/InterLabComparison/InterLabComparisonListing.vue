@@ -22,17 +22,16 @@
       <!--begin::Card title-->
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
-        
-         <!-- YEAR WISE DATA -->
+        <!-- YEAR WISE DATA -->
 
-         <h3 class="card-title align-items-start flex-column">
+        <h3 class="card-title align-items-start flex-column">
           <span class="card-label fw-semibold text-gray-400"
             >Financial Year</span
           >
         </h3>
         <div class="me-3">
           <el-select
-          class="w-150px"
+            class="w-150px"
             filterable
             placeholder="Select Year"
             v-model="selectedYearCache"
@@ -119,6 +118,7 @@
       ></ApprovalModal>
 
       <Datatable
+        checkbox-label="id"
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
@@ -177,7 +177,7 @@
             >{{ interlaboratory.remark }}</span
           >
         </template>
-        
+
         <template v-slot:approval_status="{ row: complaints }">
           <span
             v-if="complaints.approval_status == 1"
@@ -210,23 +210,31 @@
 
         <template v-slot:actions="{ row: interlaboratory }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span class="menu-link px-3">
-              <router-link :to="`/interlaboratory/edit/${interlaboratory.id}`">
-                <i
-                  class="las la-edit text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
+          <div class="d-flex flex-lg-row my-3">
+            <!--begin::Edit-->
+            <router-link :to="`/interlaboratory/edit/${interlaboratory.id}`">
+              <span
+                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="View InterLaboratory"
+              >
+                <KTIcon icon-name="pencil" icon-class="fs-2" />
+              </span>
+            </router-link>
+            <!--end::Edit-->
+
+            <!--begin::Delete-->
+            <span
+              @click="deleteItem(interlaboratory.id, false)"
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Delete InterLaboratory"
+            >
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
-            <span class="menu-link px-3">
-              <i
-                @click="deleteItem(interlaboratory.id, false)"
-                class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
-            </span>
+            <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
-          <!--end::Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -294,9 +302,9 @@ export default defineComponent({
     const auth = useAuthStore();
     const User = auth.GetUser();
     const identifier = Identifier;
-    
+
     const authStore = useAuthStore();
-    
+
     const tableHeader = ref([
       {
         columnName: "Date",
@@ -508,7 +516,6 @@ export default defineComponent({
       }
     });
 
-
     const financialYears = ref(authStore.financialYears); // Generate Financial years list using the auth store function
     const selectedYearCache = ref(
       localStorage.getItem("selectedFinancialYear") || ""
@@ -524,7 +531,6 @@ export default defineComponent({
     });
 
     async function handleChange() {
-      
       page.value = 1;
       localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
       await interlab_listing();
@@ -536,7 +542,7 @@ export default defineComponent({
 
       await interlab_listing();
     });
-    
+
     const deleteFewItem = async () => {
       try {
         const result = await Swal.fire({
@@ -700,7 +706,12 @@ export default defineComponent({
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await InterLabComparisonSearch(search.value, selectedYearCache.value ? selectedYearCache.value : financialYears.value[0]);
+        const response = await InterLabComparisonSearch(
+          search.value,
+          selectedYearCache.value
+            ? selectedYearCache.value
+            : financialYears.value[0]
+        );
 
         tableData.value = response.result.data.map(({ ...rest }) => ({
           ...rest,
@@ -784,7 +795,7 @@ export default defineComponent({
       fillItemData,
       identifier,
       reLoadData,
-      
+
       selectedYearCache,
       financialYears,
       handleChange,

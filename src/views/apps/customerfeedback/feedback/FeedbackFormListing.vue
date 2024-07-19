@@ -75,11 +75,7 @@
             <span class="me-2">{{ selectedIds.length }}</span
             >Selected
           </div>
-          <button
-            type="button"
-            class="btn btn-danger"
-            @click="deleteFewItem()"
-          >
+          <button type="button" class="btn btn-danger" @click="deleteFewItem()">
             Delete Selected
           </button>
         </div>
@@ -111,6 +107,7 @@
 
     <div class="card-body pt-0">
       <Datatable
+        checkbox-label="id"
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
@@ -128,37 +125,24 @@
         <template v-slot:feedbacker_name="{ row: feedbackform }">
           {{ feedbackform.feedbacker_name }}
         </template>
-        <template v-slot:meta="{ row: feedbackform }">
-          <span v-if="feedbackform.meta != null">
-            {{
-              feedbackform.meta?.company_name
-                ? feedbackform.meta?.company_name
-                : ""
-            }}
+        <template v-slot:customer_company="{ row: feedbackform }">
+          <span v-if="feedbackform.customer != null">
+            {{ feedbackform.customer?.company_name || "" }}
           </span>
           <span v-else> </span>
         </template>
 
         <template v-slot:customer="{ row: feedbackform }">
-          <span v-if="feedbackform.customer !== null">
-            {{ feedbackform.customer.first_name }}
-            {{ feedbackform.customer.last_name }}
+          <span v-if="feedbackform.customer != null">
+            {{ feedbackform.customer?.name || "" }}
           </span>
-          <span v-else>
-            {{ feedbackform.customer }}
-          </span>
+          <span v-else> </span>
         </template>
 
-        <!-- <template v-slot:feedback_no="{ row: feedbackform }">
-          <span class="badge py-3 px-4 fs-7 badge-light-primary">{{
-            feedbackform.feedback_no
-          }}</span>
-        </template> -->
-
         <template v-slot:avg_rating="{ row: feedbackform }">
-          <span class="badge py-3 px-4 fs-7 badge-light-primary">{{
-            feedbackform.avg_rating
-          }}</span>
+          <span class="badge py-3 px-4 fs-7 badge-light-primary"
+            >{{ feedbackform.avg_rating }} %</span
+          >
         </template>
 
         <template v-slot:created_at="{ row: feedbackform }">
@@ -178,35 +162,23 @@
         <template v-slot:actions="{ row: feedbackform }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
-            <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="View feedback"
-            >
-              <router-link :to="`/feedbacks/edit/${feedbackform.id}`">
-                <i
-                  class="bi bi-eye text-gray-600 text-hover-primary mb-1 fs-1"
-                ></i>
-              </router-link>
-            </span>
-
             <router-link :to="`/feedbacks/edit/${feedbackform.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                data-toggle="tooltip"
+                title="View feedback"
               >
                 <KTIcon icon-name="eye" icon-class="fs-2" />
               </span>
             </router-link>
 
             <span
-              class="menu-link px-3"
-              data-toggle="tooltip"
+              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
               title="Delete feedback"
+              @click="deleteItem(feedbackform.id, false)"
             >
-              <i
-                @click="deleteItem(feedbackform.id, false)"
-                class="bi bi-trash text-gray-600 text-hover-danger mb-1 fs-2"
-              ></i>
+              <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
           </div>
           <!--end::Menu FLex-->
@@ -280,7 +252,7 @@ export default defineComponent({
       },
       {
         columnName: "Customer Name",
-        columnLabel: "meta",
+        columnLabel: "customer_company",
         sortEnabled: true,
         columnWidth: 200,
       },
@@ -290,12 +262,6 @@ export default defineComponent({
         sortEnabled: true,
         columnWidth: 200,
       },
-      // {
-      //   columnName: "Feedback No.",
-      //   columnLabel: "feedback_no",
-      //   sortEnabled: true,
-      //   columnWidth: 175,
-      // },
       {
         columnName: "Average Rating %",
         columnLabel: "avg_rating",
@@ -353,13 +319,10 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ id, customer, meta, created_at, ...rest }) => ({
+          ({ id, customer, created_at, ...rest }) => ({
             id: id,
             customer: {
               ...customer,
-            },
-            meta: {
-              ...meta,
             },
             created_at: moment(created_at).format("DD-MM-YYYY"),
             ...rest,
@@ -395,13 +358,10 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
-          ({ id, customer, meta, created_at, ...rest }) => ({
+          ({ id, customer, created_at, ...rest }) => ({
             id: id,
             customer: {
               ...customer,
-            },
-            meta: {
-              ...meta,
             },
             created_at: moment(created_at).format("DD-MM-YYYY"),
             ...rest,
@@ -451,13 +411,10 @@ export default defineComponent({
           }`
         );
         tableData.value = response.result.data.map(
-          ({ id, customer, meta, created_at, ...rest }) => ({
+          ({ id, customer, created_at, ...rest }) => ({
             id: id,
             customer: {
               ...customer,
-            },
-            meta: {
-              ...meta,
             },
             created_at: moment(created_at).format("DD-MM-YYYY"),
             ...rest,
@@ -503,7 +460,6 @@ export default defineComponent({
       await report_listing();
     });
 
-    
     const deleteFewItem = async () => {
       try {
         const result = await Swal.fire({
@@ -675,13 +631,10 @@ export default defineComponent({
         );
 
         tableData.value = response.result.data.map(
-          ({ id, customer, meta, created_at, ...rest }) => ({
+          ({ id, customer, created_at, ...rest }) => ({
             id: id,
             customer: {
               ...customer,
-            },
-            meta: {
-              ...meta,
             },
             created_at: moment(created_at).format("DD-MM-YYYY"),
             ...rest,

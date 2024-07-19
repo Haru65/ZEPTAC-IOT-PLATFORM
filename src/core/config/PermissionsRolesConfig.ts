@@ -22,9 +22,6 @@ const roles = {
     4: "Site In-Charge",
     5: "Service Enginner",
     6: "Commercial Executive",
-    7: "Customer",
-    8: "Lead",
-    9: "Client",
 };
 
 const rolesArray = Object.keys(roles).map((id) => ({

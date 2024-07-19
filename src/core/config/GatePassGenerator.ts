@@ -3,7 +3,7 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
-const rgpGen = async (id, pdfName, rgpDetails) => {
+const rgpGen = async (id, pdfName, rgpDetails, companyDetails) => {
   pdfName += `_${id}_returnable_gate_pass`;
 
   const doc = new jsPDF({
@@ -21,19 +21,15 @@ const rgpGen = async (id, pdfName, rgpDetails) => {
 
   // Company Logo Img
   const img = new Image()
-  img.src = rgpDetails.value.company_details.logo_base64;
+  img.src = companyDetails.value.logo_base64;
   doc.addImage(img, 'JPEG', 0.5, 0.7, 0.7, 0.7);
 
   // create a line under heading
   doc.setLineWidth(0.01).line(0.5, 1.5, 7.75, 1.5);
 
-  
-  const rgpDate = new Date(rgpDetails.value.date).toDateString();
-  const rgpDueDate = new Date(rgpDetails.value.duedate).toDateString();
-
   const Info = [
-    [`RGP Date : ${rgpDate}`, `#RGP No. : ${rgpDetails.value.rgp_no}`],
-    [`RGP Due Date : ${rgpDueDate}`, `Quotation No. : ${rgpDetails.value.quotation_no}`],
+    [`RGP Date : ${rgpDetails.value.date || ""}`, `#RGP No. : ${rgpDetails.value.rgp_no || ""}`],
+    [`RGP Due Date : ${rgpDetails.value.duedate || ""}`, `#Quotation No. : ${rgpDetails.value.quotation.quotation_no || ""}`],
   ];
 
   autoTable(doc, {
@@ -54,8 +50,8 @@ const rgpGen = async (id, pdfName, rgpDetails) => {
 
   const LocationData = [
     [
-      `Customer Name : ${rgpDetails.value.client_company.company_name} \nContact Person : ${rgpDetails.value.customer_data.first_name} ${rgpDetails.value.customer_data.last_name} \n\nBilling Address : ${rgpDetails.value.customer_address.address1 ? rgpDetails.value.customer_address.address1 : ""} ${rgpDetails.value.customer_address.address2 ? rgpDetails.value.customer_address.address2 : ""} ${rgpDetails.value.customer_address.city ? rgpDetails.value.customer_address.city : ""} - ${rgpDetails.value.customer_address.pincode ? rgpDetails.value.customer_address.pincode : ""}, ${rgpDetails.value.customer_address.states ? rgpDetails.value.customer_address.states : ""}, ${rgpDetails.value.customer_address.country ? rgpDetails.value.customer_address.country : ""}`,
-      `Client Name : ${rgpDetails.value.client_company.company_name} \nContact Person : ${rgpDetails.value.client_data.first_name} ${rgpDetails.value.client_data.last_name} \n\nSite Address : ${rgpDetails.value.client_address.address1 ? rgpDetails.value.client_address.address1 : ""} ${rgpDetails.value.client_address.address2 ? rgpDetails.value.client_address.address2 : ""} ${rgpDetails.value.client_address.city ? rgpDetails.value.client_address.city : ""} - ${rgpDetails.value.client_address.pincode ? rgpDetails.value.client_address.pincode : ""}, ${rgpDetails.value.client_address.states ? rgpDetails.value.client_address.states : ""}, ${rgpDetails.value.client_address.country ? rgpDetails.value.client_address.country : ""}`
+      `Customer Name : ${rgpDetails.value.quotation.customer.company_name || ''} \nContact Person : ${rgpDetails.value.quotation.customer.name || ''} \n\nBilling Address : ${rgpDetails.value.quotation.customer.address1 || ""} \n${rgpDetails.value.quotation.customer.address2 || ""} \n${rgpDetails.value.quotation.customer.city || ""} ${rgpDetails.value.quotation.customer.pincode || ""} \n${rgpDetails.value.quotation.customer.state || ""} ${rgpDetails.value.quotation.customer.country || ""}`,
+      `Client Name : ${rgpDetails.value.quotation.clientx.company_name || ''} \nContact Person : ${rgpDetails.value.quotation.clientx.name || ''} \n\nSite Address : ${rgpDetails.value.quotation.clientx.address1 || ""} \n${rgpDetails.value.quotation.clientx.address2 || ""} \n${rgpDetails.value.quotation.clientx.city || ""} ${rgpDetails.value.quotation.clientx.pincode || ""} \n${rgpDetails.value.quotation.clientx.state || ""} ${rgpDetails.value.quotation.clientx.country || ""}`
     ]
   ];
 
@@ -74,23 +70,20 @@ const rgpGen = async (id, pdfName, rgpDetails) => {
     },
   });
 
-  const service_engineers = await rgpDetails.value.engineers.map(({ first_name, last_name, mobile }, index) => ({
+  const service_engineers = await rgpDetails.value.Engineers.map(({ first_name, last_name, mobile }, index) => ({
     index: index + 1,
-    name: `${first_name} ${last_name}`,
+    first_name: first_name,
+    last_name: last_name,
     mobile: mobile
   }));
 
-  console.log("->", service_engineers)
-  
-  const engData = await service_engineers.map(engineer => [engineer.index, engineer.name, engineer.mobile]);
-  
-  
-  console.log("->", engData)
+  const engData = await service_engineers.map(engineer => [engineer.index, engineer.first_name, engineer.last_name, engineer.mobile]);
 
   const engineerData = [
     [
       "Sr. No",
-      "Service Engineer Name",
+      "First Name",
+      "Last Name",
       "Mobile No.",
     ],
     ...engData,
@@ -114,7 +107,7 @@ const rgpGen = async (id, pdfName, rgpDetails) => {
 
   });
 
-  const instruments = rgpDetails.value.instruments.map(({name , instrument_id, model_no, serial_no, make, accessories_list }, index) => ({
+  const instruments = rgpDetails.value.Instruments.map(({name , instrument_id, model_no, serial_no, make, accessories_list }, index) => ({
     index: index+1,
     name,
     instrument_id,

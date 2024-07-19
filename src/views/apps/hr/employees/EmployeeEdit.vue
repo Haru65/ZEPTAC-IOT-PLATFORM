@@ -429,7 +429,7 @@
                 <div v-if="state.length" class="col-lg fv-row">
                   <div>
                     <el-select
-                      v-model="profileDetails.states"
+                      v-model="profileDetails.state"
                       filterable
                       placeholder="Select Your State..."
                     >
@@ -450,7 +450,7 @@
                       name="state"
                       class="form-control form-control-lg form-control-solid"
                       placeholder="Enter State Name"
-                      v-model="profileDetails.states"
+                      v-model="profileDetails.state"
                     />
                     <div class="fv-plugins-message-container">
                       <div class="fv-help-block">
@@ -1243,7 +1243,7 @@ interface ProfileDetails {
   address1: string;
   address2: string;
   country: string;
-  states: string;
+  state: string;
   pincode: string;
   city: string;
   dob: string;
@@ -1252,6 +1252,9 @@ interface ProfileDetails {
   pan: string;
   company_id: string;
   updated_by: string;
+
+  is_active: string;
+  availability: string;
 
   allPermissions: Array<Permission>;
 }
@@ -1373,7 +1376,7 @@ export default defineComponent({
         address1: response.meta.address1 ? response.meta.address1 : "",
         address2: response.meta.address2 ? response.meta.address2 : "",
         country: response.meta.country ? response.meta.country : "",
-        states: response.meta.states ? response.meta.states : "",
+        state: response.meta.state ? response.meta.state : "",
         city: response.meta.city ? response.meta.city : "",
         pincode: response.meta.pincode ? response.meta.pincode : "",
         dob: response.meta.dob ? response.meta.dob : "",
@@ -1382,6 +1385,8 @@ export default defineComponent({
         pan: response.meta.pan ? response.meta.pan : "",
         company_id: response.company_id ? response.company_id : "",
         updated_by: User.id,
+        is_active: response.is_active,
+        availability: response.availability,
         allPermissions: response.allPermissions ? response.allPermissions : [],
       };
     };
@@ -1453,7 +1458,7 @@ export default defineComponent({
       address1: "",
       address2: "",
       country: "",
-      states: "",
+      state: "",
       city: "",
       pincode: "",
       dob: "",
@@ -1462,6 +1467,9 @@ export default defineComponent({
       pan: "",
       company_id: "",
       updated_by: User.id,
+
+      is_active: "",
+      availability: "",
 
       allPermissions: [],
     });
@@ -1473,13 +1481,13 @@ export default defineComponent({
           state.value.pop();
         }
         if (newVal === "India") {
-          // profileDetails.value.states = "";
+          // profileDetails.value.state = "";
           INstates.forEach((ele) => {
             state.value.push(ele.name);
           });
           //console.log(state);
         } else {
-          // profileDetails.value.states = "";
+          // profileDetails.value.state = "";
         }
       }
     );
@@ -2078,7 +2086,7 @@ export default defineComponent({
         whatsapp_no: "",
         address1: "",
         address2: "",
-        states: "",
+        state: "",
         city: " ",
         country: "",
         pincode: "",
@@ -2088,6 +2096,9 @@ export default defineComponent({
         pan: "",
         company_id: "",
         updated_by: User.id,
+
+        is_active: "1",
+        availability: "1",
 
         allPermissions: [],
       };
