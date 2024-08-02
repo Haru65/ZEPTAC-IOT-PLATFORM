@@ -16,7 +16,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         heading: "Dashboard",
         route: "/dashboard",
-        keenthemesIcon: "element-1",
+        keenthemesIcon: "element-11",
         bootstrapIcon: "bi-app-indicator",
       },
     ],
@@ -28,7 +28,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Validation Service",
         route: "/",
-        keenthemesIcon: "element-plus",
+        keenthemesIcon: "abstract-35",
         bootstrapIcon: "bi-archive",
         sub: [
           {
@@ -49,7 +49,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Non-NABL Report",
         route: "/",
-        keenthemesIcon: "element-plus",
+        keenthemesIcon: "tablet-text-up",
         bootstrapIcon: "bi-archive",
 
         sub: [
@@ -67,7 +67,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "NABL Report",
         route: "/",
-        keenthemesIcon: "element-plus",
+        keenthemesIcon: "file-added",
         bootstrapIcon: "bi-archive",
 
         sub: [
@@ -85,7 +85,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "External Audit",
         route: "/",
-        keenthemesIcon: "element-plus",
+        keenthemesIcon: "tablet-ok",
         bootstrapIcon: "bi-archive",
 
         sub: [
@@ -109,7 +109,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Thermal Report",
         route: "/thermalreport",
-        keenthemesIcon: "wrench",
+        keenthemesIcon: "chart-pie-4",
         bootstrapIcon: "bi-archive",
         sub: [
           {
@@ -125,7 +125,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Thermal Instrument",
         route: "/thermalinstrument",
-        keenthemesIcon: "office-bag",
+        keenthemesIcon: "thermometer",
         bootstrapIcon: "bi-archive",
         sub: [
           {
@@ -147,7 +147,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Leads",
         route: "/sales/leads",
-        keenthemesIcon: "people",
+        keenthemesIcon: "user-tick",
         bootstrapIcon: "bi-archive",
         sub: [
           {
@@ -179,7 +179,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Clients",
         route: "/clients",
-        keenthemesIcon: "user-edit",
+        keenthemesIcon: "profile-user",
         bootstrapIcon: "bi-archive",
         sub: [
           {
@@ -195,7 +195,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Price List Items",
         route: "/pricelist",
-        keenthemesIcon: "bill",
+        keenthemesIcon: "notification-status",
         bootstrapIcon: "bi-archive",
         sub: [
           {
@@ -227,7 +227,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Invoices",
         route: "/invoices",
-        keenthemesIcon: "message-programming",
+        keenthemesIcon: "menu",
         bootstrapIcon: "bi-archive",
         sub: [
           {
@@ -243,7 +243,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         heading: "Service Request Form",
         route: "/srf/list",
-        keenthemesIcon: "educare",
+        keenthemesIcon: "abstract-26",
         bootstrapIcon: "bi-archive",
       },
     ],
@@ -255,7 +255,7 @@ const AdminMenuConfig: Array<MenuItem> = [
 
       {
         sectionTitle: "Master List",
-        keenthemesIcon: "document",
+        keenthemesIcon: "text-circle",
         route: "/masterlist",
         bootstrapIcon: "bi-archive",
         sub: [
@@ -289,7 +289,7 @@ const AdminMenuConfig: Array<MenuItem> = [
 
       {
         sectionTitle: "Instrument Management",
-        keenthemesIcon: "document",
+        keenthemesIcon: "switch",
         route: "/",
         bootstrapIcon: "bi-archive",
         sub: [
@@ -316,7 +316,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Internal Audit",
         route: "/internalaudit",
-        keenthemesIcon: "document",
+        keenthemesIcon: "share",
         bootstrapIcon: "bi-archive",
         sub: [
           {
@@ -334,7 +334,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Management Review",
         route: "/",
-        keenthemesIcon: "educare",
+        keenthemesIcon: "file-sheet",
         bootstrapIcon: "bi-archive",
         sub: [
           {
@@ -352,7 +352,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Quality Documentation",
         route: "/",
-        keenthemesIcon: "document",
+        keenthemesIcon: "wallet",
         bootstrapIcon: "bi-archive",
         sub: [
           {
@@ -395,7 +395,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         heading: "Planner",
         route: "/plan",
-        keenthemesIcon: "educare",
+        keenthemesIcon: "calendar-tick",
         bootstrapIcon: "bi-archive",
       },
 
@@ -403,7 +403,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         heading: "CheckList",
         route: "/checklist",
-        keenthemesIcon: "educare",
+        keenthemesIcon: "questionnaire-tablet",
         bootstrapIcon: "bi-archive",
       },
 
@@ -411,7 +411,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         heading: "Suppliers",
         route: "/suppliers",
-        keenthemesIcon: "educare",
+        keenthemesIcon: "delivery-3",
         bootstrapIcon: "bi-archive",
       },
 
@@ -419,7 +419,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Quality Assurance",
         route: "/",
-        keenthemesIcon: "wrench",
+        keenthemesIcon: "award",
         bootstrapIcon: "bi-archive",
         sub: [
           {
@@ -479,7 +479,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Employees Management",
         route: "/",
-        keenthemesIcon: "office-bag",
+        keenthemesIcon: "faceid",
         bootstrapIcon: "bi-archive",
         sub: [
           {
@@ -561,7 +561,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Users",
         route: "/users",
-        keenthemesIcon: "profile-user",
+        keenthemesIcon: "user",
         bootstrapIcon: "bi-archive",
         sub: [
           {
@@ -577,7 +577,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Modules",
         route: "/module_manager",
-        keenthemesIcon: "setting-3",
+        keenthemesIcon: "data",
         bootstrapIcon: "bi-archive",
         sub: [
           {
@@ -589,7 +589,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Permission",
         route: "/permission_manager",
-        keenthemesIcon: "setting-4",
+        keenthemesIcon: "check-square",
         bootstrapIcon: "bi-archive",
         sub: [
           {
@@ -601,7 +601,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "Activity Logger",
         route: "/activity_logger",
-        keenthemesIcon: "setting-4",
+        keenthemesIcon: "notepad-edit",
         bootstrapIcon: "bi-archive",
         sub: [
           {
@@ -613,7 +613,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       {
         sectionTitle: "ISO Rules",
         route: "/iso",
-        keenthemesIcon: "setting-4",
+        keenthemesIcon: "setting-3",
         bootstrapIcon: "bi-archive",
         sub: [
           {

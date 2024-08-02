@@ -433,22 +433,33 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      let response = await getQMSProcedure(itemId.toString());
-      console.log(response);
-      documentDetails.value = {
-        document_section: response.document_section,
-        document_name: response.document_name,
-        issue_date: response.issue_date,
-        amendment_date: response.amendment_date,
-        storage_medium: response.storage_medium,
-        responsible_person: response.responsible_person,
-        approval_status: response.approval_status,
-        document_file: response.document_file ? response.document_file : "",
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+      try {
+        const response = await getQMSProcedure(itemId.toString());
+        if (response?.success) {
+          documentDetails.value = {
+            document_section: response.result.document_section,
+            document_name: response.result.document_name,
+            issue_date: response.result.issue_date,
+            amendment_date: response.result.amendment_date,
+            storage_medium: response.result.storage_medium,
+            responsible_person: response.result.responsible_person,
+            approval_status: response.result.approval_status,
+            document_file: response.result.document_file ? response.result.document_file : "",
+            company_id: response.result.company_id ? response.result.company_id : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getQMSProcedure : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getQMSProcedure : ${err}`);
+      }
     });
 
     /* --------SET DATE LOGIC--------*/

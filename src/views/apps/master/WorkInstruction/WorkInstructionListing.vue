@@ -407,11 +407,17 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -439,11 +445,17 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -486,12 +498,19 @@ export default defineComponent({
               : financialYears.value[0]
           }`
         );
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
 
-        more.value = response.result.next_page_url != null ? true : false;
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
+
+          more.value = response.result.next_page_url != null ? true : false;
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -714,10 +733,16 @@ export default defineComponent({
             : financialYears.value[0]
         );
 
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

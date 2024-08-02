@@ -1081,6 +1081,13 @@ export default defineComponent({
           companyInfo.value.logo_base64 = res2.result.logo_base64
             ? "data: image/png;base64," + res2.result.logo_base64
             : getAssetPath("media/avatars/default.png");
+
+          companyInfo.value.address = res2.result.address || "";
+          companyInfo.value.city = res2.result.city || "";
+          companyInfo.value.pincode = res2.result.pincode || "";
+          companyInfo.value.state = res2.result.state || "";
+          companyInfo.value.country = res2.result.country || "";
+
         } else {
           showErrorAlert("Error", res2.message || "Error Occured");
           return;
@@ -1114,7 +1121,7 @@ export default defineComponent({
           allowOutsideClick: true,
         });
       } catch (error) {
-        console.error("Error downloading Non-NABL Report:", error);
+        console.error("Error downloading Invoice:", error);
 
         // Close Swal on success
         Swal.fire({

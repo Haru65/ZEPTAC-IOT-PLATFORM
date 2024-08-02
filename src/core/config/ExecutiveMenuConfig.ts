@@ -14,7 +14,7 @@ export interface MenuItem {
         {
           heading: "Dashboard",
           route: "dashboard",
-          keenthemesIcon: "element-1",
+          keenthemesIcon: "element-11",
           bootstrapIcon: "bi-app-indicator",
         },
       ],
@@ -27,7 +27,7 @@ export interface MenuItem {
           {
             sectionTitle: "Non-NABL Report",
             route: "/",
-            keenthemesIcon: "element-plus",
+            keenthemesIcon: "tablet-text-up",
             bootstrapIcon: "bi-archive",
     
             sub: [
@@ -45,7 +45,7 @@ export interface MenuItem {
           {
             sectionTitle: "NABL Report",
             route: "/",
-            keenthemesIcon: "element-plus",
+            keenthemesIcon: "tablet-text-up",
             bootstrapIcon: "bi-archive",
     
             sub: [
@@ -65,7 +65,7 @@ export interface MenuItem {
           {
             sectionTitle: "External Audit",
             route: "/",
-            keenthemesIcon: "element-plus",
+            keenthemesIcon: "tablet-ok",
             bootstrapIcon: "bi-archive",
     
             sub: [
@@ -93,7 +93,7 @@ export interface MenuItem {
           {
             sectionTitle: "Thermal Report",
             route: "/thermalreport",
-            keenthemesIcon: "wrench",
+            keenthemesIcon: "chart-pie-4",
             bootstrapIcon: "bi-archive",
             sub: [
               {
@@ -109,7 +109,7 @@ export interface MenuItem {
           {
             sectionTitle: "Thermal Instrument",
             route: "/thermalinstrument",
-            keenthemesIcon: "office-bag",
+            keenthemesIcon: "thermometer",
             bootstrapIcon: "bi-archive",
             sub: [
               {
@@ -135,7 +135,7 @@ export interface MenuItem {
     
           {
             sectionTitle: "Master List",
-            keenthemesIcon: "document",
+            keenthemesIcon: "text-circle",
             route: "/masterlist",
             bootstrapIcon: "bi-archive",
             sub: [
@@ -169,7 +169,7 @@ export interface MenuItem {
     
           {
             sectionTitle: "Instrument Management",
-            keenthemesIcon: "document",
+            keenthemesIcon: "switch",
             route: "/",
             bootstrapIcon: "bi-archive",
             sub: [
@@ -196,7 +196,7 @@ export interface MenuItem {
           {
             sectionTitle: "Internal Audit",
             route: "/internalaudit",
-            keenthemesIcon: "document",
+            keenthemesIcon: "share",
             bootstrapIcon: "bi-archive",
             sub: [
               {
@@ -214,7 +214,7 @@ export interface MenuItem {
           {
             sectionTitle: "Management Review",
             route: "/",
-            keenthemesIcon: "educare",
+            keenthemesIcon: "file-sheet",
             bootstrapIcon: "bi-archive",
             sub: [
               {
@@ -232,7 +232,7 @@ export interface MenuItem {
           {
             sectionTitle: "Quality Documentation",
             route: "/",
-            keenthemesIcon: "document",
+            keenthemesIcon: "wallet",
             bootstrapIcon: "bi-archive",
             sub: [
               {
@@ -275,7 +275,7 @@ export interface MenuItem {
           {
             heading: "Planner",
             route: "/plan",
-            keenthemesIcon: "educare",
+            keenthemesIcon: "calendar-tick",
             bootstrapIcon: "bi-archive",
           },
     
@@ -283,7 +283,7 @@ export interface MenuItem {
           {
             heading: "CheckList",
             route: "/checklist",
-            keenthemesIcon: "educare",
+            keenthemesIcon: "questionnaire-tablet",
             bootstrapIcon: "bi-archive",
           },
     
@@ -291,7 +291,7 @@ export interface MenuItem {
           {
             heading: "Suppliers",
             route: "/suppliers",
-            keenthemesIcon: "educare",
+            keenthemesIcon: "delivery-3",
             bootstrapIcon: "bi-archive",
           },
     
@@ -299,7 +299,7 @@ export interface MenuItem {
           {
             sectionTitle: "Quality Assurance",
             route: "/",
-            keenthemesIcon: "wrench",
+            keenthemesIcon: "award",
             bootstrapIcon: "bi-archive",
             sub: [
               {
@@ -359,7 +359,7 @@ export interface MenuItem {
           {
             sectionTitle: "Employees Management",
             route: "/",
-            keenthemesIcon: "office-bag",
+            keenthemesIcon: "faceid",
             bootstrapIcon: "bi-archive",
             sub: [
               {

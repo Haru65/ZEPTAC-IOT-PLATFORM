@@ -16,7 +16,7 @@ export interface MenuItem {
         {
           heading: "Dashboard",
           route: "/",
-          keenthemesIcon: "element-1",
+          keenthemesIcon: "element-11",
           bootstrapIcon: "bi-app-indicator",
         },
       ],
@@ -28,7 +28,7 @@ export interface MenuItem {
         {
           sectionTitle: "Validation Service",
           route: "/",
-          keenthemesIcon: "element-plus",
+          keenthemesIcon: "abstract-35",
           bootstrapIcon: "bi-archive",
           sub: [
             {
@@ -43,7 +43,7 @@ export interface MenuItem {
         {
           sectionTitle: "External Audit",
           route: "/",
-          keenthemesIcon: "element-plus",
+          keenthemesIcon: "tablet-ok",
           bootstrapIcon: "bi-archive",
   
           sub: [

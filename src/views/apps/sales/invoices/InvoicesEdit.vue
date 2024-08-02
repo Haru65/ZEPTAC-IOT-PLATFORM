@@ -1385,22 +1385,6 @@ export default defineComponent({
 
     /* -------- GENERATE PDF LOGIC --------*/
 
-    const generatePdf = async (pdfName: string) => {
-      const res2 = await getCompanyLogo(InvoiceDetails.value.company_id);
-
-      InvoiceDetails.value.company_details.id = res2.id;
-      InvoiceDetails.value.company_details.company_name = res2.company_name;
-      InvoiceDetails.value.company_details.company_logo = res2.company_logo
-        ? res2.company_logo
-        : "";
-      InvoiceDetails.value.company_details.logo_base64 = res2.logo_base64
-        ? "data: image/png;base64," + res2.logo_base64
-        : getAssetPath("media/avatars/default.png");
-
-      // console.log(InvoiceDetails.value);
-      await Gen("invoice", InvoiceId.toString(), pdfName, InvoiceDetails);
-    };
-
     function areAllPropertiesNull(array) {
       return array.some((detail) => {
         const {
@@ -1640,7 +1624,6 @@ export default defineComponent({
       InvoiceStatusArray,
       GetInvoiceStatus,
       Total,
-      generatePdf,
       SetLocation,
       SetPerDayCharge,
       SetDays,

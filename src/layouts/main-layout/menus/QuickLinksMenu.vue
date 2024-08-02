@@ -27,7 +27,7 @@
           to="/leads/add"
           class="d-flex flex-column flex-center h-100 p-6 bg-hover-light border-end border-bottom"
         >
-          <KTIcon icon-name="people" icon-class="fs-3x text-success mb-2" />
+          <KTIcon icon-name="user-tick" icon-class="fs-3x text-success mb-2" />
           <span class="fs-5 fw-semobold text-gray-800 mb-0">Lead</span>
           <span class="fs-7 text-primary-400">generate lead</span>
         </router-link>
@@ -53,7 +53,7 @@
           to="/clients/add"
           class="d-flex flex-column flex-center h-100 p-6 bg-hover-light border-end"
         >
-          <KTIcon icon-name="user-edit" icon-class="fs-3x text-success mb-2" />
+          <KTIcon icon-name="profile-user" icon-class="fs-3x text-success mb-2" />
           <span class="fs-5 fw-semobold text-gray-800 mb-0">Client</span>
           <span class="fs-7 text-primary-400">add new client</span>
         </router-link>
@@ -67,7 +67,7 @@
           class="d-flex flex-column flex-center h-100 p-6 bg-hover-light"
         >
           <KTIcon
-            icon-name="text-circle"
+            icon-name="notification-status"
             icon-class="fs-3x text-success mb-2"
           />
           <span class="fs-5 fw-semobold text-gray-800 mb-0">PriceList</span>

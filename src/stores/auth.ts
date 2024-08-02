@@ -48,10 +48,10 @@ export const useAuthStore = defineStore("auth", () => {
     let startYear, endYear;
 
 
-    if (ftype == "1") { // January - December
+    if (ftype == 1) { // January - December
       startYear = currentYear;
       endYear = startYear;
-    } else if (ftype == "2") { // April - March
+    } else if (ftype == 2) { // April - March
       if (currentMonth >= 4) {
         startYear = currentYear;
         endYear = currentYear + 1;
@@ -160,10 +160,13 @@ export const useAuthStore = defineStore("auth", () => {
         // If there is no local financial year type, initialize it with the actual value
         financialYearType.value = user.value.company_details["financial_year_type"];
         localStorage.setItem('financialYearType', user.value.company_details["financial_year_type"]);
-
+        
+        financialYearsCache.value = getAcademicYears(5, localStorage.getItem('financialYearType') || user.value.company_details['financial_year_type'] || 2);
+        
         // Also initialize the selected academic year
         selectedFinancialYear.value = getCurrentFinancialYear(user.value.company_details["financial_year_type"]);
         localStorage.setItem('selectedFinancialYear', selectedFinancialYear.value);
+
 
       })
       .catch(({ response }) => {
@@ -230,7 +233,7 @@ export const useAuthStore = defineStore("auth", () => {
   const financialYears = computed(() => {
     if (financialYearsCache.value.length === 0) {
       // Get academic years for the next 5 years based on the company financial year type
-      financialYearsCache.value = getAcademicYears(5, localStorage.getItem('financialYearType') || user.value.company_details['financial_year_type']);
+      financialYearsCache.value = getAcademicYears(5, localStorage.getItem('financialYearType') || user.value.company_details['financial_year_type'] || 2);
     }
     return financialYearsCache.value;
   });

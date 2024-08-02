@@ -2,7 +2,8 @@
     <div class="container mt-4">
         <div class="row justify-content-center">
           <h1>Icons</h1>  
-        <div v-for="(value, key) in data" :key="key" class="rounded border p-2 gap-2 m-2 col-6 col-sm-4 col-md-3 col-lg-2 d-flex justify-content-center">
+        <div v-for="(value, key, index) in data" :key="key" class="rounded border p-2 gap-2 m-2 col-6 col-sm-4 col-md-3 col-lg-2 d-flex justify-content-center">
+          <p class="col">{{index}}</p>
           <KTIcon :icon-name="key" icon-class="fs-3tx" />
         </div>
       </div>

@@ -16,7 +16,7 @@ export interface MenuItem {
         {
           heading: "Dashboard",
           route: "/",
-          keenthemesIcon: "element-1",
+          keenthemesIcon: "element-11",
           bootstrapIcon: "bi-app-indicator",
         },
       ],
@@ -28,7 +28,7 @@ export interface MenuItem {
         {
           sectionTitle: "Leads",
           route: "/sales/leads",
-          keenthemesIcon: "people",
+          keenthemesIcon: "user-tick",
           bootstrapIcon: "bi-archive",
           sub: [
             {
@@ -60,7 +60,7 @@ export interface MenuItem {
         {
           sectionTitle: "Clients",
           route: "/clients",
-          keenthemesIcon: "user-edit",
+          keenthemesIcon: "profile-user",
           bootstrapIcon: "bi-archive",
           sub: [
             {
@@ -76,7 +76,7 @@ export interface MenuItem {
         {
           sectionTitle: "Price List Items",
           route: "/pricelist",
-          keenthemesIcon: "bill",
+          keenthemesIcon: "notification-status",
           bootstrapIcon: "bi-archive",
           sub: [
             {
@@ -108,7 +108,7 @@ export interface MenuItem {
         {
           sectionTitle: "Invoices",
           route: "/invoices",
-          keenthemesIcon: "message-programming",
+          keenthemesIcon: "menu",
           bootstrapIcon: "bi-archive",
           sub: [
             {
@@ -124,7 +124,7 @@ export interface MenuItem {
         {
           heading: "Service Request Form",
           route: "/srf/list",
-          keenthemesIcon: "educare",
+          keenthemesIcon: "abstract-26",
           bootstrapIcon: "bi-archive",
         },
       ],

@@ -1987,12 +1987,15 @@ export async function TrainingSearch(search: any, year: any) {
 
 // Dashboard Routes
 
-export async function enquiryGen(company_id, yearOptions) {
+export async function enquiryGen(company_id:any, year: any) {
     try {
-      const id = { "company_id": company_id, "years": yearOptions };
-  
+        const data = {
+            company_id: company_id,
+            year: year
+        }
+
       ApiService.setHeader();
-      const response = await ApiService.post('enquiry_generated', id);
+      const response = await ApiService.post('enquiry_generated', data);
       return response.data;
     } catch (errors) {
       console.error(errors);
@@ -2000,12 +2003,15 @@ export async function enquiryGen(company_id, yearOptions) {
     }
   }
 
-export async function quotationSent(company_id, yearOptions) {
+  export async function quotationSent(company_id:any, year: any) {
     try {
-      const id = { "company_id": company_id, "years": yearOptions };
-  
+        const data = {
+            company_id: company_id,
+            year: year
+        }
+
       ApiService.setHeader();
-      const response = await ApiService.post('quotation_sent', id);
+      const response = await ApiService.post('quotation_sent', data);
       return response.data;
     } catch (errors) {
       console.error(errors);
@@ -2013,12 +2019,16 @@ export async function quotationSent(company_id, yearOptions) {
     }
   }
 
-export async function leadConversion(company_id, yearOptions) {
+
+  export async function leadConversion(company_id:any, year: any) {
     try {
-      const id = { "company_id": company_id, "years": yearOptions };
-  
+        const data = {
+            company_id: company_id,
+            year: year
+        }
+
       ApiService.setHeader();
-      const response = await ApiService.post('lead_conversion', id);
+      const response = await ApiService.post('lead_conversion', data);
       return response.data;
     } catch (errors) {
       console.error(errors);
@@ -2026,12 +2036,15 @@ export async function leadConversion(company_id, yearOptions) {
     }
   }
 
-export async function salesDone(company_id, yearOptions) {
+  export async function salesDone(company_id:any, year: any) {
     try {
-      const id = { "company_id": company_id, "years": yearOptions };
-  
+        const data = {
+            company_id: company_id,
+            year: year
+        }
+
       ApiService.setHeader();
-      const response = await ApiService.post('sales_done', id);
+      const response = await ApiService.post('sales_done', data);
       return response.data;
     } catch (errors) {
       console.error(errors);
@@ -3450,9 +3463,9 @@ export async function getQMSProcedures(data) {
         ApiService.setHeader();
         const response = await ApiService.listingget(QMS_PROCEDURE_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3467,9 +3480,9 @@ export async function QMSProcedureSearch(search: any, year: any) {
         ApiService.setHeader();
         const response = await ApiService.post('qms_search', data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3492,7 +3505,7 @@ export async function getQMSProcedure(data: any) {
         ApiService.setHeader();
         const response = await ApiService.get(QMS_PROCEDURE_URL, data);
         console.log(response.data.result)
-        return response.data.result;
+        return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
         return { success: false, message: errors?.response?.data?.message || "An error occurred" };
@@ -3556,9 +3569,9 @@ export async function getWorkInstructions(data) {
         ApiService.setHeader();
         const response = await ApiService.listingget(WORK_INSTRUCTION_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3573,9 +3586,9 @@ export async function WorkInstructionSearch(search: any, year:any) {
         ApiService.setHeader();
         const response = await ApiService.post('work_instruction_search', data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3598,7 +3611,7 @@ export async function getWorkInstruction(data: any) {
         ApiService.setHeader();
         const response = await ApiService.get(WORK_INSTRUCTION_URL, data);
         console.log(response.data.result)
-        return response.data.result;
+        return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
         return { success: false, message: errors?.response?.data?.message || "An error occurred" };
@@ -5291,6 +5304,8 @@ export async function uploadImage(fileData: FormData, onUploadProgress: UploadPr
             onUploadProgress: onUploadProgress,
         });
 
+        console.log(onUploadProgress);
+        
         return response.data;
     } catch (errors) {
         console.error(errors);

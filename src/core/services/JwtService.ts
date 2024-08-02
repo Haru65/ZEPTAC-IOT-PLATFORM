@@ -1,6 +1,6 @@
 const ID_TOKEN_KEY = "id_token" as string;
 const USER = "user" as string;
-const SELECTED_ACADEMIC_YEAR = "selectedAcademicYear" as string;
+const SELECTED_ACADEMIC_YEAR = "selectedFinancialYear" as string;
 const FINANCIAL_YEAR_TYPE = "financialYearType" as string;
 const ALERT = "alertDismissed" as string;
 
