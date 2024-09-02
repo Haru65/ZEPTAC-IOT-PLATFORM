@@ -955,10 +955,7 @@
           </div>
           <div class="modal-footer flex-center">
             <!--begin::Button-->
-            <span
-              @click="clear"
-              class="btn btn-lg btn-danger w-sd-25 w-lg-25"
-            >
+            <span @click="clear" class="btn btn-lg btn-danger w-sd-25 w-lg-25">
               Discard
             </span>
             <!--end::Button-->
@@ -1171,15 +1168,29 @@ export default defineComponent({
     });
 
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-          }))
-        );
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if(response.success){
+          if (response.result != null && response.result) {
+          Companies.value.push(
+            ...response.result?.map(({ created_at, ...rest }) => ({
+              ...rest,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+            }))
+          );
+        }
+        }
+        else{
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
@@ -1781,7 +1792,7 @@ export default defineComponent({
 
     const submit = async () => {
       console.log(itemDetails.value);
-        loading.value = true;
+      loading.value = true;
 
       const result = areAllPropertiesNull([itemDetails.value]);
 

@@ -403,6 +403,15 @@ export default defineComponent({
 
       scope_of_work: string;
       terms_and_conditions: string;
+
+      sub_total: number;
+
+      tax_id: string;
+      tax_type: string;
+      tax_description: string;
+      tax_rate: number;
+      tax_amount: number;
+
       total: number;
       lead: Data;
       client: Data;
@@ -465,6 +474,14 @@ export default defineComponent({
         pincode: "",
         country: "",
       },
+
+      sub_total: 0,
+      tax_id: "",
+      tax_type: "",
+      tax_description: "",
+      tax_rate: 0,
+      tax_amount: 0,
+
       total: 0,
       is_active: 1,
       company_id: User.company_id,
@@ -893,7 +910,15 @@ export default defineComponent({
             status: "1",
             scope_of_work: response.scope_of_work,
             terms_and_conditions: response.terms_and_conditions,
+
+            sub_total: response.sub_total,
+            tax_id: response.tax_id,
+            tax_type: response.tax_type,
+            tax_description: response.tax_description,
+            tax_rate: response.tax_rate,
+            tax_amount: response.tax_amount,
             total: response.total,
+
             lead: {
               id: response.customer_id,
               name: "",
@@ -1008,6 +1033,14 @@ export default defineComponent({
         pincode: "",
         country: "",
       },
+
+      sub_total: 0,
+      tax_id: 0,
+      tax_type: "",
+      tax_description: "",
+      tax_rate: 0,
+      tax_amount: 0,
+
       total: 0,
       company_id: "",
     });
@@ -1055,7 +1088,28 @@ export default defineComponent({
           QuotationInfo.value.enquiry_no = res.result.enquiry_no;
           QuotationInfo.value.status = res.result.status;
           QuotationInfo.value.scope_of_work = res.result.scope_of_work;
-          QuotationInfo.value.total = res.result.total;
+
+          QuotationInfo.value.sub_total = res.result.sub_total
+            ? res.result.sub_total
+            : 0.0;
+          QuotationInfo.value.tax_id = res.result.tax_id
+            ? res.result.tax_id
+            : "";
+          QuotationInfo.value.tax_type = res.result.tax_type
+            ? res.result.tax_type
+            : "";
+          QuotationInfo.value.tax_description = res.result.tax_description
+            ? res.result.tax_description
+            : "";
+          QuotationInfo.value.tax_rate = res.result.tax_rate
+            ? res.result.tax_rate
+            : "";
+          QuotationInfo.value.tax_amount = res.result.tax_amount
+            ? res.result.tax_amount
+            : "";
+
+          QuotationInfo.value.total = res.result.total ? res.result.total : 0.0;
+
           QuotationInfo.value.terms_and_conditions =
             res.result.terms_and_conditions;
         } else {
@@ -1076,7 +1130,7 @@ export default defineComponent({
           companyInfo.value.logo_base64 = res2.result.logo_base64
             ? "data: image/png;base64," + res2.result.logo_base64
             : getAssetPath("media/avatars/default.png");
-            
+
           companyInfo.value.address = res2.result.address || "";
           companyInfo.value.city = res2.result.city || "";
           companyInfo.value.pincode = res2.result.pincode || "";

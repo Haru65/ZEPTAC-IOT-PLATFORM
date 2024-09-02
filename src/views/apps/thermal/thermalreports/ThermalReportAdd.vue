@@ -479,11 +479,12 @@
 
             <div class="card-header border-0 pt-6">
               <!--begin::Card title-->
-              <div class="card-title d-flex gap-4">
+              <div class="card-title flex-md-row flex-lg-row flex-column gap-6">
                 <div class="d-flex align-items-center position-relative my-3">
                   <el-select
                     name="fromInstrumentId"
                     v-model="fromInstrumentId"
+                    class="mw-250px"
                     placeholder="From Instrument ID"
                     @change="handleFrom"
                   >
@@ -501,6 +502,7 @@
                     name="toInstrumentId"
                     filterable
                     placeholder="To Instrument ID"
+                    class="mw-250px"
                     v-model="toInstrumentId"
                     :disabled="disabelRef"
                     @change="handleTo"

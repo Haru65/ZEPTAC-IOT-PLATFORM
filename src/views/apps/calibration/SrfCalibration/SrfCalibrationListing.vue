@@ -14,7 +14,7 @@
             v-model="search"
             @input="searchItems()"
             class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search instrument name"
+            placeholder="Search customer name"
           />
         </div>
         <!--end::Search-->
@@ -22,6 +22,31 @@
       <!--begin::Card title-->
       <!--begin::Card toolbar-->
       <div class="card-toolbar">
+        <!-- YEAR WISE DATA -->
+
+        <h3 class="card-title align-items-start flex-column">
+          <span class="card-label fw-semibold text-gray-400"
+            >Financial Year</span
+          >
+        </h3>
+        <div class="me-3">
+          <el-select
+            class="w-150px"
+            filterable
+            placeholder="Select Year"
+            v-model="selectedYearCache"
+            id="financialYear"
+            @change="handleChange"
+          >
+            <el-option
+              v-for="year in financialYears"
+              :key="year"
+              :value="year"
+              :label="year"
+            />
+          </el-select>
+        </div>
+
         <!--begin::Toolbar-->
         <div
           v-if="selectedIds.length === 0"
@@ -40,10 +65,14 @@
           </button>
           <!--end::Export-->
           <!--begin::Add customer-->
-          <router-link to="./add" class="btn btn-primary">
+          <button
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#kt_modal_internal_doc"
+          >
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Instrument
-          </router-link>
+            Add Document
+          </button>
           <!--end::Add customer-->
         </div>
         <!--end::Toolbar-->
@@ -104,144 +133,92 @@
         :loading="loading"
       >
         <!-- img data -->
+        <template v-slot:id="{ row: calibration_srf }">
+          {{ calibration_srf.id }}
+        </template>
+        <template v-slot:srf_no="{ row: calibration_srf }">
+          {{ calibration_srf.srf_no }}
+        </template>
 
-        <template v-slot:id="{ row: instruments }">
-          {{ instruments.id }}
+        <template v-slot:customer_name="{ row: calibration_srf }">
+          {{ calibration_srf.customer_name || "" }}
         </template>
-        <template v-slot:model_no="{ row: instruments }">
-          {{ instruments.model_no }}
+
+        <template v-slot:customer="{ row: calibration_srf }">
+          <span v-if="calibration_srf.customer != null">
+            {{ calibration_srf.customer?.city || "" }}
+            {{ calibration_srf.customer?.state || "" }}
+          </span>
+          <span v-else> </span>
         </template>
-        <template v-slot:serial_no="{ row: instruments }">
-          {{ instruments.serial_no }}
+        <template
+          v-slot:calibration_instruments_count="{ row: calibration_srf }"
+        >
+          {{ calibration_srf.calibration_instruments_count }}
         </template>
-        <template v-slot:name="{ row: instruments }">
-          {{ instruments.name }}
+        <template v-slot:engineer="{ row: calibration_srf }">
+          <span v-if="calibration_srf.engineer != null">
+            {{ calibration_srf.engineer?.first_name || "" }}
+            {{ calibration_srf.engineer?.last_name || "" }}
+          </span>
+          <span v-else> </span>
         </template>
-        <!-- defualt data -->
-        <template v-slot:make="{ row: instruments }">
-          {{ instruments.make }}
-        </template>
-        <template v-slot:availability="{ row: instruments }">
+        <template v-slot:approval_status="{ row: calibration_srf }">
           <span
-            v-if="instruments.availability == 1"
-            class="badge py-3 px-4 fs-7 badge-light-success"
-            >Available</span
-          >
-          <span
-            v-if="instruments.availability == 0"
-            class="badge py-3 px-4 fs-7 badge-light-danger"
-            >Not Available</span
-          >
-        </template>
-
-        <template v-slot:calibration_certificate="{ row: instruments }">
-          <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <a
-              target="blank"
-              v-bind:href="`https://api.zeptac.com/storage/company/${instruments.company_id}/instruments/${instruments.calibration_certificate}`"
-              data-toggle="tooltip"
-              title="Download Calibration Certificate"
-              class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-            >
-              <KTIcon icon-name="file-down" icon-class="fs-2" />
-            </a>
-          </div>
-          <!--end::Menu FLex-->
-        </template>
-
-        <template v-slot:datasheet="{ row: instruments }">
-          <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <a
-              target="blank"
-              v-bind:href="`https://api.zeptac.com/storage/company/${instruments.company_id}/instruments/${instruments.datasheet}`"
-              data-toggle="tooltip"
-              title="Download Datasheet"
-              class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-            >
-              <KTIcon icon-name="file-down" icon-class="fs-2" />
-            </a>
-          </div>
-          <!--end::Menu FLex-->
-        </template>
-
-        <template v-slot:traceability="{ row: instruments }">
-          <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <a
-              target="blank"
-              v-bind:href="`https://api.zeptac.com/storage/company/${instruments.company_id}/instruments/${instruments.traceability}`"
-              class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Download Traceability"
-            >
-              <KTIcon icon-name="file-down" icon-class="fs-2" />
-            </a>
-          </div>
-          <!--end::Menu FLex-->
-        </template>
-        <template v-slot:approval_status="{ row: instruments }">
-          <span
-            v-if="instruments.approval_status == 1"
+            v-if="calibration_srf.approval_status == 1"
             class="badge py-3 px-4 fs-7 badge-light-primary"
-            >{{ GetApprovalStatus(instruments.approval_status) }}</span
+            >{{ GetApprovalStatus(calibration_srf.approval_status) }}</span
           >
           <span
-            v-if="instruments.approval_status == 2"
+            v-if="calibration_srf.approval_status == 2"
             class="badge py-3 px-4 fs-7 badge-light-danger"
-            >{{ GetApprovalStatus(instruments.approval_status) }}</span
+            >{{ GetApprovalStatus(calibration_srf.approval_status) }}</span
           >
           <span
-            v-if="instruments.approval_status == 3"
+            v-if="calibration_srf.approval_status == 3"
             class="badge py-3 px-4 fs-7 badge-light-success"
-            >{{ GetApprovalStatus(instruments.approval_status) }}</span
+            >{{ GetApprovalStatus(calibration_srf.approval_status) }}</span
           >
+          <span v-else> </span>
         </template>
 
-        <template v-slot:approval_button="{ row: instruments }">
+        <template v-slot:approval_button="{ row: calibration_srf }">
           <button
             type="button"
             class="btn btn-sm btn-primary"
             data-bs-toggle="modal"
             data-bs-target="#kt_modal_1"
-            @click="fillItemData(instruments)"
+            @click="fillItemData(calibration_srf)"
           >
             Open
           </button>
         </template>
-        <template v-slot:actions="{ row: instruments }">
-          <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span
-              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Download Instrument"
-              @click="downloadHistoryCard(instruments.id)"
-            >
-              <KTIcon icon-name="file-down" icon-class="fs-2" />
-            </span>
 
+        <template v-slot:actions="{ row: calibration_srf }">
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row my-3">
             <!--begin::Edit-->
-            <router-link :to="`/instruments/edit/${instruments.id}`">
+            <router-link :to="`/calibration-srf/edit/${calibration_srf.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
                 data-bs-toggle="tooltip"
-                title="View Instrument"
+                title="View Calibration Record"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
               </span>
             </router-link>
             <!--end::Edit-->
 
+            <!--begin::Delete-->
             <span
+              @click="deleteItem(calibration_srf.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
               data-bs-toggle="tooltip"
-              title="Delete Instrument"
-              @click="deleteItem(instruments.id, false)"
+              title="Delete Calibration Record"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>
+            <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
         </template>
@@ -281,129 +258,69 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import { computed, defineComponent, onMounted, ref } from "vue";
+      
+  <script lang="ts">
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
-import type { IInstrument } from "@/core/model/instruments";
-import { instrumentGen } from "@/core/config/InstrumentHCard";
-import {
-  getAllInstrument,
-  deleteInstrument,
-  InstrumentSearch,
-  getInstrumentInfo,
-  getCompanyLogo,
-} from "@/stores/api";
+import type { ICalibrationSrf } from "@/core/model/calibration_srf";
 import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
 import { hideModal } from "@/core/helpers/dom";
 import ApprovalModal from "./ApprovalModal.vue";
 import { useAuthStore } from "@/stores/auth";
 import { Identifier } from "@/core/config/WhichUserConfig";
+import {
+  getCalibrationSrfs,
+  deleteCalibrationSrf,
+  CalibrationSrfSearch,
+} from "@/stores/api";
 import arraySort from "array-sort";
 import moment from "moment";
 import Swal from "sweetalert2";
-import { getAssetPath } from "@/core/helpers/assets";
-
-interface MDetails {
-  periodicity: string;
-  m_date1: string;
-  m_date2: string;
-  m_details: string;
-  any_repair_detail: string;
-  maintenance_done_by: string;
-}
-
-interface DownloadData {
-  id: string;
-  instrument_id: string;
-  name: string;
-  description: string;
-  availability: string;
-  model_no: string;
-  serial_no: string;
-  make: string;
-
-  calibration_date: string;
-  calibration_due_date: string;
-  vendor_name: string;
-
-  accessories_list: Array<string>;
-  datasheet: string;
-  calibration_certificate: string;
-  traceability: string;
-
-  maintenance_plan: boolean;
-
-  maintenance_history: Array<MDetails>;
-  intermediate_check_plan: string[];
-
-  approval_status: string;
-
-  company_id: string;
-  created_by: string;
-  updated_by: string;
-  is_active: string;
-}
 
 export default defineComponent({
-  name: "instrument-listing",
+  name: "srf-calibration-list",
   components: {
     Datatable,
     ApprovalModal,
   },
   setup() {
+    // Financial Year Logic
+    const authStore = useAuthStore();
+
     const auth = useAuthStore();
     const User = auth.GetUser();
     const identifier = Identifier;
 
     const tableHeader = ref([
       {
-        columnName: "Model No",
-        columnLabel: "model_no",
+        columnName: "SRF No.",
+        columnLabel: "srf_no",
         sortEnabled: true,
-        columnWidth: 80,
+        columnWidth: 175,
       },
       {
-        columnName: "Serial No",
-        columnLabel: "serial_no",
+        columnName: "Customer Name",
+        columnLabel: "customer_name",
         sortEnabled: true,
-        columnWidth: 80,
+        columnWidth: 200,
       },
       {
-        columnName: "Instrument Name",
-        columnLabel: "name",
+        columnName: "Address",
+        columnLabel: "customer",
+        sortEnabled: true,
+        columnWidth: 200,
+      },
+      {
+        columnName: "Instrument Counts",
+        columnLabel: "calibration_instruments_count",
         sortEnabled: true,
         columnWidth: 75,
       },
       {
-        columnName: "Make",
-        columnLabel: "make",
+        columnName: "Responsible Person",
+        columnLabel: "engineer",
         sortEnabled: true,
-        columnWidth: 125,
-      },
-      {
-        columnName: "Availability",
-        columnLabel: "availability",
-        sortEnabled: true,
-        columnWidth: 80,
-      },
-      {
-        columnName: "Calibration Validity",
-        columnLabel: "calibration_certificate",
-        sortEnabled: false,
-        columnWidth: 85,
-      },
-      {
-        columnName: "Datasheet",
-        columnLabel: "datasheet",
-        sortEnabled: false,
-        columnWidth: 75,
-      },
-      {
-        columnName: "Traceability",
-        columnLabel: "traceability",
-        sortEnabled: false,
         columnWidth: 75,
       },
       {
@@ -430,10 +347,10 @@ export default defineComponent({
       id: "",
       approval_status: "",
       new_status: "",
+      comments: "",
       company_id: "",
       updated_by: "",
     });
-
     // functions
     const Limits = ref({
       1: 10,
@@ -456,16 +373,39 @@ export default defineComponent({
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getAllInstrument(
-          `page=${page}&limit=${limit.value}`
+        const response = await getCalibrationSrfs(
+          `page=${page}&limit=${limit.value}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
 
         if (response.success) {
           more.value = response.result.next_page_url != null ? true : false;
-          tableData.value = response.result.data.map(({ id, ...rest }) => ({
-            id: id,
-            ...rest,
-          }));
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              customer,
+              createdByUser,
+              engineer,
+              created_at,
+              ...rest
+            }) => ({
+              id: id,
+              customer: {
+                ...customer,
+              },
+              createdByUser: {
+                ...createdByUser,
+              },
+              engineer: {
+                ...engineer,
+              },
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              ...rest,
+            })
+          );
           initvalues.value.splice(
             0,
             tableData.value.length,
@@ -485,21 +425,50 @@ export default defineComponent({
     const PageLimitPoiner = async (limit) => {
       // ? Truncate the tableData
       page.value = 1;
+      //console.log(page.value, limit);
       loading.value = true;
       try {
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
 
-        const response = await getAllInstrument(
-          `page=${page.value}&limit=${limit}`
+        const response = await getCalibrationSrfs(
+          `page=${page.value}&limit=${limit}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
+
         if (response.success) {
           more.value = response.result.next_page_url != null ? true : false;
-          tableData.value = response.result.data.map(({ id, ...rest }) => ({
-            id: id,
-            ...rest,
-          }));
-          initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              customer,
+              createdByUser,
+              engineer,
+              created_at,
+              ...rest
+            }) => ({
+              id: id,
+              customer: {
+                ...customer,
+              },
+              createdByUser: {
+                ...createdByUser,
+              },
+              engineer: {
+                ...engineer,
+              },
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
         }
       } catch (error) {
         console.error(error);
@@ -530,20 +499,44 @@ export default defineComponent({
 
     const selectedIds = ref<Array<number>>([]);
 
-    const tableData = ref<Array<IInstrument>>([]);
+    const tableData = ref<Array<ICalibrationSrf>>([]);
 
-    const initvalues = ref<Array<IInstrument>>([]);
+    const initvalues = ref<Array<ICalibrationSrf>>([]);
 
-    async function instrument_listing(): Promise<void> {
+    async function qms_procedure_listing(): Promise<void> {
       try {
-        const response = await getAllInstrument(
-          `page=${page.value}&limit=${limit.value}`
+        const response = await getCalibrationSrfs(
+          `page=${page.value}&limit=${limit.value}&year=${
+            selectedYearCache.value
+              ? selectedYearCache.value
+              : financialYears.value[0]
+          }`
         );
+
         if (response.success) {
-          tableData.value = response.result.data.map(({ id, ...rest }) => ({
-            id: id,
-            ...rest,
-          }));
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              customer,
+              createdByUser,
+              engineer,
+              created_at,
+              ...rest
+            }) => ({
+              id: id,
+              customer: {
+                ...customer,
+              },
+              createdByUser: {
+                ...createdByUser,
+              },
+              engineer: {
+                ...engineer,
+              },
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              ...rest,
+            })
+          );
 
           more.value = response.result.next_page_url != null ? true : false;
           initvalues.value.splice(
@@ -565,9 +558,8 @@ export default defineComponent({
     const filteredTableHeader = computed(() => {
       const isAdmin = identifier.value === "Admin";
       const isCompanyAdmin = identifier.value === "Company-Admin";
-      const isComExec = identifier.value === "Commercial-Executive";
 
-      if (isAdmin || isCompanyAdmin || isComExec) {
+      if (isAdmin || isCompanyAdmin) {
         // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
         return tableHeader.value;
       } else {
@@ -578,8 +570,31 @@ export default defineComponent({
       }
     });
 
+    const financialYears = ref(authStore.financialYears); // Generate Financial years list using the auth store function
+    const selectedYearCache = ref(
+      localStorage.getItem("selectedFinancialYear") || ""
+    );
+
+    // Fallback to default value if localStorage data is invalid or missing
+    if (!financialYears.value.includes(selectedYearCache.value)) {
+      selectedYearCache.value = financialYears.value[0];
+    }
+
+    watch(selectedYearCache, (newValue) => {
+      localStorage.setItem("selectedFinancialYear", newValue);
+    });
+
+    async function handleChange() {
+      page.value = 1;
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+      await qms_procedure_listing();
+    }
+
     onMounted(async () => {
-      await instrument_listing();
+      // Save initial selected year to localStorage
+      localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
+
+      await qms_procedure_listing();
     });
 
     const deleteFewItem = async () => {
@@ -644,7 +659,7 @@ export default defineComponent({
 
       const deleteFromTable = async (id: number) => {
         try {
-          const response = await deleteInstrument(id);
+          const response = await deleteCalibrationSrf(id);
           if (response?.success) {
             const index = tableData.value.findIndex((item) => item.id === id);
             if (index !== -1) {
@@ -717,10 +732,10 @@ export default defineComponent({
     let debounceTimer;
 
     const searchItems = async () => {
-      console.log(search.value);
+      // console.log(search.value);
       tableData.value.splice(0, tableData.value.length, ...initvalues.value);
       if (search.value.length != 0) {
-        let results: Array<IInstrument> = [];
+        let results: Array<ICalibrationSrf> = [];
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
             results.push(tableData.value[j]);
@@ -738,21 +753,44 @@ export default defineComponent({
         page.value = 1;
         while (tableData.value.length != 0) tableData.value.pop();
         while (initvalues.value.length != 0) initvalues.value.pop();
-        await instrument_listing();
+        await qms_procedure_listing();
       }
     };
 
     async function SearchMore() {
       // Your API call logic here
       try {
-        const response = await InstrumentSearch(search.value);
+        const response = await CalibrationSrfSearch(
+          search.value,
+          selectedYearCache.value
+            ? selectedYearCache.value
+            : financialYears.value[0]
+        );
 
         if (response.success) {
-          more.value = response.result.next_page_url != null ? true : false;
-          tableData.value = response.result.data.map(({ id, ...rest }) => ({
-            id: id,
-            ...rest,
-          }));
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              customer,
+              createdByUser,
+              engineer,
+              created_at,
+              ...rest
+            }) => ({
+              id: id,
+              customer: {
+                ...customer,
+              },
+              createdByUser: {
+                ...createdByUser,
+              },
+              engineer: {
+                ...engineer,
+              },
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              ...rest,
+            })
+          );
           initvalues.value.splice(
             0,
             tableData.value.length,
@@ -795,197 +833,28 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-    function downloadFileObject(base64String, pdfName) {
-      const linkSource = base64String;
-      const downloadLink = document.createElement("a");
-      const fileName = pdfName + ".pdf";
-      downloadLink.href = linkSource;
-      downloadLink.download = fileName;
-      downloadLink.click();
-    }
-
-    // NEED TO COMPLETE
-    const downloadDocument = async (
-      companyId: any,
-      file: string,
-      pdfName: string
-    ) => {
-      try {
-        if (file != "") {
-          const linkSource = `https://api.zeptac.com/storage/company/${companyId}/instruments/${file}`;
-          const downloadLink = document.createElement("a");
-          downloadLink.href = linkSource;
-          downloadLink.download = `https://api.zeptac.com/storage/company/${companyId}/instruments/${file}`;
-          downloadLink.click();
-        } else {
-          alert("Empty File");
-        }
-      } catch (error) {
-        console.error("Error downloading PDF:", error);
-      }
-    };
-
-    const companyInfo = ref({
-      id: "",
-      company_name: "",
-      company_logo: "",
-      address: "",
-      city: "",
-      state: "",
-      country: "",
-      pincode: "",
-      logo_base64: "",
-    });
-
-    const instrumentInfo = ref<DownloadData>({
-      id: "",
-      instrument_id: "",
-      name: "",
-      description: "",
-      availability: "",
-      model_no: "",
-      serial_no: "",
-      make: "",
-      calibration_date: "",
-      calibration_due_date: "",
-      vendor_name: "",
-      accessories_list: [],
-      datasheet: "",
-      calibration_certificate: "",
-      traceability: "",
-      maintenance_plan: false,
-
-      maintenance_history: [],
-      intermediate_check_plan: [],
-
-      approval_status: "",
-      company_id: "",
-      created_by: "",
-      updated_by: "",
-      is_active: "",
-    });
-
-    const downloadHistoryCard = async (id) => {
-      let timerInterval;
-
-      try {
-        // Show initial loading Swal with generic progress messages
-        Swal.fire({
-          title: "Downloading History Card",
-          html: `<div class="swal-animation">
-        <p class="swal-text">Please wait...</p>
-        <div class="swal-progress">
-          <div class="swal-progress-bar"></div>
-        </div>
-      </div>`,
-          allowOutsideClick: false,
-          didOpen: () => {
-            Swal.showLoading();
-          },
-          willClose: () => {
-            clearInterval(timerInterval);
-          },
-        });
-
-        // Fetch RGP information
-        const res = await getInstrumentInfo(id);
-        if (res?.success != false) {
-          instrumentInfo.value = { ...res.result };
-          instrumentInfo.value.accessories_list =
-            JSON.parse(res.result.accessories_list) || [];
-          instrumentInfo.value.maintenance_history =
-            JSON.parse(res.result.maintenance_history) || [];
-        } else {
-          showErrorAlert("Error", res.message || "Error Occured");
-          return;
-        }
-
-        // Fetch company logo details
-        const res2 = await getCompanyLogo(res.result.company_id);
-
-        if (res2?.success != false) {
-          // Update local reactive state (assuming Vue 3 Composition API syntax)
-          companyInfo.value.id = res2.result.id;
-          companyInfo.value.company_name = res2.result.company_name;
-          companyInfo.value.company_logo = res2.result.company_logo
-            ? res2.result.company_logo
-            : "";
-          companyInfo.value.logo_base64 = res2.result.logo_base64
-            ? "data: image/png;base64," + res2.result.logo_base64
-            : getAssetPath("media/avatars/default.png");
-
-          companyInfo.value.address = res2.result.address || "";
-          companyInfo.value.city = res2.result.city || "";
-          companyInfo.value.pincode = res2.result.pincode || "";
-          companyInfo.value.state = res2.result.state || "";
-          companyInfo.value.country = res2.result.country || "";
-        } else {
-          showErrorAlert("Error", res2.message || "Error Occured");
-          return;
-        }
-        // Update Swal message for PDF generation
-        Swal.update({
-          title: "Generating PDF",
-          html: `<div class="swal-animation">
-        <p class="swal-text">Please wait...</p>
-        <div class="swal-progress">
-          <div class="swal-progress-bar"></div>
-        </div>
-      </div>`,
-        });
-
-        // Simulate delay for PDF generation (replace with actual function)
-        const pdfName = `instrument`;
-
-        await instrumentGen(id, pdfName, instrumentInfo, companyInfo);
-
-        // Close Swal on success
-        Swal.fire({
-          title: "Download Complete",
-          text: "Instrument History Card PDF generated successfully",
-          icon: "success",
-          timer: 2000, // Show success message for 2 seconds
-          timerProgressBar: true,
-          allowOutsideClick: true,
-        });
-      } catch (error) {
-        console.error("Error downloading History Card:", error);
-
-        // Close Swal on success
-        Swal.fire({
-          title: "Error Complete",
-          text: "Failed to download Worksheet",
-          icon: "error",
-          timer: 2000,
-          timerProgressBar: true,
-          allowOutsideClick: true,
-        });
-      } finally {
-        // Clear interval if still running
-        clearInterval(timerInterval);
-      }
-    };
-
     async function reLoadData() {
-      await instrument_listing();
+      await qms_procedure_listing();
     }
+
     // Function
-    const fillItemData = (ncr) => {
-      const { id, approval_status, company_id } = ncr;
+    const fillItemData = (item_data) => {
+      const { id, approval_status, comments, company_id } = item_data;
 
       itemData.value = {
         id: id,
         approval_status: approval_status,
         new_status: "",
+        comments: comments || "",
         company_id: company_id,
         updated_by: User.id,
       };
       console.log("itemData are:", itemData.value);
     };
-
     return {
       tableData,
       tableHeader,
+      reLoadData,
       deleteItem,
       search,
       searchItems,
@@ -1000,17 +869,19 @@ export default defineComponent({
       page,
       Limits,
       PageLimitPoiner,
-      downloadDocument,
-      downloadHistoryCard,
       filteredTableHeader,
       ApprovalStatus,
       GetApprovalStatus,
       itemData,
       fillItemData,
       identifier,
-      reLoadData,
+
+      selectedYearCache,
+      financialYears,
+      handleChange,
     };
   },
 });
 </script>
-
+      
+      

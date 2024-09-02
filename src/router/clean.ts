@@ -53,6 +53,10 @@ import {
   validateUser,
   validateFeedback,
   getFeedback,
+  getReferenceInstrument,
+  getCalibrationSrf,
+  getCalibrationInstrument,
+  validateUserNSrf,
 
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
@@ -626,7 +630,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getInstrument(instrumentItemId.toString());
             // console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1312,6 +1316,118 @@ const routes: Array<RouteRecordRaw> = [
           breadcrumbs: ["Thermal Instrument Clone"],
         },
       },
+
+      // Calibration Records - Reference Instrument
+      {
+        path: "/reference-instrument/list",
+        name: "reference-instrument-list",
+        component: () =>
+          import("@/views/apps/calibration/RefInstrument/RefInstrumentListing.vue"),
+        meta: {
+          pageTitle: "Reference Instrument List",
+          breadcrumbs: ["Reference Instrument List"],
+        },
+      },
+      {
+        path: "/reference-instrument/add",
+        name: "reference-instrument-add",
+        component: () =>
+          import("@/views/apps/calibration/RefInstrument/RefInstrumentAdd.vue"),
+        meta: {
+          pageTitle: "Reference Instrument Add",
+          breadcrumbs: ["Reference Instrument Add"],
+        },
+      },
+      {
+        path: "/reference-instrument/edit/:id",
+        name: "reference-instrument-edit",
+        beforeEnter: async (to, from, next) => {
+          const itemId = to.params.id;
+          try {
+            const response = await getReferenceInstrument(itemId.toString());
+            if (response.success == false || response.result.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/calibration/RefInstrument/RefInstrumentEdit.vue"),
+        meta: {
+          pageTitle: "Reference Instrument Edit",
+          breadcrumbs: ["Reference Instrument Edit"],
+        },
+      },
+
+      // Calibration Records - Service Request
+      {
+        path: "/calibration-srf/list",
+        name: "calibration-srf-list",
+        component: () =>
+          import("@/views/apps/calibration/SrfCalibration/SrfCalibrationListing.vue"),
+        meta: {
+          pageTitle: "Calibration Records List",
+          breadcrumbs: ["Calibration Records List"],
+        },
+      },
+      {
+        path: "/calibration-srf/edit/:id",
+        name: "calibration-srf-edit",
+        beforeEnter: async (to, from, next) => {
+
+          const itemId = to.params.id;
+          try {
+            const response = await getCalibrationSrf(itemId.toString());
+            console.log(response);
+            if (response.success == false || response.result.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/calibration/SrfCalibration/SrfCalibrationEdit.vue"),
+        meta: {
+          pageTitle: "Calibration Records View",
+          breadcrumbs: ["Calibration Records View"],
+        },
+      },
+      // Calibration Records - Calibration Instruments
+      {
+        path: "/calibration-instrument/edit/:id",
+        name: "calibration-instrument-edit",
+        beforeEnter: async (to, from, next) => {
+
+          const itemId = to.params.id;
+          try {
+            const response = await getCalibrationInstrument(itemId.toString());
+            console.log(response);
+            if (response.success==false || response.result.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/calibration/SrfCalibration/CalibrationInstrument/CalibrationInstrumentEdit.vue"),
+        meta: {
+          pageTitle: "Supplier Evalauation",
+          breadcrumbs: ["Supplier Evalauation"],
+        },
+      },
+
 
       // Supplier
       {
@@ -2011,7 +2127,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getQMSProcedure(docId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2049,7 +2165,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getWorkInstruction(docId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2087,7 +2203,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getFormAndFormat(docId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2125,7 +2241,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getNABLDoc(docId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2163,7 +2279,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getNIDoc(docId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2201,7 +2317,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getRecord(docId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2690,7 +2806,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await validateUser(data);
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2704,6 +2820,40 @@ const routes: Array<RouteRecordRaw> = [
           import("@/views/apps/srf/ServiceRequestAdd.vue"),
         meta: {
           pageTitle: "Service Request Form",
+        },
+      },
+      {
+        path: "/srf_calibration/:company/:customer/:srf/:token",
+        name: "srf-calibration-add",
+        beforeEnter: async (to, from, next) => {
+
+          const companyID = to.params.company;
+          const customerID = to.params.customer;
+          const srfID = to.params.srf;
+          const token = to.params.token;
+          const data = {
+            company_id: companyID,
+            customer_id: customerID,
+            service_request_id: srfID,
+            token: token,
+          }
+          try {
+            const response = await validateUserNSrf(data);
+            console.log(response);
+            if (response.success == false || response.result.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/calibration/SrfCalibration/SrfCalibrationAdd.vue"),
+        meta: {
+          pageTitle: "Calibration SRF",
         },
       },
       {

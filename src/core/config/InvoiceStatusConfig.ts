@@ -24,4 +24,34 @@ const GetInvoiceStatus = (id: number) => {
     }
 };
 
-export { InvoiceStatus, InvoiceStatusArray, GetInvoiceStatus };
+// GST/Taxes Details
+
+const TaxArray = [
+    {
+        id: "1",
+        tax_type: "(CGST + SGST)",
+        tax_description: "Central & State Goods and Services Tax",
+        tax_rate: 18,
+        tax_amount: 0,
+        company_id: 1,
+    },
+    {
+        id: "2",
+        tax_type: "IGST",
+        tax_description: "Integrated Goods and Services Tax",
+        tax_rate: 18,
+        tax_amount: 0,
+        company_id: 1,
+    },
+    {
+        id: "3",
+        tax_type: "Custom",
+        tax_description: "Custom GST",
+        tax_rate: 10,
+        tax_amount: 0,
+        company_id: 1,
+    },
+]
+
+
+export { InvoiceStatus, InvoiceStatusArray, GetInvoiceStatus, TaxArray };

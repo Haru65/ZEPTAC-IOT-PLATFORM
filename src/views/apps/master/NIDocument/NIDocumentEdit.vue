@@ -400,21 +400,32 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      let response = await getNIDoc(itemId.toString());
-      console.log(response);
-      documentDetails.value = {
-        document_section: response.document_section,
-        document_name: response.document_name,
-        issue_date: response.issue_date,
-        amendment_date: response.amendment_date,
-        storage_medium: response.storage_medium,
-        approval_status: response.approval_status,
-        document_file: response.document_file ? response.document_file : "",
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+      try {
+        let response = await getNIDoc(itemId.toString());
+        if (response?.success) {
+          documentDetails.value = {
+            document_section: response.result.document_section,
+            document_name: response.result.document_name,
+            issue_date: response.result.issue_date,
+            amendment_date: response.result.amendment_date,
+            storage_medium: response.result.storage_medium,
+            approval_status: response.result.approval_status,
+            document_file: response.result.document_file ? response.result.document_file : "",
+            company_id: response.result.company_id ? response.result.company_id : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getNIDoc : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getNIDoc : ${err}`);
+      }
     });
 
     /* --------SET DATE LOGIC--------*/
@@ -624,7 +635,6 @@ export default defineComponent({
 
         // Call your API here
         const response = await updateNIDoc(itemId, documentDetails.value);
-
 
         if (response?.success) {
           // Handle successful API response

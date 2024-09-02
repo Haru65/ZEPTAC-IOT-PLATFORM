@@ -24,7 +24,7 @@
       <Vform
         id="kt_account_profile_details_form"
         class="form"
-        novalidate
+        @submit="onsubmit"
         :validation-schema="profileDetailsValidator"
         enctype="multipart/form-data"
       >
@@ -315,11 +315,6 @@
                   :value="item.id"
                 />
               </el-select>
-              <div class="fv-plugins-message-container">
-                <div class="fv-help-block">
-                  <ErrorMessage name="role" />
-                </div>
-              </div>
             </div>
             <!--end::Col-->
           </div>
@@ -842,11 +837,10 @@
           <!--end::Button-->
           &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
           <!--begin::Button-->
-          <span
-            @click="onsubmit()"
+          <button
+            type="submit"
             :data-kt-indicator="loading ? 'on' : null"
             class="btn btn-lg btn-primary w-25"
-            type="submit"
           >
             <span v-if="!loading" class="indicator-label"> Submit </span>
             <span v-if="loading" class="indicator-progress">
@@ -855,7 +849,7 @@
                 class="spinner-border spinner-border-sm align-middle ms-2"
               ></span>
             </span>
-          </span>
+          </button>
           <!--end::Button-->
         </div>
         <!--end::Input group-->
@@ -950,13 +944,22 @@ export default defineComponent({
       lname: Yup.string().required().label("Last name"),
       email: Yup.string().required().email().label("Email"),
       phone: Yup.string().required().label("Phone"),
-      password: Yup.string().required().label("Password"),
-      confpassword: Yup.string().required().label("Confirm Password"),
-      pincode: Yup.string().required().label("Pincode"),
-      address1: Yup.string().required().label("Address"),
-      address2: Yup.string().required().label("Address"),
-      adhar: Yup.string().required().label("Adhar No"),
-      pan: Yup.string().required().label("Pan No"),
+      // password: Yup.string().required().label("Password"),
+      password: Yup.string()
+        .min(8, "Password must be at least 8 characters long.")
+        .matches(
+          /[A-Z]/,
+          "Password must include at least one uppercase letter."
+        )
+        .matches(/[0-9]/, "Password must include at least one number.")
+        .matches(
+          /[@$!%*?&]/,
+          "Password must include at least one special character."
+        )
+        .required("Password is required."),
+      confpassword: Yup.string()
+        .oneOf([Yup.ref("password"), null], "Passwords must match.")
+        .required("Confirm Password"),
     });
 
     const profileData = ref({
@@ -1495,26 +1498,68 @@ export default defineComponent({
       }
     }
 
+    const validateForm = (formData) => {
+      for (const key in formData) {
+        let value = formData[key];
+        if (
+          key !== "profile_pic" &&
+          key !== "address1" &&
+          key !== "address2" &&
+          key !== "city" &&
+          key !== "pincode" &&
+          key !== "state" &&
+          key !== "country" &&
+          key !== "dob" &&
+          key !== "gender" &&
+          key !== "adhar" &&
+          key !== "pan"
+        ) {
+          if (Array.isArray(value)) {
+            for (const item of value) {
+              if (!validateForm(item)) {
+                return false;
+              }
+            }
+          } else if (typeof value === "object" && value !== null) {
+            if (!validateForm(value)) {
+              return false;
+            }
+          } else if (typeof value === "string") {
+            value = value.trim();
+            if (value === "") {
+              return false;
+            }
+          } else {
+          }
+        }
+      }
+      return true;
+    };
+
     const onsubmit = async () => {
       try {
         loading.value = true;
 
-        if (User.role_id == "2") {
-          const company_id = User.company_id;
-          profileDetails.value.company_id = company_id;
-        }
-        const response = await addUser(profileDetails.value);
-        // console.log(response.error);
-        if (!response.error) {
-          // Handle successful API response
-          // console.log("API response:", response);
-          showSuccessAlert("Success", "User have been successfully added!");
-          router.push({ name: "users-list" });
+        if (validateForm(profileDetails.value)) {
+          if (User.role_id == "2") {
+            const company_id = User.company_id;
+            profileDetails.value.company_id = company_id;
+          }
+          const response = await addUser(profileDetails.value);
+          // console.log(response.error);
+          if (!response.error) {
+            // Handle successful API response
+            // console.log("API response:", response);
+            showSuccessAlert("Success", "User have been successfully added!");
+            router.push({ name: "users-list" });
+          } else {
+            // Handle API error response
+            const errorData = response.error;
+            console.log("API error:", errorData);
+            // console.log("API error:", errorData.response.data.errors);
+            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          }
         } else {
-          // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
         }
       } catch (error) {

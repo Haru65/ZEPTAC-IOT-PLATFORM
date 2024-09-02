@@ -335,27 +335,27 @@ export default defineComponent({
         let response = await validateFeedback(data.value);
         console.log(response);
 
-        if (response !== null) {
+        if (response.success && response.result != null) {
           if (response) {
-          informationData.value.name = response.name ? response.name : "";
-          informationData.value.mobile = response.mobile ? response.mobile : "";
-          informationData.value.company_name = response.company_name
-            ? response.company_name
+          informationData.value.name = response.result.name ? response.result.name : "";
+          informationData.value.mobile = response.result.mobile ? response.result.mobile : "";
+          informationData.value.company_name = response.result.company_name
+            ? response.result.company_name
             : "";
-          informationData.value.address1 = response.address1
-            ? response.address1
+          informationData.value.address1 = response.result.address1
+            ? response.result.address1
             : "";
-          informationData.value.address2 = response.address2
-            ? response.address2
+          informationData.value.address2 = response.result.address2
+            ? response.result.address2
             : "";
-          informationData.value.city = response.city ? response.city : "";
-          informationData.value.pincode = response.pincode ? response.pincode : "";
-          informationData.value.state = response.state ? response.state : "";
-          informationData.value.country = response.country ? response.country : "";
+          informationData.value.city = response.result.city ? response.result.city : "";
+          informationData.value.pincode = response.result.pincode ? response.result.pincode : "";
+          informationData.value.state = response.result.state ? response.result.state : "";
+          informationData.value.country = response.result.country ? response.result.country : "";
         }
         }
       } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
+        showErrorAlert("Error", "An error occurred during the validateFeedback API call.");
         loading.value = false;
         console.log(error);
       }

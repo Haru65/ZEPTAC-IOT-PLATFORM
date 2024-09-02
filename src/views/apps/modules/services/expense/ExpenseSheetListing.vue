@@ -118,11 +118,12 @@
               id="kt-menu-filter-button"
               class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary"
               data-kt-menu-target="#kt_menu_filter"
-              data-kt-menu-trigger="click"
+              data-kt-menu-trigger="{default:'click', lg: 'hover'}"
+              data-kt-menu-attach="parent"
               data-kt-menu-placement="bottom-end"
               data-kt-menu-flip="top-end"
             >
-              <KTIcon icon-name="filter" icon-class="fs-2" />
+            <KTIcon icon-name="filter" icon-class="fs-1" />
             </button>
 
             <!--begin::Menu 1-->

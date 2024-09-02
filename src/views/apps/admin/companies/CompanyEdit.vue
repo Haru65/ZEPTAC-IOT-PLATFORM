@@ -1275,7 +1275,8 @@ export default defineComponent({
         if (
           key !== "trial_subscription_start" &&
           key !== "trial_subscription_end" &&
-          key !== "subscription_date"
+          key !== "subscription_date" &&
+          key !== "company_logo"
         ) {
           if (Array.isArray(value)) {
             for (const item of value) {

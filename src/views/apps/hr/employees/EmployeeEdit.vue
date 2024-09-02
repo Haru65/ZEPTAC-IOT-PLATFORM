@@ -2,7 +2,7 @@
   <Vform
     id="kt_account_profile_details_form"
     class="form"
-    novalidate
+    @submit="onsubmit"
     :validation-schema="profileDetailsValidator"
     enctype="multipart/form-data"
   >
@@ -1165,13 +1165,9 @@
     <!--end::Notifications-->
 
     <div class="modal-footer flex-center">
-      <!--begin::Button-->
-      <button type="reset" class="btn btn-lg btn-danger w-25">Clear</button>
-      <!--end::Button-->
       &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
       <!--begin::Button-->
-      <span
-        @click="onsubmit()"
+      <button
         :data-kt-indicator="loading ? 'on' : null"
         class="btn btn-lg btn-primary w-25"
         type="submit"
@@ -1183,7 +1179,7 @@
             class="spinner-border spinner-border-sm align-middle ms-2"
           ></span>
         </span>
-      </span>
+      </button>
       <!--end::Button-->
     </div>
   </Vform>
@@ -1225,8 +1221,6 @@ interface ProfileDetails {
   last_name: string;
   email: string;
   phone: string;
-  password: string;
-  confpassword: string;
   role_id: string;
   userPermissions: Array<Permission>;
 
@@ -1351,8 +1345,6 @@ export default defineComponent({
         last_name: response.last_name,
         email: response.email,
         phone: response.mobile,
-        password: " ",
-        confpassword: " ",
         role_id: response.role_id,
         userPermissions: response.userPermissions,
         //  ? optional fields check for data
@@ -1424,13 +1416,6 @@ export default defineComponent({
       lname: Yup.string().required().label("Last name"),
       email: Yup.string().required().email().label("Email"),
       phone: Yup.string().required().label("Phone"),
-      password: Yup.string().required().label("Password"),
-      confpassword: Yup.string().required().label("Confirm Password"),
-      pincode: Yup.string().required().label("Pincode"),
-      address1: Yup.string().required().label("Address"),
-      address2: Yup.string().required().label("Address"),
-      adhar: Yup.string().required().label("Adhar No"),
-      pan: Yup.string().required().label("Pan No"),
     });
 
     const profileDetails = ref<ProfileDetails>({
@@ -1440,8 +1425,6 @@ export default defineComponent({
       last_name: "",
       email: "",
       phone: "",
-      password: "",
-      confpassword: "",
       role_id: "",
       userPermissions: [],
 
@@ -1970,24 +1953,25 @@ export default defineComponent({
       loading.value = true;
       // console.warn("Nice");
       try {
-        // form multipart form post
-        // push form
-        // console.log(profileDetails.value);
-        const response = await updateEmployee(profileDetails.value, userId);
-        // console.log(response.error);
-        if (!response.error) {
-          // Handle successful API response
-          // console.log("API response:", response);
-          showSuccessAlert(
-            "Success",
-            "Employee have been successfully Updated!"
-          );
-          router.push({ name: "employee-list" });
+        if (validateForm(profileDetails.value)) {
+          const response = await updateEmployee(profileDetails.value, userId);
+          // console.log(response.error);
+          if (!response.error) {
+            // Handle successful API response
+            // console.log("API response:", response);
+            showSuccessAlert(
+              "Success",
+              "Employee have been successfully Updated!"
+            );
+            router.push({ name: "employee-list" });
+          } else {
+            // Handle API error response
+            const errorData = response.error;
+            console.log("API error:", errorData);
+            // console.log("API error:", errorData.response.data.errors);
+            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          }
         } else {
-          // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
         }
       } catch (error) {
@@ -1997,6 +1981,47 @@ export default defineComponent({
       } finally {
         loading.value = false;
       }
+    };
+
+    const validateForm = (formData) => {
+      for (const key in formData) {
+        let value = formData[key];
+        if (
+          key !== "profile_pic" &&
+          key !== "employee_code" &&
+          key !== "department" &&
+          key !== "designation" &&
+          key !== "date_of_joining" &&
+          key !== "experience" &&
+          key !== "qualification" &&
+          key !== "job_desc" &&
+          key !== "reports_to" &&
+          key !== "whatsapp_no" &&
+          key !== "address1" &&
+          key !== "address2" &&
+          key !== "city" &&
+          key !== "pincode" &&
+          key !== "state" &&
+          key !== "country" &&
+          key !== "dob" &&
+          key !== "gender" &&
+          key !== "adhar" &&
+          key !== "pan"
+        ) {
+          if (typeof value === "object" && value !== null) {
+            if (!validateForm(value)) {
+              return false;
+            }
+          } else if (typeof value === "string") {
+            value = value.trim();
+            if (value === "") {
+              return false;
+            }
+          } else {
+          }
+        }
+      }
+      return true;
     };
 
     const submitPermissions = async (e) => {
@@ -2061,49 +2086,6 @@ export default defineComponent({
       });
     };
 
-    const clear = () => {
-      profileDetails.value = {
-        id: "",
-        profile_pic: "",
-        first_name: "",
-        last_name: "",
-        email: "",
-        phone: "",
-        password: "",
-        confpassword: "",
-        role_id: "",
-        userPermissions: [],
-
-        employee_code: "",
-        department: "",
-        designation: "",
-        date_of_joining: "",
-        experience: "",
-        qualification: "",
-        job_desc: "",
-        reports_to: "",
-
-        whatsapp_no: "",
-        address1: "",
-        address2: "",
-        state: "",
-        city: " ",
-        country: "",
-        pincode: "",
-        dob: "",
-        gender: "",
-        adhar: "",
-        pan: "",
-        company_id: "",
-        updated_by: User.id,
-
-        is_active: "1",
-        availability: "1",
-
-        allPermissions: [],
-      };
-    };
-
     return {
       submitButton4,
       profileDetails,
@@ -2115,7 +2097,6 @@ export default defineComponent({
       submitPermissions,
       loading,
       pLoading,
-      clear,
       state,
       countries,
       identifier,

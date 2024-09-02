@@ -7,7 +7,7 @@
       <div
         class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-30px h-30px w-md-40px h-md-40px position-relative"
         id="kt_drawer_chat_toggle"
-        data-kt-menu-trigger="click"
+        data-kt-menu-trigger="{default:'click', lg: 'hover'}"
         data-kt-menu-attach="parent"
         data-kt-menu-placement="bottom-end"
       >
@@ -35,7 +35,7 @@
       <!--begin::Menu wrapper-->
       <div
         class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-30px h-30px w-md-40px h-md-40px"
-        data-kt-menu-trigger="click"
+        data-kt-menu-trigger="{default:'click', lg: 'hover'}"
         data-kt-menu-attach="parent"
         data-kt-menu-placement="bottom-end"
       >

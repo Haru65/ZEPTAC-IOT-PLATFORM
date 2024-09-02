@@ -4,7 +4,7 @@
     <!--begin::Form-->
     <div class="container" v-if="message">
       <div class="alert alert-success">
-        Password reset link successfully sent to your email address
+        {{ message }}
       </div>
     </div>
     

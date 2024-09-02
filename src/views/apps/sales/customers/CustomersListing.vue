@@ -141,6 +141,22 @@
             <span class="text-gray-600 text-hover-primary"> Copy Link </span>
           </span>
         </template>
+
+        <template v-slot:srf_calibration_link="{ row: customer }">
+          <span>
+            <span
+              class="d-flex flex-lg-row text-hover-primary align-center gap-2 cursor-pointer"
+              data-toggle="tooltip"
+              title="Copy Service Request Link For Calibration"
+              @click="generateLink(customer.company_id, customer.id)"
+            >
+              <i
+                class="las la-link text-gray-600 text-hover-primary mb-1 fs-3"
+              ></i>
+              <span class="text-gray-600 text-hover-primary"> Copy Link </span>
+            </span>
+          </span>
+        </template>
         <template v-slot:feedback_link="{ row: customer }">
           <span
             class="d-flex flex-lg-row text-hover-primary align-center gap-2 cursor-pointer"
@@ -231,7 +247,12 @@ import { get_role } from "@/core/config/PermissionsRolesConfig";
 import moment from "moment";
 import Swal from "sweetalert2";
 import { Identifier } from "@/core/config/WhichUserConfig";
-import { deleteCustomer, CustomerSearch, getCustomers } from "@/stores/api";
+import {
+  deleteCustomer,
+  CustomerSearch,
+  getCustomers,
+  generateSrfLink,
+} from "@/stores/api";
 export default defineComponent({
   name: "customers-list",
   components: {
@@ -276,6 +297,12 @@ export default defineComponent({
         columnLabel: "company_details",
         sortEnabled: true,
         columnWidth: 175,
+      },
+      {
+        columnName: "Calibration Servie Request Link",
+        columnLabel: "srf_calibration_link",
+        sortEnabled: true,
+        columnWidth: 75,
       },
       {
         columnName: "Servie Request Link",
@@ -640,6 +667,56 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
+    /** LOGIC TO HANDLE LINK GENERATION::START*/
+
+    const generateLink = async (companyId, customerId) => {
+      try {
+        const response = await generateSrfLink({
+          customer_id: customerId,
+          company_id: companyId,
+          slug_name: "srf-calibration",
+        });
+
+        if (response.success == true) {
+          alert("Service Request Link generated successfully!");
+          await copySrfCalibrationUrl(
+            response.result.company_id,
+            response.result.customer_id,
+            response.result.service_request_id,
+            response.result.token
+          );
+        }
+      } catch (error) {
+        console.error("Error generating link:", error);
+      }
+    };
+
+    // This SRF is for NON-NABL Report (LAF, BSF)
+    const copySrfCalibrationUrl = async (companyId, customerId, srfId, tokenId) => {
+      const srf_calibration_url = `https://app.zeptac.com/srf_calibration/${companyId}/${customerId}/${srfId}/${tokenId}`;
+      // const srf_calibration_url = `http://localhost:5173/srf_calibration/${companyId}/${customerId}/${srfId}/${tokenId}`;
+
+      navigator.clipboard
+        .writeText(srf_calibration_url)
+        .then(() => {
+          console.log(
+            "SRF URL for calibration copied to clipboard:",
+            srf_calibration_url
+          );
+          alert(
+            `SRF URL for calibration copied to clipboard: ${srf_calibration_url}`
+          );
+          // You can show a success message or perform any other action here
+        })
+        .catch((error) => {
+          console.error("Error copying URL to clipboard:", error);
+          // Handle error if copying fails
+        });
+    };
+
+    /** LOGIC TO HANDLE LINK GENERATION::END*/
+
+    // This SRF is for NON-NABL Report (LAF, BSF)
     const copySrfUrl = (companyId, customerId) => {
       const srf_url = `https://app.zeptac.com/srf/${companyId}/${customerId}`;
       // const url = `http://localhost:5173/srf/${companyId}/${customerId}`;
@@ -692,8 +769,11 @@ export default defineComponent({
       Limits,
       copySrfUrl,
       copyFeedbackUrl,
+      copySrfCalibrationUrl,
       identifier,
       filteredTableHeader,
+
+      generateLink,
     };
   },
 });

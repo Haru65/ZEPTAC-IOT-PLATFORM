@@ -5,6 +5,7 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable"; // ! depretaited import
 import { ToWords } from 'to-words';
+import { getAssetPath } from "../helpers/assets";
 
 /**
  * Gen Method to print invoice or quotation reciept
@@ -52,10 +53,15 @@ const Gen = async (
         format: "a4",
     });
 
-    // URL of the diagram
+    // URL of company logo
     const img = new Image();
     img.src = companyDetails.value.logo_base64;
     img.alt = "company logo";
+
+    // URL of the brand logo
+    const brandLogo = new Image();
+    brandLogo.src = getAssetPath('media/logos/zeptac_logo_footer.png');
+    brandLogo.alt = "zeptac_logo_footer";
 
 
     // Function that will add footer to each page
@@ -68,19 +74,30 @@ const Gen = async (
         // Header
 
         // Footer
+
+        // powered by with logo
+        
+        doc.setFontSize(8);
+        doc.text("powered by", 3.80, doc.internal.pageSize.height - 0.3, { align: 'center' });
+        doc.addImage(brandLogo, "PNG", 4.13, doc.internal.pageSize.height - 0.42, 1.2, 0.2, "zeptac_logo_footer");
+        
+        // page number on each page
         const pageStr = `Page ${i} of ${pageCount}`;
-        doc.setFontSize(9);
-        doc.text(pageStr, doc.internal.pageSize.width - 0.7, doc.internal.pageSize.height - 0.4, { align: 'right' });
+        doc.setFontSize(8);
+        doc.text(pageStr, doc.internal.pageSize.width - 0.7, doc.internal.pageSize.height - 0.3, { align: 'right' });
   
+        console.log(doc.internal.pageSize.width)
+
         // doc.setTextColor(0, 0, 255);
-        doc.textWithLink("Zeptac.com", 0.6, doc.internal.pageSize.height - 0.4, { url: 'https://zeptac.com', color: 'black' });
+        // doc.textWithLink("Zeptac.com", 0.6, doc.internal.pageSize.height - 0.4, { url: 'https://zeptac.com', color: 'black' });
+        doc.setFontSize(9);
       }
     };
 
     // Function that add header
 
     // Fixed height for the diagram
-    const imgHeight = 1.5;
+    const imgHeight = 1.7;
 
     // Heading Name
     const pdfHeading = (pdftype == "quotation" ? 'QUOTATION' : 'INVOICE');
@@ -120,24 +137,28 @@ const Gen = async (
         ]
       ];
 
-      doc.setFillColor(240, 240, 240); // Light gray color
-      doc.rect(0, 0, doc.internal.pageSize.width, 1.7, 'F' );
+      // doc.setFillColor(240, 240, 240); // Light gray color
+      // doc.rect(0, 0, doc.internal.pageSize.width, 1.7, 'F' );
 
       autoTable(doc, {
         body: HeaderData,
+        theme: "plain",
         startY: 0.2,
         columnStyles: {
-          '0': { cellWidth: 3.63, fillColor: [240, 240, 240], halign: "left", },
-          '1': { cellWidth: "auto", halign: "right", fillColor: [240, 240, 240]},
+          '0': { cellWidth: 4, minCellHeight:1.7, halign: "left", },
+          '1': { cellWidth: "auto", halign: "right"},
         },
-        bodyStyles: { textColor: [0, 0, 0], fillColor: [240, 240, 240]},
+        bodyStyles: { 
+          
+        },
         didDrawCell: (data) => {
           const { cell, row, column } = data;
 
           if (data.row.index === 0 && data.column.index === 0) {
             // Add the image to the cell with full width and fixed height
-            doc.addImage(img, 'JPEG', cell.x, cell.y, 2, 1.3, "company logo");
+            doc.addImage(img, 'JPEG', cell.x, cell.y, 2.3, 1.7, "company logo");
           }
+
         },
       });
 
@@ -145,11 +166,20 @@ const Gen = async (
       doc.setDrawColor(200, 200, 200); // RGB for light gray
 
       // Draw the line
-      doc.setLineWidth(0.01).line(0, 1.7, doc.internal.pageSize.getWidth(), 1.7);
+      doc.setLineWidth(0.01).line(0, doc.autoTable.previous.finalY, doc.internal.pageSize.getWidth(), doc.autoTable.previous.finalY);
 
     }
 
 
+    // condition to check whether the quotation/invoice if daywise or equipmentwise
+    let pdfWiseType = "";
+    if(invoiceDetials.value.items.equipment_wise && invoiceDetials.value.items.equipment_wise.length == 0){
+      pdfWiseType = "DayWise";
+    }
+    else{
+      pdfWiseType = "EquipmentWise";
+    }
+    
     // generateHeader
     generateHeader(doc);
 
@@ -161,7 +191,7 @@ const Gen = async (
         {
           title: "Bill To",
           styles :{
-            fontSize: 9,
+            fontSize: 10,
           }
         },
         {
@@ -177,9 +207,9 @@ const Gen = async (
           }
         },
         {
-          title: `${titleForPdf} # : ${uniqueNumber || ""}`,
+          title: `${titleForPdf} No. : ${uniqueNumber || ""}`,
           styles: {
-            fontSize : 12,
+            fontSize : 10,
             fontStyle: "normal"
           }
         }
@@ -189,6 +219,7 @@ const Gen = async (
           title: `${invoiceDetials.value.clientx.name || ""}\n${invoiceDetials.value.clientx.address1 || ""} \n${invoiceDetials.value.clientx.address2 || ""} \n${invoiceDetials.value.clientx.city || ""} ${invoiceDetials.value.clientx.pincode || ""} \n${invoiceDetials.value.clientx.state || ""} ${invoiceDetials.value.clientx.country || ""}`,
           styles: { 
             fontSize: 10,
+            fontStyle: "normal"
           }
         },
         {
@@ -204,13 +235,14 @@ const Gen = async (
     autoTable(doc, {
       body: MainData,
       theme: 'plain',
-      startY: 1.8,
+      // startY: 2.2,
       margin: {top: 0.5},
       columnStyles: {
         '0': { cellWidth: 3.63, halign: "left", },
         '1': { cellWidth: "auto", halign: "right"},
       },
-      bodyStyles: { textColor: [0, 0, 0]},
+      bodyStyles: {
+      }
     });
 
 
@@ -221,7 +253,7 @@ const Gen = async (
           title: "Scope of Work"
         },
         {
-          title: "Quantity"
+          title: `${pdfWiseType == 'DayWise' ? 'No. of Days' : 'Quantity'}`
         },
         {
           title: "Price"
@@ -237,7 +269,7 @@ const Gen = async (
 
       [
             {
-              title: `Site Location : ${invoiceDetials.value.items.site_location || "NA"} \n\n${invoiceDetials.value.items.per_day_charge || "0"} /- Per Day\n\nNo. of days ${invoiceDetials.value.items.number_of_days || "0"}`,
+              title: `Site Location : ${invoiceDetials.value.items.site_location || "NA"} \n\n${invoiceDetials.value.items.per_day_charge || "0"} /- Per Day`,
             },
             {
               title: `${(invoiceDetials.value.items.number_of_days || 0)}`
@@ -339,40 +371,39 @@ const Gen = async (
               title: ""
             },
             {
-              title: "Subtotal"
+              title: "SUBTOTAL",
+              styles: {
+                fontStyle: "bold",
+              }
             },
             {
-              title: `${invoiceDetials.value.total}`
+              title: `${invoiceDetials.value.sub_total}`
             }
       ],
-      [
-            {
-              title: "",
-            },
-            {
-              title: ""
-            },
-            {
-              title: "Tax 0%"
-            },
-            {
-              title: ""
-            }
-      ],
-      [
-            {
-              title: "",
-            },
-            {
-              title: ""
-            },
-            {
-              title: "Tax Amount"
-            },
-            {
-              title: `${0}`
-            }
-      ],
+      ...(invoiceDetials.value.tax_type === '(CGST + SGST)'
+        ? [
+            [
+              { title: "" },
+              { title: "" },
+              { title: `CGST ${invoiceDetials.value.tax_rate / 2} %` },
+              { title: `${invoiceDetials.value.tax_amount / 2}` },
+            ],
+            [
+              { title: "" },
+              { title: "" },
+              { title: `SGST ${invoiceDetials.value.tax_rate / 2} %` },
+              { title: `${invoiceDetials.value.tax_amount / 2}` },
+            ],
+          ]
+        : [
+            [
+              { title: "" },
+              { title: "" },
+              { title: `TAX : ${invoiceDetials.value.tax_type} ${invoiceDetials.value.tax_rate} %` },
+              { title: `${invoiceDetials.value.tax_amount}` },
+            ],
+      ]),
+      [],
       [
             {
               title: "",
@@ -381,7 +412,10 @@ const Gen = async (
               title: ""
             },
           {
-              title: `Total Amount`,
+              title: `TOTAL AMOUNT`,
+              styles: {
+                fontStyle: "bold",
+              }
           },
           {
               title: `Rs.${invoiceDetials.value.total}`,
@@ -397,30 +431,33 @@ const Gen = async (
       { title: item.charge }
     ]);
 
-    if(invoiceDetials.value.items.equipment_wise.length == 0){
+    if(pdfWiseType == "DayWise"){
 
       // Day Wise Data
-      const DayWiseData = [
+      const DayWiseData:any = [
         [
           {
             title: `${invoiceDetials.value.scope_of_work}`,
           },
           {
-            title: ""
+            title: "",
           },
           {
-            title: "" 
+            title: "",
           },
           {
-            title: ""
-          }
+            title: "",
+          },
         ],
         ...ChargesItems,
         ...Footer,
         [
           {
             title: `Amount in words : ${numbersToWords}`,
-            colSpan: 4
+            colSpan: 4,
+            styles: {
+              fontStyle: "bold",
+            }
           }
         ]
       ];
@@ -429,8 +466,14 @@ const Gen = async (
         theme: "plain",
         head: tableHeader,
         body: DayWiseData,
-        headStyles: { textColor: [0, 0, 0], fillColor: [209,223,246]},
-        bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], fillColor: [240, 240, 240]},
+        headStyles: {  fillColor: [90,90,90], textColor: [255, 255, 255],halign: "center"},
+        columnStyles: {
+          '0': { cellWidth: 3.3, halign: "left", },
+          '1': { cellWidth: 1.2, halign: "center"},
+          '2': { cellWidth: 1.3, halign: "center"},
+          '3': { cellWidth: "auto", halign: "center"},
+        },
+        bodyStyles: { halign: "left",fontSize: 10, fillColor: [255, 255, 255]},
         didDrawCell: (data) => {
           const { cell, row, column } = data;
           doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
@@ -447,21 +490,24 @@ const Gen = async (
             title: `${invoiceDetials.value.scope_of_work}`,
           },
           {
-            title: ""
+            title: "",
           },
           {
-            title: "" 
+            title: "",
           },
           {
-            title: ""
-          }
+            title: "",
+          },
         ],
         ...equipments,
         ...Footer,
         [
           {
             title: `Amount in words : ${numbersToWords}`,
-            colSpan: 4
+            colSpan: 4,
+            styles: {
+              fontStyle: "bold",
+            }
           }
         ]
       ];
@@ -470,8 +516,14 @@ const Gen = async (
         theme: "plain",
         head: tableHeader,
         body: EquipmentWiseData,
-        headStyles: { textColor: [0, 0, 0], fillColor: [209,223,246]},
-        bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], fillColor: [240, 240, 240]},
+        headStyles: {  fillColor: [90,90,90], textColor: [255, 255, 255],halign: "center"},
+        columnStyles: {
+          '0': { cellWidth: 3.3, halign: "left", },
+          '1': { cellWidth: 1.2, halign: "center"},
+          '2': { cellWidth: 1.3, halign: "center"},
+          '3': { cellWidth: "auto", halign: "center"},
+        },
+        bodyStyles: { halign: "left",fontSize: 10, fillColor: [255, 255, 255]},
         didDrawCell: (data) => {
           const { cell, row, column } = data;
           doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
@@ -501,8 +553,8 @@ const Gen = async (
       theme: "plain",
       head:termsAndConditionsHeader,
       body: termsAndConditions,
-      headStyles: { textColor: [0, 0, 0], fillColor: [209,223,246]},
-      bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], fillColor: [240, 240, 240]},
+      headStyles: {  fillColor: [90,90,90], textColor: [255, 255, 255],halign: "left"},
+      bodyStyles: { halign: "left",fontSize: 10, fillColor: [240, 240, 240]},
     });
 
     // // Creating footer and saving file

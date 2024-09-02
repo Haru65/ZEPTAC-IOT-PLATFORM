@@ -5,7 +5,7 @@
       <div class="card-title">
         <!--begin::Search-->
         <div class="d-flex align-items-center position-relative my-1">
-          <KTIcon icon-name="magnifier" icon-class="fs-1 position-absoluted" />
+          <KTIcon icon-name="magnifier" icon-class="fs-1 position-absolute ms-6" />
           <input
             type="text"
             v-model="search"
@@ -88,11 +88,12 @@
             id="kt-menu-filter-button"
             class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary ms-3"
             data-kt-menu-target="#kt_menu_filter"
-            data-kt-menu-trigger="click"
+            data-kt-menu-trigger="{default:'click', lg: 'hover'}"
+            data-kt-menu-attach="parent"
             data-kt-menu-placement="bottom-end"
             data-kt-menu-flip="top-end"
           >
-            <KTIcon icon-name="category" icon-class="fs-2" />
+            <KTIcon icon-name="filter" icon-class="fs-1" />
           </button>
 
           <!--begin::Menu 1-->

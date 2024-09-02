@@ -446,24 +446,24 @@ export default defineComponent({
         let response = await validateUser(data.value);
         console.log(response);
 
-        if (response) {
-          customerData.value.name = response.name ? response.name : "";
-          customerData.value.company_name = response.company_name
-            ? response.company_name
+        if (response.success) {
+          customerData.value.name = response.result.name ? response.result.name : "";
+          customerData.value.company_name = response.result.company_name
+            ? response.result.company_name
             : "";
-          customerData.value.address1 = response.address1
-            ? response.address1
+          customerData.value.address1 = response.result.address1
+            ? response.result.address1
             : "";
-          customerData.value.address2 = response.address2
-            ? response.address2
+          customerData.value.address2 = response.result.address2
+            ? response.result.address2
             : "";
-          customerData.value.city = response.city ? response.city : "";
-          customerData.value.pincode = response.pincode ? response.pincode : "";
-          customerData.value.state = response.state ? response.state : "";
-          customerData.value.country = response.country ? response.country : "";
+          customerData.value.city = response.result.city ? response.result.city : "";
+          customerData.value.pincode = response.result.pincode ? response.result.pincode : "";
+          customerData.value.state = response.result.state ? response.result.state : "";
+          customerData.value.country = response.result.country ? response.result.country : "";
         }
       } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
+        showErrorAlert("Error", "An error occurred during the validateUser API call.");
         loading.value = false;
         console.log(error);
       }

@@ -24,7 +24,7 @@
       <Vform
         id="kt_account_profile_details_form"
         class="form"
-        novalidate
+        @submit="onsubmit"
         :validation-schema="profileDetailsValidator"
         enctype="multipart/form-data"
       >
@@ -865,13 +865,9 @@
           <!--end::Input group-->
         </div>
         <div class="modal-footer flex-center">
-          <!--begin::Button-->
-          <button type="reset" class="btn btn-lg btn-danger w-25">Clear</button>
-          <!--end::Button-->
           &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
           <!--begin::Button-->
-          <span
-            @click="onsubmit()"
+          <button
             :data-kt-indicator="loading ? 'on' : null"
             class="btn btn-lg btn-primary w-25"
             type="submit"
@@ -883,7 +879,7 @@
                 class="spinner-border spinner-border-sm align-middle ms-2"
               ></span>
             </span>
-          </span>
+          </button>
           <!--end::Button-->
         </div>
         <!--end::Input group-->
@@ -923,8 +919,6 @@ interface ProfileDetails {
   last_name: string;
   email: string;
   phone: string;
-  password: string;
-  confpassword: string;
   role_id: string;
   roles: object;
   address1: string;
@@ -988,8 +982,7 @@ export default defineComponent({
         last_name: response.last_name,
         email: response.email,
         phone: response.mobile,
-        password: " ",
-        confpassword: " ",
+        
         role_id: response.role_id,
         roles: response.roles,
         //  ? optional fields check for data
@@ -1022,13 +1015,6 @@ export default defineComponent({
       lname: Yup.string().required().label("Last name"),
       email: Yup.string().required().email().label("Email"),
       phone: Yup.string().required().label("Phone"),
-      password: Yup.string().required().label("Password"),
-      confpassword: Yup.string().required().label("Confirm Password"),
-      pincode: Yup.string().required().label("Pincode"),
-      address1: Yup.string().required().label("Address"),
-      address2: Yup.string().required().label("Address"),
-      adhar: Yup.string().required().label("Adhar No"),
-      pan: Yup.string().required().label("Pan No"),
     });
 
     const profileData = ref({
@@ -1056,8 +1042,6 @@ export default defineComponent({
       last_name: "",
       email: "",
       phone: "",
-      password: "",
-      confpassword: "",
       role_id: "",
       roles: {},
       address1: "",
@@ -1568,23 +1552,65 @@ export default defineComponent({
       }, 100);
     };
 
+    const validateForm = (formData) => {
+      for (const key in formData) {
+        let value = formData[key];
+        if (
+          key !== "profile_pic" &&
+          key !== "address1" &&
+          key !== "address2" &&
+          key !== "city" &&
+          key !== "pincode" &&
+          key !== "state" &&
+          key !== "country" &&
+          key !== "dob" &&
+          key !== "gender" &&
+          key !== "adhar" &&
+          key !== "pan"
+        ) {
+          if (Array.isArray(value)) {
+            for (const item of value) {
+              if (!validateForm(item)) {
+                return false;
+              }
+            }
+          } else if (typeof value === "object" && value !== null) {
+            if (!validateForm(value)) {
+              return false;
+            }
+          } else if (typeof value === "string") {
+            value = value.trim();
+            if (value === "") {
+              return false;
+            }
+          } else {
+          }
+        }
+      }
+      return true;
+    };
+
     const onsubmit = async () => {
       try {
         loading.value = true;
 
-        // console.log(profileDetails.value);
-        const response = await updateUser(profileDetails.value, userId);
-        // console.log(response.error);
-        if (!response.error) {
-          // Handle successful API response
-          // console.log("API response:", response);
-          showSuccessAlert("Success", "User have been successfully updated!");
-          router.push({ name: "users-list" });
+        if (validateForm(profileDetails.value)) {
+          // console.log(profileDetails.value);
+          const response = await updateUser(profileDetails.value, userId);
+          // console.log(response.error);
+          if (!response.error) {
+            // Handle successful API response
+            // console.log("API response:", response);
+            showSuccessAlert("Success", "User have been successfully updated!");
+            router.push({ name: "users-list" });
+          } else {
+            // Handle API error response
+            const errorData = response.error;
+            console.log("API error:", errorData);
+            // console.log("API error:", errorData.response.data.errors);
+            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          }
         } else {
-          // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
         }
       } catch (error) {
@@ -1631,8 +1657,6 @@ export default defineComponent({
         last_name: "",
         email: "",
         phone: "",
-        password: "",
-        confpassword: "",
         role_id: "",
         roles: {},
         address1: "",

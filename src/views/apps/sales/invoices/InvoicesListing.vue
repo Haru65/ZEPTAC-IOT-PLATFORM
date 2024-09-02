@@ -407,6 +407,15 @@ export default defineComponent({
       status: string;
       scope_of_work: string;
       terms_and_conditions: string;
+
+      sub_total: number;
+
+      tax_id: string;
+      tax_type: string;
+      tax_description: string;
+      tax_rate: number;
+      tax_amount: number;
+
       total: number;
       lead: Meta;
       client: Meta;
@@ -485,6 +494,14 @@ export default defineComponent({
         pincode: "",
         country: "",
       },
+
+      sub_total: 0,
+      tax_id: "",
+      tax_type: "",
+      tax_description: "",
+      tax_rate: 0,
+      tax_amount: 0,
+
       total: 0,
       is_active: 1,
       company_id: User.company_id,
@@ -896,7 +913,15 @@ export default defineComponent({
             status: "1",
             scope_of_work: response.scope_of_work,
             terms_and_conditions: response.terms_and_conditions,
+
+            sub_total: response.sub_total,
+            tax_id: response.tax_id,
+            tax_type: response.tax_type,
+            tax_description: response.tax_description,
+            tax_rate: response.tax_rate,
+            tax_amount: response.tax_amount,
             total: response.total,
+
             lead: {
               id: response.customer_id,
               first_name: "",
@@ -1013,6 +1038,14 @@ export default defineComponent({
         pincode: "",
         country: "",
       },
+
+      sub_total: 0,
+      tax_id: 0,
+      tax_type: "",
+      tax_description: "",
+      tax_rate: 0,
+      tax_amount: 0,
+
       total: 0,
       company_id: "",
     });
@@ -1060,7 +1093,25 @@ export default defineComponent({
           InvoiceInfo.value.enquiry_no = res.result.enquiry_no;
           InvoiceInfo.value.status = res.result.status;
           InvoiceInfo.value.scope_of_work = res.result.scope_of_work;
-          InvoiceInfo.value.total = res.result.total;
+
+          InvoiceInfo.value.sub_total = res.result.sub_total
+            ? res.result.sub_total
+            : 0.0;
+          InvoiceInfo.value.tax_id = res.result.tax_id ? res.result.tax_id : "";
+          InvoiceInfo.value.tax_type = res.result.tax_type
+            ? res.result.tax_type
+            : "";
+          InvoiceInfo.value.tax_description = res.result.tax_description
+            ? res.result.tax_description
+            : "";
+          InvoiceInfo.value.tax_rate = res.result.tax_rate
+            ? res.result.tax_rate
+            : "";
+          InvoiceInfo.value.tax_amount = res.result.tax_amount
+            ? res.result.tax_amount
+            : "";
+
+          InvoiceInfo.value.total = res.result.total ? res.result.total : 0.0;
           InvoiceInfo.value.terms_and_conditions =
             res.result.terms_and_conditions;
         } else {
@@ -1087,7 +1138,6 @@ export default defineComponent({
           companyInfo.value.pincode = res2.result.pincode || "";
           companyInfo.value.state = res2.result.state || "";
           companyInfo.value.country = res2.result.country || "";
-
         } else {
           showErrorAlert("Error", res2.message || "Error Occured");
           return;

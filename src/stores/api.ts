@@ -60,6 +60,10 @@ const BSC_URL = "bsc";
 const BSC_REPORT_URL = "bsc_reports";
 const FEEDBACK_URL = "feedbacks";
 const ACTIVITY_URL = "activity_logger";
+const REF_INSTRUMENT = "reference-instrument";
+const LINKS = "links";
+const CALIBRATION_INSTRUMENT = "calibration-instrument";
+const CALIBRATION_SRF = "calibration-srf";
 
 
 
@@ -90,12 +94,12 @@ export async function resetPassword(data: any) {
     }
 }
 
-// Validate User for Service Request
+// Validate User for Service Request of NABL
 export async function validateUser(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.post("validate_user", data);
-        return response.data.result;
+        return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
         return { success: false, message: errors?.response?.data?.message || "An error occurred" };
@@ -107,7 +111,19 @@ export async function validateFeedback(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.post("validate_feedback", data);
-        return response.data.result;
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// Validate Customer for Service Request of CalibrationRecords
+export async function validateUserNSrf(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.post("validate_user_srf", data);
+        return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
         return { success: false, message: errors?.response?.data?.message || "An error occurred" };
@@ -1006,9 +1022,9 @@ export async function getAllInstrument(data) {
         ApiService.setHeader();
         const response = await ApiService.listingget(INSTRUMENTS_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1021,9 +1037,9 @@ export async function InstrumentSearch(search: any) {
         ApiService.setHeader();
         const response = await ApiService.post('instrument_search', data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -1056,7 +1072,7 @@ export async function getInstrument(data: any) {
         ApiService.setHeader();
         const response = await ApiService.get(INSTRUMENTS_URL, data);
         console.log(response.data.result)
-        return response.data.result;
+        return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
         return { success: false, message: errors?.response?.data?.message || "An error occurred" };
@@ -2123,10 +2139,10 @@ export async function addThermalInstrument(data) {
 
 
 // forgot Password
-export async function process_json_data(data: any) {
+export async function processCalibrationInstruments(data: any) {
     try {
         ApiService.setHeader();
-        const response = await ApiService.post("process_json_data", data);
+        const response = await ApiService.post("process_calibration_instruments", data);
         return response.data;
     } catch (error) {
         console.error(error);
@@ -3675,9 +3691,9 @@ export async function getFormAndFormats(data) {
         ApiService.setHeader();
         const response = await ApiService.listingget(FORMS_AND_FORMATS_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3692,9 +3708,9 @@ export async function FormAndFormatSearch(search: any, year:any) {
         ApiService.setHeader();
         const response = await ApiService.post('form_format_search', data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3717,7 +3733,7 @@ export async function getFormAndFormat(data: any) {
         ApiService.setHeader();
         const response = await ApiService.get(FORMS_AND_FORMATS_URL, data);
         console.log(response.data.result)
-        return response.data.result;
+        return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
         return { success: false, message: errors?.response?.data?.message || "An error occurred" };
@@ -3781,9 +3797,9 @@ export async function getNABLDocs(data) {
         ApiService.setHeader();
         const response = await ApiService.listingget(NABL_DOC_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3798,9 +3814,9 @@ export async function NABLDocSearch(search: any, year:any) {
         ApiService.setHeader();
         const response = await ApiService.post('nabl_search', data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3823,7 +3839,7 @@ export async function getNABLDoc(data: any) {
         ApiService.setHeader();
         const response = await ApiService.get(NABL_DOC_URL, data);
         console.log(response.data.result)
-        return response.data.result;
+        return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
         return { success: false, message: errors?.response?.data?.message || "An error occurred" };
@@ -3888,9 +3904,9 @@ export async function getNIDocs(data) {
         ApiService.setHeader();
         const response = await ApiService.listingget(NI_DOC_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3905,9 +3921,9 @@ export async function NIDocSearch(search: any, year:any) {
         ApiService.setHeader();
         const response = await ApiService.post('ni_search', data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -3930,7 +3946,7 @@ export async function getNIDoc(data: any) {
         ApiService.setHeader();
         const response = await ApiService.get(NI_DOC_URL, data);
         console.log(response.data.result)
-        return response.data.result;
+        return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
         return { success: false, message: errors?.response?.data?.message || "An error occurred" };
@@ -3993,9 +4009,9 @@ export async function getRecords(data) {
         ApiService.setHeader();
         const response = await ApiService.listingget(RECORDS_URL, data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4010,9 +4026,9 @@ export async function RecordSearch(search: any, year:any) {
         ApiService.setHeader();
         const response = await ApiService.post('records_search', data);
         return response.data;
-    } catch (errors) {
-        console.error(errors);
-        return { error: errors };
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
 
@@ -4034,8 +4050,8 @@ export async function getRecord(data: any) {
     try {
         ApiService.setHeader();
         const response = await ApiService.get(RECORDS_URL, data);
-        console.log(response.data.result)
-        return response.data.result;
+        console.log(response.data)
+        return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
         return { success: false, message: errors?.response?.data?.message || "An error occurred" };
@@ -5897,6 +5913,356 @@ export async function getIndiaMartApi(data: any) {
         ApiService.setHeader();
         const response = await ApiService.get(APISETTING_URL, data);
         // console.log(response)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
+// REFERENCE INSTRUMENTS
+
+// listing function
+export async function getReferenceInstruments(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(REF_INSTRUMENT, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// searching function
+export async function ReferenceInstrumentSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('reference_instrument_search', data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
+// add function
+export async function addReferenceInstrument(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(REF_INSTRUMENT, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// get function
+export async function getReferenceInstrument(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(REF_INSTRUMENT, data);
+        // console.log(response)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// update function
+export async function updateReferenceInstrument(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(REF_INSTRUMENT + "/" + id, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// delete function
+export async function deleteReferenceInstrument(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(REF_INSTRUMENT + "/" + data);
+        console.log(response.data.message)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
+// SRF FOR CALIBRATION
+
+// add function
+export async function generateSrfLink(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post("generate_link", data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// update function
+export async function draftCalibrationSrf(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post("draft_calibration_srf", data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// update function
+export async function saveCalibrationSrf(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post("save_calibration_srf", data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
+
+
+
+
+// CALIBRATION INSTRUMENT
+// listing function
+export async function getCalibrationInstruments(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(CALIBRATION_INSTRUMENT, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function CalibrationInstrumentSearch(search: any, companyID:any, srfID: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search,
+            companyID: companyID,
+            srfID: srfID
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('calibration_instruments_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+
+// add function
+export async function addCalibrationInstrument(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(CALIBRATION_INSTRUMENT, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// download function
+export async function getCalibrationInstrumentInfo(data: any) {
+    try {
+        const id = { "id": data };
+        ApiService.setHeader();
+        const response = await axios.post("get_information_of_calibration_record", id);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
+// get function
+export async function getCalibrationInstrument(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(CALIBRATION_INSTRUMENT, data);
+        // console.log(response)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// update function
+export async function updateCalibrationInstrument(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(CALIBRATION_INSTRUMENT + "/" + id, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// delete function
+export async function deleteCalibrationInstrument(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(CALIBRATION_INSTRUMENT + "/" + data);
+        console.log(response.data.message)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
+
+// CALIBRATION SERVICE REPORTS - CALIBRATION RECORDS
+
+// listing function
+export async function getCalibrationSrfs(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(CALIBRATION_SRF, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// searching function
+export async function CalibrationSrfSearch(search: any, year:any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search,
+            year: year
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('calibration_srf_search', data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// add function
+export async function addCalibrationSrf(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(CALIBRATION_SRF, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// get function
+export async function getCalibrationSrf(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(CALIBRATION_SRF, data);
+        // console.log(response)
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function updateCalibrationSrf(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(CALIBRATION_SRF + "/" + id, data);
+        return response.data;
+    } catch (errors) {
+        console.error(errors);
+        return { error: errors };
+    }
+}
+
+// update function
+export async function SrfCalibrationStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("calibration_srf_status", details);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// delete function
+export async function deleteCalibrationSrf(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(CALIBRATION_SRF + "/" + data);
+        console.log(response.data.message)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+export async function getCalibrationEngineers(data: any) {
+    try {
+        //console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('get_calibration_engineers', id);
         return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);

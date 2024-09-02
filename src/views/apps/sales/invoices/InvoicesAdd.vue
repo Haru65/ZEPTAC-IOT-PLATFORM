@@ -87,7 +87,7 @@
                 class="form-check form-switch form-check-custom form-check-solid"
               >
                 <input
-                  class="form-check-input min-w-100px"
+                  class="form-check-input min-w-50px"
                   type="checkbox"
                   :value="false"
                   name="siteSameAsBilling"
@@ -615,6 +615,40 @@
               </div>
             </div>
 
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label
+                class="col-lg-3 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
+                >Select Tax/GST</label
+              >
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-9 fv-row">
+                <el-select
+                  v-model="InvoiceDetails.tax_id"
+                  filterable
+                  v-on:change="SetTax"
+                  placeholder="Please Select Tax..."
+                >
+                  <el-option
+                    value=""
+                    label="Please Select Tax..."
+                    key=""
+                    disabled
+                    >Please Select Tax...</el-option
+                  >
+                  <el-option
+                    v-for="tax of TaxArray"
+                    :key="tax.id"
+                    :label="`${tax.tax_type} ${tax.tax_rate} %`"
+                    :value="tax.id"
+                  />
+                </el-select>
+              </div>
+              <!--end::Col-->
+            </div>
+
             <!--begin::Input group-->
             <div class="row mb-6">
               <!--begin::Col-->
@@ -700,45 +734,29 @@
                   </div>
                   <div class="card-body">
                     <div class="items">
-                      <p class="d-inline gap-2">
+                      <p>
                         <span
-                          v-if="InvoiceDetails.items.id != ''"
-                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                          >+ {{ InvoiceDetails.items.site_location }} ({{
-                            InvoiceDetails.items.per_day_charge
+                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-6"
+                          >Sub Total : {{ InvoiceDetails.sub_total }}
+                        </span>
+                      </p>
+                      <p>
+                        <span
+                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-6"
+                          >Tax Rate :
+                          {{
+                            InvoiceDetails.tax_type == "(CGST + SGST)"
+                              ? `CGST ${InvoiceDetails.tax_rate / 2} % + CGST ${
+                                  InvoiceDetails.tax_rate / 2
+                                } %`
+                              : `${InvoiceDetails.tax_rate} %`
                           }}
-                          x {{ InvoiceDetails.items.number_of_days }})
                         </span>
+                      </p>
+                      <p>
                         <span
-                          v-if="InvoiceDetails.items.accomm"
-                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                          >+ Accomodation ({{
-                            InvoiceDetails.items.accommodation
-                          }})
-                        </span>
-                        <span
-                          v-if="InvoiceDetails.items.travel"
-                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                          >+ Travelling ({{ InvoiceDetails.items.travelling }})
-                        </span>
-                        <span
-                          v-if="InvoiceDetails.items.train"
-                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                          >+ Training ({{ InvoiceDetails.items.training }})
-                        </span>
-                        <span
-                          v-if="InvoiceDetails.items.board"
-                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                          >+ Boarding & Lodging ({{
-                            InvoiceDetails.items.boarding
-                          }})
-                        </span>
-                        <span
-                          v-if="InvoiceDetails.items.pick"
-                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                          >+ Pickup & Delivery ({{
-                            InvoiceDetails.items.pickup
-                          }})
+                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-6"
+                          >Tax amount : {{ InvoiceDetails.tax_amount }}
                         </span>
                       </p>
                     </div>
@@ -821,6 +839,7 @@ import { formatPrice } from "@/core/config/DataFormatter";
 import {
   InvoiceStatusArray,
   GetInvoiceStatus,
+  TaxArray,
 } from "@/core/config/InvoiceStatusConfig";
 import CustomInvoiceItems from "./CustomComponents/CustomInvoiceItems.vue";
 
@@ -871,6 +890,15 @@ interface InvoiceDetails {
   status: string;
   scope_of_work: string;
   terms_and_conditions: string;
+
+  sub_total: number;
+
+  tax_id: string;
+  tax_type: string;
+  tax_description: string;
+  tax_rate: number;
+  tax_amount: number;
+
   total: number;
   day_or_equipment: string;
   customer: Data;
@@ -1031,6 +1059,14 @@ export default defineComponent({
         pincode: "",
         country: "",
       },
+
+      sub_total: 0,
+      tax_id: "",
+      tax_type: "",
+      tax_description: "",
+      tax_rate: 0,
+      tax_amount: 0,
+
       total: 0,
       is_active: 1,
       day_or_equipment: "1",
@@ -1120,8 +1156,8 @@ export default defineComponent({
     const pickupRef = ref(true);
     const boardingRef = ref(true);
 
-    const calculateTotal = async () => {
-      InvoiceDetails.value.total =
+    const calculateSubTotal = async () => {
+      InvoiceDetails.value.sub_total =
         Number(InvoiceDetails.value.items.number_of_days) *
           Number(InvoiceDetails.value.items.per_day_charge) +
         Number(InvoiceDetails.value.items.accommodation) +
@@ -1129,7 +1165,34 @@ export default defineComponent({
         Number(InvoiceDetails.value.items.training) +
         Number(InvoiceDetails.value.items.pickup) +
         Number(InvoiceDetails.value.items.boarding);
+
+      calculateTaxAmount();
     };
+
+    /* HANDLE TAX SELECTION LOGIC */
+    async function SetTax(id) {
+      const foundTax = await TaxArray.find((item) => {
+        return item.id === id;
+      });
+      // console.log(foundTax);
+
+      if (foundTax) {
+        const { id, tax_type, tax_description, tax_rate, tax_amount } =
+          foundTax;
+
+        InvoiceDetails.value.tax_id = id;
+        InvoiceDetails.value.tax_type = tax_type;
+        InvoiceDetails.value.tax_description = tax_description;
+        InvoiceDetails.value.tax_rate = tax_rate;
+        InvoiceDetails.value.tax_amount = tax_amount;
+
+        if (dayWiseRef.value) {
+          calculateSubTotal();
+        } else {
+          calculateTotalEquipment();
+        }
+      }
+    }
 
     async function SetLocation(id) {
       const foundLocation = await locations.value.find((item) => {
@@ -1151,6 +1214,7 @@ export default defineComponent({
         InvoiceDetails.value.items.id = id;
         InvoiceDetails.value.items.site_location = site_location;
 
+        // when day-wise quotation and location is selected
         if (dayWiseRef.value) {
           InvoiceDetails.value.items.per_day_charge = per_day_charge;
           InvoiceDetails.value.items.number_of_days = "1";
@@ -1177,7 +1241,7 @@ export default defineComponent({
           pickupRef.value = true;
           boardingRef.value = true;
 
-          await calculateTotal();
+          await calculateSubTotal();
         } else {
           InvoiceDetails.value.items.per_day_charge = "";
           InvoiceDetails.value.items.accommodation = 0;
@@ -1185,43 +1249,46 @@ export default defineComponent({
           InvoiceDetails.value.items.training = 0;
           InvoiceDetails.value.items.boarding = 0;
           InvoiceDetails.value.items.pickup = 0;
-          InvoiceDetails.value.items.number_of_days = "1";
+          InvoiceDetails.value.items.number_of_days = "0";
           equipments.value.pop();
           equipments.value = [...equipment_wise];
 
           InvoiceDetails.value.items.equipment_wise = [];
 
+          InvoiceDetails.value.sub_total = 0;
           InvoiceDetails.value.total = 0;
+
+          calculateTaxAmount();
         }
       }
     }
 
     async function SetPerDayCharge() {
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function SetDays() {
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function SetAccommodation() {
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function SetTravelling() {
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function SetTraining() {
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function SetBoarding() {
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function SetPickUp() {
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function ToggleAccommodation() {
@@ -1234,7 +1301,7 @@ export default defineComponent({
         InvoiceDetails.value.items.accommodation = 0;
         InvoiceDetails.value.items.accomm = false;
       }
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function ToggleTravelling() {
@@ -1247,7 +1314,7 @@ export default defineComponent({
         InvoiceDetails.value.items.travelling = 0;
         InvoiceDetails.value.items.travel = false;
       }
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function ToggleTraining() {
@@ -1260,7 +1327,7 @@ export default defineComponent({
         InvoiceDetails.value.items.training = 0;
         InvoiceDetails.value.items.train = false;
       }
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function ToggleBoarding() {
@@ -1273,7 +1340,7 @@ export default defineComponent({
         InvoiceDetails.value.items.boarding = 0;
         InvoiceDetails.value.items.board = false;
       }
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function TogglePickUp() {
@@ -1286,7 +1353,7 @@ export default defineComponent({
         InvoiceDetails.value.items.pickup = 0;
         InvoiceDetails.value.items.pick = false;
       }
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     /* --------EQUIPMENT WISE LOGIC--------*/
@@ -1323,12 +1390,22 @@ export default defineComponent({
       calculateTotalEquipment();
     }
 
-    const calculateTotalEquipment = () => {
+    const calculateTaxAmount = () => {
+      InvoiceDetails.value.tax_amount =
+        (InvoiceDetails.value.tax_rate * InvoiceDetails.value.sub_total) /
+          100 || 0;
       InvoiceDetails.value.total =
+        InvoiceDetails.value.tax_amount + InvoiceDetails.value.sub_total || 0;
+    };
+
+    const calculateTotalEquipment = () => {
+      InvoiceDetails.value.sub_total =
         InvoiceDetails.value.items.equipment_wise.reduce(
           (sum, item) => sum + item.amount,
           0
         );
+
+      calculateTaxAmount();
     };
 
     const addNewRow = () => {
@@ -1463,7 +1540,7 @@ export default defineComponent({
           ToggleClient();
         } else {
           clientSelect.value = false;
-          GetClients(customer_id);
+          await GetClients(customer_id);
         }
       } else {
         InvoiceDetails.value.enquiry_no = "";
@@ -1538,6 +1615,10 @@ export default defineComponent({
           status,
           scope_of_work,
           terms_and_conditions,
+          tax_id,
+          tax_type,
+          tax_amount,
+          sub_total,
           total,
         } = detail;
 
@@ -1551,6 +1632,10 @@ export default defineComponent({
           status === "" ||
           scope_of_work === "" ||
           terms_and_conditions === "" ||
+          tax_id === "" ||
+          tax_type === "" ||
+          isNaN(parseFloat(tax_amount)) ||
+          isNaN(parseFloat(sub_total)) ||
           isNaN(parseFloat(total))
         );
       });
@@ -1562,7 +1647,7 @@ export default defineComponent({
         id: "",
         site_location: "",
         per_day_charge: "",
-        number_of_days: "1",
+        number_of_days: "",
         accommodation: 0,
         travelling: 0,
         training: 0,
@@ -1575,7 +1660,9 @@ export default defineComponent({
         pick: true,
         equipment_wise: [],
       };
+      InvoiceDetails.value.sub_total = 0;
       InvoiceDetails.value.total = 0;
+      calculateTaxAmount();
       equipments.value = [];
       dayWiseRef.value = value;
     };
@@ -1778,6 +1865,14 @@ export default defineComponent({
         status: "",
         scope_of_work: "",
         terms_and_conditions: "",
+
+        sub_total: 0,
+        tax_id: "",
+        tax_type: "",
+        tax_description: "",
+        tax_rate: 0,
+        tax_amount: 0,
+
         total: 0,
         day_or_equipment: "1",
         customer: {
@@ -1825,7 +1920,9 @@ export default defineComponent({
       InvoiceStatusArray,
       GetInvoiceStatus,
       Total,
+      SetTax,
       SetLocation,
+      TaxArray,
       SetPerDayCharge,
       SetDays,
       loading,
@@ -1860,4 +1957,36 @@ export default defineComponent({
   },
 });
 </script>
+
+
+
+<style>
+.el-input__inner,
+.el-select__inner {
+  font-weight: 500;
+}
+.el-input__wrapper,
+.el-select__wrapper {
+  height: 3rem;
+  border-radius: 0.5rem;
+  background-color: var(--bs-gray-100);
+  border-color: var(--bs-gray-100);
+  color: var(--bs-gray-700);
+  transition: color 0.2s ease;
+  appearance: none;
+  line-height: 1.5;
+  border: none !important;
+  padding-top: 0.825rem;
+  padding-bottom: 0.825rem;
+  padding-left: 1.5rem;
+  font-size: 1.15rem;
+  border-radius: 0.625rem;
+  box-shadow: none !important;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  display: none;
+}
+</style>
 

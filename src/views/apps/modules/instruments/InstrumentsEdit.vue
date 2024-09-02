@@ -1288,16 +1288,28 @@ export default defineComponent({
     });
 
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-          }))
-        );
-        console.log(Companies);
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Companies.value.push(
+              ...response.result?.map(({ created_at, ...rest }) => ({
+                ...rest,
+                created_at: moment(created_at).format("DD-MM-YYYY"),
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
@@ -1349,39 +1361,61 @@ export default defineComponent({
 
     onMounted(async () => {
       Companies.value.pop();
-      let response = await getInstrument(itemId.toString());
-      console.log(response);
 
-      itemDetails.value = {
-        instrument_id: response.instrument_id,
-        name: response.name,
-        description: response.description,
-        availability: response.availability,
-        model_no: response.model_no,
-        serial_no: response.serial_no,
-        make: response.make,
+      try {
+        let response = await getInstrument(itemId.toString());
+        if (response?.success) {
+          itemDetails.value = {
+            instrument_id: response.result.instrument_id,
+            name: response.result.name,
+            description: response.result.description,
+            availability: response.result.availability,
+            model_no: response.result.model_no,
+            serial_no: response.result.serial_no,
+            make: response.result.make,
 
-        calibration_date: response.calibration_date,
-        calibration_due_date: response.calibration_due_date,
-        vendor_name: response.vendor_name,
-        accessories_list: JSON.parse(response.accessories_list),
-        datasheet: response.datasheet ? response.datasheet : "",
-        calibration_certificate: response.calibration_certificate
-          ? response.calibration_certificate
-          : "",
-        traceability: response.traceability ? response.traceability : "",
+            calibration_date: response.result.calibration_date,
+            calibration_due_date: response.result.calibration_due_date,
+            vendor_name: response.result.vendor_name,
+            accessories_list: JSON.parse(response.result.accessories_list),
+            datasheet: response.result.datasheet
+              ? response.result.datasheet
+              : "",
+            calibration_certificate: response.result.calibration_certificate
+              ? response.result.calibration_certificate
+              : "",
+            traceability: response.result.traceability
+              ? response.result.traceability
+              : "",
 
-        maintenance_plan: response.maintenance_plan ? true : false,
-        maintenance_history: JSON.parse(response.maintenance_history),
-        intermediate_check_plan: JSON.parse(response.intermediate_check_plan),
+            maintenance_plan: response.result.maintenance_plan ? true : false,
+            maintenance_history: JSON.parse(
+              response.result.maintenance_history
+            ),
+            intermediate_check_plan: JSON.parse(
+              response.result.intermediate_check_plan
+            ),
 
-        approval_status: response.approval_status,
+            approval_status: response.result.approval_status,
 
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getQMSProcedure : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getQMSProcedure : ${err}`);
+      }
+
       if (User.role_id === 1) {
         await getdropcomp();
       }

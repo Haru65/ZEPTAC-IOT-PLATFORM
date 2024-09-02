@@ -147,6 +147,32 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
     ],
   },
 
+  
+  {
+    heading: "Calibration",
+    route: "calibration",
+    pages: [
+      {
+        sectionTitle: "Calibration",
+        route: "/calibration",
+        keenthemesIcon: "chart-pie-4",
+        bootstrapIcon: "bi-archive",
+        sub: [
+          {
+            heading: "Calibration Records",
+            route: "/calibration-srf/list",
+          },
+          {
+            heading: "Reference Instrument",
+            route: "/reference-instrument/list",
+          },
+        ],
+      },
+    ],
+  },
+
+
+  
   {
     heading: "Sales",
     route: "sales",

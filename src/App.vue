@@ -78,7 +78,8 @@ export default defineComponent({
   font-weight: 500;
 }
 .el-input__wrapper, .el-select__wrapper {
-  height: 3.5rem;
+  min-height: 3.5rem;
+  max-height: auto;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);
   border-color: var(--bs-gray-100);

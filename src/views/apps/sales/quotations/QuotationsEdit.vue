@@ -594,6 +594,45 @@
             </div>
             <!--end::Input group-->
 
+            <div class="row mb-6">
+              <!--begin::Label-->
+              <label
+                class="col-lg-3 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
+                >Select Tax/GST</label
+              >
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-9 fv-row">
+                <el-select
+                  v-model="QuotationDetails.tax_id"
+                  filterable
+                  v-on:change="SetTax"
+                  placeholder="Please Select Tax..."
+                >
+                  <el-option
+                    value=""
+                    label="Please Select Tax..."
+                    key=""
+                    disabled
+                    >Please Select Tax...</el-option
+                  >
+                  <el-option
+                    v-for="tax of TaxArray"
+                    :key="tax.id"
+                    :label="`${tax.tax_type} ${tax.tax_rate} %`"
+                    :value="tax.id"
+                  />
+                </el-select>
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="site_location" />
+                  </div>
+                </div>
+              </div>
+              <!--end::Col-->
+            </div>
+
             <!--begin::Input group-->
             <div class="row mb-6">
               <!--begin::Col-->
@@ -660,47 +699,29 @@
                   </div>
                   <div class="card-body">
                     <div class="items">
-                      <p class="d-inline gap-2">
+                      <p>
                         <span
-                          v-if="QuotationDetails.items.id != ''"
-                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                          >+ {{ QuotationDetails.items.site_location }} ({{
-                            QuotationDetails.items.per_day_charge
+                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-6"
+                          >Sub Total : {{ QuotationDetails.sub_total }}
+                        </span>
+                      </p>
+                      <p>
+                        <span
+                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-6"
+                          >Tax Rate :
+                          {{
+                            QuotationDetails.tax_type == "(CGST + SGST)"
+                              ? `CGST ${
+                                  QuotationDetails.tax_rate / 2
+                                } % + CGST ${QuotationDetails.tax_rate / 2} %`
+                              : `${QuotationDetails.tax_rate} %`
                           }}
-                          x {{ QuotationDetails.items.number_of_days }})
                         </span>
+                      </p>
+                      <p>
                         <span
-                          v-if="QuotationDetails.items.accomm"
-                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                          >+ Accomodation ({{
-                            QuotationDetails.items.accommodation
-                          }})
-                        </span>
-                        <span
-                          v-if="QuotationDetails.items.travel"
-                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                          >+ Travelling ({{
-                            QuotationDetails.items.travelling
-                          }})
-                        </span>
-                        <span
-                          v-if="QuotationDetails.items.train"
-                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                          >+ Training ({{ QuotationDetails.items.training }})
-                        </span>
-                        <span
-                          v-if="QuotationDetails.items.board"
-                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                          >+ Boarding & Lodging ({{
-                            QuotationDetails.items.boarding
-                          }})
-                        </span>
-                        <span
-                          v-if="QuotationDetails.items.pick"
-                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-7"
-                          >+ Pickup & Delivery ({{
-                            QuotationDetails.items.pickup
-                          }})
+                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-6"
+                          >Tax amount : {{ QuotationDetails.tax_amount }}
                         </span>
                       </p>
                     </div>
@@ -817,6 +838,7 @@ import { Gen } from "@/core/config/PdfGenerator";
 import {
   QuotationStatusArray,
   GetQuotationStatus,
+  TaxArray,
 } from "@/core/config/QuotationStatusConfig";
 
 import CustomQuotationItems from "./CustomComponents/CustomQuotationItems.vue";
@@ -879,6 +901,15 @@ interface QuotationDetails {
   status: string;
   scope_of_work: string;
   terms_and_conditions: string;
+
+  sub_total: number;
+
+  tax_id: string;
+  tax_type: string;
+  tax_description: string;
+  tax_rate: number;
+  tax_amount: number;
+
   total: number;
   day_or_equipment: string;
   customer: Data;
@@ -1008,7 +1039,7 @@ export default defineComponent({
         id: "",
         site_location: "",
         per_day_charge: "",
-        number_of_days: "1",
+        number_of_days: "",
         accommodation: 0,
         travelling: 0,
         training: 0,
@@ -1061,6 +1092,14 @@ export default defineComponent({
         logo_base64: "",
       },
       company_id: "",
+
+      sub_total: 0,
+      tax_id: "",
+      tax_type: "",
+      tax_description: "",
+      tax_rate: 0,
+      tax_amount: 0,
+
       total: 0,
       day_or_equipment: "1",
       is_active: 1,
@@ -1108,6 +1147,23 @@ export default defineComponent({
         QuotationDetails.value.day_or_equipment =
           QuotationDetails.value.items.equipment_wise.length === 0 ? "1" : "2";
 
+        QuotationDetails.value.tax_id = response.tax_id
+          ? response.tax_id.toString()
+          : "";
+        QuotationDetails.value.tax_type = response.tax_type
+          ? response.tax_type
+          : "";
+        QuotationDetails.value.tax_description = response.tax_description
+          ? response.tax_description
+          : "";
+        QuotationDetails.value.tax_rate = response.tax_rate
+          ? response.tax_rate
+          : 0;
+        QuotationDetails.value.tax_amount = response.tax_amount
+          ? response.tax_amount
+          : 0;
+        QuotationDetails.value.sub_total = parseFloat(response.sub_total);
+
         QuotationDetails.value.total = parseFloat(response.total);
         QuotationDetails.value.scope_of_work = response.scope_of_work;
         QuotationDetails.value.terms_and_conditions =
@@ -1149,8 +1205,8 @@ export default defineComponent({
     const pickupRef = ref(true);
     const boardingRef = ref(true);
 
-    const calculateTotal = async () => {
-      QuotationDetails.value.total =
+    const calculateSubTotal = async () => {
+      QuotationDetails.value.sub_total =
         Number(QuotationDetails.value.items.number_of_days) *
           Number(QuotationDetails.value.items.per_day_charge) +
         Number(QuotationDetails.value.items.accommodation) +
@@ -1158,7 +1214,34 @@ export default defineComponent({
         Number(QuotationDetails.value.items.training) +
         Number(QuotationDetails.value.items.pickup) +
         Number(QuotationDetails.value.items.boarding);
+
+      calculateTaxAmount();
     };
+
+    /* HANDLE TAX SELECTION LOGIC */
+    async function SetTax(id) {
+      const foundTax = await TaxArray.find((item) => {
+        return item.id === id;
+      });
+      // console.log(foundTax);
+
+      if (foundTax) {
+        const { id, tax_type, tax_description, tax_rate, tax_amount } =
+          foundTax;
+
+        QuotationDetails.value.tax_id = id;
+        QuotationDetails.value.tax_type = tax_type;
+        QuotationDetails.value.tax_description = tax_description;
+        QuotationDetails.value.tax_rate = tax_rate;
+        QuotationDetails.value.tax_amount = tax_amount;
+
+        if (dayWiseRef.value) {
+          calculateSubTotal();
+        } else {
+          calculateTotalEquipment();
+        }
+      }
+    }
 
     async function SetLocation(id) {
       const foundLocation = await locations.value.find((item) => {
@@ -1179,6 +1262,7 @@ export default defineComponent({
         QuotationDetails.value.items.id = id;
         QuotationDetails.value.items.site_location = site_location;
 
+        // when day-wise quotation and location is selected
         if (dayWiseRef.value === true) {
           QuotationDetails.value.items.per_day_charge = per_day_charge;
           QuotationDetails.value.items.number_of_days = "1";
@@ -1205,52 +1289,56 @@ export default defineComponent({
           pickupRef.value = true;
           boardingRef.value = true;
 
-          await calculateTotal();
+          await calculateSubTotal();
         } else {
+          // when equipment-wise quotation and location is selected
           QuotationDetails.value.items.per_day_charge = "";
           QuotationDetails.value.items.accommodation = 0;
           QuotationDetails.value.items.travelling = 0;
           QuotationDetails.value.items.training = 0;
           QuotationDetails.value.items.boarding = 0;
           QuotationDetails.value.items.pickup = 0;
-          QuotationDetails.value.items.number_of_days = "1";
+          QuotationDetails.value.items.number_of_days = "0";
           equipments.value.pop();
           equipments.value = [...equipment_wise];
 
           QuotationDetails.value.items.equipment_wise = [];
 
+          QuotationDetails.value.sub_total = 0;
           QuotationDetails.value.total = 0;
+
+          calculateTaxAmount();
         }
       }
     }
 
     async function SetPerDayCharge() {
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function SetDays() {
       // console.log(QuotationDetails.value.items.number_of_days);
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function SetAccommodation() {
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function SetTravelling() {
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function SetTraining() {
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function SetBoarding() {
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function SetPickUp() {
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function ToggleAccommodation() {
@@ -1263,7 +1351,7 @@ export default defineComponent({
         QuotationDetails.value.items.accommodation = 0;
         QuotationDetails.value.items.accomm = false;
       }
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function ToggleTravelling() {
@@ -1276,7 +1364,7 @@ export default defineComponent({
         QuotationDetails.value.items.travelling = 0;
         QuotationDetails.value.items.travel = false;
       }
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function ToggleTraining() {
@@ -1289,7 +1377,7 @@ export default defineComponent({
         QuotationDetails.value.items.training = 0;
         QuotationDetails.value.items.train = false;
       }
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function ToggleBoarding() {
@@ -1302,7 +1390,7 @@ export default defineComponent({
         QuotationDetails.value.items.boarding = 0;
         QuotationDetails.value.items.board = false;
       }
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     async function TogglePickUp() {
@@ -1315,7 +1403,7 @@ export default defineComponent({
         QuotationDetails.value.items.pickup = 0;
         QuotationDetails.value.items.pick = false;
       }
-      await calculateTotal();
+      await calculateSubTotal();
     }
 
     /* --------EQUIPMENT WISE LOGIC--------*/
@@ -1352,12 +1440,23 @@ export default defineComponent({
       calculateTotalEquipment();
     }
 
-    const calculateTotalEquipment = () => {
+    const calculateTaxAmount = () => {
+      QuotationDetails.value.tax_amount =
+        (QuotationDetails.value.tax_rate * QuotationDetails.value.sub_total) /
+          100 || 0;
       QuotationDetails.value.total =
+        QuotationDetails.value.tax_amount + QuotationDetails.value.sub_total ||
+        0;
+    };
+
+    const calculateTotalEquipment = () => {
+      QuotationDetails.value.sub_total =
         QuotationDetails.value.items.equipment_wise.reduce(
           (sum, item) => sum + item.amount,
           0
         );
+
+      calculateTaxAmount();
     };
 
     const addNewRow = () => {
@@ -1445,6 +1544,10 @@ export default defineComponent({
           status,
           scope_of_work,
           terms_and_conditions,
+          tax_id,
+          tax_type,
+          tax_amount,
+          sub_total,
           total,
         } = detail;
 
@@ -1458,6 +1561,10 @@ export default defineComponent({
           status === "" ||
           scope_of_work === "" ||
           terms_and_conditions === "" ||
+          tax_id === "" ||
+          tax_type === "" ||
+          isNaN(parseFloat(tax_amount)) ||
+          isNaN(parseFloat(sub_total)) ||
           isNaN(parseFloat(total))
         );
       });
@@ -1469,7 +1576,7 @@ export default defineComponent({
         id: "",
         site_location: "",
         per_day_charge: "",
-        number_of_days: "1",
+        number_of_days: "",
         accommodation: 0,
         travelling: 0,
         training: 0,
@@ -1482,7 +1589,9 @@ export default defineComponent({
         pick: true,
         equipment_wise: [],
       };
+      QuotationDetails.value.sub_total = 0;
       QuotationDetails.value.total = 0;
+      calculateTaxAmount();
       equipments.value = [];
       dayWiseRef.value = value;
     };
@@ -1813,9 +1922,11 @@ export default defineComponent({
       disabledDate,
       QuotationStatusArray,
       GetQuotationStatus,
-      Total,
       SendInvoice,
+      Total,
+      SetTax,
       SetLocation,
+      TaxArray,
       SetPerDayCharge,
       SetDays,
       loading,

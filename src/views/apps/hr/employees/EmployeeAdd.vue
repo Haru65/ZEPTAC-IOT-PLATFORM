@@ -2,7 +2,7 @@
   <Vform
     id="kt_account_profile_details_form"
     class="form"
-    novalidate
+    @submit="onsubmit"
     :validation-schema="profileDetailsValidator"
     enctype="multipart/form-data"
   >
@@ -1106,8 +1106,7 @@
       <!--end::Button-->
       &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
       <!--begin::Button-->
-      <span
-        @click="onsubmit()"
+      <button
         :data-kt-indicator="loading ? 'on' : null"
         class="btn btn-lg btn-primary w-25"
         type="submit"
@@ -1119,7 +1118,7 @@
             class="spinner-border spinner-border-sm align-middle ms-2"
           ></span>
         </span>
-      </span>
+      </button>
       <!--end::Button-->
     </div>
   </Vform>
@@ -1231,13 +1230,34 @@ export default defineComponent({
       lname: Yup.string().required().label("Last name"),
       email: Yup.string().required().email().label("Email"),
       phone: Yup.string().required().label("Phone"),
-      password: Yup.string().required().label("Password"),
-      confpassword: Yup.string().required().label("Confirm Password"),
-      pincode: Yup.string().required().label("Pincode"),
-      address1: Yup.string().required().label("Address"),
-      address2: Yup.string().required().label("Address"),
-      adhar: Yup.string().required().label("Adhar No"),
-      pan: Yup.string().required().label("Pan No"),
+      // password: Yup.string().required().label("Password"),
+
+      // Password validation with conditional requirement
+      password: Yup.string().required().when("licenseRef", {
+        is: false, // If licenseRef is false
+        then: Yup.string()
+          .min(8, "Password must be at least 8 characters long.")
+          .matches(
+            /[A-Z]/,
+            "Password must include at least one uppercase letter."
+          )
+          .matches(/[0-9]/, "Password must include at least one number.")
+          .matches(
+            /[@$!%*?&]/,
+            "Password must include at least one special character."
+          )
+          .required("Password is required."),
+        otherwise: Yup.string(), // If licenseRef is true, password is not required
+      }),
+
+      // Confirm password validation with conditional requirement
+      confpassword: Yup.string().required().when("licenseRef", {
+        is: false, // If licenseRef is false
+        then: Yup.string()
+          .oneOf([Yup.ref("password"), null], "Passwords must match.")
+          .required("Confirm Password"),
+        otherwise: Yup.string(), // If licenseRef is true, confpassword is not required
+      }),
     });
 
     const profileData = ref({
@@ -1802,6 +1822,55 @@ export default defineComponent({
       }
     }
 
+    const validateForm = (formData) => {
+      for (const key in formData) {
+        let value = formData[key];
+        if (
+          key !== "profile_pic" &&
+          key !== "password" &&
+          key !== "confpassword" &&
+          key !== "employee_code" &&
+          key !== "department" &&
+          key !== "designation" &&
+          key !== "date_of_joining" &&
+          key !== "experience" &&
+          key !== "qualification" &&
+          key !== "job_desc" &&
+          key !== "reports_to" &&
+          key !== "whatsapp_no" &&
+          key !== "address1" &&
+          key !== "address2" &&
+          key !== "city" &&
+          key !== "pincode" &&
+          key !== "state" &&
+          key !== "country" &&
+          key !== "dob" &&
+          key !== "gender" &&
+          key !== "adhar" &&
+          key !== "pan"
+        ) {
+          if (Array.isArray(value)) {
+            for (const item of value) {
+              if (!validateForm(item)) {
+                return false;
+              }
+            }
+          } else if (typeof value === "object" && value !== null) {
+            if (!validateForm(value)) {
+              return false;
+            }
+          } else if (typeof value === "string") {
+            value = value.trim();
+            if (value === "") {
+              return false;
+            }
+          } else {
+          }
+        }
+      }
+      return true;
+    };
+
     const onsubmit = async () => {
       // * company identification for companyid based on localstorage login
 
@@ -1809,35 +1878,42 @@ export default defineComponent({
       // console.log(profileDetails.value);
       console.warn("Nice");
       try {
-        if (licenseRef.value === false) {
-          if (
-            profileDetails.value.password === "" ||
-            profileDetails.value.confpassword === ""
-          ) {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            return;
+        if (validateForm(profileDetails.value)) {
+          if (licenseRef.value === false) {
+            if (
+              profileDetails.value.password === "" ||
+              profileDetails.value.confpassword === ""
+            ) {
+              showErrorAlert(
+                "Warning",
+                "Please Fill the Form Fields Correctly"
+              );
+              return;
+            }
           }
-        }
 
-        if (User.role_id == "2") {
-          const company_id = User.company_id;
-          profileDetails.value.company_id = company_id;
-        }
-        const response = await addEmployee(profileDetails.value);
-        // console.log(response.error);
-        if (!response.error) {
-          // Handle successful API response
-          // console.log("API response:", response);
-          showSuccessAlert(
-            "Success",
-            "Employee have been successfully inserted!"
-          );
-          router.push({ name: "employee-list" });
+          if (User.role_id == "2") {
+            const company_id = User.company_id;
+            profileDetails.value.company_id = company_id;
+          }
+          const response = await addEmployee(profileDetails.value);
+          // console.log(response.error);
+          if (!response.error) {
+            // Handle successful API response
+            // console.log("API response:", response);
+            showSuccessAlert(
+              "Success",
+              "Employee have been successfully inserted!"
+            );
+            router.push({ name: "employee-list" });
+          } else {
+            // Handle API error response
+            const errorData = response.error;
+            console.log("API error:", errorData);
+            // console.log("API error:", errorData.response.data.errors);
+            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          }
         } else {
-          // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
         }
       } catch (error) {
