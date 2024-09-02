@@ -2137,6 +2137,18 @@ export async function addThermalInstrument(data) {
     }
 }
 
+export async function process_json_data(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.post("process_json_data", data);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        return { error: error };
+    }
+}
+
+
 
 // forgot Password
 export async function processCalibrationInstruments(data: any) {
