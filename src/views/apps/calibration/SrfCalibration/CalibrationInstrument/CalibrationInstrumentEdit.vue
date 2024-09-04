@@ -321,7 +321,7 @@
                     </thead>
                     <tbody class="text-center justify-content-center">
                       <tr
-                        v-for="(data, index) in itemDetails.reading_data"
+                        v-for="(data, index) in itemDetails.reading_data && itemDetails.reading_data"
                         :key="index"
                       >
                         <td>
@@ -413,7 +413,7 @@
                       </tr>
                       <tr
                         class="text-center"
-                        v-if="itemDetails.reading_data.length === 0"
+                        v-if="itemDetails.reading_data && itemDetails.reading_data.length === 0"
                       >
                         <td
                           colspan="9"
@@ -505,6 +505,53 @@ import { useRouter, useRoute } from "vue-router";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 
+interface UUCReading {
+  ranges: string;
+  uuc_reading: string;
+  l1_up: string;
+  l2_up: string;
+  d1_down: string;
+  d2_down: string;
+  mean_value: number;
+}
+
+interface Item {
+  id: string;
+  instrument_id: string;
+  name: string;
+  parameter: string;
+
+  model_no: string;
+  serial_no: string;
+  make: string;
+
+  calibration_date: string;
+  calibration_due_date: string;
+
+  location: string;
+
+  ranges: string;
+  accuracy: string;
+  resolution: string;
+
+  calibration_points: string;
+  periodicity: string;
+
+  temp: string;
+  rh: string;
+
+  instrument_condition: string;
+  remark: string;
+
+  reference_instrument_id: string;
+  service_request_id: string;
+
+  reading_data: Array<UUCReading>;
+
+  company_id: string;
+  is_active: number;
+}
+
 export default defineComponent({
   name: "calibration-instrument-edit",
   components: {
@@ -526,7 +573,7 @@ export default defineComponent({
 
     const itemDetailsValidator = Yup.object().shape({});
 
-    const itemDetails = ref({
+    const itemDetails = ref<Item>({
       id: "",
       instrument_id: "",
       name: "",
@@ -553,21 +600,11 @@ export default defineComponent({
 
       instrument_condition: "",
       remark: "",
-      reference_instrument_id: "",
 
+      reference_instrument_id: "",
       service_request_id: "",
 
-      reading_data: [
-        {
-          ranges: "",
-          uuc_reading: "",
-          l1_up: "",
-          l2_up: "",
-          d1_down: "",
-          d2_down: "",
-          mean_value: 0,
-        },
-      ],
+      reading_data: [],
 
       company_id: "",
       is_active: 1,
@@ -603,39 +640,51 @@ export default defineComponent({
       }
     });
 
-    // Function to calculate the mean
-    function calculateMean(data) {
-      const { l1_up, l2_up, d1_down, d2_down } = data;
-      const L1_UP = Number(l1_up);
-      const L2_UP = Number(l2_up);
-      const D1_DOWN = Number(d1_down);
-      const D2_DOWN = Number(d2_down);
+ // Function to calculate the mean
+ async function calculateMean(data) {
+            const { l1_up, l2_up, d1_down, d2_down } = data;
+            const L1_UP = Number(l1_up) || 0;
+            const L2_UP = Number(l2_up) || 0;
+            const D1_DOWN = Number(d1_down) || 0;
+            const D2_DOWN = Number(d2_down) || 0;
 
-      const average = (L1_UP + L2_UP + D1_DOWN + D2_DOWN) / 4;
-      return Number(average.toFixed(5));
-    }
+            const average = (L1_UP + L2_UP + D1_DOWN + D2_DOWN) / 4;
+            return Number(average.toFixed(5));
+        }
 
-    /* UUC READING LOGIC */
+        // Set Readings data
+        async function setUUCReadings(e, index, l) {
+            if (Array.isArray(itemDetails.value.reading_data) && itemDetails.value.reading_data[index]) {
+                itemDetails.value.reading_data[index][l] = e.target.value;
+                const average = await calculateMean(itemDetails.value.reading_data[index]);
+                itemDetails.value.reading_data[index].mean_value = average;
+            }
+        }
 
-    // Set Readings data
-    async function setUUCReadings(e, index, l) {
-      itemDetails.value.reading_data[index][l] = await e.target.value;
-      const average = calculateMean(itemDetails.value.reading_data[index]);
-      itemDetails.value.reading_data[index].mean_value = average;
-    }
-
-    // add DownFlow
-    const addReading = () => {
-      itemDetails.value.reading_data.push({
-        ranges: "",
-        uuc_reading: "",
-        l1_up: "",
-        l2_up: "",
-        d1_down: "",
-        d2_down: "",
-        mean_value: 0,
-      });
-    };
+        // Add Reading
+        const addReading = () => {
+            if (Array.isArray(itemDetails.value.reading_data)) {
+                itemDetails.value.reading_data.push({
+                    ranges: "",
+                    uuc_reading: "",
+                    l1_up: "",
+                    l2_up: "",
+                    d1_down: "",
+                    d2_down: "",
+                    mean_value: 0,
+                });
+            } else {
+                itemDetails.value.reading_data = [{
+                    ranges: "",
+                    uuc_reading: "",
+                    l1_up: "",
+                    l2_up: "",
+                    d1_down: "",
+                    d2_down: "",
+                    mean_value: 0,
+                }];
+            }
+        };
 
     // remove DownFlow
     const removeReading = async (index) => {

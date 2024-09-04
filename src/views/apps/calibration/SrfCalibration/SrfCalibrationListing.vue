@@ -64,16 +64,6 @@
             Export
           </button>
           <!--end::Export-->
-          <!--begin::Add customer-->
-          <button
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#kt_modal_internal_doc"
-          >
-            <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Document
-          </button>
-          <!--end::Add customer-->
         </div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->

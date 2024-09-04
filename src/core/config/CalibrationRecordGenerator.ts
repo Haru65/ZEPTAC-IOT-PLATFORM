@@ -544,8 +544,8 @@ const CalibrationRecordGen = async (
 
     const aprrovalData = [
       [
-        { title: `${instrumentDetails.value.srf.engineer.first_name || ""} ${instrumentDetails.value.srf.engineer.last_name || ""}` },
-        { title: `${instrumentDetails.value.srf.approved_by.first_name || ""} ${instrumentDetails.value.srf.approved_by.last_name || ""}` }
+        { title: `${instrumentDetails.value.srf.engineer ? instrumentDetails.value.srf.engineer.first_name : ""} ${instrumentDetails.value.srf.engineer ? instrumentDetails.value.srf.engineer.last_name : ""}` },
+        { title: `${instrumentDetails.value.srf.approved_by ? instrumentDetails.value.srf.approved_by.first_name : ""} ${instrumentDetails.value.srf.approved_by ? instrumentDetails.value.srf.approved_by.last_name : ""}` },
       ],
     ];
 
