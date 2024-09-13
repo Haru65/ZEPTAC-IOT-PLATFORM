@@ -200,32 +200,52 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      let response = await getMRMSchedule(itemId.toString());
-      console.log(response);
+      try {
+        let response = await getMRMSchedule(itemId.toString());
 
-      Employees.value.pop();
-      itemDetails.value.agenda_points = response.meeting.map(
-        ({ id, ...rest }) => ({
-          id: id,
-          ...rest,
-        })
-      );
+        if (response.success) {
+          if (response.result != null && response.result) {
+            itemDetails.value.agenda_points = response.result.meeting.map(
+              ({ id, ...rest }) => ({
+                id: id,
+                ...rest,
+              })
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getMRMSchedule : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getMRMSchedule : ${err}`);
+      }
 
       try {
         ApiService.setHeader();
         const response = await getEmployees(`fetchAll=true`);
-        if (response.result != null && response.result) {
-          Employees.value.push(
-            ...response.result?.map(({ id, first_name, last_name }) => ({
-              id,
-              first_name,
-              last_name,
-            }))
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Employees.value.push(
+              ...response.result?.map(({ id, first_name, last_name }) => ({
+                id,
+                first_name,
+                last_name,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getEmployees : ${
+              response.message || "Error Occured in API"
+            }`
           );
         }
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
+      } catch (err) {
+        console.error(`Error Occured in getEmployees : ${err}`);
       }
     });
 

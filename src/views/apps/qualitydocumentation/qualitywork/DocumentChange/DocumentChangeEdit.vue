@@ -470,30 +470,44 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      let response = await getDocumentChange(itemId.toString());
-      console.log(response);
-      itemDetails.value = {
-        id: response.id,
-        request_date: response.request_date,
-        request_no: response.request_no,
-        document_name: response.document_name,
-        document_no: response.document_no,
-        req_from: response.req_from,
-        req_to: response.req_to,
-        nature: response.nature,
-        details: response.details,
-        reason: response.reason,
-        department: response.department,
-        effective_date: response.effective_date,
-        authority_comments: response.authority_comments,
-        comments: response.comments,
-        approval_status: response.approval_status,
+      try {
+        let response = await getDocumentChange(itemId.toString());
 
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+        if (response?.success) {
+          itemDetails.value = {
+            id: response.result.id,
+            request_date: response.result.request_date,
+            request_no: response.result.request_no,
+            document_name: response.result.document_name,
+            document_no: response.result.document_no,
+            req_from: response.result.req_from,
+            req_to: response.result.req_to,
+            nature: response.result.nature,
+            details: response.result.details,
+            reason: response.result.reason,
+            department: response.result.department,
+            effective_date: response.result.effective_date,
+            authority_comments: response.result.authority_comments,
+            comments: response.result.comments,
+            approval_status: response.result.approval_status,
+
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getDocumentChange : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getDocumentChange : ${err}`);
+      }
     });
 
     const validateForm = (formData) => {

@@ -137,7 +137,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getISORule(itemId.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.error || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1047,7 +1047,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getComplaint(complaintID.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1662,7 +1662,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getInternalDoc(docId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1699,7 +1699,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getExternalDoc(docId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1736,7 +1736,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getNonConformanceRecord(itemId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1783,7 +1783,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getRiskRegister(itemId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1830,7 +1830,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getDocumentChange(itemId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1868,7 +1868,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getImprovementPlan(itemId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2356,7 +2356,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getCalibrationInstrumentForIntermediate(itemId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2382,7 +2382,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getCalibrationInstrumentForIntermediate(itemId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2408,7 +2408,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getIntermediateCheckRecord(docId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2884,6 +2884,15 @@ const routes: Array<RouteRecordRaw> = [
           import("@/views/apps/customerfeedback/feedback/FeedbackFormAdd.vue"),
         meta: {
           pageTitle: "Customer Feedback",
+        },
+      },
+      {
+        path: "/uuc-reading/edit/:id",
+        name: "uuc-reading-edit",
+        component: () =>
+          import("@/views/apps/calibration/SrfCalibration/CalibrationInstrument/UUCReadingEdit.vue"),
+        meta: {
+          pageTitle: "Uncertainty Calculation",
         },
       },
     ],

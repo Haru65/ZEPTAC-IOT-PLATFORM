@@ -113,7 +113,7 @@
             {{ ref_instrument.instrument_id }}
           </template>
           <template v-slot:ranges="{ row: ref_instrument }">
-            {{ ref_instrument.ranges }}
+            {{ `${ref_instrument.ranges_from || ""} to ${ref_instrument.ranges_to || ""}` }}
           </template>
           <template v-slot:location="{ row: ref_instrument }">
             {{ ref_instrument.location }}

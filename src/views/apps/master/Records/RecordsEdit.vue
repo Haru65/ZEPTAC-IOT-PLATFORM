@@ -283,21 +283,34 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      let response = await getRecord(itemId.toString());
-      console.log(response);
-      documentDetails.value = {
-        document_section: response.document_section,
-        document_name: response.document_name,
-        issue_date: response.issue_date,
-        amendment_date: response.amendment_date,
-        storage_medium: response.storage_medium,
-        responsible_person: response.responsible_person,
-        approval_status: response.approval_status,
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+      try {
+        let response = await getRecord(itemId.toString());
+        if (response?.success) {
+          documentDetails.value = {
+            document_section: response.result.document_section,
+            document_name: response.result.document_name,
+            issue_date: response.result.issue_date,
+            amendment_date: response.result.amendment_date,
+            storage_medium: response.result.storage_medium,
+            responsible_person: response.result.responsible_person,
+            approval_status: response.result.approval_status,
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getRecord : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getRecord : ${err}`);
+      }
     });
 
     /* --------SET DATE LOGIC--------*/
@@ -366,8 +379,7 @@ export default defineComponent({
           loading.value = false;
           showSuccessAlert(
             "Success",
-            response.message ||
-              "Record has been successfully Updated!"
+            response.message || "Record has been successfully Updated!"
           );
 
           router.push({ name: "records" });

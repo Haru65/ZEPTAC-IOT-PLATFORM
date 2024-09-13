@@ -281,20 +281,32 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      let response = await getExternalDoc(itemId.toString());
-      console.log(response);
-      documentDetails.value = {
-        document_name: response.document_name,
-        format_no: response.format_no,
-        review_date: response.review_date,
-        revision_date: response.revision_date,
-        issue_date: response.issue_date,
-        location: response.location,
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+      try {
+        let response = await getExternalDoc(itemId.toString());
+
+        if (response?.success) {
+          documentDetails.value = {
+            document_name: response.result.document_name,
+            format_no: response.result.format_no,
+            review_date: response.result.review_date,
+            revision_date: response.result.revision_date,
+            issue_date: response.result.issue_date,
+            location: response.result.location,
+            company_id: response.result.company_id ? response.result.company_id : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getExternalDoc : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getExternalDoc : ${err}`);
+      }
     });
 
     /* --------SET DATE LOGIC--------*/

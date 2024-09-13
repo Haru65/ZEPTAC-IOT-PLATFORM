@@ -217,25 +217,6 @@
               <div class="row mb-6">
                 <div class="form-group col-md-6">
                   <label
-                    class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
-                    >Range</label
-                  >
-                  <Field
-                    type="text"
-                    name="ranges"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Enter Instrument ranges"
-                    v-model="calibrationInstrumentDetails.ranges"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="ranges" />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-group col-md-6">
-                  <label
                     class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
                     >Accuracy</label
                   >
@@ -254,6 +235,36 @@
                 </div>
               </div>
               <!--end::Input group-->
+
+                          <!-- extra fields -->
+            <div class="row mb-6">
+              <div class="form-group col-md-12">
+                <label
+                  class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
+                  >Range</label
+                >
+                <!--begin::Input group-->
+                <div class="input-group gap-2">
+                  <Field
+                    type="text"
+                    name="ranges_from"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="0"
+                    v-model="calibrationInstrumentDetails.ranges_from"
+                  />
+                  <span class="input-group-text">To</span>
+                  <Field
+                    type="text"
+                    name="ranges_to"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="1000"
+                    v-model="calibrationInstrumentDetails.ranges_to"
+                  />
+                </div>
+                <!--end::Input group-->
+              </div>
+            </div>
+            <!--end::Input group-->
 
               <!--begin::Input group-->
               <div class="row mb-6">
@@ -605,7 +616,8 @@ interface CalibrationInstrument {
 
   location: string;
 
-  ranges: string;
+  ranges_from: string;
+  ranges_to: string;
   accuracy: string;
   resolution: string;
 
@@ -658,7 +670,8 @@ export default defineComponent({
 
       location: "",
 
-      ranges: "",
+      ranges_from: "",
+      ranges_to: "",
       accuracy: "",
       resolution: "",
 
@@ -686,7 +699,8 @@ export default defineComponent({
       serial_no: Yup.string().required().label("Serial No."),
       make: Yup.string().required().label("Made by"),
 
-      ranges: Yup.string().required().label("Range"),
+      ranges_from: Yup.string().required().label("Range from"),
+      ranges_to: Yup.string().required().label("Range to"),
       accuracy: Yup.string().required().label("Accuracy"),
       resolution: Yup.string().required().label("Resolution"),
 
@@ -700,21 +714,17 @@ export default defineComponent({
         const foundParameter = parameters.find((item) => id == item.id);
 
         if (foundParameter) {
-          calibrationInstrumentDetails.value.ranges =
-            foundParameter.ranges || "";
           calibrationInstrumentDetails.value.accuracy =
             foundParameter.accuracy || "";
           calibrationInstrumentDetails.value.resolution =
             foundParameter.resolution || "";
         } else {
           calibrationInstrumentDetails.value.parameter = "";
-          calibrationInstrumentDetails.value.ranges = "";
           calibrationInstrumentDetails.value.accuracy = "";
           calibrationInstrumentDetails.value.resolution = "";
         }
       } else {
         calibrationInstrumentDetails.value.parameter = "";
-        calibrationInstrumentDetails.value.ranges = "";
         calibrationInstrumentDetails.value.accuracy = "";
         calibrationInstrumentDetails.value.resolution = "";
       }
@@ -770,7 +780,8 @@ export default defineComponent({
 
         location: "",
 
-        ranges: "",
+        ranges_from: "",
+        ranges_to: "",
         accuracy: "",
         resolution: "",
 

@@ -365,7 +365,9 @@ export default defineComponent({
         .required()
         .label("Details of Complaint"),
       corrective_action: Yup.string().required().label("Corrective Action"),
-      source_of_complaint: Yup.string().notRequired().label("Source of Complaint"),
+      source_of_complaint: Yup.string()
+        .notRequired()
+        .label("Source of Complaint"),
       comment_by_customer: Yup.string().required().label("Comment"),
     });
 
@@ -387,46 +389,59 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      let response = await getComplaint(itemId.toString());
-      // console.log(response);
-      itemDetails.value = {
-        customer_name: response.customer_name,
-        complaint_date: response.complaint_date,
-        complaint_no: response.complaint_no,
-        details_of_complaint: response.details_of_complaint,
-        corrective_action: response.corrective_action,
-        source_of_complaint: response.source_of_complaint,
-        comment_by_customer: response.comment_by_customer,
-        resolution_date: response.resolution_date,
-        complaint_status: response.complaint_status,
-        approval_status: response.approval_status,
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+      try {
+        let response = await getComplaint(itemId.toString());
+        if (response?.success) {
+          itemDetails.value = {
+            customer_name: response.result.customer_name,
+            complaint_date: response.result.complaint_date,
+            complaint_no: response.result.complaint_no,
+            details_of_complaint: response.result.details_of_complaint,
+            corrective_action: response.result.corrective_action,
+            source_of_complaint: response.result.source_of_complaint,
+            comment_by_customer: response.result.comment_by_customer,
+            resolution_date: response.result.resolution_date,
+            complaint_status: response.result.complaint_status,
+            approval_status: response.result.approval_status,
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getComplaint : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getComplaint : ${err}`);
+      }
     });
 
     const validateForm = (formData) => {
       for (const key in formData) {
         let value = formData[key];
         if (Array.isArray(value)) {
-            for (const item of value) {
-              if (!validateForm(item)) {
-                return false;
-              }
-            }
-          } else if (typeof value === "object" && value !== null) {
-            if (!validateForm(value)) {
+          for (const item of value) {
+            if (!validateForm(item)) {
               return false;
             }
-          } else if (typeof value === "string") {
-            value = value.trim();
-            if (value === "") {
-              return false;
-            }
-          } else {
           }
+        } else if (typeof value === "object" && value !== null) {
+          if (!validateForm(value)) {
+            return false;
+          }
+        } else if (typeof value === "string") {
+          value = value.trim();
+          if (value === "") {
+            return false;
+          }
+        } else {
+        }
       }
       return true;
     };
@@ -466,15 +481,11 @@ export default defineComponent({
         }
 
         // Call your API here
-        const response = await updateComplaint(
-            itemId,
-            itemDetails.value
-          );
+        const response = await updateComplaint(itemId, itemDetails.value);
         if (response?.success) {
           showSuccessAlert(
             "Success",
-            response.message ||
-              "Complaint has been successfully updated!"
+            response.message || "Complaint has been successfully updated!"
           );
           loading.value = false;
           router.push({ name: "complaint-list" });

@@ -277,41 +277,58 @@ export default defineComponent({
       try {
         ApiService.setHeader();
         const response = await getEmployees(`fetchAll=true`);
-        if (response.result != null && response.result) {
-          Employees.value.push(
-            ...response.result?.map(({ id, first_name, last_name }) => ({
-              id,
-              first_name,
-              last_name,
-            }))
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Employees.value.push(
+              ...response.result?.map(({ id, first_name, last_name }) => ({
+                id,
+                first_name,
+                last_name,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getEmployees : ${
+              response.message || "Error Occured in API"
+            }`
           );
         }
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
+      } catch (err) {
+        console.error(`Error Occured in getEmployees : ${err}`);
       }
 
       try {
         let response = await getIAuditSchedule(itemId.toString());
-        console.log(response);
-        itemDetails.value = {
-          id: response.id,
-          auditor_name: response.auditor_name,
-          address: response.address,
-          meeting_place: response.meeting_place,
-          auditees: JSON.parse(response.auditees),
-          audit_area: response.audit_area,
-          scope: response.scope,
-          approval_status: response.approval_status,
 
-          company_id: response.company_id ? response.company_id : "",
-          created_by: response.created_by,
-          updated_by: response.updated_by,
-          is_active: response.is_active,
-        };
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
+        if (response?.success) {
+          itemDetails.value = {
+            id: response.result.id,
+            auditor_name: response.result.auditor_name,
+            address: response.result.address,
+            meeting_place: response.result.meeting_place,
+            auditees: JSON.parse(response.result.auditees),
+            audit_area: response.result.audit_area,
+            scope: response.result.scope,
+            approval_status: response.result.approval_status,
+
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getIAuditSchedule : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getIAuditSchedule : ${err}`);
       }
     });
 

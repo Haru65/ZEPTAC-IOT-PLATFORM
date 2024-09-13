@@ -375,15 +375,21 @@ export default defineComponent({
           `page=${page}&limit=${limit.value}&itemId=${itemId}`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, corrective_action, ...rest }) => ({
-            id: id,
-            corrective_action: corrective_action,
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, corrective_action, ...rest }) => ({
+              id: id,
+              corrective_action: corrective_action,
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -406,15 +412,21 @@ export default defineComponent({
           `page=${page.value}&limit=${limit}&itemId=${itemId}`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, corrective_action, ...rest }) => ({
-            id: id,
-            corrective_action: corrective_action,
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, corrective_action, ...rest }) => ({
+              id: id,
+              corrective_action: corrective_action,
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -453,16 +465,23 @@ export default defineComponent({
         const response = await getCorrectiveActions(
           `page=${page.value}&limit=${limit.value}&itemId=${itemId}`
         );
-        tableData.value = response.result.data.map(
-          ({ id, corrective_action, ...rest }) => ({
-            id: id,
-            corrective_action: corrective_action,
-            ...rest,
-          })
-        );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          tableData.value = response.result.data.map(
+            ({ id, corrective_action, ...rest }) => ({
+              id: id,
+              corrective_action: corrective_action,
+              ...rest,
+            })
+          );
+
+          more.value = response.result.next_page_url != null ? true : false;
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

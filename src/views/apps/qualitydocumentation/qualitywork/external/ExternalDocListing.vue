@@ -324,29 +324,35 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            company_id,
-            document_name,
-            format_no,
-            review_date,
-            revision_date,
-            issue_date,
-            location,
-          }) => ({
-            id,
-            company_id,
-            document_name,
-            format_no,
-            review_date,
-            revision_date,
-            issue_date,
-            location,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response?.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              company_id,
+              document_name,
+              format_no,
+              review_date,
+              revision_date,
+              issue_date,
+              location,
+            }) => ({
+              id,
+              company_id,
+              document_name,
+              format_no,
+              review_date,
+              revision_date,
+              issue_date,
+              location,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -374,29 +380,35 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            company_id,
-            document_name,
-            format_no,
-            review_date,
-            revision_date,
-            issue_date,
-            location,
-          }) => ({
-            id,
-            company_id,
-            document_name,
-            format_no,
-            review_date,
-            revision_date,
-            issue_date,
-            location,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response?.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              company_id,
+              document_name,
+              format_no,
+              review_date,
+              revision_date,
+              issue_date,
+              location,
+            }) => ({
+              id,
+              company_id,
+              document_name,
+              format_no,
+              review_date,
+              revision_date,
+              issue_date,
+              location,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -439,30 +451,37 @@ export default defineComponent({
               : financialYears.value[0]
           }`
         );
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            company_id,
-            document_name,
-            format_no,
-            review_date,
-            revision_date,
-            issue_date,
-            location,
-          }) => ({
-            id,
-            company_id,
-            document_name,
-            format_no,
-            review_date,
-            revision_date,
-            issue_date,
-            location,
-          })
-        );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response?.success) {
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              company_id,
+              document_name,
+              format_no,
+              review_date,
+              revision_date,
+              issue_date,
+              location,
+            }) => ({
+              id,
+              company_id,
+              document_name,
+              format_no,
+              review_date,
+              revision_date,
+              issue_date,
+              location,
+            })
+          );
+
+          more.value = response.result.next_page_url != null ? true : false;
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -670,28 +689,34 @@ export default defineComponent({
             : financialYears.value[0]
         );
 
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            company_id,
-            document_name,
-            format_no,
-            review_date,
-            revision_date,
-            issue_date,
-            location,
-          }) => ({
-            id,
-            company_id,
-            document_name,
-            format_no,
-            review_date,
-            revision_date,
-            issue_date,
-            location,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response?.success) {
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              company_id,
+              document_name,
+              format_no,
+              review_date,
+              revision_date,
+              issue_date,
+              location,
+            }) => ({
+              id,
+              company_id,
+              document_name,
+              format_no,
+              review_date,
+              revision_date,
+              issue_date,
+              location,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

@@ -5,7 +5,8 @@ interface IRefInstrument {
     instrument_id: string;
     name: string;
     parameter: string;
-    ranges: string;
+    ranges_from: string;
+    ranges_to: string;
     location: string;
     calibration_date: string;
     calibration_due_date: string;

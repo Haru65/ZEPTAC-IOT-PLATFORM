@@ -1,7 +1,11 @@
 <template>
-  <VForm id="kt_account_profile_details_form" class="form" 
+  <VForm
+    id="kt_account_profile_details_form"
+    class="form"
     novalidate
-    :validation-schema="itemDetailsValidator">
+    @submit="onsubmit"
+    :validation-schema="itemDetailsValidator"
+  >
     <!--begin::Basic info-->
     <div class="card mb-5 mb-xl-10 p-6 pb-12">
       <!--begin::Card header-->
@@ -144,8 +148,8 @@
         <!--begin::Card footer-->
         <div class="card-footer d-flex justify-content-end py-6 px-9">
           <button
-            type="button"
-            @click="submit"
+            type="submit"
+            ref="submitButtonRef"
             :data-kt-indicator="loading ? 'on' : ''"
             class="btn btn-primary px-6"
           >
@@ -189,6 +193,8 @@ export default defineComponent({
     VForm,
   },
   setup() {
+    const submitButtonRef = ref<null | HTMLButtonElement>(null);
+
     const identifier = Identifier;
     const loading = ref(false);
     const auth = useAuthStore();
@@ -253,7 +259,7 @@ export default defineComponent({
       return true;
     };
 
-    const submit = async () => {
+    const onsubmit = async () => {
       loading.value = true;
 
       if (itemDetails.value.clause_no.trim() === "") {
@@ -262,28 +268,44 @@ export default defineComponent({
         return;
       }
 
-      try {
-        if (validateForm(itemDetails.value.risk_identification)) {
-          const response = await addRiskRegister(itemDetails.value);
-          if (response?.success) {
-            showSuccessAlert(
-            "Success",
-            response.message || "Risk Identification has been successfully inserted!"
-          );
-            loading.value = false;
-            router.push({ name: "risk-list" });
-          } else {
-            showErrorAlert("Error", response.message || "An error occurred.");
-            loading.value = false;
-            return;
-          }
-        } else {
-          showErrorAlert("Warning", "Please fill in all fields.");
-        }
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
+      const result = validateForm(itemDetails.value.risk_identification);
+
+      if (result == false) {
+        showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
         loading.value = false;
+        return;
+      }
+
+      try {
+        if (submitButtonRef.value) {
+          // Activate indicator
+          submitButtonRef.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        const response = await addRiskRegister(itemDetails.value);
+
+        if (response?.success) {
+          showSuccessAlert(
+            "Success",
+            response.message ||
+              "Risk Identification has been successfully inserted!"
+          );
+          loading.value = false;
+          router.push({ name: "risk-list" });
+        } else {
+          showErrorAlert("Error", response.message || "An error occurred.");
+          loading.value = false;
+          return;
+        }
+
+      } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
+        showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButtonRef.value) {
+          submitButtonRef.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -317,10 +339,11 @@ export default defineComponent({
     };
 
     return {
+      submitButtonRef,
       itemDetails,
       itemDetailsValidator,
       getAssetPath,
-      submit,
+      onsubmit,
       loading,
       packages,
       limit,

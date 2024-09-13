@@ -247,7 +247,7 @@ const CalibrationRecordGen = async (
               title: `Range :`,
             },
             {
-              title: `${instrumentDetails.value.ranges}` 
+              title: `${instrumentDetails.value.ranges_from || ""} to ${instrumentDetails.value.ranges_to || ""}`
             },
       ],
       [
@@ -419,7 +419,7 @@ const CalibrationRecordGen = async (
     });
 
 
-    // Details of Item Used for Calibration header
+    // Details of UUC Reading
     const UUCHeader = [
       [
         {
@@ -459,7 +459,7 @@ const CalibrationRecordGen = async (
           title: "D2",
         },
         {
-          title: "Miw=[{(I1+I2)/2}+{(D1+D2)/2}]/2",
+          title: "Mean",
           rowSpan: 2,
         },
       ],
@@ -481,13 +481,13 @@ const CalibrationRecordGen = async (
 
 
     // uuc_readings data
-    const UUCData = instrumentDetails.value.reading_data && instrumentDetails.value.reading_data.map((item, index) => [
+    const UUCData = instrumentDetails.value.readings && instrumentDetails.value.readings.map((item, index) => [
       { title: `${index+1}` },
-      { title: item.ranges },
+      { title: `${instrumentDetails.value.reference_instrument.ranges_from || ""} to ${instrumentDetails.value.reference_instrument.ranges_to || ""}` },
       { title: item.uuc_reading },
-      { title: item.l1_up },
+      { title: item.i1_up },
       { title: item.d1_down },
-      { title: item.l2_up },
+      { title: item.i2_up },
       { title: item.d2_down },
       { title: item.mean_value }
     ]);
@@ -499,12 +499,63 @@ const CalibrationRecordGen = async (
       body: UUCData,
       headStyles: {  fillColor: [90,90,90], textColor: [255, 255, 255],halign: "center", valign: "middle"},
       bodyStyles: { halign: "left",fontSize: 10, fillColor: [255, 255, 255]},
+      showHead: 'firstPage',
       didDrawCell: (data) => {
         const { cell, row, column } = data;
         doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
       },
     });
 
+    // Details Uncertainty Calculations
+    const UncertaintyCalculationHeader = [
+      [
+        {
+          title: "#",
+        },
+        {
+          title: "Range",
+        },
+        {
+          title: "UUC Reading",
+        },
+        {
+          title: "Standard Deviation",
+        },
+        {
+          title: "Hysteris",
+        },
+        {
+          title: "Zero Deviation",
+        },
+        {
+          title: "Expanded Uncertainty",
+        },
+      ]
+    ];
+
+    // uncertainty value data
+    const UncertaintyCalculationData = instrumentDetails.value.readings?.map((item, index) => [
+      { title: `${index + 1}` },
+      { title: `${instrumentDetails.value.reference_instrument.ranges_from || ""} to ${instrumentDetails.value.reference_instrument.ranges_to || ""}` },
+      { title: item.uuc_reading || "" },
+      { title: item.uncertainty?.standard_deviation || "" },  // Optional chaining to handle missing uncertainty data
+      { title: item.uncertainty?.hysteresis || "" },
+      { title: item.uncertainty?.max_zero_reading || "" },
+      { title: item.uncertainty?.expanded_uncertainty || "" },
+    ]);
+
+    autoTable(doc, {
+      theme: "plain",
+      head: UncertaintyCalculationHeader,
+      body: UncertaintyCalculationData,
+      headStyles: {  fillColor: [90,90,90], textColor: [255, 255, 255],halign: "center", valign: "middle"},
+      bodyStyles: { halign: "left",fontSize: 10, fillColor: [255, 255, 255]},
+      showHead: 'firstPage',
+      didDrawCell: (data) => {
+        const { cell, row, column } = data;
+        doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
+      },
+    });
 
     const Note = [ 
       [

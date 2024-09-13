@@ -85,7 +85,6 @@
             </div>
           </div>
 
-
           <div class="modal-footer flex-center mt-6">
             <!--begin::Button-->
             <button
@@ -233,18 +232,26 @@ export default defineComponent({
       try {
         ApiService.setHeader();
         const response = await getEmployees(`fetchAll=true`);
-        if (response.result != null && response.result) {
-          Employees.value.push(
-            ...response.result?.map(({ id, first_name, last_name }) => ({
-              id,
-              first_name,
-              last_name,
-            }))
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Employees.value.push(
+              ...response.result?.map(({ id, first_name, last_name }) => ({
+                id,
+                first_name,
+                last_name,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getEmployees : ${
+              response.message || "Error Occured in API"
+            }`
           );
         }
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
+      } catch (err) {
+        console.error(`Error Occured in getEmployees : ${err}`);
       }
     });
 
@@ -314,7 +321,8 @@ export default defineComponent({
           // Handle successful API response
           showSuccessAlert(
             "Success",
-            response.message || "Meeting of Minutes has been successfully added!"
+            response.message ||
+              "Meeting of Minutes has been successfully added!"
           );
           loading.value = false;
           router.push({ name: "mrm-minutes-list" });

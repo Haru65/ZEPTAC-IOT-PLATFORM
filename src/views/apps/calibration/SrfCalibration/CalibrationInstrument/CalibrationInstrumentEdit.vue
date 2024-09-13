@@ -135,7 +135,8 @@
                       <tr>
                         <td class="text-gray-600">Range:</td>
                         <td class="text-gray-800">
-                          {{ itemDetails.ranges || "" }}
+                          {{ itemDetails.ranges_from || "" }} to
+                          {{ itemDetails.ranges_to || "" }}
                         </td>
                       </tr>
                       <!--end::Row-->
@@ -216,20 +217,39 @@
                       value=""
                       label="Select Master Instrument..."
                     >
-                    Select Master Instrument
+                      Select Master Instrument
                     </el-option>
                     <el-option
                       v-for="item in ReferenceInstruments"
                       :key="item.id"
-                      :label="item.name"
+                      :label="item.instrument_id"
                       :value="item.id"
                     />
                   </el-select>
                 </div>
                 <!--end::Col-->
               </div>
+
+              <div class="modal-footer flex-start w-100 mb-6">
+                <button
+                  type="button"
+                  ref="submitButtonRef"
+                  @click="submit"
+                  class="btn btn-md btn-success"
+                >
+                  <span class="indicator-label"> Submit </span>
+                  <span class="indicator-progress">
+                    Please wait...
+                    <span
+                      class="spinner-border spinner-border-sm align-middle ms-2"
+                    ></span>
+                  </span>
+                </button>
+              </div>
             </div>
             <!--end::Card body-->
+
+            <!--end::Input group-->
           </div>
           <!--end::Customer-->
         </form>
@@ -243,246 +263,249 @@
       <div
         class="flex-lg-row-fluid me-lg-6 order-2 order-lg-1 mb-10 mb-lg-0 bg-body rounded"
       >
-        <VForm
-          id="kt_account_profile_details_form"
-          class="form"
-          novalidate
-          :validation-schema="itemDetailsValidator"
-        >
-          <!--begin::Card body-->
-          <div class="card-body border-top p-sd-2 p-lg-9">
-            <!--begin::Input group-->
-
-            <!-- Tabs Navigation -->
-            <ul class="nav nav-tabs mb-3 fs-4" id="myTab" role="tablist">
-              <li class="nav-item" role="presentation">
-                <button
-                  class="nav-link active"
-                  id="downFlowVelocity-tab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#downFlowVelocity"
-                  type="button"
-                  role="tab"
-                  aria-controls="downFlowVelocity"
-                  aria-selected="true"
-                >
-                  UUC Readings
-                </button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button
-                  class="nav-link"
-                  id="filterLeakage-tab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#filterLeakage"
-                  type="button"
-                  role="tab"
-                  aria-controls="filterLeakage"
-                  aria-selected="false"
-                >
-                  Uncertainity Readings
-                </button>
-              </li>
-            </ul>
-
-            <!-- Tabs Content -->
-            <div class="tab-content" id="myTabContent">
-              <div
-                class="tab-pane fade show active"
-                id="downFlowVelocity"
-                role="tabpanel"
-                aria-labelledby="downFlowVelocity-tab"
-              >
-                <div class="row mb-6">
-                  <div class="container-fluid">
-                    <div class="alert alert-primary mt-2">
-                      <h3>UUC Readings in psi</h3>
-                    </div>
-                  </div>
-                </div>
-                <div class="table-responsive py-6 mb-6">
-                  <table
-                    class="table table-responsive table-bordered g-6 w-100 fw-bold text-gray-700"
-                  >
-                    <thead
-                      class="fw-semibold fs-6 text-gray-700 text-center justify-content-center"
-                    >
-                      <tr>
-                        <th class="col-1">#</th>
-                        <th class="col-2">Range of UUC in psi</th>
-                        <th class="col-2">UUC Reading</th>
-                        <th class="col-2">I1 psi (&#8593;)</th>
-                        <th class="col-2">D1 psi (&#8595;)</th>
-                        <th class="col-2">I2 psi (&#8593;)</th>
-                        <th class="col-2">D2 psi (&#8595;)</th>
-                        <th class="col-2">Mean</th>
-                        <th class="col-2">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody class="text-center justify-content-center">
-                      <tr
-                        v-for="(data, index) in itemDetails.reading_data && itemDetails.reading_data"
-                        :key="index"
-                      >
-                        <td>
-                          <span
-                            class="form-control form-control-lg form-control-transparent"
-                          >
-                            {{ index + 1 }}
-                          </span>
-                        </td>
-                        <td>
-                          <input
-                            type="text"
-                            :name="'ranges' + index"
-                            class="form-control form-control-lg form-control-solid min-w-100px"
-                            placeholder="0 to 100..."
-                            v-model="data.ranges"
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="text"
-                            :name="'uuc_reading' + index"
-                            class="form-control form-control-lg form-control-solid min-w-100px"
-                            placeholder="0"
-                            v-model="data.uuc_reading"
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="text"
-                            :name="'l1_up' + index"
-                            class="form-control form-control-lg form-control-solid min-w-100px"
-                            placeholder="0"
-                            v-model="data.l1_up"
-                            @keyup="setUUCReadings($event, index, 'l1_up')"
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="text"
-                            :name="'d1_down' + index"
-                            class="form-control form-control-lg form-control-solid min-w-100px"
-                            placeholder="0"
-                            v-model="data.d1_down"
-                            @keyup="setUUCReadings($event, index, 'd1_down')"
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="text"
-                            :name="'l2_up' + index"
-                            class="form-control form-control-lg form-control-solid min-w-100px"
-                            placeholder="0"
-                            v-model="data.l2_up"
-                            @keyup="setUUCReadings($event, index, 'l2_up')"
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="text"
-                            :name="'d2_down' + index"
-                            class="form-control form-control-lg form-control-solid min-w-100px"
-                            placeholder="0"
-                            v-model="data.d2_down"
-                            @keyup="setUUCReadings($event, index, 'd2_down')"
-                          />
-                        </td>
-                        <td>
-                          <div
-                            class="form-control form-control-lg form-control-transparent min-w-100px"
-                          >
-                            {{ data.mean_value ? data.mean_value : "" }}
-                          </div>
-                        </td>
-                        <td>
-                          <div class="d-flex flex-lg-row my-3">
-                            <!--begin::Delete-->
-                            <span
-                              @click="removeReading(index)"
-                              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-                              data-bs-toggle="tooltip"
-                              title="Delete Row"
-                            >
-                              <KTIcon icon-name="trash" icon-class="fs-2" />
-                            </span>
-                            <!--end::Delete-->
-                          </div>
-                        </td>
-                      </tr>
-                      <tr
-                        class="text-center"
-                        v-if="itemDetails.reading_data && itemDetails.reading_data.length === 0"
-                      >
-                        <td
-                          colspan="9"
-                          class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200 text-align-center"
-                        >
-                          No Readings.
-                        </td>
-                      </tr>
-                    </tbody>
-                    <div class="text-start">
-                      <div class="d-flex flex-lg-row mt-6">
-                        <!--begin::Add-->
-                        <span
-                          @click="addReading"
-                          class="btn btn-icon btn-primary rounded-circle w-40px h-40px me-3"
-                          data-bs-toggle="tooltip"
-                          title="Add Row"
-                        >
-                          <KTIcon icon-name="plus" icon-class="fs-2" />
-                        </span>
-                        <!--end::Add-->
-                      </div>
-                    </div>
-                  </table>
-                </div>
-              </div>
-
-              <div
-                class="tab-pane fade"
-                id="filterLeakage"
-                role="tabpanel"
-                aria-labelledby="filterLeakage-tab"
-              >
-                <div class="row mb-6">
-                  <div class="container-fluid">
-                    <div class="alert alert-primary mt-2">
-                      <h3>Uncertanity Calculation (COMMING SOON)</h3>
-                    </div>
-                  </div>
-                </div>
+        <!--begin::Card body-->
+        <div class="card-body border-top p-sd-2 p-lg-9">
+          <div class="row mb-6">
+            <div class="container-fluid">
+              <div class="alert alert-primary mt-2">
+                <h3>UUC Readings in psi</h3>
               </div>
             </div>
           </div>
-
-          <div class="modal-footer flex-center w-100 mb-6">
-            <!--begin::Button-->
-            <!--end::Button-->
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-            <!--begin::Button-->
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click.prevent="submit()"
+          <div class="table-responsive py-6 mb-6">
+            <table
+              class="table table-responsive table-bordered g-6 w-100 fw-bold text-gray-700"
             >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
-              <span v-if="loading" class="indicator-progress">
-                Please wait...
-                <span
-                  class="spinner-border spinner-border-sm align-middle ms-2"
-                ></span>
-              </span>
-            </span>
-            <!--end::Button-->
+              <thead
+                class="fw-semibold fs-6 text-gray-700 text-center justify-content-center"
+              >
+                <tr>
+                  <th class="col-2">UUC Reading</th>
+                  <th class="col-2">I1 psi (&#8593;)</th>
+                  <th class="col-2">D1 psi (&#8595;)</th>
+                  <th class="col-2">I2 psi (&#8593;)</th>
+                  <th class="col-2">D2 psi (&#8595;)</th>
+                  <th class="col-2">Mean</th>
+                  <th class="col-2"></th>
+                </tr>
+              </thead>
+              <tbody class="text-center justify-content-center">
+                <tr>
+                  <td>
+                    <input
+                      type="text"
+                      name="uuc_reading"
+                      class="form-control form-control-lg form-control-solid min-w-100px"
+                      placeholder="0"
+                      v-model="uucDetails.uuc_reading"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="i1_up"
+                      class="form-control form-control-lg form-control-solid min-w-100px"
+                      placeholder="0"
+                      v-model="uucDetails.i1_up"
+                      @keyup="setUUCReading($event, 'i1_up')"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="d1_down"
+                      class="form-control form-control-lg form-control-solid min-w-100px"
+                      placeholder="0"
+                      v-model="uucDetails.d1_down"
+                      @keyup="setUUCReading($event, 'd1_down')"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="i2_up"
+                      class="form-control form-control-lg form-control-solid min-w-100px"
+                      placeholder="0"
+                      v-model="uucDetails.i2_up"
+                      @keyup="setUUCReading($event, 'i2_up')"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="d2_down"
+                      class="form-control form-control-lg form-control-solid min-w-100px"
+                      placeholder="0"
+                      v-model="uucDetails.d2_down"
+                      @keyup="setUUCReading($event, 'd2_down')"
+                    />
+                  </td>
+                  <td>
+                    <div
+                      class="form-control form-control-lg form-control-transparent min-w-100px"
+                    >
+                      {{ uucDetails.mean_value || "" }}
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex flex-lg-row my-3">
+                      <button
+                        type="button"
+                        ref="uucSubmitButtonRef"
+                        @click="submitUUC"
+                        class="btn btn-sm btn-success"
+                      >
+                        <span class="indicator-label"> Save </span>
+                        <span class="indicator-progress">
+                          Please wait...
+                          <span
+                            class="spinner-border spinner-border-sm align-middle ms-2"
+                          ></span>
+                        </span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <!--end::Input group-->
-        </VForm>
+        </div>
       </div>
-
       <!--end::Content-->
+    </div>
+
+    <div class="card mt-6">
+      <div class="card-header border-0 pt-6">
+        <!--begin::Card title-->
+        <div class="card-title">
+          <h2 class="fw-bold">UUC Readings</h2>
+        </div>
+        <!--begin::Card title-->
+
+        <!--begin::Card toolbar-->
+        <div class="card-toolbar">
+          <!--begin::Toolbar-->
+          <div
+            v-if="selectedIds.length === 0"
+            class="d-flex justify-content-end"
+            data-kt-customer-table-toolbar="base"
+          ></div>
+          <!--end::Toolbar-->
+          <!--begin::Group actions-->
+          <div
+            v-else
+            class="d-flex justify-content-end align-items-center"
+            data-kt-customer-table-toolbar="selected"
+          >
+            <div class="fw-bold me-5">
+              <span class="me-2">{{ selectedIds.length }}</span
+              >Selected
+            </div>
+            <button
+              type="button"
+              class="btn btn-danger"
+              @click="deleteFewItem()"
+            >
+              Delete Selected
+            </button>
+          </div>
+          <!--end::Group actions-->
+          <!--begin::Group actions-->
+          <div
+            class="d-flex justify-content-end align-items-center d-none"
+            data-kt-customer-table-toolbar="selected"
+          >
+            <div class="fw-bold me-5">
+              <span
+                class="me-2"
+                data-kt-customer-table-select="selected_count"
+              ></span
+              >Selected
+            </div>
+            <button
+              type="button"
+              class="btn btn-danger"
+              data-kt-customer-table-select="delete_selected"
+            >
+              Delete Selected
+            </button>
+          </div>
+          <!--end::Group actions-->
+        </div>
+        <!--end::Card toolbar-->
+      </div>
+      <div class="card-body pt-0">
+        <Datatable
+          @on-sort="sort"
+          @on-items-select="onItemSelect"
+          :data="tableData"
+          :header="tableHeader"
+          :checkbox-enabled="true"
+          :items-per-page-dropdown-enabled="false"
+          :loading="loading"
+        >
+          <!-- img data -->
+          <template v-slot:id="{ row: uuc_reading }">
+            {{ uuc_reading.id }}
+          </template>
+          <template v-slot:ranges="{ row: uuc_reading }">
+            <span v-if="uuc_reading">
+              {{
+              `${itemDetails.ranges_from || ""} to ${
+                itemDetails.ranges_to || ""
+              }`
+            }}
+            </span>
+          </template>
+          <template v-slot:uuc_reading="{ row: uuc_reading }">
+            {{ uuc_reading.uuc_reading }}
+          </template>
+          <template v-slot:i1_up="{ row: uuc_reading }">
+            {{ uuc_reading.i1_up }}
+          </template>
+          <template v-slot:d1_down="{ row: uuc_reading }">
+            {{ uuc_reading.d1_down }}
+          </template>
+          <template v-slot:i2_up="{ row: uuc_reading }">
+            {{ uuc_reading.i2_up }}
+          </template>
+          <template v-slot:d2_down="{ row: uuc_reading }">
+            {{ uuc_reading.d2_down }}
+          </template>
+          <template v-slot:mean_value="{ row: uuc_reading }">
+            {{ uuc_reading.mean_value }}
+          </template>
+
+          <template v-slot:actions="{ row: uuc_reading }">
+            <!--begin::Menu Flex-->
+            <div class="d-flex flex-lg-row my-3">
+              <!--begin::Edit-->
+              <a :href="`/uuc-reading/edit/${uuc_reading.id}`" target="blank">
+                <span
+                  class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+                  data-bs-toggle="tooltip"
+                  title="View Uncertainity Calculation"
+                >
+                  <KTIcon icon-name="finance-calculator" icon-class="fs-2" />
+                </span>
+              </a>
+              <!--end::Edit-->
+
+              <!--begin::Delete-->
+              <span
+                @click="deleteItem(uuc_reading.id, false)"
+                class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
+                data-bs-toggle="tooltip"
+                title="Delete UUC Reading"
+              >
+                <KTIcon icon-name="trash" icon-class="fs-2" />
+              </span>
+              <!--end::Delete-->
+            </div>
+            <!--end::Menu FLex-->
+          </template>
+        </Datatable>
+      </div>
     </div>
   </div>
 </template>
@@ -490,12 +513,18 @@
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
+import Datatable from "@/components/kt-datatable/KTDataTable.vue";
+import type { Sort } from "@/components/kt-datatable/table-partials/models";
+import arraySort from "array-sort";
+
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import {
   getCalibrationInstrument,
+  getUUCReadings,
   getReferenceInstruments,
   updateCalibrationInstrument,
-  updateLAFReport,
+  deleteUUCReading,
+  addUUCReading,
 } from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
@@ -504,15 +533,18 @@ import { useAuthStore } from "@/stores/auth";
 import { useRouter, useRoute } from "vue-router";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
+import type { IUUCReading } from "@/core/model/ucc_reading";
 
 interface UUCReading {
-  ranges: string;
+  calibration_instrument_id: string;
   uuc_reading: string;
-  l1_up: string;
-  l2_up: string;
+  i1_up: string;
   d1_down: string;
+  i2_up: string;
   d2_down: string;
   mean_value: number;
+  company_id: string;
+  is_active: number;
 }
 
 interface Item {
@@ -530,7 +562,8 @@ interface Item {
 
   location: string;
 
-  ranges: string;
+  ranges_from: string;
+  ranges_to: string;
   accuracy: string;
   resolution: string;
 
@@ -546,8 +579,6 @@ interface Item {
   reference_instrument_id: string;
   service_request_id: string;
 
-  reading_data: Array<UUCReading>;
-
   company_id: string;
   is_active: number;
 }
@@ -558,18 +589,224 @@ export default defineComponent({
     ErrorMessage,
     Field,
     VForm,
+    Datatable,
   },
   setup() {
     const identifier = Identifier;
     const loading = ref(false);
+    const uucLoading = ref(false);
     const auth = useAuthStore();
     const router = useRouter();
     const route = useRoute();
     const User = auth.GetUser();
 
+    const submitButtonRef = ref<null | HTMLButtonElement>(null);
+    const uucSubmitButtonRef = ref<null | HTMLButtonElement>(null);
+
     const itemId = route.params.id;
 
-    const ReferenceInstruments = ref([{ id: "", name: "" }]);
+    /* UUC Reading Listing Logic:Begin */
+
+    const tableHeader = ref([
+      {
+        columnName: "Range",
+        columnLabel: "ranges",
+        sortEnabled: false,
+        columnWidth: 100,
+      },
+      {
+        columnName: "UUC Reading",
+        columnLabel: "uuc_reading",
+        sortEnabled: true,
+        columnWidth: 80,
+      },
+      {
+        columnName: "I1 up (psi)",
+        columnLabel: "i1_up",
+        sortEnabled: true,
+        columnWidth: 80,
+      },
+      {
+        columnName: "D1 down (psi)",
+        columnLabel: "d1_down",
+        sortEnabled: true,
+        columnWidth: 80,
+      },
+      {
+        columnName: "I2 up (psi)",
+        columnLabel: "i2_up",
+        sortEnabled: true,
+        columnWidth: 80,
+      },
+      {
+        columnName: "D2 down (psi)",
+        columnLabel: "d2_down",
+        sortEnabled: true,
+        columnWidth: 80,
+      },
+      {
+        columnName: "Mean",
+        columnLabel: "mean_value",
+        sortEnabled: true,
+        columnWidth: 100,
+      },
+      {
+        columnName: "Actions",
+        columnLabel: "actions",
+        sortEnabled: false,
+        columnWidth: 75,
+      },
+    ]);
+
+    const selectedIds = ref<Array<number>>([]);
+
+    const tableData = ref<Array<IUUCReading>>([]);
+
+    const initvalues = ref<Array<IUUCReading>>([]);
+
+    async function record_listing(): Promise<void> {
+      try {
+        const response = await getUUCReadings(
+          `calibrationInstumentId=${itemId}&fetchAll=true`
+        );
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            tableData.value = response.result.map(({ ...rest }) => ({
+              ...rest,
+            }));
+
+            initvalues.value.splice(
+              0,
+              tableData.value.length,
+              ...tableData.value
+            );
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        //console.log("done");
+        setTimeout(() => {
+          loading.value = false;
+        }, 100);
+      }
+    }
+
+    const deleteFewItem = async () => {
+      try {
+        const result = await Swal.fire({
+          title: "Are you sure?",
+          text: "You will not be able to recover from this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "red",
+          confirmButtonText: "Yes, I am sure!",
+          cancelButtonText: "No, cancel it!",
+        });
+
+        if (result.isConfirmed) {
+          let allSuccess = true;
+          let finalMessage = "Selected items deleted successfully.";
+
+          for (const id of selectedIds.value) {
+            const response = await deleteItem(id, true);
+            if (!response.success) {
+              allSuccess = false;
+              finalMessage =
+                response.message ||
+                "An error occurred while deleting some items.";
+              break;
+            }
+          }
+
+          selectedIds.value.length = 0;
+
+          if (allSuccess) {
+            showSuccessAlert("Success", finalMessage);
+          } else {
+            showErrorAlert("Error", finalMessage);
+          }
+        }
+      } catch (error: any) {
+        const errorMessage = error.message || "An unknown error occurred";
+        showErrorAlert("Error", errorMessage);
+      }
+    };
+
+    const deleteItem = async (id: number, mul: boolean) => {
+      const deleteConfirmation = async () => {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You will not be able to recover from this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "red",
+            confirmButtonText: "Yes, I am sure!",
+          });
+          return result.isConfirmed;
+        } catch (error: any) {
+          const errorMessage = error.message || "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return false;
+        }
+      };
+
+      const deleteFromTable = async (id: number) => {
+        try {
+          const response = await deleteUUCReading(id);
+          if (response?.success) {
+            const index = tableData.value.findIndex((item) => item.id === id);
+            if (index !== -1) {
+              tableData.value.splice(index, 1);
+              // console.log(`Item with id ${id} deleted successfully`);
+            }
+            showSuccessAlert(
+              "Success",
+              response.message || `Item with id ${id} deleted successfully.`
+            );
+            return { success: true };
+          } else {
+            throw new Error(
+              response?.message || `Failed to delete the item with id ${id}`
+            );
+          }
+        } catch (error: any) {
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            "An unknown error occurred";
+          showErrorAlert("Error", errorMessage);
+          return { success: false, message: errorMessage };
+        }
+      };
+
+      if (!mul) {
+        const isConfirmed = await deleteConfirmation();
+        if (isConfirmed) {
+          return await deleteFromTable(id);
+        } else {
+          return { success: false };
+        }
+      } else {
+        return await deleteFromTable(id);
+      }
+    };
+
+    const sort = (sort: Sort) => {
+      const reverse: boolean = sort.order === "asc";
+      if (sort.label) {
+        arraySort(tableData.value, sort.label, { reverse });
+      }
+    };
+    const onItemSelect = (selectedItems: Array<number>) => {
+      selectedIds.value = selectedItems;
+    };
+
+    /* UUC Reading Listing Logic:End */
+
+    const ReferenceInstruments = ref([{ id: "", name: "", instrument_id: "" }]);
 
     const itemDetailsValidator = Yup.object().shape({});
 
@@ -588,7 +825,8 @@ export default defineComponent({
 
       location: "",
 
-      ranges: "",
+      ranges_from: "",
+      ranges_to: "",
       accuracy: "",
       resolution: "",
 
@@ -604,11 +842,92 @@ export default defineComponent({
       reference_instrument_id: "",
       service_request_id: "",
 
-      reading_data: [],
-
       company_id: "",
       is_active: 1,
     });
+
+    const uucDetails = ref<UUCReading>({
+      calibration_instrument_id: itemId.toString(),
+      uuc_reading: "",
+      i1_up: "",
+      d1_down: "",
+      i2_up: "",
+      d2_down: "",
+      mean_value: 0,
+      company_id: itemDetails.value.company_id,
+      is_active: 1,
+    });
+
+    const resetUUCReading = async () => {
+      uucDetails.value = {
+        calibration_instrument_id: itemId.toString(),
+        uuc_reading: "",
+        i1_up: "",
+        d1_down: "",
+        i2_up: "",
+        d2_down: "",
+        mean_value: 0,
+        company_id: itemDetails.value.company_id,
+        is_active: 1,
+      };
+
+      await record_listing();
+    };
+
+    const submitUUC = async () => {
+      if (
+        itemDetails.value.reference_instrument_id == "" ||
+        itemDetails.value.reference_instrument_id == null
+      ) {
+        showErrorAlert("Error", "Please Select Reference Instrument.");
+        return;
+      }
+
+      uucLoading.value = true;
+      uucDetails.value.company_id = itemDetails.value.company_id || "";
+
+      const result = validateForm(uucDetails.value);
+
+      if (result == false) {
+        showErrorAlert("Warning", "Please fill all the details correctly.");
+        uucLoading.value = false;
+        return;
+      }
+
+      try {
+        if (uucSubmitButtonRef.value) {
+          // Activate indicator
+          uucSubmitButtonRef.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
+        const response = await addUUCReading(uucDetails.value);
+
+        if (response?.success) {
+          // Handle successful API response
+          uucLoading.value = false;
+          showSuccessAlert(
+            "Success",
+            response.message || "Reading Added Successfully!"
+          );
+
+          resetUUCReading();
+        } else {
+          // Handle API error response
+          uucLoading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
+        }
+      } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
+        showErrorAlert("Error", "An error occurred during the API call.");
+      } finally {
+        if (uucSubmitButtonRef.value) {
+          uucSubmitButtonRef.value.removeAttribute("data-kt-indicator");
+        }
+        uucLoading.value = false;
+      }
+    };
 
     const GetMasterInstruments = async () => {
       ApiService.setHeader();
@@ -624,7 +943,6 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-
       ReferenceInstruments.value = [];
 
       await GetMasterInstruments();
@@ -634,64 +952,42 @@ export default defineComponent({
 
       if (response.success) {
         itemDetails.value = { ...response.result };
-        itemDetails.value.reading_data = response.result.reading_data
-          ? JSON.parse(response.result.reading_data)
-          : [];
       }
+
+      await record_listing();
     });
 
- // Function to calculate the mean
- async function calculateMean(data) {
-            const { l1_up, l2_up, d1_down, d2_down } = data;
-            const L1_UP = Number(l1_up) || 0;
-            const L2_UP = Number(l2_up) || 0;
-            const D1_DOWN = Number(d1_down) || 0;
-            const D2_DOWN = Number(d2_down) || 0;
+    // Function to calculate the mean
+    async function calculateMean(data) {
+      const { i1_up, i2_up, d1_down, d2_down } = data;
+      const L1_UP = Number(i1_up) || 0;
+      const L2_UP = Number(i2_up) || 0;
+      const D1_DOWN = Number(d1_down) || 0;
+      const D2_DOWN = Number(d2_down) || 0;
 
-            const average = (L1_UP + L2_UP + D1_DOWN + D2_DOWN) / 4;
-            return Number(average.toFixed(5));
+      const average = (L1_UP + L2_UP + D1_DOWN + D2_DOWN) / 4;
+      return Number(average.toFixed(5));
+    }
+
+    /* --------SET READING DATA--------*/
+    async function setUUCReading(e, l) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
+            uucDetails.value[l] = e.target.value;
+          } else {
+            uucDetails.value[l] = "";
+          }
+        } else {
+          uucDetails.value[l] = "";
         }
-
-        // Set Readings data
-        async function setUUCReadings(e, index, l) {
-            if (Array.isArray(itemDetails.value.reading_data) && itemDetails.value.reading_data[index]) {
-                itemDetails.value.reading_data[index][l] = e.target.value;
-                const average = await calculateMean(itemDetails.value.reading_data[index]);
-                itemDetails.value.reading_data[index].mean_value = average;
-            }
-        }
-
-        // Add Reading
-        const addReading = () => {
-            if (Array.isArray(itemDetails.value.reading_data)) {
-                itemDetails.value.reading_data.push({
-                    ranges: "",
-                    uuc_reading: "",
-                    l1_up: "",
-                    l2_up: "",
-                    d1_down: "",
-                    d2_down: "",
-                    mean_value: 0,
-                });
-            } else {
-                itemDetails.value.reading_data = [{
-                    ranges: "",
-                    uuc_reading: "",
-                    l1_up: "",
-                    l2_up: "",
-                    d1_down: "",
-                    d2_down: "",
-                    mean_value: 0,
-                }];
-            }
-        };
-
-    // remove DownFlow
-    const removeReading = async (index) => {
-      if (index != null) {
-        itemDetails.value.reading_data.splice(index, 1);
+      } catch (err) {
+        uucDetails.value[l] = "";
       }
-    };
+
+      const average = await calculateMean(uucDetails.value);
+      uucDetails.value.mean_value = average;
+    }
 
     const validateForm = (formData) => {
       for (const key in formData) {
@@ -730,7 +1026,7 @@ export default defineComponent({
 
       console.log(itemDetails.value);
       try {
-        if (validateForm(itemDetails.value.reading_data)) {
+        if (validateForm(itemDetails.value)) {
           const response = await updateCalibrationInstrument(
             itemId,
             itemDetails.value
@@ -795,16 +1091,26 @@ export default defineComponent({
     };
 
     return {
+      uucSubmitButtonRef,
+      submitButtonRef,
+      tableData,
+      tableHeader,
+      deleteItem,
+      selectedIds,
+      deleteFewItem,
+      sort,
+      onItemSelect,
       itemDetails,
       ReferenceInstruments,
       itemDetailsValidator,
       getAssetPath,
       submit,
+      submitUUC,
       loading,
+      uucLoading,
 
-      addReading,
-      removeReading,
-      setUUCReadings,
+      uucDetails,
+      setUUCReading,
     };
   },
 });

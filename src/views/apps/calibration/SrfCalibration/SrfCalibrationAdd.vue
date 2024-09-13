@@ -517,7 +517,7 @@
               {{ calibration_instrument.parameter }}
             </template>
             <template v-slot:ranges="{ row: calibration_instrument }">
-              {{ calibration_instrument.ranges }}
+              {{ `${calibration_instrument.ranges_from || ""} to ${calibration_instrument.ranges_to || ""}` }}
             </template>
             <template v-slot:location="{ row: calibration_instrument }">
               {{ calibration_instrument.location }}

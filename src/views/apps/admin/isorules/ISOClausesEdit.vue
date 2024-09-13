@@ -584,15 +584,19 @@ export default defineComponent({
 
       try {
         let response = await getISORule(itemId.toString());
-        console.log(response);
-        ISO.value = {
-          id: response.id,
-          clauses: JSON.parse(response.clauses),
-          company_id: response.company_id ? response.company_id : "",
-          is_active: response.is_active,
-        };
 
-        clauses.splice(0, clauses.length, ...ISO.value.clauses);
+        if (response.success) {
+          ISO.value = {
+            id: response.result.id,
+            clauses: JSON.parse(response.result.clauses),
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            is_active: response.result.is_active,
+          };
+
+          clauses.splice(0, clauses.length, ...ISO.value.clauses);
+        }
         // Object.assign(clauses, ISO.value.clauses);
       } catch (error) {
         console.log(error);

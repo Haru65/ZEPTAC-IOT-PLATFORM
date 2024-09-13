@@ -22,20 +22,18 @@
                   >Service Request</label
                 >
                 <el-select
-                    filterable
-                    v-model="itemDetails.service_request_id"
-                    placeholder="Enter srf and select it to add..."
-                  >
-                    <el-option
-                      v-for="(item, index) in srfs"
-                      :key="index"
-                      :label="item.srf_no"
-                      :value="item.id"
-                    />
-                  </el-select>
-                <div
-                  class="fv-plugins-message-container mt-0"
+                  filterable
+                  v-model="itemDetails.service_request_id"
+                  placeholder="Enter srf and select it to add..."
                 >
+                  <el-option
+                    v-for="(item, index) in srfs"
+                    :key="index"
+                    :label="item.srf_no"
+                    :value="item.id"
+                  />
+                </el-select>
+                <div class="fv-plugins-message-container mt-0">
                   <div class="fv-help-block">
                     <ErrorMessage name="service_request_id" />
                   </div>
@@ -74,7 +72,6 @@
                 </div>
               </div>
             </div>
-
           </div>
 
           <div class="modal-footer flex-center w-100">
@@ -112,7 +109,7 @@
   </div>
 </template>
       
-      <script lang="ts">
+<script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
@@ -162,9 +159,7 @@ export default defineComponent({
       },
     ]);
 
-    const itemDetailsValidator = Yup.object().shape({
-     
-    });
+    const itemDetailsValidator = Yup.object().shape({});
 
     const itemDetails = ref<Item>({
       service_request_id: "",
@@ -175,7 +170,6 @@ export default defineComponent({
       is_active: "1",
     });
 
-
     onMounted(async () => {
       srfs.value.pop();
       CleanRoomInstruments.value.pop();
@@ -183,17 +177,20 @@ export default defineComponent({
       try {
         ApiService.setHeader();
         const response = await getAllInstrument(`fetchAll=true`);
-        if (response.result != null && response.result) {
-          CleanRoomInstruments.value.push(
-            ...response.result?.map(({ id, instrument_id, name, ...rest }) => ({
-              id,
-              instrument_id,
-              name,
-              ...rest,
-            }))
-          );
+        if (response.success) {
+          if (response.result != null && response.result) {
+            CleanRoomInstruments.value.push(
+              ...response.result?.map(
+                ({ id, instrument_id, name, ...rest }) => ({
+                  id,
+                  instrument_id,
+                  name,
+                  ...rest,
+                })
+              )
+            );
+          }
         }
-        console.log(CleanRoomInstruments.value);
       } catch (error) {
         showErrorAlert("Error", "An error occurred during the API call.");
         loading.value = false;
@@ -298,9 +295,7 @@ export default defineComponent({
       }
     };
 
-    const clear = () => {
-
-    };
+    const clear = () => {};
     const showSuccessAlert = (title, message) => {
       Swal.fire({
         title,

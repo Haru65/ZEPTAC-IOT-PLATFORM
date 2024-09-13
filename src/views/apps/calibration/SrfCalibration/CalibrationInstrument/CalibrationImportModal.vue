@@ -122,7 +122,7 @@
                                     <td>{{ r.make }}</td>
                                     <td>{{ r.model_no }}</td>
                                     <td>{{ r.serial_no }}</td>
-                                    <td>{{ r.ranges }}</td>
+                                    <td>{{ r.ranges_from }} to {{ r.ranges_to }}</td>
                                     <td>{{ r.accuracy }}</td>
                                     <td>{{ r.calibration_date }}</td>
                                     <td>{{ r.calibration_due_date }}</td>
@@ -207,7 +207,8 @@ interface readingsData {
 
   location: string;
 
-  ranges: string;
+  ranges_from: string;
+  ranges_to: string;
   accuracy: string;
   resolution: string;
 
@@ -220,7 +221,6 @@ interface readingsData {
   instrument_condition: string; // ok or damaged
   remark: string; // based on instrument_condition remark is given
 
-  reading_data: [];
   reference_instrument_id: string;
   service_request_id: string;
 
@@ -306,7 +306,8 @@ export default defineComponent({
               temp: item["temp"],
               rh: item["rh"],
 
-              ranges: item["ranges"],
+              ranges_from: item["ranges_from"],
+              ranges_to: item["ranges_to"],
               accuracy: item["accuracy"],
               resolution: item["resolution"],
 
@@ -317,7 +318,6 @@ export default defineComponent({
               periodicity: item["periodicity"],
               instrument_condition: item["instrument_condition"],
               remark: item["remark"],
-              reading_data: [],
               reference_instrument_id: "",
               service_request_id: props.data.service_request_id,
 

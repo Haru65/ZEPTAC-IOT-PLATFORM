@@ -255,40 +255,54 @@ export default defineComponent({
       try {
         ApiService.setHeader();
         const response = await getEmployees(`fetchAll=true`);
-        if (response.result != null && response.result) {
-          Employees.value.push(
-            ...response.result?.map(({ id, first_name, last_name }) => ({
-              id,
-              first_name,
-              last_name,
-            }))
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Employees.value.push(
+              ...response.result?.map(({ id, first_name, last_name }) => ({
+                id,
+                first_name,
+                last_name,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getEmployees : ${
+              response.message || "Error Occured in API"
+            }`
           );
         }
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
+      } catch (err) {
+        console.error(`Error Occured in getEmployees : ${err}`);
       }
 
       try {
-        ApiService.setHeader();
-
         let response = await getMRMSchedule(itemId.toString());
-        console.log(response);
-        itemDetails.value = {
-          meeting_date: response.meeting_date,
-          agenda: response.agenda,
-          attendees: JSON.parse(response.attendees),
-          approval_status: response.approval_status,
 
-          company_id: response.company_id ? response.company_id : "",
-          created_by: response.created_by,
-          updated_by: response.updated_by,
-          is_active: response.is_active,
-        };
+        if (response.success) {
+          itemDetails.value = {
+            meeting_date: response.result.meeting_date,
+            agenda: response.result.agenda,
+            attendees: JSON.parse(response.result.attendees),
+            approval_status: response.result.approval_status,
 
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getMRMSchedule : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getMRMSchedule : ${err}`);
       }
     });
 
@@ -358,7 +372,7 @@ export default defineComponent({
         }
 
         // Call your API here
-          const response = await updateMRMSchedule(itemId, itemDetails.value);
+        const response = await updateMRMSchedule(itemId, itemDetails.value);
 
         if (response?.success) {
           // Handle successful API response

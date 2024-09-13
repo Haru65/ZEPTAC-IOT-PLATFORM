@@ -532,7 +532,6 @@
 import { getAssetPath } from "@/core/helpers/assets";
 import { computed, defineComponent, onMounted, reactive, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { getIAuditObservation, getISORule } from "@/stores/api";
 
 import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
 import { hideModal } from "@/core/helpers/dom";
@@ -550,6 +549,7 @@ import {
   getIAuditSchedule,
   getIAuditObservations,
   deleteIAuditObservation,
+  getISORule,
 } from "@/stores/api";
 import type { IClause } from "@/core/model/audit_observation";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
@@ -663,12 +663,18 @@ export default defineComponent({
           `page=${page}&limit=${limit.value}&itemId=${itemId}`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id,
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ id, ...rest }) => ({
+            id,
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -693,12 +699,18 @@ export default defineComponent({
           `page=${page.value}&limit=${limit}&itemId=${itemId}`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id,
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ id, ...rest }) => ({
+            id,
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -733,12 +745,18 @@ export default defineComponent({
           `page=${page.value}&limit=${limit.value}&itemId=${itemId}`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id,
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ id, ...rest }) => ({
+            id,
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -805,43 +823,57 @@ export default defineComponent({
     onMounted(async () => {
       try {
         let response = await getIAuditSchedule(itemId.toString());
-        console.log(response);
-        auditDetails.value = {
-          id: response.id,
-          auditor_name: response.auditor_name,
-          address: response.address,
-          meeting_place: response.meeting_place,
-          auditees: JSON.parse(response.auditees),
-          audit_area: response.audit_area,
-          scope: response.scope,
-          approval_status: response.approval_status,
+        if (response?.success) {
+          auditDetails.value = {
+            id: response.result.id,
+            auditor_name: response.result.auditor_name,
+            address: response.result.address,
+            meeting_place: response.result.meeting_place,
+            auditees: JSON.parse(response.result.auditees),
+            audit_area: response.result.audit_area,
+            scope: response.result.scope,
+            approval_status: response.result.approval_status,
 
-          company_id: response.company_id ? response.company_id : "",
-          created_by: response.created_by,
-          updated_by: response.updated_by,
-          is_active: response.is_active,
-        };
-        clauseDetails.value.audit_schedule_id = response.id;
-      } catch (error) {
-        // Handle errors, e.g., show an error message
-        console.error("Error fetching leads data:", error);
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+          clauseDetails.value.audit_schedule_id = response.result.id;
+        } else {
+          console.error(
+            `Error Occured in getIAuditSchedule : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getIAuditSchedule : ${err}`);
       }
 
       try {
         let res = await getISORule(User.company_id);
-        console.log(res);
-        ISO.value = {
-          id: res.id,
-          clauses: JSON.parse(res.clauses),
-          company_id: res.company_id ? res.company_id : "",
-          is_active: res.is_active,
-        };
 
-        Object.assign(clauses, ISO.value.clauses);
-      } catch (error) {
-        console.log(error);
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
+        if (res.success) {
+          ISO.value = {
+            id: res.result.id,
+            clauses: JSON.parse(res.result.clauses),
+            company_id: res.result.company_id ? res.result.company_id : "",
+            is_active: res.result.is_active,
+          };
+
+          Object.assign(clauses, ISO.value.clauses);
+        } else {
+          console.error(
+            `Error Occured in getISORule : ${
+              res.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getISORule : ${err}`);
       }
 
       try {
@@ -851,7 +883,7 @@ export default defineComponent({
         }, 250);
       } catch (error) {
         // Handle errors, e.g., show an error message
-        console.error("Error fetching leads data:", error);
+        console.error("Error fetching  data:", error);
       }
     });
 

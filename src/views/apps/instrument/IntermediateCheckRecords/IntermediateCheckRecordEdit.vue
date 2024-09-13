@@ -707,7 +707,14 @@
             </div>
             <!--end::Accordion-->
 
-            <div class="row mb-6" v-if="Identifier == 'Admin' || Identifier == 'Company-Admin' || Identifier == 'Commercial-Executive'">
+            <div
+              class="row mb-6"
+              v-if="
+                Identifier == 'Admin' ||
+                Identifier == 'Company-Admin' ||
+                Identifier == 'Commercial-Executive'
+              "
+            >
               <div class="form-group col-md-12 mb-8 mb-sd-8">
                 <label
                   class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
@@ -886,33 +893,38 @@ export default defineComponent({
     onMounted(async () => {
       try {
         let response = await getIntermediateCheckRecord(itemId.toString());
-        console.log(response);
 
-        itemDetails.value.instrument.name = response.instrument.name;
-        itemDetails.value.instrument.make = response.instrument.make;
-        itemDetails.value.instrument.model_no = response.instrument.model_no;
-        itemDetails.value.instrument.serial_no = response.instrument.serial_no;
+        if (response.success) {
+          itemDetails.value.instrument.name = response.result.instrument.name;
+          itemDetails.value.instrument.make = response.result.instrument.make;
+          itemDetails.value.instrument.model_no =
+            response.result.instrument.model_no;
+          itemDetails.value.instrument.serial_no =
+            response.result.instrument.serial_no;
 
-        itemDetails.value.instrument_id = response.instrument_id;
-        itemDetails.value.check_date = response.check_date;
-        itemDetails.value.uuc_details = JSON.parse(response.uuc_details);
-        itemDetails.value.master_equipment_1 = JSON.parse(
-          response.master_equipment_1
-        );
-        itemDetails.value.master_equipment_2 = JSON.parse(
-          response.master_equipment_2
-        );
-        itemDetails.value.intermediate_check_readings = JSON.parse(
-          response.intermediate_check_readings
-        );
-        itemDetails.value.review_commands = response.review_commands;
-        itemDetails.value.approval_status = response.approval_status;
-        itemDetails.value.company_id = response.company_id
-          ? response.company_id
-          : "";
-        itemDetails.value.created_by = response.created_by;
-        itemDetails.value.updated_by = response.updated_by;
-        itemDetails.value.is_active = response.is_active;
+          itemDetails.value.instrument_id = response.result.instrument_id;
+          itemDetails.value.check_date = response.result.check_date;
+          itemDetails.value.uuc_details = JSON.parse(
+            response.result.uuc_details
+          );
+          itemDetails.value.master_equipment_1 = JSON.parse(
+            response.result.master_equipment_1
+          );
+          itemDetails.value.master_equipment_2 = JSON.parse(
+            response.result.master_equipment_2
+          );
+          itemDetails.value.intermediate_check_readings = JSON.parse(
+            response.result.intermediate_check_readings
+          );
+          itemDetails.value.review_commands = response.result.review_commands;
+          itemDetails.value.approval_status = response.result.approval_status;
+          itemDetails.value.company_id = response.result.company_id
+            ? response.result.company_id
+            : "";
+          itemDetails.value.created_by = response.result.created_by;
+          itemDetails.value.updated_by = response.result.updated_by;
+          itemDetails.value.is_active = response.result.is_active;
+        }
       } catch (error) {
         showErrorAlert("Error", "An error occurred during the API call.");
         loading.value = false;
@@ -1000,9 +1012,9 @@ export default defineComponent({
 
         // Call your API here
         const response = await updateIntermediateCheckRecord(
-              itemId,
-              itemDetails.value
-            );
+          itemId,
+          itemDetails.value
+        );
 
         if (response?.success) {
           // Handle successful API response

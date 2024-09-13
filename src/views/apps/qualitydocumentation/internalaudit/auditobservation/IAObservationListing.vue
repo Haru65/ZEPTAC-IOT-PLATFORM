@@ -139,7 +139,6 @@
             <router-link :to="`/auditobservations/add/${audit_schedule.id}`">
               <span
                 class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
-
                 >+ Observation
               </span>
             </router-link>
@@ -154,7 +153,6 @@
             <router-link :to="`/non_conformance/list/${audit_schedule.id}`">
               <span
                 class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
-
                 >View Non-conformances
               </span>
             </router-link>
@@ -318,13 +316,18 @@ export default defineComponent({
               : financialYears.value[0]
           }`
         );
-
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id: id,
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ id, ...rest }) => ({
+            id: id,
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -350,13 +353,18 @@ export default defineComponent({
               : financialYears.value[0]
           }`
         );
-
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id: id,
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ id, ...rest }) => ({
+            id: id,
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -399,13 +407,20 @@ export default defineComponent({
               : financialYears.value[0]
           }`
         );
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id: id,
-          ...rest,
-        }));
 
-        more.value = response.result.next_page_url != null ? true : false;
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          tableData.value = response.result.data.map(({ id, ...rest }) => ({
+            id: id,
+            ...rest,
+          }));
+
+          more.value = response.result.next_page_url != null ? true : false;
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -612,13 +627,18 @@ export default defineComponent({
             ? selectedYearCache.value
             : financialYears.value[0]
         );
-
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id: id,
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ id, ...rest }) => ({
+            id: id,
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

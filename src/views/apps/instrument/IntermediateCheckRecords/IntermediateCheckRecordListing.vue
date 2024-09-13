@@ -207,13 +207,18 @@ export default defineComponent({
         const response = await getIntermediateCheckRecords(
           `page=${page}&limit=${limit.value}`
         );
-
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id: id,
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ id, ...rest }) => ({
+            id: id,
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -235,13 +240,18 @@ export default defineComponent({
         const response = await getIntermediateCheckRecords(
           `page=${page.value}&limit=${limit}`
         );
-
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id: id,
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ id, ...rest }) => ({
+            id: id,
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -280,13 +290,19 @@ export default defineComponent({
         const response = await getIntermediateCheckRecords(
           `page=${page.value}&limit=${limit.value}`
         );
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id: id,
-          ...rest,
-        }));
+        if (response.success) {
+          tableData.value = response.result.data.map(({ id, ...rest }) => ({
+            id: id,
+            ...rest,
+          }));
 
-        more.value = response.result.next_page_url != null ? true : false;
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+          more.value = response.result.next_page_url != null ? true : false;
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -335,13 +351,18 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await IntermediateCheckRecordSearch(search.value);
-
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ id, ...rest }) => ({
-          id: id,
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ id, ...rest }) => ({
+            id: id,
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

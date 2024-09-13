@@ -532,7 +532,7 @@
               {{ calibration_instrument.parameter }}
             </template>
             <template v-slot:ranges="{ row: calibration_instrument }">
-              {{ calibration_instrument.ranges }}
+              {{ `${calibration_instrument.ranges_from || ""} to ${calibration_instrument.ranges_to || ""}` }}
             </template>
             <template v-slot:location="{ row: calibration_instrument }">
               {{ calibration_instrument.location }}
@@ -545,7 +545,9 @@
                   class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
                   data-bs-toggle="tooltip"
                   title="Download Calibration Certificate"
-                  @click="downloadCalibrationRecord(calibration_instrument.id)"
+                  @click="
+                    downloadCalibrationRecordsZip(calibration_instrument.id)
+                  "
                 >
                   <KTIcon icon-name="file-down" icon-class="fs-2" />
                 </span>
@@ -660,6 +662,9 @@ import * as Yup from "yup";
 import { useBodyStore } from "@/stores/body";
 import { useRouter, useRoute } from "vue-router";
 import LayoutService from "@/core/services/LayoutService";
+
+import JSZip from "jszip";
+
 import {
   validateUserNSrf,
   saveCalibrationSrf,
@@ -677,7 +682,6 @@ import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 
 import CalibrationInstrumentAddModal from "./CalibrationInstrument/CalibrationInstrumentAddModal.vue";
-import ReadingModal from "./CustomComponents/ReadingModal.vue";
 import { CalibrationRecordGen } from "@/core/config/CalibrationRecordGenerator";
 
 interface Engineer {
@@ -704,16 +708,6 @@ interface Data {
   pincode: string;
   country: string;
   mobile: string;
-}
-
-interface UUCReading {
-  ranges: string;
-  uuc_reading: string;
-  l1_up: string;
-  l2_up: string;
-  d1_down: string;
-  d2_down: string;
-  mean_value: number;
 }
 
 interface SrfData {
@@ -751,9 +745,11 @@ interface ReferenceInstrumentData {
   calibration_date: string;
   calibration_due_date: string;
 
-  ranges: string;
+  ranges_from: string;
+  ranges_to: string;
   accuracy: string;
 
+  uncertainty: string;
   resolution: string;
   vendor_name: "";
   accessories_list: [];
@@ -771,6 +767,45 @@ interface ReferenceInstrumentData {
   is_active: string;
 }
 
+// Define the interface for the UncertaintyValue
+interface UncertaintyValue {
+  id: string;
+  company_id: string;
+  reading_id: string;
+  standard_deviation: number;
+  uncertainty_due_process: number;
+  standard_uncertainty: number;
+  uncertainty_resolution: number;
+  hysteresis: number;
+  uncertainty_due_hysteresis: number;
+  max_zero_reading: number;
+  zero_deviation: number;
+  total_uncertainty: number;
+  effective_deg_freedom: number;
+  is_infinite: boolean;
+  combined_uncertainty: string;
+  expanded_uncertainty: string;
+
+}
+
+// Define the interface for the Reading
+interface Reading {
+  id: string;
+  company_id: string;
+  calibration_instrument_id: string;
+  uuc_reading: string;
+  i1_up: string;
+  d1_down: string;
+  i2_up: string;
+  d2_down: string;
+  mean_value: string;
+  is_active: string;
+  created_at: string;
+  updated_at: string;
+  uncertainty: UncertaintyValue; // Nested UncertaintyValue
+}
+
+
 interface DownloadData {
   id: string;
   instrument_id: string;
@@ -786,7 +821,8 @@ interface DownloadData {
 
   location: string;
 
-  ranges: string;
+  ranges_from: string;
+  ranges_to: string;
   accuracy: string;
   resolution: string;
 
@@ -802,7 +838,7 @@ interface DownloadData {
   reference_instrument_id: string;
   service_request_id: string;
 
-  reading_data: Array<UUCReading>;
+  readings: Reading [];
 
   company_id: string;
   is_active: string;
@@ -819,7 +855,6 @@ export default defineComponent({
     ErrorMessage,
     Datatable,
     CalibrationInstrumentAddModal,
-    ReadingModal,
   },
   setup() {
     const draftSubmitButton = ref<null | HTMLButtonElement>(null);
@@ -876,7 +911,8 @@ export default defineComponent({
     const readingDetails = ref({
       id: "",
       reference_instrument_id: "",
-      ranges: "",
+      ranges_from: "",
+      ranges_to: "",
       reading_data: [],
     });
 
@@ -956,9 +992,8 @@ export default defineComponent({
         if (response.success) {
           more.value = response.result.next_page_url != null ? true : false;
           tableData.value = response.result.data.map(
-            ({ id, reading_data, ...rest }) => ({
+            ({ id, ...rest }) => ({
               id: id,
-              reading_data: JSON.parse(reading_data),
               ...rest,
             })
           );
@@ -993,9 +1028,8 @@ export default defineComponent({
         if (response.success) {
           more.value = response.result.next_page_url != null ? true : false;
           tableData.value = response.result.data.map(
-            ({ id, reading_data, ...rest }) => ({
+            ({ id, ...rest }) => ({
               id: id,
-              reading_data: JSON.parse(reading_data),
               ...rest,
             })
           );
@@ -1045,9 +1079,8 @@ export default defineComponent({
         );
         if (response.success) {
           tableData.value = response.result.data.map(
-            ({ id, reading_data, ...rest }) => ({
+            ({ id, ...rest }) => ({
               id: id,
-              reading_data: JSON.parse(reading_data),
               ...rest,
             })
           );
@@ -1241,9 +1274,8 @@ export default defineComponent({
         if (response.success) {
           more.value = response.result.next_page_url != null ? true : false;
           tableData.value = response.result.data.map(
-            ({ id, reading_data, ...rest }) => ({
+            ({ id, ...rest }) => ({
               id: id,
-              reading_data: JSON.parse(reading_data),
               ...rest,
             })
           );
@@ -1488,7 +1520,8 @@ export default defineComponent({
 
       location: "",
 
-      ranges: "",
+      ranges_from: "",
+      ranges_to: "",
       accuracy: "",
       resolution: "",
 
@@ -1504,17 +1537,7 @@ export default defineComponent({
       reference_instrument_id: "",
       service_request_id: "",
 
-      reading_data: [
-        {
-          ranges: "",
-          uuc_reading: "",
-          l1_up: "",
-          l2_up: "",
-          d1_down: "",
-          d2_down: "",
-          mean_value: 0,
-        },
-      ],
+      readings : [],
 
       company_id: "",
       is_active: "",
@@ -1578,9 +1601,11 @@ export default defineComponent({
         calibration_date: "",
         calibration_due_date: "",
 
-        ranges: "",
+        ranges_from: "",
+        ranges_to: "",
         accuracy: "",
 
+        uncertainty: "",
         resolution: "",
         vendor_name: "",
         accessories_list: [],
@@ -1599,7 +1624,7 @@ export default defineComponent({
       },
     });
 
-    const downloadCalibrationRecord = async (id) => {
+    const downloadCalibrationRecordsZip = async (id) => {
       let timerInterval;
 
       try {
@@ -1624,15 +1649,15 @@ export default defineComponent({
         // Fetch RGP information
         const res = await getCalibrationInstrumentInfo(id);
         if (res?.success != false) {
-          instrumentInfo.value = { ...res.result };
-          instrumentInfo.value.reading_data =
-            JSON.parse(res.result.reading_data) || [];
-
+          instrumentInfo.value = { ...res.result } as DownloadData;
+          instrumentInfo.value.readings = [ ...res.result.readings ] as Reading[];
           instrumentInfo.value.srf = { ...res.result.srf };
         } else {
           showErrorAlert("Error", res.message || "Error Occured");
           return;
         }
+
+        console.log(instrumentInfo.value);
 
         // Fetch company logo details
         const res2 = await getCompanyLogo(res.result.company_id);
@@ -1706,12 +1731,13 @@ export default defineComponent({
     }
 
     const fillItemData = async (data) => {
-      const { id, reference_instrument_id, ranges, reading_data } = data;
+      const { id, reference_instrument_id, ranges_from, ranges_to, reading_data } = data;
 
       readingDetails.value = {
         id: id,
         reference_instrument_id: reference_instrument_id,
-        ranges: ranges,
+        ranges_from: ranges_from,
+        ranges_to: ranges_to,
         reading_data: JSON.parse(reading_data),
       };
       console.log("readingDetails are:", readingDetails.value);
@@ -1749,7 +1775,7 @@ export default defineComponent({
       GetCalSrfStatus,
       onsubmit,
       fillItemData,
-      downloadCalibrationRecord,
+      downloadCalibrationRecordsZip,
     };
   },
 });

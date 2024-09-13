@@ -13,128 +13,128 @@
           <!--begin::Card body-->
           <div class="card-body border-top p-sd-2 p-lg-9">
             <div class="row mb-6">
-                <div class="col-md-12 fv-row mb-8 mb-sd-8">
-                  <!--begin::Label-->
-                  <label class="required fs-5 fw-bold text-gray-700 mb-2"
-                    >Area of Improvement</label
-                  >
-                  <!--end::Label-->
+              <div class="col-md-12 fv-row mb-8 mb-sd-8">
+                <!--begin::Label-->
+                <label class="required fs-5 fw-bold text-gray-700 mb-2"
+                  >Area of Improvement</label
+                >
+                <!--end::Label-->
 
-                  <!--begin::Input-->
-                  <div>
-                    <el-select
-                      v-model="itemDetails.area"
-                      filterable
-                      name="area"
-                      @change="setTarget($event)"
-                      placeholder="--Select--"
-                    >
-                      <el-option
-                        v-for="item in AreaOfImprovement"
-                        :key="item.id"
-                        :label="item.area"
-                        :value="item.id"
-                      />
-                    </el-select>
-                  </div>
-                  <!--end::Col-->
-                  <div
-                    class="fv-plugins-message-container mt-3"
-                    v-if="!itemDetails.area"
+                <!--begin::Input-->
+                <div>
+                  <el-select
+                    v-model="itemDetails.area"
+                    filterable
+                    name="area"
+                    @change="setTarget($event)"
+                    placeholder="--Select--"
                   >
-                    <div class="fv-help-block">
-                      <ErrorMessage name="area" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row mb-6">
-                <!--begin::Col-->
-                <div class="col-md-12 fv-row">
-                  <!--begin::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                    >Target Rating</label
-                  >
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <div class="form-control form-control-lg form-control-solid">
-                    {{ itemDetails.target }}
-                  </div>
-                  <!--end::Input-->
+                    <el-option
+                      v-for="item in AreaOfImprovement"
+                      :key="item.id"
+                      :label="item.area"
+                      :value="item.id"
+                    />
+                  </el-select>
                 </div>
                 <!--end::Col-->
-              </div>
-
-              <div class="row mb-6">
-                <!--begin::Col-->
-                <div class="col-md-12 fv-row">
-                  <!--begin::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                    >Select Quarter</label
-                  >
-                  <!--end::Label-->
-
-                  <div>
-                    <el-select
-                      v-model="itemDetails.quarter"
-                      filterable
-                      name="quarter"
-                      placeholder="--Select--"
-                    >
-                      <el-option
-                        v-for="item in Quarters"
-                        :key="item.quarter"
-                        :label="item.quarter"
-                        :value="item.quarter"
-                      />
-                    </el-select>
-                  </div>
-                  <!--end::Col-->
-                  <div
-                    class="fv-plugins-message-container mt-3"
-                    v-if="!itemDetails.quarter"
-                  >
-                    <div class="fv-help-block">
-                      <ErrorMessage name="quarter" />
-                    </div>
+                <div
+                  class="fv-plugins-message-container mt-3"
+                  v-if="!itemDetails.area"
+                >
+                  <div class="fv-help-block">
+                    <ErrorMessage name="area" />
                   </div>
                 </div>
-                <!--end::Col-->
               </div>
+            </div>
 
-              <div class="row mb-6">
-                <!--begin::Col-->
-                <div class="col-md-12 fv-row">
-                  <!--begin::Label-->
-                  <label
-                    class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                    >OutCome of Improvement</label
+            <div class="row mb-6">
+              <!--begin::Col-->
+              <div class="col-md-12 fv-row">
+                <!--begin::Label-->
+                <label
+                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Target Rating</label
+                >
+                <!--end::Label-->
+
+                <!--begin::Input-->
+                <div class="form-control form-control-lg form-control-solid">
+                  {{ itemDetails.target }}
+                </div>
+                <!--end::Input-->
+              </div>
+              <!--end::Col-->
+            </div>
+
+            <div class="row mb-6">
+              <!--begin::Col-->
+              <div class="col-md-12 fv-row">
+                <!--begin::Label-->
+                <label
+                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Select Quarter</label
+                >
+                <!--end::Label-->
+
+                <div>
+                  <el-select
+                    v-model="itemDetails.quarter"
+                    filterable
+                    name="quarter"
+                    placeholder="--Select--"
                   >
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <Field
-                    type="text"
-                    as="textarea"
-                    rows="3"
-                    v-model="itemDetails.outcome"
-                    name="outcome"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Specify the outcome achieved..."
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="outcome" />
-                    </div>
-                  </div>
-                  <!--end::Input-->
+                    <el-option
+                      v-for="item in Quarters"
+                      :key="item.quarter"
+                      :label="item.quarter"
+                      :value="item.quarter"
+                    />
+                  </el-select>
                 </div>
                 <!--end::Col-->
+                <div
+                  class="fv-plugins-message-container mt-3"
+                  v-if="!itemDetails.quarter"
+                >
+                  <div class="fv-help-block">
+                    <ErrorMessage name="quarter" />
+                  </div>
+                </div>
               </div>
+              <!--end::Col-->
+            </div>
+
+            <div class="row mb-6">
+              <!--begin::Col-->
+              <div class="col-md-12 fv-row">
+                <!--begin::Label-->
+                <label
+                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >OutCome of Improvement</label
+                >
+                <!--end::Label-->
+
+                <!--begin::Input-->
+                <Field
+                  type="text"
+                  as="textarea"
+                  rows="3"
+                  v-model="itemDetails.outcome"
+                  name="outcome"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Specify the outcome achieved..."
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="outcome" />
+                  </div>
+                </div>
+                <!--end::Input-->
+              </div>
+              <!--end::Col-->
+            </div>
           </div>
 
           <div class="modal-footer flex-center w-100">
@@ -176,7 +176,11 @@ import { useAuthStore } from "@/stores/auth";
 import { useRouter, useRoute } from "vue-router";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
-import { AreaOfImprovement, GetAreaTarget, Quarters } from "@/core/model/improvement";
+import {
+  AreaOfImprovement,
+  GetAreaTarget,
+  Quarters,
+} from "@/core/model/improvement";
 
 interface Item {
   area: string;
@@ -223,47 +227,61 @@ export default defineComponent({
     });
 
     async function setTarget(id) {
-      if(id !== ""){
+      if (id !== "") {
         itemDetails.value.target = await GetAreaTarget(id);
       }
     }
 
     onMounted(async () => {
-      let response = await getImprovementPlan(itemId.toString());
-      console.log(response);
-      itemDetails.value = {
-        area: response.area,
-        target: response.target,
-        outcome: response.outcome,
-        quarter: response.quarter,
-        approval_status: response.approval_status,
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+      try {
+        let response = await getImprovementPlan(itemId.toString());
+
+        if (response?.success) {
+          itemDetails.value = {
+            area: response.result.area,
+            target: response.result.target,
+            outcome: response.result.outcome,
+            quarter: response.result.quarter,
+            approval_status: response.result.approval_status,
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getImprovementPlan : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getImprovementPlan : ${err}`);
+      }
     });
 
     const validateForm = (formData) => {
       for (const key in formData) {
         let value = formData[key];
         if (Array.isArray(value)) {
-            for (const item of value) {
-              if (!validateForm(item)) {
-                return false;
-              }
-            }
-          } else if (typeof value === "object" && value !== null) {
-            if (!validateForm(value)) {
+          for (const item of value) {
+            if (!validateForm(item)) {
               return false;
             }
-          } else if (typeof value === "string") {
-            value = value.trim();
-            if (value === "") {
-              return false;
-            }
-          } else {
           }
+        } else if (typeof value === "object" && value !== null) {
+          if (!validateForm(value)) {
+            return false;
+          }
+        } else if (typeof value === "string") {
+          value = value.trim();
+          if (value === "") {
+            return false;
+          }
+        } else {
+        }
       }
       return true;
     };

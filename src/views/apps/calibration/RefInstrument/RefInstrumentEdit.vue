@@ -178,25 +178,35 @@
 
             <!-- extra fields -->
             <div class="row mb-6">
-              <div class="form-group col-md-6">
+              <div class="form-group col-md-12">
                 <label
                   class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
                   >Range</label
                 >
-                <Field
-                  type="text"
-                  name="ranges"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Instrument ranges"
-                  v-model="itemDetails.ranges"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="ranges" />
-                  </div>
+                <!--begin::Input group-->
+                <div class="input-group gap-2">
+                  <Field
+                    type="text"
+                    name="ranges_from"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="0"
+                    v-model="itemDetails.ranges_from"
+                  />
+                  <span class="input-group-text">To</span>
+                  <Field
+                    type="text"
+                    name="ranges_to"
+                    class="form-control form-control-lg form-control-solid"
+                    placeholder="1000"
+                    v-model="itemDetails.ranges_to"
+                  />
                 </div>
+                <!--end::Input group-->
               </div>
-
+            </div>
+            <!--end::Input group-->
+            <!-- extra fields -->
+            <div class="row mb-6">
               <div class="form-group col-md-6">
                 <label
                   class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
@@ -215,11 +225,6 @@
                   </div>
                 </div>
               </div>
-            </div>
-            <!--end::Input group-->
-
-            <!-- extra fields -->
-            <div class="row mb-6">
               <div class="form-group col-md-6">
                 <label
                   class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
@@ -238,6 +243,32 @@
                   </div>
                 </div>
               </div>
+
+            </div>
+            <!--end::Input group-->
+
+            <!-- extra fields -->
+            <div class="row mb-6">
+
+              <div class="form-group col-md-6">
+                <label
+                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
+                  >Uncertainity</label
+                >
+                <Field
+                  type="text"
+                  name="uncertainty"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Enter uncertainty"
+                  v-model="itemDetails.uncertainty"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="uncertainty" />
+                  </div>
+                </div>
+              </div>
+
 
               <div class="form-group col-md-6">
                 <label
@@ -738,8 +769,10 @@ interface ItemDetails {
   calibration_date: string;
   calibration_due_date: string;
 
-  ranges: string;
+  ranges_from: string;
+  ranges_to: string;
   accuracy: string;
+  uncertainty: string;
 
   resolution: string;
   vendor_name: "";
@@ -786,8 +819,10 @@ export default defineComponent({
       serial_no: Yup.string().required().label("Serial No."),
       make: Yup.string().required().label("Made by"),
 
-      ranges: Yup.string().required().label("Range"),
+      ranges_from: Yup.string().required().label("Range from"),
+      ranges_to: Yup.string().required().label("Range to"),
       accuracy: Yup.string().required().label("Accuracy"),
+      uncertainty: Yup.string().required().label("Uncertainity"),
 
       resolution: Yup.string().required().label("resolution"),
       location: Yup.string().required().label("Location"),
@@ -842,8 +877,10 @@ export default defineComponent({
       calibration_date: "",
       calibration_due_date: "",
 
-      ranges: "",
+      ranges_from: "",
+      ranges_to: "",
       accuracy: "",
+      uncertainty: "",
 
       resolution: "",
       vendor_name: "",
@@ -895,8 +932,10 @@ export default defineComponent({
             serial_no: response.result.serial_no,
             make: response.result.make,
 
-            ranges: response.result.ranges,
+            ranges_from: response.result.ranges_from,
+            ranges_to: response.result.ranges_to,
             accuracy: response.result.accuracy,
+            uncertainty: response.result.uncertainty,
             resolution: response.result.resolution,
 
             calibration_date: response.result.calibration_date,
@@ -923,13 +962,13 @@ export default defineComponent({
           };
         } else {
           console.error(
-            `Error Occured in getQMSProcedure : ${
+            `Error Occured in getReferenceInstrument : ${
               response.message || "Error Occured in API"
             }`
           );
         }
       } catch (err) {
-        console.error(`Error Occured in getQMSProcedure : ${err}`);
+        console.error(`Error Occured in getReferenceInstrument : ${err}`);
       }
 
       if (User.role_id === 1) {
@@ -1244,7 +1283,6 @@ export default defineComponent({
         },
       });
     };
-
 
     return {
       submitButton,

@@ -264,20 +264,34 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      let response = await getNonConformanceRecord(itemId.toString());
-      console.log(response);
-      ncrDetails.value = {
-        nc_details: response.nc_details,
-        action_required: response.action_required,
-        completion_date: response.completion_date,
-        review_date: response.review_date,
-        verification_details: response.verification_details,
-        approval_status: response.approval_status,
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+      try {
+        let response = await getNonConformanceRecord(itemId.toString());
+
+        if (response?.success) {
+          ncrDetails.value = {
+            nc_details: response.result.nc_details,
+            action_required: response.result.action_required,
+            completion_date: response.result.completion_date,
+            review_date: response.result.review_date,
+            verification_details: response.result.verification_details,
+            approval_status: response.result.approval_status,
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getExternalDoc : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getExternalDoc : ${err}`);
+      }
     });
 
     /* --------SET DATE LOGIC--------*/

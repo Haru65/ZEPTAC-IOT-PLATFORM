@@ -381,29 +381,35 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            customer_name,
-            complaint_date,
-            details_of_complaint,
-            corrective_action,
-            resolution_date,
-            complaint_status,
-            ...rest
-          }) => ({
-            id,
-            customer_name,
-            complaint_date,
-            details_of_complaint,
-            corrective_action,
-            resolution_date,
-            complaint_status,
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              customer_name,
+              complaint_date,
+              details_of_complaint,
+              corrective_action,
+              resolution_date,
+              complaint_status,
+              ...rest
+            }) => ({
+              id,
+              customer_name,
+              complaint_date,
+              details_of_complaint,
+              corrective_action,
+              resolution_date,
+              complaint_status,
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -431,29 +437,35 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            customer_name,
-            complaint_date,
-            details_of_complaint,
-            corrective_action,
-            resolution_date,
-            complaint_status,
-            ...rest
-          }) => ({
-            id,
-            customer_name,
-            complaint_date,
-            details_of_complaint,
-            corrective_action,
-            resolution_date,
-            complaint_status,
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              customer_name,
+              complaint_date,
+              details_of_complaint,
+              corrective_action,
+              resolution_date,
+              complaint_status,
+              ...rest
+            }) => ({
+              id,
+              customer_name,
+              complaint_date,
+              details_of_complaint,
+              corrective_action,
+              resolution_date,
+              complaint_status,
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -496,30 +508,37 @@ export default defineComponent({
               : financialYears.value[0]
           }`
         );
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            customer_name,
-            complaint_date,
-            details_of_complaint,
-            corrective_action,
-            resolution_date,
-            complaint_status,
-            ...rest
-          }) => ({
-            id,
-            customer_name,
-            complaint_date,
-            details_of_complaint,
-            corrective_action,
-            resolution_date,
-            complaint_status,
-            ...rest,
-          })
-        );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              customer_name,
+              complaint_date,
+              details_of_complaint,
+              corrective_action,
+              resolution_date,
+              complaint_status,
+              ...rest
+            }) => ({
+              id,
+              customer_name,
+              complaint_date,
+              details_of_complaint,
+              corrective_action,
+              resolution_date,
+              complaint_status,
+              ...rest,
+            })
+          );
+
+          more.value = response.result.next_page_url != null ? true : false;
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -742,29 +761,35 @@ export default defineComponent({
             : financialYears.value[0]
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            customer_name,
-            complaint_date,
-            details_of_complaint,
-            corrective_action,
-            resolution_date,
-            complaint_status,
-            ...rest
-          }) => ({
-            id,
-            customer_name,
-            complaint_date,
-            details_of_complaint,
-            corrective_action,
-            resolution_date,
-            complaint_status,
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              customer_name,
+              complaint_date,
+              details_of_complaint,
+              corrective_action,
+              resolution_date,
+              complaint_status,
+              ...rest
+            }) => ({
+              id,
+              customer_name,
+              complaint_date,
+              details_of_complaint,
+              corrective_action,
+              resolution_date,
+              complaint_status,
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

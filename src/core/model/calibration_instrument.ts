@@ -5,7 +5,8 @@ interface ICalibrationInstrument {
     instrument_id: string;
     name: string;
     parameter: string;
-    ranges: string;
+    ranges_from: string;
+    ranges_to: string;
     location: string;
     calibration_date: string;
     calibration_due_date: string;
@@ -19,23 +20,20 @@ interface ICalibrationInstrument {
     {
       id: "1",
       param_name: "Pressure",
-      ranges: "range-1",
-      accuracy: "accuracy-1",
-      resolution: "resolution-1",
+      accuracy: "800",
+      resolution: "100",
     },
     {
       id: "2",
       param_name: "Thermal",
-      ranges: "range-2",
-      accuracy: "accuracy-2",
-      resolution: "resolution-2",
+      accuracy: "200",
+      resolution: "400",
     },
     {
       id: "3",
       param_name: "Mass & Volume",
-      ranges: "range-3",
-      accuracy: "accuracy-3",
-      resolution: "resolution-3",
+      accuracy: "700",
+      resolution: "1000",
     }
   ];
 

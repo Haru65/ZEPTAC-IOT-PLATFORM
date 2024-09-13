@@ -827,12 +827,14 @@ export default defineComponent({
         let response = await getCalibrationInstrumentForIntermediate(
           itemId.toString()
         );
-        console.log(response);
-        itemDetails.instrument_id = response.id;
-        itemDetails.instrument.name = response.name;
-        itemDetails.instrument.make = response.make;
-        itemDetails.instrument.model_no = response.model_no;
-        itemDetails.instrument.serial_no = response.serial_no;
+
+        if (response.success) {
+          itemDetails.instrument_id = response.result.id;
+          itemDetails.instrument.name = response.result.name;
+          itemDetails.instrument.make = response.result.make;
+          itemDetails.instrument.model_no = response.result.model_no;
+          itemDetails.instrument.serial_no = response.result.serial_no;
+        }
       } catch (error) {
         showErrorAlert("Error", "An error occurred during the API call.");
         loading.value = false;

@@ -1407,13 +1407,13 @@ export default defineComponent({
           };
         } else {
           console.error(
-            `Error Occured in getQMSProcedure : ${
+            `Error Occured in getInstrument : ${
               response.message || "Error Occured in API"
             }`
           );
         }
       } catch (err) {
-        console.error(`Error Occured in getQMSProcedure : ${err}`);
+        console.error(`Error Occured in getInstrument : ${err}`);
       }
 
       if (User.role_id === 1) {

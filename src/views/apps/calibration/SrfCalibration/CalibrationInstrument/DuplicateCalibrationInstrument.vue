@@ -137,7 +137,8 @@ interface DuplicateItem {
 
   location: string;
 
-  ranges: string;
+  ranges_from: string;
+  ranges_to: string;
   accuracy: string;
   resolution: string;
 
@@ -192,7 +193,8 @@ export default defineComponent({
 
       location: "",
 
-      ranges: "",
+      ranges_from: "",
+      ranges_to: "",
       accuracy: "",
       resolution: "",
 
@@ -215,34 +217,6 @@ export default defineComponent({
     async function resetTheData() {}
 
     onMounted(async function () {});
-
-    function areAllPropertiesNull(array) {
-      return array.some((detail) => {
-        const {
-          name,
-          model_no,
-          serial_no,
-          make,
-          calibration_date,
-          calibration_due_date,
-          ranges,
-          accuracy,
-        } = detail;
-
-        // Check if any property is null or empty
-
-        return (
-          name === "" ||
-          model_no === "" ||
-          serial_no === "" ||
-          make === "" ||
-          calibration_date === "" ||
-          calibration_due_date === "" ||
-          ranges === "" ||
-          accuracy === ""
-        );
-      });
-    }
 
     const showSuccessAlert = (title, message) => {
       Swal.fire({

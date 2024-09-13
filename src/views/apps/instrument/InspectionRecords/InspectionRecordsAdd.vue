@@ -303,12 +303,13 @@ export default defineComponent({
         let response = await getCalibrationInstrumentForInspection(
           itemId.toString()
         );
-        console.log(response);
-        itemDetails.value.instrument_id = response.id;
-        itemDetails.value.instrument.name = response.name;
-        itemDetails.value.instrument.make = response.make;
-        itemDetails.value.instrument.model_no = response.model_no;
-        itemDetails.value.instrument.serial_no = response.serial_no;
+        if (response.success) {
+          itemDetails.value.instrument_id = response.result.id;
+          itemDetails.value.instrument.name = response.result.name;
+          itemDetails.value.instrument.make = response.result.make;
+          itemDetails.value.instrument.model_no = response.result.model_no;
+          itemDetails.value.instrument.serial_no = response.result.serial_no;
+        }
       } catch (error) {
         showErrorAlert("Error", "An error occurred during the API call.");
         loading.value = false;

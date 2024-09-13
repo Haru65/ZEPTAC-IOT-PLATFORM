@@ -505,20 +505,36 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      let response = await getRiskRegister(itemId.toString());
-      console.log(response);
-      itemDetails.value = {
-        id: response.id,
-        clause_no: response.clause_no,
-        risk_identification: JSON.parse(response.risk_identification),
-        risk_evaluation: JSON.parse(response.risk_evaluation),
-        risk_counter: JSON.parse(response.risk_counter),
-        approval_status: response.approval_status,
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+      try {
+        let response = await getRiskRegister(itemId.toString());
+
+        if (response?.success) {
+          itemDetails.value = {
+            id: response.result.id,
+            clause_no: response.result.clause_no,
+            risk_identification: JSON.parse(
+              response.result.risk_identification
+            ),
+            risk_evaluation: JSON.parse(response.result.risk_evaluation),
+            risk_counter: JSON.parse(response.result.risk_counter),
+            approval_status: response.result.approval_status,
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getRiskRegister : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getRiskRegister : ${err}`);
+      }
     });
 
     const validateForm = (formData) => {

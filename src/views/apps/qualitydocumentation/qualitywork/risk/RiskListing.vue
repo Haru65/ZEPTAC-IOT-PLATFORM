@@ -405,6 +405,7 @@ export default defineComponent({
           }`
         );
 
+        if(response.success){
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -422,6 +423,7 @@ export default defineComponent({
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -448,6 +450,7 @@ export default defineComponent({
           }`
         );
 
+        if(response.success){
         more.value = response.result.next_page_url != null ? true : false;
         tableData.value = response.result.data.map(
           ({
@@ -465,6 +468,7 @@ export default defineComponent({
           })
         );
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -507,6 +511,8 @@ export default defineComponent({
               : financialYears.value[0]
           }`
         );
+        
+        if(response.success){
         tableData.value = response.result.data.map(
           ({
             id,
@@ -525,6 +531,7 @@ export default defineComponent({
 
         more.value = response.result.next_page_url != null ? true : false;
         initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -747,23 +754,29 @@ export default defineComponent({
             : financialYears.value[0]
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            risk_identification,
-            risk_evaluation,
-            risk_counter,
-            ...rest
-          }) => ({
-            id: id,
-            risk_identification: JSON.parse(risk_identification),
-            risk_evaluation: JSON.parse(risk_evaluation),
-            risk_counter: JSON.parse(risk_counter),
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              risk_identification,
+              risk_evaluation,
+              risk_counter,
+              ...rest
+            }) => ({
+              id: id,
+              risk_identification: JSON.parse(risk_identification),
+              risk_evaluation: JSON.parse(risk_evaluation),
+              risk_counter: JSON.parse(risk_counter),
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
