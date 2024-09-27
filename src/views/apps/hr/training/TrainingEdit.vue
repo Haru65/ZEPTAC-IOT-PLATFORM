@@ -370,23 +370,37 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      let response = await getTraining(itemId.toString());
-      // console.log(response);
-      trainingDetails.value = {
-        training_date: response.training_date,
-        training_topic: response.training_topic,
-        training_criteria: response.training_criteria,
-        training_desc: response.training_desc,
-        trainers: JSON.parse(response.trainers),
-        trainees: JSON.parse(response.trainees),
-        training_mode: response.training_mode,
-        training_status: response.training_status,
-        approval_status: response.approval_status,
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+      try {
+        let response = await getTraining(itemId.toString());
+
+        if (response.success) {
+          trainingDetails.value = {
+            training_date: response.result.training_date,
+            training_topic: response.result.training_topic,
+            training_criteria: response.result.training_criteria,
+            training_desc: response.result.training_desc,
+            trainers: JSON.parse(response.result.trainers),
+            trainees: JSON.parse(response.result.trainees),
+            training_mode: response.result.training_mode,
+            training_status: response.result.training_status,
+            approval_status: response.result.approval_status,
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getTraining : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getTraining : ${err}`);
+      }
     });
 
     function areAllPropertiesNotNull(array) {
@@ -444,12 +458,12 @@ export default defineComponent({
         if (result) {
           const response = await updateTraining(itemId, trainingDetails.value);
           // console.log(response.error);
-          if (!response.error) {
+          if (response.success) {
             // Handle successful API response
             //   console.log("API response:", response);
             showSuccessAlert(
               "Success",
-              "Training Plan has been successfully Updated!"
+              response.message || "Training Plan has been successfully Updated!"
             );
 
             // clear();
@@ -457,10 +471,8 @@ export default defineComponent({
             loading.value = false;
           } else {
             // Handle API error response
-            //   console.log("API error:", errorData);
-            // console.log("API error:", errorData.response.data.errors);
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
             loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
           }
         } else {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");

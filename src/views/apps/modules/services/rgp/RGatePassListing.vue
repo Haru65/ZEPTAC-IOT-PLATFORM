@@ -499,33 +499,39 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            rgp_no,
-            customer,
-            quotation_id,
-            engineers,
-            instruments,
-            status,
-            date,
-            duedate,
-            ...rest
-          }) => ({
-            id: id,
-            rgp_no: rgp_no,
-            customer: { ...customer },
-            quotation_id: quotation_id,
-            engineers: JSON.parse(engineers).length,
-            instruments: JSON.parse(instruments).length,
-            status: status,
-            date,
-            duedate,
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              rgp_no,
+              customer,
+              quotation_id,
+              engineers,
+              instruments,
+              status,
+              date,
+              duedate,
+              ...rest
+            }) => ({
+              id: id,
+              rgp_no: rgp_no,
+              customer: { ...customer },
+              quotation_id: quotation_id,
+              engineers: JSON.parse(engineers).length,
+              instruments: JSON.parse(instruments).length,
+              status: status,
+              date,
+              duedate,
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -553,33 +559,39 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            rgp_no,
-            customer,
-            quotation_id,
-            engineers,
-            instruments,
-            status,
-            date,
-            duedate,
-            ...rest
-          }) => ({
-            id: id,
-            rgp_no: rgp_no,
-            customer: { ...customer },
-            quotation_id: quotation_id,
-            engineers: JSON.parse(engineers).length,
-            instruments: JSON.parse(instruments).length,
-            status: status,
-            date,
-            duedate,
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              rgp_no,
+              customer,
+              quotation_id,
+              engineers,
+              instruments,
+              status,
+              date,
+              duedate,
+              ...rest
+            }) => ({
+              id: id,
+              rgp_no: rgp_no,
+              customer: { ...customer },
+              quotation_id: quotation_id,
+              engineers: JSON.parse(engineers).length,
+              instruments: JSON.parse(instruments).length,
+              status: status,
+              date,
+              duedate,
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -616,33 +628,39 @@ export default defineComponent({
               : financialYears.value[0]
           }`
         );
-        console.log(response);
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            rgp_no,
-            customer,
-            quotation_id,
-            engineers,
-            instruments,
-            status,
-            date,
-            duedate,
-            ...rest
-          }) => ({
-            id: id,
-            rgp_no: rgp_no,
-            customer: { ...customer },
-            quotation_id: quotation_id,
-            engineers: JSON.parse(engineers).length,
-            instruments: JSON.parse(instruments).length,
-            status: status,
-            date,
-            duedate,
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+
+        if (response.success) {
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              rgp_no,
+              customer,
+              quotation_id,
+              engineers,
+              instruments,
+              status,
+              date,
+              duedate,
+              ...rest
+            }) => ({
+              id: id,
+              rgp_no: rgp_no,
+              customer: { ...customer },
+              quotation_id: quotation_id,
+              engineers: JSON.parse(engineers).length,
+              instruments: JSON.parse(instruments).length,
+              status: status,
+              date,
+              duedate,
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -1070,33 +1088,39 @@ export default defineComponent({
             : financialYears.value[0]
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            rgp_no,
-            customer,
-            quotation_id,
-            engineers,
-            instruments,
-            status,
-            date,
-            duedate,
-            ...rest
-          }) => ({
-            id: id,
-            rgp_no: rgp_no,
-            customer: { ...customer },
-            quotation_id: quotation_id,
-            engineers: JSON.parse(engineers).length,
-            instruments: JSON.parse(instruments).length,
-            status: status,
-            date,
-            duedate,
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              rgp_no,
+              customer,
+              quotation_id,
+              engineers,
+              instruments,
+              status,
+              date,
+              duedate,
+              ...rest
+            }) => ({
+              id: id,
+              rgp_no: rgp_no,
+              customer: { ...customer },
+              quotation_id: quotation_id,
+              engineers: JSON.parse(engineers).length,
+              instruments: JSON.parse(instruments).length,
+              status: status,
+              date,
+              duedate,
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

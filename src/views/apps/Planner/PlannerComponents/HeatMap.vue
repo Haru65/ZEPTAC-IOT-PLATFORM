@@ -216,8 +216,11 @@ export default defineComponent({
         
         const response = await getPlansWithPlanner(selectedYearCache.value ? selectedYearCache.value : financialYears.value[0]);
 
-        if (response) {
-          series.value = response.map((planData) => ({
+        console.log(response);
+        console.log(response.result);
+        console.log(response);
+        if (response.success) {
+          series.value = response.result.map((planData) => ({
             id: planData.plan_id.toString(),
             name: planData.plan_name,
             data: planData.counts_by_month,

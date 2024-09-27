@@ -59,9 +59,9 @@
                   class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
                   >Instrument ID.</label
                 >
-                <div
-                  class="form-control form-control-lg form-control-solid"
-                >{{ itemDetails.instrument_id }}</div>
+                <div class="form-control form-control-lg form-control-solid">
+                  {{ itemDetails.instrument_id }}
+                </div>
               </div>
             </div>
             <!--end::Input group-->
@@ -307,7 +307,6 @@ import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 import { Identifier } from "@/core/config/WhichUserConfig";
 
-
 interface itemDetails {
   instrument_id: string;
   name: string;
@@ -360,16 +359,27 @@ export default defineComponent({
     });
 
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-          }))
-        );
-        console.log(Companies);
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Companies.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
@@ -394,28 +404,43 @@ export default defineComponent({
 
     onMounted(async () => {
       Companies.value.pop();
-      let response = await getThermalInstrument(itemId.toString());
-      console.log(response);
 
-      itemDetails.value = {
-        instrument_id: response.instrument_id,
-        name: response.name,
-        availability: response.availability,
-        model_no: response.model_no,
-        serial_no: response.serial_no,
-        make: response.make,
+      try {
+        let response = await getThermalInstrument(itemId.toString());
 
-        calibration_date: response.calibration_date,
-        calibration_due_date: response.calibration_due_date,
+        if (response.success) {
+          itemDetails.value = {
+            instrument_id: response.result.instrument_id,
+            name: response.result.name,
+            availability: response.result.availability,
+            model_no: response.result.model_no,
+            serial_no: response.result.serial_no,
+            make: response.result.make,
 
-        ranges: response.ranges,
-        accuracy: response.accuracy,
+            calibration_date: response.result.calibration_date,
+            calibration_due_date: response.result.calibration_due_date,
 
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+            ranges: response.result.ranges,
+            accuracy: response.result.accuracy,
+
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getThermalInstrument : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getThermalInstrument : ${err}`);
+      }
+
       if (User.role_id === 1) {
         await getdropcomp();
       }
@@ -449,30 +474,24 @@ export default defineComponent({
       });
     }
 
-    
     /* --------SET DATE LOGIC--------*/
-    
-    async function setDates(e, dateType) {
-      try{
-        if (e != null) {
 
-          if(e != "" && e != null){
+    async function setDates(e, dateType) {
+      try {
+        if (e != null) {
+          if (e != "" && e != null) {
             itemDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
-          }
-          else{
+          } else {
             itemDetails.value[dateType] = "";
           }
+        } else {
+          itemDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        itemDetails.value[dateType] = "";
+      }
 
-      } else {
-        itemDetails.value[dateType] = "";
-      }
-      }
-      catch(err){
-        itemDetails.value[dateType] = "";
-      }
-      
       console.log(dateType, " ", itemDetails.value[dateType]);
-
     }
 
     const submit = async () => {
@@ -488,27 +507,23 @@ export default defineComponent({
 
       console.warn("Nice");
       try {
-        
         // Call your API here with the form values
         const response = await updateThermalInstrument(
           itemId,
           itemDetails.value
         );
-        console.log(response.result.error);
-        if (!response.result.error) {
+
+        if (response.success) {
           // Handle successful API response
-          console.log("API response:", response);
           showSuccessAlert(
             "Success",
-            "Instrument has been successfully updated!"
+            response.message || "Instrument has been successfully updated!"
           );
           router.push({ name: "thermal-instrument-list" });
         } else {
           // Handle API error response
-          const errorData = response.result.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.result.data.errors);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call

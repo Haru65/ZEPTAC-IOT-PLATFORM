@@ -1228,40 +1228,49 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      let response = await getBSCReport(itemId.toString());
-      console.log(response);
+      try {
+        let response = await getBSCReport(itemId.toString());
 
-      if (response != null) {
-        itemDetails.value = {
-          id: response.id,
-          bsc_id: response.bsc_id,
-          certificate_number: response.certificate_number,
-          ulr_number: response.ulr_number,
-          d_receipt: response.d_receipt,
-          d_testing: response.d_testing,
-          d_issue: response.d_issue,
-          r_due_date: response.r_due_date,
-          description: response.description,
-          make: response.make,
-          model_no: response.model_no,
-          serial_no: response.serial_no,
-          id_no: response.id_no,
-          testing_at: response.testing_at,
-          room_name: response.room_name,
-          room_id: response.room_id,
-          temperature: response.temperature,
-          humidity: response.humidity,
-          differential_pressure: response.differential_pressure,
-          inFlow: JSON.parse(response.inFlow),
-          downFlow: JSON.parse(response.downFlow),
-          filter: JSON.parse(response.filter),
-          particle: JSON.parse(response.particle),
+        if (response.success) {
+          itemDetails.value = {
+            id: response.result.id,
+            bsc_id: response.result.bsc_id,
+            certificate_number: response.result.certificate_number,
+            ulr_number: response.result.ulr_number,
+            d_receipt: response.result.d_receipt,
+            d_testing: response.result.d_testing,
+            d_issue: response.result.d_issue,
+            r_due_date: response.result.r_due_date,
+            description: response.result.description,
+            make: response.result.make,
+            model_no: response.result.model_no,
+            serial_no: response.result.serial_no,
+            id_no: response.result.id_no,
+            testing_at: response.result.testing_at,
+            room_name: response.result.room_name,
+            room_id: response.result.room_id,
+            temperature: response.result.temperature,
+            humidity: response.result.humidity,
+            differential_pressure: response.result.differential_pressure,
+            inFlow: JSON.parse(response.result.inFlow),
+            downFlow: JSON.parse(response.result.downFlow),
+            filter: JSON.parse(response.result.filter),
+            particle: JSON.parse(response.result.particle),
 
-          company_id: response.company_id,
-          created_by: response.created_by,
-          updated_by: response.updated_by,
-          is_active: response.is_active,
-        };
+            company_id: response.result.company_id,
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getBSCReport : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getBSCReport : ${err}`);
       }
     });
 
@@ -1496,16 +1505,17 @@ export default defineComponent({
       try {
         if (validateForm(itemDetails.value)) {
           const response = await updateBSCReport(itemId, itemDetails.value);
-          if (!response.error) {
+          if (response.success) {
             showSuccessAlert(
               "Success",
-              "BSC Report has been successfully updated!"
+              response.message || "BSC Report has been successfully updated!"
             );
             loading.value = false;
             router.push({ name: "bsc-list" });
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            // Handle API error response
             loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
             return;
           }
         } else {

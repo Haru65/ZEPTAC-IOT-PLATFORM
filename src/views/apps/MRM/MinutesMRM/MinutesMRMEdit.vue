@@ -86,7 +86,7 @@
               <div class="card-footer d-flex justify-content-end py-6">
                 <button
                   type="button"
-                  ref="submitButton"
+                  :ref="'submitButton_' + index"
                   class="btn btn-md btn-success px-6"
                   @click="submit(item.id, item)"
                 >

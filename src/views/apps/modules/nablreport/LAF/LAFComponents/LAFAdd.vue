@@ -1038,11 +1038,20 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      let response = await getLaminarAirFlow(itemId.toString());
-      console.log(response);
+      try {
+        let response = await getLaminarAirFlow(itemId.toString());
 
-      if (response != null) {
-        itemDetails.value.laf_id = response.id;
+        if (response.success) {
+          itemDetails.value.laf_id = response.result.id;
+        } else {
+          console.error(
+            `Error Occured in getLaminarAirFlow : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getLaminarAirFlow : ${err}`);
       }
     });
 
@@ -1235,20 +1244,20 @@ export default defineComponent({
       try {
         if (validateForm(itemDetails.value)) {
           const response = await addLAFReport(itemDetails.value);
-          if (!response.error) {
+          if (response.success) {
             showSuccessAlert(
               "Success",
-              "LAF Report has been successfully added!"
+              response.message || "LAF Report has been successfully added!"
             );
             loading.value = false;
             router.push({ name: "laf-list" });
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            // Handle API error response
             loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
             return;
           }
         } else {
-          console.log(validateForm(itemDetails));
           showErrorAlert("Warning", "Please fill in all fields.");
           return;
         }

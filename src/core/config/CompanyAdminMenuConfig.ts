@@ -82,6 +82,13 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
         ],
       },
 
+      {
+        heading: "Service Request Form",
+        route: "/srf/list",
+        keenthemesIcon: "abstract-26",
+        bootstrapIcon: "bi-archive",
+      },
+
       /*
 
       {
@@ -272,12 +279,6 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
             route: "/invoices/list",
           },
         ],
-      },
-      {
-        heading: "Service Request Form",
-        route: "/srf/list",
-        keenthemesIcon: "abstract-26",
-        bootstrapIcon: "bi-archive",
       },
     ],
   },

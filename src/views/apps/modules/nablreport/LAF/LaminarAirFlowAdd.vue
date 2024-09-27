@@ -177,6 +177,7 @@ export default defineComponent({
       try {
         ApiService.setHeader();
         const response = await getAllInstrument(`fetchAll=true`);
+
         if (response.success) {
           if (response.result != null && response.result) {
             CleanRoomInstruments.value.push(
@@ -190,26 +191,39 @@ export default defineComponent({
               )
             );
           }
+        } else {
+          console.error(
+            `Error Occured in getAllInstrument : ${
+              response.message || "Error Occured in API"
+            }`
+          );
         }
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
+      } catch (err) {
+        console.error(`Error Occured in getAllInstrument : ${err}`);
       }
 
       try {
         ApiService.setHeader();
         const response = await getServiceRequests(`fetchAll=true`);
-        if (response.result != null && response.result) {
-          srfs.value.push(
-            ...response.result?.map(({ id, srf_no }) => ({
-              id,
-              srf_no,
-            }))
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            srfs.value.push(
+              ...response.result?.map(({ id, srf_no }) => ({
+                id,
+                srf_no,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getServiceRequests : ${
+              response.message || "Error Occured in API"
+            }`
           );
         }
-        console.log(srfs.value);
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
+      } catch (err) {
+        console.error(`Error Occured in getServiceRequests : ${err}`);
         loading.value = false;
       }
     });
@@ -269,16 +283,18 @@ export default defineComponent({
 
         if (validateForm(itemDetails.value)) {
           const response = await addLaminarAirFlow(itemDetails.value);
-          if (!response.error) {
+          if (response.success) {
             showSuccessAlert(
               "Success",
-              "Laminar Air Flow has been successfully added!"
+              response.message ||
+                "Laminar Air Flow has been successfully added!"
             );
             loading.value = false;
             router.push({ name: "laf-list" });
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            // Handle API error response
             loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
             return;
           }
         } else {

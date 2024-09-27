@@ -290,16 +290,21 @@ export default defineComponent({
         const response = await getUsers(
           `page=${page.value}&limit=${limit.value}`
         );
-
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            role_id: get_role(role_id),
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ created_at, role_id, ...rest }) => ({
+              ...rest,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              role_id: get_role(role_id),
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -319,16 +324,21 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         const response = await getUsers(`page=${page}&limit=${limit.value}`);
-
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            role_id: get_role(role_id),
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ created_at, role_id, ...rest }) => ({
+              ...rest,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              role_id: get_role(role_id),
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -349,16 +359,21 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         const response = await getUsers(`page=${page.value}&limit=${limit}`);
-
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            role_id: get_role(role_id),
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ created_at, role_id, ...rest }) => ({
+              ...rest,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              role_id: get_role(role_id),
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -553,16 +568,21 @@ export default defineComponent({
       // Your API call logic here
       try {
         const response = await UserSearch(search.value);
-
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ created_at, role_id, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            role_id: get_role(role_id),
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ created_at, role_id, ...rest }) => ({
+              ...rest,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              role_id: get_role(role_id),
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

@@ -58,9 +58,9 @@
                   class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
                   >Instrument ID.</label
                 >
-                <div
-                  class="form-control form-control-lg form-control-solid"
-                >######</div>
+                <div class="form-control form-control-lg form-control-solid">
+                  ######
+                </div>
               </div>
             </div>
             <!--end::Input group-->
@@ -310,7 +310,6 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import {
   addThermalInstrument,
   getThermalInstrument,
-  deleteThermalInstrument,
   getCompanies,
 } from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
@@ -376,16 +375,27 @@ export default defineComponent({
     });
 
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-          }))
-        );
-        console.log(Companies);
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Companies.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
@@ -410,31 +420,46 @@ export default defineComponent({
 
     onMounted(async () => {
       Companies.value.pop();
-      let response = await getThermalInstrument(itemId.toString());
-      console.log(response);
 
-      itemDetails.value = {
-        instrument_id: "",
-        name: response.name,
-        availability: response.availability,
-        model_no: response.model_no,
-        serial_no: "",
-        make: response.make,
+      try {
+        let response = await getThermalInstrument(itemId.toString());
 
-        calibration_date: response.calibration_date,
-        calibration_due_date: response.calibration_due_date,
+        if (response.success) {
+          itemDetails.value = {
+            instrument_id: "",
+            name: response.result.name,
+            availability: response.result.availability,
+            model_no: response.result.model_no,
+            serial_no: "",
+            make: response.result.make,
 
-        ranges: response.ranges,
-        accuracy: response.accuracy,
+            calibration_date: response.result.calibration_date,
+            calibration_due_date: response.result.calibration_due_date,
 
-        company_id: response.company_id ? response.company_id : "",
-        created_by: User.id,
-        updated_by: User.id,
-        is_active: response.is_active,
-      };
+            ranges: response.result.ranges,
+            accuracy: response.result.accuracy,
 
-      Calibration.value = response.calibration_date;
-      CalibrationDue.value = response.calibration_due_date;
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: User.id,
+            updated_by: User.id,
+            is_active: response.result.is_active,
+          };
+
+          Calibration.value = response.result.calibration_date;
+          CalibrationDue.value = response.result.calibration_due_date;
+        } else {
+          console.error(
+            `Error Occured in getThermalInstrument : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getThermalInstrument : ${err}`);
+      }
+
       CalibRef.value = true;
 
       if (User.role_id === 1) {
@@ -470,32 +495,26 @@ export default defineComponent({
       });
     }
 
-    
     /* --------SET DATE LOGIC--------*/
 
     async function setDates(e, dateType) {
-      try{
+      try {
         if (e != null) {
-
-          if(e != "" && e != null){
+          if (e != "" && e != null) {
             itemDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
-          }
-          else{
+          } else {
             itemDetails.value[dateType] = "";
           }
+        } else {
+          itemDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        itemDetails.value[dateType] = "";
+      }
 
-      } else {
-        itemDetails.value[dateType] = "";
-      }
-      }
-      catch(err){
-        itemDetails.value[dateType] = "";
-      }
-      
       console.log(dateType, " ", itemDetails.value[dateType]);
-
     }
-    
+
     const handleToggle = (e) => {
       if (e.target.checked === true) {
         CalibRef.value = true;
@@ -540,21 +559,18 @@ export default defineComponent({
 
         // Call your API here with the form values
         const response = await addThermalInstrument(itemDetails.value);
-        console.log(response.result.error);
-        if (!response.result.error) {
+
+        if (response.success) {
           // Handle successful API response
-          console.log("API response:", response);
           showSuccessAlert(
             "Success",
-            "Instrument has been successfully inserted!"
+            response.message || "Instrument has been successfully inserted!"
           );
           router.push({ name: "thermal-instrument-list" });
         } else {
           // Handle API error response
-          const errorData = response.result.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.result.data.errors);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
@@ -563,23 +579,6 @@ export default defineComponent({
       } finally {
         loading.value = false;
       }
-    };
-
-    const deleteItem = () => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover from this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "red",
-        confirmButtonText: "Yes, I am sure!",
-      }).then((result: { [x: string]: any }) => {
-        if (result["isConfirmed"]) {
-          // Put your function here
-          deleteThermalInstrument(itemId);
-          router.push({ name: "thermal-instrument-list" });
-        }
-      });
     };
 
     const showSuccessAlert = (title, message) => {
@@ -620,7 +619,6 @@ export default defineComponent({
       submit,
       loading,
       Companies,
-      deleteItem,
       identifier,
       User,
       handleToggle,
@@ -632,10 +630,12 @@ export default defineComponent({
 </script>
 
 <style>
-.el-input__inner, .el-select__inner {
+.el-input__inner,
+.el-select__inner {
   font-weight: 500;
 }
-.el-input__wrapper, .el-select__wrapper {
+.el-input__wrapper,
+.el-select__wrapper {
   height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

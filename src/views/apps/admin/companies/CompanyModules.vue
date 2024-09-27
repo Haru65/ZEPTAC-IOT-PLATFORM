@@ -87,14 +87,7 @@
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import {
-  addLaminarAirFlow,
-  getServiceRequests,
-  getAllInstrument,
-  getModules,
-  assignModules,
-  getCompany,
-} from "@/stores/api";
+import { getModules, assignModules, getCompany } from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import { Identifier } from "@/core/config/WhichUserConfig";
@@ -135,37 +128,51 @@ export default defineComponent({
     const itemDetails = ref<{ modules: Module[] }>({ modules: [] });
 
     onMounted(async () => {
-      
       console.log(User);
       moduleArray.value.pop();
+
       try {
         ApiService.setHeader();
         const response = await getModules(`fetchAll=true`);
-        if (response.result != null && response.result) {
-          moduleArray.value.push(
-            ...response.result?.map(({ id, name, ...rest }) => ({
-              id,
-              name,
-              ...rest,
-            }))
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            moduleArray.value.push(
+              ...response.result?.map(({ id, name, ...rest }) => ({
+                id,
+                name,
+                ...rest,
+              }))
+            );
+          }
+          console.log(moduleArray.value);
+        } else {
+          console.error(
+            `Error Occured in getModules : ${
+              response.message || "Error Occured in API"
+            }`
           );
         }
-        console.log(moduleArray.value);
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
+      } catch (err) {
+        console.error(`Error Occured in getModules : ${err}`);
         loading.value = false;
       }
 
       try {
         ApiService.setHeader();
         const res = await getCompany(itemId);
-        if (res != null) {
-          itemDetails.value.modules = res.modules;
+
+        if (res.success) {
+          itemDetails.value.modules = res.result.modules || [];
+        } else {
+          console.error(
+            `Error Occured in getCompany : ${
+              res.message || "Error Occured in API"
+            }`
+          );
         }
-        console.log(itemDetails.value.modules);
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
+      } catch (err) {
+        console.error(`Error Occured in getCompany : ${err}`);
       }
 
       updateModulesWithStatus();
@@ -184,7 +191,7 @@ export default defineComponent({
           );
         }
       }
-      console.log(moduleArr.value)
+      console.log(moduleArr.value);
     }
 
     const updateModulesWithStatus = () => {
@@ -203,15 +210,16 @@ export default defineComponent({
 
       try {
         const response = await assignModules(itemId, moduleArr.value);
-        if (!response.error) {
+        if (response.success) {
           showSuccessAlert(
             "Success",
-            "Module Successfully Assigned to Company!"
+            response.message || "Module Successfully Assigned to Company!"
           );
           loading.value = false;
           router.push({ name: "company-list" });
         } else {
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          // Handle API error response
+          showErrorAlert("Error", response.message || "An error occurred.");
           loading.value = false;
           return;
         }

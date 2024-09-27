@@ -597,33 +597,55 @@ export default {
     onMounted(async () => {
       // creating instance of ApecChart
       chartInstance = new ApexCharts(chartRef.value, options.value);
-      console.log(chartRef.value);
 
-      ApiService.setHeader();
-      // response from API
-      let response = await getThermalReport(itemId.toString());
-      console.log(response);
+      try {
+        ApiService.setHeader();
+        // response from API
+        let response = await getThermalReport(itemId.toString());
 
-      thermalReportDetails.value.company_id = response.company_id;
+        if (response.success) {
+          thermalReportDetails.value.company_id = response.result.company_id;
 
-      thermalReportDetails.value.instruments = JSON.parse(response.instruments);
-      thermalReportDetails.value.excel_data = JSON.parse(response.excel_data);
+          thermalReportDetails.value.instruments = JSON.parse(
+            response.result.instruments
+          );
+          thermalReportDetails.value.excel_data = JSON.parse(
+            response.result.excel_data
+          );
 
-      thermalReportDetails.value.min_temp = JSON.parse(response.min_temp);
-      thermalReportDetails.value.max_temp = JSON.parse(response.max_temp);
+          thermalReportDetails.value.min_temp = JSON.parse(
+            response.result.min_temp
+          );
+          thermalReportDetails.value.max_temp = JSON.parse(
+            response.result.max_temp
+          );
 
-      thermalReportDetails.value.min_rh = JSON.parse(response.min_rh);
-      thermalReportDetails.value.max_rh = JSON.parse(response.max_rh);
+          thermalReportDetails.value.min_rh = JSON.parse(
+            response.result.min_rh
+          );
+          thermalReportDetails.value.max_rh = JSON.parse(
+            response.result.max_rh
+          );
 
-      thermalReportDetails.value.avg_temp = response.avg_temp;
-      thermalReportDetails.value.avg_rh = response.avg_rh;
+          thermalReportDetails.value.avg_temp = response.result.avg_temp;
+          thermalReportDetails.value.avg_rh = response.result.avg_rh;
 
-      thermalReportDetails.value.sensor_location_diagram =
-        response.sensor_location_diagram;
-      thermalReportDetails.value.sensor_location_chart =
-        response.sensor_location_chart;
+          thermalReportDetails.value.sensor_location_diagram =
+            response.result.sensor_location_diagram;
+          thermalReportDetails.value.sensor_location_chart =
+            response.result.sensor_location_chart;
 
-      console.log(thermalReportDetails.value);
+          console.log(thermalReportDetails.value);
+        } else {
+          console.error(
+            `Error Occured in getThermalReport : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getThermalReport : ${err}`);
+      }
 
       // when all data gets loaded update the chart series and option
       updateChartData();
@@ -695,7 +717,7 @@ export default {
       if (canvas.value) {
         try {
           const diagramUrl = await canvas.value.toDataURL();
-          console.log(diagramUrl)
+          console.log(diagramUrl);
 
           const base64DiagramData = diagramUrl
             ?.toString()
@@ -724,8 +746,8 @@ export default {
       // url for chart
       if (chartInstance) {
         try {
-          const {imgURI} = await chartRef.value.dataURI();
-          console.log(imgURI)
+          const { imgURI } = await chartRef.value.dataURI();
+          console.log(imgURI);
           const base64ChartData = imgURI
             ?.toString()
             .replace(/^data:image\/\w+;base64,/, "");
@@ -758,17 +780,17 @@ export default {
           itemId,
           thermalReportImages.value
         );
-        console.log(response.result.error);
-        if (!response.result.error) {
+        if (response?.success) {
           // Handle successful API response
-          console.log("API response:", response);
-          showSuccessAlert("Success", "Diagram has been successfully added!");
+          showSuccessAlert(
+            "Success",
+            response.message || "Diagram has been successfully added!"
+          );
           router.push({ name: "thermal-report-list" });
         } else {
           // Handle API error response
-          const errorData = response.result.error;
-          console.log("API error:", errorData);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call

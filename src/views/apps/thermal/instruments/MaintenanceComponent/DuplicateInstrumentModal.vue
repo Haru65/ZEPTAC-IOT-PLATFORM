@@ -81,22 +81,24 @@
 
           <!--begin::Modal footer-->
           <div class="modal-footer flex-center">
-              <!--begin::Button-->
-              <button
-                ref="submitButtonRef"
-                type="submit"
-                id="kt_modal_new_address_submit"
-                class="btn btn-primary"
-              >
-                <span v-if="loading === false" class="indicator-label"> Submit </span>
-                <span v-else class="indicator-label">
-                  Please wait...
-                  <span
-                    class="spinner-border spinner-border-sm align-middle ms-2"
-                  ></span>
-                </span>
-              </button>
-              <!--end::Button-->
+            <!--begin::Button-->
+            <button
+              ref="submitButtonRef"
+              type="submit"
+              id="kt_modal_new_address_submit"
+              class="btn btn-primary"
+            >
+              <span v-if="loading === false" class="indicator-label">
+                Submit
+              </span>
+              <span v-else class="indicator-label">
+                Please wait...
+                <span
+                  class="spinner-border spinner-border-sm align-middle ms-2"
+                ></span>
+              </span>
+            </button>
+            <!--end::Button-->
           </div>
           <!--end::Modal footer-->
         </VForm>
@@ -157,7 +159,7 @@ export default defineComponent({
     const newAddressModalRef = ref<null | HTMLElement>(null);
     const newAddressData = ref<NewAddressData>({});
     const validationSchema = Yup.object().shape({});
-    
+
     const loading = ref(false);
 
     const auth = useAuthStore();
@@ -247,26 +249,26 @@ export default defineComponent({
       loading.value = true;
 
       try {
-
-        if(itemDetails.value.serial_no === ""){
+        if (itemDetails.value.serial_no === "") {
           showErrorAlert("Warning", "Please Enter Serial Number");
-            loading.value = false;
-            return;
+          loading.value = false;
+          return;
         }
 
         const response = await getThermalInstrument(props.instrumentId);
         console.log(response);
 
-        if(!response.error){
-          itemDetails.value.name = response.name;
-          itemDetails.value.availability = response.availability;
-          itemDetails.value.model_no = response.model_no;
+        if (response.success) {
+          itemDetails.value.name = response.result.name;
+          itemDetails.value.availability = response.result.availability;
+          itemDetails.value.model_no = response.result.model_no;
 
-          itemDetails.value.make = response.make;
-          itemDetails.value.calibration_date = response.calibration_date;
-          itemDetails.value.calibration_due_date = response.calibration_due_date;
-          itemDetails.value.ranges = response.ranges;
-          itemDetails.value.accuracy = response.accuracy;
+          itemDetails.value.make = response.result.make;
+          itemDetails.value.calibration_date = response.result.calibration_date;
+          itemDetails.value.calibration_due_date =
+            response.result.calibration_due_date;
+          itemDetails.value.ranges = response.result.ranges;
+          itemDetails.value.accuracy = response.result.accuracy;
 
           const result = areAllPropertiesNull([itemDetails.value]);
 
@@ -277,33 +279,29 @@ export default defineComponent({
           }
 
           const res = await addThermalInstrument(itemDetails.value);
-          // console.log(response.error);
-          if (!res.error) {
+
+          if (res.success) {
             // Handle successful API response
             //   console.log("API response:", response);
-            
+
             loading.value = false;
             showSuccessAlert(
               "Success",
-              "Instrument has been successfully inserted!"
+              res.message || "Instrument has been successfully inserted!"
             );
 
-            await emit('HandleDuplicate');
+            await emit("HandleDuplicate");
             hideModal(newAddressModalRef.value);
-
           } else {
             // Handle API error response
-            //   console.log("API error:", errorData);
-            // console.log("API error:", errorData.response.data.errors);
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            loading.value = false;
+            showErrorAlert("Error", res.message || "An error occurred.");
           }
-
+        } else {
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
-        else{
-          showErrorAlert("Error", "An error occurred during the API call.");
-          loading.value= false;
-        }
-
       } catch (error) {
         // Handle any other errors during API call
         // console.error("API call error:", error);
@@ -311,7 +309,6 @@ export default defineComponent({
       } finally {
         loading.value = false;
       }
-
     };
 
     return {

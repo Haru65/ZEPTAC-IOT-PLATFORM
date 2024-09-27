@@ -828,17 +828,23 @@ export default defineComponent({
           itemId.toString()
         );
 
-        if (response.success) {
+        if (response?.success) {
           itemDetails.instrument_id = response.result.id;
           itemDetails.instrument.name = response.result.name;
           itemDetails.instrument.make = response.result.make;
           itemDetails.instrument.model_no = response.result.model_no;
           itemDetails.instrument.serial_no = response.result.serial_no;
+        } else {
+          console.error(
+            `Error Occured in getCalibrationInstrumentForIntermediate : ${
+              response.message || "Error Occured in API"
+            }`
+          );
         }
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
+      } catch (err) {
+        console.error(`Error Occured in getCalibrationInstrumentForIntermediate : ${err}`);
       }
+
     });
 
     /* --------SET DATE LOGIC--------*/

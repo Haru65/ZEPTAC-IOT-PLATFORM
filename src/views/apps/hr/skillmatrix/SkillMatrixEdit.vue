@@ -185,16 +185,29 @@ export default defineComponent({
     ]);
 
     const getDropEmployee = async () => {
-      ApiService.setHeader();
-      const response = await getEmployees(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Employees.value.push(
-          ...response.result?.map(({ id, first_name, last_name }) => ({
-            id,
-            first_name,
-            last_name,
-          }))
-        );
+      try {
+        ApiService.setHeader();
+        const response = await getEmployees(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Employees.value.push(
+              ...response.result?.map(({ id, first_name, last_name }) => ({
+                id,
+                first_name,
+                last_name,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getEmployees : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getEmployees : ${err}`);
       }
     };
 
@@ -241,29 +254,42 @@ export default defineComponent({
       Employees.value.pop();
       await getDropEmployee();
 
-      let response = await getSkillMatrix(itemId.toString());
-      // console.log(response);
-      skillMatrixDetails.value = {
-        user_id: response.user_id,
-        skills: JSON.parse(response.skills),
-        approval_status: response.approval_status,
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+      try {
+        let response = await getSkillMatrix(itemId.toString());
 
-      // Mutate the properties of the reactive skills array
-      Object.assign(skills, JSON.parse(response.skills));
+        if (response.success) {
+          skillMatrixDetails.value = {
+            user_id: response.result.user_id,
+            skills: JSON.parse(response.result.skills),
+            approval_status: response.result.approval_status,
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
 
-      updateProgressStatus();
+          // Mutate the properties of the reactive skills array
+          Object.assign(skills, JSON.parse(response.result.skills));
+
+          updateProgressStatus();
+        } else {
+          console.error(
+            `Error Occured in getSkillMatrix : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getSkillMatrix : ${err}`);
+      }
     });
 
     const submit = async () => {
       loading.value = true;
 
       try {
-
         skillMatrixDetails.value.skills = skills;
 
         console.log(skillMatrixDetails.value);
@@ -274,12 +300,12 @@ export default defineComponent({
             skillMatrixDetails.value
           );
           // console.log(response.error);
-          if (!response.error) {
+          if (response.success) {
             // Handle successful API response
             //   console.log("API response:", response);
             showSuccessAlert(
               "Success",
-              "Skill Matrix has been successfully Updated!"
+              response.message || "Skill Matrix has been successfully Updated!"
             );
 
             // clear();
@@ -287,9 +313,7 @@ export default defineComponent({
             loading.value = false;
           } else {
             // Handle API error response
-            //   console.log("API error:", errorData);
-            // console.log("API error:", errorData.response.data.errors);
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            showErrorAlert("Error", response.message || "An error occurred.");
             loading.value = false;
           }
         } else {

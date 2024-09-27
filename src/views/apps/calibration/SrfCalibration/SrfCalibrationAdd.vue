@@ -417,6 +417,16 @@
           >
             <CalibrationImportModal v-bind:data="data"></CalibrationImportModal>
 
+            <span
+              class="btn btn-icon btn-light-primary  me-3"
+              data-bs-toggle="tooltip"
+              title="Refresh"
+              @click="reLoadData"
+            >
+              <KTIcon icon-name="arrows-circle" icon-class="fs-2" />
+            </span>
+
+
             <!--begin::Export-->
             <button
               type="button"

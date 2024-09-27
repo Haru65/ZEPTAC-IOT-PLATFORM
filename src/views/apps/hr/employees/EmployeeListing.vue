@@ -122,7 +122,6 @@
         </template>
 
         <template v-slot:history_card="{ row: employee }">
-          
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span
@@ -138,7 +137,6 @@
         </template>
 
         <template v-slot:profile_pic="{ row: employee }">
-
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row" v-if="employee.meta.profile_pic">
             <a
@@ -163,7 +161,7 @@
               v-bind:href="`https://api.zeptac.com/storage/company/${employee.company_id}/aadhar_cards/${employee.meta.adhar}`"
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
               data-bs-toggle="tooltip"
-               title="Download Aadhar Card"
+              title="Download Aadhar Card"
             >
               <KTIcon icon-name="fingerprint-scanning" icon-class="fs-1" />
             </a>
@@ -173,8 +171,8 @@
         </template>
 
         <template v-slot:pan="{ row: employee }">
-           <!--begin::Menu Flex-->
-           <div class="d-flex flex-lg-row" v-if="employee.meta.pan">
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row" v-if="employee.meta.pan">
             <a
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${employee.company_id}/pan_cards/${employee.meta.pan}`"
@@ -206,7 +204,7 @@
 
             <!--begin::Delete-->
             <span
-                @click="deleteItem(employee.id, false)"
+              @click="deleteItem(employee.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
               data-bs-toggle="tooltip"
               title="Delete Employee"
@@ -369,18 +367,23 @@ export default defineComponent({
         const response = await getEmployees(
           `page=${page.value}&limit=${limit.value}`
         );
-
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, role_id, meta, ...rest }) => ({
-            id: id,
-            role_id: get_role(role_id),
-            meta: { ...meta },
-            ...rest,
-          })
-        );
-        //console.log(tableData.value);
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, role_id, meta, ...rest }) => ({
+              id: id,
+              role_id: get_role(role_id),
+              meta: { ...meta },
+              ...rest,
+            })
+          );
+          //console.log(tableData.value);
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -405,16 +408,22 @@ export default defineComponent({
           `page=${page}&limit=${limit.value}`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, role_id, meta, ...rest }) => ({
-            id: id,
-            role_id: get_role(role_id),
-            meta: { ...meta },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, role_id, meta, ...rest }) => ({
+              id: id,
+              role_id: get_role(role_id),
+              meta: { ...meta },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -439,16 +448,22 @@ export default defineComponent({
           `page=${page.value}&limit=${limit}`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, role_id, meta, ...rest }) => ({
-            id: id,
-            role_id: get_role(role_id),
-            meta: { ...meta },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, role_id, meta, ...rest }) => ({
+              id: id,
+              role_id: get_role(role_id),
+              meta: { ...meta },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -654,16 +669,22 @@ export default defineComponent({
         ApiService.setHeader();
         const response = await EmployeeSearch(search.value);
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, role_id, meta, ...rest }) => ({
-            id: id,
-            role_id: get_role(role_id),
-            meta: { ...meta },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, role_id, meta, ...rest }) => ({
+              id: id,
+              role_id: get_role(role_id),
+              meta: { ...meta },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

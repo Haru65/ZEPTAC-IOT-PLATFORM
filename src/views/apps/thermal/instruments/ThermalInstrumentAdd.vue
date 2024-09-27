@@ -58,9 +58,9 @@
                   class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
                   >Instrument ID.</label
                 >
-                <div
-                  class="form-control form-control-lg form-control-solid"
-                >######</div>
+                <div class="form-control form-control-lg form-control-solid">
+                  ######
+                </div>
               </div>
             </div>
             <!--end::Input group-->
@@ -257,7 +257,6 @@
                 </div>
               </div>
             </div>
-
           </div>
           <div class="modal-footer flex-center">
             <!--begin::Button-->
@@ -305,10 +304,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
-import {
-  GetIncrInstrumentId
-} from "@/stores/api";
-
+import { GetIncrInstrumentId } from "@/stores/api";
 
 interface itemDetails {
   instrument_id: string;
@@ -360,16 +356,27 @@ export default defineComponent({
     });
 
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-          }))
-        );
-        console.log(Companies);
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Companies.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
@@ -399,26 +406,21 @@ export default defineComponent({
 
     /* --------SET DATE LOGIC--------*/
     async function setDates(e, dateType) {
-      try{
+      try {
         if (e != null) {
-
-          if(e != "" && e != null){
+          if (e != "" && e != null) {
             itemDetails.value[dateType] = moment(e).format("YYYY-MM-DD");
-          }
-          else{
+          } else {
             itemDetails.value[dateType] = "";
           }
+        } else {
+          itemDetails.value[dateType] = "";
+        }
+      } catch (err) {
+        itemDetails.value[dateType] = "";
+      }
 
-      } else {
-        itemDetails.value[dateType] = "";
-      }
-      }
-      catch(err){
-        itemDetails.value[dateType] = "";
-      }
-      
       console.log(dateType, " ", itemDetails.value[dateType]);
-
     }
 
     onMounted(async () => {
@@ -469,25 +471,24 @@ export default defineComponent({
 
       try {
         console.log(itemDetails.value);
-        
+
         // Call your API here with the form values
         const response = await addThermalInstrument(itemDetails.value);
-        // console.log(response.error);
-        if (!response.error) {
+
+        if (response.success) {
           // Handle successful API response
           //   console.log("API response:", response);
           showSuccessAlert(
             "Success",
-            "Instrument has been successfully inserted!"
+            response.message || "Instrument has been successfully inserted!"
           );
 
           clear();
           router.push({ name: "thermal-instrument-list" });
         } else {
           // Handle API error response
-          //   console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
@@ -565,10 +566,12 @@ export default defineComponent({
 </script>
 
 <style>
-.el-input__inner, .el-select__inner {
+.el-input__inner,
+.el-select__inner {
   font-weight: 500;
 }
-.el-input__wrapper, .el-select__wrapper {
+.el-input__wrapper,
+.el-select__wrapper {
   min-height: 3.5rem;
   border-radius: 0.5rem;
   background-color: var(--bs-gray-100);

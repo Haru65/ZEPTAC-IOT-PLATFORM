@@ -894,7 +894,7 @@ export default defineComponent({
       try {
         let response = await getIntermediateCheckRecord(itemId.toString());
 
-        if (response.success) {
+        if (response?.success) {
           itemDetails.value.instrument.name = response.result.instrument.name;
           itemDetails.value.instrument.make = response.result.instrument.make;
           itemDetails.value.instrument.model_no =
@@ -924,10 +924,15 @@ export default defineComponent({
           itemDetails.value.created_by = response.result.created_by;
           itemDetails.value.updated_by = response.result.updated_by;
           itemDetails.value.is_active = response.result.is_active;
+        } else {
+          console.error(
+            `Error Occured in getIntermediateCheckRecord : ${
+              response.message || "Error Occured in API"
+            }`
+          );
         }
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
+      } catch (err) {
+        console.error(`Error Occured in getIntermediateCheckRecord : ${err}`);
       }
     });
 

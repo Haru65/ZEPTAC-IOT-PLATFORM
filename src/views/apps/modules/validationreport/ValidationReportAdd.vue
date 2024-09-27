@@ -1714,38 +1714,50 @@ export default defineComponent({
 
           if (isConfirmed) {
             validationReportDetails.value.rgp_id = rgpId;
-            const response = await getRGatePass(rgpId);
-            if (response) {
-              validationReportDetails.value.rgp_no = response.rgp_no;
-              RgpData.value = { ...response };
 
-              validationReportDetails.value.engineers = {
-                ...response?.Engineers,
-              };
-              validationReportDetails.value.instruments = {
-                ...response?.Instruments,
-              };
+            try {
+              const response = await getRGatePass(rgpId);
 
-              validationReportDetails.value.tests = [
-                {
-                  air_velocity_test_reports: [],
-                },
-                {
-                  filter_integrity_test_reports: [],
-                },
-                {
-                  particle_count_test_reports: [],
-                },
-                {
-                  recovery_test_reports: [],
-                },
-              ];
-            } else {
+              if (response.success) {
+                validationReportDetails.value.rgp_no = response.result.rgp_no;
+                RgpData.value = { ...response.result };
+
+                validationReportDetails.value.engineers = {
+                  ...response.result?.Engineers,
+                };
+                validationReportDetails.value.instruments = {
+                  ...response.result?.Instruments,
+                };
+
+                validationReportDetails.value.tests = [
+                  {
+                    air_velocity_test_reports: [],
+                  },
+                  {
+                    filter_integrity_test_reports: [],
+                  },
+                  {
+                    particle_count_test_reports: [],
+                  },
+                  {
+                    recovery_test_reports: [],
+                  },
+                ];
+              } else {
+                console.error(
+                  `Error Occured in getRGatePass : ${
+                    response.message || "Error Occured in API"
+                  }`
+                );
+              }
+            } catch (err) {
+              console.error(`Error Occured in getRGatePass : ${err}`);
             }
           } else {
             validationReportDetails.value.rgp_id = RgpData.value?.id;
             validationReportDetails.value.rgp_no = RgpData.value?.rgp_no;
-            validationReportDetails.value.worksheet_filled_count = RgpData.value?.worksheet_filled_count;
+            validationReportDetails.value.worksheet_filled_count =
+              RgpData.value?.worksheet_filled_count;
 
             validationReportDetails.value.engineers = RgpData.value?.Engineers;
             validationReportDetails.value.instruments =
@@ -1753,17 +1765,28 @@ export default defineComponent({
           }
         } else {
           validationReportDetails.value.rgp_id = rgpId;
-          const response = await getRGatePass(rgpId);
-          if (response) {
-            validationReportDetails.value.rgp_no = response.rgp_no;
-            RgpData.value = { ...response };
-            validationReportDetails.value.engineers = {
-              ...response?.Engineers,
-            };
-            validationReportDetails.value.instruments = {
-              ...response?.Instruments,
-            };
-          } else {
+
+          try {
+            const response = await getRGatePass(rgpId);
+
+            if (response.success) {
+              validationReportDetails.value.rgp_no = response.result.rgp_no;
+              RgpData.value = { ...response.result };
+              validationReportDetails.value.engineers = {
+                ...response.result?.Engineers,
+              };
+              validationReportDetails.value.instruments = {
+                ...response.result?.Instruments,
+              };
+            } else {
+              console.error(
+                `Error Occured in getRGatePass : ${
+                  response.message || "Error Occured in API"
+                }`
+              );
+            }
+          } catch (err) {
+            console.error(`Error Occured in getRGatePass : ${err}`);
           }
         }
       } else {
@@ -1774,18 +1797,24 @@ export default defineComponent({
       try {
         /* --------GET ALL IN PROCESS AND COMPLETED RGP LOGIC--------*/
         const response = await getOnGoingCompletedRGPVal(User.company_id);
-        if (response) {
-          RGatePasses.value = response.result.map(({ id, ...rest }) => ({
-            id: id,
-            ...rest,
-          }));
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            RGatePasses.value = response.result.map(({ id, ...rest }) => ({
+              id: id,
+              ...rest,
+            }));
+          }
         } else {
-          console.error(`Error Occured in getOnGoingCompletedRGPVal`);
+          console.error(
+            `Error Occured in getOnGoingCompletedRGPVal : ${
+              response.message || "Error Occured in API"
+            }`
+          );
         }
       } catch (err) {
         console.error(`Error Occured in getOnGoingCompletedRGPVal : ${err}`);
       }
-
     });
 
     const onsubmit = async () => {
@@ -1806,21 +1835,21 @@ export default defineComponent({
           validationReportDetails.value
         );
         // console.log(response.error);
-        if (!response.error) {
+        if (response.success) {
           // Handle successful API response
           //   console.log("API response:", response);
           loading.value = false;
           showSuccessAlert(
             "Success",
-            "Validation Report has been successfully submitted!"
+            response.message ||
+              "Validation Report has been successfully submitted!"
           );
           // clear();
           route.push({ name: "validationreport-list" });
         } else {
           // Handle API error response
-          // const errorData = response.error;
           loading.value = false;
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call

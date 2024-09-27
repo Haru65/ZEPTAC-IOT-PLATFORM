@@ -3,14 +3,10 @@
 </template>
 
 <script lang="ts">
-
 export default {
-  
   name: "auditobservation-edit",
-setup() {
-
-return {
-};
-}
+  setup() {
+    return {};
+  },
 };
 </script>

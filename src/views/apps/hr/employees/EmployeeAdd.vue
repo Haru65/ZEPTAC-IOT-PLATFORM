@@ -1201,17 +1201,29 @@ export default defineComponent({
     const loading = ref(false);
     const Companies = ref([{ id: "", company_name: "" }]);
     const state = ref([""]);
+
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-          }))
-        );
-        // console.log(Companies);
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Companies.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
@@ -1230,34 +1242,6 @@ export default defineComponent({
       lname: Yup.string().required().label("Last name"),
       email: Yup.string().required().email().label("Email"),
       phone: Yup.string().required().label("Phone"),
-      // password: Yup.string().required().label("Password"),
-
-      // Password validation with conditional requirement
-      password: Yup.string().required().when("licenseRef", {
-        is: false, // If licenseRef is false
-        then: Yup.string()
-          .min(8, "Password must be at least 8 characters long.")
-          .matches(
-            /[A-Z]/,
-            "Password must include at least one uppercase letter."
-          )
-          .matches(/[0-9]/, "Password must include at least one number.")
-          .matches(
-            /[@$!%*?&]/,
-            "Password must include at least one special character."
-          )
-          .required("Password is required."),
-        otherwise: Yup.string(), // If licenseRef is true, password is not required
-      }),
-
-      // Confirm password validation with conditional requirement
-      confpassword: Yup.string().required().when("licenseRef", {
-        is: false, // If licenseRef is false
-        then: Yup.string()
-          .oneOf([Yup.ref("password"), null], "Passwords must match.")
-          .required("Confirm Password"),
-        otherwise: Yup.string(), // If licenseRef is true, confpassword is not required
-      }),
     });
 
     const profileData = ref({
@@ -1310,7 +1294,7 @@ export default defineComponent({
       gender: "",
       adhar: "",
       pan: "",
-      company_id: "",
+      company_id: User.company_id,
       created_by: User.id,
       updated_by: User.id,
       is_active: "1",
@@ -1852,16 +1836,19 @@ export default defineComponent({
           if (Array.isArray(value)) {
             for (const item of value) {
               if (!validateForm(item)) {
+                console.log(key);
                 return false;
               }
             }
           } else if (typeof value === "object" && value !== null) {
             if (!validateForm(value)) {
+              console.log(key);
               return false;
             }
           } else if (typeof value === "string") {
             value = value.trim();
             if (value === "") {
+              console.log(key);
               return false;
             }
           } else {
@@ -1875,7 +1862,9 @@ export default defineComponent({
       // * company identification for companyid based on localstorage login
 
       loading.value = true;
-      // console.log(profileDetails.value);
+      console.log(profileDetails.value);
+      console.log(validateForm(profileDetails.value));
+
       console.warn("Nice");
       try {
         if (validateForm(profileDetails.value)) {
@@ -1898,20 +1887,18 @@ export default defineComponent({
           }
           const response = await addEmployee(profileDetails.value);
           // console.log(response.error);
-          if (!response.error) {
+          if (response.success) {
             // Handle successful API response
             // console.log("API response:", response);
             showSuccessAlert(
               "Success",
-              "Employee have been successfully inserted!"
+              response.message || "Employee have been successfully inserted!"
             );
             router.push({ name: "employee-list" });
           } else {
             // Handle API error response
-            const errorData = response.error;
-            console.log("API error:", errorData);
-            // console.log("API error:", errorData.response.data.errors);
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
           }
         } else {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");

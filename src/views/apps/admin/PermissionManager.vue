@@ -65,8 +65,7 @@
           v-if="selectedIds.length === 0"
           class="d-flex justify-content-end"
           data-kt-customer-table-toolbar="base"
-        >
-        </div>
+        ></div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->
         <div
@@ -255,12 +254,18 @@ export default defineComponent({
         const response = await getPermissions(
           `page=${page}&limit=${limit.value}`
         );
-        
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -284,12 +289,18 @@ export default defineComponent({
         const response = await getPermissions(
           `page=${page.value}&limit=${limit}`
         );
-        
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -323,12 +334,18 @@ export default defineComponent({
         const response = await getPermissions(
           `page=${page.value}&limit=${limit.value}`
         );
-        
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -432,12 +449,18 @@ export default defineComponent({
       try {
         ApiService.setHeader();
         const response = await PermissionSearch(search.value);
-        
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -508,18 +531,17 @@ export default defineComponent({
       try {
         // Call your API here with the form values
         const response = await addPermission(permissionDetails.value);
-        // console.log(response.error);
-        if (!response.error) {
+        if (response.success) {
           // Handle successful API response
           // console.log("API response:", response);
-          showSuccessAlert("Success", "Permission added successfully");
+          showSuccessAlert("Success", response.message || "Permission added successfully");
 
           // clear();
           router.push({ name: "permission-manager-list" });
         } else {
-          // Handle API error response
-          // const errorData = response.error;
-          showErrorAlert("Warning", "Please enter a permission name");
+            // Handle API error response
+            loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call

@@ -612,13 +612,12 @@ export default defineComponent({
 
         if (result) {
           const response = await addValidationProcedure(procedureDetails.value);
-          // console.log(response.error);
-          if (!response.error) {
+          if (response.success) {
             // Handle successful API response
             //   console.log("API response:", response);
             showSuccessAlert(
               "Success",
-              "Document has been successfully inserted!"
+              response.message || "Document has been successfully inserted!"
             );
 
             clear();
@@ -626,10 +625,8 @@ export default defineComponent({
             loading.value = false;
           } else {
             // Handle API error response
-            //   console.log("API error:", errorData);
-            // console.log("API error:", errorData.response.data.errors);
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
             loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
           }
         } else {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");

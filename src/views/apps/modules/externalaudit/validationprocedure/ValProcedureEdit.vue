@@ -460,22 +460,38 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      let response = await getValidationProcedure(itemId.toString());
-      console.log(response);
-      procedureDetails.value = {
-        document_name: response.document_name,
-        issue_date: response.issue_date,
-        issue_no: response.issue_no,
-        revision_date: response.revision_date,
-        revision_no: response.revision_no,
-        prepared_by: response.prepared_by,
-        approved_by: response.approved_by,
-        audit_document: response.audit_document ? response.audit_document : "",
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+      try {
+        let response = await getValidationProcedure(itemId.toString());
+
+        if (response.success) {
+          procedureDetails.value = {
+            document_name: response.result.document_name,
+            issue_date: response.result.issue_date,
+            issue_no: response.result.issue_no,
+            revision_date: response.result.revision_date,
+            revision_no: response.result.revision_no,
+            prepared_by: response.result.prepared_by,
+            approved_by: response.result.approved_by,
+            audit_document: response.result.audit_document
+              ? response.result.audit_document
+              : "",
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getValidationProcedure : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getValidationProcedure : ${err}`);
+      }
     });
 
     const uploadProgress = ref<number>(0);
@@ -685,13 +701,12 @@ export default defineComponent({
             itemId,
             procedureDetails.value
           );
-          // console.log(response.error);
-          if (!response.error) {
+          if (response.success) {
             // Handle successful API response
             //   console.log("API response:", response);
             showSuccessAlert(
               "Success",
-              "Document has been successfully Updated!"
+              response.message || "Document has been successfully Updated!"
             );
 
             // clear();
@@ -699,10 +714,8 @@ export default defineComponent({
             loading.value = false;
           } else {
             // Handle API error response
-            //   console.log("API error:", errorData);
-            // console.log("API error:", errorData.response.data.errors);
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
             loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
           }
         } else {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");

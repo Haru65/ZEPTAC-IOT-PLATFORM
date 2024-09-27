@@ -1229,11 +1229,21 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      let response = await getBioSafetyCabinet(itemId.toString());
-      console.log(response);
 
-      if (response != null) {
-        itemDetails.value.bsc_id = response.id;
+      try {
+        let response = await getBioSafetyCabinet(itemId.toString());
+
+        if (response.success) {
+          itemDetails.value.bsc_id = response.result.id;
+        } else {
+          console.error(
+            `Error Occured in getBioSafetyCabinet : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getBioSafetyCabinet : ${err}`);
       }
     });
 
@@ -1468,16 +1478,17 @@ export default defineComponent({
       try {
         if (validateForm(itemDetails.value)) {
           const response = await addBSCReport(itemDetails.value);
-          if (!response.error) {
+          if (response.success) {
             showSuccessAlert(
               "Success",
-              "BSC Report has been successfully added!"
+              response.message || "BSC Report has been successfully added!"
             );
             loading.value = false;
             router.push({ name: "bsc-list" });
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            // Handle API error response
             loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
             return;
           }
         } else {

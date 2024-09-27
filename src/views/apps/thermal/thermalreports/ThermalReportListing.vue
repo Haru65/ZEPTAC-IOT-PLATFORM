@@ -301,27 +301,33 @@ export default defineComponent({
               : financialYears.value[0]
           }`
         );
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            room_name,
-            logger_used,
-            mapping_duration,
-            logging_interval,
-            company_name,
-            ...rest
-          }) => ({
-            id: id,
-            room_name: room_name,
-            logger_used: logger_used,
-            mapping_duration: mapping_duration,
-            logging_interval: logging_interval,
-            company_name: company_name.company_name,
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              room_name,
+              logger_used,
+              mapping_duration,
+              logging_interval,
+              company_name,
+              ...rest
+            }) => ({
+              id: id,
+              room_name: room_name,
+              logger_used: logger_used,
+              mapping_duration: mapping_duration,
+              logging_interval: logging_interval,
+              company_name: company_name.company_name,
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -349,27 +355,33 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            room_name,
-            logger_used,
-            mapping_duration,
-            logging_interval,
-            company_name,
-            ...rest
-          }) => ({
-            id: id,
-            room_name: room_name,
-            logger_used: logger_used,
-            mapping_duration: mapping_duration,
-            logging_interval: logging_interval,
-            company_name: company_name.company_name,
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              room_name,
+              logger_used,
+              mapping_duration,
+              logging_interval,
+              company_name,
+              ...rest
+            }) => ({
+              id: id,
+              room_name: room_name,
+              logger_used: logger_used,
+              mapping_duration: mapping_duration,
+              logging_interval: logging_interval,
+              company_name: company_name.company_name,
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -410,28 +422,34 @@ export default defineComponent({
               : financialYears.value[0]
           }`
         );
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            room_name,
-            logger_used,
-            mapping_duration,
-            logging_interval,
-            company_name,
-            ...rest
-          }) => ({
-            id: id,
-            room_name: room_name,
-            logger_used: logger_used,
-            mapping_duration: mapping_duration,
-            logging_interval: logging_interval,
-            company_name: company_name.company_name,
-            ...rest,
-          })
-        );
+        if (response.success) {
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              room_name,
+              logger_used,
+              mapping_duration,
+              logging_interval,
+              company_name,
+              ...rest
+            }) => ({
+              id: id,
+              room_name: room_name,
+              logger_used: logger_used,
+              mapping_duration: mapping_duration,
+              logging_interval: logging_interval,
+              company_name: company_name.company_name,
+              ...rest,
+            })
+          );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+          more.value = response.result.next_page_url != null ? true : false;
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -647,27 +665,33 @@ export default defineComponent({
             : financialYears.value[0]
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            room_name,
-            logger_used,
-            mapping_duration,
-            logging_interval,
-            company_name,
-            ...rest
-          }) => ({
-            id: id,
-            room_name: room_name,
-            logger_used: logger_used,
-            mapping_duration: mapping_duration,
-            logging_interval: logging_interval,
-            company_name: company_name.company_name,
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              room_name,
+              logger_used,
+              mapping_duration,
+              logging_interval,
+              company_name,
+              ...rest
+            }) => ({
+              id: id,
+              room_name: room_name,
+              logger_used: logger_used,
+              mapping_duration: mapping_duration,
+              logging_interval: logging_interval,
+              company_name: company_name.company_name,
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

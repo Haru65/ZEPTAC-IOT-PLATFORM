@@ -957,18 +957,32 @@ export default defineComponent({
     const Quotations = ref<QuotationData[]>([]);
 
     const GetApprovedQuotations = async () => {
-      ApiService.setHeader();
-      const company_ID = User.company_id;
-      const response = await GetAppovedQuotationsList(company_ID);
-      // console.log("approved quotation: ", response)
-      Quotations.value = response.result.map(
-        ({ id, customer, client, ...rest }) => ({
-          id: id,
-          customer: customer,
-          client: client,
-          ...rest,
-        })
-      );
+      try {
+        ApiService.setHeader();
+        const company_ID = User.company_id;
+        const response = await GetAppovedQuotationsList(company_ID);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Quotations.value = response.result.map(
+              ({ id, customer, client, ...rest }) => ({
+                id: id,
+                customer: customer,
+                client: client,
+                ...rest,
+              })
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in GetAppovedQuotationsList : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in GetAppovedQuotationsList : ${err}`);
+      }
     };
 
     /* --------SET QUOTATION DATA LOGIC--------*/
@@ -995,14 +1009,22 @@ export default defineComponent({
       try {
         const company_id = User.company_id;
         const response = await getAvailableEngineers(company_id);
-        // console.log(response.result);
-        if (response.result) {
-          AvailableEngineers.value = response.result.map(({ ...rest }) => ({
-            ...rest,
-          }));
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            AvailableEngineers.value = response.result.map(({ ...rest }) => ({
+              ...rest,
+            }));
+          }
+        } else {
+          console.error(
+            `Error Occured in getAvailableEngineers : ${
+              response.message || "Error Occured in API"
+            }`
+          );
         }
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        console.error(`Error Occured in getAvailableEngineers : ${err}`);
       }
     }
 
@@ -1019,14 +1041,22 @@ export default defineComponent({
       try {
         const company_id = User.company_id;
         const response = await getAvailableInstruments(company_id);
-        // console.log(response.result);
-        if (response.result) {
-          AvailableInstruments.value = response.result.map(({ ...rest }) => ({
-            ...rest,
-          }));
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            AvailableInstruments.value = response.result.map(({ ...rest }) => ({
+              ...rest,
+            }));
+          }
+        } else {
+          console.error(
+            `Error Occured in getAvailableInstruments : ${
+              response.message || "Error Occured in API"
+            }`
+          );
         }
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        console.error(`Error Occured in getAvailableInstruments : ${err}`);
       }
     }
     // Computed Property for Selected Instrument
@@ -1209,13 +1239,11 @@ export default defineComponent({
             loading.value = false;
             showErrorAlert("Error", response.message || "An error occurred.");
           }
-
         } else {
           // Handle API error response
           loading.value = false;
           showErrorAlert("Error", resp.message || "An error occurred.");
         }
-        
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);

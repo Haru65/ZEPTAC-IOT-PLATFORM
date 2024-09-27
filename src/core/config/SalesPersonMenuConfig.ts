@@ -121,12 +121,7 @@ export interface MenuItem {
             },
           ],
         },
-        {
-          heading: "Service Request Form",
-          route: "/srf/list",
-          keenthemesIcon: "abstract-26",
-          bootstrapIcon: "bi-archive",
-        },
+
       ],
     },
   ];

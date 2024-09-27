@@ -957,50 +957,85 @@ export default defineComponent({
     const userId = route.params.id;
 
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-          }))
-        );
-        // console.log(Companies);
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Companies.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
     // get image as base64 and convert to img form larvel
     const loadUser = async () => {
-      ApiService.setHeader();
-      const response = await getUser(userId);
-      // console.log(response);
-      profileDetails.value = {
-        id: userId.toString(),
-        profile_pic: response.meta.profile_pic || "",
-        first_name: response.first_name,
-        last_name: response.last_name,
-        email: response.email,
-        phone: response.mobile,
-        
-        role_id: response.role_id,
-        roles: response.roles,
-        //  ? optional fields check for data
-        address1: response.meta.address1 ? response.meta.address1 : "",
-        address2: response.meta.address2 ? response.meta.address2 : "",
-        country: response.meta.country ? response.meta.country : "",
-        state: response.meta.state ? response.meta.state : "",
-        city: response.meta.city ? response.meta.city : "",
-        pincode: response.meta.pincode ? response.meta.pincode : "",
-        dob: response.meta.dob ? response.meta.dob : "",
-        gender: response.meta.gender ? response.meta.gender : "",
-        adhar: response.meta.adhar ? response.meta.adhar : "",
-        pan: response.meta.pan ? response.meta.pan : "",
-        company_id: response.company_id ? response.company_id : "",
-        updated_by: User.id,
-        is_active: response.is_active,
-        availability: response.availability,
-      };
+      try {
+        ApiService.setHeader();
+        const response = await getUser(userId);
+
+        if (response.success) {
+          profileDetails.value = {
+            id: userId.toString(),
+            profile_pic: response.result.meta.profile_pic || "",
+            first_name: response.result.first_name,
+            last_name: response.result.last_name,
+            email: response.result.email,
+            phone: response.result.mobile,
+
+            role_id: response.result.role_id,
+            roles: response.result.roles,
+            //  ? optional fields check for data
+            address1: response.result.meta.address1
+              ? response.result.meta.address1
+              : "",
+            address2: response.result.meta.address2
+              ? response.result.meta.address2
+              : "",
+            country: response.result.meta.country
+              ? response.result.meta.country
+              : "",
+            state: response.result.meta.state ? response.result.meta.state : "",
+            city: response.result.meta.city ? response.result.meta.city : "",
+            pincode: response.result.meta.pincode
+              ? response.result.meta.pincode
+              : "",
+            dob: response.result.meta.dob ? response.result.meta.dob : "",
+            gender: response.result.meta.gender
+              ? response.result.meta.gender
+              : "",
+            adhar: response.result.meta.adhar ? response.result.meta.adhar : "",
+            pan: response.result.meta.pan ? response.result.meta.pan : "",
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            updated_by: User.id,
+            is_active: response.result.is_active,
+            availability: response.result.availability,
+          };
+        } else {
+          console.error(
+            `Error Occured in getUser : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getUser : ${err}`);
+      }
     };
 
     onMounted(async () => {
@@ -1598,17 +1633,18 @@ export default defineComponent({
           // console.log(profileDetails.value);
           const response = await updateUser(profileDetails.value, userId);
           // console.log(response.error);
-          if (!response.error) {
+          if (response.success) {
             // Handle successful API response
             // console.log("API response:", response);
-            showSuccessAlert("Success", "User have been successfully updated!");
+            showSuccessAlert(
+              "Success",
+              response.message || "User have been successfully updated!"
+            );
             router.push({ name: "users-list" });
           } else {
             // Handle API error response
-            const errorData = response.error;
-            console.log("API error:", errorData);
-            // console.log("API error:", errorData.response.data.errors);
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
           }
         } else {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");

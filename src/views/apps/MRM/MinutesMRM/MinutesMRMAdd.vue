@@ -189,8 +189,7 @@ export default defineComponent({
     const Employees = ref([{ id: "", first_name: "", last_name: "" }]);
 
     const itemDetailsValidator = Yup.object().shape({
-      meeting_date: Yup.string().required().label("Meeting Date"),
-      agenda: Yup.string().required().label("Meeting Agenda"),
+      
     });
 
     const itemDetails = ref<Item>({
@@ -210,24 +209,31 @@ export default defineComponent({
 
       try {
         let response = await getMRMSchedule(itemId.toString());
-        console.log(response);
 
-        itemDetails.value.agenda_points = Agendas.map((item) => ({
-          management_review_meeting_id: response.id,
-          point_id: item.id,
-          point: item.point,
-          outcomes: "",
-          action_required: "",
-          responsible_person: "",
-          company_id: User.company_id,
-          created_by: User.id,
-          updated_by: User.id,
-          is_active: "1",
-        }));
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
+        if (response.success) {
+          itemDetails.value.agenda_points = Agendas.map((item) => ({
+            management_review_meeting_id: response.result.id,
+            point_id: item.id,
+            point: item.point,
+            outcomes: "",
+            action_required: "",
+            responsible_person: "",
+            company_id: User.company_id,
+            created_by: User.id,
+            updated_by: User.id,
+            is_active: "1",
+          }));
+        } else {
+          console.error(
+            `Error Occured in getMRMSchedule : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getMRMSchedule : ${err}`);
       }
+
 
       try {
         ApiService.setHeader();

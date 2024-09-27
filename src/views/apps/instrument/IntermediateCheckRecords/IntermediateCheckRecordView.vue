@@ -244,11 +244,13 @@ export default defineComponent({
     });
 
     onMounted(async () => {
+      
       try {
         let response = await getCalibrationInstrumentForIntermediate(
           itemId.toString()
         );
-        if (response.success) {
+
+        if (response?.success) {
           itemDetails.instrument_id = response.result.id;
           itemDetails.name = response.result.name;
           itemDetails.make = response.result.make;
@@ -258,11 +260,17 @@ export default defineComponent({
             .intermediate_check_records
             ? response?.result.intermediate_check_records
             : [];
+        } else {
+          console.error(
+            `Error Occured in getCalibrationInstrumentForIntermediate : ${
+              response.message || "Error Occured in API"
+            }`
+          );
         }
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
+      } catch (err) {
+        console.error(`Error Occured in getCalibrationInstrumentForIntermediate : ${err}`);
       }
+
     });
 
     const showErrorAlert = (title, message) => {

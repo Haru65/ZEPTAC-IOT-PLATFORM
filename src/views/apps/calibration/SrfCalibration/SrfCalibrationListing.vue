@@ -187,6 +187,17 @@
         <template v-slot:actions="{ row: calibration_srf }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row my-3">
+            <!--begin::Menu Flex-->
+            <span
+              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Download Zip of Calibration SRF"
+              @click="handleZipFile(calibration_srf.id)"
+            >
+              <KTIcon icon-name="folder-down" icon-class="fs-2" />
+            </span>
+            <!--end::Menu FLex-->
+
             <!--begin::Edit-->
             <router-link :to="`/calibration-srf/edit/${calibration_srf.id}`">
               <span
@@ -263,6 +274,7 @@ import {
   getCalibrationSrfs,
   deleteCalibrationSrf,
   CalibrationSrfSearch,
+  getCalibrationSrfBulk,
 } from "@/stores/api";
 import arraySort from "array-sort";
 import moment from "moment";
@@ -823,6 +835,55 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
+    function downloadFileObject(base64String, nameOfFile, fExtension) {
+      const linkSource = base64String;
+      const downloadLink = document.createElement("a");
+      const fileName = nameOfFile + fExtension;
+      downloadLink.href = linkSource;
+      downloadLink.download = fileName;
+      downloadLink.click();
+    }
+
+    const handleZipFile = async (id: any) => {
+      try {
+        // Trigger the backend to generate the ZIP
+        const response = await getCalibrationSrfBulk(id);
+
+        if (response.success) {
+          showSuccessAlert(
+            "Success",
+            response.message || `Zip Created Successfully`
+          );
+
+          // Construct the zip file URL (ensure this path is correct)
+          // const zipFilePath = `http://localhost:8000${response.result.zip_file_path}`;
+          const zipFilePath = `https://api.zeptac.com${response.result.zip_file_path}`;
+
+          console.log(`Download link: ${zipFilePath}`); // Debugging
+
+          // Create an anchor element (hidden link) to download the ZIP
+          const downloadLink = document.createElement("a");
+          downloadLink.href = zipFilePath;
+          downloadLink.download = "calibration_zip.zip"; // Name of the downloaded file
+          downloadLink.target = "_blank"; // Open in a new tab (optional)
+
+          // Append the link to the document body and trigger click to start download
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+
+          // Remove the link after downloading
+          document.body.removeChild(downloadLink);
+        } else {
+          showErrorAlert("Error", response.message || `Zip Creation Failed`);
+        }
+      } catch (error: any) {
+        // Handle any errors during the process
+        const errorMessage = error.message || "An unknown error occurred";
+        showErrorAlert("Error", errorMessage);
+        console.error("Error", error);
+      }
+    };
+
     async function reLoadData() {
       await qms_procedure_listing();
     }
@@ -869,6 +930,8 @@ export default defineComponent({
       selectedYearCache,
       financialYears,
       handleChange,
+
+      handleZipFile,
     };
   },
 });

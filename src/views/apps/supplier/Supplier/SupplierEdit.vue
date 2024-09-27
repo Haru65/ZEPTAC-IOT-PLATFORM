@@ -397,6 +397,8 @@ export default defineComponent({
     const User = auth.GetUser();
     const itemId = route.params.id;
 
+    const submitButton = ref<null | HTMLButtonElement>(null);
+
     const itemDetails = ref<Item>({
       registration_date: "",
       supplier_name: "",
@@ -427,27 +429,43 @@ export default defineComponent({
     });
 
     onMounted(async () => {
-      let response = await getSupplier(itemId.toString());
-      console.log(response);
-      itemDetails.value = {
-        registration_date: response.registration_date,
-        supplier_name: response.supplier_name,
-        supplier_code: response.supplier_code,
-        contact_person: response.contact_person,
-        contact_number: response.contact_number,
-        email: response.email,
-        supplier_category: response.supplier_category,
-        product_service_details: response.product_service_details,
-        status: response.status,
-        approval_status: response.approval_status,
+      try {
+        let response = await getSupplier(itemId.toString());
 
-        evaluation: response.evaluation ? [response.evaluation] : [],
+        if (response.success) {
+          itemDetails.value = {
+            registration_date: response.result.registration_date,
+            supplier_name: response.result.supplier_name,
+            supplier_code: response.result.supplier_code,
+            contact_person: response.result.contact_person,
+            contact_number: response.result.contact_number,
+            email: response.result.email,
+            supplier_category: response.result.supplier_category,
+            product_service_details: response.result.product_service_details,
+            status: response.result.status,
+            approval_status: response.result.approval_status,
 
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+            evaluation: response.result.evaluation
+              ? [response.result.evaluation]
+              : [],
+
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getSupplier : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getSupplier : ${err}`);
+      }
     });
 
     /* --------SET DATE LOGIC--------*/
@@ -470,34 +488,38 @@ export default defineComponent({
     }
 
     const submit = async () => {
-      try {
-        loading.value = true;
-        console.log(itemDetails.value);
+      loading.value = true;
 
+      try {
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
         const response = await updateSupplier(itemId, itemDetails.value);
-        // console.log(response.error);
-        if (!response.error) {
+
+        if (response?.success) {
           // Handle successful API response
-          //   console.log("API response:", response);
           showSuccessAlert(
             "Success",
-            "Form & Format has been successfully Updated!"
+            response.message || "Supplier has been successfully updated!"
           );
-
-          router.push({ name: "forms-formats" });
           loading.value = false;
+          router.push({ name: "supplier-list" });
         } else {
           // Handle API error response
-          //   console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
-        // console.error("API call error:", error);
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };

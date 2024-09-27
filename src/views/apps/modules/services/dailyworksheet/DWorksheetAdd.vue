@@ -91,397 +91,387 @@
                 </div>
               </div>
             </div>
-              <!--end::Input group-->
+            <!--end::Input group-->
 
-              <!--begin::Input group-->
-              <div class="row mb-6" v-if="itemDetails.rgp_id">
-                <!--begin::Col-->
-                <div class="col-md-6 fv-row mb-8 mb-sd-8">
-                  <!--begin::Label-->
-                  <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                    >Customer :</label
-                  >
-                  <!--end::Label-->
+            <!--begin::Input group-->
+            <div class="row mb-6" v-if="itemDetails.rgp_id">
+              <!--begin::Col-->
+              <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                <!--begin::Label-->
+                <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Customer :</label
+                >
+                <!--end::Label-->
 
-                  <!--begin::Input-->
-                  <div class="form-control form-control-lg form-control-solid">
-                    <div>
-                      {{ RgpData?.quotation?.customer.company_name || "" }}
-                    </div>
-                    <div class="mt-2 pt-4">
-                      <h6 class="mt-5">Billing Address:</h6>
-                      <div class="mt-2">
-                        <div class="mb-1">
-                          <br />
-                          <span
-                            v-show="RgpData?.quotation?.customer.company_name"
-                          >
-                            {{
-                              `${
-                                RgpData?.quotation?.customer.company_name || ""
-                              }`
-                            }}
-                          </span>
-                          <br />
-                          <span>
-                            {{ `${RgpData?.quotation?.customer.name}` }}
-                          </span>
-                          <!-- v-if company_data present -->
-                          <div
-                            v-show="RgpData?.quotation?.customer.company_name"
-                          >
-                            <br />
-                            <span>
-                              {{
-                                `${RgpData?.quotation?.customer.address1 || ""}`
-                              }}
-                            </span>
-                            <br />
-                            <span>
-                              {{
-                                `${RgpData?.quotation?.customer.address2 || ""}`
-                              }}
-                            </span>
-                          </div>
-                          <div v-show="RgpData?.quotation?.customer.country">
-                            <span>
-                              {{
-                                `${RgpData?.quotation?.customer.city || ""} - ${
-                                  RgpData?.quotation?.customer.pincode || ""
-                                }`
-                              }}
-                            </span>
-                            <br />
-                            <span>
-                              {{
-                                `${RgpData?.quotation?.customer.state || ""} ${
-                                  RgpData?.quotation?.customer.country || ""
-                                }`
-                              }}
-                            </span>
-                            <br />
-                          </div>
-                        </div>
+                <!--begin::Input-->
+                <div class="form-control form-control-lg form-control-solid">
+                  <div>
+                    {{ RgpData?.quotation?.customer.company_name || "" }}
+                  </div>
+                  <div class="mt-2 pt-4">
+                    <h6 class="mt-5">Billing Address:</h6>
+                    <div class="mt-2">
+                      <div class="mb-1">
                         <br />
-                      </div>
-                    </div>
-                  </div>
-
-                  <!--end::Input-->
-                </div>
-                <!--end::Col-->
-                <!--begin::Col-->
-                <div class="col-md-6 fv-row mb-8 mb-sd-8">
-                  <!--begin::Label-->
-                  <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                    >Client :</label
-                  >
-                  <!--end::Label-->
-
-                  <!--begin::Input-->
-                  <div class="form-control form-control-lg form-control-solid">
-                    <div>
-                      {{ RgpData?.quotation?.clientx.company_name }}
-                    </div>
-                    <div class="mt-2 pt-4">
-                      <h6 class="mt-5">Site Address:</h6>
-                      <div class="mt-2">
-                        <div class="mb-1" v-show="RgpData?.quotation?.clientx">
-                          <br />
-                          <span
-                            v-show="RgpData?.quotation?.clientx.company_name"
-                          >
-                            {{
-                              `${
-                                RgpData?.quotation?.clientx.company_name || ""
-                              }`
-                            }}
-                          </span>
-                          <br />
-                          <span>
-                            {{ `${RgpData?.quotation?.clientx.name || ""}` }}
-                          </span>
-                          <!-- v-if company_data present -->
-                          <div
-                            v-show="RgpData?.quotation?.clientx.company_name"
-                          >
-                            <br />
-                            <span>
-                              {{
-                                `${RgpData?.quotation?.clientx.address1 || ""}`
-                              }}
-                            </span>
-                            <br />
-                            <span>
-                              {{
-                                `${RgpData?.quotation?.clientx.address2 || ""}`
-                              }}
-                            </span>
-                          </div>
-                          <div v-show="RgpData?.quotation?.clientx.country">
-                            <span>
-                              {{
-                                `${RgpData?.quotation?.clientx.city || ""} - ${
-                                  RgpData?.quotation?.clientx.pincode || ""
-                                }`
-                              }}
-                            </span>
-                            <br />
-                            <span>
-                              {{
-                                `${RgpData?.quotation?.clientx.state || ""} ${
-                                  RgpData?.quotation?.clientx.country || ""
-                                }`
-                              }}
-                            </span>
-                            <br />
-                          </div>
-                        </div>
-                        <br />
-                      </div>
-                    </div>
-                  </div>
-
-                  <!--end::Input-->
-                </div>
-                <!--end::Col-->
-              </div>
-              <!--end::Input group-->
-
-              <div class="row mb-6">
-                <div class="form-group col-md-6 mb-8 mb-sd-8">
-                  <label
-                    class="btn btn-outline btn-outline-dashed btn-outline-default p-5 d-flex align-items-center"
-                  >
-                    <!--begin::Info-->
-                    <span class="d-block fw-semobold text-start">
-                      <span class="text-dark fw-bold d-block fs-4 mb-2"
-                        >Work Status</span
-                      >
-                      <input
-                        type="radio"
-                        class="btn-check"
-                        name="work_status"
-                        id="1"
-                        value="1"
-                        v-model="itemDetails.work_status"
-                        autocomplete="off"
-                      />
-                      <label class="btn btn-outline-primary" for="1"
-                        >Ongoing</label
-                      >
-
-                      <input
-                        type="radio"
-                        class="btn-check"
-                        name="work_status"
-                        id="2"
-                        v-model="itemDetails.work_status"
-                        value="2"
-                        autocomplete="off"
-                      />
-                      <label class="btn btn-outline-primary" for="2"
-                        >Completed</label
-                      >
-                    </span>
-                    <!--end::Info-->
-                  </label>
-                </div>
-                <div class="form-group col-md-6 mb-8 mb-sd-8">
-                  <label
-                    class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
-                  >
-                    <!--begin::Info-->
-                    <span class="d-block fw-semobold text-start">
-                      <span class="text-dark fw-bold d-block fs-4 mb-2"
-                        >Work Date</span
-                      >
-                      <div class="block">
-                        <el-date-picker
-                          type="date"
-                          name="work_date"
-                          id="work_date"
-                          v-model="itemDetails.work_date"
-                          @change="setDates($event, 'work_date')"
-                          placeholder="Pick Work Day"
-                          :editable="false"
-                        />
-                      </div>
-                    </span>
-                    <!--end::Info-->
-                  </label>
-                  <div
-                    class="fv-plugins-message-container"
-                    v-if="!itemDetails.work_date"
-                  >
-                    <div class="fv-help-block">
-                      <ErrorMessage name="work_date" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row mb-6">
-                <div class="form-group col-md-6 mb-8 mb-sd-8">
-                  <label
-                    class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
-                  >
-                    <!--begin::Info-->
-                    <span class="d-block fw-semobold text-start">
-                      <span class="text-dark fw-bold d-block fs-4 mb-2"
-                        >Work Start Time</span
-                      >
-                      <div class="block">
-                        <el-time-picker
-                          type="time"
-                          id="start_time"
-                          name="start_time"
-                          v-model="itemDetails.start_time"
-                          @change="setDateTiming($event, 'start_time')"
-                          placeholder="Pick start time"
-                          :editable="false"
-                        />
-                      </div>
-                    </span>
-                    <!--end::Info-->
-                  </label>
-                  <div
-                    class="fv-plugins-message-container"
-                    v-if="!itemDetails.start_time"
-                  >
-                    <div class="fv-help-block">
-                      <ErrorMessage name="start_time" />
-                    </div>
-                  </div>
-                </div>
-                <div class="form-group col-md-6 mb-8 mb-sd-8">
-                  <label
-                    class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
-                  >
-                    <!--begin::Info-->
-                    <span class="d-block fw-semobold text-start">
-                      <span class="text-dark fw-bold d-block fs-4 mb-2"
-                        >Work Finish Time</span
-                      >
-                      <div class="block">
-                        <el-time-picker
-                          type="time"
-                          name="end_time"
-                          id="end_time"
-                          v-model="itemDetails.end_time"
-                          @change="setDateTiming($event, 'end_time')"
-                          placeholder="Pick end time"
-                          :editable="false"
-                        />
-                      </div>
-                    </span>
-                    <!--end::Info-->
-                  </label>
-                  <div
-                    class="fv-plugins-message-container"
-                    v-if="!itemDetails.end_time"
-                  >
-                    <div class="fv-help-block">
-                      <ErrorMessage name="end_time" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row mb-6">
-                <div class="form-group col-md-6 mb-8 mb-sd-8">
-                  <label
-                    class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
-                    >Scope of Work</label
-                  >
-                  <Field
-                    type="textarea"
-                    as="textarea"
-                    name="scope_of_work"
-                    rows="4"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Specify scope of work..."
-                    v-model="itemDetails.scope_of_work"
-                  />
-                  <div class="fv-plugins-message-container">
-                    <div class="fv-help-block">
-                      <ErrorMessage name="scope_of_work" />
-                    </div>
-                  </div>
-                </div>
-                <div class="form-group col-md-6 mb-8 mb-sd-8">
-                  <label
-                    class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
-                    >Problem Faced (if any)</label
-                  >
-                  <Field
-                    type="textarea"
-                    as="textarea"
-                    name="problem"
-                    rows="4"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Specify any problem faced..."
-                    v-model="itemDetails.problem"
-                  />
-                </div>
-              </div>
-
-              <div class="row mb-6">
-                <div class="form-group col-md-12 mb-8 mb-sd-8">
-                  <label
-                    class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
-                    >Tests Conducted</label
-                  >
-                  <div class="row">
-                    <div
-                      class="col-lg-4 col-md-6 col-sm-12"
-                      v-for="test in ConductedTests"
-                      :key="test.id"
-                    >
-                      <div class="d-flex align-items-center p-3 m-3">
-                        <!--begin::Checkbox-->
-                        <label
-                          class="form-check form-check-custom form-check-solid me-10"
+                        <span
+                          v-show="RgpData?.quotation?.customer.company_name"
                         >
-                          <Field
-                            class="form-check-input border-dark"
-                            type="checkbox"
-                            name="test"
-                            :value="test.test"
-                            :id="test.id"
-                            :v-model="selectedTests"
-                            @click="ToggleCheckBoxForTests($event)"
-                          />
-
-                          <span
-                            class="form-check-label fs-5 fw-semibold text-nowrap text-gray-700"
-                            >{{ test.test }}</span
-                          >
-                        </label>
-                        <!--end::Checkbox-->
+                          {{
+                            `${RgpData?.quotation?.customer.company_name || ""}`
+                          }}
+                        </span>
+                        <br />
+                        <span>
+                          {{ `${RgpData?.quotation?.customer.name}` }}
+                        </span>
+                        <!-- v-if company_data present -->
+                        <div v-show="RgpData?.quotation?.customer.company_name">
+                          <br />
+                          <span>
+                            {{
+                              `${RgpData?.quotation?.customer.address1 || ""}`
+                            }}
+                          </span>
+                          <br />
+                          <span>
+                            {{
+                              `${RgpData?.quotation?.customer.address2 || ""}`
+                            }}
+                          </span>
+                        </div>
+                        <div v-show="RgpData?.quotation?.customer.country">
+                          <span>
+                            {{
+                              `${RgpData?.quotation?.customer.city || ""} - ${
+                                RgpData?.quotation?.customer.pincode || ""
+                              }`
+                            }}
+                          </span>
+                          <br />
+                          <span>
+                            {{
+                              `${RgpData?.quotation?.customer.state || ""} ${
+                                RgpData?.quotation?.customer.country || ""
+                              }`
+                            }}
+                          </span>
+                          <br />
+                        </div>
                       </div>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+
+                <!--end::Input-->
+              </div>
+              <!--end::Col-->
+              <!--begin::Col-->
+              <div class="col-md-6 fv-row mb-8 mb-sd-8">
+                <!--begin::Label-->
+                <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+                  >Client :</label
+                >
+                <!--end::Label-->
+
+                <!--begin::Input-->
+                <div class="form-control form-control-lg form-control-solid">
+                  <div>
+                    {{ RgpData?.quotation?.clientx.company_name }}
+                  </div>
+                  <div class="mt-2 pt-4">
+                    <h6 class="mt-5">Site Address:</h6>
+                    <div class="mt-2">
+                      <div class="mb-1" v-show="RgpData?.quotation?.clientx">
+                        <br />
+                        <span v-show="RgpData?.quotation?.clientx.company_name">
+                          {{
+                            `${RgpData?.quotation?.clientx.company_name || ""}`
+                          }}
+                        </span>
+                        <br />
+                        <span>
+                          {{ `${RgpData?.quotation?.clientx.name || ""}` }}
+                        </span>
+                        <!-- v-if company_data present -->
+                        <div v-show="RgpData?.quotation?.clientx.company_name">
+                          <br />
+                          <span>
+                            {{
+                              `${RgpData?.quotation?.clientx.address1 || ""}`
+                            }}
+                          </span>
+                          <br />
+                          <span>
+                            {{
+                              `${RgpData?.quotation?.clientx.address2 || ""}`
+                            }}
+                          </span>
+                        </div>
+                        <div v-show="RgpData?.quotation?.clientx.country">
+                          <span>
+                            {{
+                              `${RgpData?.quotation?.clientx.city || ""} - ${
+                                RgpData?.quotation?.clientx.pincode || ""
+                              }`
+                            }}
+                          </span>
+                          <br />
+                          <span>
+                            {{
+                              `${RgpData?.quotation?.clientx.state || ""} ${
+                                RgpData?.quotation?.clientx.country || ""
+                              }`
+                            }}
+                          </span>
+                          <br />
+                        </div>
+                      </div>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+
+                <!--end::Input-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Input group-->
+
+            <div class="row mb-6">
+              <div class="form-group col-md-6 mb-8 mb-sd-8">
+                <label
+                  class="btn btn-outline btn-outline-dashed btn-outline-default p-5 d-flex align-items-center"
+                >
+                  <!--begin::Info-->
+                  <span class="d-block fw-semobold text-start">
+                    <span class="text-dark fw-bold d-block fs-4 mb-2"
+                      >Work Status</span
+                    >
+                    <input
+                      type="radio"
+                      class="btn-check"
+                      name="work_status"
+                      id="1"
+                      value="1"
+                      v-model="itemDetails.work_status"
+                      autocomplete="off"
+                    />
+                    <label class="btn btn-outline-primary" for="1"
+                      >Ongoing</label
+                    >
+
+                    <input
+                      type="radio"
+                      class="btn-check"
+                      name="work_status"
+                      id="2"
+                      v-model="itemDetails.work_status"
+                      value="2"
+                      autocomplete="off"
+                    />
+                    <label class="btn btn-outline-primary" for="2"
+                      >Completed</label
+                    >
+                  </span>
+                  <!--end::Info-->
+                </label>
+              </div>
+              <div class="form-group col-md-6 mb-8 mb-sd-8">
+                <label
+                  class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
+                >
+                  <!--begin::Info-->
+                  <span class="d-block fw-semobold text-start">
+                    <span class="text-dark fw-bold d-block fs-4 mb-2"
+                      >Work Date</span
+                    >
+                    <div class="block">
+                      <el-date-picker
+                        type="date"
+                        name="work_date"
+                        id="work_date"
+                        v-model="itemDetails.work_date"
+                        @change="setDates($event, 'work_date')"
+                        placeholder="Pick Work Day"
+                        :editable="false"
+                      />
+                    </div>
+                  </span>
+                  <!--end::Info-->
+                </label>
+                <div
+                  class="fv-plugins-message-container"
+                  v-if="!itemDetails.work_date"
+                >
+                  <div class="fv-help-block">
+                    <ErrorMessage name="work_date" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-6">
+              <div class="form-group col-md-6 mb-8 mb-sd-8">
+                <label
+                  class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
+                >
+                  <!--begin::Info-->
+                  <span class="d-block fw-semobold text-start">
+                    <span class="text-dark fw-bold d-block fs-4 mb-2"
+                      >Work Start Time</span
+                    >
+                    <div class="block">
+                      <el-time-picker
+                        type="time"
+                        id="start_time"
+                        name="start_time"
+                        v-model="itemDetails.start_time"
+                        @change="setDateTiming($event, 'start_time')"
+                        placeholder="Pick start time"
+                        :editable="false"
+                      />
+                    </div>
+                  </span>
+                  <!--end::Info-->
+                </label>
+                <div
+                  class="fv-plugins-message-container"
+                  v-if="!itemDetails.start_time"
+                >
+                  <div class="fv-help-block">
+                    <ErrorMessage name="start_time" />
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-md-6 mb-8 mb-sd-8">
+                <label
+                  class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
+                >
+                  <!--begin::Info-->
+                  <span class="d-block fw-semobold text-start">
+                    <span class="text-dark fw-bold d-block fs-4 mb-2"
+                      >Work Finish Time</span
+                    >
+                    <div class="block">
+                      <el-time-picker
+                        type="time"
+                        name="end_time"
+                        id="end_time"
+                        v-model="itemDetails.end_time"
+                        @change="setDateTiming($event, 'end_time')"
+                        placeholder="Pick end time"
+                        :editable="false"
+                      />
+                    </div>
+                  </span>
+                  <!--end::Info-->
+                </label>
+                <div
+                  class="fv-plugins-message-container"
+                  v-if="!itemDetails.end_time"
+                >
+                  <div class="fv-help-block">
+                    <ErrorMessage name="end_time" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-6">
+              <div class="form-group col-md-6 mb-8 mb-sd-8">
+                <label
+                  class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
+                  >Scope of Work</label
+                >
+                <Field
+                  type="textarea"
+                  as="textarea"
+                  name="scope_of_work"
+                  rows="4"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Specify scope of work..."
+                  v-model="itemDetails.scope_of_work"
+                />
+                <div class="fv-plugins-message-container">
+                  <div class="fv-help-block">
+                    <ErrorMessage name="scope_of_work" />
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-md-6 mb-8 mb-sd-8">
+                <label
+                  class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
+                  >Problem Faced (if any)</label
+                >
+                <Field
+                  type="textarea"
+                  as="textarea"
+                  name="problem"
+                  rows="4"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Specify any problem faced..."
+                  v-model="itemDetails.problem"
+                />
+              </div>
+            </div>
+
+            <div class="row mb-6">
+              <div class="form-group col-md-12 mb-8 mb-sd-8">
+                <label
+                  class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
+                  >Tests Conducted</label
+                >
+                <div class="row">
+                  <div
+                    class="col-lg-4 col-md-6 col-sm-12"
+                    v-for="test in ConductedTests"
+                    :key="test.id"
+                  >
+                    <div class="d-flex align-items-center p-3 m-3">
+                      <!--begin::Checkbox-->
+                      <label
+                        class="form-check form-check-custom form-check-solid me-10"
+                      >
+                        <Field
+                          class="form-check-input border-dark"
+                          type="checkbox"
+                          name="test"
+                          :value="test.test"
+                          :id="test.id"
+                          :v-model="selectedTests"
+                          @click="ToggleCheckBoxForTests($event)"
+                        />
+
+                        <span
+                          class="form-check-label fs-5 fw-semibold text-nowrap text-gray-700"
+                          >{{ test.test }}</span
+                        >
+                      </label>
+                      <!--end::Checkbox-->
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div class="row mb-6">
-                <div class="form-group col-12 mb-8">
-                  <label
-                    class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
-                    >Any Other Test (if any)</label
-                  >
-                  <Field
-                    type="textarea"
-                    as="textarea"
-                    name="other_test"
-                    rows="3"
-                    class="form-control form-control-lg form-control-solid"
-                    placeholder="Specify the test name..."
-                    v-model="itemDetails.other_test"
-                  />
-                </div>
+            <div class="row mb-6">
+              <div class="form-group col-12 mb-8">
+                <label
+                  class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
+                  >Any Other Test (if any)</label
+                >
+                <Field
+                  type="textarea"
+                  as="textarea"
+                  name="other_test"
+                  rows="3"
+                  class="form-control form-control-lg form-control-solid"
+                  placeholder="Specify the test name..."
+                  v-model="itemDetails.other_test"
+                />
               </div>
+            </div>
 
             <div class="row mb-6">
               <div class="form-group col-md-6 mb-8 mb-sd-8">
@@ -755,12 +745,23 @@ export default defineComponent({
     const fetchRGP = async (rgpId: any) => {
       itemDetails.value.engineer_id = "";
       if (rgpId !== "") {
-        itemDetails.value.rgp_id = rgpId;
-        const response = await getRGatePass(rgpId);
-        itemDetails.value.rgp_no = response.rgp_no;
-        if (response) {
-          RgpData.value = { ...response };
-          Engineers.value = { ...response?.Engineers };
+        try {
+          itemDetails.value.rgp_id = rgpId;
+          const response = await getRGatePass(rgpId);
+
+          if (response.success) {
+            itemDetails.value.rgp_no = response.result.rgp_no;
+            RgpData.value = { ...response.result };
+            Engineers.value = { ...response?.result.Engineers };
+          } else {
+            console.error(
+              `Error Occured in getRGatePass : ${
+                response.message || "Error Occured in API"
+              }`
+            );
+          }
+        } catch (err) {
+          console.error(`Error Occured in getRGatePass : ${err}`);
         }
       } else {
       }
@@ -768,13 +769,26 @@ export default defineComponent({
 
     onMounted(async () => {
       /* --------GET ALL IN PROCESS RGP LOGIC--------*/
-      const response = await getOnGoingRGP(User.company_id);
-      if (response) {
-        RGatePasses.value = response.result.map(({ id, ...rest }) => ({
-          id: id,
-          ...rest,
-        }));
-      } else {
+
+      try {
+        const response = await getOnGoingRGP(User.company_id);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            RGatePasses.value = response.result.map(({ id, ...rest }) => ({
+              id: id,
+              ...rest,
+            }));
+          }
+        } else {
+          console.error(
+            `Error Occured in getOnGoingRGP : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getOnGoingRGP : ${err}`);
       }
     });
 

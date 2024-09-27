@@ -137,13 +137,21 @@
         </template>
         <template v-slot:equipment_wise="{ row: pricelist }">
           <div>
-            <el-select filterable placeholder="Equipment Wise Charges's">
+            <el-select filterable placeholder="Equipment Wise Charges">
               <el-option
-                disabled="disabled"
+                disabled
                 v-for="(equip, index) in pricelist.equipment_wise"
                 :key="index"
-                :value="`${equip.name} --- ${formatPrice(equip.charge)}`"
-                :label="`${equip.name} --- ${formatPrice(equip.charge)}`"
+                :value="`${equip.name} --- ${
+                  equip.charge !== null && !isNaN(equip.charge)
+                    ? formatPrice(equip.charge)
+                    : 'N/A'
+                }`"
+                :label="`${equip.name} --- ${
+                  equip.charge !== null && !isNaN(equip.charge)
+                    ? formatPrice(equip.charge)
+                    : 'N/A'
+                }`"
               />
             </el-select>
           </div>
@@ -345,32 +353,38 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            customer_type,
-            site_location,
-            per_day_charge,
-            equipment_wise,
-            accommodation,
-            travelling,
-            training,
-            created_at,
-          }) => ({
-            id,
-            customer_type: customer_type ? customer_type : "---",
-            site_location: site_location,
-            per_day_charge: per_day_charge,
-            equipment_wise: JSON.parse(equipment_wise),
-            accommodation: accommodation,
-            travelling: travelling,
-            training: training,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
-        loading.value = false;
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              customer_type,
+              site_location,
+              per_day_charge,
+              equipment_wise,
+              accommodation,
+              travelling,
+              training,
+              created_at,
+            }) => ({
+              id,
+              customer_type: customer_type ? customer_type : "---",
+              site_location: site_location,
+              per_day_charge: per_day_charge,
+              equipment_wise: JSON.parse(equipment_wise),
+              accommodation: accommodation,
+              travelling: travelling,
+              training: training,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+          loading.value = false;
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -398,31 +412,37 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            customer_type,
-            site_location,
-            per_day_charge,
-            equipment_wise,
-            accommodation,
-            travelling,
-            training,
-            created_at,
-          }) => ({
-            id,
-            customer_type: customer_type ? customer_type : "---",
-            site_location: site_location,
-            per_day_charge: per_day_charge,
-            equipment_wise: JSON.parse(equipment_wise),
-            accommodation: accommodation,
-            travelling: travelling,
-            training: training,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              customer_type,
+              site_location,
+              per_day_charge,
+              equipment_wise,
+              accommodation,
+              travelling,
+              training,
+              created_at,
+            }) => ({
+              id,
+              customer_type: customer_type ? customer_type : "---",
+              site_location: site_location,
+              per_day_charge: per_day_charge,
+              equipment_wise: JSON.parse(equipment_wise),
+              accommodation: accommodation,
+              travelling: travelling,
+              training: training,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -462,31 +482,37 @@ export default defineComponent({
         );
         // console.log(response);
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            customer_type,
-            site_location,
-            per_day_charge,
-            equipment_wise,
-            accommodation,
-            travelling,
-            training,
-            created_at,
-          }) => ({
-            id,
-            customer_type: customer_type ? customer_type : "---",
-            site_location: site_location,
-            per_day_charge: per_day_charge,
-            equipment_wise: JSON.parse(equipment_wise),
-            accommodation: accommodation,
-            travelling: travelling,
-            training: training,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              customer_type,
+              site_location,
+              per_day_charge,
+              equipment_wise,
+              accommodation,
+              travelling,
+              training,
+              created_at,
+            }) => ({
+              id,
+              customer_type: customer_type ? customer_type : "---",
+              site_location: site_location,
+              per_day_charge: per_day_charge,
+              equipment_wise: JSON.parse(equipment_wise),
+              accommodation: accommodation,
+              travelling: travelling,
+              training: training,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -694,31 +720,37 @@ export default defineComponent({
             : financialYears.value[0]
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            customer_type,
-            site_location,
-            per_day_charge,
-            equipment_wise,
-            accommodation,
-            travelling,
-            training,
-            created_at,
-          }) => ({
-            id,
-            customer_type: customer_type ? customer_type : "---",
-            site_location: site_location,
-            per_day_charge: per_day_charge,
-            equipment_wise: JSON.parse(equipment_wise),
-            accommodation: accommodation,
-            travelling: travelling,
-            training: training,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              customer_type,
+              site_location,
+              per_day_charge,
+              equipment_wise,
+              accommodation,
+              travelling,
+              training,
+              created_at,
+            }) => ({
+              id,
+              customer_type: customer_type ? customer_type : "---",
+              site_location: site_location,
+              per_day_charge: per_day_charge,
+              equipment_wise: JSON.parse(equipment_wise),
+              accommodation: accommodation,
+              travelling: travelling,
+              training: training,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

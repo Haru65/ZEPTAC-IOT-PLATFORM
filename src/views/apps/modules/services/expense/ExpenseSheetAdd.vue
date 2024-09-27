@@ -233,7 +233,9 @@
                     <div
                       class="form-control form-control-lg form-control-solid"
                     >
-                      <div>{{ RgpData?.quotation.client.company_name || "" }}</div>
+                      <div>
+                        {{ RgpData?.quotation.client.company_name || "" }}
+                      </div>
                       <div class="mt-2 pt-4">
                         <h6 class="mt-5">Site Address:</h6>
                         <div class="mt-2">
@@ -604,7 +606,6 @@
                           {{ RgpData?.quotation.quotation_no || "" }}
                         </span>
                       </p>
-
                     </div>
                     <!--end::Row-->
                   </div>
@@ -703,9 +704,7 @@
                       <!--end::Table body-->
                       <tfoot class="fw-semobold text-gray-800">
                         <tr>
-                          <td class="text-end" colspan="2">
-                            Total
-                          </td>
+                          <td class="text-end" colspan="2">Total</td>
                           <td class="text-center">
                             ₹ {{ itemDetails.total_amount }}
                           </td>
@@ -912,11 +911,22 @@ export default defineComponent({
       itemDetails.value.engineer_last_name = "";
       Engineers.value = [];
       if (rgpId !== "") {
-        const response = await getRGatePass(rgpId);
-        if (response) {
-          itemDetails.value.rgp_id = rgpId;
-          RgpData.value = { ...response };
-          Engineers.value = { ...response?.Engineers };
+        try {
+          const response = await getRGatePass(rgpId);
+
+          if (response.success) {
+            itemDetails.value.rgp_id = rgpId;
+            RgpData.value = { ...response.result };
+            Engineers.value = { ...response?.result.Engineers };
+          } else {
+            console.error(
+              `Error Occured in getRGatePass : ${
+                response.message || "Error Occured in API"
+              }`
+            );
+          }
+        } catch (err) {
+          console.error(`Error Occured in getRGatePass : ${err}`);
         }
       } else {
       }
@@ -945,7 +955,7 @@ export default defineComponent({
         console.error("Error setting engineer:", error);
       }
     };
-    
+
     /* EXPENSE DATE LOGIC */
     async function setExpenseDate(e, index) {
       try {
@@ -1033,7 +1043,6 @@ export default defineComponent({
 
     /* EXPENSE REMOVAL LOGIC */
     const RemoveExpense = (index) => {
-      
       itemDetails.value.expenses = removeObjectWithId(
         itemDetails.value.expenses,
         index
@@ -1045,30 +1054,29 @@ export default defineComponent({
       for (const key in formData) {
         let value = formData[key];
         if (Array.isArray(value)) {
-            if (value.length === 0) {
-              // Return false if the array is empty
-              return false;
-            }
-            for (const item of value) {
-              if (!validateForm(item)) {
-                return false;
-              }
-            }
-          } else if (typeof value === "object" && value !== null) {
-            if (!validateForm(value)) {
-              return false;
-            }
-          } else if (typeof value === "string") {
-            value = value.trim();
-            if (value === "") {
-              return false;
-            }
-          } else {
+          if (value.length === 0) {
+            // Return false if the array is empty
+            return false;
           }
+          for (const item of value) {
+            if (!validateForm(item)) {
+              return false;
+            }
+          }
+        } else if (typeof value === "object" && value !== null) {
+          if (!validateForm(value)) {
+            return false;
+          }
+        } else if (typeof value === "string") {
+          value = value.trim();
+          if (value === "") {
+            return false;
+          }
+        } else {
+        }
       }
       return true;
     };
-
 
     function areAllPropertiesNotNull(array) {
       return array.every((obj) => {
@@ -1108,15 +1116,27 @@ export default defineComponent({
 
     /* --------GET ALL INPROCESS AND COMPLETED RGP LOGIC--------*/
     const GetOnGoingRGP = async () => {
-      ApiService.setHeader();
+      try {
+        ApiService.setHeader();
 
-      const response = await getOnGoingCompletedRGP(User.company_id);
-      if (response) {
-        RGatePasses.value = response.result.map(({ id, ...rest }) => ({
-          id: id,
-          ...rest,
-        }));
-      } else {
+        const response = await getOnGoingCompletedRGP(User.company_id);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            RGatePasses.value = response.result.map(({ id, ...rest }) => ({
+              id: id,
+              ...rest,
+            }));
+          }
+        } else {
+          console.error(
+            `Error Occured in getOnGoingCompletedRGP : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getOnGoingCompletedRGP : ${err}`);
       }
     };
 
@@ -1164,17 +1184,18 @@ export default defineComponent({
           });
         }
       } else if (currentStepIndex.value === 1) {
-        if (itemDetails.value.expenses && itemDetails.value.expenses.length > 0) {
+        if (
+          itemDetails.value.expenses &&
+          itemDetails.value.expenses.length > 0
+        ) {
           const result = validateForm(itemDetails.value.expenses);
 
-          if(result == false){
+          if (result == false) {
             Swal.fire({
               icon: "info",
               title: "Please fill all the details",
             });
-          }
-          else{
-            
+          } else {
             currentStepIndex.value++;
 
             if (!stepperObj.value) {
@@ -1183,7 +1204,6 @@ export default defineComponent({
 
             stepperObj.value.goNext();
           }
-
         } else {
           Swal.fire({
             icon: "info",

@@ -265,29 +265,34 @@ export default defineComponent({
     onMounted(async () => {
       try {
         let response = await getFeedback(itemId.toString());
-        console.log(response);
 
-        if (response !== null) {
+        if (response.success) {
           itemDetails.value = {
-            id: response.id,
-            customer_id: response.customer_id,
-            feedbacker_name: response.feedbacker_name,
-            feedback_data: JSON.parse(response.feedback_data),
-            avg_rating: response.avg_rating,
-            suggestion_remark: response.suggestion_remark,
+            id: response.result.id,
+            customer_id: response.result.customer_id,
+            feedbacker_name: response.result.feedbacker_name,
+            feedback_data: JSON.parse(response.result.feedback_data),
+            avg_rating: response.result.avg_rating,
+            suggestion_remark: response.result.suggestion_remark,
 
-            company_id: response.company_id ? response.company_id : "",
-            created_by: response.created_by,
-            updated_by: response.updated_by,
-            is_active: response.is_active,
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
           };
 
-          informationData.value = {...response.customer};
+          informationData.value = { ...response.result.customer };
+        } else {
+          console.error(
+            `Error Occured in getFeedback : ${
+              response.message || "Error Occured in API"
+            }`
+          );
         }
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
-        console.log(error);
+      } catch (err) {
+        console.error(`Error Occured in getFeedback : ${err}`);
       }
 
       console.log(route.params);

@@ -472,16 +472,27 @@ export default defineComponent({
     });
 
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-          }))
-        );
-        console.log(Companies);
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Companies.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
@@ -708,20 +719,19 @@ export default defineComponent({
 
         if (validateForm(itemDetails)) {
           const response = await addMethodValidation(itemDetails.value);
-          if (!response.error) {
+          if (response.success) {
             showSuccessAlert(
               "Success",
-              "Method Validation has been successfully inserted!"
+              response.message || "Method Validation has been successfully inserted!"
             );
             loading.value = false;
             router.push({ name: "method-validation-list" });
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            showErrorAlert("Error", response.message || "An error occurred.");
             loading.value = false;
             return;
           }
         } else {
-          console.log(validateForm(itemDetails));
           showErrorAlert("Warning", "Please fill in all fields.");
           return;
         }

@@ -783,15 +783,10 @@ import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import {
-  getCustomers,
-  getUser,
-  getClient,
-  GetCustomerClients,
   getInvoice,
   updateInvoice,
   deleteInvoice,
   getPriceList,
-  getCompanyLogo,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import moment from "moment";
@@ -955,30 +950,42 @@ export default defineComponent({
     ]);
 
     const getSelects = async () => {
-      ApiService.setHeader();
-      const response = await getPriceList(`fetchAll=true`);
+      try {
+        ApiService.setHeader();
+        const response = await getPriceList(`fetchAll=true`);
 
-      if (response.result != null && response.result) {
-        const data = response?.result?.map(
-          ({
-            id,
-            site_location,
-            per_day_charge,
-            accommodation,
-            travelling,
-            training,
-            equipment_wise,
-          }) => ({
-            id,
-            site_location,
-            per_day_charge,
-            accommodation,
-            travelling,
-            training,
-            equipment_wise: JSON.parse(equipment_wise),
-          })
-        );
-        locations.value = data;
+        if (response.success) {
+          if (response.result != null && response.result) {
+            const data = response?.result?.map(
+              ({
+                id,
+                site_location,
+                per_day_charge,
+                accommodation,
+                travelling,
+                training,
+                equipment_wise,
+              }) => ({
+                id,
+                site_location,
+                per_day_charge,
+                accommodation,
+                travelling,
+                training,
+                equipment_wise: JSON.parse(equipment_wise),
+              })
+            );
+            locations.value = data;
+          }
+        } else {
+          console.error(
+            `Error Occured in getPriceList : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getPriceList : ${err}`);
       }
     };
 
@@ -1071,78 +1078,96 @@ export default defineComponent({
       // Function that get all PriceLists
       await getSelects();
 
-      // get the invoice details
-      const response = await getInvoice(InvoiceId);
+      try {
+        // get the invoice details
+        const response = await getInvoice(InvoiceId);
 
-      if (response) {
-        const items = JSON.parse(response.items);
-        InvoiceDetails.value.status = response.status;
+        if (response.success) {
+          const items = JSON.parse(response.result.items);
+          InvoiceDetails.value.status = response.result.status;
 
-        InvoiceDetails.value.invoice_no = response.invoice_no;
-        InvoiceDetails.value.customer_id = response.customer_id;
-        InvoiceDetails.value.client_id = response.client_id;
-        InvoiceDetails.value.date = response.date;
-        InvoiceDetails.value.duedate = response.duedate;
-        InvoiceDetails.value.items = await items;
-        InvoiceDetails.value.company_id = response.company_id;
+          InvoiceDetails.value.invoice_no = response.result.invoice_no;
+          InvoiceDetails.value.customer_id = response.result.customer_id;
+          InvoiceDetails.value.client_id = response.result.client_id;
+          InvoiceDetails.value.date = response.result.date;
+          InvoiceDetails.value.duedate = response.result.duedate;
+          InvoiceDetails.value.items = await items;
+          InvoiceDetails.value.company_id = response.result.company_id;
 
-        InvoiceDetails.value.customer = { ...response.customer };
-        InvoiceDetails.value.client = { ...response.client };
-        InvoiceDetails.value.enquiry_no = response.enquiry_no;
+          InvoiceDetails.value.customer = { ...response.result.customer };
+          InvoiceDetails.value.client = { ...response.result.client };
+          InvoiceDetails.value.enquiry_no = response.result.enquiry_no;
 
-        // check whether daywise or equipment
-        dayWiseRef.value =
-          InvoiceDetails.value.items.equipment_wise.length === 0 ? true : false;
-        InvoiceDetails.value.day_or_equipment =
-          InvoiceDetails.value.items.equipment_wise.length === 0 ? "1" : "2";
+          // check whether daywise or equipment
+          dayWiseRef.value =
+            InvoiceDetails.value.items.equipment_wise.length === 0
+              ? true
+              : false;
+          InvoiceDetails.value.day_or_equipment =
+            InvoiceDetails.value.items.equipment_wise.length === 0 ? "1" : "2";
 
-        InvoiceDetails.value.tax_id = response.tax_id
-          ? response.tax_id.toString()
-          : "";
-        InvoiceDetails.value.tax_type = response.tax_type
-          ? response.tax_type
-          : "";
-        InvoiceDetails.value.tax_description = response.tax_description
-          ? response.tax_description
-          : "";
-        InvoiceDetails.value.tax_rate = response.tax_rate
-          ? response.tax_rate
-          : 0;
-        InvoiceDetails.value.tax_amount = response.tax_amount
-          ? response.tax_amount
-          : 0;
-        InvoiceDetails.value.sub_total = parseFloat(response.sub_total);
+          InvoiceDetails.value.tax_id = response.result.tax_id
+            ? response.result.tax_id.toString()
+            : "";
+          InvoiceDetails.value.tax_type = response.result.tax_type
+            ? response.result.tax_type
+            : "";
+          InvoiceDetails.value.tax_description = response.result.tax_description
+            ? response.result.tax_description
+            : "";
+          InvoiceDetails.value.tax_rate = response.result.tax_rate
+            ? response.result.tax_rate
+            : 0;
+          InvoiceDetails.value.tax_amount = response.result.tax_amount
+            ? response.result.tax_amount
+            : 0;
+          InvoiceDetails.value.sub_total = parseFloat(
+            response.result.sub_total
+          );
 
-        InvoiceDetails.value.total = parseFloat(response.total);
-        InvoiceDetails.value.scope_of_work = response.scope_of_work;
-        InvoiceDetails.value.terms_and_conditions =
-          response.terms_and_conditions;
-        InvoiceDetails.value.created_by = response.created_by;
-        InvoiceDetails.value.updated_by = User.id;
+          InvoiceDetails.value.total = parseFloat(response.result.total);
+          InvoiceDetails.value.scope_of_work = response.result.scope_of_work;
+          InvoiceDetails.value.terms_and_conditions =
+            response.result.terms_and_conditions;
+          InvoiceDetails.value.created_by = response.result.created_by;
+          InvoiceDetails.value.updated_by = User.id;
 
-        // check approved or not
-        isItemApproved.value =
-          response.status === 3 || response.status === 4 ? true : false;
+          // check approved or not
+          isItemApproved.value =
+            response.result.status === 3 || response.result.status === 4
+              ? true
+              : false;
 
-        // check service want for itself
-        isSiteSameAsBilling.value =
-          response.client_id == null || response.client_id == "" ? true : false;
+          // check service want for itself
+          isSiteSameAsBilling.value =
+            response.result.client_id == null || response.result.client_id == ""
+              ? true
+              : false;
 
-        const foundLocation = await locations.value.find((item) => {
-          return item.id === InvoiceDetails.value.items.id;
-        });
+          const foundLocation = await locations.value.find((item) => {
+            return item.id === InvoiceDetails.value.items.id;
+          });
 
-        if (foundLocation) {
-          const { equipment_wise } = foundLocation;
+          if (foundLocation) {
+            const { equipment_wise } = foundLocation;
 
-          equipments.value = [...equipment_wise];
+            equipments.value = [...equipment_wise];
+          }
+
+          accommodationRef.value = InvoiceDetails.value.items.accomm;
+          travellingRef.value = InvoiceDetails.value.items.travel;
+          trainingRef.value = InvoiceDetails.value.items.train;
+          pickupRef.value = InvoiceDetails.value.items.pick;
+          boardingRef.value = InvoiceDetails.value.items.board;
+        } else {
+          console.error(
+            `Error Occured in getInvoice : ${
+              response.message || "Error Occured in API"
+            }`
+          );
         }
-
-        accommodationRef.value = InvoiceDetails.value.items.accomm;
-        travellingRef.value = InvoiceDetails.value.items.travel;
-        trainingRef.value = InvoiceDetails.value.items.train;
-        pickupRef.value = InvoiceDetails.value.items.pick;
-        boardingRef.value = InvoiceDetails.value.items.board;
+      } catch (err) {
+        console.error(`Error Occured in getInvoice : ${err}`);
       }
     });
 

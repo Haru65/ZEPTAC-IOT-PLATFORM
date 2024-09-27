@@ -767,20 +767,21 @@ export default defineComponent({
       try {
         if (validateForm(itemDetails)) {
           const response = await addReplicateReport(itemDetails);
-          if (!response.error) {
+          if (response.success) {
             showSuccessAlert(
               "Success",
-              "Replicate Report has been successfully inserted!"
+              response.message || "Replicate Report has been successfully inserted!"
             );
             loading.value = false;
             router.push({ name: "replicate-report-list" });
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            showErrorAlert("Error", response.message || "An error occurred.");
             loading.value = false;
             return;
           }
         } else {
           showErrorAlert("Warning", "Please fill in all fields.");
+          return;
         }
       } catch (error) {
         showErrorAlert("Error", "An error occurred during the API call.");

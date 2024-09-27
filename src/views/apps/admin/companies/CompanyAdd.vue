@@ -1213,14 +1213,19 @@ export default defineComponent({
           // Call your API here with the form values
           const response = await addCompany(companyDetails.value);
           // console.log(response.error);
-          if (!response.error) {
+          if (response.success) {
             // Handle successful API response
             // console.log("API response:", response);
             showSuccessAlert(
               "Success",
-              "Company details have been successfully inserted!"
+              response.message || "Company details have been successfully inserted!"
             );
             router.push({ name: "company-list" });
+          }
+          else{
+            // Handle API error response
+            loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
           }
         } else {
           showErrorAlert("Warning", "Please fill in all fields.");

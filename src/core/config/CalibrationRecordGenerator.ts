@@ -187,7 +187,7 @@ const CalibrationRecordGen = async (
           }
         },
         {
-          title: `PO No. : ${instrumentDetails.value.srf.srf_no || ""}\n\nCertificate No. : ${"CAL/MA/21-22/001-001"}\n\nRequest Date : ${instrumentDetails.value.srf.request_date || ""}`,
+          title: `PO No. : ${instrumentDetails.value.srf.purchase_order_no || ""}\n\nCertificate No. : ${"CAL/MA/21-22/001-001"}\n\nRequest Date : ${instrumentDetails.value.srf.request_date || ""}`,
           styles: {
             fontSize : 10,
             fontStyle: "normal",

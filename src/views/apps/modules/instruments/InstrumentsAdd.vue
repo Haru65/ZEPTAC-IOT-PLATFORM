@@ -1172,17 +1172,15 @@ export default defineComponent({
         ApiService.setHeader();
         const response = await getCompanies(`fetchAll=true`);
 
-        if(response.success){
+        if (response.success) {
           if (response.result != null && response.result) {
-          Companies.value.push(
-            ...response.result?.map(({ created_at, ...rest }) => ({
-              ...rest,
-              created_at: moment(created_at).format("DD-MM-YYYY"),
-            }))
-          );
-        }
-        }
-        else{
+            Companies.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
           console.error(
             `Error Occured in getCompanies : ${
               response.message || "Error Occured in API"

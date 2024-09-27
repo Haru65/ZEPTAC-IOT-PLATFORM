@@ -1320,67 +1320,116 @@ export default defineComponent({
     }
 
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-          }))
-        );
-        // console.log(Companies);
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Companies.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
     // get image as base64 and convert to img form larvel
     const loadUser = async () => {
-      ApiService.setHeader();
-      const response = await getEmployee(userId);
-      // console.log(response);
-      profileDetails.value = {
-        id: userId.toString(),
-        profile_pic: response.meta.profile_pic ?? "",
-        first_name: response.first_name,
-        last_name: response.last_name,
-        email: response.email,
-        phone: response.mobile,
-        role_id: response.role_id,
-        userPermissions: response.userPermissions,
-        //  ? optional fields check for data
+      try {
+        ApiService.setHeader();
+        const response = await getEmployee(userId);
 
-        employee_code: response.meta.employee_code
-          ? response.meta.employee_code
-          : "",
-        department: response.meta.department ? response.meta.department : "",
-        designation: response.meta.designation ? response.meta.designation : "",
-        date_of_joining: response.meta.date_of_joining
-          ? response.meta.date_of_joining
-          : "",
-        experience: response.meta.experience ? response.meta.experience : "",
-        qualification: response.meta.qualification
-          ? response.meta.qualification
-          : "",
-        job_desc: response.meta.job_desc ? response.meta.job_desc : "",
-        reports_to: response.meta.reports_to ? response.meta.reports_to : "",
+        if (response?.success) {
+          profileDetails.value = {
+            id: userId.toString(),
+            profile_pic: response.result.meta.profile_pic ?? "",
+            first_name: response.result.first_name,
+            last_name: response.result.last_name,
+            email: response.result.email,
+            phone: response.result.mobile,
+            role_id: response.result.role_id,
+            userPermissions: response.result.userPermissions,
+            //  ? optional fields check for data
 
-        whatsapp_no: response.meta.whatsapp_no ? response.meta.whatsapp_no : "",
-        address1: response.meta.address1 ? response.meta.address1 : "",
-        address2: response.meta.address2 ? response.meta.address2 : "",
-        country: response.meta.country ? response.meta.country : "",
-        state: response.meta.state ? response.meta.state : "",
-        city: response.meta.city ? response.meta.city : "",
-        pincode: response.meta.pincode ? response.meta.pincode : "",
-        dob: response.meta.dob ? response.meta.dob : "",
-        gender: response.meta.gender ? response.meta.gender : "",
-        adhar: response.meta.adhar ? response.meta.adhar : "",
-        pan: response.meta.pan ? response.meta.pan : "",
-        company_id: response.company_id ? response.company_id : "",
-        updated_by: User.id,
-        is_active: response.is_active,
-        availability: response.availability,
-        allPermissions: response.allPermissions ? response.allPermissions : [],
-      };
+            employee_code: response.result.meta.employee_code
+              ? response.result.meta.employee_code
+              : "",
+            department: response.result.meta.department
+              ? response.result.meta.department
+              : "",
+            designation: response.result.meta.designation
+              ? response.result.meta.designation
+              : "",
+            date_of_joining: response.result.meta.date_of_joining
+              ? response.result.meta.date_of_joining
+              : "",
+            experience: response.result.meta.experience
+              ? response.result.meta.experience
+              : "",
+            qualification: response.result.meta.qualification
+              ? response.result.meta.qualification
+              : "",
+            job_desc: response.result.meta.job_desc
+              ? response.result.meta.job_desc
+              : "",
+            reports_to: response.result.meta.reports_to
+              ? response.result.meta.reports_to
+              : "",
+
+            whatsapp_no: response.result.meta.whatsapp_no
+              ? response.result.meta.whatsapp_no
+              : "",
+            address1: response.result.meta.address1
+              ? response.result.meta.address1
+              : "",
+            address2: response.result.meta.address2
+              ? response.result.meta.address2
+              : "",
+            country: response.result.meta.country
+              ? response.result.meta.country
+              : "",
+            state: response.result.meta.state ? response.result.meta.state : "",
+            city: response.result.meta.city ? response.result.meta.city : "",
+            pincode: response.result.meta.pincode
+              ? response.result.meta.pincode
+              : "",
+            dob: response.result.meta.dob ? response.result.meta.dob : "",
+            gender: response.result.meta.gender
+              ? response.result.meta.gender
+              : "",
+            adhar: response.result.meta.adhar ? response.result.meta.adhar : "",
+            pan: response.result.meta.pan ? response.result.meta.pan : "",
+            company_id: response.result.company_id
+              ? response.result.company_id
+              : "",
+            updated_by: User.id,
+            is_active: response.result.is_active,
+            availability: response.result.availability,
+            allPermissions: response.result.allPermissions
+              ? response.result.allPermissions
+              : [],
+          };
+        } else {
+          console.error(
+            `Error Occured in getEmployee : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getEmployee : ${err}`);
+      }
     };
 
     const updatePermissionsWithStatus = () => {
@@ -1956,20 +2005,18 @@ export default defineComponent({
         if (validateForm(profileDetails.value)) {
           const response = await updateEmployee(profileDetails.value, userId);
           // console.log(response.error);
-          if (!response.error) {
+          if (response.success) {
             // Handle successful API response
             // console.log("API response:", response);
             showSuccessAlert(
               "Success",
-              "Employee have been successfully Updated!"
+              response.message || "Employee have been successfully Updated!"
             );
             router.push({ name: "employee-list" });
           } else {
             // Handle API error response
-            const errorData = response.error;
-            console.log("API error:", errorData);
-            // console.log("API error:", errorData.response.data.errors);
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
           }
         } else {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
@@ -2034,20 +2081,16 @@ export default defineComponent({
         // console.log(profileDetails.value);
         const response = await updatePermission(userId, permArr.value);
         // console.log(response.error);
-        if (!response.error) {
+        if (response.success) {
           // Handle successful API response
           console.log("API response:", response);
           showSuccessAlert(
             "Success",
-            "Permission have been successfully updated!"
+            response.message || "Permission have been successfully updated!"
           );
           router.push({ name: "employee-list" });
         } else {
-          // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call

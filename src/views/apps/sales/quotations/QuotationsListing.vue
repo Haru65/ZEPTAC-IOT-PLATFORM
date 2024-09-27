@@ -282,7 +282,6 @@ import {
   getQuotation,
   addQuotation,
   QuotationSearch,
-  GetIncrQuotationId,
   getQuotationInfo,
   getCompanyLogo,
 } from "@/stores/api";
@@ -525,17 +524,23 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, customer, client, company_details, ...rest }) => ({
-            id: id,
-            customer: { ...customer },
-            client: { ...client },
-            company_details: { ...company_details },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, customer, client, company_details, ...rest }) => ({
+              id: id,
+              customer: { ...customer },
+              client: { ...client },
+              company_details: { ...company_details },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -563,17 +568,23 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, customer, client, company_details, ...rest }) => ({
-            id: id,
-            customer: { ...customer },
-            client: { ...client },
-            company_details: { ...company_details },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, customer, client, company_details, ...rest }) => ({
+              id: id,
+              customer: { ...customer },
+              client: { ...client },
+              company_details: { ...company_details },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -647,17 +658,23 @@ export default defineComponent({
         );
         // console.log(response);
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, customer, client, company_details, ...rest }) => ({
-            id: id,
-            customer: { ...customer },
-            client: { ...client },
-            company_details: { ...company_details },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, customer, client, company_details, ...rest }) => ({
+              id: id,
+              customer: { ...customer },
+              client: { ...client },
+              company_details: { ...company_details },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -839,17 +856,23 @@ export default defineComponent({
             : financialYears.value[0]
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, customer, client, company_details, ...rest }) => ({
-            id: id,
-            customer: { ...customer },
-            client: { ...client },
-            company_details: { ...company_details },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, customer, client, company_details, ...rest }) => ({
+              id: id,
+              customer: { ...customer },
+              client: { ...client },
+              company_details: { ...company_details },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -899,59 +922,77 @@ export default defineComponent({
         if (result["isConfirmed"]) {
           const response = await getQuotation(id);
 
-          quotationDetail.value = {
-            quotation_no: "",
-            customer_id: response.customer_id,
-            client_id: response.client_id,
-            items: JSON.parse(response.items),
-            date: response.date,
-            duedate: response.duedate,
-            enquiry_no: response.enquiry_no,
-            status: "1",
-            scope_of_work: response.scope_of_work,
-            terms_and_conditions: response.terms_and_conditions,
+          if (response.success) {
+            quotationDetail.value = {
+              quotation_no: "",
+              customer_id: response.result.customer_id,
+              client_id: response.result.client_id,
+              items: JSON.parse(response.result.items),
+              date: response.result.date,
+              duedate: response.result.duedate,
+              enquiry_no: response.result.enquiry_no,
+              status: "1",
+              scope_of_work: response.result.scope_of_work,
+              terms_and_conditions: response.result.terms_and_conditions,
 
-            sub_total: response.sub_total,
-            tax_id: response.tax_id,
-            tax_type: response.tax_type,
-            tax_description: response.tax_description,
-            tax_rate: response.tax_rate,
-            tax_amount: response.tax_amount,
-            total: response.total,
+              sub_total: response.result.sub_total,
+              tax_id: response.result.tax_id,
+              tax_type: response.result.tax_type,
+              tax_description: response.result.tax_description,
+              tax_rate: response.result.tax_rate,
+              tax_amount: response.result.tax_amount,
+              total: response.result.total,
 
-            lead: {
-              id: response.customer_id,
-              name: "",
-              company_name: "",
-              address1: "",
-              address2: "",
-              city: "",
-              state: "",
-              pincode: "",
-              country: "",
-            },
-            client: {
-              id: response.client_id,
-              name: "",
-              company_name: "",
-              address1: "",
-              address2: "",
-              city: "",
-              state: "",
-              pincode: "",
-              country: "",
-            },
-            is_active: response.is_active,
-            company_id: User.company_id,
-            created_by: User.id,
-            updated_by: User.id,
-          };
-          // add
-          const respons = await addQuotation(quotationDetail.value);
-          // console.log(response.error);
-          if (!respons.error) {
-            // list fetch update
-            await quotation_listing();
+              lead: {
+                id: response.result.customer_id,
+                name: "",
+                company_name: "",
+                address1: "",
+                address2: "",
+                city: "",
+                state: "",
+                pincode: "",
+                country: "",
+              },
+              client: {
+                id: response.result.client_id,
+                name: "",
+                company_name: "",
+                address1: "",
+                address2: "",
+                city: "",
+                state: "",
+                pincode: "",
+                country: "",
+              },
+              is_active: response.result.is_active,
+              company_id: User.company_id,
+              created_by: User.id,
+              updated_by: User.id,
+            };
+            // add
+            const res = await addQuotation(quotationDetail.value);
+            // console.log(response.error);
+            if (res.success) {
+              // list fetch update
+              await quotation_listing();
+            } else {
+              console.error(
+                `Error Occured in addQuotation : ${
+                  res.message || "Error Occured in API"
+                }`
+              );
+
+              showErrorAlert("Error", res.message || "An error occurred.");
+            }
+          } else {
+            console.error(
+              `Error Occured in getQuotation : ${
+                response.message || "Error Occured in API"
+              }`
+            );
+
+            showErrorAlert("Error", response.message || "An error occurred.");
           }
         }
       });

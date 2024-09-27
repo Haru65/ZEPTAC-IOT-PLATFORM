@@ -153,7 +153,6 @@
             <!--end::Delete-->
           </div>
           <!--end::Menu FLex-->
-
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -285,17 +284,23 @@ export default defineComponent({
 
         const response = await getClients(`page=${page}&limit=${limit.value}`);
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, created_at, customer, company_details, ...rest }) => ({
-            id,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            customer: { ...customer },
-            company_details: { ...company_details },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, created_at, customer, company_details, ...rest }) => ({
+              id,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              customer: { ...customer },
+              company_details: { ...company_details },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -317,17 +322,23 @@ export default defineComponent({
 
         const response = await getClients(`page=${page.value}&limit=${limit}`);
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, created_at, customer, company_details, ...rest }) => ({
-            id,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            customer: { ...customer },
-            company_details: { ...company_details },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, created_at, customer, company_details, ...rest }) => ({
+              id,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              customer: { ...customer },
+              company_details: { ...company_details },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -372,17 +383,23 @@ export default defineComponent({
         );
         // console.log(response);
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, created_at, customer, company_details, ...rest }) => ({
-            id,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            customer: { ...customer },
-            company_details: { ...company_details },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, created_at, customer, company_details, ...rest }) => ({
+              id,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              customer: { ...customer },
+              company_details: { ...company_details },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -560,17 +577,23 @@ export default defineComponent({
       try {
         const response = await ClientSearch(search.value);
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, created_at, customer, company_details, ...rest }) => ({
-            id,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            customer: { ...customer },
-            company_details: { ...company_details },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, created_at, customer, company_details, ...rest }) => ({
+              id,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              customer: { ...customer },
+              company_details: { ...company_details },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

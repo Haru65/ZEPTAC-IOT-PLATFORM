@@ -825,10 +825,8 @@ import ApiService from "@/core/services/ApiService";
 import {
   getCustomers,
   addInvoice,
-  getUser,
   getClient,
   GetCustomerClients,
-  GetIncrInvoiceId,
   getPriceList,
   getCustomer,
 } from "@/stores/api";
@@ -983,30 +981,42 @@ export default defineComponent({
     const siteSameAsBilling = ref(false);
 
     const getSelects = async () => {
-      ApiService.setHeader();
-      const response = await getPriceList(`fetchAll=true`);
+      try {
+        ApiService.setHeader();
+        const response = await getPriceList(`fetchAll=true`);
 
-      if (response.result != null && response.result) {
-        const data = response?.result?.map(
-          ({
-            id,
-            site_location,
-            per_day_charge,
-            accommodation,
-            travelling,
-            training,
-            equipment_wise,
-          }) => ({
-            id,
-            site_location,
-            per_day_charge,
-            accommodation,
-            travelling,
-            training,
-            equipment_wise: JSON.parse(equipment_wise),
-          })
-        );
-        locations.value = data;
+        if (response.success) {
+          if (response.result != null && response.result) {
+            const data = response?.result?.map(
+              ({
+                id,
+                site_location,
+                per_day_charge,
+                accommodation,
+                travelling,
+                training,
+                equipment_wise,
+              }) => ({
+                id,
+                site_location,
+                per_day_charge,
+                accommodation,
+                travelling,
+                training,
+                equipment_wise: JSON.parse(equipment_wise),
+              })
+            );
+            locations.value = data;
+          }
+        } else {
+          console.error(
+            `Error Occured in getPriceList : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getPriceList : ${err}`);
       }
     };
 
@@ -1515,26 +1525,52 @@ export default defineComponent({
       InvoiceDetails.value.client.state = "";
       InvoiceDetails.value.client.country = "";
 
-      ApiService.setHeader();
-      const response = await GetCustomerClients(id);
-      // console.log(response);
-      Clients.value.push(
-        ...response.result.map(({ ...rest }) => ({
-          ...rest,
-        }))
-      );
-      // console.log(Clients.value);
+      try {
+        ApiService.setHeader();
+        const response = await GetCustomerClients(id);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Clients.value.push(
+              ...response.result.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in GetCustomerClients : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in GetCustomerClients : ${err}`);
+      }
     };
 
     const GetUserData = async (id) => {
       if (id != "") {
         const customer_id = id;
-        const response = await getCustomer(customer_id);
-        // console.log(response);
-        InvoiceDetails.value.customer = { ...response };
-        InvoiceDetails.value.customer_id = response.id;
-        InvoiceDetails.value.customer.id = response.id;
-        InvoiceDetails.value.enquiry_no = response.enquiry_no;
+
+        try {
+          const response = await getCustomer(customer_id);
+
+          if (response.success) {
+            InvoiceDetails.value.customer = { ...response.result };
+            InvoiceDetails.value.customer_id = response.result.id;
+            InvoiceDetails.value.customer.id = response.result.id;
+            InvoiceDetails.value.enquiry_no = response.result.enquiry_no;
+          } else {
+            console.error(
+              `Error Occured in getCustomer : ${
+                response.message || "Error Occured in API"
+              }`
+            );
+          }
+        } catch (err) {
+          console.error(`Error Occured in getCustomer : ${err}`);
+        }
 
         if (siteSameAsBilling.value) {
           ToggleClient();
@@ -1561,23 +1597,33 @@ export default defineComponent({
     const GetClientData = async (id) => {
       if (id != "") {
         const customer_id = id;
-        const response = await getClient(customer_id);
-        // console.log(response);
-        InvoiceDetails.value.client_id = response.id;
-        InvoiceDetails.value.client.id = response.id;
-        InvoiceDetails.value.client.name = response.name;
-        InvoiceDetails.value.client.company_name = response.company_name;
-        InvoiceDetails.value.client.address1 = response.address1;
-        InvoiceDetails.value.client.address2 = response.address2;
-        InvoiceDetails.value.client.city = response.city;
-        InvoiceDetails.value.client.pincode = response.pincode;
-        InvoiceDetails.value.client.state = response.state;
-        InvoiceDetails.value.client.country = response.country;
+        try {
+          const response = await getClient(customer_id);
+
+          if (response.success) {
+            InvoiceDetails.value.client_id = response.result.id;
+            InvoiceDetails.value.client.id = response.result.id;
+            InvoiceDetails.value.client.name = response.result.name;
+            InvoiceDetails.value.client.company_name =
+              response.result.company_name;
+            InvoiceDetails.value.client.address1 = response.result.address1;
+            InvoiceDetails.value.client.address2 = response.result.address2;
+            InvoiceDetails.value.client.city = response.result.city;
+            InvoiceDetails.value.client.pincode = response.result.pincode;
+            InvoiceDetails.value.client.state = response.result.state;
+            InvoiceDetails.value.client.country = response.result.country;
+          } else {
+            console.error(
+              `Error Occured in getClient : ${
+                response.message || "Error Occured in API"
+              }`
+            );
+          }
+        } catch (err) {
+          console.error(`Error Occured in getClient : ${err}`);
+        }
+
         disabledselect.value = false;
-        /* *
-         TODO : get customer_id and from meta get client ids get customer_id and from meta get client ids and put into Ref object
-         ? Problem of getting clients;
-        */
       } else {
         InvoiceDetails.value.customer = {
           id: "",
@@ -1594,14 +1640,27 @@ export default defineComponent({
     };
 
     const GetCustomers = async () => {
-      ApiService.setHeader();
-      const response = await getCustomers(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Customers.value.push(
-          ...response.result.map(({ ...rest }) => ({
-            ...rest,
-          }))
-        );
+      try {
+        ApiService.setHeader();
+        const response = await getCustomers(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Customers.value.push(
+              ...response.result.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCustomers : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCustomers : ${err}`);
       }
     };
 

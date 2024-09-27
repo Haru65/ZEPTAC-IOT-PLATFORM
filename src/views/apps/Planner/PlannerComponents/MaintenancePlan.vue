@@ -23,10 +23,7 @@
                 data-kt-customer-table-toolbar="base"
               >
                 <!--begin::Add customer-->
-                <router-link
-                  to="/plan"
-                  class="btn btn-light"
-                >
+                <router-link to="/plan" class="btn btn-light">
                   <KTIcon icon-name="arrow-left" icon-class="fs-2" />
                   Back
                 </router-link>
@@ -249,7 +246,7 @@
               </h3>
               <div class="me-3">
                 <el-select
-          class="w-150px"
+                  class="w-150px"
                   filterable
                   placeholder="Select Year"
                   v-model="selectedYearCache"
@@ -341,8 +338,8 @@
                   }}</span>
                 </template>
                 <template v-slot:actions="{ row: planner }">
-                 <!--begin::Menu Flex-->
-                 <div class="d-flex flex-lg-row my-3">
+                  <!--begin::Menu Flex-->
+                  <div class="d-flex flex-lg-row my-3">
                     <!--begin::Delete-->
                     <span
                       @click="deleteItem(planner.id, false)"
@@ -403,7 +400,6 @@
 import { defineComponent, onMounted, ref, watch } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import {
-  getPlan,
   addPlanner,
   getPlanners,
   deletePlanner,
@@ -540,16 +536,22 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, month_id, data, ...rest }) => ({
-            id,
-            month_id,
-            data: JSON.parse(data),
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, month_id, data, ...rest }) => ({
+              id,
+              month_id,
+              data: JSON.parse(data),
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -578,16 +580,22 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, month_id, data, ...rest }) => ({
-            id,
-            month_id,
-            data: JSON.parse(data),
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, month_id, data, ...rest }) => ({
+              id,
+              month_id,
+              data: JSON.parse(data),
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -626,16 +634,22 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, month_id, data, ...rest }) => ({
-            id,
-            month_id,
-            data: JSON.parse(data),
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, month_id, data, ...rest }) => ({
+              id,
+              month_id,
+              data: JSON.parse(data),
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -669,15 +683,27 @@ export default defineComponent({
     });
 
     const getdropinstrument = async () => {
-      ApiService.setHeader();
-      const response = await getCalibratedInstruments(User.company_id);
-      if (response.result != null && response.result) {
-        Instruments.value.push(
-          ...response.result?.map(({ ...rest }) => ({
-            ...rest,
-          }))
-        );
-        // console.log(Companies);
+      try {
+        ApiService.setHeader();
+        const response = await getCalibratedInstruments(User.company_id);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Instruments.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCalibratedInstruments : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCalibratedInstruments : ${err}`);
       }
     };
 
@@ -719,7 +745,6 @@ export default defineComponent({
     });
 
     async function handleChange() {
-      
       page.value = 1;
       localStorage.setItem("selectedFinancialYear", selectedYearCache.value);
       await planner_listing();
@@ -774,24 +799,28 @@ export default defineComponent({
       try {
         if (validateForm(itemDetails)) {
           const response = await addPlanner(itemDetails.value);
-          if (!response.error) {
+
+          if (response?.success) {
+            // Handle successful API response
+
             showSuccessAlert(
               "Success",
-              "Maintenance Plan has been successfully added!"
+              response.message ||
+                "Maintenance Plan has been successfully added!"
             );
+
             dataLoading.value = false;
             loading.value = true;
             clear();
             planner_listing();
-            // router.push({ name: "plan-list" });
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            dataLoading.value = false;
-            return;
+            // Handle API error response
+            loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
           }
         } else {
-          console.log(validateForm(itemDetails));
-          showErrorAlert("Warning", "Please fill in all fields.");
+          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          dataLoading.value = false;
           return;
         }
       } catch (error) {
@@ -804,8 +833,6 @@ export default defineComponent({
       }
     };
 
-    
-    
     const deleteFewItem = async () => {
       try {
         const result = await Swal.fire({
@@ -936,7 +963,6 @@ export default defineComponent({
       });
     };
 
-
     const sort = (sort: Sort) => {
       const reverse: boolean = sort.order === "asc";
       if (sort.label) {
@@ -993,7 +1019,7 @@ export default defineComponent({
       Limits,
       Instruments,
       setInstrument,
-      
+
       selectedYearCache,
       financialYears,
       handleChange,

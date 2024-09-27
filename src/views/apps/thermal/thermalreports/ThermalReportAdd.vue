@@ -1485,10 +1485,21 @@ export default defineComponent({
     /* --------HANDLE RGP SELECTION LOGIC--------*/
     const fetchRGP = async (rgpId: any) => {
       if (rgpId !== "") {
-        const response = await getRGatePass(rgpId);
-        if (response) {
-          itemDetails.value.rgp_id = rgpId;
-          RgpData.value = { ...response };
+        try {
+          const response = await getRGatePass(rgpId);
+
+          if (response.success) {
+            itemDetails.value.rgp_id = rgpId;
+            RgpData.value = { ...response.result };
+          } else {
+            console.error(
+              `Error Occured in getRGatePass : ${
+                response.message || "Error Occured in API"
+              }`
+            );
+          }
+        } catch (err) {
+          console.error(`Error Occured in getRGatePass : ${err}`);
         }
       } else {
       }
@@ -1500,22 +1511,30 @@ export default defineComponent({
       try {
         /* --------GET ALL IN PROCESS AND COMPLETED RGP LOGIC--------*/
         const response = await getOnGoingCompletedRGPTherm(User.company_id);
-        if (response) {
-          RGatePasses.value = response.result.map(({ id, ...rest }) => ({
-            id: id,
-            ...rest,
-          }));
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            RGatePasses.value = response.result.map(({ id, ...rest }) => ({
+              id: id,
+              ...rest,
+            }));
+          }
         } else {
-          console.error(`Error Occured in getOnGoingCompletedRGPTherm`);
+          console.error(
+            `Error Occured in getOnGoingCompletedRGPTherm : ${
+              response.message || "Error Occured in API"
+            }`
+          );
         }
       } catch (err) {
         console.error(`Error Occured in getOnGoingCompletedRGPTherm : ${err}`);
+        loading.value = false;
       }
 
       try {
         await thermal_instrument_listing();
       } catch (err) {
-        console.error(`Error Occured in getOnGoingCompletedRGPTherm : ${err}`);
+        console.error(`Error Occured in thermal_instrument_listing : ${err}`);
       }
 
       _stepperObj.value = StepperComponent.createInsance(
@@ -1665,21 +1684,18 @@ export default defineComponent({
 
       try {
         const response = await addThermalReport(itemDetails.value);
-        if (!response.error) {
+        if (response?.success) {
           showSuccessAlert(
             "Success",
-            "Thermal Report have been successfully Added!"
+            response.message || "Thermal Report have been successfully Added!"
           );
 
           loading.value = false;
           route.push({ name: "thermal-report-list" });
         } else {
           // Handle API error response
-          const errorData = response.error;
-          // console.log("API error:", errorData);
-          console.log("API error:", errorData.response.data.errors);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call

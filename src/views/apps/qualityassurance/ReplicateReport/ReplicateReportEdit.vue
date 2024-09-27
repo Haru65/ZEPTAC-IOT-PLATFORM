@@ -699,29 +699,34 @@ export default defineComponent({
     onMounted(async () => {
       try {
         let response = await getReplicateReport(itemId.toString());
-        console.log(response);
-
-        itemDetails.value.replicate_date = response.replicate_date;
-        itemDetails.value.engineer_1 = response.engineer_1;
-        itemDetails.value.engineer_2 = response.engineer_2;
-        itemDetails.value.uuc_details = JSON.parse(response.uuc_details);
-        itemDetails.value.master_equipment_1 = JSON.parse(
-          response.master_equipment_1
-        );
-        itemDetails.value.replicate_report_readings = JSON.parse(
-          response.replicate_report_readings
-        );
-        itemDetails.value.review_commands = response.review_commands;
-        itemDetails.value.approval_status = response.approval_status;
-        itemDetails.value.company_id = response.company_id
-          ? response.company_id
-          : "";
-        itemDetails.value.created_by = response.created_by;
-        itemDetails.value.updated_by = response.updated_by;
-        itemDetails.value.is_active = response.is_active;
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
+        if (response?.success) {
+          itemDetails.value.replicate_date = response.result.replicate_date;
+          itemDetails.value.engineer_1 = response.result.engineer_1;
+          itemDetails.value.engineer_2 = response.result.engineer_2;
+          itemDetails.value.uuc_details = JSON.parse(response.result.uuc_details);
+          itemDetails.value.master_equipment_1 = JSON.parse(
+            response.result.master_equipment_1
+          );
+          itemDetails.value.replicate_report_readings = JSON.parse(
+            response.result.replicate_report_readings
+          );
+          itemDetails.value.review_commands = response.result.review_commands;
+          itemDetails.value.approval_status = response.result.approval_status;
+          itemDetails.value.company_id = response.result.company_id
+            ? response.result.company_id
+            : "";
+          itemDetails.value.created_by = response.result.created_by;
+          itemDetails.value.updated_by = response.result.updated_by;
+          itemDetails.value.is_active = response.result.is_active;
+        } else {
+          console.error(
+            `Error Occured in getReplicateReport : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getReplicateReport : ${err}`);
       }
     });
 
@@ -796,15 +801,16 @@ export default defineComponent({
             itemId,
             itemDetails.value
           );
-          if (!response.error) {
+          if (response.success) {
             showSuccessAlert(
               "Success",
-              "Replicate Report has been successfully updated!"
+              response.message ||
+                "Replicate Report has been successfully updated!"
             );
             loading.value = false;
             router.push({ name: "replicate-report-list" });
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            showErrorAlert("Error", response.message || "An error occurred.");
             loading.value = false;
             return;
           }

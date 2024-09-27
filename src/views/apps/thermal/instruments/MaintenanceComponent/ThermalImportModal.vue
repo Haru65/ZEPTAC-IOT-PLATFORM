@@ -246,12 +246,7 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import * as xlsx from "xlsx";
 import moment from "moment";
-import {
-  addThermalInstrument,
-  GetIncrInstrumentId,
-  getCompanies,
-  process_json_data,
-} from "@/stores/api";
+import { process_json_data } from "@/stores/api";
 import { User } from "@/core/services/JwtService";
 
 interface NewAddressData {}
@@ -398,73 +393,6 @@ export default defineComponent({
       }
     };
 
-    //     const handleChange = async (e) => {
-    //       let fileInput = e.target;
-    //       const file = e.target.files[0];
-    // console.log(file.type)
-    //       try {
-    //         if (
-    //           file &&
-    //           file.type ==
-    //             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    //         ) {
-    //           const rows = ref([]);
-    //           const ReadingsData = ref<readingsData[]>([]);
-
-    //           // Read the file as an ArrayBuffer
-    //           const arrayBuffer = await file.arrayBuffer();
-
-    //           // Parse the workbook using xlsx.read
-    //           const wb = xlsx.read(arrayBuffer, { type: "array" });
-
-    //           console.log(wb);
-
-    //           /* Update data with records from the specified range */
-    //           rows.value = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-    //             range,
-    //           });
-
-    //           // maaping the data in particular format
-    //           ReadingsData.value = rows.value.map(
-    //             (item: { [key: string]: any }, index) => {
-    //               return {
-    //                 id: index,
-    //                 instrument_id: "",
-    //                 name: item["Instrument name"],
-    //                 make: item["Make"],
-    //                 model_no: item["Model no."],
-    //                 serial_no: item["Serial no."],
-    //                 ranges: item["Range"],
-    //                 accuracy: item["Accuracy"],
-    //                 calibration_date: instrumentData.value.calibration_date,
-    //                 calibration_due_date: instrumentData.value.calibration_due_date,
-    //                 availability: "1",
-    //                 company_id: User.company_id,
-    //                 created_by: User.id,
-    //                 updated_by: User.id,
-    //                 is_active: 1,
-    //               };
-    //             }
-    //           );
-
-    //           // finally push this data
-    //           instrumentData.value.data = ReadingsData.value;
-
-    //           console.log(instrumentData.value);
-
-    //           fileInput.value = "";
-    //         } else {
-    //           alert("Please select .xls file");
-    //           fileInput.value = "";
-    //         }
-    //       } catch (error) {
-    //         console.error("Error reading the file:", error);
-    //         alert(
-    //           "Error occured during api call. Please reload the page and try again."
-    //         );
-    //       }
-    //     };
-
     const showSuccessAlert = (title, message) => {
       Swal.fire({
         title,
@@ -511,100 +439,19 @@ export default defineComponent({
       }
     };
 
-    // async function addDataToDatabase() {
-    //   const totalInstruments = instrumentData.value.data.length;
-    //   let instrumentsAdded = 0;
-
-    //   try {
-    //     for (const [index, obj] of instrumentData.value.data.entries()) {
-    //       const res = await GetIncrInstrumentId(User.company_id);
-    //       IncrInstrument(res, index);
-    //       await addThermalInstrument(obj);
-
-    //       // Increment the number of instruments added
-    //       instrumentsAdded++;
-
-    //       // Calculate progress
-    //       const progress = Math.round(
-    //         (instrumentsAdded / totalInstruments) * 100
-    //       );
-
-    //       // Update progress bar
-    //       updateProgressBar(progress);
-    //     }
-    //   } catch (error) {
-    //     // Handle any errors during API call
-    //     showErrorAlert("Error", "An error occurred during the API call.");
-    //   } finally {
-    //     // Hide loading indicator when process completes or encounters an error
-    //     loading2.value = false;
-    //   }
-    // }
-
-    // const submit = async (e) => {
-    //   if (instrumentData.value.data.length <= 0) {
-    //     showErrorAlert(
-    //       "Warning",
-    //       "You must upload an Excel file. Please try again later."
-    //     );
-    //     return;
-    //   }
-
-    //   Swal.fire({
-    //     title: "Adding Instruments",
-    //     html: '<div class="progress"><div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div></div>',
-    //     allowOutsideClick: false,
-    //     showCancelButton: false,
-    //     showConfirmButton: false,
-    //     willOpen: () => {
-    //       Swal.showLoading();
-    //       addDataToDatabase(); // Start adding instruments
-    //     },
-    //   });
-
-    //   try {
-    //     await addDataToDatabase();
-    //     Swal.fire({
-    //       icon: "success",
-    //       title: "Instruments Successfully Added",
-    //     });
-    //   } catch (error) {
-    //     Swal.fire({
-    //       icon: "error",
-    //       title: "Failed to Add Instruments",
-    //       text: "An error occurred while adding instruments.",
-    //     });
-    //   } finally {
-    //     Swal.close(); // Close the SweetAlert loading indicator
-    //     // Reset instrument data and hide modal
-    //     instrumentData.value = {
-    //       data: [],
-    //       calibration_date: "",
-    //       calibration_due_date: "",
-    //     };
-    //     hideModal(newAddressModalRef.value);
-    //   }
-    // };
-
-    // function updateProgressBar(progress) {
-    //   const progressBar = document.getElementById("progressBar");
-    //   if (progressBar) {
-    //     progressBar.style.width = progress + "%";
-    //     progressBar.setAttribute("aria-valuenow", progress);
-    //   } else {
-    //     console.error("Progress bar element not found.");
-    //   }
-    // }
-
     async function addDataToDatabase() {
       try {
-        await process_json_data(instrumentData.value);
+        const response = await process_json_data(instrumentData.value);
 
-        // If the processing is successful, show success message
-        Swal.fire({
-          icon: "success",
-          title: "Instruments Successfully Added",
-        });
+        if (response.success) {
+          // If the processing is successful, show success message
+          Swal.fire({
+            icon: "success",
+            title: "Instruments Successfully Added",
+          });
+        } else {
+          showErrorAlert("Error", response.message || "An error occurred.");
+        }
       } catch (error) {
         // If an error occurs during processing, show error message
         showErrorAlert("Error", "An error occurred during the API call.");

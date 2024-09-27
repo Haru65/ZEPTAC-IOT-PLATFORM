@@ -123,7 +123,7 @@
               data-kt-menu-placement="bottom-end"
               data-kt-menu-flip="top-end"
             >
-            <KTIcon icon-name="filter" icon-class="fs-1" />
+              <KTIcon icon-name="filter" icon-class="fs-1" />
             </button>
 
             <!--begin::Menu 1-->
@@ -492,17 +492,23 @@ export default defineComponent({
           }&status=${statusString}`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, engineer, rgp, ...rest }) => ({
-            id,
-            rgp: { ...rgp },
-            engineer: { ...engineer },
-            customer: { ...rgp.quotation.customer },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, engineer, rgp, ...rest }) => ({
+              id,
+              rgp: { ...rgp },
+              engineer: { ...engineer },
+              customer: { ...rgp.quotation.customer },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -530,17 +536,23 @@ export default defineComponent({
           }&status=${statusString}`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, engineer, rgp, ...rest }) => ({
-            id,
-            rgp: { ...rgp },
-            engineer: { ...engineer },
-            customer: { ...rgp.quotation.customer },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, engineer, rgp, ...rest }) => ({
+              id,
+              rgp: { ...rgp },
+              engineer: { ...engineer },
+              customer: { ...rgp.quotation.customer },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -569,17 +581,23 @@ export default defineComponent({
           }&status=${statusString}`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, engineer, rgp, ...rest }) => ({
-            id,
-            rgp: { ...rgp },
-            engineer: { ...engineer },
-            customer: { ...rgp.quotation.customer },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, engineer, rgp, ...rest }) => ({
+              id,
+              rgp: { ...rgp },
+              engineer: { ...engineer },
+              customer: { ...rgp.quotation.customer },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -820,17 +838,23 @@ export default defineComponent({
           statusString
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, engineer, rgp, ...rest }) => ({
-            id,
-            rgp: { ...rgp },
-            engineer: { ...engineer },
-            customer: { ...rgp.quotation.customer },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, engineer, rgp, ...rest }) => ({
+              id,
+              rgp: { ...rgp },
+              engineer: { ...engineer },
+              customer: { ...rgp.quotation.customer },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

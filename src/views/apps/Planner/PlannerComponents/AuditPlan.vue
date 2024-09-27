@@ -265,7 +265,6 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref, watch } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import {
-  getPlan,
   addPlanner,
   getPlanners,
   deletePlanner,
@@ -364,16 +363,22 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, month_id, data, ...rest }) => ({
-            id,
-            month_id,
-            data: JSON.parse(data),
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, month_id, data, ...rest }) => ({
+              id,
+              month_id,
+              data: JSON.parse(data),
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -402,16 +407,22 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, month_id, data, ...rest }) => ({
-            id,
-            month_id,
-            data: JSON.parse(data),
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, month_id, data, ...rest }) => ({
+              id,
+              month_id,
+              data: JSON.parse(data),
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -450,16 +461,22 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, month_id, data, ...rest }) => ({
-            id,
-            month_id,
-            data: JSON.parse(data),
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, month_id, data, ...rest }) => ({
+              id,
+              month_id,
+              data: JSON.parse(data),
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -548,24 +565,28 @@ export default defineComponent({
       try {
         if (validateForm(itemDetails)) {
           const response = await addPlanner(itemDetails.value);
-          if (!response.error) {
+
+          if (response?.success) {
+            // Handle successful API response
+
             showSuccessAlert(
               "Success",
-              "Internal Audit Plan has been successfully added!"
+              response.message ||
+                "Internal Audit Plan has been successfully added!"
             );
+
             dataLoading.value = false;
             loading.value = true;
             clear();
             planner_listing();
-            // router.push({ name: "plan-list" });
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            dataLoading.value = false;
-            return;
+            // Handle API error response
+            loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
           }
         } else {
-          console.log(validateForm(itemDetails));
-          showErrorAlert("Warning", "Please fill in all fields.");
+          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          dataLoading.value = false;
           return;
         }
       } catch (error) {

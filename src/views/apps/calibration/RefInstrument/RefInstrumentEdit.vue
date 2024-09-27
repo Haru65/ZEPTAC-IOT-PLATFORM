@@ -8,6 +8,7 @@
         <VForm
           id="kt_account_profile_details_form"
           class="form"
+          @submit="onsubmit"
           :validation-schema="itemDetailsValidator"
         >
           <!--begin::Card body-->
@@ -716,10 +717,10 @@
           </div>
           <div class="modal-footer flex-center">
             <!--begin::Button-->
-            <span
+            <button
+            type="submit"
               ref="submitButton"
               class="btn btn-primary w-sd-25 w-lg-25"
-              @click="submit"
             >
               <span class="indicator-label"> Update </span>
               <span class="indicator-progress">
@@ -728,7 +729,7 @@
                   class="spinner-border spinner-border-sm align-middle ms-2"
                 ></span>
               </span>
-            </span>
+            </button>
             <!--end::Button-->
           </div>
           <!--end::Input group-->
@@ -840,9 +841,8 @@ export default defineComponent({
         if (response.success) {
           if (response.result != null && response.result) {
             Companies.value.push(
-              ...response.result?.map(({ created_at, ...rest }) => ({
+              ...response.result?.map(({ ...rest }) => ({
                 ...rest,
-                created_at: moment(created_at).format("DD-MM-YYYY"),
               }))
             );
           }
@@ -1206,7 +1206,7 @@ export default defineComponent({
       return true;
     };
 
-    const submit = async () => {
+    const onsubmit = async () => {
       loading.value = true;
 
       const result = validateForm(itemDetails);
@@ -1288,7 +1288,7 @@ export default defineComponent({
       submitButton,
       itemDetails,
       itemDetailsValidator,
-      submit,
+      onsubmit,
       loading,
       packages,
       limit,

@@ -645,16 +645,27 @@ export default defineComponent({
     const NOTES = `En ≤1: The laboratory is performing satisfactorily\nEn >1: The laboratory is performing unsatisfactory and requires corrective actions`;
 
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-          }))
-        );
-        console.log(Companies);
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Companies.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
@@ -749,36 +760,47 @@ export default defineComponent({
         await getdropcomp();
       }
 
-      let response = await getInterLabComparison(itemId.toString());
-      console.log(response);
-      itemDetails.value = {
-        artifact_name: response.artifact_name,
-        lab_date: response.lab_date,
-        artifact_id: response.artifact_id,
-        ranges: response.ranges,
-        serial_no: response.serial_no,
-        least_count: response.least_count,
-        make: response.make,
-        model_no: response.model_no,
+      try {
+        let response = await getInterLabComparison(itemId.toString());
+        if (response?.success) {
+          itemDetails.value = {
+            artifact_name: response.result.artifact_name,
+            lab_date: response.result.lab_date,
+            artifact_id: response.result.artifact_id,
+            ranges: response.result.ranges,
+            serial_no: response.result.serial_no,
+            least_count: response.result.least_count,
+            make: response.result.make,
+            model_no: response.result.model_no,
 
-        participate_lab_name: response.participate_lab_name,
-        participate_lab_id: response.participate_lab_id,
-        participate_lab_address: response.participate_lab_address,
+            participate_lab_name: response.result.participate_lab_name,
+            participate_lab_id: response.result.participate_lab_id,
+            participate_lab_address: response.result.participate_lab_address,
 
-        reference_lab_name: response.reference_lab_name,
-        reference_lab_id: response.reference_lab_id,
-        reference_lab_address: response.reference_lab_address,
+            reference_lab_name: response.result.reference_lab_name,
+            reference_lab_id: response.result.reference_lab_id,
+            reference_lab_address: response.result.reference_lab_address,
 
-        readings: response.readings ? JSON.parse(response.readings) : [],
-        status: response.status,
-        remark: response.remark,
-        approval_status: response.approval_status,
+            readings: response.result.readings ? JSON.parse(response.result.readings) : [],
+            status: response.result.status,
+            remark: response.result.remark,
+            approval_status: response.result.approval_status,
 
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+            company_id: response.result.company_id ? response.result.company_id : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getMethodValidation : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getMethodValidation : ${err}`);
+      }
     });
 
     const addReading = () => {
@@ -811,7 +833,9 @@ export default defineComponent({
     };
 
     async function calculateOverallStatus(items) {
-      const allEnRatiosSatisfactory = items.every((item) => item.en_ratio <= EN_VALUE);
+      const allEnRatiosSatisfactory = items.every(
+        (item) => item.en_ratio <= EN_VALUE
+      );
       return allEnRatiosSatisfactory ? true : false;
     }
 
@@ -948,15 +972,16 @@ export default defineComponent({
             itemId,
             itemDetails.value
           );
-          if (!response.error) {
+          if (response.success) {
             showSuccessAlert(
               "Success",
-              "Interlaboratory Comparison has been successfully updated!"
+              response.message ||
+                "Interlaboratory Comparison has been successfully updated!"
             );
             loading.value = false;
             router.push({ name: "interlaboratory-list" });
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            showErrorAlert("Error", response.message || "An error occurred.");
             loading.value = false;
             return;
           }

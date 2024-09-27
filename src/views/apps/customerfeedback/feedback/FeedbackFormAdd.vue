@@ -10,7 +10,7 @@
           class="form"
           novalidate
           :validation-schema="itemValidator"
-          @submit=submit
+          @submit="submit"
         >
           <!--begin::Card body-->
           <div class="card-body p-sd-2 p-lg-9">
@@ -334,11 +334,13 @@ export default defineComponent({
 
         let response = await validateFeedback(data.value);
         console.log(response);
-
         if (response.success && response.result != null) {
-          if (response) {
-          informationData.value.name = response.result.name ? response.result.name : "";
-          informationData.value.mobile = response.result.mobile ? response.result.mobile : "";
+          informationData.value.name = response.result.name
+            ? response.result.name
+            : "";
+          informationData.value.mobile = response.result.mobile
+            ? response.result.mobile
+            : "";
           informationData.value.company_name = response.result.company_name
             ? response.result.company_name
             : "";
@@ -348,14 +350,30 @@ export default defineComponent({
           informationData.value.address2 = response.result.address2
             ? response.result.address2
             : "";
-          informationData.value.city = response.result.city ? response.result.city : "";
-          informationData.value.pincode = response.result.pincode ? response.result.pincode : "";
-          informationData.value.state = response.result.state ? response.result.state : "";
-          informationData.value.country = response.result.country ? response.result.country : "";
-        }
+          informationData.value.city = response.result.city
+            ? response.result.city
+            : "";
+          informationData.value.pincode = response.result.pincode
+            ? response.result.pincode
+            : "";
+          informationData.value.state = response.result.state
+            ? response.result.state
+            : "";
+          informationData.value.country = response.result.country
+            ? response.result.country
+            : "";
+        } else {
+          console.error(
+            `Error Occured in validateFeedback : ${
+              response.message || "Error Occured in API"
+            }`
+          );
         }
       } catch (error) {
-        showErrorAlert("Error", "An error occurred during the validateFeedback API call.");
+        showErrorAlert(
+          "Error",
+          "An error occurred during the validateFeedback API call."
+        );
         loading.value = false;
         console.log(error);
       }
@@ -366,9 +384,7 @@ export default defineComponent({
     const validateForm = (formData) => {
       for (const key in formData) {
         let value = formData[key];
-        if (
-          key !== "suggestion_remark"
-        ) {
+        if (key !== "suggestion_remark") {
           if (Array.isArray(value)) {
             for (const item of value) {
               if (!validateForm(item)) {

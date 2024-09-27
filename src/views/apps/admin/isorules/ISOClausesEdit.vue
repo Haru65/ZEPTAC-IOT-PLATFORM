@@ -559,14 +559,27 @@ export default defineComponent({
     });
 
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ ...rest }) => ({
-            ...rest,
-          }))
-        );
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Companies.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
@@ -596,12 +609,17 @@ export default defineComponent({
           };
 
           clauses.splice(0, clauses.length, ...ISO.value.clauses);
+
+          // Object.assign(clauses, ISO.value.clauses);
+        } else {
+          console.error(
+            `Error Occured in getISORule : ${
+              response.message || "Error Occured in API"
+            }`
+          );
         }
-        // Object.assign(clauses, ISO.value.clauses);
-      } catch (error) {
-        console.log(error);
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
+      } catch (err) {
+        console.error(`Error Occured in getISORule : ${err}`);
       }
     });
 
@@ -667,20 +685,18 @@ export default defineComponent({
 
         const response = await updateISORule(itemId, ISO.value);
         // console.log(response.error);
-        if (!response.error) {
+        if (response.success) {
           // Handle successful API response
           // console.log("API response:", response);
           showSuccessAlert(
             "Success",
-            "ISO Rules have been successfully Updated!"
+            response.message || "ISO Rules have been successfully Updated!"
           );
           router.push({ name: "iso-list" });
         } else {
           // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert("Warning", "Please Add Atleast one clause");
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call

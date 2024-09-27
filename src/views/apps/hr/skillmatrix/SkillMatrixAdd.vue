@@ -67,7 +67,8 @@
                 <div class="alert alert-primary font-bold mt-2">
                   <div class="d-flex flex-column">
                     <li class="d-flex align-items-center py-2">
-                      <span class="bullet bullet-dot me-5"></span> Score 75-100 - Share the Knowledge to Other Personel
+                      <span class="bullet bullet-dot me-5"></span> Score 75-100
+                      - Share the Knowledge to Other Personel
                     </li>
                     <li class="d-flex align-items-center py-2">
                       <span class="bullet bullet-dot me-5"></span>
@@ -149,7 +150,6 @@ import moment from "moment";
 
 import RangeSlider from "./RangeSlider.vue";
 
-
 export default defineComponent({
   name: "skill-matrix-add",
   components: {
@@ -179,16 +179,29 @@ export default defineComponent({
     });
 
     const getDropEmployee = async () => {
-      ApiService.setHeader();
-      const response = await getEmployees(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Employees.value.push(
-          ...response.result?.map(({ id, first_name, last_name }) => ({
-            id,
-            first_name,
-            last_name,
-          }))
-        );
+      try {
+        ApiService.setHeader();
+        const response = await getEmployees(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Employees.value.push(
+              ...response.result?.map(({ id, first_name, last_name }) => ({
+                id,
+                first_name,
+                last_name,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getEmployees : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getEmployees : ${err}`);
       }
     };
 
@@ -243,36 +256,30 @@ export default defineComponent({
     };
 
     const submit = async () => {
-
       loading.value = true;
 
       try {
-
         skillMatrixDetails.value.skills = skills;
-        
+
         console.log(skillMatrixDetails.value);
         // return;
         if (skillMatrixDetails.value.user_id != "") {
           const response = await addSkillMatrix(skillMatrixDetails.value);
           // console.log(response.error);
-          if (!response.error) {
+          if (response.success) {
             // Handle successful API response
             //   console.log("API response:", response);
             showSuccessAlert(
               "Success",
-              "Skill Matrix has been successfully inserted!"
+              response.message || "Skill Matrix has been successfully inserted!"
             );
             loading.value = false;
-            
+
             router.push({ name: "skill-matrix-list" });
           } else {
             // Handle API error response
-
-            const errorData = response.error;
-            console.log("API error:", errorData);
-            // console.log("API error:", errorData.response.data.errors);
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
             loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
           }
         } else {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");

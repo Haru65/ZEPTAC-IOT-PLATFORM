@@ -5,7 +5,8 @@
       <!--begin::Modal content-->
       <div class="modal-content">
         <!--begin::Form-->
-        <VForm id="kt_account_profile_details_form" class="form">
+        <VForm id="kt_account_profile_details_form" class="form" 
+        @submit="submit">
           <!--begin::Card body-->
           <div class="card-body border-top p-sd-2 p-lg-9">
             <!-- extra fields -->
@@ -340,21 +341,21 @@
             </div>
           </div>
 
-          <div class="modal-footer flex-center w-100">
+          <div class="modal-footer flex-center mt-6">
             <!--begin::Button-->
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click="submit()"
+            <button
+              type="submit"
+              ref="submitButton"
+              class="btn btn-primary w-sd-25 w-lg-25"
             >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Submit </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
                 ></span>
               </span>
-            </span>
+            </button>
             <!--end::Button-->
           </div>
           <!--end::Input group-->
@@ -420,11 +421,11 @@ export default defineComponent({
     const User = auth.GetUser();
     const itemId = route.params.id;
 
+    const submitButton = ref<null | HTMLButtonElement>(null);
     const SUPPLIER_SCORE = 2;
 
     const SUPPLIER_APPROVE_MSG = "Approved.";
     const SUPPLIER_REJECT_MSG = "Rejected.";
-
 
     const itemDetails = ref<Item>({
       supplier_id: "",
@@ -446,16 +447,24 @@ export default defineComponent({
     onMounted(async () => {
       try {
         let response = await getSupplier(itemId.toString());
-        console.log(response);
-        itemDetails.value.supplier_id = response.id;
-        itemDetails.value.supplier.supplier_name = response.supplier_name;
-        itemDetails.value.supplier.supplier_code = response.supplier_code;
-        itemDetails.value.supplier.supplier_category =
-          response.supplier_category;
-        console.log(itemDetails.value);
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
+
+        if (response.success) {
+          itemDetails.value.supplier_id = response.result.id;
+          itemDetails.value.supplier.supplier_name =
+            response.result.supplier_name;
+          itemDetails.value.supplier.supplier_code =
+            response.result.supplier_code;
+          itemDetails.value.supplier.supplier_category =
+            response.result.supplier_category;
+        } else {
+          console.error(
+            `Error Occured in getSupplier : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getSupplier : ${err}`);
       }
     });
 
@@ -540,41 +549,57 @@ export default defineComponent({
     const submit = async () => {
       loading.value = true;
 
-      if (itemDetails.value.supplier.supplier_category === "1") {
-        itemDetails.value.evaluation_matrix = productQuestions.value;
-      } else if (itemDetails.value.supplier.supplier_category === "2") {
-        itemDetails.value.evaluation_matrix = serviceQuestions.value;
-      }
-
       try {
-        if (itemDetails.value.supplier_id != "") {
-          const response = await addSupplierEvaluation(itemDetails.value);
-          if (!response.error) {
-            showSuccessAlert(
-              "Success",
-              "Evaluation of Supplier has been successfully Done!"
-            );
-            loading.value = false;
-            router.push({ name: "supplier-list" });
-          } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
-            loading.value = false;
-            return;
-          }
-        } else {
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        loading.value = true;
+
+        if (itemDetails.value.supplier.supplier_category === "1") {
+          itemDetails.value.evaluation_matrix = productQuestions.value;
+        } else if (itemDetails.value.supplier.supplier_category === "2") {
+          itemDetails.value.evaluation_matrix = serviceQuestions.value;
+        }
+
+        if (itemDetails.value.supplier_id == "") {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
           loading.value = false;
           return;
         }
+
+        // Call your API here
+        const response = await addSupplierEvaluation(itemDetails.value);
+
+        if (response?.success) {
+          // Handle successful API response
+          showSuccessAlert(
+            "Success",
+            response.message ||
+              "Evaluation of Supplier has been successfully Done!"
+          );
+          loading.value = false;
+          router.push({ name: "supplier-list" });
+        } else {
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
+        }
       } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
-        loading.value = false;
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
 
     return {
+      submitButton,
       itemDetails,
       submit,
       loading,

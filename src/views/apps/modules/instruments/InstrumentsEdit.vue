@@ -1295,9 +1295,8 @@ export default defineComponent({
         if (response.success) {
           if (response.result != null && response.result) {
             Companies.value.push(
-              ...response.result?.map(({ created_at, ...rest }) => ({
+              ...response.result?.map(({ ...rest }) => ({
                 ...rest,
-                created_at: moment(created_at).format("DD-MM-YYYY"),
               }))
             );
           }

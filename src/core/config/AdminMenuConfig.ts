@@ -98,7 +98,14 @@ const AdminMenuConfig: Array<MenuItem> = [
             route: "/quality",
           },
         ],
-      }
+      },
+
+      {
+        heading: "Service Request Form",
+        route: "/srf/list",
+        keenthemesIcon: "abstract-26",
+        bootstrapIcon: "bi-archive",
+      },
 
     ],
   },
@@ -264,12 +271,6 @@ const AdminMenuConfig: Array<MenuItem> = [
             route: "/invoices/list",
           },
         ],
-      },
-      {
-        heading: "Service Request Form",
-        route: "/srf/list",
-        keenthemesIcon: "abstract-26",
-        bootstrapIcon: "bi-archive",
       },
     ],
   },

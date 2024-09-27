@@ -260,15 +260,21 @@ export default defineComponent({
 
         const response = await getISORules(`page=${page}&limit=${limit.value}`);
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, clauses, ...rest }) => ({
-            id: id,
-            clauses: JSON.parse(clauses),
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, clauses, ...rest }) => ({
+              id: id,
+              clauses: JSON.parse(clauses),
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -289,15 +295,21 @@ export default defineComponent({
 
         const response = await getISORules(`page=${page.value}&limit=${limit}`);
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, clauses, ...rest }) => ({
-            id: id,
-            clauses: JSON.parse(clauses),
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, clauses, ...rest }) => ({
+              id: id,
+              clauses: JSON.parse(clauses),
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -336,16 +348,22 @@ export default defineComponent({
         const response = await getISORules(
           `page=${page.value}&limit=${limit.value}`
         );
-        tableData.value = response.result.data.map(
-          ({ id, clauses, ...rest }) => ({
-            id: id,
-            clauses: JSON.parse(clauses),
-            ...rest,
-          })
-        );
+        if (response.success) {
+          tableData.value = response.result.data.map(
+            ({ id, clauses, ...rest }) => ({
+              id: id,
+              clauses: JSON.parse(clauses),
+              ...rest,
+            })
+          );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+          more.value = response.result.next_page_url != null ? true : false;
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

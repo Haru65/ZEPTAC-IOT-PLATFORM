@@ -284,13 +284,13 @@ export default defineComponent({
           };
         } else {
           console.error(
-            `Error Occured in getExternalDoc : ${
+            `Error Occured in getNonConformanceRecord : ${
               response.message || "Error Occured in API"
             }`
           );
         }
       } catch (err) {
-        console.error(`Error Occured in getExternalDoc : ${err}`);
+        console.error(`Error Occured in getNonConformanceRecord : ${err}`);
       }
     });
 

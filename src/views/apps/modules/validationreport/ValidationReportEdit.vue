@@ -734,7 +734,6 @@ interface ValidationReport {
   updated_by: string;
 }
 
-
 interface Data {
   id: string;
   name: string;
@@ -839,9 +838,9 @@ export default defineComponent({
           state: "",
           country: "",
         },
-      }
+      },
     });
-    
+
     const validationReportDetails = ref<ValidationReport>({
       id: "",
       rgp_id: "",
@@ -1654,31 +1653,37 @@ export default defineComponent({
       try {
         /* --------GET VALIDATION REPORT LOGIC--------*/
         const response = await getValidationReport(itemId.toString());
-        if (response) {
-          RgpData.value = {...response.rgp}
+        if (response.success) {
+          RgpData.value = { ...response.result.rgp };
 
-          validationReportDetails.value = {...response};
-          
-          validationReportDetails.value.tests =JSON.parse(response.tests);
-          tempData.value.tests = JSON.parse(response.tests);
+          validationReportDetails.value = { ...response.result };
 
-          validationReportDetails.value.id = response.id;
-          validationReportDetails.value.rgp_id = response.rgp_id;
-          validationReportDetails.value.rgp_no = response?.rgp.rgp_no ?? "";
-          
+          validationReportDetails.value.tests = JSON.parse(
+            response.result.tests
+          );
+          tempData.value.tests = JSON.parse(response.result.tests);
 
-          validationReportDetails.value.report_status = response.report_status;
-          validationReportDetails.value.company_id = response.company_id;
-          validationReportDetails.value.created_by = response.created_by;
+          validationReportDetails.value.id = response.result.id;
+          validationReportDetails.value.rgp_id = response.result.rgp_id;
+          validationReportDetails.value.rgp_no =
+            response.result?.rgp.rgp_no ?? "";
+
+          validationReportDetails.value.report_status =
+            response.result.report_status;
+          validationReportDetails.value.company_id = response.result.company_id;
+          validationReportDetails.value.created_by = response.result.created_by;
           validationReportDetails.value.updated_by = User.company_id;
         } else {
-          console.error(`Error Occured in getValidationReport`);
+          console.error(
+            `Error Occured in getValidationReport : ${
+              response.message || "Error Occured in API"
+            }`
+          );
         }
       } catch (err) {
         console.error(`Error Occured in getValidationReport : ${err}`);
       }
-      console.log(validationReportDetails.value)
-      console.log(RgpData.value)
+      
     });
 
     const onsubmit = async () => {
@@ -1700,21 +1705,21 @@ export default defineComponent({
           validationReportDetails.value
         );
         // console.log(response.error);
-        if (!response.error) {
+        if (response.success) {
           // Handle successful API response
           //   console.log("API response:", response);
           loading.value = false;
           showSuccessAlert(
             "Success",
-            "Validation Report has been successfully Updated!"
+            response.message ||
+              "Validation Report has been successfully Updated!"
           );
           // clear();
           router.push({ name: "validationreport-list" });
         } else {
           // Handle API error response
-          // const errorData = response.error;
           loading.value = false;
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call

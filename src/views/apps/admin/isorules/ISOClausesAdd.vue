@@ -595,14 +595,27 @@ export default defineComponent({
     });
 
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ ...rest }) => ({
-            ...rest,
-          }))
-        );
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Companies.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
@@ -669,20 +682,18 @@ export default defineComponent({
 
         const response = await addISORule(ISO.value);
         // console.log(response.error);
-        if (!response.error) {
+        if (response.success) {
           // Handle successful API response
           // console.log("API response:", response);
           showSuccessAlert(
             "Success",
-            "ISO Rules have been successfully inserted!"
+            response.message || "ISO Rules have been successfully inserted!"
           );
           router.push({ name: "iso-list" });
         } else {
-          // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert("Warning", "Please Add Atleast one clause");
+            // Handle API error response
+            loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call

@@ -817,18 +817,11 @@ import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import {
-  getLeads,
   updateQuotation,
   addInvoice,
-  getUser,
-  getClient,
-  GetLeadClients,
   getQuotation,
   deleteQuotation,
-  GetIncrInvoiceId,
   getPriceList,
-  getLeadNCustomer,
-  getCompanyLogo,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import moment from "moment";
@@ -1003,30 +996,42 @@ export default defineComponent({
     ]);
 
     const getSelects = async () => {
-      ApiService.setHeader();
-      const response = await getPriceList(`fetchAll=true`);
+      try {
+        ApiService.setHeader();
+        const response = await getPriceList(`fetchAll=true`);
 
-      if (response.result != null && response.result) {
-        const data = response?.result?.map(
-          ({
-            id,
-            site_location,
-            per_day_charge,
-            accommodation,
-            travelling,
-            training,
-            equipment_wise,
-          }) => ({
-            id,
-            site_location,
-            per_day_charge,
-            accommodation,
-            travelling,
-            training,
-            equipment_wise: JSON.parse(equipment_wise),
-          })
-        );
-        locations.value = data;
+        if (response.success) {
+          if (response.result != null && response.result) {
+            const data = response?.result?.map(
+              ({
+                id,
+                site_location,
+                per_day_charge,
+                accommodation,
+                travelling,
+                training,
+                equipment_wise,
+              }) => ({
+                id,
+                site_location,
+                per_day_charge,
+                accommodation,
+                travelling,
+                training,
+                equipment_wise: JSON.parse(equipment_wise),
+              })
+            );
+            locations.value = data;
+          }
+        } else {
+          console.error(
+            `Error Occured in getPriceList : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getPriceList : ${err}`);
       }
     };
 
@@ -1120,80 +1125,99 @@ export default defineComponent({
       // Function that get all PriceLists
       await getSelects();
 
-      // get the quotaion details
-      const response = await getQuotation(QuotationId);
+      try {
+        // get the quotaion details
+        const response = await getQuotation(QuotationId);
 
-      if (response) {
-        const items = JSON.parse(response.items);
-        QuotationDetails.value.status = response.status;
+        if (response.success) {
+          const items = JSON.parse(response.result.items);
+          QuotationDetails.value.status = response.result.status;
 
-        QuotationDetails.value.quotation_no = response.quotation_no;
-        QuotationDetails.value.customer_id = response.customer_id;
-        QuotationDetails.value.client_id = response.client_id;
-        QuotationDetails.value.date = response.date;
-        QuotationDetails.value.duedate = response.duedate;
-        QuotationDetails.value.items = await items;
-        QuotationDetails.value.company_id = response.company_id;
+          QuotationDetails.value.quotation_no = response.result.quotation_no;
+          QuotationDetails.value.customer_id = response.result.customer_id;
+          QuotationDetails.value.client_id = response.result.client_id;
+          QuotationDetails.value.date = response.result.date;
+          QuotationDetails.value.duedate = response.result.duedate;
+          QuotationDetails.value.items = await items;
+          QuotationDetails.value.company_id = response.result.company_id;
 
-        QuotationDetails.value.customer = { ...response.customer };
-        QuotationDetails.value.client = { ...response.client };
-        QuotationDetails.value.enquiry_no = response.enquiry_no;
+          QuotationDetails.value.customer = { ...response.result.customer };
+          QuotationDetails.value.client = { ...response.result.client };
+          QuotationDetails.value.enquiry_no = response.result.enquiry_no;
 
-        // check whether daywise or equipment
-        dayWiseRef.value =
-          QuotationDetails.value.items.equipment_wise.length === 0
-            ? true
-            : false;
-        QuotationDetails.value.day_or_equipment =
-          QuotationDetails.value.items.equipment_wise.length === 0 ? "1" : "2";
+          // check whether daywise or equipment
+          dayWiseRef.value =
+            QuotationDetails.value.items.equipment_wise.length === 0
+              ? true
+              : false;
+          QuotationDetails.value.day_or_equipment =
+            QuotationDetails.value.items.equipment_wise.length === 0
+              ? "1"
+              : "2";
 
-        QuotationDetails.value.tax_id = response.tax_id
-          ? response.tax_id.toString()
-          : "";
-        QuotationDetails.value.tax_type = response.tax_type
-          ? response.tax_type
-          : "";
-        QuotationDetails.value.tax_description = response.tax_description
-          ? response.tax_description
-          : "";
-        QuotationDetails.value.tax_rate = response.tax_rate
-          ? response.tax_rate
-          : 0;
-        QuotationDetails.value.tax_amount = response.tax_amount
-          ? response.tax_amount
-          : 0;
-        QuotationDetails.value.sub_total = parseFloat(response.sub_total);
+          QuotationDetails.value.tax_id = response.result.tax_id
+            ? response.result.tax_id.toString()
+            : "";
+          QuotationDetails.value.tax_type = response.result.tax_type
+            ? response.result.tax_type
+            : "";
+          QuotationDetails.value.tax_description = response.result
+            .tax_description
+            ? response.result.tax_description
+            : "";
+          QuotationDetails.value.tax_rate = response.result.tax_rate
+            ? response.result.tax_rate
+            : 0;
+          QuotationDetails.value.tax_amount = response.result.tax_amount
+            ? response.result.tax_amount
+            : 0;
+          QuotationDetails.value.sub_total = parseFloat(
+            response.result.sub_total
+          );
 
-        QuotationDetails.value.total = parseFloat(response.total);
-        QuotationDetails.value.scope_of_work = response.scope_of_work;
-        QuotationDetails.value.terms_and_conditions =
-          response.terms_and_conditions;
-        QuotationDetails.value.created_by = response.created_by;
-        QuotationDetails.value.updated_by = User.id;
+          QuotationDetails.value.total = parseFloat(response.result.total);
+          QuotationDetails.value.scope_of_work = response.result.scope_of_work;
+          QuotationDetails.value.terms_and_conditions =
+            response.result.terms_and_conditions;
+          QuotationDetails.value.created_by = response.result.created_by;
+          QuotationDetails.value.updated_by = User.id;
 
-        // check approved or not
-        isItemApproved.value =
-          response.status === 3 || response.status === 4 ? true : false;
+          // check approved or not
+          isItemApproved.value =
+            response.result.status === 3 || response.result.status === 4
+              ? true
+              : false;
 
-        // check service want for itself
-        isSiteSameAsBilling.value =
-          response.client_id == null || response.client_id == "" ? true : false;
+          // check service want for itself
+          isSiteSameAsBilling.value =
+            response.result.client_id == null || response.result.client_id == ""
+              ? true
+              : false;
 
-        const foundLocation = await locations.value.find((item) => {
-          return item.id === QuotationDetails.value.items.id;
-        });
+          const foundLocation = await locations.value.find((item) => {
+            return item.id === QuotationDetails.value.items.id;
+          });
 
-        if (foundLocation) {
-          const { equipment_wise } = foundLocation;
+          if (foundLocation) {
+            const { equipment_wise } = foundLocation;
 
-          equipments.value = [...equipment_wise];
+            equipments.value = [...equipment_wise];
+          }
+
+          accommodationRef.value = QuotationDetails.value.items.accomm;
+          travellingRef.value = QuotationDetails.value.items.travel;
+          trainingRef.value = QuotationDetails.value.items.train;
+          pickupRef.value = QuotationDetails.value.items.pick;
+          boardingRef.value = QuotationDetails.value.items.board;
+        } else {
+          console.error(
+            `Error Occured in getQuotation : ${
+              response.message || "Error Occured in API"
+            }`
+          );
         }
-
-        accommodationRef.value = QuotationDetails.value.items.accomm;
-        travellingRef.value = QuotationDetails.value.items.travel;
-        trainingRef.value = QuotationDetails.value.items.train;
-        pickupRef.value = QuotationDetails.value.items.pick;
-        boardingRef.value = QuotationDetails.value.items.board;
+      } catch (err) {
+        console.error(`Error Occured in getQuotation : ${err}`);
       }
     });
 
@@ -1847,29 +1871,16 @@ export default defineComponent({
               QuotationId
             );
             // Call your API here with the form values
-            if (res.error) {
+            if (res.success == false) {
               // Handle successful API response
-              const errorData = res.error;
-              console.log("API error:", errorData);
-              // console.log("API error:", errorData.response.data.errors);
-              showErrorAlert(
-                "Warning",
-                "Please Fill the Form Fields Correctly"
-              );
+
+              showErrorAlert("Error", res.message || "An error occurred.");
               return;
             }
 
             // sending to
             // set to invoice
             // draf status
-
-            // * inrc invoice count
-            // const ress = await GetIncrInvoiceId(User.company_id);
-            // let latestinvoice_no = ress.result.split("_");
-            // latestinvoice_no =
-            //   latestinvoice_no[0] +
-            //   "_" +
-            //   (parseInt(latestinvoice_no[1]) + 1).toString();
 
             // generate from backend
 
@@ -1879,22 +1890,22 @@ export default defineComponent({
             QuotationDetails.value.created_by = User.id;
             const response = await addInvoice(QuotationDetails.value);
             // console.log(response.error);
-            if (!response.error) {
+            if (response.success) {
               // Handle successful API response
               // console.log("API response:", response);
               showSuccessAlert(
                 "Success",
-                "Quotation Successfully Converted to Invoice"
+                response.message ||
+                  "Quotation Successfully Converted to Invoice"
               );
               route.push({ name: "quotation-list" });
             } else {
               // Handle API error response
-              const errorData = response.error;
-              // console.log("API error:", errorData);
-              console.log("API error:", errorData.response.data.errors);
               showErrorAlert(
-                "Warning",
-                "Invoice Already Exist For this Quotation"
+                "Error",
+                response.message ||
+                  "Invoice Already Exist For this Quotation" ||
+                  "An error occurred."
               );
             }
           } catch (error) {

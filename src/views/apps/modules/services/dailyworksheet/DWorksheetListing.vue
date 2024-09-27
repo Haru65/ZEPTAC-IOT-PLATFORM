@@ -452,16 +452,22 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, engineer, rgp, ...rest }) => ({
-            id,
-            engineer: { ...engineer },
-            customer: { ...rgp.quotation.customer },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, engineer, rgp, ...rest }) => ({
+              id,
+              engineer: { ...engineer },
+              customer: { ...rgp.quotation.customer },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -488,16 +494,22 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, engineer, rgp, ...rest }) => ({
-            id,
-            engineer: { ...engineer },
-            customer: { ...rgp.quotation.customer },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, engineer, rgp, ...rest }) => ({
+              id,
+              engineer: { ...engineer },
+              customer: { ...rgp.quotation.customer },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -525,16 +537,22 @@ export default defineComponent({
           }`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, engineer, rgp, ...rest }) => ({
-            id,
-            engineer: { ...engineer },
-            customer: { ...rgp.quotation.customer },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, engineer, rgp, ...rest }) => ({
+              id,
+              engineer: { ...engineer },
+              customer: { ...rgp.quotation.customer },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -772,16 +790,22 @@ export default defineComponent({
             : financialYears.value[0]
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, engineer, rgp, ...rest }) => ({
-            id,
-            engineer: { ...engineer },
-            customer: { ...rgp.quotation.customer },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, engineer, rgp, ...rest }) => ({
+              id,
+              engineer: { ...engineer },
+              customer: { ...rgp.quotation.customer },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -924,7 +948,6 @@ export default defineComponent({
         if (res?.success != false) {
           worksheetInfo.value = { ...res.result };
           worksheetInfo.value.tests = JSON.parse(res.result.tests);
-
         } else {
           showErrorAlert("Error", res.message || "Error Occured");
           return;

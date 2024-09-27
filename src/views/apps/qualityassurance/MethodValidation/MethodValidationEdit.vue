@@ -466,16 +466,27 @@ export default defineComponent({
     });
 
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("MMMM Do YYYY"),
-          }))
-        );
-        console.log(Companies);
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Companies.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
@@ -535,26 +546,37 @@ export default defineComponent({
         await getdropcomp();
       }
 
-      let response = await getMethodValidation(itemId.toString());
-      console.log(response);
-      itemDetails.value = {
-        method_name: response.method_name,
-        val_date: response.val_date,
-        application_area: response.application_area,
-        reference: response.reference,
-        equipment: response.equipment,
-        reference_standard: response.reference_standard,
-        method_validation: response.method_validation,
-        readings: response.readings ? JSON.parse(response.readings) : [],
-        status: response.status,
-        remark: response.remark,
-        approval_status: response.approval_status,
+      try {
+        let response = await getMethodValidation(itemId.toString());
+        if (response?.success) {
+          itemDetails.value = {
+            method_name: response.result.method_name,
+            val_date: response.result.val_date,
+            application_area: response.result.application_area,
+            reference: response.result.reference,
+            equipment: response.result.equipment,
+            reference_standard: response.result.reference_standard,
+            method_validation: response.result.method_validation,
+            readings: response.result.readings ? JSON.parse(response.result.readings) : [],
+            status: response.result.status,
+            remark: response.result.remark,
+            approval_status: response.result.approval_status,
 
-        company_id: response.company_id ? response.company_id : "",
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+            company_id: response.result.company_id ? response.result.company_id : "",
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getMethodValidation : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getMethodValidation : ${err}`);
+      }
     });
 
     const addReading = () => {
@@ -586,7 +608,9 @@ export default defineComponent({
     };
 
     async function calculateOverallStatus(items) {
-      const allEnRatiosSatisfactory = items.every((item) => item.en_ratio <= EN_VALUE);
+      const allEnRatiosSatisfactory = items.every(
+        (item) => item.en_ratio <= EN_VALUE
+      );
       return allEnRatiosSatisfactory ? true : false;
     }
 
@@ -628,12 +652,11 @@ export default defineComponent({
           itemDetails.value.readings[index].en_ratio = 0;
         }
 
-        const result = await calculateOverallStatus(itemDetails.value.readings)
-        if(result){
+        const result = await calculateOverallStatus(itemDetails.value.readings);
+        if (result) {
           itemDetails.value.status = "1";
           itemDetails.value.remark = SATISFACTORY;
-        }
-        else{
+        } else {
           itemDetails.value.status = "2";
           itemDetails.value.remark = UNSATISFACTORY;
         }
@@ -724,15 +747,15 @@ export default defineComponent({
             itemId,
             itemDetails.value
           );
-          if (!response.error) {
+          if (response.success) {
             showSuccessAlert(
               "Success",
-              "Method Validation has been successfully updated!"
+              response.message || "Method Validation has been successfully updated!"
             );
             loading.value = false;
             router.push({ name: "method-validation-list" });
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            showErrorAlert("Error", response.message || "An error occurred.");
             loading.value = false;
             return;
           }

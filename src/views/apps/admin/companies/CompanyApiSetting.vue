@@ -159,9 +159,11 @@ export default defineComponent({
     });
 
     onMounted(async () => {
+
       try {
         let response = await getIndiaMartApi(CompanyId.toString());
-        if (response?.success) {
+
+        if (response.success) {
           apiDetails.value.indiamart_key = response.result.indiamart_key;
           apiDetails.value.last_fetch_time = response.result.last_fetch_time;
           apiDetails.value.company_id = response.result.company_id;
@@ -169,9 +171,15 @@ export default defineComponent({
           itemDetails.value.indiamart_key = response.result.indiamart_key;
           itemDetails.value.last_fetch_time = response.result.last_fetch_time;
           itemDetails.value.company_id = response.result.company_id;
+        } else {
+          console.error(
+            `Error Occured in getIndiaMartApi : ${
+              response.message || "Error Occured in API"
+            }`
+          );
         }
-      } catch (error) {
-        showErrorAlert("Error", "An error occurred during the API call.");
+      } catch (err) {
+        console.error(`Error Occured in getIndiaMartApi : ${err}`);
       }
     });
 

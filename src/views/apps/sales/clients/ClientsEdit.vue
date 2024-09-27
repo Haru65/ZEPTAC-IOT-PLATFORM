@@ -504,16 +504,27 @@ export default defineComponent({
     const clientId = route.params.id;
 
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-          }))
-        );
-        // console.log(Companies);
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Companies.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
@@ -553,40 +564,62 @@ export default defineComponent({
       try {
         const response = await getClient(clientId);
 
-        profileDetails.value = {
-          customer_id: response.customer_id,
-          name: response.name,
-          email: response.email,
-          mobile: response.mobile,
-          address1: response.address1,
-          address2: response.address2,
-          country: response.country,
-          state: response.state,
-          city: response.city,
-          pincode: response.pincode,
-          gst_number: response.gst_number,
-          company_name: response.company_name,
-          is_active: response.is_active,
-          company_id: response.company_id,
-          created_by: response.created_by,
-          updated_by: User.id,
-        };
-      } catch (error) {
-        console.log(`Error occured: ${error}`);
+        if (response.success) {
+          profileDetails.value = {
+            customer_id: response.result.customer_id,
+            name: response.result.name,
+            email: response.result.email,
+            mobile: response.result.mobile,
+            address1: response.result.address1,
+            address2: response.result.address2,
+            country: response.result.country,
+            state: response.result.state,
+            city: response.result.city,
+            pincode: response.result.pincode,
+            gst_number: response.result.gst_number,
+            company_name: response.result.company_name,
+            is_active: response.result.is_active,
+            company_id: response.result.company_id,
+            created_by: response.result.created_by,
+            updated_by: User.id,
+          };
+        } else {
+          console.error(
+            `Error Occured in getClient : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getClient : ${err}`);
       }
+
       await isValidGSTNo();
     });
 
     const GetLeads = async () => {
-      ApiService.setHeader();
-      const response = await getLeads(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Leads.value.push(
-          ...response.result?.map(({ id, ...rest }) => ({
-            id,
-            ...rest,
-          }))
-        );
+      try {
+        ApiService.setHeader();
+        const response = await getLeads(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Leads.value.push(
+              ...response.result?.map(({ id, ...rest }) => ({
+                id,
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getLeads : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getLeads : ${err}`);
       }
     };
 
@@ -596,7 +629,6 @@ export default defineComponent({
       mobile: Yup.string().required().label("Phone"),
       company_name: Yup.string().required().label("Company Name"),
     });
-
 
     const profileDetails = ref<ProfileDetails>({
       customer_id: "",
@@ -618,12 +650,14 @@ export default defineComponent({
     });
 
     const onsubmit = async () => {
-
-      if(profileDetails.value.customer_id == "" || profileDetails.value.customer_id == null){
+      if (
+        profileDetails.value.customer_id == "" ||
+        profileDetails.value.customer_id == null
+      ) {
         showErrorAlert("Error", "Please Select Lead.");
         return;
       }
-      
+
       try {
         if (submitButton.value) {
           // Activate indicator
@@ -641,7 +675,7 @@ export default defineComponent({
             "Success",
             response.message || "Client Updated Successfully!"
           );
-          router.push({name: "clients-list"});
+          router.push({ name: "clients-list" });
         } else {
           // Handle API error response
           loading.value = false;

@@ -647,16 +647,27 @@ export default defineComponent({
     const NOTES = `En ≤1: The laboratory is performing satisfactorily\nEn >1: The laboratory is performing unsatisfactory and requires corrective actions`;
 
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ created_at, ...rest }) => ({
-            ...rest,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-          }))
-        );
-        console.log(Companies);
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Companies.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
@@ -918,20 +929,19 @@ export default defineComponent({
 
         if (validateForm(itemDetails)) {
           const response = await addInterLabComparison(itemDetails.value);
-          if (!response.error) {
+          if (response.success) {
             showSuccessAlert(
               "Success",
-              "Interlaboratory Comparison has been successfully inserted!"
+              response.message || "Interlaboratory Comparison has been successfully inserted!"
             );
             loading.value = false;
             router.push({ name: "interlaboratory-list" });
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            showErrorAlert("Error", response.message || "An error occurred.");
             loading.value = false;
             return;
           }
         } else {
-          console.log(validateForm(itemDetails));
           showErrorAlert("Warning", "Please fill in all fields.");
           return;
         }

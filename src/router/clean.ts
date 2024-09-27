@@ -57,6 +57,7 @@ import {
   getCalibrationSrf,
   getCalibrationInstrument,
   validateUserNSrf,
+  getUser,
 
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
@@ -181,7 +182,7 @@ const routes: Array<RouteRecordRaw> = [
           //console.log(companyId);
           try {
             const response = await getCompany(companyId);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -258,6 +259,21 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/users/edit/:id",
         name: "users-edit",
+        beforeEnter: async (to, from, next) => {
+          const userId = to.params.id;
+          //console.log(companyId);
+          try {
+            const response = await getUser(userId);
+            if (response.success == false || response.result.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
         component: () => import("@/views/apps/admin/users/UserEdit.vue"),
         meta: {
           pageTitle: "User Edit",
@@ -292,7 +308,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getEmployee(empId.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -337,7 +353,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getLead(LeadId);
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -385,7 +401,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getCustomer(customerId);
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -433,7 +449,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getClient(clientId);
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -479,7 +495,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getPriceListItem(priceItemId.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -524,8 +540,7 @@ const routes: Array<RouteRecordRaw> = [
           //console.log(companyId);
           try {
             const response = await getQuotation(quotationId);
-            console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -569,8 +584,7 @@ const routes: Array<RouteRecordRaw> = [
           //console.log(companyId);
           try {
             const response = await getInvoice(invoiceId);
-            console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -704,7 +718,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getDailyWorksheet(worksheetID.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -752,7 +766,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getExpenseSheet(itemID.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -799,7 +813,7 @@ const routes: Array<RouteRecordRaw> = [
           //console.log(companyId);
           try {
             const response = await getValidationReport(itemID.toString());
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -952,7 +966,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getValidationProcedure(valProcedureID.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -999,7 +1013,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getQualityProcedure(qualProcedureID.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1084,7 +1098,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getFeedback(itemID.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1131,7 +1145,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getTraining(trainingID.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1178,7 +1192,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getSkillMatrix(itemId.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1225,7 +1239,7 @@ const routes: Array<RouteRecordRaw> = [
           const reportID = to.params.id;
           try {
             const response = await getThermalReport(reportID.toString());
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1274,7 +1288,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getThermalInstrument(instrumentId.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1299,7 +1313,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getThermalInstrument(instrumentId.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1449,7 +1463,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getSupplier(itemId.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.error || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1475,7 +1489,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getSupplier(docId.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.error || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1524,7 +1538,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getMethodValidation(itemId.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1573,7 +1587,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getInterLabComparison(itemId.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1622,7 +1636,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getReplicateReport(itemId.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1896,7 +1910,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getIAuditSchedule(itemId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -1975,7 +1989,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getIAuditSchedule(itemId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2024,7 +2038,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getMRMSchedule(itemId.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2052,7 +2066,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getMRMSchedule(itemId.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2088,7 +2102,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getMRMSchedule(itemId.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2446,7 +2460,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getCalibrationInstrumentForInspection(itemId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2472,7 +2486,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getCalibrationInstrumentForInspection(itemId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2498,7 +2512,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getInspectionRecord(docId.toString());
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2617,7 +2631,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await getPlan(itemId.toString());
             console.log(response);
-            if (response.error || response.is_active == 0) {
+            if (response.success == false) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route
@@ -2870,7 +2884,7 @@ const routes: Array<RouteRecordRaw> = [
           try {
             const response = await validateFeedback(data);
             console.log(response);
-            if (response.success == false || response.is_active == 0) {
+            if (response.success == false || response.result.is_active == 0) {
               next("/404"); // Redirect to the fallback route
             } else {
               next(); // Continue to the desired route

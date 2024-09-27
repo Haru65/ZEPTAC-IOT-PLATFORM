@@ -178,7 +178,6 @@
             <router-link :to="`/suppliers/evaluation/${suppliers.id}`">
               <span
                 class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
-
                 >+ Evaluate Supplier
               </span>
             </router-link>
@@ -428,12 +427,17 @@ export default defineComponent({
         const response = await getSuppliers(
           `page=${page}&limit=${limit.value}`
         );
-
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -456,12 +460,17 @@ export default defineComponent({
         const response = await getSuppliers(
           `page=${page.value}&limit=${limit}`
         );
-
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -500,12 +509,19 @@ export default defineComponent({
         const response = await getSuppliers(
           `page=${page.value}&limit=${limit.value}`
         );
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
 
-        more.value = response.result.next_page_url != null ? true : false;
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
+
+          more.value = response.result.next_page_url != null ? true : false;
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -700,10 +716,16 @@ export default defineComponent({
       try {
         const response = await SupplierSearch(search.value);
 
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

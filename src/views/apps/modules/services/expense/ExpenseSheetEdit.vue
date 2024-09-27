@@ -368,7 +368,13 @@
 
           <!--begin::Actions-->
           <div class="mb-0">
-            <button type="button" @click="formSubmit" class="btn btn-sm btn-primary">Update</button>
+            <button
+              type="button"
+              @click="formSubmit"
+              class="btn btn-sm btn-primary"
+            >
+              Update
+            </button>
           </div>
           <!--end::Actions-->
         </div>
@@ -484,18 +490,23 @@ export default defineComponent({
       try {
         ApiService.setHeader();
         const response = await getExpenseSheet(itemId.toString());
-        if (response) {
-          itemDetails.value = { ...response };
-          itemDetails.value.expenses = JSON.parse(response.expenses);
+
+        if (response.success) {
+          itemDetails.value = { ...response.result };
+          itemDetails.value.expenses = JSON.parse(response.result.expenses);
 
           itemDetails.value.expenses.forEach((expense) => {
             // You can set the initial value for imgData here
-            // expense.imgData = `http://localhost:8000/storage/company/${response.company_id}/expenses/${expense.receipt}`;
-            expense.imgData = `https://api.zeptac.com/storage/company/${response.company_id}/expenses/${expense.receipt}`;
+            // expense.imgData = `http://localhost:8000/storage/company/${response.result.company_id}/expenses/${expense.receipt}`;
+            expense.imgData = `https://api.zeptac.com/storage/company/${response.result.company_id}/expenses/${expense.receipt}`;
             expense.visible = false; // You can set the initial value for visible here
           });
         } else {
-          console.error(`Error Occured in getExpenseSheet`);
+          console.error(
+            `Error Occured in getExpenseSheet : ${
+              response.message || "Error Occured in API"
+            }`
+          );
         }
       } catch (err) {
         console.error(`Error Occured in getExpenseSheet : ${err}`);

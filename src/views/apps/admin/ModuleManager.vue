@@ -187,11 +187,17 @@ export default defineComponent({
         ApiService.setHeader();
         const response = await getModules(`page=${page}&limit=${limit.value}`);
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -214,11 +220,17 @@ export default defineComponent({
         ApiService.setHeader();
         const response = await getModules(`page=${page.value}&limit=${limit}`);
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -253,11 +265,17 @@ export default defineComponent({
           `page=${page.value}&limit=${limit.value}`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -311,11 +329,17 @@ export default defineComponent({
         ApiService.setHeader();
         const response = await ModuleSearch(search.value);
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(({ ...rest }) => ({
-          ...rest,
-        }));
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -387,17 +411,17 @@ export default defineComponent({
         // Call your API here with the form values
         const response = await addModule(itemDetails.value);
         // console.log(response.error);
-        if (!response.error) {
+        if (response.success) {
           // Handle successful API response
           // console.log("API response:", response);
-          showSuccessAlert("Success", "Module added successfully");
+          showSuccessAlert("Success", response.message || "Module added successfully");
 
           // clear();
           await module_listing();
         } else {
-          // Handle API error response
-          // const errorData = response.error;
-          showErrorAlert("Warning", "Please enter a module name");
+            // Handle API error response
+            loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call

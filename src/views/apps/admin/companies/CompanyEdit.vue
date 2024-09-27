@@ -1064,42 +1064,56 @@ export default defineComponent({
     const debouncedValidateGST = debounce(isValidGSTNo, 1000);
 
     onMounted(async () => {
-      const response = await getCompany(CompanyId);
-      // console.log(CompanyId);
-      companyDetails.value = {
-        id: response.id,
-        company_logo: response.company_logo || "",
-        company_name: response.company_name,
-        address: response.address,
-        contact_person: response.contact_person,
-        mobile_number: response.mobile_number,
-        email: response.email,
-        country: response.country,
-        state: response.state,
-        pincode: response.pincode,
-        city: response.city,
-        gst_details: response.gst_details,
-        user_limit: response.user_limit,
-        selected_package: response.selected_package,
-        financial_year_type: response.financial_year_type,
-        quotation_no_prefix: response.quotation_no_prefix,
-        quotation_no_init: response.quotation_no_init,
-        invoice_no_prefix: response.invoice_no_prefix,
-        invoice_no_init: response.invoice_no_init,
-        rgp_no_prefix: response.rgp_no_prefix,
-        rgp_no_init: response.rgp_no_init,
-        enquiry_no_prefix: response.enquiry_no_prefix,
-        enquiry_no_init: response.enquiry_no_init,
-        instrument_id_prefix: response.instrument_id_prefix,
-        instrument_id_init: response.instrument_id_init,
-        srf_no_prefix: response.srf_no_prefix,
-        srf_no_init: response.srf_no_init,
+      try {
+        const response = await getCompany(CompanyId);
 
-        usage_type: response.usage_type,
-        is_trial: response.is_trial,
-        trial_subscription_start: response.trial_subscription_start || "",
-        trial_subscription_end: response.trial_subscription_end || "",
-      };
+        if (response.success) {
+          companyDetails.value = {
+            id: response.result.id,
+            company_logo: response.result.company_logo || "",
+            company_name: response.result.company_name,
+            address: response.result.address,
+            contact_person: response.result.contact_person,
+            mobile_number: response.result.mobile_number,
+            email: response.result.email,
+            country: response.result.country,
+            state: response.result.state,
+            pincode: response.result.pincode,
+            city: response.result.city,
+            gst_details: response.result.gst_details,
+            user_limit: response.result.user_limit,
+            selected_package: response.result.selected_package,
+            financial_year_type: response.result.financial_year_type,
+            quotation_no_prefix: response.result.quotation_no_prefix,
+            quotation_no_init: response.result.quotation_no_init,
+            invoice_no_prefix: response.result.invoice_no_prefix,
+            invoice_no_init: response.result.invoice_no_init,
+            rgp_no_prefix: response.result.rgp_no_prefix,
+            rgp_no_init: response.result.rgp_no_init,
+            enquiry_no_prefix: response.result.enquiry_no_prefix,
+            enquiry_no_init: response.result.enquiry_no_init,
+            instrument_id_prefix: response.result.instrument_id_prefix,
+            instrument_id_init: response.result.instrument_id_init,
+            srf_no_prefix: response.result.srf_no_prefix,
+            srf_no_init: response.result.srf_no_init,
+
+            usage_type: response.result.usage_type,
+            is_trial: response.result.is_trial,
+            trial_subscription_start:
+              response.result.trial_subscription_start || "",
+            trial_subscription_end:
+              response.result.trial_subscription_end || "",
+          };
+        } else {
+          console.error(
+            `Error Occured in getCompany : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompany : ${err}`);
+      }
 
       await isValidGSTNo();
     });
@@ -1313,14 +1327,19 @@ export default defineComponent({
           // Call your API here with the form values
           const response = await updateCompany(companyDetails.value, CompanyId);
           // console.log(response.error);
-          if (!response.error) {
+          if (response.success) {
             // Handle successful API response
             // console.log("API response:", response);
             showSuccessAlert(
               "Success",
-              "Company details have been successfully updated!"
+              response.message ||
+                "Company details have been successfully updated!"
             );
             router.push({ name: "company-list" });
+          } else {
+            // Handle API error response
+            loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
           }
         } else {
           showErrorAlert("Warning", "Please fill in all fields.");

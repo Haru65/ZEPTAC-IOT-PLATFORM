@@ -734,23 +734,26 @@
                       <p>
                         <span
                           class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-6"
-                          >Sub Total : {{
-                            QuotationDetails.sub_total
+                          >Sub Total : {{ QuotationDetails.sub_total }}
+                        </span>
+                      </p>
+                      <p>
+                        <span
+                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-6"
+                          >Tax Rate :
+                          {{
+                            QuotationDetails.tax_type == "(CGST + SGST)"
+                              ? `CGST ${
+                                  QuotationDetails.tax_rate / 2
+                                } % + CGST ${QuotationDetails.tax_rate / 2} %`
+                              : `${QuotationDetails.tax_rate} %`
                           }}
                         </span>
                       </p>
                       <p>
                         <span
                           class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-6"
-                          >Tax Rate : {{ QuotationDetails.tax_type == '(CGST + SGST)' ? `CGST ${QuotationDetails.tax_rate/2} % + CGST ${QuotationDetails.tax_rate/2} %` : `${QuotationDetails.tax_rate} %` }}
-                        </span>
-                      </p>
-                      <p>
-                        <span
-                          class="badge badge-light-primary flex-shrink-0 align-self-center py-3 px-4 fs-6"
-                          >Tax amount : {{
-                            QuotationDetails.tax_amount
-                          }}
+                          >Tax amount : {{ QuotationDetails.tax_amount }}
                         </span>
                       </p>
                     </div>
@@ -819,12 +822,9 @@ import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import {
-  getLeads,
   addQuotation,
-  getUser,
   getClient,
   GetLeadClients,
-  GetIncrQuotationId,
   getPriceList,
   getLeadNCustomer,
   getCustomer,
@@ -836,7 +836,7 @@ import { formatPrice } from "@/core/config/DataFormatter";
 import {
   QuotationStatusArray,
   GetQuotationStatus,
-  TaxArray
+  TaxArray,
 } from "@/core/config/QuotationStatusConfig";
 
 import CustomQuotationItems from "./CustomComponents/CustomQuotationItems.vue";
@@ -979,30 +979,42 @@ export default defineComponent({
     ]);
 
     const getSelects = async () => {
-      ApiService.setHeader();
-      const response = await getPriceList(`fetchAll=true`);
+      try {
+        ApiService.setHeader();
+        const response = await getPriceList(`fetchAll=true`);
 
-      if (response.result != null && response.result) {
-        const data = response?.result?.map(
-          ({
-            id,
-            site_location,
-            per_day_charge,
-            accommodation,
-            travelling,
-            training,
-            equipment_wise,
-          }) => ({
-            id,
-            site_location,
-            per_day_charge,
-            accommodation,
-            travelling,
-            training,
-            equipment_wise: JSON.parse(equipment_wise),
-          })
-        );
-        locations.value = data;
+        if (response.success) {
+          if (response.result != null && response.result) {
+            const data = response?.result?.map(
+              ({
+                id,
+                site_location,
+                per_day_charge,
+                accommodation,
+                travelling,
+                training,
+                equipment_wise,
+              }) => ({
+                id,
+                site_location,
+                per_day_charge,
+                accommodation,
+                travelling,
+                training,
+                equipment_wise: JSON.parse(equipment_wise),
+              })
+            );
+            locations.value = data;
+          }
+        } else {
+          console.error(
+            `Error Occured in getPriceList : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getPriceList : ${err}`);
       }
     };
 
@@ -1164,8 +1176,7 @@ export default defineComponent({
         Number(QuotationDetails.value.items.pickup) +
         Number(QuotationDetails.value.items.boarding);
 
-        calculateTaxAmount();
-
+      calculateTaxAmount();
     };
 
     /* HANDLE TAX SELECTION LOGIC */
@@ -1176,13 +1187,8 @@ export default defineComponent({
       // console.log(foundTax);
 
       if (foundTax) {
-        const {
-          id,
-          tax_type,
-          tax_description,
-          tax_rate,
-          tax_amount,
-        } = foundTax;
+        const { id, tax_type, tax_description, tax_rate, tax_amount } =
+          foundTax;
 
         QuotationDetails.value.tax_id = id;
         QuotationDetails.value.tax_type = tax_type;
@@ -1247,7 +1253,6 @@ export default defineComponent({
 
           await calculateSubTotal();
         } else {
-          
           // when equipment-wise quotation and location is selected
           QuotationDetails.value.items.per_day_charge = "";
           QuotationDetails.value.items.accommodation = 0;
@@ -1265,7 +1270,6 @@ export default defineComponent({
           QuotationDetails.value.total = 0;
 
           calculateTaxAmount();
-          
         }
       }
     }
@@ -1398,11 +1402,13 @@ export default defineComponent({
     }
 
     const calculateTaxAmount = () => {
-      
-      QuotationDetails.value.tax_amount = (QuotationDetails.value.tax_rate * QuotationDetails.value.sub_total) / 100 || 0;
-      QuotationDetails.value.total = (QuotationDetails.value.tax_amount + QuotationDetails.value.sub_total) || 0;
-
-    }
+      QuotationDetails.value.tax_amount =
+        (QuotationDetails.value.tax_rate * QuotationDetails.value.sub_total) /
+          100 || 0;
+      QuotationDetails.value.total =
+        QuotationDetails.value.tax_amount + QuotationDetails.value.sub_total ||
+        0;
+    };
 
     const calculateTotalEquipment = () => {
       QuotationDetails.value.sub_total =
@@ -1411,8 +1417,7 @@ export default defineComponent({
           0
         );
 
-        calculateTaxAmount();
-
+      calculateTaxAmount();
     };
 
     const addNewRow = () => {
@@ -1522,26 +1527,52 @@ export default defineComponent({
       QuotationDetails.value.client.state = "";
       QuotationDetails.value.client.country = "";
 
-      ApiService.setHeader();
-      const response = await GetLeadClients(id);
-      // console.log(response);
-      Clients.value.push(
-        ...response.result.map(({ ...rest }) => ({
-          ...rest,
-        }))
-      );
-      // console.log(Clients.value);
+      try {
+        ApiService.setHeader();
+        const response = await GetLeadClients(id);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Clients.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in GetLeadClients : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in GetLeadClients : ${err}`);
+      }
     };
 
     const GetUserData = async (id) => {
       if (id != "") {
         const customer_id = id;
-        const response = await getCustomer(customer_id);
-        // console.log(response);
-        QuotationDetails.value.customer = { ...response };
-        QuotationDetails.value.customer_id = response.id;
-        QuotationDetails.value.customer.id = response.id;
-        QuotationDetails.value.enquiry_no = response.enquiry_no;
+
+        try {
+          const response = await getCustomer(customer_id);
+
+          if (response.success) {
+            QuotationDetails.value.customer = { ...response.result };
+            QuotationDetails.value.customer_id = response.result.id;
+            QuotationDetails.value.customer.id = response.result.id;
+            QuotationDetails.value.enquiry_no = response.result.enquiry_no;
+          } else {
+            console.error(
+              `Error Occured in getCustomer : ${
+                response.message || "Error Occured in API"
+              }`
+            );
+          }
+        } catch (err) {
+          console.error(`Error Occured in getCustomer : ${err}`);
+        }
 
         if (siteSameAsBilling.value) {
           ToggleClient();
@@ -1568,23 +1599,34 @@ export default defineComponent({
     const GetClientData = async (id) => {
       if (id != "") {
         const customer_id = id;
-        const response = await getClient(customer_id);
-        // console.log(response);
-        QuotationDetails.value.client_id = response.id;
-        QuotationDetails.value.client.id = response.id;
-        QuotationDetails.value.client.name = response.name;
-        QuotationDetails.value.client.company_name = response.company_name;
-        QuotationDetails.value.client.address1 = response.address1;
-        QuotationDetails.value.client.address2 = response.address2;
-        QuotationDetails.value.client.city = response.city;
-        QuotationDetails.value.client.pincode = response.pincode;
-        QuotationDetails.value.client.state = response.state;
-        QuotationDetails.value.client.country = response.country;
+
+        try {
+          const response = await getClient(customer_id);
+
+          if (response.success) {
+            QuotationDetails.value.client_id = response.result.id;
+            QuotationDetails.value.client.id = response.result.id;
+            QuotationDetails.value.client.name = response.result.name;
+            QuotationDetails.value.client.company_name =
+              response.result.company_name;
+            QuotationDetails.value.client.address1 = response.result.address1;
+            QuotationDetails.value.client.address2 = response.result.address2;
+            QuotationDetails.value.client.city = response.result.city;
+            QuotationDetails.value.client.pincode = response.result.pincode;
+            QuotationDetails.value.client.state = response.result.state;
+            QuotationDetails.value.client.country = response.result.country;
+          } else {
+            console.error(
+              `Error Occured in getClient : ${
+                response.message || "Error Occured in API"
+              }`
+            );
+          }
+        } catch (err) {
+          console.error(`Error Occured in getClient : ${err}`);
+        }
+
         disabledselect.value = false;
-        /* *
-         TODO : get customer_id and from meta get client ids get customer_id and from meta get client ids and put into Ref object
-         ? Problem of getting clients;
-        */
       } else {
         QuotationDetails.value.customer = {
           id: "",
@@ -1603,14 +1645,28 @@ export default defineComponent({
 
     const GetLeads = async () => {
       const companyId = User.company_id;
-      ApiService.setHeader();
-      const response = await getLeadNCustomer(companyId);
-      if (response.result != null && response.result) {
-        Customers.value.push(
-          ...response.result.map(({ ...rest }) => ({
-            ...rest,
-          }))
-        );
+
+      try {
+        ApiService.setHeader();
+        const response = await getLeadNCustomer(companyId);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Customers.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getLeadNCustomer : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getLeadNCustomer : ${err}`);
       }
     };
 

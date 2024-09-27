@@ -637,14 +637,27 @@ export default defineComponent({
     const User = auth.GetUser();
 
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ ...rest }) => ({
-            ...rest,
-          }))
-        );
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Companies.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
@@ -654,36 +667,47 @@ export default defineComponent({
 
       try {
         const response = await getLead(LeadId);
-        
-        if(response.is_converted){
-          route.push({ name: "leads-list" });
-          return;
-        }
 
-        profileDetails.value = {
-          name: response.name,
-          email: response.email,
-          mobile: response.mobile,
-          enquiry_no: response.enquiry_no,
-          extra_leads: response.extra_leads ? JSON.parse(response.extra_leads) : [],
-          address1: response.address1,
-          address2: response.address2,
-          country: response.country,
-          state: response.state,
-          city: response.city,
-          pincode: response.pincode,
-          gst_number: response.gst_number,
-          source: response.source,
-          is_converted: response.is_converted,
-          company_name: response.company_name,
-          is_active: response.is_active,
-          company_id: response.company_id,
-          created_by: response.created_by,
-          updated_by: User.id,
-        };
-      } catch (error) {
-        console.log(`Error occured: ${error}`);
+        if (response.success) {
+          if (response.result.is_converted) {
+            route.push({ name: "leads-list" });
+            return;
+          }
+
+          profileDetails.value = {
+            name: response.result.name,
+            email: response.result.email,
+            mobile: response.result.mobile,
+            enquiry_no: response.result.enquiry_no,
+            extra_leads: response.result.extra_leads
+              ? JSON.parse(response.result.extra_leads)
+              : [],
+            address1: response.result.address1,
+            address2: response.result.address2,
+            country: response.result.country,
+            state: response.result.state,
+            city: response.result.city,
+            pincode: response.result.pincode,
+            gst_number: response.result.gst_number,
+            source: response.result.source,
+            is_converted: response.result.is_converted,
+            company_name: response.result.company_name,
+            is_active: response.result.is_active,
+            company_id: response.result.company_id,
+            created_by: response.result.created_by,
+            updated_by: User.id,
+          };
+        } else {
+          console.error(
+            `Error Occured in getLead : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getLead : ${err}`);
       }
+
       await isValidGSTNo();
     });
 
@@ -787,7 +811,6 @@ export default defineComponent({
             response.message || "Lead updated Successfully!"
           );
           route.push({ name: "leads-list" });
-
         } else {
           // Handle API error response
           loading.value = false;

@@ -9,6 +9,7 @@
           id="kt_account_profile_details_form"
           class="form"
           novalidate
+          @submit="onsubmit()"
           :validation-schema="itemDetailsValidator"
         >
           <!--begin::Card body-->
@@ -58,7 +59,7 @@
                 />
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
-                    <ErrorMessage name="complaint_no" />
+                    <ErrorMessage name="per_day_charge" />
                   </div>
                 </div>
                 <!--end::Input-->
@@ -161,25 +162,31 @@
           </div>
           <div class="modal-footer flex-center w-100">
             <!--begin::Button-->
-            <button type="reset" class="btn btn-lg btn-danger w-sd-25 w-lg-25">
-              Discard
+            <button
+              type="button"
+              @click="clear"
+              class="btn btn-lg btn-danger w-sd-25 w-lg-25"
+            >
+              Clear
             </button>
             <!--end::Button-->
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
             <!--begin::Button-->
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click="submit()"
+
+            <!--begin::Button-->
+            <button
+              ref="submitButton"
+              type="submit"
+              class="btn btn-primary w-sd-25 w-lg-25"
             >
-              <span v-if="!loading" class="indicator-label"> Submit </span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Submit </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
                 ></span>
               </span>
-            </span>
+            </button>
             <!--end::Button-->
           </div>
           <!--end::Input group-->
@@ -213,6 +220,7 @@ export default defineComponent({
     PriceCustomComponent,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
     const loading = ref(false);
     const auth = useAuthStore();
     const router = useRouter();
@@ -284,10 +292,10 @@ export default defineComponent({
     };
 
     async function SetEquipment(foundItem, index) {
-        // console.log(foundItem);
-        const {id, name} = foundItem;
-        itemDetails.value.equipment_wise[index].id = await id;
-        itemDetails.value.equipment_wise[index].name = await name;
+      // console.log(foundItem);
+      const { id, name } = foundItem;
+      itemDetails.value.equipment_wise[index].id = await id;
+      itemDetails.value.equipment_wise[index].name = await name;
     }
 
     async function SetCharge(e, index) {
@@ -311,31 +319,73 @@ export default defineComponent({
       );
     };
 
-    const submit = async () => {
-      loading.value = true;
-      // console.warn("Nice");
-      try {
-        // Call your API here with the form values
-        const response = await addPriceList(itemDetails.value);
-        // console.log(response.error);
-        if (!response.error) {
-          // Handle successful API response
-          // console.log("API response:", response);
-          showSuccessAlert("Success", "Item has been successfully inserted!");
+    const validateForm = (formData) => {
+      for (const key in formData) {
+        let value = formData[key];
+        if (key !== "customer_type") {
+          if (Array.isArray(value)) {
+            for (const item of value) {
+              if (!validateForm(item)) {
+                return false;
+              }
+            }
+          } else if (typeof value === "object" && value !== null) {
+            if (!validateForm(value)) {
+              return false;
+            }
+          } else if (typeof value === "string") {
+            value = value.trim();
+            if (value === "") {
+              return false;
+            }
+          } else {
+          }
+        }
+      }
+      return true;
+    };
 
+    const onsubmit = async () => {
+      loading.value = true;
+
+      const result = validateForm(itemDetails);
+      console.log(itemDetails.value, result);
+      if (result == false) {
+        showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+        loading.value = false;
+        return;
+      }
+
+      try {
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
+        const response = await addPriceList(itemDetails.value);
+
+        if (response?.success) {
+          // Handle successful API response
+
+          showSuccessAlert(
+            "Success",
+            response.message || "Item has been successfully inserted!"
+          );
           router.push({ name: "price-list" });
         } else {
           // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
     };
@@ -367,12 +417,34 @@ export default defineComponent({
         },
       });
     };
+    const clear = () => {
+      itemDetails.value = {
+        site_location: "",
+        per_day_charge: "",
+        equipment_wise: [
+          {
+            id: "",
+            name: "",
+            charge: "",
+          },
+        ],
+        accommodation: "0",
+        travelling: "0",
+        training: "0",
+        customer_type: "",
+        company_id: User.company_id,
+        created_by: User.id,
+        updated_by: User.id,
+        is_active: 1,
+      };
+    };
 
     return {
+      submitButton,
       itemDetails,
       itemDetailsValidator,
       getAssetPath,
-      submit,
+      onsubmit,
       loading,
       packages,
       limit,
@@ -381,6 +453,7 @@ export default defineComponent({
       addNewRow,
       SetEquipment,
       SetCharge,
+      clear
     };
   },
 });

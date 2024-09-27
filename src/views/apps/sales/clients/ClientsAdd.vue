@@ -514,27 +514,53 @@ export default defineComponent({
     const state = ref([""]);
 
     const getdropcomp = async () => {
-      ApiService.setHeader();
-      const response = await getCompanies(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Companies.value.push(
-          ...response.result?.map(({ ...rest }) => ({
-            ...rest,
-          }))
-        );
+      try {
+        ApiService.setHeader();
+        const response = await getCompanies(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Companies.value.push(
+              ...response.result?.map(({ ...rest }) => ({
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanies : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanies : ${err}`);
       }
     };
 
     const GetLeads = async () => {
-      ApiService.setHeader();
-      const response = await getLeads(`fetchAll=true`);
-      if (response.result != null && response.result) {
-        Leads.value.push(
-          ...response.result?.map(({ id, ...rest }) => ({
-            id,
-            ...rest,
-          }))
-        );
+      try {
+        ApiService.setHeader();
+        const response = await getLeads(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            Leads.value.push(
+              ...response.result?.map(({ id, ...rest }) => ({
+                id,
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getLeads : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getLeads : ${err}`);
       }
     };
 

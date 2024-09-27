@@ -333,16 +333,22 @@ export default defineComponent({
           `page=${page.value}&limit=${limit.value}`
         );
         // console.log(response);
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, created_at, company_details, ...rest }) => ({
-            id,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            company_details: { ...company_details },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, created_at, company_details, ...rest }) => ({
+              id,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              company_details: { ...company_details },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -379,16 +385,22 @@ export default defineComponent({
           `page=${page}&limit=${limit.value}`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, created_at, company_details, ...rest }) => ({
-            id,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            company_details: { ...company_details },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, created_at, company_details, ...rest }) => ({
+              id,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              company_details: { ...company_details },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -412,16 +424,22 @@ export default defineComponent({
           `page=${page.value}&limit=${limit}`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, created_at, company_details, ...rest }) => ({
-            id,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            company_details: { ...company_details },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, created_at, company_details, ...rest }) => ({
+              id,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              company_details: { ...company_details },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -626,16 +644,22 @@ export default defineComponent({
       try {
         const response = await CustomerSearch(search.value);
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, created_at, company_details, ...rest }) => ({
-            id,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            company_details: { ...company_details },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, created_at, company_details, ...rest }) => ({
+              id,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              company_details: { ...company_details },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -692,7 +716,12 @@ export default defineComponent({
     };
 
     // This SRF is for NON-NABL Report (LAF, BSF)
-    const copySrfCalibrationUrl = async (companyId, customerId, srfId, tokenId) => {
+    const copySrfCalibrationUrl = async (
+      companyId,
+      customerId,
+      srfId,
+      tokenId
+    ) => {
       const srf_calibration_url = `https://app.zeptac.com/srf_calibration/${companyId}/${customerId}/${srfId}/${tokenId}`;
       // const srf_calibration_url = `http://localhost:5173/srf_calibration/${companyId}/${customerId}/${srfId}/${tokenId}`;
 

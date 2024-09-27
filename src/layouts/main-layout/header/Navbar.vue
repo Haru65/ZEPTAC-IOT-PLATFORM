@@ -176,21 +176,31 @@ export default defineComponent({
         const company_id = User.company_id;
 
         const response = await calibrationNotification(company_id);
-        // console.log(response);
-        dueCalibration.value = response.result.map(
-          ({ id, instrument_id, name, calibration_due_date }) => ({
-            id,
-            instrument_id,
-            name,
-            calibration_due_date: moment(calibration_due_date).format("D MMM"),
-          })
-        );
-        calibrationNotificationCount.value = dueCalibration.value
-          ? dueCalibration.value.length
-          : 0;
-      } catch (error) {
-        // Handle errors, e.g., show an error message
-        console.error("Error fetching data:", error);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            dueCalibration.value = response.result?.map(
+              ({ id, instrument_id, name, calibration_due_date }) => ({
+                id,
+                instrument_id,
+                name,
+                calibration_due_date:
+                  moment(calibration_due_date).format("D MMM"),
+              })
+            );
+            calibrationNotificationCount.value = dueCalibration.value
+              ? dueCalibration.value.length
+              : 0;
+          }
+        } else {
+          console.error(
+            `Error Occured in calibrationNotification : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in calibrationNotification : ${err}`);
       }
     };
 
@@ -199,22 +209,31 @@ export default defineComponent({
         const company_id = User.company_id;
 
         const response = await maintenanceNotification(company_id);
-        // console.log(response);
-        dueMaintenance.value = response.result.map(
-          ({ id, instrument_id, name, m_date2 }) => ({
-            id,
-            instrument_id,
-            name,
-            m_date2: moment(m_date2).format("D MMM"),
-          })
-        );
 
-        maintenanaceNotificationCount.value = dueMaintenance.value
-          ? dueMaintenance.value.length
-          : 0;
-      } catch (error) {
-        // Handle errors, e.g., show an error message
-        console.error("Error fetching data:", error);
+        if (response.success) {
+          if (response.result != null && response.result) {
+            dueMaintenance.value = response.result?.map(
+              ({ id, instrument_id, name, m_date2 }) => ({
+                id,
+                instrument_id,
+                name,
+                m_date2: moment(m_date2).format("D MMM"),
+              })
+            );
+
+            maintenanaceNotificationCount.value = dueMaintenance.value
+              ? dueMaintenance.value.length
+              : 0;
+          }
+        } else {
+          console.error(
+            `Error Occured in maintenanceNotification : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in maintenanceNotification : ${err}`);
       }
     };
 

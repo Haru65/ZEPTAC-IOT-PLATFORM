@@ -426,24 +426,21 @@ export default defineComponent({
         if (result) {
           const response = await addTraining(trainingDetails.value);
           // console.log(response.error);
-          if (!response.error) {
+          if (response.success) {
             // Handle successful API response
             //   console.log("API response:", response);
             showSuccessAlert(
               "Success",
-              "Training Plan has been successfully inserted!"
+              response.message || "Training Plan has been successfully inserted!"
             );
 
             router.push({ name: "training-list" });
             loading.value = false;
           } else {
-            // Handle API error response
 
-            const errorData = response.error;
-            console.log("API error:", errorData);
-            // console.log("API error:", errorData.response.data.errors);
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            // Handle API error response
             loading.value = false;
+            showErrorAlert("Error", response.message || "An error occurred.");
           }
         } else {
           showErrorAlert("Warning", "Please Fill the Form Fields Correctly");

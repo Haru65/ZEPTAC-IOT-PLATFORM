@@ -5,7 +5,10 @@
       <div class="card-title">
         <!--begin::Search-->
         <div class="d-flex align-items-center position-relative my-1">
-          <KTIcon icon-name="magnifier" icon-class="fs-1 position-absolute ms-6" />
+          <KTIcon
+            icon-name="magnifier"
+            icon-class="fs-1 position-absolute ms-6"
+          />
           <input
             type="text"
             v-model="search"
@@ -398,16 +401,22 @@ export default defineComponent({
           `page=${page}&limit=${limit.value}&sources=${sourcesString}`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, created_at, company_details, ...rest }) => ({
-            id,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            company_details: { ...company_details },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, created_at, company_details, ...rest }) => ({
+              id,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              company_details: { ...company_details },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -432,16 +441,22 @@ export default defineComponent({
           `page=${page.value}&limit=${limit}&sources=${sourcesString}`
         );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, created_at, company_details, ...rest }) => ({
-            id,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            company_details: { ...company_details },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, created_at, company_details, ...rest }) => ({
+              id,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              company_details: { ...company_details },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -477,16 +492,22 @@ export default defineComponent({
         );
         // // console.log(response);
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, created_at, company_details, ...rest }) => ({
-            id,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            company_details: { ...company_details },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, created_at, company_details, ...rest }) => ({
+              id,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              company_details: { ...company_details },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -667,16 +688,22 @@ export default defineComponent({
         const sourcesString = selectedSources.value.join(",");
         const response = await LeadsSearch(search.value, sourcesString);
 
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({ id, created_at, company_details, ...rest }) => ({
-            id,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            company_details: { ...company_details },
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({ id, created_at, company_details, ...rest }) => ({
+              id,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              company_details: { ...company_details },
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
+        }
       } catch (error) {
         console.error(error);
       } finally {

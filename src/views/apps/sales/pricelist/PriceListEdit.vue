@@ -9,6 +9,7 @@
           id="kt_account_profile_details_form"
           class="form"
           novalidate
+          @submit="onsubmit"
           :validation-schema="itemDetailsValidator"
         >
           <!--begin::Card body-->
@@ -161,28 +162,19 @@
           </div>
           <div class="modal-footer flex-center">
             <!--begin::Button-->
-            <span
-              @click="deleteItem"
-              class="btn btn-lg btn-danger w-sd-25 w-lg-25"
+            <button
+              type="submit"
+              ref="submitButton"
+              class="btn btn-primary w-sd-25 w-lg-25"
             >
-              Delete
-            </span>
-            <!--end::Button-->
-            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-            <!--begin::Button-->
-            <span
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click="submit()"
-            >
-              <span v-if="!loading" class="indicator-label"> Update</span>
-              <span v-if="loading" class="indicator-progress">
+              <span class="indicator-label"> Update </span>
+              <span class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
                 ></span>
               </span>
-            </span>
+            </button>
             <!--end::Button-->
           </div>
           <!--end::Input group-->
@@ -197,18 +189,13 @@
 import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import {
-  updatePriceListItem,
-  getPriceListItem,
-  deletePriceListItem,
-} from "@/stores/api";
+import { updatePriceListItem, getPriceListItem } from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter, useRoute } from "vue-router";
 import { Equipments, GetEquipment } from "@/core/model/pricelist";
 import PriceCustomComponent from "./PriceCustomComponent.vue";
-
 
 export default defineComponent({
   name: "price-edit",
@@ -219,6 +206,7 @@ export default defineComponent({
     PriceCustomComponent,
   },
   setup() {
+    const submitButton = ref<null | HTMLButtonElement>(null);
     const router = useRouter();
     const route = useRoute();
     const itemId = route.params.id;
@@ -226,12 +214,10 @@ export default defineComponent({
     const auth = useAuthStore();
     const User = auth.GetUser();
 
-
     const itemDetailsValidator = Yup.object().shape({
       site_location: Yup.string().required().label("Site Location"),
       per_day_charge: Yup.string().required().label("Per Day Charge"),
     });
-
 
     const itemDetails = ref({
       site_location: "",
@@ -253,23 +239,34 @@ export default defineComponent({
       is_active: 1,
     });
 
-
     onMounted(async () => {
-      const response = await getPriceListItem(itemId.toString());
-      // console.log(response);
-      itemDetails.value = {
-        site_location: response.site_location,
-        per_day_charge: response.per_day_charge,
-        equipment_wise: JSON.parse(response.equipment_wise),
-        accommodation: response.accommodation,
-        travelling: response.travelling,
-        training: response.training,
-        customer_type: response.customer_type,
-        company_id: response.company_id,
-        created_by: response.created_by,
-        updated_by: response.updated_by,
-        is_active: response.is_active,
-      };
+      try {
+        const response = await getPriceListItem(itemId.toString());
+
+        if (response.success) {
+          itemDetails.value = {
+            site_location: response.result.site_location,
+            per_day_charge: response.result.per_day_charge,
+            equipment_wise: JSON.parse(response.result.equipment_wise),
+            accommodation: response.result.accommodation,
+            travelling: response.result.travelling,
+            training: response.result.training,
+            customer_type: response.result.customer_type,
+            company_id: response.result.company_id,
+            created_by: response.result.created_by,
+            updated_by: response.result.updated_by,
+            is_active: response.result.is_active,
+          };
+        } else {
+          console.error(
+            `Error Occured in getPriceListItem : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getPriceListItem : ${err}`);
+      }
     });
 
     function areAllPropertiesNotNull(array) {
@@ -311,17 +308,16 @@ export default defineComponent({
     };
 
     async function SetEquipment(foundItem, index) {
-        // console.log(foundItem);
-        const {id, name} = foundItem;
-        itemDetails.value.equipment_wise[index].id = await id;
-        itemDetails.value.equipment_wise[index].name = await name;
+      // console.log(foundItem);
+      const { id, name } = foundItem;
+      itemDetails.value.equipment_wise[index].id = await id;
+      itemDetails.value.equipment_wise[index].name = await name;
     }
 
     async function SetCharge(e, index) {
       // console.log(e);
       itemDetails.value.equipment_wise[index].charge = await e.target.value;
     }
-
 
     const removeObjectWithId = (arr, id) => {
       if (id !== -1) {
@@ -338,50 +334,77 @@ export default defineComponent({
         index
       );
     };
+    const validateForm = (formData) => {
+      for (const key in formData) {
+        let value = formData[key];
+        if (key !== "customer_type") {
+          if (Array.isArray(value)) {
+            for (const item of value) {
+              if (!validateForm(item)) {
+                return false;
+              }
+            }
+          } else if (typeof value === "object" && value !== null) {
+            if (!validateForm(value)) {
+              return false;
+            }
+          } else if (typeof value === "string") {
+            value = value.trim();
+            if (value === "") {
+              return false;
+            }
+          } else {
+          }
+        }
+      }
+      return true;
+    };
 
-    const submit = async () => {
+    const onsubmit = async () => {
       loading.value = true;
-      // console.warn("Nice");
+
+      const result = validateForm(itemDetails);
+      console.log(itemDetails.value, result);
+      if (result == false) {
+        showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+        loading.value = false;
+        return;
+      }
+
       try {
-        // Call your API here with the form values
+        if (submitButton.value) {
+          // Activate indicator
+          submitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+
+        // Call your API here
+
         const response = await updatePriceListItem(itemId, itemDetails.value);
-        // console.log(response.error);
-        if (!response.error) {
+
+        if (response?.success) {
           // Handle successful API response
-          // console.log("API response:", response);
-          showSuccessAlert("Success", "Item has been successfully updated!");
+
+          showSuccessAlert(
+            "Success",
+            response.message || "Item has been successfully inserted!"
+          );
+
           router.push({ name: "price-list" });
         } else {
           // Handle API error response
-          const errorData = response.error;
-          console.log("API error:", errorData);
-          // console.log("API error:", errorData.response.data.errors);
-          showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call
         console.error("API call error:", error);
         showErrorAlert("Error", "An error occurred during the API call.");
       } finally {
+        if (submitButton.value) {
+          submitButton.value.removeAttribute("data-kt-indicator");
+        }
         loading.value = false;
       }
-    };
-
-    const deleteItem = () => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will not be able to recover from this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "red",
-        confirmButtonText: "Yes, I am sure!",
-      }).then((result: { [x: string]: any }) => {
-        if (result["isConfirmed"]) {
-          // Put your function here
-          deletePriceListItem(itemId);
-          router.push({ name: "price-list" });
-        }
-      });
     };
 
     const showSuccessAlert = (title, message) => {
@@ -413,12 +436,12 @@ export default defineComponent({
     };
 
     return {
+      submitButton,
       itemDetails,
       itemDetailsValidator,
       getAssetPath,
-      submit,
+      onsubmit,
       loading,
-      deleteItem,
       Equipments,
       RemoveRow,
       addNewRow,
