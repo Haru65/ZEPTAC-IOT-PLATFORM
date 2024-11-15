@@ -56,8 +56,10 @@ import {
   getReferenceInstrument,
   getCalibrationSrf,
   getCalibrationInstrument,
+  getCalibrationProcedure,
   validateUserNSrf,
   getUser,
+  getTempLead,
 
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
@@ -326,6 +328,42 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/temp_leads/list",
+        name: "temp-leads-list",
+        component: () => import("@/views/apps/sales/existsLeads/ExistsLeadsListing.vue"),
+        meta: {
+          pageTitle: "Exists List",
+          breadcrumbs: ["Exists List"],
+        },
+      },
+
+      {
+        path: "/temp_leads/edit/:ogLeadId/:tempLeadId",
+        name: "temp-leads-edit",
+        component: () => import("@/views/apps/sales/existsLeads/ExistsLeadsEdit.vue"),
+        beforeEnter: async (to, from, next) => {
+          const tempLeadId = to.params.id;
+          //console.log(companyId);
+          try {
+            const response = await getTempLead(tempLeadId);
+            console.log(response);
+            if (response.success == false || response.result.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        meta: {
+          pageTitle: "Leads Edit",
+          breadcrumbs: ["Leads Edit"],
+        },
+      },
+
+      {
         path: "/leads/list",
         name: "leads-list",
         component: () => import("@/views/apps/sales/leads/LeadsListing.vue"),
@@ -414,6 +452,32 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Customers Edit",
           breadcrumbs: ["Customers Edit"],
+        },
+      },
+      {
+        path: "/customers/login/:id",
+        name: "customers-login",
+        component: () =>
+          import("@/views/apps/sales/customers/CustomersLogin.vue"),
+        beforeEnter: async (to, from, next) => {
+          const customerId = to.params.id;
+          //console.log(companyId);
+          try {
+            const response = await getCustomer(customerId);
+            console.log(response);
+            if (response.success == false || response.result.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        meta: {
+          pageTitle: "Customers Accessibility",
+          breadcrumbs: ["Customers Accessibility"],
         },
       },
 
@@ -524,9 +588,8 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: "/quotations/add",
-        name: "quotation-add",
-        component: () =>
-          import("@/views/apps/sales/quotations/QuotationsAdd.vue"),
+        name: "quotation-wrapper",
+        component: () => import("@/views/apps/sales/quotations/QuotationWrapper.vue"),
         meta: {
           pageTitle: "Quotation Add",
           breadcrumbs: ["Quotation Add"],
@@ -534,7 +597,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: "/quotations/edit/:id",
-        name: "quotation-edit",
+        name: "quotation-edit-wrapper",
         beforeEnter: async (to, from, next) => {
           const quotationId = to.params.id;
           //console.log(companyId);
@@ -551,7 +614,7 @@ const routes: Array<RouteRecordRaw> = [
           }
         },
         component: () =>
-          import("@/views/apps/sales/quotations/QuotationsEdit.vue"),
+          import("@/views/apps/sales/quotations/QuotationEditWrapper.vue"),
         meta: {
           pageTitle: "Quotation Edit",
           breadcrumbs: ["Quotation Edit"],
@@ -569,8 +632,8 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: "/invoices/add",
-        name: "invoices-add",
-        component: () => import("@/views/apps/sales/invoices/InvoicesAdd.vue"),
+        name: "invoices-wrapper",
+        component: () => import("@/views/apps/sales/invoices/InvoiceWrapper.vue"),
         meta: {
           pageTitle: "Invoices Add",
           breadcrumbs: ["Invoices Add"],
@@ -578,7 +641,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: "/invoices/edit/:id",
-        name: "invoice-edit",
+        name: "invoice-edit-wrapper",
         beforeEnter: async (to, from, next) => {
           const invoiceId = to.params.id;
           //console.log(companyId);
@@ -594,7 +657,7 @@ const routes: Array<RouteRecordRaw> = [
             next("/404"); // Redirect to the fallback route
           }
         },
-        component: () => import("@/views/apps/sales/invoices/InvoicesEdit.vue"),
+        component: () => import("@/views/apps/sales/invoices/InvoiceEditWrapper.vue"),
         meta: {
           pageTitle: "Invoice Edit",
           breadcrumbs: ["Invoice Edit"],
@@ -1389,7 +1452,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/calibration-srf/edit/:id",
+        path: "/calibration-srf/edit/:id/:company_id",
         name: "calibration-srf-edit",
         beforeEnter: async (to, from, next) => {
 
@@ -1442,6 +1505,52 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
 
+      // Calibration Procedure Routes
+      {
+        path: "/calibration-procedure/list",
+        name: "calibration-procedure-list",
+        component: () =>
+          import("@/views/apps/calibration/procedure/CalibrationProcedureListing.vue"),
+        meta: {
+          pageTitle: "Calibration Procedure List",
+          breadcrumbs: ["Calibration Procedure List"],
+        },
+      },
+      {
+        path: "/calibration-procedure/add",
+        name: "calibration-procedure-add",
+        component: () =>
+          import("@/views/apps/calibration/procedure/CalibrationProcedureAdd.vue"),
+        meta: {
+          pageTitle: "Calibration Procedure Add",
+          breadcrumbs: ["Calibration Procedure Add"],
+        },
+      },
+      {
+        path: "/calibration-procedure/edit/:id",
+        name: "calibration-procedure-edit",
+        beforeEnter: async (to, from, next) => {
+          const valProcedureID = to.params.id;
+          try {
+            const response = await getCalibrationProcedure(valProcedureID.toString());
+            console.log(response);
+            if (response.success == false || response.result.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/calibration/procedure/CalibrationProcedureEdit.vue"),
+        meta: {
+          pageTitle: "Calibration Procedure Edit",
+          breadcrumbs: ["Calibration Procedure Edit"],
+        },
+      },
 
       // Supplier
       {
@@ -2672,6 +2781,92 @@ const routes: Array<RouteRecordRaw> = [
           pageTitle: "Profile Details",
         }
       },
+
+      // Notifications
+      {
+        path: "/notifications/list",
+        name: "notifications-list",
+        component: () => import("@/views/apps/notification/NotificationListing.vue"),
+        meta: {
+          pageTitle: "Notification List",
+          breadcrumbs: ["Notification List"],
+        },
+      },
+
+      // Logged In Customers Routes/Pages
+      {
+        path: "/customer/planner",
+        name: "customer-planner-list",
+        component: () => import("@/views/apps/notification/NotificationListing.vue"),
+        meta: {
+          pageTitle: "Planner",
+          breadcrumbs: ["Planner"],
+        },
+      },
+      {
+        path: "/customer/activities",
+        name: "customer-activities-list",
+        component: () => import("@/views/apps/notification/NotificationListing.vue"),
+        meta: {
+          pageTitle: "Activities",
+          breadcrumbs: ["Activities"],
+        },
+      },
+      {
+        path: "/customer/reports",
+        name: "customer-reports-page",
+        component: () => import("@/views/apps/customers/reports/CustomerReports.vue"),
+        meta: {
+          pageTitle: "Reports",
+          breadcrumbs: ["Reports"],
+        },
+      },
+      {
+        path: "/customer/validation-reports",
+        name: "customer-validation-reports",
+        component: () => import("@/views/apps/customers/reports/ValidationReports.vue"),
+        meta: {
+          pageTitle: "Validation Reports",
+          breadcrumbs: ["Validation Reports"],
+        },
+      },
+      {
+        path: "/customer/thermal-reports",
+        name: "customer-thermal-reports",
+        component: () => import("@/views/apps/customers/reports/ThermalReports.vue"),
+        meta: {
+          pageTitle: "Thermal Reports",
+          breadcrumbs: ["Thermal Reports"],
+        },
+      },
+      {
+        path: "/customer/equipments",
+        name: "customer-equipments-list",
+        component: () => import("@/views/apps/notification/NotificationListing.vue"),
+        meta: {
+          pageTitle: "Equipments",
+          breadcrumbs: ["Equipments"],
+        },
+      },
+      {
+        path: "/customer/invoices",
+        name: "customer-invoices-list",
+        component: () => import("@/views/apps/customers/billings/CustomerInvoices.vue"),
+        meta: {
+          pageTitle: "Invoices",
+          breadcrumbs: ["Invoices"],
+        },
+      },
+      {
+        path: "/customer/orders",
+        name: "customer-orders-list",
+        component: () => import("@/views/apps/notification/NotificationListing.vue"),
+        meta: {
+          pageTitle: "Purchase Orders",
+          breadcrumbs: ["Purchase Orders"],
+        },
+      },
+
     ],
   },
 

@@ -36,3 +36,15 @@ export const financialTypes = [
       name: "April - March",
   },
 ];
+
+
+export const billingFormatTypes = [
+  {
+      id: "1",
+      name: "billing-format-1",
+  },
+  {
+      id: "2",
+      name: "billing-format-2",
+  },
+];

@@ -66,7 +66,7 @@
           <!--begin::Add customer-->
           <router-link to="/skill_matrix/add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Skill Matrix
+            Skill Matrix
           </router-link>
           <!--end::Add customer-->
         </div>

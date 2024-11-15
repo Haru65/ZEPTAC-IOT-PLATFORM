@@ -9,6 +9,7 @@ const CUSTOMERS_URL = "customers";
 const PRICELIST_URL = "pricelist";
 const INVOICE_URL = "invoice";
 const QUOTATION_URL = "quotation";
+const TEMP_LEADS_URL = 'temp_leads';
 const LEADS_URL = 'leads';
 const CLIENTS_URL = "clients";
 const EMPLOYEE_URL = "employee";
@@ -65,6 +66,8 @@ const LINKS = "links";
 const CALIBRATION_INSTRUMENT = "calibration-instrument";
 const UUC_READING = "uuc-reading";
 const CALIBRATION_SRF = "calibration-srf";
+const CAL_PROC_URL = "calibration-procedure";
+const NOTIFICATION_URL = "notifications";
 
 
 
@@ -561,6 +564,106 @@ export async function deleteCustomer(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(CUSTOMERS_URL + "/" + data);
+        console.log(response.data.message)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// Grant Login From Customer
+export async function grantCustomerLogin(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put("grant_customer_login" + "/" + id, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
+
+// Revoke Login From Customer
+export async function revokeCustomerLogin(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put("revoke_customer_login" + "/" + id, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
+
+
+// Temp Leads or Exists Leads
+
+export async function TempLeadSearch(search: any, sourcesString: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search,
+            sources: sourcesString
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('temp_leads_search', data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// getlisting
+export async function getTempLeads(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(TEMP_LEADS_URL, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+export async function getTempLead(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(TEMP_LEADS_URL, data);
+        //console.log(response)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+export async function updateTempLead(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(TEMP_LEADS_URL + "/" + id, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// delete
+export async function deleteTempLead(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(TEMP_LEADS_URL + "/" + data);
         console.log(response.data.message)
         return response.data;
     } catch (errors:any) {
@@ -6358,6 +6461,135 @@ export async function getCalibrationSrfBulk(data: any) {
         const id = { "id": data };
         ApiService.setHeader();
         const response = await ApiService.post('generate_calibrataion_bulk', id);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
+// VALIDATION PROCEDURE
+
+// getlists
+export async function getCalibrationProcedures(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(CAL_PROC_URL, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
+export async function getCalibrationProcedure(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(CAL_PROC_URL, data);
+        console.log(response.data)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+export async function addCalibrationProcedure(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.post(CAL_PROC_URL, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+export async function updateCalibrationProcedure(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(CAL_PROC_URL + "/" + id, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
+export async function deleteCalibrationProcedure(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(CAL_PROC_URL + "/" + data);
+        console.log(response.data.message)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+export async function CalibrationProcedureSearch(search: any, year:any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search,
+            year: year
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('calibration_procedure_search', data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
+// Notification Routes
+
+export async function NotificationSearch(search: any, typesString: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search,
+            types: typesString
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('notification_search', data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// getlisting
+export async function getNotifications(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(NOTIFICATION_URL, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// delete function
+export async function deleteNotification(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(NOTIFICATION_URL + "/" + data);
+        console.log(response.data.message)
         return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);

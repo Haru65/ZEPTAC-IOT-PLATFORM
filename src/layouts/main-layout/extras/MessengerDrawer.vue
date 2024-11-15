@@ -7,33 +7,23 @@
     data-kt-drawer-name="chat"
     data-kt-drawer-activate="true"
     data-kt-drawer-overlay="true"
-    data-kt-drawer-width="{default:'300px', 'md': '500px'}"
+    data-kt-drawer-width="{default:'500px', 'md': 500px', 'lg': '800px'}"
     data-kt-drawer-direction="end"
     data-kt-drawer-toggle="#kt_drawer_chat_toggle"
     data-kt-drawer-close="#kt_drawer_chat_close"
   >
     <!--begin::Messenger-->
-    <div class="card w-100" id="kt_drawer_chat_messenger">
+    <div class="card w-100 mw-500px" id="kt_drawer_chat_messenger">
       <!--begin::Card header-->
       <div class="card-header pe-5" id="kt_drawer_chat_messenger_header">
         <!--begin::Title-->
         <div class="card-title">
           <!--begin::User-->
           <div class="d-flex justify-content-center flex-column me-3">
-            <a
-              href="#"
+            <span
               class="fs-4 fw-bold text-gray-900 text-hover-primary me-1 mb-2 lh-1"
-              >Brian Cox</a
+              >Notifications</span
             >
-
-            <!--begin::Info-->
-            <div class="mb-0 lh-1">
-              <span
-                class="badge badge-success badge-circle w-10px h-10px me-1"
-              ></span>
-              <span class="fs-7 fw-semobold text-gray-400">Active</span>
-            </div>
-            <!--end::Info-->
           </div>
           <!--end::User-->
         </div>
@@ -41,20 +31,6 @@
 
         <!--begin::Card toolbar-->
         <div class="card-toolbar">
-          <!--begin::Menu-->
-          <div class="me-2">
-            <button
-              class="btn btn-sm btn-icon btn-active-icon-primary"
-              data-kt-menu-trigger="click"
-              data-kt-menu-placement="bottom-end"
-              data-kt-menu-flip="top-end"
-            >
-              <i class="bi bi-three-dots fs-3"></i>
-            </button>
-            <Dropdown4></Dropdown4>
-          </div>
-          <!--end::Menu-->
-
           <!--begin::Close-->
           <div
             class="btn btn-sm btn-icon btn-active-icon-primary"
@@ -82,77 +58,50 @@
           data-kt-scroll-wrappers="#kt_drawer_chat_messenger_body"
           data-kt-scroll-offset="0px"
         >
-          <template v-for="(item, index) in messages" :key="index">
-            <MessageIn
-              ref="messagesInRef"
-              v-if="item.type === 'in'"
-              :name="item.name"
-              :image="item.image"
-              :time="item.time"
-              :text="item.text"
-            ></MessageIn>
-            <MessageOut
-              ref="messagesOutRef"
-              v-if="item.type === 'out'"
-              :image="item.image"
-              :time="item.time"
-              :text="item.text"
-            ></MessageOut>
-          </template>
+          <div
+            class="d-flex justify-content-start mb-2"
+            v-for="notification in notifications"
+            :key="notification.id"
+          >
+            <div class="d-flex flex-column align-items-start">
+              <div
+                class="p-5 rounded bg-light-info text-dark fw-sembold mw-lg-400px text-start d-flex justify-content-between align-items-center"
+                data-kt-element="message-text"
+              >
+                <span>{{ notification.data.message }}</span>
+                <button
+                  class="btn btn-sm btn-light ms-2"
+                  @click="markAsRead(notification.id)"
+                  v-if="!notification.read"
+                >
+                  <i class="fas fa-check"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <p
+            class="text-dark fw-sembold text-center"
+            v-if="!notifications.length"
+          >
+            No new notifications
+          </p>
+
+          <!--begin::View more-->
+          <div class="py-3 text-center border-top">
+            <router-link
+              to="/notifications/list"
+              class="btn btn-color-gray-600 btn-active-color-primary"
+            >
+              View All
+              <KTIcon icon-name="arrow-right" icon-class="fs-5" />
+            </router-link>
+          </div>
+          <!--end::View more-->
         </div>
         <!--end::Messages-->
       </div>
       <!--end::Card body-->
-
-      <!--begin::Card footer-->
-      <div class="card-footer pt-4" id="kt_drawer_chat_messenger_footer">
-        <!--begin::Input-->
-        <input
-          class="form-control form-control-flush mb-3"
-          data-kt-element="input"
-          placeholder="Type a message"
-          v-model="newMessageText"
-          @keydown.enter="addNewMessage"
-        />
-        <!--end::Input-->
-
-        <!--begin:Toolbar-->
-        <div class="d-flex flex-stack">
-          <!--begin::Actions-->
-          <div class="d-flex align-items-center me-2">
-            <button
-              class="btn btn-sm btn-icon btn-active-light-primary me-1"
-              type="button"
-              data-bs-toggle="tooltip"
-              title="Coming soon"
-            >
-              <i class="bi bi-paperclip fs-3"></i>
-            </button>
-            <button
-              class="btn btn-sm btn-icon btn-active-light-primary me-1"
-              type="button"
-              data-bs-toggle="tooltip"
-              title="Coming soon"
-            >
-              <i class="bi bi-upload fs-3"></i>
-            </button>
-          </div>
-          <!--end::Actions-->
-
-          <!--begin::Send-->
-          <button
-            @click="addNewMessage"
-            class="btn btn-primary"
-            type="button"
-            data-kt-element="send"
-          >
-            Send
-          </button>
-          <!--end::Send-->
-        </div>
-        <!--end::Toolbar-->
-      </div>
-      <!--end::Card footer-->
     </div>
     <!--end::Messenger-->
   </div>
@@ -161,10 +110,14 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, ref } from "vue";
+import { defineComponent, onBeforeUnmount, onMounted, ref } from "vue";
 import MessageIn from "@/components/messenger-parts/MessageIn.vue";
 import MessageOut from "@/components/messenger-parts/MessageOut.vue";
 import Dropdown4 from "@/components/dropdown/Dropdown4.vue";
+
+import { useAuthStore } from "@/stores/auth";
+import { getToken } from "@/core/services/JwtService";
+import initializeEcho from "@/echo";
 
 interface KTMessage {
   type: string;
@@ -186,54 +139,113 @@ export default defineComponent({
     const messagesInRef = ref<null | HTMLElement>(null);
     const messagesOutRef = ref<null | HTMLElement>(null);
 
-    const messages = ref<Array<KTMessage>>([
-      {
-        type: "in",
-        name: "Brian Cox",
-        image: getAssetPath("media/avatars/300-25.jpg"),
-        time: "5 Hours",
-        text: "How likely are you to recommend our company to your friends and family ?",
-      },
-      {
-        type: "out",
-        image: getAssetPath("media/avatars/300-1.jpg"),
-        time: "2 Hours",
-        text: "Hey there, we’re just writing to let you know that you’ve been subscribed to a repository on GitHub.",
-      },
-      {
-        type: "in",
-        name: "Brian Cox",
-        image: getAssetPath("media/avatars/300-25.jpg"),
-        time: "2 Hour",
-        text: "Ok, Understood!",
-      },
-      {
-        type: "out",
-        image: getAssetPath("media/avatars/300-1.jpg"),
-        time: "2 Hours",
-        text: "You’ll receive notifications for all issues, pull requests!",
-      },
-      {
-        type: "in",
-        name: "Brian Cox",
-        image: getAssetPath("media/avatars/300-25.jpg"),
-        time: "1 Hour",
-        text: "You can unwatch this repository immediately by clicking here: portal.com",
-      },
-      {
-        type: "out",
-        image: getAssetPath("media/avatars/300-1.jpg"),
-        time: "4 mins",
-        text: "Most purchased Business courses during this sale!",
-      },
-      {
-        type: "in",
-        name: "Brian Cox",
-        image: getAssetPath("media/avatars/300-25.jpg"),
-        time: "2 mins",
-        text: "Company BBQ to celebrate the last quater achievements and goals. Food and drinks provided",
-      },
-    ]);
+    const authStore = useAuthStore();
+    const User = authStore.GetUser();
+
+    const notifications: any = ref([]);
+    // Get the company ID dynamically if needed
+    const companyId = User.company_id;
+
+    // Get the API token from local storage
+    const token = getToken();
+
+    let Echo;
+
+    // Function to fetch the latest unread notifications
+    const fetchLatestUnreadNotifications = async () => {
+      try {
+        const response = await fetch(
+          `https://api.zeptac.com/api/v1/notifications/latest`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          notifications.value = data.notifications; // Assuming the response contains a notifications array
+        } else {
+          console.error("Error fetching notifications:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+
+    const markAsRead = async (notificationId) => {
+      try {
+        const response = await fetch(
+          `https://api.zeptac.com/api/v1/notifications/${notificationId}/read`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.ok) {
+          const updatedNotifications = notifications.value.filter(
+            (notification) => {
+              if (notification.id !== notificationId) {
+                return notification;
+              }
+            }
+          );
+          notifications.value = updatedNotifications;
+        } else {
+          console.error(
+            "Error marking notification as read:",
+            response.statusText
+          );
+        }
+      } catch (error) {
+        console.error("Error marking notification as read:", error);
+      }
+    };
+
+    onMounted(async () => {
+      console.log("onMount -> before fetch1");
+      await fetchLatestUnreadNotifications();
+      console.log("onMount -> after fetch1");
+
+      try {
+        if (User.role_id === 2) {
+          // Create or retrieve the existing Echo instance
+          Echo = initializeEcho(token);
+
+          console.log("onMount -> before listener setup");
+
+          // Set up event listener if not already set
+          if (!sessionStorage.getItem("echoListenerSet")) {
+            Echo.channel(`company-${companyId}`).listen(
+              ".lead.already.exists",
+              async (event) => {
+                console.log("Received event: Lead already exists", event);
+
+                // Fetch the latest unread notifications
+                await fetchLatestUnreadNotifications();
+              }
+            );
+
+            // Mark the listener as set
+            sessionStorage.setItem("echoListenerSet", "true");
+          }
+
+          console.log("onMount -> after listener setup");
+        } else {
+          console.log("User is not a company admin. Skipping Echo setup.");
+        }
+      } catch (error) {
+        console.error("Error setting up real-time notifications:", error);
+      }
+    });
+
+    const messages = ref<Array<KTMessage>>([]);
 
     const newMessageText = ref("");
 
@@ -280,6 +292,8 @@ export default defineComponent({
       messagesInRef,
       messagesOutRef,
       getAssetPath,
+      notifications,
+      markAsRead,
     };
   },
 });

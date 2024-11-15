@@ -29,7 +29,7 @@ export function useFilteredMenu(menuConfig: MenuItem[], modules: string[]) {
 
     filteredMenu.push(...menuConfig.filter((item) => {
       // Check if the item has a route and if it's in company_modules
-      if (item.route && modules.includes(item.route)) {
+      if (item.route && modules?.includes(item.route)) {
         return true;
       }
       return false;

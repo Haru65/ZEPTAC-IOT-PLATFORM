@@ -22,6 +22,7 @@ export interface CompanyDetails {
   is_trial: boolean;
   trial_subscription_start: string;
   trial_subscription_end: string;
+  billing_format: string;
 }
 
 export const useAuthStore = defineStore("auth", () => {
@@ -147,6 +148,8 @@ export const useAuthStore = defineStore("auth", () => {
     companyDetails.value = {} as CompanyDetails;
     JwtService.destroySelectedYear();
     JwtService.destroyFinancialType();
+    sessionStorage.removeItem("echoInitialized")
+    sessionStorage.removeItem("echoListenerSet")
   }
 
 

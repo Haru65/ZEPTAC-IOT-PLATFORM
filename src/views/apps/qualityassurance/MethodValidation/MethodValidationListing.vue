@@ -66,7 +66,7 @@
           <!--begin::Add customer-->
           <router-link to="/method_validation/add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Method Validation
+          Method Validation
           </router-link>
           <!--end::Add customer-->
         </div>

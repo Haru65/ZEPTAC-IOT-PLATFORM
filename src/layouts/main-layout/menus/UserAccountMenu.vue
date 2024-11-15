@@ -17,8 +17,8 @@
           />
           <div v-else class="symbol-circle">
             <span
-            :class="`bg-dark text-primary text-uppercase`"
-            class="symbol-label fs-3 fw-bold"
+              :class="`bg-dark text-primary text-uppercase`"
+              class="symbol-label fs-3 fw-bold"
               >{{ User.first_name.charAt(0) || "" }}</span
             >
           </div>
@@ -36,9 +36,9 @@
           </div>
           <span class="fw-semobold fs-7">
             {{
-              User.company_details.company_name
-                ? User.company_details.company_name
-                : User.meta.company_name
+              User.company_details?.company_name ||
+              User.meta?.company_name ||
+              ""
             }}
             <br />
             {{ Identifier }}

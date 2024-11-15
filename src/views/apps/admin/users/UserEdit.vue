@@ -865,11 +865,10 @@
           <!--end::Input group-->
         </div>
         <div class="modal-footer flex-center">
-          &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
           <!--begin::Button-->
           <button
             :data-kt-indicator="loading ? 'on' : null"
-            class="btn btn-lg btn-primary w-25"
+            class="btn btn-lg btn-primary w-sd-25 w-lg-25"
             type="submit"
           >
             <span v-if="!loading" class="indicator-label"> Update </span>

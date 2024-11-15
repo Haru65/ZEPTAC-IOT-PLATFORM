@@ -28,6 +28,7 @@
   <!--end::App-->
 
   <!-- <KTDrawers /> -->
+  <KTMessengerDrawer />
   <KTScrollTop />
   <KTModals />
   <!-- <KTCustomize /> -->
@@ -52,6 +53,9 @@ import { useRoute } from "vue-router";
 import { reinitializeComponents } from "@/core/plugins/keenthemes";
 import LayoutService from "@/core/services/LayoutService";
 
+import KTMessengerDrawer from "@/layouts/main-layout/extras/MessengerDrawer.vue";
+
+
 export default defineComponent({
   name: "default-layout",
   components: {
@@ -63,6 +67,7 @@ export default defineComponent({
     KTScrollTop,
     KTModals,
     // KTCustomize,
+    KTMessengerDrawer,
   },
   setup() {
     const route = useRoute();

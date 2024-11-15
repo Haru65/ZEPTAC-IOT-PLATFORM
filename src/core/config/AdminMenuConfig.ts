@@ -159,6 +159,10 @@ const AdminMenuConfig: Array<MenuItem> = [
         bootstrapIcon: "bi-archive",
         sub: [
           {
+            heading: "Calibration Procedure",
+            route: "/calibration-procedure/list",
+          },
+          {
             heading: "Calibration Records",
             route: "/calibration-srf/list",
           },
@@ -189,6 +193,10 @@ const AdminMenuConfig: Array<MenuItem> = [
           {
             heading: "List Leads",
             route: "/leads/list",
+          },
+          {
+            heading: "Exists Leads",
+            route: "/temp_leads/list",
           },
         ],
       },

@@ -868,6 +868,7 @@ export default defineComponent({
     const router = useRouter();
     const route = useRoute();
     const srfID = route.params.id;
+    const companyID = route.params.company_id;
 
     //Create form validation object
     const itemValidator = Yup.object().shape({});
@@ -986,7 +987,7 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         const response = await getCalibrationInstruments(
-          `page=${page}&limit=${limit.value}&companyID=${User.company_id}&srfID=${srfID}`
+          `page=${page}&limit=${limit.value}&companyID=${companyID}&srfID=${srfID}`
         );
 
         if (response.success) {
@@ -1022,7 +1023,7 @@ export default defineComponent({
         while (initvalues.value.length != 0) initvalues.value.pop();
 
         const response = await getCalibrationInstruments(
-          `page=${page.value}&limit=${limit}&companyID=${User.company_id}&srfID=${srfID}`
+          `page=${page.value}&limit=${limit}&companyID=${companyID}&srfID=${srfID}`
         );
 
         if (response.success) {
@@ -1075,7 +1076,7 @@ export default defineComponent({
     async function calibration_instrument_listing(): Promise<void> {
       try {
         const response = await getCalibrationInstruments(
-          `page=${page.value}&limit=${limit.value}&companyID=${User.company_id}&srfID=${srfID}`
+          `page=${page.value}&limit=${limit.value}&companyID=${companyID}&srfID=${srfID}`
         );
         if (response.success) {
           tableData.value = response.result.data.map(

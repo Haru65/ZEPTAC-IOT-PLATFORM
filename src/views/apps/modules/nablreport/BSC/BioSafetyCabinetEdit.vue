@@ -606,14 +606,16 @@ export default defineComponent({
         },
       ],
 
-      meta: {
-        company_name: "",
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        state: "",
-        country: "",
+      customer: {
+          id: "",
+          name: "",
+          company_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          pincode: "",
+          state: "",
+          country: "",
       },
 
       service: {
@@ -675,7 +677,7 @@ export default defineComponent({
         itemDetails.value.created_by = res.result.created_by;
         itemDetails.value.updated_by = res.result.updated_by;
 
-        itemDetails.value.meta = res.result.meta;
+        itemDetails.value.customer = res.result.customer;
         itemDetails.value.service = res.result.service;
         itemDetails.value.cleanroom_instruments =
           res.result.cleanroom_instruments;

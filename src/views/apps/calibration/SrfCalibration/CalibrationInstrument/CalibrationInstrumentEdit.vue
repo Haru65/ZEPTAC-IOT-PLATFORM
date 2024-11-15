@@ -24,7 +24,7 @@
                 >
                   <!--begin::Add customer-->
                   <router-link
-                    :to="`/calibration-srf/edit/${itemDetails.service_request_id}`"
+                    :to="`/calibration-srf/edit/${itemDetails.service_request_id}/${itemDetails.company_id}`"
                     class="btn btn-primary"
                   >
                     <KTIcon icon-name="arrow-left" icon-class="fs-2" />
@@ -1032,20 +1032,24 @@ export default defineComponent({
             itemDetails.value
           );
 
-          if (response.success) {
+          if (response?.success) {
+            console.log("im here")
             showSuccessAlert(
               "Success",
-              "Calibration Instrument Reading has been successfully updated!"
+              response.message || "Calibration Instrument Reading has been successfully updated!"
             );
             loading.value = false;
+
             router.push({
               name: "calibration-srf-edit",
               params: {
                 id: itemDetails.value.service_request_id,
+                company_id: itemDetails.value.company_id,
               },
             });
+            console.log("not reached");
           } else {
-            showErrorAlert("Warning", "Please Fill the Form Fields Correctly");
+            showErrorAlert("Error", response.message || "An error occurred.");
             loading.value = false;
             return;
           }

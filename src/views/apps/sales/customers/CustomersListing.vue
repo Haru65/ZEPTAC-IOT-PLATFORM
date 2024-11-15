@@ -119,6 +119,22 @@
         <template v-slot:company_name="{ row: customer }">
           {{ customer.company_name }}
         </template>
+        <template
+          v-slot:grant_access="{ row: customer }"
+          v-if="identifier == 'Admin' || identifier == 'Company-Admin'"
+        >
+        <span
+            v-if="customer.grant_access == true"
+            class="badge py-3 px-4 fs-7 badge-light-success"
+            >Yes</span
+          >
+          <span
+            v-if="customer.grant_access == false"
+            class="badge py-3 px-4 fs-7 badge-light-primary"
+            >No</span
+          >
+          <span v-else></span>
+        </template>
         <template v-slot:created_at="{ row: customer }">
           {{ customer.created_at }}
         </template>
@@ -128,51 +144,81 @@
         >
           {{ customer.company_details.company_name }}
         </template>
-        <template v-slot:srf_link="{ row: customer }">
-          <span
-            class="d-flex flex-lg-row text-hover-primary align-center gap-2 cursor-pointer"
-            data-toggle="tooltip"
-            title="Copy Service Request Link"
-            @click="copySrfUrl(customer.company_id, customer.id)"
-          >
-            <i
-              class="las la-link text-gray-600 text-hover-primary mb-1 fs-3"
-            ></i>
-            <span class="text-gray-600 text-hover-primary"> Copy Link </span>
-          </span>
-        </template>
-
-        <template v-slot:srf_calibration_link="{ row: customer }">
-          <span>
-            <span
-              class="d-flex flex-lg-row text-hover-primary align-center gap-2 cursor-pointer"
-              data-toggle="tooltip"
-              title="Copy Service Request Link For Calibration"
-              @click="generateLink(customer.company_id, customer.id)"
-            >
-              <i
-                class="las la-link text-gray-600 text-hover-primary mb-1 fs-3"
-              ></i>
-              <span class="text-gray-600 text-hover-primary"> Copy Link </span>
-            </span>
-          </span>
-        </template>
-        <template v-slot:feedback_link="{ row: customer }">
-          <span
-            class="d-flex flex-lg-row text-hover-primary align-center gap-2 cursor-pointer"
-            data-toggle="tooltip"
-            title="Copy Feedback Link"
-            @click="copyFeedbackUrl(customer.company_id, customer.id)"
-          >
-            <i
-              class="las la-link text-gray-600 text-hover-primary mb-1 fs-3"
-            ></i>
-            <span class="text-gray-600 text-hover-primary"> Copy Link </span>
-          </span>
-        </template>
         <template v-slot:actions="{ row: customer }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row my-3">
+            <div class="dropdown">
+              <button
+                type="button"
+                class="btn btn-sm btn-secondary btn-icon-gray-900 btn-text-gray-900"
+                id="dropdownMenuButton1"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Action
+              </button>
+              <ul
+                class="dropdown-menu dropdown-menu-start"
+                aria-labelledby="dropdownMenuButton1"
+              >
+                <li>
+                  <router-link
+                    class="dropdown-item btn"
+                    data-toggle="tooltip"
+                    title="Provide Login Access"
+                    :to="`/customers/login/${customer.id}`"
+                  >
+                    <KTIcon icon-name="user-tick" icon-class="fs-2" />
+                    Login Access</router-link
+                  >
+                </li>
+                <li>
+                  <router-link
+                    :to="`/customers/edit/${customer.id}`"
+                    data-toggle="tooltip"
+                    title="View /Edit Customer"
+                    class="dropdown-item btn"
+                  >
+                    <KTIcon icon-name="pencil" icon-class="fs-2" />
+                    Edit
+                  </router-link>
+                </li>
+                <li>
+                  <span
+                    class="dropdown-item btn"
+                    data-toggle="tooltip"
+                    title="Copy Service Request Link For Calibration"
+                    @click="generateLink(customer.company_id, customer.id)"
+                  >
+                    <KTIcon icon-name="paper-clip" icon-class="fs-2" />
+                    Calibration SRF
+                  </span>
+                </li>
+                <li>
+                  <span
+                    class="dropdown-item btn"
+                    data-toggle="tooltip"
+                    title="Copy Service Request Link For Cleanroom"
+                    @click="copySrfUrl(customer.company_id, customer.id)"
+                  >
+                    <KTIcon icon-name="paper-clip" icon-class="fs-2" />
+                    Cleanroom SRF
+                  </span>
+                </li>
+                <li>
+                  <span
+                    class="dropdown-item btn"
+                    data-toggle="tooltip"
+                    title="Copy Feedback Link"
+                    @click="copyFeedbackUrl(customer.company_id, customer.id)"
+                  >
+                    <KTIcon icon-name="paper-clip" icon-class="fs-2" />
+                    Feedback
+                  </span>
+                </li>
+              </ul>
+            </div>
+
             <!--begin::Edit-->
             <router-link :to="`/customers/edit/${customer.id}`">
               <span
@@ -287,6 +333,12 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
+        columnName: "Login Access",
+        columnLabel: "grant_access",
+        sortEnabled: true,
+        columnWidth: 175,
+      },
+      {
         columnName: "Created Date",
         columnLabel: "created_at",
         sortEnabled: true,
@@ -299,28 +351,10 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
-        columnName: "Calibration Servie Request Link",
-        columnLabel: "srf_calibration_link",
-        sortEnabled: true,
-        columnWidth: 75,
-      },
-      {
-        columnName: "Servie Request Link",
-        columnLabel: "srf_link",
-        sortEnabled: true,
-        columnWidth: 75,
-      },
-      {
-        columnName: "Feedback Form Link",
-        columnLabel: "feedback_link",
-        sortEnabled: true,
-        columnWidth: 75,
-      },
-      {
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
-        columnWidth: 75,
+        columnWidth: 100,
       },
     ]);
 

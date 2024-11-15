@@ -1007,7 +1007,7 @@
                                 <el-date-picker
                                   type="date"
                                   v-model="editedDate"
-                                  class="badge"
+                                  class="badge w-250px"
                                   @change="
                                     setPlanAndEditDates($event, 'editedDate')
                                   "

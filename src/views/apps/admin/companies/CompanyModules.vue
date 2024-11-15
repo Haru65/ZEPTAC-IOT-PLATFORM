@@ -16,7 +16,7 @@
             <!--begin::Input group-->
 
             <!--begin::Table-->
-            <div class="table-responsive">
+            <div class="table-responsive mb-6">
               <table
                 class="table table-row-dashed border-gray-300 align-middle gy-6"
               >

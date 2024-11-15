@@ -14,7 +14,7 @@
             v-model="search"
             @input="searchItems()"
             class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search quotations"
+            placeholder="Search Customer"
           />
         </div>
         <!--end::Search-->

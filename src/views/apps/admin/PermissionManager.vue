@@ -21,12 +21,6 @@
             placeholder="Enter permission name"
             v-model="permissionDetails.permission_name"
           />
-          <button
-            @click.prevent="onsubmit"
-            class="btn btn-success fw-bold flex-shrink-0"
-          >
-            Add permission
-          </button>
         </div>
         <div class="fv-plugins-message-container">
           <div class="fv-help-block">
@@ -34,6 +28,14 @@
           </div>
         </div>
         <!--end::Title-->
+
+        <button
+            @click.prevent="onsubmit"
+            class="btn btn-success fw-bold flex-shrink-0 mt-2  w-sd-25 w-lg-25"
+          >
+            Add permission
+          </button>
+
       </div>
       <!--end::Input group-->
     </Vform>

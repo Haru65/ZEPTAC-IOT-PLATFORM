@@ -9,6 +9,7 @@
           id="kt_account_profile_details_form"
           class="form"
           novalidate
+          @submit="submit"
           :validation-schema="companyDetailsValidator"
         >
           <!--begin::Card body-->
@@ -579,6 +580,106 @@
             </div>
             <!--end::Input group-->
 
+            <!--begin::Heading-->
+            <div class="mb-6">
+              <h4 class="col-form-label fw-semobold fs-6">Select Billing Format</h4>
+              <span class="fw-semibold text-muted fs-7 lh-1"
+                >2 billing format options.</span
+              >
+            </div>
+            <!--end::Heading-->
+            <!--begin::Options-->
+            <div
+              class="row gy-5"
+              data-kt-buttons="true"
+              data-kt-buttons-target=".form-check-image:not(.disabled),.form-check-input:not([disabled])"
+              data-kt-initialized="1"
+            >
+              <!--begin::Col-->
+              <div class="col-lg-3">
+                <!--begin::Option-->
+                <label
+                  :class="[
+                    companyDetails.billing_format === 'billing-format-1' &&
+                      'active',
+                  ]"
+                  class="form-check-image form-check-success"
+                >
+                  <!--begin::Image-->
+                  <div class="form-check-wrapper p-6">
+                    <img
+                      :src="
+                        getAssetPath('media/billingformat/billing-format-1.jpg')
+                      "
+                      class="mw-100"
+                      alt="Format 1 Picture"
+                    />
+                  </div>
+                  <!--end::Image-->
+                  <!--begin::Check-->
+                  <div
+                    class="form-check form-check-custom form-check-success form-check-sm form-check-solid"
+                  >
+                    <input
+                      v-model="companyDetails.billing_format"
+                      class="form-check-input"
+                      type="radio"
+                      value="billing-format-1"
+                      name="billing_format"
+                    />
+                    <!--begin::Label-->
+                    <div class="form-check-label text-gray-800">Format 1</div>
+                    <!--end::Label-->
+                  </div>
+                  <!--end::Check-->
+                </label>
+                <!--end::Option-->
+              </div>
+              <!--end::Col-->
+              <!--begin::Col-->
+              <div class="col-lg-3">
+                <!--begin::Option-->
+                <label
+                  :class="[
+                    companyDetails.billing_format === 'billing-format-2' &&
+                      'active',
+                  ]"
+                  class="form-check-image form-check-success"
+                >
+                  <!--begin::Image-->
+                  <div class="form-check-wrapper p-6">
+                    <img
+                      :src="
+                        getAssetPath('media/billingformat/billing-format-2.jpg')
+                      "
+                      class="mw-100"
+                      alt="Format 2 Picture"
+                    />
+                  </div>
+                  <!--end::Image-->
+                  <!--begin::Check-->
+                  <div
+                    class="form-check form-check-custom form-check-success form-check-sm form-check-solid"
+                  >
+                    <input
+                      v-model="companyDetails.billing_format"
+                      class="form-check-input"
+                      type="radio"
+                      value="billing-format-2"
+                      name="billing_format"
+                    />
+                    <!--begin::Label-->
+                    <div class="form-check-label text-gray-800">Format 2</div>
+                    <!--end::Label-->
+                  </div>
+                  <!--end::Check-->
+                </label>
+                <!--end::Option-->
+              </div>
+              <!--end::Col-->
+            </div>
+            <!--end::Options-->
+
             <!--begin::Input group-->
             <div class="row mb-6">
               <!--begin::Label-->
@@ -901,19 +1002,19 @@
             </div>
             <!--end::Input group-->
           </div>
+
           <div class="modal-footer flex-center">
             <!--begin::Button-->
-            <button type="reset" class="btn btn-lg btn-danger w-25">
+            <button type="reset" class="btn btn-lg btn-danger w-sd-25 w-lg-25">
               Discard
             </button>
             <!--end::Button-->
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
             <!--begin::Button-->
             <button
-              :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-25"
               type="submit"
-              @click="submit()"
+              :data-kt-indicator="loading ? 'on' : null"
+              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
             >
               <span v-if="!loading" class="indicator-label"> Submit </span>
               <span v-if="loading" class="indicator-progress">
@@ -982,6 +1083,8 @@ interface companyDetails {
   is_trial: boolean;
   trial_subscription_start: string;
   trial_subscription_end: string;
+
+  billing_format: string;
 }
 
 export default defineComponent({
@@ -1073,6 +1176,8 @@ export default defineComponent({
       is_trial: true,
       trial_subscription_start: "",
       trial_subscription_end: "",
+
+      billing_format: "billing-format-1",
     });
 
     const validGSTRef = ref(false);
@@ -1218,11 +1323,11 @@ export default defineComponent({
             // console.log("API response:", response);
             showSuccessAlert(
               "Success",
-              response.message || "Company details have been successfully inserted!"
+              response.message ||
+                "Company details have been successfully inserted!"
             );
             router.push({ name: "company-list" });
-          }
-          else{
+          } else {
             // Handle API error response
             loading.value = false;
             showErrorAlert("Error", response.message || "An error occurred.");

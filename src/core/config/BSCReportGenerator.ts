@@ -29,10 +29,10 @@ const BSCReportGen = async (id, pdfName, reportInfo) => {
       align: "center",
     });
 
-    const customerAddress = `${reportInfo.value.meta.address1} ${reportInfo.value.meta.address2} ${reportInfo.value.meta.city} ${reportInfo.value.meta.pincode} ${reportInfo.value.meta.state} ${reportInfo.value.meta.country}`;
+    const customerAddress = `${reportInfo.value.customer.address1 || ""} ${reportInfo.value.customer.address2 || ""} ${reportInfo.value.customer.city || ""} ${reportInfo.value.customer.pincode || ""} ${reportInfo.value.customer.state || ""} ${reportInfo.value.customer.country || ""}`;
 
     const CustomerDetails = [
-      [{ title: `Customer Name & Address\n\n${reportInfo.value.meta.company_name}\n${customerAddress}`, rowSpan: 7}, { title:`Certificate Number : ${reportInfo.value.certificate_number}`}],
+      [{ title: `Customer Name & Address\n\n${reportInfo.value.customer.company_name || ""}\n${customerAddress}`, rowSpan: 7}, { title:`Certificate Number : ${reportInfo.value.certificate_number}`}],
       [{ title:`ULR Number : ${reportInfo.value.ulr_number}`}],
       [{ title:`SRF Number : ${reportInfo.value.service.srf_no}`}],
       [{ title:`Date of Receipt : ${reportInfo.value.d_receipt}`}],

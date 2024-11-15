@@ -279,7 +279,7 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref, computed, watch } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable/table-partials/models";
-import type { IInvoices } from "@/core/model/invoices";
+import type { IInvoices, InvoiceInfoType } from "@/core/model/invoices";
 import {
   getInvoiceList,
   deleteInvoice,
@@ -296,7 +296,9 @@ import { GetInvoiceStatus } from "@/core/config/InvoiceStatusConfig";
 import moment from "moment";
 import Swal from "sweetalert2";
 import { Identifier } from "@/core/config/WhichUserConfig";
-import { Gen } from "@/core/config/PdfGenerator";
+// import { Gen } from "@/core/config/PdfGenerator";
+import { BillingFormat1Generator } from "@/core/config/billing/BillingFormat1";
+import { BillingFormat2Generator } from "@/core/config/billing/BillingFormat2";
 
 export default defineComponent({
   name: "invoices-list",
@@ -1014,7 +1016,7 @@ export default defineComponent({
       logo_base64: "",
     });
 
-    const InvoiceInfo = ref({
+    const InvoiceInfo = ref<InvoiceInfoType>({
       id: "",
       invoice_no: "",
       customer_id: "",
@@ -1193,13 +1195,32 @@ export default defineComponent({
 </div>`,
         });
 
-        await Gen(
-          "invoice",
+                // Switch-case logic to choose which generation function to call
+                switch (auth.companyDetails["billing_format"]) {
+          case "billing-format-1":
+            // Call the generation logic for format 1
+            await BillingFormat1Generator(
+              "invoice",
           id,
           InvoiceInfo.value.invoice_no,
           InvoiceInfo,
           companyInfo
-        );
+            );
+            break;
+          case "billing-format-2":
+            // Call the generation logic for format 2
+            await BillingFormat2Generator(
+              "invoice",
+          id,
+          InvoiceInfo.value.invoice_no,
+          InvoiceInfo,
+          companyInfo
+            );
+            break;
+          default:
+            showErrorAlert("Error", "Unsupported quotation format");
+            return;
+        }
 
         // Close Swal on success
         Swal.fire({

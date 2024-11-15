@@ -2,11 +2,10 @@
   <!--begin::Navbar-->
   <div class="app-navbar flex-shrink-0">
     <!--begin::Notifications-->
-    <div class="app-navbar-item ms-1 ms-md-3">
+    <div class="app-navbar-item ms-1 ms-md-3" v-if="Identifier != 'Customer'">
       <!--begin::Menu- wrapper-->
       <div
         class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-30px h-30px w-md-40px h-md-40px position-relative"
-        id="kt_drawer_chat_toggle"
         data-kt-menu-trigger="{default:'click', lg: 'hover'}"
         data-kt-menu-attach="parent"
         data-kt-menu-placement="bottom-end"
@@ -29,6 +28,22 @@
       <!--end::Menu wrapper-->
     </div>
     <!--end::Notifications-->
+
+    <!--begin::Chat-->
+    <div class="app-navbar-item ms-1 ms-md-3">
+      <!--begin::Menu wrapper-->
+      <div
+        class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-30px h-30px w-md-40px h-md-40px position-relative"
+        id="kt_drawer_chat_toggle"
+      >
+        <KTIcon icon-name="message-text-2" icon-class="fs-2 fs-md-1" />
+        <span
+          class="bullet bullet-dot bg-success h-6px w-6px position-absolute translate-middle top-0 start-50 animation-blink"
+        ></span>
+      </div>
+      <!--end::Menu wrapper-->
+    </div>
+    <!--end::Chat-->
 
     <!--begin::Quick links-->
     <div class="app-navbar-item ms-1 ms-md-3">
@@ -122,6 +137,7 @@ import { computed, defineComponent, onMounted, ref } from "vue";
 import KTNotificationMenu from "@/layouts/main-layout/menus/NotificationsMenu.vue";
 import KTQuickLinksMenu from "@/layouts/main-layout/menus/QuickLinksMenu.vue";
 import KTUserMenu from "@/layouts/main-layout/menus/UserAccountMenu.vue";
+
 import KTThemeModeSwitcher from "@/layouts/main-layout/theme-mode/ThemeModeSwitcher.vue";
 import { ThemeModeComponent } from "@/assets/ts/layout";
 import { useThemeStore } from "@/stores/theme";
@@ -129,6 +145,7 @@ import { useAuthStore } from "@/stores/auth";
 import { calibrationNotification, maintenanceNotification } from "@/stores/api";
 import moment from "moment";
 import { blank64 } from "./blank";
+import { Identifier } from "@/core/config/WhichUserConfig";
 
 interface Instrument {
   id: string;
@@ -238,12 +255,14 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      await fetchDueCalibration();
-      await fetchDueMaintenance();
+      if (User.role_id !== 7) {
+        await fetchDueCalibration();
+        await fetchDueMaintenance();
 
-      TotalNotification.value =
-        calibrationNotificationCount.value +
-        maintenanaceNotificationCount.value;
+        TotalNotification.value =
+          calibrationNotificationCount.value +
+          maintenanaceNotificationCount.value;
+      }
     });
 
     return {
@@ -256,6 +275,7 @@ export default defineComponent({
       calibrationNotificationCount,
       TotalNotification,
       blank64,
+      Identifier,
     };
   },
 });

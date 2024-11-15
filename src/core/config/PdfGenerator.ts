@@ -97,7 +97,9 @@ const Gen = async (
     // Function that add header
 
     // Fixed height for the diagram
-    const imgHeight = 1.7;
+    const logoWidth = 2.3;
+    const logoHeight = 1.7;
+    let headerEnd = 0;
 
     // Heading Name
     const pdfHeading = (pdftype == "quotation" ? 'QUOTATION' : 'INVOICE');
@@ -109,30 +111,14 @@ const Gen = async (
         [
           {
             title: "",
-            rowSpan: 3,
+            styles: { 
+              minCellHeight: 1.7,
+            },
           },
           {
-            title: `${pdfHeading}`,
+            title: "",
             styles: { 
-              fontSize: 20,
             },
-          }
-        ],
-        [
-          {
-            title: `${companyDetails.value.company_name || ""}`,
-            styles: { 
-              fontSize: 10,
-              fontStyle: "bold"
-            }
-          }
-        ],
-        [
-          {
-            title: `${companyDetails.value.address || ""} \n${companyDetails.value.city || ""} ${companyDetails.value.pincode || ""} ${companyDetails.value.state || ""} ${companyDetails.value.country || ""}`,
-            styles: { 
-              fontSize: 9,
-            }
           }
         ]
       ];
@@ -145,18 +131,65 @@ const Gen = async (
         theme: "plain",
         startY: 0.2,
         columnStyles: {
-          '0': { cellWidth: 4, minCellHeight:1.7, halign: "left", },
+          '0': { cellWidth: 4, halign: "left", },
           '1': { cellWidth: "auto", halign: "right"},
         },
         bodyStyles: { 
           
         },
+
+        willDrawCell: (data) => {
+          if (data.row.index === 0 && data.column.index === 1) {
+
+            doc.autoTable({
+                body: [
+                    [
+                      {
+                        title: `${pdfHeading}`,
+                        styles: { 
+                          fontSize: 20,
+                        },
+                      }
+                    ],
+                    [
+                      {
+                        title: `${companyDetails.value.company_name || ""}`,
+                        styles: { 
+                          fontSize: 10,
+                          fontStyle: "bold"
+                        },
+                      }
+                    ],
+                    [
+                      {
+                        title: `${companyDetails.value.address || ""} \n${companyDetails.value.city || ""} ${companyDetails.value.pincode || ""} ${companyDetails.value.state || ""} ${companyDetails.value.country || ""}`,
+                        styles: { 
+                          fontSize: 9,
+                          fontStyle: "normal"
+                        },
+                      }
+                    ],
+                ],
+                theme: "plain",
+                startY: data.cell.y,
+                margin: {left: data.cell.x},
+                tableWidth: 'auto',
+                columnStyles: {
+                  '0': { cellWidth: "auto", halign: "right"},
+                },
+                
+            });
+            
+          }
+        },
+
+
         didDrawCell: (data) => {
           const { cell, row, column } = data;
 
           if (data.row.index === 0 && data.column.index === 0) {
             // Add the image to the cell with full width and fixed height
-            doc.addImage(img, 'JPEG', cell.x, cell.y, 2.3, 1.7, "company logo");
+            doc.addImage(img, 'JPEG', cell.x, cell.y, logoWidth, logoHeight, "company logo");
           }
 
         },
@@ -195,7 +228,10 @@ const Gen = async (
           }
         },
         {
-          title: "",
+          title: `${titleForPdf} No. : ${uniqueNumber || ""}`,
+          styles: {
+            fontSize : 10,
+          }
         },
       ],
       [
@@ -207,7 +243,7 @@ const Gen = async (
           }
         },
         {
-          title: `${titleForPdf} No. : ${uniqueNumber || ""}`,
+          title: `${titleForPdf} Date : ${invoiceDetials.value.date || ""}`,
           styles: {
             fontSize : 10,
             fontStyle: "normal"
@@ -223,7 +259,7 @@ const Gen = async (
           }
         },
         {
-          title: `Enquiry No : ${invoiceDetials.value.enquiry_no || ""}\n\n${titleForPdf} Date : ${invoiceDetials.value.date || ""}\n\n${titleForPdf} Due Date : ${invoiceDetials.value.duedate || ""}`,
+          title: `Enquiry No : ${invoiceDetials.value.enquiry_no || ""}`,
           styles: {
             fontSize : 10,
             fontStyle: "normal",
@@ -238,7 +274,7 @@ const Gen = async (
       // startY: 2.2,
       margin: {top: 0.5},
       columnStyles: {
-        '0': { cellWidth: 3.63, halign: "left", },
+        '0': { cellWidth: 4, halign: "left", },
         '1': { cellWidth: "auto", halign: "right"},
       },
       bodyStyles: {
@@ -250,16 +286,16 @@ const Gen = async (
     const tableHeader = [
       [
         {
-          title: "Scope of Work"
+          title: "Description"
         },
         {
-          title: `${pdfWiseType == 'DayWise' ? 'No. of Days' : 'Quantity'}`
+          title: `${pdfWiseType == 'DayWise' ? 'No. of Days' : 'Qty'}`
         },
         {
-          title: "Price"
+          title: "Price (INR)"
         },
         {
-          title: "Amount"
+          title: "Total Amount (INR)"
         }
       ],
     ];
@@ -428,7 +464,7 @@ const Gen = async (
       { title: item.name },
       { title: item.quantity },
       { title: item.charge },
-      { title: item.charge }
+      { title: item.charge * item.quantity }
     ]);
 
     if(pdfWiseType == "DayWise"){

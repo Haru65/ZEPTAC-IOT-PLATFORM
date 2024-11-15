@@ -83,7 +83,7 @@
               </div>
             </div>
 
-            <div class="container">
+            <div class="container mb-6">
               <div class="row g-5 g-xl-8">
                 <div
                   v-for="(skill, index) in skills"

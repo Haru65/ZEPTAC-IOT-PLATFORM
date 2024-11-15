@@ -67,7 +67,7 @@
           <!--begin::Add customer-->
           <router-link to="/interlaboratory/add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Interlaboratory Comparison
+            Interlaboratory Comparison
           </router-link>
           <!--end::Add customer-->
         </div>

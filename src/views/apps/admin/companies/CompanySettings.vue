@@ -9,6 +9,7 @@
           id="kt_account_profile_details_form"
           class="form"
           novalidate
+          @submit="submit"
           :validation-schema="companyDetailsValidator"
         >
           <!--begin::Card body-->
@@ -822,9 +823,8 @@
             <!--begin::Button-->
             <button
               :data-kt-indicator="loading ? 'on' : null"
-              class="btn btn-lg btn-primary w-25"
+              class="btn btn-lg btn-primary w-sd-25 w-lg-25"
               type="submit"
-              @click="submit()"
             >
               <span v-if="!loading" class="indicator-label"> Update </span>
               <span v-if="loading" class="indicator-progress">

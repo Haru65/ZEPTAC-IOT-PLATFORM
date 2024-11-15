@@ -21,12 +21,6 @@
             placeholder="Enter module name"
             v-model="itemDetails.module_name"
           />
-          <button
-            @click.prevent="onsubmit"
-            class="btn btn-success fw-bold flex-shrink-0"
-          >
-            Add Module
-          </button>
         </div>
         <div class="fv-plugins-message-container">
           <div class="fv-help-block">
@@ -34,6 +28,13 @@
           </div>
         </div>
         <!--end::Title-->
+
+        <button
+          @click.prevent="onsubmit"
+          class="btn btn-success fw-bold flex-shrink-0 mt-2 w-sd-25 w-lg-25"
+        >
+          Add Module
+        </button>
       </div>
       <!--end::Input group-->
     </Vform>
@@ -414,14 +415,17 @@ export default defineComponent({
         if (response.success) {
           // Handle successful API response
           // console.log("API response:", response);
-          showSuccessAlert("Success", response.message || "Module added successfully");
+          showSuccessAlert(
+            "Success",
+            response.message || "Module added successfully"
+          );
 
           // clear();
           await module_listing();
         } else {
-            // Handle API error response
-            loading.value = false;
-            showErrorAlert("Error", response.message || "An error occurred.");
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
         }
       } catch (error) {
         // Handle any other errors during API call

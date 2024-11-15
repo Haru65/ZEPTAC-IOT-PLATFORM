@@ -64,6 +64,13 @@
           <!--end::Submit button-->
         </div>
         <!--end::Actions-->
+
+        <div class="text-end mb-10 p-2">
+          <router-link to="/" class="fs-3 text-decoration-underline fw-semibold text-primary">
+            Go Home
+          </router-link>
+        </div>
+
       </VForm>
       <!--end::Form-->
     </div>

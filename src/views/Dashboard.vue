@@ -71,7 +71,6 @@
         ></QuotationWidget>
       </div>
       <!--end::Col-->
-
     </div>
     <!--end::Row-->
     <!--begin::Row-->

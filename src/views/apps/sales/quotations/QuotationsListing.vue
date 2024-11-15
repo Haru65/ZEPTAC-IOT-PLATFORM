@@ -275,7 +275,7 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref, computed, watch } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import type { IQuotations } from "@/core/model/quotation";
+import type { IQuotations, QuotationInfoType } from "@/core/model/quotation";
 import {
   getQuotationList,
   deleteQuotation,
@@ -292,7 +292,9 @@ import { GetQuotationStatus } from "@/core/config/QuotationStatusConfig";
 import moment from "moment";
 import Swal from "sweetalert2";
 import { Identifier } from "@/core/config/WhichUserConfig";
-import { Gen } from "@/core/config/PdfGenerator";
+// import { Gen } from "@/core/config/PdfGenerator";
+import { BillingFormat1Generator } from "@/core/config/billing/BillingFormat1";
+import { BillingFormat2Generator } from "@/core/config/billing/BillingFormat2";
 
 export default defineComponent({
   name: "quotation-list",
@@ -1010,7 +1012,7 @@ export default defineComponent({
       logo_base64: "",
     });
 
-    const QuotationInfo = ref({
+    const QuotationInfo = ref<QuotationInfoType>({
       id: "",
       quotation_no: "",
       customer_id: "",
@@ -1170,7 +1172,7 @@ export default defineComponent({
             : "";
           companyInfo.value.logo_base64 = res2.result.logo_base64
             ? "data: image/png;base64," + res2.result.logo_base64
-            : getAssetPath("media/avatars/default.png");
+            : getAssetPath("media/logos/zeptac_logo.png");
 
           companyInfo.value.address = res2.result.address || "";
           companyInfo.value.city = res2.result.city || "";
@@ -1192,13 +1194,32 @@ export default defineComponent({
 </div>`,
         });
 
-        await Gen(
-          "quotation",
-          id,
-          QuotationInfo.value.quotation_no,
-          QuotationInfo,
-          companyInfo
-        );
+        // Switch-case logic to choose which generation function to call
+        switch (auth.companyDetails["billing_format"]) {
+          case "billing-format-1":
+            // Call the generation logic for format 1
+            await BillingFormat1Generator(
+              "quotation",
+              id,
+              QuotationInfo.value.quotation_no,
+              QuotationInfo,
+              companyInfo
+            );
+            break;
+          case "billing-format-2":
+            // Call the generation logic for format 2
+            await BillingFormat2Generator(
+              "quotation",
+              id,
+              QuotationInfo.value.quotation_no,
+              QuotationInfo,
+              companyInfo
+            );
+            break;
+          default:
+            showErrorAlert("Error", "Unsupported quotation format");
+            return;
+        }
 
         // Close Swal on success
         Swal.fire({

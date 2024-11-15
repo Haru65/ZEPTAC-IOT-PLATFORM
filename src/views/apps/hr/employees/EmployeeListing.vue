@@ -42,7 +42,7 @@
           <!--begin::Add customer-->
           <router-link to="./add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Employee
+            Employee
           </router-link>
           <!--end::Add customer-->
         </div>

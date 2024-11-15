@@ -199,7 +199,7 @@
             <!--end::Menu FLex-->
 
             <!--begin::Edit-->
-            <router-link :to="`/calibration-srf/edit/${calibration_srf.id}`">
+            <router-link :to="`/calibration-srf/edit/${calibration_srf.id}/${calibration_srf.company_id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
                 data-bs-toggle="tooltip"
@@ -835,15 +835,7 @@ export default defineComponent({
       selectedIds.value = selectedItems;
     };
 
-    function downloadFileObject(base64String, nameOfFile, fExtension) {
-      const linkSource = base64String;
-      const downloadLink = document.createElement("a");
-      const fileName = nameOfFile + fExtension;
-      downloadLink.href = linkSource;
-      downloadLink.download = fileName;
-      downloadLink.click();
-    }
-
+    // function that handles bulk download zip
     const handleZipFile = async (id: any) => {
       try {
         // Trigger the backend to generate the ZIP

@@ -833,14 +833,14 @@
         </div>
         <div class="modal-footer flex-center">
           <!--begin::Button-->
-          <button type="reset" class="btn btn-lg btn-danger w-25">Clear</button>
+          <button type="reset" class="btn btn-lg btn-danger w-sd-25 w-lg-25">Clear</button>
           <!--end::Button-->
           &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
           <!--begin::Button-->
           <button
             type="submit"
             :data-kt-indicator="loading ? 'on' : null"
-            class="btn btn-lg btn-primary w-25"
+            class="btn btn-lg btn-primary w-sd-25 w-lg-25"
           >
             <span v-if="!loading" class="indicator-label"> Submit </span>
             <span v-if="loading" class="indicator-progress">

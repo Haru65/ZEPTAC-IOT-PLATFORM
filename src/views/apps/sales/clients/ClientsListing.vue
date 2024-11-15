@@ -369,7 +369,7 @@ export default defineComponent({
       return identifier.value === "Admin"
         ? tableHeader.value
         : tableHeader.value.filter(
-            (column) => column.columnLabel !== "company_name"
+            (column) => column.columnLabel !== "company_details"
           );
     });
 

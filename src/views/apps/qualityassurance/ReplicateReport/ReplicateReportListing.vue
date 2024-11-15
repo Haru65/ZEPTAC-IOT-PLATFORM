@@ -67,7 +67,7 @@
           <!--begin::Add customer-->
           <router-link to="/replicate_report/add" class="btn btn-primary">
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            + Replicate Report
+            Replicate Report
           </router-link>
           <!--end::Add customer-->
         </div>

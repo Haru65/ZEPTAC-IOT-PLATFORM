@@ -490,6 +490,7 @@ interface ProfileDetails {
   gst_number: string;
   source: string;
   is_converted: boolean;
+  grant_access: boolean;
   is_active: number;
   company_id: string;
   company_name: string;
@@ -561,6 +562,7 @@ export default defineComponent({
       gst_number: "",
       source: "webapp",
       is_converted: true,
+      grant_access: false,
       company_name: "",
       is_active: 1,
       company_id: User.company_id,
@@ -702,6 +704,7 @@ export default defineComponent({
         gst_number: "",
         source: "webapp",
         is_converted: true,
+        grant_access: false,
         company_id: User.company_id,
         company_name: "",
         created_by: User.id,

@@ -235,45 +235,45 @@
 
                 <!--begin::Input-->
                 <div class="form-control form-control-lg form-control-solid">
-                  <div>{{ RgpData?.quotation.client.company_name || "" }}</div>
+                  <div>{{ RgpData?.quotation.clientx.company_name || "" }}</div>
                   <div class="mt-2 pt-4">
                     <h6 class="mt-5">Site Address:</h6>
                     <div class="mt-2">
-                      <div class="mb-1" v-show="RgpData?.quotation.client">
+                      <div class="mb-1" v-show="RgpData?.quotation.clientx">
                         <br />
-                        <span v-show="RgpData?.quotation.client.company_name">
+                        <span v-show="RgpData?.quotation.clientx.company_name">
                           {{
-                            `${RgpData?.quotation.client.company_name || ""}`
+                            `${RgpData?.quotation.clientx.company_name || ""}`
                           }}
                         </span>
                         <br />
                         <span>
-                          {{ `${RgpData?.quotation.client.name || ""}` }}
+                          {{ `${RgpData?.quotation.clientx.name || ""}` }}
                         </span>
                         <!-- v-if company_data present -->
-                        <div v-show="RgpData?.quotation.client.company_name">
+                        <div v-show="RgpData?.quotation.clientx.company_name">
                           <br />
                           <span>
-                            {{ `${RgpData?.quotation.client.address1 || ""}` }}
+                            {{ `${RgpData?.quotation.clientx.address1 || ""}` }}
                           </span>
                           <br />
                           <span>
-                            {{ `${RgpData?.quotation.client.address2 || ""}` }}
+                            {{ `${RgpData?.quotation.clientx.address2 || ""}` }}
                           </span>
                         </div>
-                        <div v-show="RgpData?.quotation.client.country">
+                        <div v-show="RgpData?.quotation.clientx.country">
                           <span>
                             {{
-                              `${RgpData?.quotation.client.city || ""} - ${
-                                RgpData?.quotation.client.pincode || ""
+                              `${RgpData?.quotation.clientx.city || ""} - ${
+                                RgpData?.quotation.clientx.pincode || ""
                               }`
                             }}
                           </span>
                           <br />
                           <span>
                             {{
-                              `${RgpData?.quotation.client.state || ""} ${
-                                RgpData?.quotation.client.country || ""
+                              `${RgpData?.quotation.clientx.state || ""} ${
+                                RgpData?.quotation.clientx.country || ""
                               }`
                             }}
                           </span>
