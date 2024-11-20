@@ -199,7 +199,7 @@ export const useAuthStore = defineStore("auth", () => {
   function forgotPassword(email: string) {
 
 
-    return ApiService.post("forgot_password", email)
+    return ApiService.post("forgot_password", { email })
       .then((response) => {
         return response.data;
       })

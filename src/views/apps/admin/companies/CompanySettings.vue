@@ -13,7 +13,7 @@
           :validation-schema="companyDetailsValidator"
         >
           <!--begin::Card body-->
-          <div class="card-body border-top p-9">
+          <div class="card-body p-9">
             <div class="row mb-6">
               <!--begin::Label-->
               <label class="col-lg-4 col-form-label fw-semobold fs-6"
@@ -921,13 +921,13 @@ export default defineComponent({
     const state = ref([""]);
 
     const companyDetailsValidator = Yup.object().shape({
-      company_name: Yup.string().required().label("Compnay Name"),
+      // company_name: Yup.string().required().label("Compnay Name"),
       address: Yup.string().required().label("Company Address"),
       contact_person: Yup.string().required().label("Contact Person"),
       mobile_number: Yup.string().required().label("Contact"),
-      email: Yup.string().required().email().label("Email"),
-      country: Yup.string().required().label("Country"),
-      state: Yup.string().required().label("State"),
+      // email: Yup.string().required().email().label("Email"),
+      // country: Yup.string().required().label("Country"),
+      // state: Yup.string().required().label("State"),
       city: Yup.string().required().label("City"),
       pincode: Yup.string().required().label("Pincode"),
       gst_details: Yup.string().required().label("GST Number"),

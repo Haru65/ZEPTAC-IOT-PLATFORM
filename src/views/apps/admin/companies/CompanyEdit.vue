@@ -969,13 +969,13 @@ export default defineComponent({
       contact_person: Yup.string().required().label("Contact Person"),
       mobile_number: Yup.string().required().label("Contact"),
       email: Yup.string().required().email().label("Email"),
-      country: Yup.string().required().label("Country"),
-      state: Yup.string().required().label("State"),
+      // country: Yup.string().required().label("Country"),
+      // state: Yup.string().required().label("State"),
       city: Yup.string().required().label("City"),
       pincode: Yup.string().required().label("Pincode"),
       gst_details: Yup.string().required().label("GST Number"),
 
-      selected_package: Yup.string().required().label("Package"),
+      // selected_package: Yup.string().required().label("Package"),
 
       quotation_no_init: Yup.string().required().label("Quotation Suffix"),
       quotation_no_prefix: Yup.string().required().label("Quotation Prefix"),

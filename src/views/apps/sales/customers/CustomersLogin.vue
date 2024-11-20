@@ -208,6 +208,7 @@
 
           <!--begin::Actions-->
           <div class="d-flex justify-content-start gap-2 mb-0">
+
             <button
               v-if="profileDetails.grant_access == true"
               type="button"
@@ -218,6 +219,25 @@
             >
               <!--begin::Indicator-->
               <span class="indicator-label">Revoke Login</span>
+              <span class="indicator-progress"
+                >Please wait...
+                <span
+                  class="spinner-border spinner-border-sm align-middle ms-2"
+                ></span
+              ></span>
+              <!--end::Indicator-->
+            </button>
+
+            <button
+              v-if="profileDetails.grant_access == true"
+              type="button"
+              ref="resetSubmitButton"
+              @click="sendResetLinkToCustomer"
+              class="btn btn-sm btn-primary"
+              id="kt_subscriptions_create_button"
+            >
+              <!--begin::Indicator-->
+              <span class="indicator-label">Reset Password</span>
               <span class="indicator-progress"
                 >Please wait...
                 <span
@@ -308,6 +328,7 @@ export default defineComponent({
   setup() {
     const revokeSubmitButton = ref<null | HTMLButtonElement>(null);
     const grantSubmitButton = ref<null | HTMLButtonElement>(null);
+    const resetSubmitButton = ref<null | HTMLButtonElement>(null);
     const auth = useAuthStore();
     const router = useRouter();
     const route = useRoute();
@@ -457,6 +478,42 @@ export default defineComponent({
       }
     };
 
+    // Send a reset link to customer
+    const sendResetLinkToCustomer = async () => {
+      try {
+        if (resetSubmitButton.value) {
+          // Activate indicator
+          resetSubmitButton.value.setAttribute("data-kt-indicator", "on");
+        }
+        loading.value = true;
+
+        // Call your API here
+        const response = await auth.forgotPassword(profileDetails.value.email as string);
+
+        if (response?.success) {
+          // Handle successful API response
+          loading.value = false;
+          showSuccessAlert(
+            "Success",
+            response.message || "Reset Link Sent Successfully on Email"
+          );
+        } else {
+          // Handle API error response
+          loading.value = false;
+          showErrorAlert("Error", response.message || "An error occurred.");
+        }
+      } catch (error) {
+        // Handle any other errors during API call
+        console.error("API call error:", error);
+        showErrorAlert("Error", "An error occurred during the API call.");
+      } finally {
+        if (resetSubmitButton.value) {
+          resetSubmitButton.value.removeAttribute("data-kt-indicator");
+        }
+        loading.value = false;
+      }
+    };
+
     const showSuccessAlert = (title, message) => {
       Swal.fire({
         title,
@@ -488,10 +545,12 @@ export default defineComponent({
     return {
       grantSubmitButton,
       revokeSubmitButton,
+      resetSubmitButton,
       profileDetails,
       getAssetPath,
       revokeLogin,
       grantLogin,
+      sendResetLinkToCustomer,
       loading,
     };
   },
