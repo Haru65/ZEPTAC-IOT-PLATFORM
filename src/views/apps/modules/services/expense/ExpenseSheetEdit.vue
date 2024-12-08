@@ -290,7 +290,7 @@
                 <!--begin::Email-->
                 <a
                   :href="`mailto:${itemDetails?.engineer.email}`"
-                  class="fw-semobold text-gray-600 text-hover-primary"
+                  class="fw-semobold text-gray-600 text-hover-primary text-wrap"
                   >{{ itemDetails?.engineer.email || "" }}</a
                 >
                 <!--end::Email-->

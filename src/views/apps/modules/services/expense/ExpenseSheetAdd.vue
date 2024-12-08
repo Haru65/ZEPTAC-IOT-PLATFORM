@@ -234,56 +234,56 @@
                       class="form-control form-control-lg form-control-solid"
                     >
                       <div>
-                        {{ RgpData?.quotation.client.company_name || "" }}
+                        {{ RgpData?.quotation.clientx.company_name || "" }}
                       </div>
                       <div class="mt-2 pt-4">
                         <h6 class="mt-5">Site Address:</h6>
                         <div class="mt-2">
-                          <div class="mb-1" v-show="RgpData?.quotation.client">
+                          <div class="mb-1" v-show="RgpData?.quotation.clientx">
                             <br />
                             <span
-                              v-show="RgpData?.quotation.client.company_name"
+                              v-show="RgpData?.quotation.clientx.company_name"
                             >
                               {{
                                 `${
-                                  RgpData?.quotation.client.company_name || ""
+                                  RgpData?.quotation.clientx.company_name || ""
                                 }`
                               }}
                             </span>
                             <br />
                             <span>
-                              {{ `${RgpData?.quotation.client.name || ""}` }}
+                              {{ `${RgpData?.quotation.clientx.name || ""}` }}
                             </span>
                             <!-- v-if company_data present -->
                             <div
-                              v-show="RgpData?.quotation.client.company_name"
+                              v-show="RgpData?.quotation.clientx.company_name"
                             >
                               <br />
                               <span>
                                 {{
-                                  `${RgpData?.quotation.client.address1 || ""}`
+                                  `${RgpData?.quotation.clientx.address1 || ""}`
                                 }}
                               </span>
                               <br />
                               <span>
                                 {{
-                                  `${RgpData?.quotation.client.address2 || ""}`
+                                  `${RgpData?.quotation.clientx.address2 || ""}`
                                 }}
                               </span>
                             </div>
-                            <div v-show="RgpData?.quotation.client.country">
+                            <div v-show="RgpData?.quotation.clientx.country">
                               <span>
                                 {{
-                                  `${RgpData?.quotation.client.city || ""} - ${
-                                    RgpData?.quotation.client.pincode || ""
+                                  `${RgpData?.quotation.clientx.city || ""} - ${
+                                    RgpData?.quotation.clientx.pincode || ""
                                   }`
                                 }}
                               </span>
                               <br />
                               <span>
                                 {{
-                                  `${RgpData?.quotation.client.state || ""} ${
-                                    RgpData?.quotation.client.country || ""
+                                  `${RgpData?.quotation.clientx.state || ""} ${
+                                    RgpData?.quotation.clientx.country || ""
                                   }`
                                 }}
                               </span>
@@ -640,7 +640,7 @@
                       <p>
                         <span class="text-gray-700"> Client Name: </span>
                         <span class="text-gray-800">
-                          {{ RgpData?.quotation.client.company_name }}
+                          {{ RgpData?.quotation.clientx.company_name }}
                         </span>
                       </p>
                       <p>
@@ -648,12 +648,12 @@
                       </p>
                       <p>
                         <span class="text-gray-800">
-                          {{ RgpData?.quotation.client.address1 || "" }}
-                          {{ RgpData?.quotation.client.address2 || "" }}
-                          {{ RgpData?.quotation.client.city || "" }}
-                          {{ RgpData?.quotation.client.pincode || "" }}
-                          {{ RgpData?.quotation.client.state || "" }}
-                          {{ RgpData?.quotation.client.country || "" }}
+                          {{ RgpData?.quotation.clientx.address1 || "" }}
+                          {{ RgpData?.quotation.clientx.address2 || "" }}
+                          {{ RgpData?.quotation.clientx.city || "" }}
+                          {{ RgpData?.quotation.clientx.pincode || "" }}
+                          {{ RgpData?.quotation.clientx.state || "" }}
+                          {{ RgpData?.quotation.clientx.country || "" }}
                         </span>
                       </p>
                     </div>
@@ -944,7 +944,6 @@ export default defineComponent({
             itemDetails.value.engineer_id = engineerDetails.id;
             itemDetails.value.engineer_first_name = engineerDetails.first_name;
             itemDetails.value.engineer_last_name = engineerDetails.last_name;
-            console.log("in");
           } else {
             itemDetails.value.engineer_id = "";
             itemDetails.value.engineer_first_name = "";

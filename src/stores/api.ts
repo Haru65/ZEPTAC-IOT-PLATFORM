@@ -68,6 +68,8 @@ const UUC_READING = "uuc-reading";
 const CALIBRATION_SRF = "calibration-srf";
 const CAL_PROC_URL = "calibration-procedure";
 const NOTIFICATION_URL = "notifications";
+const PO_URL = "purchase-order";
+const PO_PAYMENT_URL = "po-payment";
 
 
 
@@ -6589,6 +6591,248 @@ export async function deleteNotification(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(NOTIFICATION_URL + "/" + data);
+        console.log(response.data.message)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// PURCHASE ORDER ROUTES
+// list function
+export async function getPurchaseOrders(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(PO_URL, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// search function
+export async function PurchaseOrderSearch(search: any, year:any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search,
+            year: year
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('purchase_order_search', data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// get function
+export async function getPurchaseOrder(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(PO_URL, data);
+        // console.log(response)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// check whether purchase order is editable
+export async function purchaseOrderEditable(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get("purchase_order_editable", data);
+        // console.log(response)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// funtion to check po is already created or not
+export async function check_po_created(data: string | Number) {
+    try {
+        // console.log(data)
+        const id = { "id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('check_po_exist', id);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
+
+// add function
+export async function addPurchaseOrder(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.post(PO_URL, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// update function
+export async function updatePurchaseOrder(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(PO_URL + "/" + id, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// update approval status function
+export async function PurchaseOrderStatus(id: any, data: any) {
+    try {
+        //console.log(data)
+        const details = {
+            id: id,
+            data: data
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post("purchase_order_status", details);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// delete function
+export async function deletePurchaseOrder(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(PO_URL + "/" + data);
+        console.log(response.data.message)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
+
+// PURCHASE ORDER PAYMENTS ROUTES
+// list function
+export async function getPoPayments(data) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(PO_PAYMENT_URL, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// search function
+export async function PoPaymentSearch(search: any, year:any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search,
+            year: year
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('po_payment_search', data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// get function
+export async function getPoPayment(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(PO_PAYMENT_URL, data);
+        // console.log(response)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// add function
+export async function addPoPayment(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.post(PO_PAYMENT_URL, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// update function
+export async function updatePoPayment(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(PO_PAYMENT_URL + "/" + id, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// get Purchase Orders for direct add
+export async function getPoDirect(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get("get_po_direct", data);
+        // console.log(response)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
+// Get due Purchase Orders
+export async function getDuePurchaseOrders(data: any) {
+    try {
+        // console.log(data)
+        const id = { "company_id": data };
+        ApiService.setHeader();
+        const response = await ApiService.post('get_due_purchase_orders', id);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// delete function
+export async function deletePoPayment(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(PO_PAYMENT_URL + "/" + data);
         console.log(response.data.message)
         return response.data;
     } catch (errors:any) {

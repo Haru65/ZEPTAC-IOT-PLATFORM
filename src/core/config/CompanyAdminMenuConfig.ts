@@ -288,6 +288,18 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
           },
         ],
       },
+      {
+        heading: "Purchase Orders",
+        route: "/purchase-order/list",
+        keenthemesIcon: "cheque",
+        bootstrapIcon: "bi-archive",
+      },
+      {
+        heading: "Payments",
+        route: "/po-payment/list",
+        keenthemesIcon: "cheque",
+        bootstrapIcon: "bi-archive",
+      },
     ],
   },
   {

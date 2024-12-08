@@ -532,7 +532,11 @@
               {{ calibration_instrument.parameter }}
             </template>
             <template v-slot:ranges="{ row: calibration_instrument }">
-              {{ `${calibration_instrument.ranges_from || ""} to ${calibration_instrument.ranges_to || ""}` }}
+              {{
+                `${calibration_instrument.ranges_from || ""} to ${
+                  calibration_instrument.ranges_to || ""
+                }`
+              }}
             </template>
             <template v-slot:location="{ row: calibration_instrument }">
               {{ calibration_instrument.location }}
@@ -767,6 +771,12 @@ interface ReferenceInstrumentData {
   is_active: string;
 }
 
+interface Step {
+  description: string;
+  formula?: string;
+  steps?: string[];
+}
+
 // Define the interface for the UncertaintyValue
 interface UncertaintyValue {
   id: string;
@@ -785,7 +795,7 @@ interface UncertaintyValue {
   is_infinite: boolean;
   combined_uncertainty: string;
   expanded_uncertainty: string;
-
+  steps: Step[];
 }
 
 // Define the interface for the Reading
@@ -804,7 +814,6 @@ interface Reading {
   updated_at: string;
   uncertainty: UncertaintyValue; // Nested UncertaintyValue
 }
-
 
 interface DownloadData {
   id: string;
@@ -838,7 +847,7 @@ interface DownloadData {
   reference_instrument_id: string;
   service_request_id: string;
 
-  readings: Reading [];
+  readings: Reading[];
 
   company_id: string;
   is_active: string;
@@ -992,12 +1001,10 @@ export default defineComponent({
 
         if (response.success) {
           more.value = response.result.next_page_url != null ? true : false;
-          tableData.value = response.result.data.map(
-            ({ id, ...rest }) => ({
-              id: id,
-              ...rest,
-            })
-          );
+          tableData.value = response.result.data.map(({ id, ...rest }) => ({
+            id: id,
+            ...rest,
+          }));
           initvalues.value.splice(
             0,
             tableData.value.length,
@@ -1028,12 +1035,10 @@ export default defineComponent({
 
         if (response.success) {
           more.value = response.result.next_page_url != null ? true : false;
-          tableData.value = response.result.data.map(
-            ({ id, ...rest }) => ({
-              id: id,
-              ...rest,
-            })
-          );
+          tableData.value = response.result.data.map(({ id, ...rest }) => ({
+            id: id,
+            ...rest,
+          }));
           initvalues.value.splice(
             0,
             tableData.value.length,
@@ -1079,12 +1084,10 @@ export default defineComponent({
           `page=${page.value}&limit=${limit.value}&companyID=${companyID}&srfID=${srfID}`
         );
         if (response.success) {
-          tableData.value = response.result.data.map(
-            ({ id, ...rest }) => ({
-              id: id,
-              ...rest,
-            })
-          );
+          tableData.value = response.result.data.map(({ id, ...rest }) => ({
+            id: id,
+            ...rest,
+          }));
 
           more.value = response.result.next_page_url != null ? true : false;
           initvalues.value.splice(
@@ -1274,12 +1277,10 @@ export default defineComponent({
 
         if (response.success) {
           more.value = response.result.next_page_url != null ? true : false;
-          tableData.value = response.result.data.map(
-            ({ id, ...rest }) => ({
-              id: id,
-              ...rest,
-            })
-          );
+          tableData.value = response.result.data.map(({ id, ...rest }) => ({
+            id: id,
+            ...rest,
+          }));
           initvalues.value.splice(
             0,
             tableData.value.length,
@@ -1538,7 +1539,47 @@ export default defineComponent({
       reference_instrument_id: "",
       service_request_id: "",
 
-      readings : [],
+      readings: [
+        {
+          id: "",
+          company_id: "",
+          calibration_instrument_id: "",
+          uuc_reading: "",
+          i1_up: "",
+          d1_down: "",
+          i2_up: "",
+          d2_down: "",
+          mean_value: "",
+          is_active: "",
+          created_at: "",
+          updated_at: "",
+          uncertainty: {
+            id: "",
+            company_id: "",
+            reading_id: "",
+            standard_deviation: 0,
+            uncertainty_due_process: 0,
+            standard_uncertainty: 0,
+            uncertainty_resolution: 0,
+            hysteresis: 0,
+            uncertainty_due_hysteresis: 0,
+            max_zero_reading: 0,
+            zero_deviation: 0,
+            total_uncertainty: 0,
+            effective_deg_freedom: 0,
+            is_infinite: false,
+            combined_uncertainty: "",
+            expanded_uncertainty: "",
+            steps: [
+              {
+                description: "",
+                formula: "",
+                steps: [],
+              },
+            ],
+          },
+        },
+      ],
 
       company_id: "",
       is_active: "",
@@ -1651,7 +1692,7 @@ export default defineComponent({
         const res = await getCalibrationInstrumentInfo(id);
         if (res?.success != false) {
           instrumentInfo.value = { ...res.result } as DownloadData;
-          instrumentInfo.value.readings = [ ...res.result.readings ] as Reading[];
+          instrumentInfo.value.readings = [...res.result.readings] as Reading[];
           instrumentInfo.value.srf = { ...res.result.srf };
         } else {
           showErrorAlert("Error", res.message || "Error Occured");
@@ -1695,7 +1736,9 @@ export default defineComponent({
         });
 
         // Simulate delay for PDF generation (replace with actual function)
-        const pdfName = `calibration_instrument_record_${instrumentInfo.value.srf.srf_no || "_"}_${instrumentInfo.value.srf.purchase_order_no || "_"}`;
+        const pdfName = `calibration_instrument_record_${
+          instrumentInfo.value.srf.srf_no || "_"
+        }_${instrumentInfo.value.srf.purchase_order_no || "_"}`;
 
         await CalibrationRecordGen(id, pdfName, instrumentInfo, companyInfo);
 
@@ -1732,7 +1775,13 @@ export default defineComponent({
     }
 
     const fillItemData = async (data) => {
-      const { id, reference_instrument_id, ranges_from, ranges_to, reading_data } = data;
+      const {
+        id,
+        reference_instrument_id,
+        ranges_from,
+        ranges_to,
+        reading_data,
+      } = data;
 
       readingDetails.value = {
         id: id,

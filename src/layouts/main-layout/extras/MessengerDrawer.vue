@@ -7,13 +7,13 @@
     data-kt-drawer-name="chat"
     data-kt-drawer-activate="true"
     data-kt-drawer-overlay="true"
-    data-kt-drawer-width="{default:'500px', 'md': 500px', 'lg': '800px'}"
+    data-kt-drawer-width="{default:'350px', 'md': 500px', 'lg': '800px'}"
     data-kt-drawer-direction="end"
     data-kt-drawer-toggle="#kt_drawer_chat_toggle"
     data-kt-drawer-close="#kt_drawer_chat_close"
   >
     <!--begin::Messenger-->
-    <div class="card w-100 mw-500px" id="kt_drawer_chat_messenger">
+    <div class="card w-100" style="min-width: 350px;" id="kt_drawer_chat_messenger">
       <!--begin::Card header-->
       <div class="card-header pe-5" id="kt_drawer_chat_messenger_header">
         <!--begin::Title-->
@@ -84,7 +84,7 @@
             class="text-dark fw-sembold text-center"
             v-if="!notifications.length"
           >
-            No new notifications
+            Currently there is no new notifications.
           </p>
 
           <!--begin::View more-->

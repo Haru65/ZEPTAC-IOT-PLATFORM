@@ -1595,29 +1595,55 @@ export default defineComponent({
     }
 
     const handleDayWiseChange = async (value) => {
-      QuotationDetails.value.items.id = "";
-      QuotationDetails.value.items = await {
-        id: "",
-        site_location: "",
-        per_day_charge: "",
-        number_of_days: "",
-        accommodation: 0,
-        travelling: 0,
-        training: 0,
-        boarding: 0,
-        pickup: 0,
-        accomm: true,
-        travel: true,
-        train: true,
-        board: true,
-        pick: true,
-        equipment_wise: [],
-      };
-      QuotationDetails.value.sub_total = 0;
-      QuotationDetails.value.total = 0;
-      calculateTaxAmount();
-      equipments.value = [];
-      dayWiseRef.value = value;
+      if (value == true) {
+        QuotationDetails.value.items.id = "";
+        QuotationDetails.value.items = await {
+          id: "",
+          site_location: "",
+          per_day_charge: "",
+          number_of_days: "",
+          accommodation: 0,
+          travelling: 0,
+          training: 0,
+          boarding: 0,
+          pickup: 0,
+          accomm: true,
+          travel: true,
+          train: true,
+          board: true,
+          pick: true,
+          equipment_wise: [],
+        };
+        QuotationDetails.value.sub_total = 0;
+        QuotationDetails.value.total = 0;
+        calculateTaxAmount();
+        equipments.value = [];
+        dayWiseRef.value = value;
+      } else if (value == false) {
+        QuotationDetails.value.items.id = "";
+        QuotationDetails.value.items = await {
+          id: "",
+          site_location: "",
+          per_day_charge: "",
+          number_of_days: "",
+          accommodation: 0,
+          travelling: 0,
+          training: 0,
+          boarding: 0,
+          pickup: 0,
+          accomm: false,
+          travel: false,
+          train: false,
+          board: false,
+          pick: false,
+          equipment_wise: [],
+        };
+        QuotationDetails.value.sub_total = 0;
+        QuotationDetails.value.total = 0;
+        calculateTaxAmount();
+        equipments.value = [];
+        dayWiseRef.value = value;
+      }
     };
 
     /* --------SET DATE LOGIC--------*/

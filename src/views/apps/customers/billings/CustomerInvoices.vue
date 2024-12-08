@@ -132,6 +132,18 @@
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
             <span
+              v-if="quotations.status == 4 && identifier == 'Customer'"
+              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Generate Purchase Order"
+              @click="
+                createPurchaseOrder(quotations.id, quotations.quotation_no)
+              "
+            >
+              <KTIcon icon-name="cheque" icon-class="fs-2" />
+            </span>
+
+            <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
               data-bs-toggle="tooltip"
               title="Download Quotation"
@@ -216,6 +228,7 @@ import { Identifier } from "@/core/config/WhichUserConfig";
 // import { Gen } from "@/core/config/PdfGenerator";
 import { BillingFormat1Generator } from "@/core/config/billing/BillingFormat1";
 import { BillingFormat2Generator } from "@/core/config/billing/BillingFormat2";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "customer-invoices-list",
@@ -225,6 +238,7 @@ export default defineComponent({
   setup() {
     // Financial Year Logic
     const authStore = useAuthStore();
+    const route = useRouter();
 
     const tableHeader = ref([
       {
@@ -979,6 +993,28 @@ export default defineComponent({
       }
     };
 
+    const createPurchaseOrder = async (id, quotationNumber) => {
+      Swal.fire({
+        title: "Are you sure?",
+        text: `You want to create purchase order for this Quotation : ${quotationNumber}`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "red",
+        confirmButtonText: "Yes, I am sure!",
+        cancelButtonText: "No, cancel it!",
+      }).then(async (result: { [x: string]: any }) => {
+        if (result["isConfirmed"]) {
+          route.push({
+            name: "customer-purchase-order-add", // Route name defined in your router
+            params: {
+              id: id,
+              quotation_no: quotationNumber,
+            },
+          });
+        }
+      });
+    };
+
     return {
       tableData,
       tableHeader,
@@ -1004,6 +1040,7 @@ export default defineComponent({
       selectedYearCache,
       financialYears,
       handleChange,
+      createPurchaseOrder,
     };
   },
 });

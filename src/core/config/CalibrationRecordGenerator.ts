@@ -7,6 +7,50 @@ import autoTable from "jspdf-autotable"; // ! depretaited import
 import { ToWords } from 'to-words';
 import { getAssetPath } from "../helpers/assets";
 
+interface Step {
+  description: string;
+  formula?: string;
+  steps?: string[];
+}
+
+// Define the interface for the UncertaintyValue
+interface UncertaintyValue {
+  id: string;
+  company_id: string;
+  reading_id: string;
+  standard_deviation: number;
+  uncertainty_due_process: number;
+  standard_uncertainty: number;
+  uncertainty_resolution: number;
+  hysteresis: number;
+  uncertainty_due_hysteresis: number;
+  max_zero_reading: number;
+  zero_deviation: number;
+  total_uncertainty: number;
+  effective_deg_freedom: number;
+  is_infinite: boolean;
+  combined_uncertainty: string;
+  expanded_uncertainty: string;
+  steps: Step[];
+}
+
+// Define the interface for the Reading
+interface Reading {
+  id: string;
+  company_id: string;
+  calibration_instrument_id: string;
+  uuc_reading: string;
+  i1_up: string;
+  d1_down: string;
+  i2_up: string;
+  d2_down: string;
+  mean_value: string;
+  is_active: string;
+  created_at: string;
+  updated_at: string;
+  uncertainty: UncertaintyValue; // Nested UncertaintyValue
+}
+
 /**
  * Gen Method to print calibration record of instrument
  * @param id  string
@@ -27,8 +71,10 @@ const CalibrationRecordGen = async (
         orientation: "portrait",
         unit: "in",
         format: "a4",
+        compress: true
     });
 
+    
     // URL of company logo
     const img = new Image();
     img.src = companyDetails.value.logo_base64;
@@ -38,7 +84,6 @@ const CalibrationRecordGen = async (
     const brandLogo = new Image();
     brandLogo.src = getAssetPath('media/logos/zeptac_logo_footer.png');
     brandLogo.alt = "zeptac_logo_footer";
-
 
     // Function that will add footer to each page
     const addFooters = (doc) => {
@@ -69,6 +114,356 @@ const CalibrationRecordGen = async (
         doc.setFontSize(9);
       }
     };
+
+    // Calculation Part Logic
+
+    // PDF Generation Function
+    async function generateUncertainityCalculation(doc, readings: Reading[]) {
+      readings.forEach((reading, index) => {
+        doc.addPage();
+
+        const uncertainty = reading?.uncertainty;
+        const referenceInstrument = instrumentDetails.value.reference_instrument;
+
+        const calculationHeader = `Calculation for Reading ${index + 1}`;
+
+        // Master and Calibration Details Table
+        const masterAndCalibrationHeader = [
+          [
+            { title: `${calculationHeader}`, colSpan: 4, halign: "center" },
+          ],
+          [
+            { title: "Details of Standard used for Calibration", colSpan: 2 },
+            { title: "Details of Unit Under Calibration", colSpan: 2 },
+          ],
+        ];
+
+        const masterAndCalibrationBody = [
+          [
+            { title: "Range :" },
+            { title: `${referenceInstrument.ranges_from || ""} to ${referenceInstrument.ranges_to || ""}` },
+            { title: "Range :" },
+            { title: `${instrumentDetails.value.ranges_from || ""} to ${instrumentDetails.value.ranges_to || ""}` },
+          ],
+          [
+            { title: "Least Count :" },
+            { title: `${referenceInstrument.resolution || ""}` },
+            { title: "Least Count :" },
+            { title: `${instrumentDetails.value.resolution || ""}` },
+          ],
+          [
+            { title: "Uncertainty :" },
+            { title: `${referenceInstrument.uncertainty || ""}` },
+            { title: "Serial No. :" },
+            { title: `${instrumentDetails.value.serial_no || ""}` },
+          ],
+        ];
+
+        autoTable(doc, {
+          theme: "plain",
+          head: masterAndCalibrationHeader,
+          body: masterAndCalibrationBody,
+          headStyles: { fillColor: [90, 90, 90], textColor: [255, 255, 255], halign: "center" },
+          columnStyles: {
+            0: { cellWidth: 1.8, halign: "left" },
+            1: { cellWidth: 1.8, halign: "left" },
+            2: { cellWidth: 1.8, halign: "left" },
+            3: { cellWidth: "auto", halign: "left" },
+          },
+          bodyStyles: { halign: "left", fontSize: 10, fillColor: [255, 255, 255] },
+          didDrawCell: (data) => {
+            const { cell } = data;
+            doc.rect(cell.x, cell.y, cell.width, cell.height, "S");
+          },
+        });
+
+        // Temperature during Calibration Table
+        const tmpTableHeader = [
+          [
+            { title: "Temperature during calibration", colSpan: 4, halign: "center" },
+          ],
+        ];
+
+        const tmpTableBody = [
+          [
+            { title: "" },
+            { title: "Beginning" },
+            { title: "End" },
+            { title: "Mean" },
+          ],
+          [
+            { title: "Temperature (°C)" },
+            { title: "25.6" },
+            { title: "25.8" },
+            { title: "25.7" },
+          ],
+          [
+            { title: "Pressure (% R.H)" },
+            { title: "51" },
+            { title: "49" },
+            { title: "50" },
+          ],
+        ];
+
+        autoTable(doc, {
+          theme: "plain",
+          head: tmpTableHeader,
+          body: tmpTableBody,
+          columnStyles: {
+            0: { cellWidth: 1.8, halign: "left" },
+            1: { cellWidth: 1.8, halign: "left" },
+            2: { cellWidth: 1.8, halign: "left" },
+            3: { cellWidth: "auto", halign: "left" },
+          },
+          headStyles: { fillColor: [90, 90, 90], textColor: [255, 255, 255], halign: "center" },
+          bodyStyles: { halign: "left", fontSize: 10, fillColor: [255, 255, 255] },
+          didDrawCell: (data) => {
+            const { cell } = data;
+            doc.rect(cell.x, cell.y, cell.width, cell.height, "S");
+          },
+        });
+
+        // Parse the 'steps' field from the uncertainty object
+        let stepsArray: Step[] = [];
+
+        if (typeof uncertainty?.steps === 'string') {
+          try {
+            stepsArray = JSON.parse(uncertainty?.steps);
+          } catch (e) {
+            console.error("Error parsing steps:", e);
+          }
+        } else if (Array.isArray(uncertainty?.steps)) {
+          stepsArray = uncertainty?.steps;
+        }
+
+        if (stepsArray.length > 0) {
+          const stepData: any[] = [];
+
+          for (let stepIndex = 0; stepIndex < stepsArray.length; stepIndex++) {
+            const step = stepsArray[stepIndex];
+
+            stepData.push([{ title: `Step ${stepIndex + 1}: ${step.description}`, colSpan: 2, styles: { fontStyle: 'bold' }}]);
+
+            if (step.formula) {
+              // Wrap long formula text to prevent overflow
+              const wrappedFormula = doc.splitTextToSize(step.formula, 5);
+              stepData.push([{ title: "Formula", styles: { fontStyle: 'italic' } }, { title: wrappedFormula.join("\n"), styles: { fontStyle: 'normal', fontSize: 10 } }]);
+            }
+
+            if (step.steps && step.steps.length > 0) {
+              for (let subIndex = 0; subIndex < step.steps.length; subIndex++) {
+                const subStep = step.steps[subIndex];
+                const wrappedSubStep = doc.splitTextToSize(subStep, 5);
+                stepData.push([{ title: `Sub-step ${subIndex + 1}:` }, { title: wrappedSubStep.join('\n'), styles: { fontStyle: 'normal' , fontSize: 10 }}]);
+              }
+            }
+          }
+          // Generate the table with autoTable
+          autoTable(doc, {
+            theme: 'plain',
+            head: [['Step Description', 'Details']],
+            columnStyles: {
+              0: { cellWidth: 2, halign: 'left' },
+              1: { cellWidth: "auto", halign: 'left' }
+            },
+            body: stepData,
+            headStyles: { fillColor: [90, 90, 90], textColor: [255, 255, 255], halign: 'center' },
+            bodyStyles: { fontSize: 10, halign: 'left', fillColor: [255, 255, 255] },
+            didDrawCell: (data) => {
+              const { cell, row, column } = data;
+              doc.rect(cell.x, cell.y, cell.width, cell.height, 'S'); // Adding border around cells
+            },
+          });
+        } else {
+          // If no calculation steps are available, display in a table
+          const noStepsMessage = [
+            [
+              {
+                title: "No calculation steps available.",
+                colSpan:2,
+                halign: 'center',
+                fontStyle: 'bold',
+              }
+            ]
+          ];
+          
+          autoTable(doc, {
+            theme: 'plain',
+            head: [['Step Description', 'Details']],
+            body: noStepsMessage,
+            columnStyles: {
+              0: { cellWidth: 3.63, halign: 'left' },
+              1: { cellWidth: 3.63, halign: 'left' }
+            },
+            headStyles: { fillColor: [90, 90, 90], textColor: [255, 255, 255], halign: 'center' },
+            bodyStyles: { fontSize: 10, halign: 'left', fillColor: [255, 255, 255] },
+            didDrawCell: (data) => {
+              const { cell, row, column } = data;
+              doc.rect(cell.x, cell.y, cell.width, cell.height, 'S'); // Adding border around cells
+            },
+          });
+        }
+
+        // Data for the table
+        const uncertaintyData = [
+          {
+            source: 'Due to Process',
+            type: 'Type A',
+            estimate: reading?.uncertainty?.standard_deviation || '',
+            distribution: 'Normal',
+            divisor: 'sqrt(4)',
+            sensitivity: '1',
+            standardUncertainty: reading?.uncertainty?.uncertainty_due_process || '',
+            degreeOfFreedom: '3',
+          },
+          {
+            source: 'Standard Uncertainty',
+            type: 'Type B',
+            estimate: referenceInstrument?.uncertainty || '',
+            distribution: 'Normal',
+            divisor: '2',
+            sensitivity: '1',
+            standardUncertainty: reading?.uncertainty?.standard_uncertainty || '',
+            degreeOfFreedom: 'infinity',
+          },
+          {
+            source: 'Resolution',
+            type: 'Type B',
+            estimate: referenceInstrument?.resolution || '',
+            distribution: 'Rectangular',
+            divisor: '2sqrt(3)',
+            sensitivity: '1',
+            standardUncertainty: reading?.uncertainty?.uncertainty_resolution || '',
+            degreeOfFreedom: 'infinity',
+          },
+          {
+            source: 'Hysteresis',
+            type: 'Type B',
+            estimate: reading?.uncertainty?.hysteresis || '',
+            distribution: 'Rectangular',
+            divisor: 'sqrt(3)',
+            sensitivity: '1',
+            standardUncertainty: reading?.uncertainty?.uncertainty_due_hysteresis || '',
+            degreeOfFreedom: 'infinity',
+          },
+          {
+            source: 'Zero Deviation',
+            type: 'Type B',
+            estimate: reading?.uncertainty?.max_zero_reading || '',
+            distribution: 'Rectangular',
+            divisor: 'sqrt(3)',
+            sensitivity: '1',
+            standardUncertainty: reading?.uncertainty?.zero_deviation || '',
+            degreeOfFreedom: 'infinity',
+          },
+        ];
+
+        // Define the table columns
+        const columns = [
+          { title: 'Sources', dataKey: 'source' },
+          { title: 'Type', dataKey: 'type' },
+          { title: 'Estimates', dataKey: 'estimate' },
+          { title: 'Probability Distribution', dataKey: 'distribution' },
+          { title: 'Divisor', dataKey: 'divisor' },
+          { title: 'Sensitivity', dataKey: 'sensitivity' },
+          { title: 'Standard Uncertainty', dataKey: 'standardUncertainty' },
+          { title: 'Degree of Freedom', dataKey: 'degreeOfFreedom' },
+        ];
+
+        const formatedData = [
+          [
+            {
+              title: "Uncertainty",
+              colSpan:6,
+              halign: 'right'
+            },
+            {
+              title: `${reading?.uncertainty?.total_uncertainty || ""}`
+            },
+            {
+              title: ""
+            }
+          ],
+          [
+            {
+              title: "Combined Uncertainty",
+              colSpan:6,
+              halign: 'right'
+            },
+            {
+              title: `${reading?.uncertainty?.combined_uncertainty || ""}`
+            },
+            {
+              title: ""
+            }
+          ],
+          [
+            {
+              title: "k",
+              colSpan:6,
+              halign: 'right'
+            },
+            {
+              title: "2"
+            },
+            {
+              title: ""
+            }
+          ],
+          [
+            {
+              title: "Expanded Uncertainty",
+              colSpan:6,
+              halign: 'right'
+            },
+            {
+              title: `${reading?.uncertainty?.expanded_uncertainty || ""}`
+            },
+            {
+              title: ""
+            }
+          ],
+
+        ];
+
+        const UncertainityBudget = uncertaintyData.map(item => [
+          item.source,
+          item.type,
+          item.estimate,
+          item.distribution,
+          item.divisor,
+          item.sensitivity,
+          item.standardUncertainty,
+          item.degreeOfFreedom,
+        ]);
+
+        UncertainityBudget.push(...formatedData);
+
+        // Generate the table with autoTable
+        autoTable(doc, {
+          theme: 'plain',
+          head: [columns],
+          body: UncertainityBudget,
+          columnStyles: {
+            0: { cellWidth: 1, halign: 'left' }, // Sources column width
+            1: { cellWidth: 0.6, halign: 'left' }, // Type column width
+            2: { cellWidth: 1, halign: 'left' }, // Estimates column width
+            3: { cellWidth: 1, halign: 'left' }, // Probability Distribution column width
+            4: { cellWidth: 1, halign: 'left' }, // Divisor column width
+            5: { cellWidth:0.6, halign: 'left' }, // Sensitivity column width
+            6: { cellWidth: 1, halign: 'left' }, // Standard Uncertainty column width
+            7: { cellWidth: "auto", halign: 'left' }, // Degree of Freedom column width
+          },
+          headStyles: { fillColor: [90, 90, 90], textColor: [255, 255, 255], halign: 'center' },
+          bodyStyles: { fontSize: 10, halign: 'left', fillColor: [255, 255, 255] },
+          didDrawCell: (data) => {
+            const { cell } = data;
+            doc.rect(cell.x, cell.y, cell.width, cell.height, 'S'); // Adding border around cells
+          },
+        });
+
+      });
+    }
 
     // Function that add header
 
@@ -612,6 +1007,8 @@ const CalibrationRecordGen = async (
       bodyStyles: { halign: "left",fontSize: 10, fillColor: [240, 240, 240]},
     });
 
+    // Uncertainity Calculations Function
+    await generateUncertainityCalculation(doc, instrumentDetails.value.readings);
 
     // // Creating footer and saving file
     // doc

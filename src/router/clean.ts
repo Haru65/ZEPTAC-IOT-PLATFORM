@@ -60,6 +60,10 @@ import {
   validateUserNSrf,
   getUser,
   getTempLead,
+  getPurchaseOrder,
+  getPoPayment,
+  check_po_created,
+  purchaseOrderEditable,
 
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
@@ -1270,6 +1274,99 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Skill Matrix Edit",
           breadcrumbs: ["Skill Matrix Edit"],
+        },
+      },
+
+      // Purchase Order Payments
+      {
+        path: "/purchase-order/list",
+        name: "purchase-order-list",
+        component: () =>
+          import("@/views/apps/po/purchaseorder/PurchaseOrderListing.vue"),
+        meta: {
+          pageTitle: "Purchase Order List",
+          breadcrumbs: ["Purchase Order List"],
+        },
+      },
+      {
+        path: "/purchase-order/edit/:id",
+        name: "purchase-order-view",
+        beforeEnter: async (to, from, next) => {
+          const poId = to.params.id;
+          //console.log(companyId);
+          try {
+            const response = await getPurchaseOrder(poId);
+            if (response.success == false || response.result.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/po/purchaseorder/PurchaseOrderView.vue"),
+        meta: {
+          pageTitle: "Purchase Order View",
+          breadcrumbs: ["Purchase Order View"],
+        },
+      },
+      
+      // Purchase Order Payments 
+      {
+        path: "/po-payment/list",
+        name: "po-payment-list",
+        component: () =>
+          import("@/views/apps/po/payment/PoPaymentListing.vue"),
+        meta: {
+          pageTitle: "Purchase Order Payment List",
+          breadcrumbs: ["Purchase Order Payment List"],
+        },
+      },
+      {
+        path: "/po-payment/add",
+        name: "po-payment-add",
+        component: () =>
+          import("@/views/apps/po/payment/PoPaymentAdd.vue"),
+        meta: {
+          pageTitle: "Purchase Order Payment Add",
+          breadcrumbs: ["Purchase Order Payment Add"],
+        },
+      },
+      {
+        path: "/po-payment/direct/:id",
+        name: "po-payment-direct-add",
+        component: () =>
+          import("@/views/apps/po/payment/PoPaymentDirectAdd.vue"),
+        meta: {
+          pageTitle: "Purchase Order Payment Add",
+          breadcrumbs: ["Purchase Order Payment Add"],
+        },
+      },
+      {
+        path: "/po-payment/edit/:id",
+        name: "po-payment-edit",
+        beforeEnter: async (to, from, next) => {
+          const poPaymentID = to.params.id;
+          try {
+            const response = await getPoPayment(poPaymentID.toString());
+            if (response.success == false || response.result.is_active == 0 || response.result.status == 1 || response.result.status == 2) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/po/payment/PoPaymentEdit.vue"),
+        meta: {
+          pageTitle: "Purchase Order Payment Edit",
+          breadcrumbs: ["Purchase Order Payment Edit"],
         },
       },
 
@@ -2859,11 +2956,57 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: "/customer/orders",
-        name: "customer-orders-list",
-        component: () => import("@/views/apps/notification/NotificationListing.vue"),
+        name: "customer-purchase-order-list",
+        component: () => import("@/views/apps/customers/po/CustomerPurchaseOrders.vue"),
         meta: {
           pageTitle: "Purchase Orders",
           breadcrumbs: ["Purchase Orders"],
+        },
+      },
+      {
+        path: "/customer/orders/add/:id/:quotation_no",
+        name: "customer-purchase-order-add",
+        beforeEnter: async (to, from, next) => {
+          const itemId = to.params.id;
+          try {
+            const response = await check_po_created(itemId.toString());
+            if (response.success == false || response.result.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () => import("@/views/apps/customers/po/CustomerPurchaseOrderAdd.vue"),
+        meta: {
+          pageTitle: "Purchase Orders Add",
+          breadcrumbs: ["Purchase Orders Add"],
+        },
+      },
+      {
+        path: "/customer/orders/edit/:id",
+        name: "customer-purchase-order-edit",
+        beforeEnter: async (to, from, next) => {
+          const itemId = to.params.id;
+          try {
+            const response = await purchaseOrderEditable(itemId.toString());
+            if (response.success == false || response.result.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () => import("@/views/apps/customers/po/CustomerPurchaseOrderEdit.vue"),
+        meta: {
+          pageTitle: "Purchase Orders Edit",
+          breadcrumbs: ["Purchase Orders Edit"],
         },
       },
 
