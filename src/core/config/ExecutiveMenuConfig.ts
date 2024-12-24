@@ -200,12 +200,12 @@ export interface MenuItem {
             bootstrapIcon: "bi-archive",
             sub: [
               {
-                heading: "Internal Audit Observation",
-                route: "/auditobservations",
-              },
-              {
                 heading: "Internal Audit Schedule",
                 route: "/auditschedule",
+              },
+              {
+                heading: "Internal Audit Observation",
+                route: "/auditobservations",
               },
             ],
           },

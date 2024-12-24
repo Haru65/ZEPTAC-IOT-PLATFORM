@@ -173,17 +173,6 @@
                   >
                 </li>
                 <li>
-                  <router-link
-                    :to="`/customers/edit/${customer.id}`"
-                    data-toggle="tooltip"
-                    title="View /Edit Customer"
-                    class="dropdown-item btn"
-                  >
-                    <KTIcon icon-name="pencil" icon-class="fs-2" />
-                    Edit
-                  </router-link>
-                </li>
-                <li>
                   <span
                     class="dropdown-item btn"
                     data-toggle="tooltip"

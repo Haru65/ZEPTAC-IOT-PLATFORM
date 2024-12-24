@@ -344,7 +344,7 @@ export default defineComponent({
 
       po_file: "",
 
-      company_id: User.company_id,
+      company_id: "",
       created_by: User.id,
       updated_by: User.id,
       is_active: "1",

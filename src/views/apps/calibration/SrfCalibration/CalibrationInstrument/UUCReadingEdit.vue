@@ -3,7 +3,7 @@
     <!-- Two divs side by side -->
     <div class="row g-5">
       <div class="col-lg-6">
-        <div class="card shadow mb-5">
+        <div class="card card-stretch shadow mb-5">
           <div class="card-header">
             <h3 class="card-title">Master Instrument</h3>
           </div>
@@ -51,7 +51,7 @@
       </div>
 
       <div class="col-lg-6">
-        <div class="card shadow mb-5">
+        <div class="card card-stretch shadow mb-5">
           <div class="card-header">
             <h3 class="card-title">Calibration Instrument</h3>
           </div>
@@ -186,20 +186,20 @@
 
                     <!-- Display formula if present -->
                     <div v-if="step.formula" class="mb-3">
-                      <h5 class="card-subtitle mb-2 text-muted">Formula:</h5>
-                      <pre><code class="bg-light p-2 border rounded fs-4">{{ step.formula }}</code></pre>
+                      <h5 class="card-subtitle mb-2 text-dark">Formula:</h5>
+                      <pre><code class="bg-light text-dark p-2 border rounded fs-4">{{ step.formula }}</code></pre>
                     </div>
 
                     <!-- Display sub-steps if present -->
                     <div v-if="step.steps && step.steps.length" class="mt-3">
-                      <h5 class="card-subtitle mb-2 text-muted">Sub-steps:</h5>
+                      <h5 class="card-subtitle mb-2 text-dark">Sub-steps:</h5>
                       <ul class="list-unstyled">
                         <li
                           v-for="(subStep, subIndex) in step.steps"
                           :key="subIndex"
                           class="mb-2"
                         >
-                          <pre><code class="bg-light p-2 border rounded fs-4">{{ subStep }}</code></pre>
+                          <pre><code class="bg-light text-dark p-2 border rounded fs-4">{{ subStep }}</code></pre>
                         </li>
                       </ul>
                     </div>
@@ -212,7 +212,21 @@
                 No calculation steps available.
               </div>
 
-              <div class="table-responsive">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+        <!-- Full width div below -->
+        <div class="row g-5">
+      <div class="col-lg-12">
+        <div class="card card-stretch shadow mb-5">
+          <div class="card-header">
+            <h3 class="card-title">Uncertainity Budget</h3>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
                 <table class="table table-bordered">
                   <thead>
                     <tr class="fw-bold fs-6 text-gray-800">
@@ -343,11 +357,11 @@
                   </tbody>
                 </table>
               </div>
-            </div>
           </div>
         </div>
       </div>
     </div>
+
   </section>
 </template>
   
