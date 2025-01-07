@@ -8,6 +8,7 @@ interface IDocument {
     revision_date: string;
     issue_date: string;
     location: string;
+    document_file: string;
     company_id: string;
   }
   

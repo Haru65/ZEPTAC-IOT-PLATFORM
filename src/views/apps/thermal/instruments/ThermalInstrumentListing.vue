@@ -57,11 +57,12 @@
           <button
             type="button"
             id="kt-menu-filter-button"
-            class="btn btn-md btn-icon btn-color-success btn-active-light-success me-3"
+            class="btn btn-info me-3"
             data-bs-toggle="modal"
             data-bs-target="#kt_modal_thermal_instrument"
           >
             <KTIcon icon-name="add-item" icon-class="fs-1" />
+            Import
           </button>
 
           <ThermalImportModal></ThermalImportModal>

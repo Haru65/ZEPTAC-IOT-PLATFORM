@@ -52,7 +52,7 @@ export interface MenuItem {
         {
           heading: "Purchase Orders",
           route: "/customer/orders",
-          keenthemesIcon: "abstract-26",
+          keenthemesIcon: "wallet",
           bootstrapIcon: "bi-archive",
         },
         {

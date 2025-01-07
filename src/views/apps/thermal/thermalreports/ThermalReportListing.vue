@@ -131,6 +131,10 @@
         >
           {{ thermal_reports.company_name }}
         </template>
+        
+        <template v-slot:created_at="{ row: thermal_reports }">
+            {{ thermal_reports.created_at }}
+          </template>
         <template v-slot:actions="{ row: thermal_reports }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row">
@@ -265,6 +269,12 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
+        columnName: "Created Date",
+        columnLabel: "created_at",
+        sortEnabled: true,
+        columnWidth: 75,
+      },
+      {
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
@@ -311,6 +321,7 @@ export default defineComponent({
               mapping_duration,
               logging_interval,
               company_name,
+              created_at,
               ...rest
             }) => ({
               id: id,
@@ -319,6 +330,7 @@ export default defineComponent({
               mapping_duration: mapping_duration,
               logging_interval: logging_interval,
               company_name: company_name.company_name,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
               ...rest,
             })
           );
@@ -365,6 +377,7 @@ export default defineComponent({
               mapping_duration,
               logging_interval,
               company_name,
+              created_at,
               ...rest
             }) => ({
               id: id,
@@ -373,6 +386,7 @@ export default defineComponent({
               mapping_duration: mapping_duration,
               logging_interval: logging_interval,
               company_name: company_name.company_name,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
               ...rest,
             })
           );
@@ -431,6 +445,7 @@ export default defineComponent({
               mapping_duration,
               logging_interval,
               company_name,
+              created_at,
               ...rest
             }) => ({
               id: id,
@@ -439,6 +454,7 @@ export default defineComponent({
               mapping_duration: mapping_duration,
               logging_interval: logging_interval,
               company_name: company_name.company_name,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
               ...rest,
             })
           );
@@ -675,6 +691,7 @@ export default defineComponent({
               mapping_duration,
               logging_interval,
               company_name,
+              created_at,
               ...rest
             }) => ({
               id: id,
@@ -683,6 +700,7 @@ export default defineComponent({
               mapping_duration: mapping_duration,
               logging_interval: logging_interval,
               company_name: company_name.company_name,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
               ...rest,
             })
           );

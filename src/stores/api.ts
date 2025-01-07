@@ -70,6 +70,7 @@ const CAL_PROC_URL = "calibration-procedure";
 const NOTIFICATION_URL = "notifications";
 const PO_URL = "purchase-order";
 const PO_PAYMENT_URL = "po-payment";
+const COMPANY_TAX_URL = "company-tax";
 
 
 
@@ -6833,6 +6834,88 @@ export async function deletePoPayment(data: any) {
         //console.log(data)
         ApiService.setHeader();
         const response = await ApiService.delete(PO_PAYMENT_URL + "/" + data);
+        console.log(response.data.message)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// COMPANY TAX SYSTEM ROUTES
+// list function
+export async function getCompanyTaxes(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(COMPANY_TAX_URL, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// search function
+export async function CompanyTaxSearch(search: any) {
+    try {
+        //console.log(data)
+        const data = {
+            search: search
+        }
+        ApiService.setHeader();
+        const response = await ApiService.post('tax_search', data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// get function
+export async function getCompanyTax(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.get(COMPANY_TAX_URL, data);
+        // console.log(response)
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// add function
+export async function addCompanyTax(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.post(COMPANY_TAX_URL, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// update function
+export async function updateCompanyTax(id: any, data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.put(COMPANY_TAX_URL + "/" + id, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// delete function
+export async function deleteCompanyTax(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.delete(COMPANY_TAX_URL + "/" + data);
         console.log(response.data.message)
         return response.data;
     } catch (errors:any) {

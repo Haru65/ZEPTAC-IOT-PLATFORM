@@ -92,6 +92,15 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/company-tax",
+        name: "company-tax",
+        component: () => import("@/views/apps/taxes/CompanyTaxListing.vue"),
+        meta: {
+          pageTitle: "Tax List",
+          breadcrumbs: ["Tax List"],
+        },
+      },
+      {
         path: "/permission_manager/list",
         name: "permission-manager-list",
         component: () => import("@/views/apps/admin/PermissionManager.vue"),

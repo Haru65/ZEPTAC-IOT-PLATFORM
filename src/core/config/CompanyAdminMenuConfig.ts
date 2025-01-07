@@ -291,13 +291,13 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
       {
         heading: "Purchase Orders",
         route: "/purchase-order/list",
-        keenthemesIcon: "cheque",
+        keenthemesIcon: "wallet",
         bootstrapIcon: "bi-archive",
       },
       {
         heading: "Payments",
         route: "/po-payment/list",
-        keenthemesIcon: "cheque",
+        keenthemesIcon: "bank",
         bootstrapIcon: "bi-archive",
       },
     ],
@@ -589,6 +589,12 @@ const CompanyAdminMenuConfig: Array<MenuItem> = [
         ],
       },
 
+      {
+        heading: "Taxes",
+        route: "/company-tax",
+        keenthemesIcon: "abstract-26",
+        bootstrapIcon: "bi-archive",
+      },
 
     ],
   },

@@ -9,6 +9,7 @@ interface ITReport {
     company_name:{
       company_name: string;
     };
+    created_at: string;
   }
   
   export type { ITReport };

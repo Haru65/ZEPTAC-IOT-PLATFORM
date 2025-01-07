@@ -20,7 +20,7 @@ const roles = {
     2: "Company Admin",
     3: "Sales Person",
     4: "Site In-Charge",
-    5: "Service Enginner",
+    5: "Service Engineer",
     6: "Commercial Executive",
 };
 
@@ -45,7 +45,7 @@ const c_roles = {
     2: "Company Admin",
     3: "Sales Person",
     4: "Site In-Charge",
-    5: "Service Enginner",
+    5: "Service Engineer",
     6: "Commercial Executive",
 };
 

@@ -27,28 +27,19 @@
 
         <!--begin::Username-->
         <div class="d-flex flex-column">
-          <div class="fw-bold d-flex align-items-center fs-5">
+          <div class="fw-bold d-flex align-items-center fs-5 text-wrap">
             {{ User.first_name + " " + User.last_name }}
-            <span
-              class="badge badge-light-success fw-bold fs-8 px-1 py-1 ms-2"
-              >{{ User.role }}</span
-            >
           </div>
-          <span class="fw-semobold fs-7">
+          <div class="fw-semibold text-gray-800 fs-7">
             {{
               User.company_details?.company_name ||
               User.meta?.company_name ||
               ""
             }}
-            <br />
+          </div>
+          <div class="fw-semibold text-primary fs-7">
             {{ Identifier }}
-            <br />
-            <a
-              :href="`mailto:` + User.email"
-              class="fw-semobold text-muted text-hover-primary fs-7"
-              >{{ User.email }}</a
-            >
-          </span>
+          </div>
         </div>
         <!--end::Username-->
       </div>

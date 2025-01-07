@@ -157,6 +157,20 @@
         <template v-slot:location="{ row: documents }">
           {{ documents.location }}
         </template>
+        <template v-slot:document_file="{ row: documents }">
+          <!--begin::Menu Flex-->
+          <div class="d-flex flex-lg-row">
+            <a
+              target="blank"
+              v-bind:href="`https://api.zeptac.com/storage/company/${documents.company_id}/external_documents/${documents.document_file}`"
+              data-toggle="tooltip"
+              title="Download File"
+              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
+              >⤓ File
+            </a>
+          </div>
+          <!--end::Menu FLex-->
+        </template>
         <template v-slot:actions="{ row: documents }">
           <!--begin::Menu Flex-->
           <div class="d-flex flex-lg-row my-3">
@@ -287,6 +301,12 @@ export default defineComponent({
         columnWidth: 75,
       },
       {
+        columnName: "File",
+        columnLabel: "document_file",
+        sortEnabled: true,
+        columnWidth: 75,
+      },
+      {
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
@@ -326,27 +346,9 @@ export default defineComponent({
 
         if (response?.success) {
           more.value = response.result.next_page_url != null ? true : false;
-          tableData.value = response.result.data.map(
-            ({
-              id,
-              company_id,
-              document_name,
-              format_no,
-              review_date,
-              revision_date,
-              issue_date,
-              location,
-            }) => ({
-              id,
-              company_id,
-              document_name,
-              format_no,
-              review_date,
-              revision_date,
-              issue_date,
-              location,
-            })
-          );
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
           initvalues.value.splice(
             0,
             tableData.value.length,
@@ -382,27 +384,9 @@ export default defineComponent({
 
         if (response?.success) {
           more.value = response.result.next_page_url != null ? true : false;
-          tableData.value = response.result.data.map(
-            ({
-              id,
-              company_id,
-              document_name,
-              format_no,
-              review_date,
-              revision_date,
-              issue_date,
-              location,
-            }) => ({
-              id,
-              company_id,
-              document_name,
-              format_no,
-              review_date,
-              revision_date,
-              issue_date,
-              location,
-            })
-          );
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
           initvalues.value.splice(
             0,
             tableData.value.length,
@@ -453,27 +437,9 @@ export default defineComponent({
         );
 
         if (response?.success) {
-          tableData.value = response.result.data.map(
-            ({
-              id,
-              company_id,
-              document_name,
-              format_no,
-              review_date,
-              revision_date,
-              issue_date,
-              location,
-            }) => ({
-              id,
-              company_id,
-              document_name,
-              format_no,
-              review_date,
-              revision_date,
-              issue_date,
-              location,
-            })
-          );
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
 
           more.value = response.result.next_page_url != null ? true : false;
           initvalues.value.splice(
@@ -690,27 +656,9 @@ export default defineComponent({
         );
 
         if (response?.success) {
-          tableData.value = response.result.data.map(
-            ({
-              id,
-              company_id,
-              document_name,
-              format_no,
-              review_date,
-              revision_date,
-              issue_date,
-              location,
-            }) => ({
-              id,
-              company_id,
-              document_name,
-              format_no,
-              review_date,
-              revision_date,
-              issue_date,
-              location,
-            })
-          );
+          tableData.value = response.result.data.map(({ ...rest }) => ({
+            ...rest,
+          }));
           initvalues.value.splice(
             0,
             tableData.value.length,

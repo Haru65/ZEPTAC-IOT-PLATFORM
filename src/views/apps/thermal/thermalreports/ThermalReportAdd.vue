@@ -342,7 +342,7 @@
               <div class="form-group col-md-6">
                 <label
                   class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
-                  >AcceptanceCriteria for Temperature</label
+                  >Acceptance Criteria for Temperature</label
                 >
                 <Field
                   type="text"
@@ -359,8 +359,8 @@
 
               <div class="form-group col-md-6">
                 <label
-                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
-                  >AcceptanceCriteria for Humidity</label
+                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6 text-nowrap"
+                  >Acceptance Criteria for Humidity</label
                 >
                 <Field
                   type="text"

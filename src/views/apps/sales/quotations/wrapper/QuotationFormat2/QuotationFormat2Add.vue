@@ -424,9 +424,9 @@
                   >
                   <el-option
                     v-for="tax of TaxArray"
-                    :key="tax.id"
+                    :key="tax.tax_id"
                     :label="`${tax.tax_type} ${tax.tax_rate} %`"
-                    :value="tax.id"
+                    :value="tax.tax_id"
                   />
                 </el-select>
               </div>
@@ -531,7 +531,7 @@
                             QuotationDetails.tax_type == "(CGST + SGST)"
                               ? `CGST ${
                                   QuotationDetails.tax_rate / 2
-                                } % + CGST ${QuotationDetails.tax_rate / 2} %`
+                                } % + SGST ${QuotationDetails.tax_rate / 2} %`
                               : `${QuotationDetails.tax_rate} %`
                           }}
                         </span>
@@ -613,6 +613,7 @@ import {
   GetLeadClients,
   getLeadNCustomer,
   getCustomer,
+  getCompanyTaxes,
 } from "@/stores/api";
 import { useAuthStore } from "@/stores/auth";
 import moment from "moment";
@@ -621,11 +622,9 @@ import { formatPrice } from "@/core/config/DataFormatter";
 import {
   QuotationStatusArray,
   GetQuotationStatus,
-  TaxArray,
 } from "@/core/config/QuotationStatusConfig";
 
 import { uomOptions } from "@/core/model/quotation";
-
 
 interface Data {
   id: string;
@@ -676,7 +675,13 @@ interface QuotationDetails {
   created_by: string;
   updated_by: string;
 }
-
+interface TaxInterface {
+  tax_id: string;
+  tax_type: string;
+  tax_description: string;
+  tax_rate: number;
+  tax_amount: number;
+}
 export default defineComponent({
   name: "quotation-format-2",
   components: {
@@ -719,6 +724,34 @@ export default defineComponent({
         country: "",
       },
     ]);
+
+    const TaxArray = ref<TaxInterface[]>([]);
+
+    const getTaxDropDown = async () => {
+      try {
+        ApiService.setHeader();
+        const response = await getCompanyTaxes(`fetchAll=true`);
+
+        if (response.success) {
+          if (response.result != null && response.result) {
+            TaxArray.value.push(
+              ...response.result?.map(({ id, ...rest }) => ({
+                tax_id: id.toString(),
+                ...rest,
+              }))
+            );
+          }
+        } else {
+          console.error(
+            `Error Occured in getCompanyTaxes : ${
+              response.message || "Error Occured in API"
+            }`
+          );
+        }
+      } catch (err) {
+        console.error(`Error Occured in getCompanyTaxes : ${err}`);
+      }
+    };
 
     const siteSameAsBilling = ref(false);
 
@@ -850,20 +883,21 @@ export default defineComponent({
       Customers.value.pop();
       Clients.value.pop();
       await GetLeads();
+      await getTaxDropDown();
     });
 
     /* HANDLE TAX SELECTION LOGIC */
     async function SetTax(id) {
-      const foundTax = await TaxArray.find((item) => {
-        return item.id === id;
+      const foundTax = await TaxArray.value?.find((item) => {
+        return item.tax_id == id;
       });
       // console.log(foundTax);
 
       if (foundTax) {
-        const { id, tax_type, tax_description, tax_rate, tax_amount } =
+        const { tax_id, tax_type, tax_description, tax_rate, tax_amount } =
           foundTax;
 
-        QuotationDetails.value.tax_id = id;
+        QuotationDetails.value.tax_id = tax_id;
         QuotationDetails.value.tax_type = tax_type;
         QuotationDetails.value.tax_description = tax_description;
         QuotationDetails.value.tax_rate = tax_rate;
@@ -1415,7 +1449,7 @@ export default defineComponent({
       setQuantity,
       setUnitPrice,
       setDates,
-      uomOptions
+      uomOptions,
     };
   },
 });

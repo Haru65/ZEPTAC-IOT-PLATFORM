@@ -83,6 +83,9 @@
           >
             {{ thermal_reports.company_name }}
           </template>
+          <template v-slot:created_at="{ row: thermal_reports }">
+            {{ thermal_reports.created_at }}
+          </template>
           <template v-slot:actions="{ row: thermal_reports }">
             <!--begin::Menu Flex-->
             <div class="d-flex flex-lg-row">
@@ -197,6 +200,12 @@
           columnWidth: 175,
         },
         {
+          columnName: "Created At",
+          columnLabel: "created_at",
+          sortEnabled: true,
+          columnWidth: 75,
+        },
+        {
           columnName: "Actions",
           columnLabel: "actions",
           sortEnabled: false,
@@ -243,6 +252,7 @@
                 mapping_duration,
                 logging_interval,
                 company_name,
+                created_at,
                 ...rest
               }) => ({
                 id: id,
@@ -251,6 +261,7 @@
                 mapping_duration: mapping_duration,
                 logging_interval: logging_interval,
                 company_name: company_name.company_name,
+                created_at: moment(created_at).format("DD-MM-YYYY"),
                 ...rest,
               })
             );
@@ -297,6 +308,7 @@
                 mapping_duration,
                 logging_interval,
                 company_name,
+                created_at,
                 ...rest
               }) => ({
                 id: id,
@@ -305,6 +317,7 @@
                 mapping_duration: mapping_duration,
                 logging_interval: logging_interval,
                 company_name: company_name.company_name,
+                created_at: moment(created_at).format("DD-MM-YYYY"),
                 ...rest,
               })
             );
@@ -363,6 +376,7 @@
                 mapping_duration,
                 logging_interval,
                 company_name,
+                created_at,
                 ...rest
               }) => ({
                 id: id,
@@ -371,6 +385,7 @@
                 mapping_duration: mapping_duration,
                 logging_interval: logging_interval,
                 company_name: company_name.company_name,
+                created_at: moment(created_at).format("DD-MM-YYYY"),
                 ...rest,
               })
             );
@@ -506,6 +521,7 @@
                 mapping_duration,
                 logging_interval,
                 company_name,
+                created_at,
                 ...rest
               }) => ({
                 id: id,
@@ -514,6 +530,7 @@
                 mapping_duration: mapping_duration,
                 logging_interval: logging_interval,
                 company_name: company_name.company_name,
+                created_at: moment(created_at).format("DD-MM-YYYY"),
                 ...rest,
               })
             );

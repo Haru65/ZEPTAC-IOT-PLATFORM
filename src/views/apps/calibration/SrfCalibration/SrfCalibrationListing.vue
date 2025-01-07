@@ -183,6 +183,9 @@
             Open
           </button>
         </template>
+        <template v-slot:created_at="{ row: calibration_srf }">
+            {{ calibration_srf.created_at }}
+          </template>
 
         <template v-slot:actions="{ row: calibration_srf }">
           <!--begin::Menu Flex-->
@@ -335,6 +338,12 @@ export default defineComponent({
         columnName: "Reject/Approve",
         columnLabel: "approval_button",
         sortEnabled: false,
+        columnWidth: 75,
+      },
+      {
+        columnName: "Created Date",
+        columnLabel: "created_at",
+        sortEnabled: true,
         columnWidth: 75,
       },
       {
