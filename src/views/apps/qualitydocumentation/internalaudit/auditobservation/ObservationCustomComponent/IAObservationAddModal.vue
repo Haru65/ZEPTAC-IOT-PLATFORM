@@ -233,7 +233,7 @@
                             <a
                               target="blank"
                               v-bind:href="`https://api.zeptac.com/storage/temporary/${clauseDetails.evidence}`"
-                              data-toggle="tooltip"
+                              v-tooltip
                               title="preview file"
                               class="underline"
                               >{{ clauseDetails.evidence }}
@@ -249,7 +249,7 @@
                         <!--begin::Action-->
 
                         <KTIcon
-                          data-toggle="tooltip"
+                          v-tooltip
                           title="remove file"
                           icon-name="cross"
                           class="cursor-pointer fs-2tx text-danger rounded"

@@ -155,7 +155,7 @@
               class="menu-link px-3"
               data-bs-toggle="modal"
               data-bs-target="#kt_modal_srf"
-              data-toggle="tooltip"
+              v-tooltip
               title="View Scope of Work"
               @click="fillItemData(srf)"
             >
@@ -171,7 +171,7 @@
           <div class="d-flex flex-lg-row">
             <span
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete SRF"
               @click="deleteItem(srf.id, false)"
             >

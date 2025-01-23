@@ -1,5 +1,5 @@
 import type { App } from "vue";
-import type { AxiosResponse } from "axios";
+import type { AxiosRequestConfig, AxiosResponse } from "axios";
 import axios from "axios";
 import VueAxios from "vue-axios";
 import JwtService from "@/core/services/JwtService";
@@ -81,14 +81,18 @@ class ApiService {
     //console.log(slug);
     return ApiService.vueInstance.axios.get(`${resource}?${slug}`);
   }
+
   /**
-   * @description set the POST HTTP request
-   * @param resource: string
-   * @param params: AxiosRequestConfig
-   * @returns Promise<AxiosResponse>
-   */
-  static post(resource: string, params: any): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios.post(`${resource}`, params);
+ * @description set the POST HTTP request
+ * @param resource: string
+ * @param params: any
+ * @param config: Optional AxiosRequestConfig for custom configurations like responseType
+ * @returns Promise<AxiosResponse>
+ */
+  static post(resource: string, params: any, config?: AxiosRequestConfig): Promise<AxiosResponse> {
+    // If config is provided, merge it with any default settings
+    const requestConfig = config || {};  // Default to an empty object if no config is passed
+    return ApiService.vueInstance.axios.post(`${resource}`, params, requestConfig);
   }
 
   /**

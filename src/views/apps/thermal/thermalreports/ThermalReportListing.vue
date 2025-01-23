@@ -140,7 +140,7 @@
           <div class="d-flex flex-lg-row">
             <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Download Thermal Report"
               @click="downloadReport(thermal_reports.id)"
             >
@@ -151,7 +151,7 @@
             <router-link :to="`/thermalreport/edit/${thermal_reports.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View Thermal Report"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -161,7 +161,7 @@
 
             <span
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete Thermal Report"
               @click="deleteItem(thermal_reports.id, false)"
             >

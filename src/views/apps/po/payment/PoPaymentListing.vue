@@ -1,4 +1,5 @@
 <template>
+  <PoPaymentExportModal></PoPaymentExportModal>
   <div class="card">
     <div class="card-header border-0 pt-6">
       <!--begin::Card title-->
@@ -55,9 +56,9 @@
           <!--begin::Export-->
           <button
             type="button"
-            class="btn btn-light-primary me-3"
+            class="btn btn-light-info me-3"
             data-bs-toggle="modal"
-            data-bs-target="#kt_customers_export_modal"
+            data-bs-target="#kt_po_payment_export_modal"
           >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
@@ -176,7 +177,7 @@
             <router-link :to="`/po-payment/edit/${popayment.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View Po Payment"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -241,11 +242,13 @@ import { formatPrice } from "@/core/config/DataFormatter";
 import moment from "moment";
 import Swal from "sweetalert2";
 import { Identifier } from "@/core/config/WhichUserConfig";
+import PoPaymentExportModal from "./PoPaymentExportModal.vue";
 
 export default defineComponent({
   name: "po-payment-list",
   components: {
     Datatable,
+    PoPaymentExportModal,
   },
   setup() {
     // Financial Year Logic

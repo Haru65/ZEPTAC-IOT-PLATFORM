@@ -167,7 +167,7 @@
             <a
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${formformat.company_id}/form_format/${formformat.document_file}`"
-              data-toggle="tooltip"
+              v-tooltip
               title="Download File"
               class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
               >⤓ File
@@ -213,7 +213,7 @@
             <router-link :to="`/forms_and_formats/edit/${formformat.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View Form Format"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -225,7 +225,7 @@
             <span
               @click="deleteItem(formformat.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete Form Format"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />

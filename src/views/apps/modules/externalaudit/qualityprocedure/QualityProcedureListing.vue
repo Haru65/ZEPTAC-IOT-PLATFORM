@@ -157,7 +157,7 @@
             <a
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${qualprocedure.company_id}/audits/${qualprocedure.audit_document}`"
-              data-toggle="tooltip"
+              v-tooltip
               title="Download Audit Document"
               class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
               >⤓ Audit Document
@@ -172,7 +172,7 @@
             <router-link :to="`/quality/edit/${qualprocedure.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View Quality Procedure"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -184,7 +184,7 @@
             <span
               @click="deleteItem(qualprocedure.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete Quality Procedure"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />

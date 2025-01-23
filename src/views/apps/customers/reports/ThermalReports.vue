@@ -91,7 +91,7 @@
             <div class="d-flex flex-lg-row">
               <span
                 class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="Download Thermal Report"
                 @click="downloadReport(thermal_reports.id)"
               >

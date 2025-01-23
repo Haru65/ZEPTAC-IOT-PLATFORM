@@ -58,7 +58,7 @@
                   <label
                     class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
                     data-kt-image-input-action="change"
-                    data-bs-toggle="tooltip"
+                    v-tooltip
                     title="Change company Logo"
                   >
                     <i class="bi bi-pencil-fill fs-7"></i>
@@ -79,7 +79,7 @@
                   <span
                     class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
                     data-kt-image-input-action="remove"
-                    data-bs-toggle="tooltip"
+                    v-tooltip
                     @click="removeFileFromTemp"
                     title="Remove image"
                   >
@@ -185,7 +185,7 @@
 
                 <i
                   class="fas fa-exclamation-circle ms-1 fs-7"
-                  data-bs-toggle="tooltip"
+                  v-tooltip
                   title="Phone number must be active"
                 ></i>
               </label>
@@ -221,7 +221,7 @@
 
                 <i
                   class="fas fa-exclamation-circle ms-1 fs-7"
-                  data-bs-toggle="tooltip"
+                  v-tooltip
                   title="Email must be unique"
                 ></i>
               </label>
@@ -403,7 +403,7 @@
                   >
                     <i
                       class="fas fs-4 fa-check-circle text-success me-6"
-                      data-toggle="tooltip"
+                      v-tooltip
                       title="GST number is valid"
                     ></i>
                   </div>
@@ -413,7 +413,7 @@
                   >
                     <i
                       class="fas fs-4 fa-times-circle text-danger me-6"
-                      data-toggle="tooltip"
+                      v-tooltip
                       title="GST number is Invalid/Incorrect"
                     ></i>
                   </div>

@@ -1,4 +1,5 @@
 <template>
+  <ThermalInstrumentExportModal></ThermalInstrumentExportModal>
   <div class="card">
     <div class="card-header border-0 pt-6">
       <!--begin::Card title-->
@@ -69,9 +70,9 @@
           <!--begin::Export-->
           <button
             type="button"
-            class="btn btn-light-primary me-3"
+            class="btn btn-light-info me-3"
             data-bs-toggle="modal"
-            data-bs-target="#kt_customers_export_modal"
+            data-bs-target="#kt_thermal_instrument_export_modal"
           >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
@@ -192,7 +193,7 @@
             <!--begin::Clone-->
             <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              data-toggle="tooltip"
+              v-tooltip
               title="Clone Instrument"
               data-bs-toggle="modal"
               :data-bs-target="
@@ -208,7 +209,7 @@
             <router-link :to="`/cloneinstrument/${thermal_instruments.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="Clone Instrument"
               >
                 <KTIcon icon-name="copy" icon-class="fs-2" />
@@ -222,7 +223,7 @@
             >
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View Instrument"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -233,7 +234,7 @@
             <!--end::Delete-->
             <span
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete Instrument"
               @click="deleteItem(thermal_instruments.id, false)"
             >
@@ -287,6 +288,7 @@ import type { Sort } from "@/components/kt-datatable/table-partials/models";
 import type { ITInstrument } from "@/core/model/thermal_instruments";
 import DuplicateInstrumentModal from "./MaintenanceComponent/DuplicateInstrumentModal.vue";
 import ThermalImportModal from "./MaintenanceComponent/ThermalImportModal.vue";
+import ThermalInstrumentExportModal from "./ThermalInstrumentExportModal.vue";
 import {
   getThermalInstruments,
   deleteThermalInstrument,
@@ -305,6 +307,7 @@ export default defineComponent({
     Datatable,
     DuplicateInstrumentModal,
     ThermalImportModal,
+    ThermalInstrumentExportModal,
   },
   setup() {
     // Academic Year Logic

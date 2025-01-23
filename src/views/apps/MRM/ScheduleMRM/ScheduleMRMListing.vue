@@ -1,4 +1,5 @@
 <template>
+  <ScheduleMRMExportModal></ScheduleMRMExportModal>
   <div class="card">
     <div class="card-header border-0 pt-6">
       <!--begin::Card title-->
@@ -56,9 +57,9 @@
           <!--begin::Export-->
           <button
             type="button"
-            class="btn btn-light-primary me-3"
+            class="btn btn-light-info me-3"
             data-bs-toggle="modal"
-            data-bs-target="#kt_customers_export_modal"
+            data-bs-target="#kt_mrm_scheudle_export_modal"
           >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
@@ -192,7 +193,7 @@
             <router-link :to="`/mrm_schedule/edit/${mrm.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View MRM Schedule"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -204,7 +205,7 @@
             <span
               @click="deleteItem(mrm.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete MRM Schedule"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />
@@ -258,6 +259,7 @@ import type { IMRM } from "@/core/model/mrm";
 import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
 import { hideModal } from "@/core/helpers/dom";
 import ApprovalModal from "./ApprovalModal.vue";
+import ScheduleMRMExportModal from "./ScheduleMRMExportModal.vue";
 import { useAuthStore } from "@/stores/auth";
 import { Identifier } from "@/core/config/WhichUserConfig";
 import {
@@ -274,6 +276,7 @@ export default defineComponent({
   components: {
     Datatable,
     ApprovalModal,
+    ScheduleMRMExportModal,
   },
   setup() {
     // Financial Year Logic

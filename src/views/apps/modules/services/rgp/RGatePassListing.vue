@@ -203,7 +203,7 @@
           <div class="d-flex flex-lg-row">
             <span
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Download RGP"
               @click="downloadRGP(rgps.id)"
             >
@@ -211,7 +211,7 @@
             </span>
             <span
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Free Up Resources Taken"
               @click="ReleaseResources(rgps.id)"
             >
@@ -219,7 +219,7 @@
             </span>
             <span
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete RGP"
               @click="deleteItem(rgps.id, false)"
             >

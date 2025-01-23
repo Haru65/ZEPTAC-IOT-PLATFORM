@@ -197,7 +197,7 @@
             <router-link :to="`/records/edit/${record.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View Record"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -209,7 +209,7 @@
             <span
               @click="deleteItem(record.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete Record"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />

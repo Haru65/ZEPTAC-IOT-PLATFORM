@@ -213,7 +213,7 @@
               <router-link :to="`/temp_leads/edit/${temp_leads.og_lead_id}/${temp_leads.id}`">
                 <span
                   class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                  data-bs-toggle="tooltip"
+                  v-tooltip
                   title="View Lead"
                 >
                   <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -225,7 +225,7 @@
               <span
                 @click="deleteItem(temp_leads.id, false)"
                 class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="Delete Lead"
               >
                 <KTIcon icon-name="trash" icon-class="fs-2" />

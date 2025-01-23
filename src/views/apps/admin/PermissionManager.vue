@@ -115,7 +115,7 @@
             <span
               @click="deletepermission(permissions.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete Permission"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />

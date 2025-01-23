@@ -53,16 +53,7 @@
           class="d-flex justify-content-end"
           data-kt-customer-table-toolbar="base"
         >
-          <!--begin::Export-->
-          <button
-            type="button"
-            class="btn btn-light-primary me-3"
-            data-bs-toggle="modal"
-            data-bs-target="#kt_customers_export_modal"
-          >
-            <KTIcon icon-name="exit-up" icon-class="fs-2" />
-            Export
-          </button>
+        
         </div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->
@@ -146,7 +137,7 @@
           <span
             v-if="mrm.meetings_count === 0"
             class="menu-link px-3"
-            data-toggle="tooltip"
+            v-tooltip
             title="Add Meetings of Minute"
           >
             <router-link :to="`/mrm_minutes/add/${mrm.id}`">
@@ -165,7 +156,7 @@
             <router-link :to="`/mrm_minutes/edit/${mrm.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View MRM"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -177,7 +168,7 @@
             <span
               @click="deleteItem(mrm.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete MRM"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />

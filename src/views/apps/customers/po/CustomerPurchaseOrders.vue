@@ -198,7 +198,7 @@
             <router-link v-if="po.approval_status == '1'" :to="`/customer/orders/edit/${po.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="Edit Purchase Order"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -210,7 +210,7 @@
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${po.company_id}/purchase_orders/${po.po_file}`"
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Download Purchase Order"
             >
               <KTIcon icon-name="file-down" icon-class="fs-2" />
@@ -221,7 +221,7 @@
             <router-link :to="`/purchase-order/edit/${po.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View Purchase Order"
               >
                 <KTIcon icon-name="eye" icon-class="fs-2" />
@@ -334,7 +334,7 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
-        columnName: "Status",
+        columnName: "Payment Status",
         columnLabel: "status",
         sortEnabled: true,
         columnWidth: 75,

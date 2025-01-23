@@ -1,4 +1,5 @@
 <template>
+  <InvoiceExportModal></InvoiceExportModal>
   <div class="card">
     <div class="card-header border-0 pt-6">
       <!--begin::Card title-->
@@ -55,9 +56,9 @@
           <!--begin::Export-->
           <button
             type="button"
-            class="btn btn-light-primary me-3"
+            class="btn btn-light-info me-3"
             data-bs-toggle="modal"
-            data-bs-target="#kt_customers_export_modal"
+            data-bs-target="#kt_invoice_export_modal"
           >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
@@ -198,7 +199,7 @@
           <div class="d-flex flex-lg-row">
             <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Download Invoice"
               @click="downloadInvoice(invoices.id)"
             >
@@ -207,7 +208,7 @@
 
             <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Clone Invoice"
               @click="dupInvoice(invoices.id)"
             >
@@ -218,7 +219,7 @@
             <router-link :to="`/invoices/edit/${invoices.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View Invoice"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -228,7 +229,7 @@
 
             <span
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete Invoice"
               @click="deleteItem(invoices.id, false)"
             >
@@ -299,11 +300,13 @@ import { Identifier } from "@/core/config/WhichUserConfig";
 // import { Gen } from "@/core/config/PdfGenerator";
 import { BillingFormat1Generator } from "@/core/config/billing/BillingFormat1";
 import { BillingFormat2Generator } from "@/core/config/billing/BillingFormat2";
+import InvoiceExportModal from "./InvoiceExportModal.vue";
 
 export default defineComponent({
   name: "invoices-list",
   components: {
     Datatable,
+    InvoiceExportModal,
   },
   setup() {
     // Financial Year Logic
@@ -1132,7 +1135,7 @@ export default defineComponent({
 
           InvoiceInfo.value.date = res.result.date;
           InvoiceInfo.value.duedate = res.result.duedate;
-          InvoiceInfo.value.enquiry_no = res.result.enquiry_no;
+          InvoiceInfo.value.enquiry_no = res.result.enquiry_no ? res.result.enquiry_no : "NA" ;
           InvoiceInfo.value.status = res.result.status;
           InvoiceInfo.value.scope_of_work = res.result.scope_of_work;
 

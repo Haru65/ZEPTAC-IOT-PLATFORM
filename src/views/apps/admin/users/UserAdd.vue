@@ -68,7 +68,7 @@
                 <label
                   class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
                   data-kt-image-input-action="change"
-                  data-bs-toggle="tooltip"
+                  v-tooltip
                   title="Change profile image"
                 >
                   <i class="bi bi-pencil-fill fs-7"></i>
@@ -89,7 +89,7 @@
                 <span
                   class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
                   data-kt-image-input-action="remove"
-                  data-bs-toggle="tooltip"
+                  v-tooltip
                   @click="removeProfileFromTemp"
                   title="Remove image"
                 >
@@ -198,7 +198,7 @@
 
               <i
                 class="fas fa-exclamation-circle ms-1 fs-7"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="Phone number must be active"
               ></i>
             </label>
@@ -235,7 +235,7 @@
 
               <i
                 class="fas fa-exclamation-circle ms-1 fs-7"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="keep strong password"
               ></i>
             </label>
@@ -269,7 +269,7 @@
 
               <i
                 class="fas fa-exclamation-circle ms-1 fs-7"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="keep strong password"
               ></i>
             </label>
@@ -684,7 +684,7 @@
                         <a
                           target="blank"
                           v-bind:href="`https://api.zeptac.com/storage/temporary/${profileDetails.adhar}`"
-                          data-toggle="tooltip"
+                          v-tooltip
                           title="preview file"
                           class="underline"
                           >{{ profileDetails.adhar }}
@@ -700,7 +700,7 @@
                     <!--begin::Action-->
 
                     <KTIcon
-                      data-toggle="tooltip"
+                      v-tooltip
                       title="remove file"
                       icon-name="cross"
                       class="cursor-pointer fs-2tx text-danger rounded"
@@ -796,7 +796,7 @@
                         <a
                           target="blank"
                           v-bind:href="`https://api.zeptac.com/storage/temporary/${profileDetails.pan}`"
-                          data-toggle="tooltip"
+                          v-tooltip
                           title="preview file"
                           class="underline"
                           >{{ profileDetails.pan }}
@@ -812,7 +812,7 @@
                     <!--begin::Action-->
 
                     <KTIcon
-                      data-toggle="tooltip"
+                      v-tooltip
                       title="remove file"
                       icon-name="cross"
                       class="cursor-pointer fs-2tx text-danger rounded"

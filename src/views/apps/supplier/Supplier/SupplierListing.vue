@@ -1,4 +1,5 @@
 <template>
+  <SupplierExportModal></SupplierExportModal>
   <div class="card">
     <div class="card-header border-0 pt-6">
       <!--begin::Card title-->
@@ -31,9 +32,9 @@
           <!--begin::Export-->
           <button
             type="button"
-            class="btn btn-light-primary me-3"
+            class="btn btn-light-info me-3"
             data-bs-toggle="modal"
-            data-bs-target="#kt_customers_export_modal"
+            data-bs-target="#kt_supplier_export_modal"
           >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
@@ -169,30 +170,15 @@
         </template>
 
         <template v-slot:supplier_evaluation="{ row: suppliers }">
-          <span
-            v-if="!suppliers.evaluation"
-            class="menu-link px-3"
-            data-toggle="tooltip"
-            title="Evaluate the Supplier"
-          >
-            <router-link :to="`/suppliers/evaluation/${suppliers.id}`">
-              <span
-                class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
-                >+ Evaluate Supplier
-              </span>
+          <span v-if="!suppliers.evaluation" v-tooltip title="Evaluate The Supplier" >
+            <router-link :to="`/suppliers/evaluation/${suppliers.id}`" class="btn btn-sm btn-outline btn-outline-info text-nowrap btn-active-light-info">+ Evaluate
             </router-link>
           </span>
           <span
             v-else
-            class="menu-link px-3"
-            data-toggle="tooltip"
-            title="Supplier Already Evaluated"
+            class="badge py-3 px-4 fs-7 badge-info"
+            >Evaluated</span
           >
-            <span
-              class="border rounded badge py-3 fs-7 badge-light-success text-hover-primary cursor-pointer"
-              >Evaluated
-            </span>
-          </span>
         </template>
         <template v-slot:approval_status="{ row: suppliers }">
           <span
@@ -231,7 +217,7 @@
             <router-link :to="`/suppliers/edit/${suppliers.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View Supplier"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -243,7 +229,7 @@
             <span
               @click="deleteItem(suppliers.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete Clause"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />
@@ -298,6 +284,7 @@ import { getSuppliers, deleteSupplier, SupplierSearch } from "@/stores/api";
 import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
 import { hideModal } from "@/core/helpers/dom";
 import ApprovalModal from "./ApprovalModal.vue";
+import SupplierExportModal from "./SupplierExportModal.vue";
 import { useAuthStore } from "@/stores/auth";
 import { Identifier } from "@/core/config/WhichUserConfig";
 import arraySort from "array-sort";
@@ -313,6 +300,7 @@ export default defineComponent({
     Datatable,
     SupplierAddModal,
     ApprovalModal,
+    SupplierExportModal,
   },
   setup() {
     const auth = useAuthStore();
@@ -363,14 +351,14 @@ export default defineComponent({
         columnWidth: 75,
       },
       {
-        columnName: "Registration Date",
-        columnLabel: "registration_date",
+        columnName: "Evaluate Supplier",
+        columnLabel: "supplier_evaluation",
         sortEnabled: true,
         columnWidth: 75,
       },
       {
-        columnName: "Evaluate Supplier",
-        columnLabel: "supplier_evaluation",
+        columnName: "Registration Date",
+        columnLabel: "registration_date",
         sortEnabled: true,
         columnWidth: 75,
       },

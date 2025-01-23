@@ -147,7 +147,7 @@
 
               <i
                 class="fas fa-exclamation-circle ms-1 fs-7"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="Phone number must be active"
               ></i>
             </label>
@@ -287,7 +287,7 @@
                   <div class="text-start mt-8">
                     <button
                       type="button"
-                      data-toggle="tooltip"
+                      v-tooltip
                       title="lead information"
                       class="btn btn-primary btn-sm"
                       data-bs-toggle="modal"
@@ -307,33 +307,6 @@
           </div>
           <!--end::Accordion-->
           <div class="separator my-10"></div>
-
-          <!-- <div class="row mb-6">
-            <label class="col-lg-4 col-form-label fw-semobold fs-6">
-              <span>Enquiry Number</span>
-
-              <i
-                class="fas fa-exclamation-circle ms-1 fs-7"
-                data-bs-toggle="tooltip"
-                title="Enquiry Number Required"
-              ></i>
-            </label>
-            <div class="col-lg-8 fv-row">
-              <Field
-                type="text"
-                disabled
-                name="enquiry_no"
-                class="form-control form-control-lg form-control-solid"
-                placeholder="Enter enquiry number"
-                v-model="profileDetails.enquiry_no"
-              />
-              <div class="fv-plugins-message-container">
-                <div class="fv-help-block">
-                  <ErrorMessage name="enquiry_no" />
-                </div>
-              </div>
-            </div>
-          </div> -->
 
           <div class="row mb-6">
             <!--begin::Label-->
@@ -554,7 +527,7 @@
                   >
                     <i
                       class="fas fs-4 fa-check-circle text-success me-6"
-                      data-toggle="tooltip"
+                      v-tooltip
                       title="GST number is valid"
                     ></i>
                   </div>
@@ -564,7 +537,7 @@
                   >
                     <i
                       class="fas fs-4 fa-times-circle text-danger me-6"
-                      data-toggle="tooltip"
+                      v-tooltip
                       title="GST number is Invalid/Incorrect"
                     ></i>
                   </div>

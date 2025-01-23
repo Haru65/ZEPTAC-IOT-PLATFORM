@@ -162,7 +162,7 @@
             <a
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${documents.company_id}/internal_documents/${documents.document_file}`"
-              data-toggle="tooltip"
+              v-tooltip
               title="Download File"
               class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
               >⤓ File
@@ -177,7 +177,7 @@
             <router-link :to="`/internaldocuments/edit/${documents.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View Internal Document"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -189,7 +189,7 @@
             <span
               @click="deleteItem(documents.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete Internal Document"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />

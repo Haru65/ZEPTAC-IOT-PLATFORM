@@ -1,4 +1,5 @@
 <template>
+  <PurchaseOrderExportModal></PurchaseOrderExportModal>
   <div class="card">
     <div class="card-header border-0 pt-6">
       <!--begin::Card title-->
@@ -55,9 +56,9 @@
           <!--begin::Export-->
           <button
             type="button"
-            class="btn btn-light-primary me-3"
+            class="btn btn-light-info me-3"
             data-bs-toggle="modal"
-            data-bs-target="#kt_customers_export_modal"
+            data-bs-target="#kt_purcahse_order_export_modal"
           >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
@@ -206,7 +207,7 @@
           >
             Open
           </span>
-          <span v-else></span>
+          <span v-else class="badge py-3 px-4 badge-light"> Disabled </span>
         </template>
         <template v-slot:actions="{ row: po }">
           <!--begin::Menu Flex-->
@@ -216,7 +217,7 @@
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${po.company_id}/purchase_orders/${po.po_file}`"
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Download Purchase Order"
             >
               <KTIcon icon-name="file-down" icon-class="fs-2" />
@@ -227,7 +228,7 @@
             <router-link :to="`/purchase-order/edit/${po.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View Purchase Order"
               >
                 <KTIcon icon-name="eye" icon-class="fs-2" />
@@ -290,6 +291,7 @@ import { useAuthStore } from "@/stores/auth";
 import { formatPrice } from "@/core/config/DataFormatter";
 import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
 import ApprovalModal from "./ApprovalModal.vue";
+import PurchaseOrderExportModal from "./PurchaseOrderExportModal.vue";
 import moment from "moment";
 import Swal from "sweetalert2";
 import { Identifier } from "@/core/config/WhichUserConfig";
@@ -299,6 +301,7 @@ export default defineComponent({
   components: {
     Datatable,
     ApprovalModal,
+    PurchaseOrderExportModal,
   },
   setup() {
     // Financial Year Logic
@@ -342,7 +345,7 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
-        columnName: "Status",
+        columnName: "Payment Status",
         columnLabel: "status",
         sortEnabled: true,
         columnWidth: 75,

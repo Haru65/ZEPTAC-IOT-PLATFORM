@@ -1,4 +1,5 @@
 <template>
+  <EmployeeExportModal></EmployeeExportModal>
   <div class="card">
     <div class="card-header border-0 pt-6">
       <!--begin::Card title-->
@@ -31,9 +32,9 @@
           <!--begin::Export-->
           <button
             type="button"
-            class="btn btn-light-primary me-3"
+            class="btn btn-light-info me-3"
             data-bs-toggle="modal"
-            data-bs-target="#kt_Employee_export_modal"
+            data-bs-target="#kt_employee_export_modal"
           >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
@@ -126,7 +127,7 @@
           <div class="d-flex flex-lg-row">
             <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Download Employee History Card"
               @click="downloadHistoryCard(employee.id)"
             >
@@ -143,7 +144,7 @@
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${employee.company_id}/profile_images/${employee.meta.profile_pic}`"
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Download Photo"
             >
               <KTIcon icon-name="profile-circle" icon-class="fs-1" />
@@ -160,7 +161,7 @@
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${employee.company_id}/aadhar_cards/${employee.meta.adhar}`"
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Download Aadhar Card"
             >
               <KTIcon icon-name="fingerprint-scanning" icon-class="fs-1" />
@@ -177,7 +178,7 @@
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${employee.company_id}/pan_cards/${employee.meta.pan}`"
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Download Pan Card"
             >
               <KTIcon icon-name="badge" icon-class="fs-1" />
@@ -194,7 +195,7 @@
             <router-link :to="`/employee/edit/${employee.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View Employee"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -206,7 +207,7 @@
             <span
               @click="deleteItem(employee.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete Employee"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />
@@ -273,13 +274,13 @@ import {
 import { blank64 } from "../../admin/users/blank";
 import Swal from "sweetalert2";
 import { Identifier } from "@/core/config/WhichUserConfig";
+import EmployeeExportModal from "./EmployeeExportModal.vue";
 
 export default defineComponent({
   name: "employee-list",
   components: {
     Datatable,
-    // ExportCustomerModal,
-    // AddCustomerModal,
+    EmployeeExportModal,
   },
   setup() {
     const loading = ref(true);

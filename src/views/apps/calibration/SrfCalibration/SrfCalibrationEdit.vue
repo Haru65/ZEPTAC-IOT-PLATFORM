@@ -547,7 +547,7 @@
                 <!-- begin::download -->
                 <span
                   class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-                  data-bs-toggle="tooltip"
+                  v-tooltip
                   title="Download Calibration Certificate"
                   @click="
                     downloadCalibrationRecordsZip(calibration_instrument.id)
@@ -562,7 +562,7 @@
                   class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
                   data-bs-toggle="modal"
                   data-bs-target="#kt_modal_uuc_reading"
-                  data-toggle="tooltip"
+                  v-tooltip
                   title="View Instrumet Info"
                   @click="fillItemData(calibration_instrument)"
                 >
@@ -576,7 +576,7 @@
                 >
                   <span
                     class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                    data-bs-toggle="tooltip"
+                    v-tooltip
                     title="View Calibration Record"
                   >
                     <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -588,7 +588,7 @@
                 <span
                   @click="deleteItem(calibration_instrument.id, false)"
                   class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-                  data-bs-toggle="tooltip"
+                  v-tooltip
                   title="Delete Calibration Instrument"
                 >
                   <KTIcon icon-name="trash" icon-class="fs-2" />

@@ -193,7 +193,7 @@
             <!--begin::Menu Flex-->
             <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Download Zip of Calibration SRF"
               @click="handleZipFile(calibration_srf.id)"
             >
@@ -205,7 +205,7 @@
             <router-link :to="`/calibration-srf/edit/${calibration_srf.id}/${calibration_srf.company_id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View Calibration Record"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -217,7 +217,7 @@
             <span
               @click="deleteItem(calibration_srf.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete Calibration Record"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />

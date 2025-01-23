@@ -165,7 +165,7 @@
             <router-link :to="`/feedbacks/edit/${feedbackform.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-toggle="tooltip"
+                v-tooltip
                 title="View feedback"
               >
                 <KTIcon icon-name="eye" icon-class="fs-2" />
@@ -174,7 +174,7 @@
 
             <span
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete feedback"
               @click="deleteItem(feedbackform.id, false)"
             >

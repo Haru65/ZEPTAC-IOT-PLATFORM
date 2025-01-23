@@ -1,4 +1,5 @@
 <template>
+  <InstrumentExportModal></InstrumentExportModal>
   <div class="card">
     <div class="card-header border-0 pt-6">
       <!--begin::Card title-->
@@ -31,9 +32,9 @@
           <!--begin::Export-->
           <button
             type="button"
-            class="btn btn-light-primary me-3"
+            class="btn btn-light-info me-3"
             data-bs-toggle="modal"
-            data-bs-target="#kt_customers_export_modal"
+            data-bs-target="#kt_instrument_export_modal"
           >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
@@ -140,7 +141,7 @@
             <a
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${instruments.company_id}/instruments/${instruments.calibration_certificate}`"
-              data-toggle="tooltip"
+              v-tooltip
               title="Download Calibration Certificate"
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
             >
@@ -156,7 +157,7 @@
             <a
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${instruments.company_id}/instruments/${instruments.datasheet}`"
-              data-toggle="tooltip"
+              v-tooltip
               title="Download Datasheet"
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
             >
@@ -173,7 +174,7 @@
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${instruments.company_id}/instruments/${instruments.traceability}`"
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Download Traceability"
             >
               <KTIcon icon-name="file-down" icon-class="fs-2" />
@@ -215,7 +216,7 @@
           <div class="d-flex flex-lg-row">
             <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Download Instrument"
               @click="downloadHistoryCard(instruments.id)"
             >
@@ -226,7 +227,7 @@
             <router-link :to="`/instruments/edit/${instruments.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View Instrument"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -236,7 +237,7 @@
 
             <span
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete Instrument"
               @click="deleteItem(instruments.id, false)"
             >
@@ -298,6 +299,7 @@ import {
 import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
 import { hideModal } from "@/core/helpers/dom";
 import ApprovalModal from "./ApprovalModal.vue";
+import InstrumentExportModal from "./InstrumentExportModal.vue";
 import { useAuthStore } from "@/stores/auth";
 import { Identifier } from "@/core/config/WhichUserConfig";
 import arraySort from "array-sort";
@@ -351,6 +353,7 @@ export default defineComponent({
   components: {
     Datatable,
     ApprovalModal,
+    InstrumentExportModal,
   },
   setup() {
     const auth = useAuthStore();
@@ -499,7 +502,11 @@ export default defineComponent({
             id: id,
             ...rest,
           }));
-          initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
         }
       } catch (error) {
         console.error(error);

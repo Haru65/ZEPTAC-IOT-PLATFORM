@@ -144,7 +144,7 @@
               <router-link :to="`/users/edit/${user.id}`">
                 <span
                   class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                  data-bs-toggle="tooltip"
+                  v-tooltip
                   title="View User"
                 >
                   <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -156,7 +156,7 @@
               <span
                 @click="deleteItem(user.id, false)"
                 class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="Delete User"
               >
                 <KTIcon icon-name="trash" icon-class="fs-2" />

@@ -290,7 +290,7 @@
               <router-link :to="`/expensesheets/edit/${expensesheets.id}`">
                 <span
                   class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                  data-bs-toggle="tooltip"
+                  v-tooltip
                   title="View Expense Sheet"
                 >
                   <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -302,7 +302,7 @@
               <span
                 @click="deleteItem(expensesheets.id, false)"
                 class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="Delete Expense Sheet"
               >
                 <KTIcon icon-name="trash" icon-class="fs-2" />

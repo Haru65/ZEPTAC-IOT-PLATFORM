@@ -1,4 +1,5 @@
 <template>
+  <IAuditScheduleExportModal></IAuditScheduleExportModal>
   <div class="card">
     <div class="card-header border-0 pt-6">
       <!--begin::Card title-->
@@ -56,9 +57,9 @@
           <!--begin::Export-->
           <button
             type="button"
-            class="btn btn-light-primary me-3"
+            class="btn btn-light-info me-3"
             data-bs-toggle="modal"
-            data-bs-target="#kt_customers_export_modal"
+            data-bs-target="#kt_audit_scheudle_export_modal"
           >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
@@ -178,7 +179,7 @@
             <router-link :to="`/auditschedule/edit/${audit_schedule.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View Audit Schedule"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -190,7 +191,7 @@
             <span
               @click="deleteItem(audit_schedule.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete Audit Schedule"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />
@@ -249,6 +250,7 @@ import {
 import { ApprovalStatus, GetApprovalStatus } from "@/core/model/global";
 import { hideModal } from "@/core/helpers/dom";
 import ApprovalModal from "./ApprovalModal.vue";
+import IAuditScheduleExportModal from "./IAuditScheduleExportModal.vue";
 import { useAuthStore } from "@/stores/auth";
 import { Identifier } from "@/core/config/WhichUserConfig";
 import arraySort from "array-sort";
@@ -261,6 +263,7 @@ export default defineComponent({
   components: {
     Datatable,
     ApprovalModal,
+    IAuditScheduleExportModal,
   },
   setup() {
     // Financial Year Logic

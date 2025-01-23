@@ -419,7 +419,7 @@
 
             <span
               class="btn btn-icon btn-light-primary  me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Refresh"
               @click="reLoadData"
             >
@@ -546,7 +546,7 @@
                 <!--begin::Clone-->
                 <span
                   class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-                  data-toggle="tooltip"
+                  v-tooltip
                   title="Clone Instrument"
                   data-bs-toggle="modal"
                   :data-bs-target="
@@ -563,7 +563,7 @@
                 <span
                   @click="deleteItem(calibration_instrument.id, false)"
                   class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-                  data-bs-toggle="tooltip"
+                  v-tooltip
                   title="Delete Calibration Instrument"
                 >
                   <KTIcon icon-name="trash" icon-class="fs-2" />

@@ -483,7 +483,7 @@
               <a :href="`/uuc-reading/edit/${uuc_reading.id}`" target="blank">
                 <span
                   class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                  data-bs-toggle="tooltip"
+                  v-tooltip
                   title="View Uncertainity Calculation"
                 >
                   <KTIcon icon-name="finance-calculator" icon-class="fs-2" />
@@ -495,7 +495,7 @@
               <span
                 @click="deleteItem(uuc_reading.id, false)"
                 class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="Delete UUC Reading"
               >
                 <KTIcon icon-name="trash" icon-class="fs-2" />

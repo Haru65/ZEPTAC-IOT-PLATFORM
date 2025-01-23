@@ -6923,3 +6923,296 @@ export async function deleteCompanyTax(data: any) {
         return { success: false, message: errors?.response?.data?.message || "An error occurred" };
     }
 }
+
+
+// All EXPORTS APIS
+//QUOTATIO EXPORT
+export async function ExportQuotationData(data: any) {
+    try {
+        // Set necessary headers
+        ApiService.setHeader();
+
+        // Send POST request to the backend
+        const response = await ApiService.post("export_quotations", data, {
+            responseType: 'blob', // This is part of the config, not inside the data
+        });
+
+        // Log the response headers to check content type (optional)
+        console.log(response.headers['content-type']);  // Should be 'application/pdf' or 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+        // Handle the binary response (the PDF/Excel file)
+        const blob = response.data;
+
+        // Check if the blob is valid (non-zero size)
+        if (blob && blob.size > 0) {
+            return blob; // Return the blob for further handling
+        } else {
+            throw new Error("The response file is empty or invalid.");
+        }
+    } catch (errors: any) {
+        // Handle any errors during the process
+        console.error(errors?.response?.data?.message || "An error occurred during export.");
+        throw new Error(errors?.response?.data?.message || "An error occurred during export.");
+    }
+}
+
+
+//INVOICE EXPORT
+export async function ExportInvoiceData(data: any) {
+    try {
+        // Set necessary headers, if required (e.g., authorization)
+        ApiService.setHeader();
+        
+        // Send GET request to the backend with query params
+        const response = await ApiService.post("export_invoices", data, {
+            responseType: 'blob', // This is part of the config, not inside the data
+        });
+
+        // Log the response headers to check content type
+        console.log(response.headers['content-type']);  // Should be 'application/pdf' or 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+        const blob = response.data;
+        if (blob && blob.size > 0) {
+            // Return the blob data (don't download here)
+            return blob;
+        } else {
+            throw new Error("The response file is empty or invalid.");
+        }
+    } catch (errors:any) {
+        // Handle any errors (e.g., API errors)
+        console.error(errors?.response?.data?.message || "An error occurred during export.");
+        throw new Error(errors?.response?.data?.message || "An error occurred during export.");
+    }
+}
+
+
+//PURCHASE ORDER EXPORT
+export async function ExportPurchaseOrderData(data: any) {
+    try {
+        // Set necessary headers, if required (e.g., authorization)
+        ApiService.setHeader();
+        
+        // Send GET request to the backend with query params
+        const response = await ApiService.post("export_purchase_orders", data, {
+            responseType: 'blob', // This is part of the config, not inside the data
+        });
+
+        // Log the response headers to check content type
+        console.log(response.headers['content-type']);  // Should be 'application/pdf' or 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+        const blob = response.data;
+        if (blob && blob.size > 0) {
+            // Return the blob data (don't download here)
+            return blob;
+        } else {
+            throw new Error("The response file is empty or invalid.");
+        }
+    } catch (errors:any) {
+        // Handle any errors (e.g., API errors)
+        console.error(errors?.response?.data?.message || "An error occurred during export.");
+        throw new Error(errors?.response?.data?.message || "An error occurred during export.");
+    }
+}
+
+
+//PO PAYMENT EXPORT
+export async function ExportPoPaymentData(data: any) {
+    try {
+        // Set necessary headers, if required (e.g., authorization)
+        ApiService.setHeader();
+        
+        // Send GET request to the backend with query params
+        const response = await ApiService.post("export_po_payments", data, {
+            responseType: 'blob', // This is part of the config, not inside the data
+        });
+
+        // Log the response headers to check content type
+        console.log(response.headers['content-type']);  // Should be 'application/pdf' or 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+        const blob = response.data;
+        if (blob && blob.size > 0) {
+            // Return the blob data (don't download here)
+            return blob;
+        } else {
+            throw new Error("The response file is empty or invalid.");
+        }
+    } catch (errors:any) {
+        // Handle any errors (e.g., API errors)
+        console.error(errors?.response?.data?.message || "An error occurred during export.");
+        throw new Error(errors?.response?.data?.message || "An error occurred during export.");
+    }
+}
+
+
+//COMPANY EMPLOYEES EXPORT
+export async function ExportEmployeeData(data: any) {
+    try {
+        // Set necessary headers, if required (e.g., authorization)
+        ApiService.setHeader();
+        
+        // Send GET request to the backend with query params
+        const response = await ApiService.post("export_employees", data, {
+            responseType: 'blob', // This is part of the config, not inside the data
+        });
+
+        // Log the response headers to check content type
+        console.log(response.headers['content-type']);  // Should be 'application/pdf' or 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+        const blob = response.data;
+        if (blob && blob.size > 0) {
+            // Return the blob data (don't download here)
+            return blob;
+        } else {
+            throw new Error("The response file is empty or invalid.");
+        }
+    } catch (errors:any) {
+        // Handle any errors (e.g., API errors)
+        console.error(errors?.response?.data?.message || "An error occurred during export.");
+        throw new Error(errors?.response?.data?.message || "An error occurred during export.");
+    }
+}
+
+
+// SUPPLIERS EXPORT
+export async function ExportSupplierData(data: any) {
+    try {
+        // Set necessary headers, if required (e.g., authorization)
+        ApiService.setHeader();
+        
+        // Send GET request to the backend with query params
+        const response = await ApiService.post("export_suppliers", data, {
+            responseType: 'blob', // This is part of the config, not inside the data
+        });
+
+        // Log the response headers to check content type
+        console.log(response.headers['content-type']);  // Should be 'application/pdf' or 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+        const blob = response.data;
+        if (blob && blob.size > 0) {
+            // Return the blob data (don't download here)
+            return blob;
+        } else {
+            throw new Error("The response file is empty or invalid.");
+        }
+    } catch (errors:any) {
+        // Handle any errors (e.g., API errors)
+        console.error(errors?.response?.data?.message || "An error occurred during export.");
+        throw new Error(errors?.response?.data?.message || "An error occurred during export.");
+    }
+}
+
+
+// INSTRUMENTS EXPORT
+export async function ExportInstrumentData(data: any) {
+    try {
+        // Set necessary headers, if required (e.g., authorization)
+        ApiService.setHeader();
+        
+        // Send GET request to the backend with query params
+        const response = await ApiService.post("export_instruments", data, {
+            responseType: 'blob', // This is part of the config, not inside the data
+        });
+
+        // Log the response headers to check content type
+        console.log(response.headers['content-type']);  // Should be 'application/pdf' or 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+        const blob = response.data;
+        if (blob && blob.size > 0) {
+            // Return the blob data (don't download here)
+            return blob;
+        } else {
+            throw new Error("The response file is empty or invalid.");
+        }
+    } catch (errors:any) {
+        // Handle any errors (e.g., API errors)
+        console.error(errors?.response?.data?.message || "An error occurred during export.");
+        throw new Error(errors?.response?.data?.message || "An error occurred during export.");
+    }
+}
+
+
+// THERMAL INSTRUMENTS EXPORT
+export async function ExportThermalInstrumentData(data: any) {
+    try {
+        // Set necessary headers, if required (e.g., authorization)
+        ApiService.setHeader();
+        
+        // Send GET request to the backend with query params
+        const response = await ApiService.post("export_thermal_instruments", data, {
+            responseType: 'blob', // This is part of the config, not inside the data
+        });
+
+        // Log the response headers to check content type
+        console.log(response.headers['content-type']);  // Should be 'application/pdf' or 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+        const blob = response.data;
+        if (blob && blob.size > 0) {
+            // Return the blob data (don't download here)
+            return blob;
+        } else {
+            throw new Error("The response file is empty or invalid.");
+        }
+    } catch (errors:any) {
+        // Handle any errors (e.g., API errors)
+        console.error(errors?.response?.data?.message || "An error occurred during export.");
+        throw new Error(errors?.response?.data?.message || "An error occurred during export.");
+    }
+}
+
+
+// INTERNAL AUDIT SCHEDULES EXPORT
+export async function ExportAuditScheduleData(data: any) {
+    try {
+        // Set necessary headers, if required (e.g., authorization)
+        ApiService.setHeader();
+        
+        // Send GET request to the backend with query params
+        const response = await ApiService.post("export_audit_schedules", data, {
+            responseType: 'blob', // This is part of the config, not inside the data
+        });
+
+        // Log the response headers to check content type
+        console.log(response.headers['content-type']);  // Should be 'application/pdf' or 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+        const blob = response.data;
+        if (blob && blob.size > 0) {
+            // Return the blob data (don't download here)
+            return blob;
+        } else {
+            throw new Error("The response file is empty or invalid.");
+        }
+    } catch (errors:any) {
+        // Handle any errors (e.g., API errors)
+        console.error(errors?.response?.data?.message || "An error occurred during export.");
+        throw new Error(errors?.response?.data?.message || "An error occurred during export.");
+    }
+}
+
+
+// MANAGEMENT REVIEW MEETINGS SCHEDULE EXPORT
+export async function ExportMrmScheduleData(data: any) {
+    try {
+        // Set necessary headers, if required (e.g., authorization)
+        ApiService.setHeader();
+        
+        // Send GET request to the backend with query params
+        const response = await ApiService.post("export_mrm_schedules", data, {
+            responseType: 'blob', // This is part of the config, not inside the data
+        });
+
+        // Log the response headers to check content type
+        console.log(response.headers['content-type']);  // Should be 'application/pdf' or 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+        const blob = response.data;
+        if (blob && blob.size > 0) {
+            // Return the blob data (don't download here)
+            return blob;
+        } else {
+            throw new Error("The response file is empty or invalid.");
+        }
+    } catch (errors:any) {
+        // Handle any errors (e.g., API errors)
+        console.error(errors?.response?.data?.message || "An error occurred during export.");
+        throw new Error(errors?.response?.data?.message || "An error occurred during export.");
+    }
+}

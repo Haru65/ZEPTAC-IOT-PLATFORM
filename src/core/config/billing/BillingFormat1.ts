@@ -259,7 +259,7 @@ const BillingFormat1Generator = async (
           }
         },
         {
-          title: `Enquiry No : ${invoiceDetials.value.enquiry_no || ""}`,
+          title: `Enquiry No : ${invoiceDetials.value.enquiry_no || "NA"}`,
           styles: {
             fontSize : 10,
             fontStyle: "normal",

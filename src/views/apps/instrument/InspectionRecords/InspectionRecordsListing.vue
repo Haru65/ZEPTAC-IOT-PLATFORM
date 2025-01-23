@@ -51,7 +51,7 @@
         <template v-slot:inspection_record="{ row: inspection_instrument }">
           <span
             class="menu-link px-3"
-            data-toggle="tooltip"
+            v-tooltip
             title="Add Inspection Record"
           >
             <router-link
@@ -70,7 +70,7 @@
           <div class="d-flex flex-lg-row">
             <span
               class="menu-link"
-              data-toggle="tooltip"
+              v-tooltip
               title="View Inspection Records"
             >
               <router-link

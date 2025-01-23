@@ -164,7 +164,7 @@
                 <li>
                   <router-link
                     class="dropdown-item btn"
-                    data-toggle="tooltip"
+                    v-tooltip
                     title="Provide Login Access"
                     :to="`/customers/login/${customer.id}`"
                   >
@@ -175,7 +175,7 @@
                 <li>
                   <span
                     class="dropdown-item btn"
-                    data-toggle="tooltip"
+                    v-tooltip
                     title="Copy Service Request Link For Calibration"
                     @click="generateLink(customer.company_id, customer.id)"
                   >
@@ -186,7 +186,7 @@
                 <li>
                   <span
                     class="dropdown-item btn"
-                    data-toggle="tooltip"
+                    v-tooltip
                     title="Copy Service Request Link For Cleanroom"
                     @click="copySrfUrl(customer.company_id, customer.id)"
                   >
@@ -197,7 +197,7 @@
                 <li>
                   <span
                     class="dropdown-item btn"
-                    data-toggle="tooltip"
+                    v-tooltip
                     title="Copy Feedback Link"
                     @click="copyFeedbackUrl(customer.company_id, customer.id)"
                   >
@@ -212,7 +212,7 @@
             <router-link :to="`/customers/edit/${customer.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
+                v-tooltip
                 title="View Customer"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -224,7 +224,7 @@
             <span
               @click="deleteItem(customer.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
+              v-tooltip
               title="Delete Customer"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />
