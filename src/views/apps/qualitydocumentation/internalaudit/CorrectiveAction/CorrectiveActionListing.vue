@@ -90,7 +90,7 @@
             <a
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${audit_observation.company_id}/audit_evidences/${audit_observation.evidence}`"
-              v-tooltip
+              data-toggle="tooltip"
               title="Download File"
               class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
               >⤓ File
@@ -154,7 +154,7 @@
             <span
               v-if="audit_observation.corrective_action == null"
               class="menu-link px-3"
-              v-tooltip
+              data-toggle="tooltip"
               title="Add Corrective Action"
               data-bs-toggle="modal"
               :data-bs-target="'#kt_modal_new_address'"
@@ -168,7 +168,7 @@
             <span
               v-else
               class="menu-link px-3"
-              v-tooltip
+              data-toggle="tooltip"
               title="Edit Corrective Action"
               data-bs-toggle="modal"
               :data-bs-target="'#kt_modal_new_address_edit'"

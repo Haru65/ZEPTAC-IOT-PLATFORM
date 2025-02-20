@@ -128,7 +128,7 @@
           {{ laf.cleanroom_instruments }}
         </template>
         <template v-slot:laf_report="{ row: laf }">
-          <span class="menu-link" v-tooltip title="Add LAF Report">
+          <span class="menu-link" data-toggle="tooltip" title="Add LAF Report">
             <router-link :to="`/laf_reports/add/${laf.id}`">
               <span
                 class="border rounded badge py-3 fs-7 badge-light-primary text-hover-success cursor-pointer"

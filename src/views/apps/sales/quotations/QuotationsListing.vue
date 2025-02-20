@@ -195,7 +195,7 @@
           <div class="d-flex flex-lg-row">
             <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Download Quotation"
               @click="downloadQuotation(quotations.id)"
             >
@@ -204,7 +204,7 @@
 
             <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Clone Quotation"
               @click="dupQuotation(quotations.id)"
             >
@@ -215,7 +215,7 @@
             <router-link :to="`/quotations/edit/${quotations.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="View Quotation"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -225,7 +225,7 @@
 
             <span
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Delete Quotation"
               @click="deleteItem(quotations.id, false)"
             >

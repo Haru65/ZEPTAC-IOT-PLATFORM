@@ -120,7 +120,7 @@
             <div class="d-flex flex-lg-row">
               <span
                 class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="Download Non-NABL Report"
                 @click="downloadReport(validationreports.id)"
               >

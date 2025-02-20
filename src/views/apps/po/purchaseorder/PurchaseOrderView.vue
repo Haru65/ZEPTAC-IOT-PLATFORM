@@ -314,7 +314,7 @@
               <router-link
                 :to="`/po-payment/direct/${itemDetails.id}`"
                 class="btn btn-sm btn-light-primary me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="Add transaction related to this Purchase Order"
                 >Add Payments</router-link
               >

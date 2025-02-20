@@ -162,7 +162,7 @@
             <a
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${ni.company_id}/national_international_documents/${ni.document_file}`"
-              v-tooltip
+              data-toggle="tooltip"
               title="Download File"
               class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
               >⤓ File
@@ -208,7 +208,7 @@
             <router-link :to="`/ni_documents/edit/${ni.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="View NI Doc"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -220,7 +220,7 @@
             <span
               @click="deleteItem(ni.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Delete NI Doc"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />

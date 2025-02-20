@@ -75,21 +75,34 @@
 
               <div class="form-group col-md-6">
                 <label
-                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
+                  class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
                   >Parameter</label
                 >
-                <Field
-                  type="text"
-                  name="parameter"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Parameter... "
-                  v-model="itemDetails.parameter"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="parameter" />
-                  </div>
+
+                <div class="row">
+                  <el-select
+                    filterable
+                    placeholder="Please Select Parameter"
+                    name="parameter"
+                    v-model="itemDetails.parameter"
+                  >
+                    <el-option
+                      value=""
+                      disabled
+                      label="Please Select Parameter"
+                      key=""
+                    >
+                      Please Select Parameter</el-option
+                    >
+                    <el-option
+                      v-for="item in parameters"
+                      :key="item"
+                      :value="item"
+                      :label="item"
+                    />
+                  </el-select>
                 </div>
+                <!--end::Input-->
               </div>
             </div>
             <!--end::Input group-->
@@ -244,13 +257,11 @@
                   </div>
                 </div>
               </div>
-
             </div>
             <!--end::Input group-->
 
             <!-- extra fields -->
             <div class="row mb-6">
-
               <div class="form-group col-md-6">
                 <label
                   class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
@@ -269,7 +280,6 @@
                   </div>
                 </div>
               </div>
-
 
               <div class="form-group col-md-6">
                 <label
@@ -568,7 +578,7 @@
                           <a
                             target="blank"
                             v-bind:href="`https://api.zeptac.com/storage/company/${itemDetails.company_id}/instruments/${itemDetails.manual_file}`"
-                            v-tooltip
+                            data-toggle="tooltip"
                             title="preview file"
                             class="underline"
                             >{{ itemDetails.manual_file }}
@@ -580,7 +590,7 @@
                       <!--begin::Action-->
 
                       <KTIcon
-                        v-tooltip
+                        data-toggle="tooltip"
                         title="remove file"
                         icon-name="cross"
                         class="cursor-pointer fs-2tx text-danger rounded"
@@ -612,7 +622,7 @@
                           <a
                             target="blank"
                             v-bind:href="`https://api.zeptac.com/storage/temporary/${itemDetails.manual_file}`"
-                            v-tooltip
+                            data-toggle="tooltip"
                             title="preview file"
                             class="underline"
                             >{{ itemDetails.manual_file }}
@@ -627,7 +637,7 @@
                       <!--begin::Action-->
 
                       <KTIcon
-                        v-tooltip
+                        data-toggle="tooltip"
                         title="remove file"
                         icon-name="cross"
                         class="cursor-pointer fs-2tx text-danger rounded"
@@ -718,7 +728,7 @@
           <div class="modal-footer flex-center">
             <!--begin::Button-->
             <button
-            type="submit"
+              type="submit"
               ref="submitButton"
               class="btn btn-primary w-sd-25 w-lg-25"
             >
@@ -757,6 +767,7 @@ import { limit, Identifier } from "@/core/config/WhichUserConfig";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter, useRoute } from "vue-router";
 import ApiService from "@/core/services/ApiService";
+import { parameters, months } from "@/core/model/calibration_instrument";
 import moment from "moment";
 
 interface ItemDetails {
@@ -814,7 +825,6 @@ export default defineComponent({
 
     const itemDetailsValidator = Yup.object().shape({
       instrument_id: Yup.string().required().label("Instrument Id"),
-      parameter: Yup.string().required().label("Parameter"),
       name: Yup.string().required().label("Instrument Name"),
       model_no: Yup.string().required().label("Model No."),
       serial_no: Yup.string().required().label("Serial No."),
@@ -1296,6 +1306,7 @@ export default defineComponent({
       Companies,
       User,
       setDates,
+      parameters,
 
       handleManualChange,
       uploadProgressForManual,

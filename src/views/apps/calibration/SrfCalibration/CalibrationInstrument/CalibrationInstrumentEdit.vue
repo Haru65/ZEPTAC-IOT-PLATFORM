@@ -480,10 +480,10 @@
             <!--begin::Menu Flex-->
             <div class="d-flex flex-lg-row my-3">
               <!--begin::Edit-->
-              <a :href="`/uuc-reading/edit/${uuc_reading.id}`" target="blank">
+              <a :href="`/pressure-calibration/edit/${uuc_reading.id}`" target="blank">
                 <span
                   class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                  v-tooltip
+                  data-bs-toggle="tooltip"
                   title="View Uncertainity Calculation"
                 >
                   <KTIcon icon-name="finance-calculator" icon-class="fs-2" />
@@ -495,7 +495,7 @@
               <span
                 @click="deleteItem(uuc_reading.id, false)"
                 class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="Delete UUC Reading"
               >
                 <KTIcon icon-name="trash" icon-class="fs-2" />
@@ -520,11 +520,11 @@ import arraySort from "array-sort";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import {
   getCalibrationInstrument,
-  getUUCReadings,
+  getPressureReadings,
   getReferenceInstruments,
   updateCalibrationInstrument,
-  deleteUUCReading,
-  addUUCReading,
+  deletePressureReading,
+  addPressureReading,
 } from "@/stores/api";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import * as Yup from "yup";
@@ -666,7 +666,7 @@ export default defineComponent({
 
     async function record_listing(): Promise<void> {
       try {
-        const response = await getUUCReadings(
+        const response = await getPressureReadings(
           `calibrationInstumentId=${itemId}&fetchAll=true`
         );
 
@@ -755,7 +755,7 @@ export default defineComponent({
 
       const deleteFromTable = async (id: number) => {
         try {
-          const response = await deleteUUCReading(id);
+          const response = await deletePressureReading(id);
           if (response?.success) {
             const index = tableData.value.findIndex((item) => item.id === id);
             if (index !== -1) {
@@ -901,7 +901,7 @@ export default defineComponent({
         }
 
         // Call your API here
-        const response = await addUUCReading(uucDetails.value);
+        const response = await addPressureReading(uucDetails.value);
 
         if (response?.success) {
           // Handle successful API response

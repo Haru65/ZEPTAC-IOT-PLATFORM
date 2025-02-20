@@ -392,7 +392,7 @@
                           <a
                             target="blank"
                             v-bind:href="`https://api.zeptac.com/storage/company/${itemDetails.company_id}/instruments/${itemDetails.datasheet}`"
-                            v-tooltip
+                            data-toggle="tooltip"
                             title="preview file"
                             class="underline"
                             >{{ itemDetails.datasheet }}
@@ -404,7 +404,7 @@
                       <!--begin::Action-->
 
                       <KTIcon
-                        v-tooltip
+                        data-toggle="tooltip"
                         title="remove file"
                         icon-name="cross"
                         class="cursor-pointer fs-2tx text-danger rounded"
@@ -436,7 +436,7 @@
                           <a
                             target="blank"
                             v-bind:href="`https://api.zeptac.com/storage/temporary/${itemDetails.datasheet}`"
-                            v-tooltip
+                            data-toggle="tooltip"
                             title="preview file"
                             class="underline"
                             >{{ itemDetails.datasheet }}
@@ -451,7 +451,7 @@
                       <!--begin::Action-->
 
                       <KTIcon
-                        v-tooltip
+                        data-toggle="tooltip"
                         title="remove file"
                         icon-name="cross"
                         class="cursor-pointer fs-2tx text-danger rounded"
@@ -553,7 +553,7 @@
                           <a
                             target="blank"
                             v-bind:href="`https://api.zeptac.com/storage/company/${itemDetails.company_id}/instruments/${itemDetails.traceability}`"
-                            v-tooltip
+                            data-toggle="tooltip"
                             title="preview file"
                             class="underline"
                             >{{ itemDetails.traceability }}
@@ -565,7 +565,7 @@
                       <!--begin::Action-->
 
                       <KTIcon
-                        v-tooltip
+                        data-toggle="tooltip"
                         title="remove file"
                         icon-name="cross"
                         class="cursor-pointer fs-2tx text-danger rounded"
@@ -597,7 +597,7 @@
                           <a
                             target="blank"
                             v-bind:href="`https://api.zeptac.com/storage/temporary/${itemDetails.traceability}`"
-                            v-tooltip
+                            data-toggle="tooltip"
                             title="preview file"
                             class="underline"
                             >{{ itemDetails.traceability }}
@@ -612,7 +612,7 @@
                       <!--begin::Action-->
 
                       <KTIcon
-                        v-tooltip
+                        data-toggle="tooltip"
                         title="remove file"
                         icon-name="cross"
                         class="cursor-pointer fs-2tx text-danger rounded"
@@ -714,7 +714,7 @@
                           <a
                             target="blank"
                             v-bind:href="`https://api.zeptac.com/storage/company/${itemDetails.company_id}/instruments/${itemDetails.calibration_certificate}`"
-                            v-tooltip
+                            data-toggle="tooltip"
                             title="preview file"
                             class="underline"
                             >{{ itemDetails.calibration_certificate }}
@@ -726,7 +726,7 @@
                       <!--begin::Action-->
 
                       <KTIcon
-                        v-tooltip
+                        data-toggle="tooltip"
                         title="remove file"
                         icon-name="cross"
                         class="cursor-pointer fs-2tx text-danger rounded"
@@ -758,7 +758,7 @@
                           <a
                             target="blank"
                             v-bind:href="`https://api.zeptac.com/storage/temporary/${itemDetails.calibration_certificate}`"
-                            v-tooltip
+                            data-toggle="tooltip"
                             title="preview file"
                             class="underline"
                             >{{ itemDetails.calibration_certificate }}
@@ -773,7 +773,7 @@
                       <!--begin::Action-->
 
                       <KTIcon
-                        v-tooltip
+                        data-toggle="tooltip"
                         title="remove file"
                         icon-name="cross"
                         class="cursor-pointer fs-2tx text-danger rounded"
@@ -933,7 +933,7 @@
                     <div class="text-start mt-8">
                       <button
                         type="button"
-                        v-tooltip
+                        data-toggle="tooltip"
                         title="maintenance plan"
                         class="btn btn-primary btn-sm"
                         data-bs-toggle="modal"

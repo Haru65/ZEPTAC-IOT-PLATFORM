@@ -170,7 +170,7 @@
         </template>
 
         <template v-slot:supplier_evaluation="{ row: suppliers }">
-          <span v-if="!suppliers.evaluation" v-tooltip title="Evaluate The Supplier" >
+          <span v-if="!suppliers.evaluation" data-toggle="tooltip" title="Evaluate The Supplier" >
             <router-link :to="`/suppliers/evaluation/${suppliers.id}`" class="btn btn-sm btn-outline btn-outline-info text-nowrap btn-active-light-info">+ Evaluate
             </router-link>
           </span>
@@ -217,7 +217,7 @@
             <router-link :to="`/suppliers/edit/${suppliers.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="View Supplier"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -229,7 +229,7 @@
             <span
               @click="deleteItem(suppliers.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Delete Clause"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />

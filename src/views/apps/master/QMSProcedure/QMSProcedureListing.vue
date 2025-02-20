@@ -167,7 +167,7 @@
             <a
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${qms.company_id}/qms/${qms.document_file}`"
-              v-tooltip
+              data-toggle="tooltip"
               title="Download File"
               class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
               >⤓ File
@@ -213,7 +213,7 @@
             <router-link :to="`/qms_procedures/edit/${qms.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="View QMS Procedure"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -225,7 +225,7 @@
             <span
               @click="deleteItem(qms.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Delete QMS Procedure"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />

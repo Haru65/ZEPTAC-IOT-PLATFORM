@@ -17,24 +17,8 @@ interface ICalibrationInstrument {
   
 
   export const parameters = [
-    {
-      id: "1",
-      param_name: "Pressure",
-      accuracy: "800",
-      resolution: "100",
-    },
-    {
-      id: "2",
-      param_name: "Thermal",
-      accuracy: "200",
-      resolution: "400",
-    },
-    {
-      id: "3",
-      param_name: "Mass & Volume",
-      accuracy: "700",
-      resolution: "1000",
-    }
+    "Pressure",
+    "Electro-technical"
   ];
 
   export const months = [
@@ -164,8 +148,8 @@ interface ICalibrationInstrument {
     steps: Step[];
   }
   
-  // Define the interface for the Reading
-  export interface Reading {
+  // Define the interface for the PressureReading
+  export interface PressureReading {
     id: string;
     company_id: string;
     calibration_instrument_id: string;
@@ -214,7 +198,7 @@ interface ICalibrationInstrument {
     reference_instrument_id: string;
     service_request_id: string;
   
-    readings: Reading[];
+    readings: PressureReading[];
   
     company_id: string;
     is_active: string;

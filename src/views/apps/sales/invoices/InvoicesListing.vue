@@ -199,7 +199,7 @@
           <div class="d-flex flex-lg-row">
             <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Download Invoice"
               @click="downloadInvoice(invoices.id)"
             >
@@ -208,7 +208,7 @@
 
             <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Clone Invoice"
               @click="dupInvoice(invoices.id)"
             >
@@ -219,7 +219,7 @@
             <router-link :to="`/invoices/edit/${invoices.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="View Invoice"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -229,7 +229,7 @@
 
             <span
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Delete Invoice"
               @click="deleteItem(invoices.id, false)"
             >

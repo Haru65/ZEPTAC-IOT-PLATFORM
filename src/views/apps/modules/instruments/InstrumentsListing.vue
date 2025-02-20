@@ -141,7 +141,7 @@
             <a
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${instruments.company_id}/instruments/${instruments.calibration_certificate}`"
-              v-tooltip
+              data-toggle="tooltip"
               title="Download Calibration Certificate"
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
             >
@@ -157,7 +157,7 @@
             <a
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${instruments.company_id}/instruments/${instruments.datasheet}`"
-              v-tooltip
+              data-toggle="tooltip"
               title="Download Datasheet"
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
             >
@@ -174,7 +174,7 @@
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${instruments.company_id}/instruments/${instruments.traceability}`"
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-              v-tooltip
+              data-toggle="tooltip"
               title="Download Traceability"
             >
               <KTIcon icon-name="file-down" icon-class="fs-2" />
@@ -216,7 +216,7 @@
           <div class="d-flex flex-lg-row">
             <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Download Instrument"
               @click="downloadHistoryCard(instruments.id)"
             >
@@ -227,7 +227,7 @@
             <router-link :to="`/instruments/edit/${instruments.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="View Instrument"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -237,7 +237,7 @@
 
             <span
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Delete Instrument"
               @click="deleteItem(instruments.id, false)"
             >

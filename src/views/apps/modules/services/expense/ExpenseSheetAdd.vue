@@ -106,7 +106,7 @@
                       <span>Returnable Gate Pass</span>
                       <i
                         class="fas fa-exclamation-circle ms-2 fs-7"
-                        v-tooltip
+                        data-bs-toggle="tooltip"
                         title="Select at least one engineer"
                       ></i>
                     </label>
@@ -309,7 +309,7 @@
                       <span>Engineers</span>
                       <i
                         class="fas fa-exclamation-circle ms-2 fs-7"
-                        v-tooltip
+                        data-bs-toggle="tooltip"
                         title="Select at least one engineer"
                       ></i>
                     </label>

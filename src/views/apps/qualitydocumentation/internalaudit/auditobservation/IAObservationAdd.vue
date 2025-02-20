@@ -83,7 +83,7 @@
                         <span
                           v-if="clause['has_nc']"
                           type="button"
-                          v-tooltip
+                          data-toggle="tooltip"
                           title="View NC Observation"
                           class="btn btn-primary rounded btn-sm"
                           data-bs-toggle="modal"
@@ -136,7 +136,7 @@
                                 <span
                                   v-if="nestedClause['has_nc']"
                                   type="button"
-                                  v-tooltip
+                                  data-toggle="tooltip"
                                   title="View NC Observation"
                                   class="btn btn-primary rounded btn-sm"
                                   data-bs-toggle="modal"
@@ -195,7 +195,7 @@
                                         <span
                                           v-if="nestedNestedClause.has_nc"
                                           type="button"
-                                          v-tooltip
+                                          data-toggle="tooltip"
                                           title="View NC Observation"
                                           class="btn btn-primary rounded btn-sm"
                                           data-bs-toggle="modal"
@@ -263,7 +263,7 @@
                                                     nestedNestedNestedClause.has_nc
                                                   "
                                                   type="button"
-                                                  v-tooltip
+                                                  data-toggle="tooltip"
                                                   title="View NC Observation"
                                                   class="btn btn-primary rounded btn-sm"
                                                   data-bs-toggle="modal"
@@ -428,7 +428,7 @@
                 <a
                   target="blank"
                   v-bind:href="`https://api.zeptac.com/storage/company/${audit_observation.company_id}/audit_evidences/${audit_observation.evidence}`"
-                  v-tooltip
+                  data-toggle="tooltip"
                   title="Download File"
                   class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
                   >⤓ File
@@ -478,7 +478,7 @@
                 <span
                   @click="deleteItem(audit_observation.id, false)"
                   class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-                  v-tooltip
+                  data-bs-toggle="tooltip"
                   title="Delete Observation"
                 >
                   <KTIcon icon-name="trash" icon-class="fs-2" />

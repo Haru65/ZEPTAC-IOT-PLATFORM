@@ -169,7 +169,7 @@
                     <a
                       target="blank"
                       v-bind:href="`https://api.zeptac.com/storage/company/${itemDetails.company_id}/purchase_orders/${itemDetails.po_file}`"
-                      v-tooltip
+                      data-toggle="tooltip"
                       title="preview file"
                       class="underline"
                       >{{ itemDetails.po_file }}
@@ -181,7 +181,7 @@
                 <!--begin::Action-->
 
                 <KTIcon
-                  v-tooltip
+                  data-toggle="tooltip"
                   title="remove file"
                   icon-name="cross"
                   class="cursor-pointer fs-2tx text-danger rounded"
@@ -210,7 +210,7 @@
                     <a
                       target="blank"
                       v-bind:href="`https://api.zeptac.com/storage/temporary/${itemDetails.po_file}`"
-                      v-tooltip
+                      data-toggle="tooltip"
                       title="preview file"
                       class="underline"
                       >{{ itemDetails.po_file }}
@@ -226,7 +226,7 @@
                 <!--begin::Action-->
 
                 <KTIcon
-                  v-tooltip
+                  data-toggle="tooltip"
                   title="remove file"
                   icon-name="cross"
                   class="cursor-pointer fs-2tx text-danger rounded"

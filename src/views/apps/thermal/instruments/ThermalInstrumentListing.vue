@@ -193,7 +193,7 @@
             <!--begin::Clone-->
             <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              v-tooltip
+              data-toggle="tooltip"
               title="Clone Instrument"
               data-bs-toggle="modal"
               :data-bs-target="
@@ -209,7 +209,7 @@
             <router-link :to="`/cloneinstrument/${thermal_instruments.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="Clone Instrument"
               >
                 <KTIcon icon-name="copy" icon-class="fs-2" />
@@ -223,7 +223,7 @@
             >
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="View Instrument"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -234,7 +234,7 @@
             <!--end::Delete-->
             <span
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Delete Instrument"
               @click="deleteItem(thermal_instruments.id, false)"
             >

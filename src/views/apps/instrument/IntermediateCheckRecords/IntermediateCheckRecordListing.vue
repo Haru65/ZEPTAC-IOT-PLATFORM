@@ -51,7 +51,7 @@
         <template v-slot:intermediate_record="{ row: intermediate_instrument }">
           <span
             class="menu-link px-3"
-            v-tooltip
+            data-toggle="tooltip"
             title="Add Intermediate Check Plan"
           >
             <router-link
@@ -70,7 +70,7 @@
           <div class="d-flex flex-lg-row">
             <span
               class="menu-link"
-              v-tooltip
+              data-toggle="tooltip"
               title="View Intermediate Check Plan"
             >
               <router-link

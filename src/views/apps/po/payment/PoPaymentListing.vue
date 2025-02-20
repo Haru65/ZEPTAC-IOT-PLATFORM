@@ -177,7 +177,7 @@
             <router-link :to="`/po-payment/edit/${popayment.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="View Po Payment"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />

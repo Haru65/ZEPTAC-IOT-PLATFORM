@@ -1606,8 +1606,36 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/calibration/SrfCalibration/CalibrationInstrument/CalibrationInstrumentEdit.vue"),
         meta: {
-          pageTitle: "Supplier Evalauation",
-          breadcrumbs: ["Supplier Evalauation"],
+          pageTitle: "Calibration Instrument Edit",
+          breadcrumbs: ["Calibration Instrument Edit"],
+        },
+      },
+
+      // Modified
+      // Calibration Records - Dynamic Calibration Instruments
+      {
+        path: "/calibration-instrument/:type/edit/:id",
+        name: "calibration-instrument-edit-wrapper",
+        beforeEnter: async (to, from, next) => {
+          const itemId = to.params.id;
+          try {
+            const response = await getCalibrationInstrument(itemId.toString());
+            console.log(response);
+            if (response.success==false || response.result.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () =>
+          import("@/views/apps/calibration/SrfCalibration/CalZeptac/calibrationInstrumentWrapper/CalibrationInstrumentEditWrapper.vue"),
+        meta: {
+          pageTitle: "Calibration Instrument Edit",
+          breadcrumbs: ["Calibration Instrument Edit"],
         },
       },
 
@@ -2903,7 +2931,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/customer/planner",
         name: "customer-planner-list",
-        component: () => import("@/views/apps/notification/NotificationListing.vue"),
+        component: () => import("@/views/apps/customers/planners/CustomerPlanners.vue"),
         meta: {
           pageTitle: "Planner",
           breadcrumbs: ["Planner"],
@@ -2912,7 +2940,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/customer/activities",
         name: "customer-activities-list",
-        component: () => import("@/views/apps/notification/NotificationListing.vue"),
+        component: () => import("@/views/apps/customers/activities/CustomerActivities.vue"),
         meta: {
           pageTitle: "Activities",
           breadcrumbs: ["Activities"],
@@ -2948,7 +2976,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/customer/equipments",
         name: "customer-equipments-list",
-        component: () => import("@/views/apps/notification/NotificationListing.vue"),
+        component: () => import("@/views/apps/customers/equipments/CustomerEquipments.vue"),
         meta: {
           pageTitle: "Equipments",
           breadcrumbs: ["Equipments"],
@@ -3248,10 +3276,9 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/uuc-reading/edit/:id",
-        name: "uuc-reading-edit",
-        component: () =>
-          import("@/views/apps/calibration/SrfCalibration/CalibrationInstrument/UUCReadingEdit.vue"),
+        path: "/pressure-calibration/edit/:id",
+        name: "pressure-calibration-edit",
+        component: () => import("@/views/apps/calibration/SrfCalibration/CalZeptac/calibrationInstrumentWrapper/pressure/PressureReadingEdit.vue"),
         meta: {
           pageTitle: "Uncertainty Calculation",
         },

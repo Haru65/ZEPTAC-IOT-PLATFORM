@@ -253,8 +253,8 @@
             <span
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
               data-bs-toggle="modal"
-              v-tooltip
-              title="View Training"
+              data-toggle="tooltip"
+              title="View Tax"
               data-bs-target="#kt_modal_tax_edit"
               @click="fillItemData(company_tax)"
             >
@@ -265,8 +265,8 @@
             <span
               @click="deleteItem(company_tax.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              v-tooltip
-              title="Delete Permission"
+              data-bs-toggle="tooltip"
+              title="Delete Tax"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />
             </span>

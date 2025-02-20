@@ -321,7 +321,7 @@
                       <td>
                         <span
                           @click="RemoveRow(index)"
-                          v-tooltip
+                          data-toggle="tooltip"
                           title="Delete Equipment"
                           class="border border-danger rounded-circle badge m-3 py-3 px-4 bg-light-danger fs-7 badge-light-danger text-danger text-hover-dark cursor-pointer"
                           >x

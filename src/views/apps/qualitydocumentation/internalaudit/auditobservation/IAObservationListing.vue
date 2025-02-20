@@ -121,7 +121,7 @@
         </template>
         <template v-slot:observation="{ row: audit_schedule }">
           <span 
-            v-tooltip
+            data-toggle="tooltip"
             title="Add Audit Observation">
             <router-link :to="`/auditobservations/add/${audit_schedule.id}`" class="btn btn-sm btn-outline btn-outline-info text-nowrap btn-active-light-info">+ Observation
             </router-link>
@@ -129,7 +129,7 @@
         </template>
         <template v-slot:non_conformance="{ row: audit_schedule }">
           <span
-            b-tooltip
+            data-bs-toggle="tooltip"
             title="View Non-Conformance">
             <router-link :to="`/non_conformance/list/${audit_schedule.id}`" class="btn btn-sm btn-info text-nowrap">View Non-conformances
             </router-link>
@@ -142,7 +142,7 @@
             <router-link :to="`/auditschedule/edit/${audit_schedule.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-toggle="tooltip"
                 title="View Audit Schedule"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -154,7 +154,7 @@
             <span
               @click="deleteItem(audit_schedule.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Delete Audit Schedule"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />

@@ -127,7 +127,7 @@
           <div class="d-flex flex-lg-row">
             <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Download Employee History Card"
               @click="downloadHistoryCard(employee.id)"
             >
@@ -144,7 +144,7 @@
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${employee.company_id}/profile_images/${employee.meta.profile_pic}`"
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Download Photo"
             >
               <KTIcon icon-name="profile-circle" icon-class="fs-1" />
@@ -161,7 +161,7 @@
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${employee.company_id}/aadhar_cards/${employee.meta.adhar}`"
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Download Aadhar Card"
             >
               <KTIcon icon-name="fingerprint-scanning" icon-class="fs-1" />
@@ -178,7 +178,7 @@
               target="blank"
               v-bind:href="`https://api.zeptac.com/storage/company/${employee.company_id}/pan_cards/${employee.meta.pan}`"
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Download Pan Card"
             >
               <KTIcon icon-name="badge" icon-class="fs-1" />
@@ -195,7 +195,7 @@
             <router-link :to="`/employee/edit/${employee.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="View Employee"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -207,7 +207,7 @@
             <span
               @click="deleteItem(employee.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Delete Employee"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />

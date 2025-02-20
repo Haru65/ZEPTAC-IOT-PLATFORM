@@ -195,7 +195,7 @@
             <router-link :to="`/risks/edit/${risk.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="View Risk"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -207,7 +207,7 @@
             <span
               @click="deleteItem(risk.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Delete Risk"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />

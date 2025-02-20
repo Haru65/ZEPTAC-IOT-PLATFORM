@@ -545,39 +545,45 @@
               <!--begin::Menu Flex-->
               <div class="d-flex flex-lg-row my-3">
                 <!-- begin::download -->
-                <span
+                <!-- <span
                   class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-                  v-tooltip
+                  data-bs-toggle="tooltip"
                   title="Download Calibration Certificate"
                   @click="
-                    downloadCalibrationRecordsZip(calibration_instrument.id)
+                    downloadCalibrationRecordsZip(
+                      calibration_instrument.id,
+                      calibration_instrument.parameter
+                    )
+                  "
+                >
+                  <KTIcon icon-name="file-down" icon-class="fs-2" />
+                </span> -->
+                <!-- end::download -->
+
+                <!-- begin::download -->
+                <span
+                  class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
+                  data-bs-toggle="tooltip"
+                  title="Download Calibration Certificate"
+                  @click="
+                    downloadPdf(
+                      calibration_instrument.parameter,
+                      calibration_instrument.id
+                    )
                   "
                 >
                   <KTIcon icon-name="file-down" icon-class="fs-2" />
                 </span>
                 <!-- end::download -->
 
-                <!-- begin::Info -->
-                <!-- <span
-                  class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-                  data-bs-toggle="modal"
-                  data-bs-target="#kt_modal_uuc_reading"
-                  v-tooltip
-                  title="View Instrumet Info"
-                  @click="fillItemData(calibration_instrument)"
-                >
-                  <KTIcon icon-name="eye" icon-class="fs-2" />
-                </span> -->
-                <!--end::Info-->
-
                 <!--begin::Edit-->
                 <router-link
-                  :to="`/calibration-instrument/edit/${calibration_instrument.id}`"
+                  :to="`/calibration-instrument/${calibration_instrument.parameter}/edit/${calibration_instrument.id}`"
                 >
                   <span
                     class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                    v-tooltip
-                    title="View Calibration Record"
+                    data-bs-toggle="tooltip"
+                    title="View Calibration Instrument"
                   >
                     <KTIcon icon-name="pencil" icon-class="fs-2" />
                   </span>
@@ -588,7 +594,7 @@
                 <span
                   @click="deleteItem(calibration_instrument.id, false)"
                   class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-                  v-tooltip
+                  data-bs-toggle="tooltip"
                   title="Delete Calibration Instrument"
                 >
                   <KTIcon icon-name="trash" icon-class="fs-2" />
@@ -679,14 +685,18 @@ import {
   getCalibrationSrf,
   getCalibrationEngineers,
   updateCalibrationSrf,
-  getCalibrationInstrumentInfo,
   getCompanyLogo,
+  getPressureCalibrationInstrumentInfo,
+  getElectroCalibrationInstrumentInfo,
+  DownloadElectroCalibrationInstrument,
+  DownloadPressureCalibrationInstrument,
 } from "@/stores/api";
 import ApiService from "@/core/services/ApiService";
 import moment from "moment";
 
 import CalibrationInstrumentAddModal from "./CalibrationInstrument/CalibrationInstrumentAddModal.vue";
-import { CalibrationRecordGen } from "@/core/config/CalibrationRecordGenerator";
+import { PressureCalibrationGen } from "@/core/config/PressureCalibrationGenerator";
+import { ElectroCalibrationGen } from "@/core/config/ElectroCalibrationGenerator";
 
 interface Engineer {
   id: string;
@@ -798,8 +808,8 @@ interface UncertaintyValue {
   steps: Step[];
 }
 
-// Define the interface for the Reading
-interface Reading {
+// Define the interface for the Pressure Reading
+interface PressureReading {
   id: string;
   company_id: string;
   calibration_instrument_id: string;
@@ -815,7 +825,8 @@ interface Reading {
   uncertainty: UncertaintyValue; // Nested UncertaintyValue
 }
 
-interface DownloadData {
+// Pressure Instrument Interface
+interface PressureInstrumentDownloadData {
   id: string;
   instrument_id: string;
   name: string;
@@ -847,7 +858,68 @@ interface DownloadData {
   reference_instrument_id: string;
   service_request_id: string;
 
-  readings: Reading[];
+  // pressureReadings
+  pressure_readings: PressureReading[];
+
+  company_id: string;
+  is_active: string;
+
+  srf: SrfData;
+  reference_instrument: ReferenceInstrumentData;
+}
+
+// Define the interface for the Electro Reading
+interface GroupedElectroReading {
+  parameter_id: string;
+  parameter_name: string;
+  parameter_unit: string;
+  readings: ElectroReading[];
+}
+
+interface ElectroReading {
+  id: string;
+  standard_reading: string;
+  uuc_readings: number[];
+  average_reading: string;
+  error_reading: string;
+  uncertainity_percentage: string;
+}
+
+// Electro Technical Instrument Interface
+interface ElectroTechnicalDownloadData {
+  id: string;
+  instrument_id: string;
+  name: string;
+  parameter: string;
+
+  model_no: string;
+  serial_no: string;
+  make: string;
+
+  calibration_date: string;
+  calibration_due_date: string;
+
+  location: string;
+
+  ranges_from: string;
+  ranges_to: string;
+  accuracy: string;
+  resolution: string;
+
+  calibration_points: string;
+  periodicity: string;
+
+  temp: string;
+  rh: string;
+
+  instrument_condition: string;
+  remark: string;
+
+  reference_instrument_id: string;
+  service_request_id: string;
+
+  // electroReadings
+  electro_readings: GroupedElectroReading[];
 
   company_id: string;
   is_active: string;
@@ -1495,6 +1567,7 @@ export default defineComponent({
       }
     };
 
+    // Company Information
     const companyInfo = ref({
       id: "",
       company_name: "",
@@ -1507,7 +1580,10 @@ export default defineComponent({
       logo_base64: "",
     });
 
-    const instrumentInfo = ref<DownloadData>({
+    /**** PRESSURE INSTRUMENT CALIBRATION LOGIC ****/
+
+    // Pressure instrument Calibration
+    const pressureInstrumentInfo = ref<PressureInstrumentDownloadData>({
       id: "",
       instrument_id: "",
       name: "",
@@ -1539,7 +1615,7 @@ export default defineComponent({
       reference_instrument_id: "",
       service_request_id: "",
 
-      readings: [
+      pressure_readings: [
         {
           id: "",
           company_id: "",
@@ -1666,7 +1742,8 @@ export default defineComponent({
       },
     });
 
-    const downloadCalibrationRecordsZip = async (id) => {
+    // function to download pressure
+    async function downloadPressureCalibration(id) {
       let timerInterval;
 
       try {
@@ -1689,17 +1766,21 @@ export default defineComponent({
         });
 
         // Fetch RGP information
-        const res = await getCalibrationInstrumentInfo(id);
+        const res = await getPressureCalibrationInstrumentInfo(id);
         if (res?.success != false) {
-          instrumentInfo.value = { ...res.result } as DownloadData;
-          instrumentInfo.value.readings = [...res.result.readings] as Reading[];
-          instrumentInfo.value.srf = { ...res.result.srf };
+          pressureInstrumentInfo.value = {
+            ...res.result,
+          } as PressureInstrumentDownloadData;
+          pressureInstrumentInfo.value.pressure_readings = [
+            ...res.result.pressure_readings,
+          ] as PressureReading[];
+          pressureInstrumentInfo.value.srf = { ...res.result.srf };
         } else {
           showErrorAlert("Error", res.message || "Error Occured");
           return;
         }
 
-        console.log(instrumentInfo.value);
+        console.log(pressureInstrumentInfo.value);
 
         // Fetch company logo details
         const res2 = await getCompanyLogo(res.result.company_id);
@@ -1737,10 +1818,15 @@ export default defineComponent({
 
         // Simulate delay for PDF generation (replace with actual function)
         const pdfName = `calibration_instrument_record_${
-          instrumentInfo.value.srf.srf_no || "_"
-        }_${instrumentInfo.value.srf.purchase_order_no || "_"}`;
+          pressureInstrumentInfo.value.srf.srf_no || "_"
+        }_${pressureInstrumentInfo.value.srf.purchase_order_no || "_"}`;
 
-        await CalibrationRecordGen(id, pdfName, instrumentInfo, companyInfo);
+        await PressureCalibrationGen(
+          id,
+          pdfName,
+          pressureInstrumentInfo,
+          companyInfo
+        );
 
         // Close Swal on success
         Swal.fire({
@@ -1767,6 +1853,269 @@ export default defineComponent({
         // Clear interval if still running
         clearInterval(timerInterval);
       }
+    }
+
+    /**** ELECTRO-TECHNICAL INSTRUMENT CALIBRATION LOGIC ****/
+    const electroInstrumentInfo = ref<ElectroTechnicalDownloadData>({
+      id: "",
+      instrument_id: "",
+      name: "",
+      parameter: "",
+
+      model_no: "",
+      serial_no: "",
+      make: "",
+
+      calibration_date: "",
+      calibration_due_date: "",
+
+      location: "",
+
+      ranges_from: "",
+      ranges_to: "",
+      accuracy: "",
+      resolution: "",
+
+      calibration_points: "",
+      periodicity: "",
+
+      temp: "",
+      rh: "",
+
+      instrument_condition: "",
+      remark: "",
+
+      reference_instrument_id: "",
+      service_request_id: "",
+
+      electro_readings: [
+        {
+          parameter_id: "",
+          parameter_name: "",
+          parameter_unit: "",
+          readings: [
+            {
+              id: "",
+              standard_reading: "",
+              uuc_readings: Array(10).fill(null), // Array of 10 empty values
+              average_reading: "",
+              error_reading: "",
+              uncertainity_percentage: "",
+            },
+          ],
+        },
+      ],
+
+      company_id: "",
+      is_active: "",
+
+      srf: {
+        id: "",
+        company_id: "",
+        customer_id: "",
+        srf_no: "",
+        purchase_order_no: "",
+        request_date: "",
+        customer_name: "",
+
+        status: "",
+        comments: "",
+        approval_status: "",
+
+        assigned_to: "",
+        created_by: "",
+        updated_by: "",
+
+        customer: {
+          id: "",
+          name: "",
+          company_name: "",
+          address1: "",
+          address2: "",
+          city: "",
+          state: "",
+          pincode: "",
+          country: "",
+          mobile: "",
+        },
+
+        engineer: {
+          id: "",
+          first_name: "",
+          last_name: "",
+          mobile: "",
+        },
+        made_by: {
+          id: "",
+          first_name: "",
+          last_name: "",
+        },
+        approved_by: {
+          id: "",
+          first_name: "",
+          last_name: "",
+        },
+      },
+
+      reference_instrument: {
+        id: "",
+        instrument_id: "",
+        parameter: "",
+        name: "",
+        model_no: "",
+        serial_no: "",
+        make: "",
+        calibration_date: "",
+        calibration_due_date: "",
+
+        ranges_from: "",
+        ranges_to: "",
+        accuracy: "",
+
+        uncertainty: "",
+        resolution: "",
+        vendor_name: "",
+        accessories_list: [],
+
+        doi: "",
+        manual_available: "",
+        manual_file: "",
+        software_available: "",
+        location: "",
+        certificate_no: "",
+
+        company_id: "",
+        created_by: "",
+        updated_by: "",
+        is_active: "",
+      },
+    });
+
+    // function to download electro
+    async function downloadElectroTechnicalCalibration(id) {
+      let timerInterval;
+
+      try {
+        // Show initial loading Swal with generic progress messages
+        Swal.fire({
+          title: "Downloading Calibration Certificate",
+          html: `<div class="swal-animation">
+    <p class="swal-text">Please wait...</p>
+    <div class="swal-progress">
+      <div class="swal-progress-bar"></div>
+    </div>
+  </div>`,
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          willClose: () => {
+            clearInterval(timerInterval);
+          },
+        });
+
+        // Fetch RGP information
+        const res = await getElectroCalibrationInstrumentInfo(id);
+        if (res?.success != false) {
+          electroInstrumentInfo.value = {
+            ...res.result,
+          } as ElectroTechnicalDownloadData;
+          electroInstrumentInfo.value.electro_readings = [
+            ...res.result.electro_readings,
+          ] as GroupedElectroReading[];
+          electroInstrumentInfo.value.srf = { ...res.result.srf };
+        } else {
+          showErrorAlert("Error", res.message || "Error Occured");
+          return;
+        }
+
+        console.log(electroInstrumentInfo.value);
+
+        // Fetch company logo details
+        const res2 = await getCompanyLogo(res.result.company_id);
+
+        if (res2?.success != false) {
+          // Update local reactive state (assuming Vue 3 Composition API syntax)
+          companyInfo.value.id = res2.result.id;
+          companyInfo.value.company_name = res2.result.company_name;
+          companyInfo.value.company_logo = res2.result.company_logo
+            ? res2.result.company_logo
+            : "";
+          companyInfo.value.logo_base64 = res2.result.logo_base64
+            ? "data: image/png;base64," + res2.result.logo_base64
+            : getAssetPath("media/avatars/default.png");
+
+          companyInfo.value.address = res2.result.address || "";
+          companyInfo.value.city = res2.result.city || "";
+          companyInfo.value.pincode = res2.result.pincode || "";
+          companyInfo.value.state = res2.result.state || "";
+          companyInfo.value.country = res2.result.country || "";
+        } else {
+          showErrorAlert("Error", res2.message || "Error Occured");
+          return;
+        }
+        // Update Swal message for PDF generation
+        Swal.update({
+          title: "Generating PDF",
+          html: `<div class="swal-animation">
+    <p class="swal-text">Please wait...</p>
+    <div class="swal-progress">
+      <div class="swal-progress-bar"></div>
+    </div>
+  </div>`,
+        });
+
+        // Simulate delay for PDF generation (replace with actual function)
+        const pdfName = `calibration_instrument_record_${
+          electroInstrumentInfo.value.srf.srf_no || "_"
+        }_${electroInstrumentInfo.value.srf.purchase_order_no || "_"}`;
+
+        await ElectroCalibrationGen(
+          id,
+          pdfName,
+          electroInstrumentInfo,
+          companyInfo
+        );
+
+        // Close Swal on success
+        Swal.fire({
+          title: "Download Complete",
+          text: "Calibration Certificate generated successfully",
+          icon: "success",
+          timer: 2000, // Show success message for 2 seconds
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } catch (error) {
+        console.error("Error downloading Calibration Certificate:", error);
+
+        // Close Swal on success
+        Swal.fire({
+          title: "Error Complete",
+          text: "Failed to Calibration Certificate",
+          icon: "error",
+          timer: 2000,
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } finally {
+        // Clear interval if still running
+        clearInterval(timerInterval);
+      }
+    }
+
+    const downloadCalibrationRecordsZip = async (id, parameter) => {
+      switch (parameter) {
+        case "Pressure":
+          await downloadPressureCalibration(id);
+          break;
+        case "Electro-technical":
+          await downloadElectroTechnicalCalibration(id);
+          break;
+        default:
+          console.warn("Invalid parameter. No matching function found.");
+          break;
+      }
     };
 
     async function reLoadData() {
@@ -1791,6 +2140,115 @@ export default defineComponent({
         reading_data: JSON.parse(reading_data),
       };
       console.log("readingDetails are:", readingDetails.value);
+    };
+
+    const downloadPdf = async (parameterType, instrumentId) => {
+      try {
+        // Show initial loading Swal with a generic progress message
+        Swal.fire({
+          title: "Downloading Calibration Certificate",
+          html: `<div class="swal-animation">
+        <p class="swal-text">Please wait...</p>
+        <div class="swal-progress">
+          <div class="swal-progress-bar"></div>
+        </div>
+      </div>`,
+          allowOutsideClick: false, // Prevent closing the Swal while downloading
+          didOpen: () => {
+            Swal.showLoading(); // Show loading animation
+          },
+        });
+
+        // Define the data to send in the request
+        const data = {
+          parameter: parameterType,
+          id: instrumentId,
+        };
+
+        // Switch statement to determine the calibration type and API call
+        let response;
+        switch (parameterType) {
+          case "Electro-technical":
+            // Call the function for Electro-technical calibration
+            response = await DownloadElectroCalibrationInstrument(data);
+            break;
+
+          case "Pressure":
+          default:
+            // Default is Pressure, you can also specify any other default behavior
+            // or if you wish to make it default when parameterType is undefined
+            response = await DownloadPressureCalibrationInstrument(data);
+            break;
+        }
+
+        if (response?.success == false) {
+          console.log("im here");
+          const errorMessage =
+            response?.message || "Export failed due to server error.";
+          showErrorAlert("Error", errorMessage); // Show specific error
+          console.error("Export Error:", errorMessage);
+          return; // Exit the function if no valid response
+        }
+
+        // Check if the response is successful (non-empty Blob data)
+        if (!response || response.size === 0) {
+          const errorMessage =
+            response?.message || "Export failed due to server error.";
+
+          // Show error Swal after the failure
+          Swal.fire({
+            title: "Error",
+            text: "An error occurred during the export process.",
+            icon: "error",
+            timer: 2000, // Show error message for 2 seconds
+            timerProgressBar: true,
+            allowOutsideClick: true,
+          });
+
+          console.error("Export Error:", errorMessage);
+          return; // Exit the function if no valid response
+        }
+
+        // Update Swal message for PDF generation progress
+        Swal.update({
+          title: "Generating PDF",
+          html: `<div class="swal-animation">
+        <p class="swal-text">Please wait...</p>
+        <div class="swal-progress">
+          <div class="swal-progress-bar"></div>
+        </div>
+      </div>`,
+        });
+
+        // Trigger the download if the response is valid
+        const fileType = "pdf";
+        const fileName = `calibration_instrument_${moment().format(
+          "YYYYMMDD_HHmmss"
+        )}.${fileType}`;
+
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(response); // Use the Blob response here
+        link.download = fileName; // Set the filename for download
+        link.click(); // Trigger the download
+
+        // Show success message after the download is triggered
+        Swal.fire({
+          title: "Download Complete",
+          text: "Calibration Certificate generated successfully",
+          icon: "success",
+          timer: 2000, // Show success message for 2 seconds
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } catch (error) {
+        // Handle errors if the download fails
+        console.error("API call error:", error);
+        alert("An error occurred during the export process.");
+        showErrorAlert("Error", "An error occurred during the export process."); // Show specific error
+      } finally {
+        // Ensure the loading animation is stopped if still running
+        // Swal.close();
+      }
     };
 
     return {
@@ -1826,6 +2284,8 @@ export default defineComponent({
       onsubmit,
       fillItemData,
       downloadCalibrationRecordsZip,
+
+      downloadPdf,
     };
   },
 });

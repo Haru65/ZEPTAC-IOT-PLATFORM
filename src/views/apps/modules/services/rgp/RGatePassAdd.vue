@@ -349,7 +349,7 @@
                       <span>Select Engineers</span>
                       <i
                         class="fas fa-exclamation-circle ms-2 fs-7"
-                        v-tooltip
+                        data-bs-toggle="tooltip"
                         title="Select at least one engineer"
                       ></i>
                     </label>
@@ -449,7 +449,7 @@
                       <span>Select Instrument</span>
                       <i
                         class="fas fa-exclamation-circle ms-2 fs-7"
-                        v-tooltip
+                        data-bs-toggle="tooltip"
                         title="Select at least one instrument"
                       ></i>
                     </label>

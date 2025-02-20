@@ -237,46 +237,6 @@
             <!--end::Input group-->
 
             <div class="row mb-6">
-              <label
-                class="btn btn-outline btn-outline-dashed btn-outline-default p-5 d-flex align-items-center"
-              >
-                <!--begin::Info-->
-                <span class="d-block fw-semobold text-start">
-                  <span class="text-dark fw-bold d-block fs-6 mb-2"
-                    >Quotation based on Day-Wise or Equipment-Wise</span
-                  >
-                  <input
-                    type="radio"
-                    class="btn-check"
-                    name="work_status"
-                    id="day_wise"
-                    value="1"
-                    v-model="InvoiceDetails.day_or_equipment"
-                    v-on:change="handleDayWiseChange(true)"
-                    autocomplete="off"
-                  />
-                  <label class="btn btn-outline-primary" for="day_wise"
-                    >Day Wise</label
-                  >
-                  <input
-                    type="radio"
-                    class="btn-check"
-                    name="work_status"
-                    id="equipment_wise"
-                    v-model="InvoiceDetails.day_or_equipment"
-                    v-on:change="handleDayWiseChange(false)"
-                    value="2"
-                    autocomplete="off"
-                  />
-                  <label class="btn btn-outline-primary" for="equipment_wise"
-                    >Equiment Wise</label
-                  >
-                </span>
-                <!--end::Info-->
-              </label>
-            </div>
-
-            <div class="row mb-6">
               <div class="table-responsive">
                 <table class="table table-rounded border gy-4 gs-7 text-nowrap">
                   <thead>
@@ -359,7 +319,7 @@
                       <td>
                         <span
                           @click="RemoveRow(index)"
-                          v-tooltip
+                          data-toggle="tooltip"
                           title="Delete Equipment"
                           class="border border-danger rounded-circle badge m-3 py-3 px-4 bg-light-danger fs-7 badge-light-danger text-danger text-hover-dark cursor-pointer"
                           >x

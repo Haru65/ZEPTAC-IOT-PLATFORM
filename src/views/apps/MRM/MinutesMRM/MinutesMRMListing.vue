@@ -137,7 +137,7 @@
           <span
             v-if="mrm.meetings_count === 0"
             class="menu-link px-3"
-            v-tooltip
+            data-toggle="tooltip"
             title="Add Meetings of Minute"
           >
             <router-link :to="`/mrm_minutes/add/${mrm.id}`">
@@ -156,7 +156,7 @@
             <router-link :to="`/mrm_minutes/edit/${mrm.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="View MRM"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -168,7 +168,7 @@
             <span
               @click="deleteItem(mrm.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Delete MRM"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />

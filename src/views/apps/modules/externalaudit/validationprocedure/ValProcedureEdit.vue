@@ -267,7 +267,7 @@
                           <a
                             target="blank"
                             v-bind:href="`https://api.zeptac.com/storage/company/${procedureDetails.company_id}/audits/${procedureDetails.audit_document}`"
-                            v-tooltip
+                            data-toggle="tooltip"
                             title="preview file"
                             class="underline"
                             >{{ procedureDetails.audit_document }}
@@ -279,7 +279,7 @@
                       <!--begin::Action-->
 
                       <KTIcon
-                        v-tooltip
+                        data-toggle="tooltip"
                         title="remove file"
                         icon-name="cross"
                         class="cursor-pointer fs-2tx text-danger rounded"
@@ -311,7 +311,7 @@
                           <a
                             target="blank"
                             v-bind:href="`https://api.zeptac.com/storage/temporary/${procedureDetails.audit_document}`"
-                            v-tooltip
+                            data-toggle="tooltip"
                             title="preview file"
                             class="underline"
                             >{{ procedureDetails.audit_document }}
@@ -326,7 +326,7 @@
                       <!--begin::Action-->
 
                       <KTIcon
-                        v-tooltip
+                        data-toggle="tooltip"
                         title="remove file"
                         icon-name="cross"
                         class="cursor-pointer fs-2tx text-danger rounded"

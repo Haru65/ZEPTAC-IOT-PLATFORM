@@ -198,7 +198,7 @@
             <span
               @click="deleteItem(notifications.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Delete notifications"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />

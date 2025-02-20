@@ -64,13 +64,14 @@ const ACTIVITY_URL = "activity_logger";
 const REF_INSTRUMENT = "reference-instrument";
 const LINKS = "links";
 const CALIBRATION_INSTRUMENT = "calibration-instrument";
-const UUC_READING = "uuc-reading";
+const PRESSURE_CALIBRATION_URL = "pressure-calibration";
 const CALIBRATION_SRF = "calibration-srf";
 const CAL_PROC_URL = "calibration-procedure";
 const NOTIFICATION_URL = "notifications";
 const PO_URL = "purchase-order";
 const PO_PAYMENT_URL = "po-payment";
 const COMPANY_TAX_URL = "company-tax";
+const ELECTRO_CALIBRATION_URL = "electro-calibration";
 
 
 
@@ -6218,12 +6219,25 @@ export async function addCalibrationInstrument(data) {
     }
 }
 
-// download function
-export async function getCalibrationInstrumentInfo(data: any) {
+// pressure instrument download function
+export async function getPressureCalibrationInstrumentInfo(data: any) {
     try {
         const id = { "id": data };
         ApiService.setHeader();
-        const response = await axios.post("get_information_of_calibration_record", id);
+        const response = await axios.post("get_information_of_pressure", id);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+// pressure instrument download function
+export async function getElectroCalibrationInstrumentInfo(data: any) {
+    try {
+        const id = { "id": data };
+        ApiService.setHeader();
+        const response = await axios.post("get_information_of_electro", id);
         return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
@@ -6276,11 +6290,11 @@ export async function deleteCalibrationInstrument(data: any) {
 // Calibration instrument - UUC Readings
 
 // listing function
-export async function getUUCReadings(data) {
+export async function getPressureReadings(data) {
     try {
         //console.log(data)
         ApiService.setHeader();
-        const response = await ApiService.listingget(UUC_READING, data);
+        const response = await ApiService.listingget(PRESSURE_CALIBRATION_URL, data);
         return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
@@ -6289,11 +6303,11 @@ export async function getUUCReadings(data) {
 }
 
 // add function
-export async function addUUCReading(data) {
+export async function addPressureReading(data) {
     try {
         //console.log(data)
         ApiService.setHeader();
-        const response = await ApiService.post(UUC_READING, data);
+        const response = await ApiService.post(PRESSURE_CALIBRATION_URL, data);
         return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
@@ -6302,10 +6316,10 @@ export async function addUUCReading(data) {
 }
 
 // get function
-export async function getUUCReading(data: any) {
+export async function getPressureReading(data: any) {
     try {
         ApiService.setHeader();
-        const response = await ApiService.get(UUC_READING, data);
+        const response = await ApiService.get(PRESSURE_CALIBRATION_URL, data);
         // console.log(response)
         return response.data;
     } catch (errors:any) {
@@ -6315,11 +6329,11 @@ export async function getUUCReading(data: any) {
 }
 
 // update function
-export async function updateUUCReading(id: any, data: any) {
+export async function updatePressureReading(id: any, data: any) {
     try {
         //console.log(data)
         ApiService.setHeader();
-        const response = await ApiService.put(UUC_READING + "/" + id, data);
+        const response = await ApiService.put(PRESSURE_CALIBRATION_URL + "/" + id, data);
         return response.data;
     } catch (errors:any) {
         console.error(errors?.response?.data?.message);
@@ -6328,11 +6342,11 @@ export async function updateUUCReading(id: any, data: any) {
 }
 
 // delete function
-export async function deleteUUCReading(data: any) {
+export async function deletePressureReading(data: any) {
     try {
         //console.log(data)
         ApiService.setHeader();
-        const response = await ApiService.delete(UUC_READING + "/" + data);
+        const response = await ApiService.delete(PRESSURE_CALIBRATION_URL + "/" + data);
         console.log(response.data.message)
         return response.data;
     } catch (errors:any) {
@@ -6924,6 +6938,34 @@ export async function deleteCompanyTax(data: any) {
     }
 }
 
+// New Routes For Calibration
+
+// list function
+export async function getElectrocalibrations(data: any) {
+    try {
+        //console.log(data)
+        ApiService.setHeader();
+        const response = await ApiService.listingget(ELECTRO_CALIBRATION_URL, data);
+        return response.data;
+    } catch (errors:any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
+
+// Save Electro Calibration Readings
+export async function addElectrocalibration(data: any) {
+    try {
+        ApiService.setHeader();
+        const response = await ApiService.post(ELECTRO_CALIBRATION_URL, data);
+        return response.data;
+    } catch (errors: any) {
+        console.error(errors?.response?.data?.message);
+        return { success: false, message: errors?.response?.data?.message || "An error occurred" };
+    }
+}
+
 
 // All EXPORTS APIS
 //QUOTATIO EXPORT
@@ -7215,4 +7257,62 @@ export async function ExportMrmScheduleData(data: any) {
         console.error(errors?.response?.data?.message || "An error occurred during export.");
         throw new Error(errors?.response?.data?.message || "An error occurred during export.");
     }
+}
+
+
+// PDF DOWNLOAD API BACKEND FORMAT
+// Electro-Technical
+export async function DownloadElectroCalibrationInstrument(data: any) {
+    try {
+        // Set necessary headers, if required (e.g., authorization)
+        ApiService.setHeader();
+        
+        // Send GET request to the backend with query params
+        const response = await ApiService.post("download_electro_calibration_instrument", data, {
+            responseType: 'blob', // This is part of the config, not inside the data
+        });
+
+        // Log the response headers to check content type
+        console.log(response.headers['content-type']);  // Should be 'application/pdf' or 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+        const blob = response.data;
+        if (blob && blob.size > 0) {
+            // Return the blob data (don't download here)
+            return blob;
+        } else {
+            throw new Error("The response file is empty or invalid.");
+        }
+    } catch (errors:any) {
+        // Handle any errors (e.g., API errors)
+        console.error(errors?.response?.data?.message || "An error occurred during export.");
+        throw new Error(errors?.response?.data?.message || "An error occurred during export.");
+    }
+}
+// Pressure
+export async function DownloadPressureCalibrationInstrument(data: any) {
+    try {
+        // Set necessary headers, if required (e.g., authorization)
+        ApiService.setHeader();
+        
+        // Send GET request to the backend with query params
+        const response = await ApiService.post("download_pressure_calibration_instrument", data, {
+            responseType: 'blob', // This is part of the config, not inside the data
+        });
+
+        // Log the response headers to check content type
+        console.log(response.headers['content-type']);  // Should be 'application/pdf' or 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+        const blob = response.data;
+        if (blob && blob.size > 0) {
+            // Return the blob data (don't download here)
+            return blob;
+        } else {
+            throw new Error("The response file is empty or invalid.");
+        }
+    } catch (errors:any) {
+        // Handle any errors (e.g., API errors)
+        console.error(errors?.response?.data?.message || "An error occurred during export.");
+        throw new Error(errors?.response?.data?.message || "An error occurred during export.");
+    }
+
 }

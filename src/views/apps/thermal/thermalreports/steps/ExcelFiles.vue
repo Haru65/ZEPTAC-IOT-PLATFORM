@@ -58,7 +58,7 @@
                   <div class="card-toolbar">
                     <button
                       class="border border-danger rounded-circle badge m-3 py-3 px-4 bg-danger fs-9 badge-danger text-white cursor-pointer"
-                      v-tooltip
+                      data-toggle="tooltip"
                       title="Remove file"
                       @click="DeleteFile(index)"
                     >X

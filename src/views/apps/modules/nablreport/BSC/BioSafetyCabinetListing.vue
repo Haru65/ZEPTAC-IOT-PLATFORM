@@ -128,7 +128,7 @@
           {{ bsc.cleanroom_instruments }}
         </template>
         <template v-slot:bsc_report="{ row: bsc }">
-          <span class="menu-link" v-tooltip title="Add BSC Report">
+          <span class="menu-link" data-toggle="tooltip" title="Add BSC Report">
             <router-link :to="`/bsc_reports/add/${bsc.id}`">
               <span
                 class="border rounded badge py-3 fs-7 badge-light-primary text-hover-success cursor-pointer"

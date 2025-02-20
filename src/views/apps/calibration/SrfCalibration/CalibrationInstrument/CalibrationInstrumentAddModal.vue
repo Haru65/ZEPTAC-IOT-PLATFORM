@@ -171,7 +171,6 @@
                       placeholder="Please Select Parameter"
                       name="parameter"
                       v-model="calibrationInstrumentDetails.parameter"
-                      v-on:change="setParameter"
                     >
                       <el-option
                         value=""
@@ -183,9 +182,9 @@
                       >
                       <el-option
                         v-for="item in parameters"
-                        :key="item.id"
-                        :value="item.id"
-                        :label="item.param_name"
+                        :key="item"
+                        :value="item"
+                        :label="item"
                       />
                     </el-select>
                   </div>
@@ -708,27 +707,6 @@ export default defineComponent({
       rh: Yup.string().required().label("Relative Humidity"),
     });
 
-    /* --------SET PARAMETER LOGIC--------*/
-    const setParameter = (id) => {
-      if (id != null || id != "") {
-        const foundParameter = parameters.find((item) => id == item.id);
-
-        if (foundParameter) {
-          calibrationInstrumentDetails.value.accuracy =
-            foundParameter.accuracy || "";
-          calibrationInstrumentDetails.value.resolution =
-            foundParameter.resolution || "";
-        } else {
-          calibrationInstrumentDetails.value.parameter = "";
-          calibrationInstrumentDetails.value.accuracy = "";
-          calibrationInstrumentDetails.value.resolution = "";
-        }
-      } else {
-        calibrationInstrumentDetails.value.parameter = "";
-        calibrationInstrumentDetails.value.accuracy = "";
-        calibrationInstrumentDetails.value.resolution = "";
-      }
-    };
 
     // Watch for changes in props.data and update itemData accordingly
     watch(
@@ -917,7 +895,6 @@ export default defineComponent({
       clear,
       parameters,
       months,
-      setParameter,
     };
   },
 });

@@ -134,7 +134,7 @@
             <span
               v-if="quotations.status == 4 && identifier == 'Customer'"
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Generate Purchase Order"
               @click="
                 createPurchaseOrder(quotations.id, quotations.quotation_no)
@@ -145,7 +145,7 @@
 
             <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Download Quotation"
               @click="downloadQuotation(quotations.id)"
             >
@@ -156,7 +156,7 @@
             <!-- <router-link :to="`/quotations/edit/${quotations.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="View Quotation"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />

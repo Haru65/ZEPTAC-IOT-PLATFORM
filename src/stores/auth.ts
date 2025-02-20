@@ -16,7 +16,7 @@ export interface User {
 
 export interface CompanyDetails {
   company_id: number;
-  company_name: number;
+  company_name: string;
   financial_year_type: string;
   is_active: number;
   is_trial: boolean;

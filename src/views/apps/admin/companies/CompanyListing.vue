@@ -100,7 +100,7 @@
             <router-link :to="`/company/apisetting/${company.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="Company ApiSetting"
               >
                 <KTIcon icon-name="setting-2" icon-class="fs-2" />
@@ -112,7 +112,7 @@
             <router-link :to="`/company/modules/${company.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="Company Module"
               >
                 <KTIcon icon-name="abstract-28" icon-class="fs-2" />
@@ -124,7 +124,7 @@
             <router-link :to="`/company/edit/${company.id}`">
               <span
                 class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="View Company"
               >
                 <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -136,7 +136,7 @@
             <span
               @click="deleteItem(company.id, false)"
               class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              v-tooltip
+              data-bs-toggle="tooltip"
               title="Delete Company"
             >
               <KTIcon icon-name="trash" icon-class="fs-2" />

@@ -1,21 +1,16 @@
 <template>
   <!--begin::Footer-->
   <div
-    class="app-sidebar-footer flex-column-auto pt-2 pb-6 px-6"
+    class="app-sidebar-menu flex-column-auto pt-2 pb-2 px-2 border-top"
     id="kt_app_sidebar_footer"
   >
-    <a
-      href= "{{ process.env.VITE_APP_PORTAL_WEBSITE_URL }}"
-      class="btn btn-flex flex-center btn-custom btn-primary overflow-hidden text-nowrap px-0 h-40px w-100"
-      data-bs-toggle="tooltip"
-      data-bs-trigger="hover"
-      data-bs-dismiss-="click"
-      title="200+ in-house components and 3rd-party plugins"
-    >
-      
-      <span class="btn-label">Contact Support</span>
-      <KTIcon icon-name="document" icon-class="btn-icon fs-2 m-0" />
-    </a>
+    <div class="menu menu-column menu-rounded menu-sub-indention px-3">
+      <div class="menu-item">
+        <div class="menu-content">
+          <h4 class="menu-heading fw-bold fs-3">Powered by Zeptac</h4>
+        </div>
+      </div>
+    </div>
   </div>
   <!--end::Footer-->
 </template>

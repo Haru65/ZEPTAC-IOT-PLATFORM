@@ -368,7 +368,7 @@
   <script lang="ts">
 // basic imports
 import { getAssetPath, getIllustrationsPath } from "@/core/helpers/assets";
-import { getUUCReading } from "@/stores/api";
+import { getPressureReading } from "@/stores/api";
 import { defineComponent, onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 // OR if using custom default options
@@ -477,19 +477,19 @@ export default defineComponent({
 
     onMounted(async () => {
       try {
-        const response = await getUUCReading(itemId.toString());
+        const response = await getPressureReading(itemId.toString());
         if (response?.success) {
           reading.value = response.result as Reading;
           steps.value = JSON.parse(response.result.uncertainty.steps) as Step[];
         } else {
           console.error(
-            `Error Occured in getUUCReading : ${
+            `Error Occured in getPressureReading : ${
               response.message || "Error Occured in API"
             }`
           );
         }
       } catch (err) {
-        console.error(`Error Occured in getUUCReading : ${err}`);
+        console.error(`Error Occured in getPressureReading : ${err}`);
       }
     });
     return {

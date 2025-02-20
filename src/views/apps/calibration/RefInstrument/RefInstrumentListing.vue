@@ -132,7 +132,7 @@
               <router-link :to="`/reference-instrument/edit/${ref_instrument.id}`">
                 <span
                   class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                  v-tooltip
+                  data-bs-toggle="tooltip"
                   title="View Reference Instrument"
                 >
                   <KTIcon icon-name="pencil" icon-class="fs-2" />
@@ -142,7 +142,7 @@
   
               <span
                 class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="Delete Reference Instrument"
                 @click="deleteItem(ref_instrument.id, false)"
               >

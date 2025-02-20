@@ -965,7 +965,13 @@
       >
         <div class="menu-item pt-5">
           <div class="menu-content">
-            <h4 class="menu-heading fw-bold fs-3">Your Company</h4>
+            <h4 class="menu-heading fw-bold fs-3">
+              {{
+                User.company_details?.company_name ||
+                User.meta?.company_name ||
+                ""
+              }}
+            </h4>
           </div>
         </div>
         <template v-for="(item, i) in CustomerMenuConfig" :key="i">
@@ -1191,6 +1197,7 @@ export default defineComponent({
     };
 
     return {
+      User,
       hasActiveChildren,
       AdminMenuConfig,
       CompanyAdminMenuConfig,

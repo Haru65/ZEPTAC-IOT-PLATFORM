@@ -208,7 +208,7 @@
             <div class="d-flex flex-lg-row">
               <span
                 class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="Download Worksheet"
                 @click="downloadWorksheet(dailyworksheets.id)"
               >
@@ -216,7 +216,7 @@
               </span>
               <span
                 class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-                v-tooltip
+                data-bs-toggle="tooltip"
                 title="Delete Worksheet"
                 @click="deleteItem(dailyworksheets.id, false)"
               >
