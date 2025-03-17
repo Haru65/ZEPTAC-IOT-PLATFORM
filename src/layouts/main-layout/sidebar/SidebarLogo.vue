@@ -9,18 +9,18 @@
           (themeMode === 'dark' && layout === 'light-sidebar')
         "
         alt="Logo"
-        :src="getAssetPath('media/logos/zeptac_logo.png')"
+        :src="getAssetPath('media/logos/zeptac_white_horizontal.png')"
         class="h-25px app-sidebar-logo-default"
       />
       <img
         v-if="themeMode === 'light' && layout === 'light-sidebar'"
         alt="Logo"
-        :src="getAssetPath('media/logos/zeptac_logo.png')"
+        :src="getAssetPath('media/logos/zeptac_white_horizontal.png')"
         class="h-25px app-sidebar-logo-default"
       />
       <img
         alt="Logo"
-        :src="getAssetPath('media/logos/zeptac_logo.png')"
+        :src="getAssetPath('media/logos/zeptac_white_horizontal.png')"
         class="h-20px app-sidebar-logo-minimize"
       />
     </router-link>

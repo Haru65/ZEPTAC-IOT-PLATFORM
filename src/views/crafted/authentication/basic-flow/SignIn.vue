@@ -28,6 +28,7 @@
           class="form-control form-control-lg form-control-solid"
           type="text"
           name="email"
+          placeholder="Please enter your email address"
           autocomplete="off"
         />
         <!--end::Input-->
@@ -61,6 +62,7 @@
           class="form-control form-control-lg form-control-solid"
           type="password"
           name="password"
+          placeholder="Please enter your password"
           autocomplete="off"
         />
         <!--end::Input-->
@@ -80,7 +82,8 @@
           type="submit"
           ref="submitButton"
           id="kt_sign_in_submit"
-          class="btn btn-lg btn-primary w-100 mb-5"
+          class="btn btn-lg w-100 mb-5 text-white"
+          style="background-color: #0e91a5;"
         >
           <span class="indicator-label"> Continue </span>
 
@@ -93,23 +96,6 @@
         </button>
         <!--end::Submit button-->
 
-        <!--begin::Separator-->
-        <div class="text-center text-muted text-uppercase fw-bold mb-5">or</div>
-        <!--end::Separator-->
-
-        <!--begin::Google link-->
-        <a
-          href="#"
-          class="btn btn-flex flex-center btn-light btn-lg w-100 mb-5"
-        >
-          <img
-            alt="Logo"
-            :src="getAssetPath('media/svg/brand-logos/google-icon.svg')"
-            class="h-20px me-3"
-          />
-          Continue with Google
-        </a>
-        <!--end::Google link-->
       </div>
       <!--end::Actions-->
     </VForm>
@@ -207,3 +193,14 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+
+.form-control {
+  background-color: var(--bs-gray-300);
+  border-color: var(--bs-gray-300);
+  color: var(--bs-gray-900);
+  transition: color 0.2s ease;
+}
+
+</style>

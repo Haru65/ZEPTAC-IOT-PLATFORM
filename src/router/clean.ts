@@ -3046,6 +3046,48 @@ const routes: Array<RouteRecordRaw> = [
           breadcrumbs: ["Purchase Orders Edit"],
         },
       },
+      {
+        path: "/customer/feedbacks/add",
+        name: "customer-feedbacks-add",
+        component: () => import("@/views/apps/customers/feedbacks/CustomerFeedbackAdd.vue"),
+        meta: {
+          pageTitle: "Feedback Form Add",
+          breadcrumbs: ["Feedback Form Add"],
+        },
+      },
+      {
+        path: "/customer/feedbacks",
+        name: "customer-feedbacks-list",
+        component: () => import("@/views/apps/customers/feedbacks/CustomerFeedbackListing.vue"),
+        meta: {
+          pageTitle: "Feedback Forms",
+          breadcrumbs: ["Feedback Forms"],
+        },
+      },
+      {
+        path: "customer/feedbacks/view/:id",
+        name: "customer-feedbacks-view",
+        beforeEnter: async (to, from, next) => {
+          const itemID = to.params.id;
+          try {
+            const response = await getFeedback(itemID.toString());
+            console.log(response);
+            if (response.success == false || response.result.is_active == 0) {
+              next("/404"); // Redirect to the fallback route
+            } else {
+              next(); // Continue to the desired route
+            }
+          } catch (error) {
+            console.error(error);
+            next("/404"); // Redirect to the fallback route
+          }
+        },
+        component: () => import("@/views/apps/customers/feedbacks/CustomerFeedbackView.vue"),
+        meta: {
+          pageTitle: "Customer Feedback View",
+          breadcrumbs: ["Customer Feedback View"],
+        },
+      },
 
     ],
   },

@@ -108,19 +108,13 @@
             {{ user.id }}
           </template>
           <template v-slot:name="{ row: user }">
-            <div class="d-flex justify-content-start align-items-center">
-              <span style="margin-left: 5.5%">
-                <span class="text-gray-600 text-hover-primary mb-1">
-                  {{ user.first_name + " " + user.last_name }}
-                </span>
-              </span>
-            </div>
+            {{ user.first_name + " " + user.last_name }}
           </template>
           <!-- defualt data -->
           <template v-slot:email="{ row: user }">
             <a
               v-bind:href="'mailto:' + user.email"
-              class="text-gray-600 text-hover-primary mb-1"
+              class="text-hover-primary mb-1"
             >
               {{ user.email }}
             </a>

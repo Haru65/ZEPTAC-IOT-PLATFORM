@@ -2,7 +2,7 @@ import { computed, ref, watch } from "vue";
 import { defineStore } from "pinia";
 import ApiService from "@/core/services/ApiService";
 import JwtService, { User } from "@/core/services/JwtService";
-
+import { useCustomerStore } from "@/stores/customerStore";
 
 export interface User {
   first_name: string;
@@ -12,6 +12,7 @@ export interface User {
   api_token: string;
   data: string;
   company_details: CompanyDetails;
+  role_id: string;
 }
 
 export interface CompanyDetails {
@@ -37,6 +38,8 @@ export const useAuthStore = defineStore("auth", () => {
 
   const financialYearsCache = ref<string[]>([]); // Cache for financial years
 
+  // Get customer store instance
+  const customerStore = useCustomerStore();
 
   function getCurrentFinancialYear(ftype) {
     const date = new Date();
@@ -83,6 +86,11 @@ export const useAuthStore = defineStore("auth", () => {
     companyDetails.value = authUser.company_details;
     errors.value = {};
     JwtService.saveToken(user.value.api_token);
+
+    // ✅ Fetch Customer-Company Data Only for Customer Role
+    if (authUser.role_id == "7") {
+      await customerStore.fetchCustomerCompanyData();
+    }
 
     const localFinancialYear = localStorage.getItem("financialYearType");
     const actualFinancialYear = user.value.company_details["financial_year_type"];
@@ -150,6 +158,8 @@ export const useAuthStore = defineStore("auth", () => {
     JwtService.destroyFinancialType();
     sessionStorage.removeItem("echoInitialized")
     sessionStorage.removeItem("echoListenerSet")
+      // ✅ Correctly resetting the store
+    customerStore.resetStore();
   }
 
 
@@ -276,7 +286,8 @@ export const useAuthStore = defineStore("auth", () => {
     return years;
   }
 
-
+  const isCustomer = computed(() => user.value?.role_id == "7");
+  
   return {
     errors,
     user,
@@ -293,5 +304,7 @@ export const useAuthStore = defineStore("auth", () => {
     selectedFinancialYear,
     financialYearType,
     companyDetails,
+
+    isCustomer,
   };
 });

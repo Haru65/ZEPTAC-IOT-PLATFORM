@@ -17,8 +17,8 @@
           <img
             v-if="themeMode === 'light' && layout === 'light-header'"
             alt="Logo"
-            :src="getAssetPath('media/logos/zeptac_color_noname.png')"
-            class="h-20px h-lg-30px app-sidebar-logo-default theme-light-show"
+            :src="getAssetPath('media/logos/zeptac_gradient_horizontal.png')"
+            class="h-10px h-lg-20px app-sidebar-logo-default theme-light-show"
           />
           <img
             v-if="
@@ -26,8 +26,8 @@
               (themeMode === 'dark' && layout === 'light-header')
             "
             alt="Logo"
-            :src="getAssetPath('media/logos/zeptac_color_noname.png')"
-            class="h-20px h-lg-30px app-sidebar-logo-default"
+            :src="getAssetPath('media/logos/zeptac_white_horizontal.png')"
+            class="h-10px h-lg-20px app-sidebar-logo-default"
           />
         </router-link>
       </div>
@@ -35,7 +35,7 @@
         <!--begin::sidebar mobile toggle-->
         <div
           class="d-flex align-items-center d-lg-none ms-n3 me-1 me-md-2"
-          v-tooltip
+          data-bs-toggle="tooltip"
           title="Show sidebar menu"
         >
           <div
@@ -50,9 +50,16 @@
         <div class="d-flex align-items-center flex-grow-1 flex-lg-grow-0">
           <router-link to="/" class="d-lg-none">
             <img
+              v-if="themeMode === 'light'"
               alt="Logo"
-              :src="getAssetPath('media/logos/zeptac_color.png')"
-              class="h-30px"
+              :src="getAssetPath('media/logos/zeptac_gradient_horizontal.png')"
+              class="h-20px"
+            />
+            <img
+              v-else
+              alt="Logo"
+              :src="getAssetPath('media/logos/zeptac_white_horizontal.png')"
+              class="h-20px"
             />
           </router-link>
         </div>

@@ -20,15 +20,9 @@
       <div class="d-flex flex-center flex-wrap px-6">
         <!--begin::Links-->
         <div class="d-flex fw-semibold text-primary fs-base">
-          <router-link to="/terms">
-            <p class="px-5">Terms</p>
-          </router-link>
-          <router-link to="/plans">
-            <p class="px-5">Plans</p>
-          </router-link>
-          <router-link to="/contactus">
+          <a href="https://zeptac.com/contact/" target="_blank">
             <p class="px-5">Contact Us</p>
-          </router-link>
+          </a>
         </div>
         <!--end::Links-->
       </div>
@@ -40,7 +34,7 @@
     <div
       class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-center order-1 order-lg-2"
       :style="`background-image: url('${getAssetPath(
-        'media/misc/auth-bg.png'
+        'media/misc/zeptac-auth-bg.jpg'
       )}')`"
     >
       <!--begin::Content-->
@@ -48,36 +42,34 @@
         class="d-flex flex-column flex-center py-7 py-lg-15 px-5 px-md-15 w-100"
       >
         <!--begin::Logo-->
-        <router-link to="/" class="mb-0 mb-lg-12">
+        <router-link to="/" class="mb-0 mb-lg-20">
           <img
             alt="Logo"
-            :src="getAssetPath('media/logos/zeptac_white.png')"
-            class="h-60px h-lg-75px"
+            :src="getAssetPath('media/logos/zeptac_white_horizontal.png')"
+            class="h-30px h-lg-60px"
           />
         </router-link>
         <!--end::Logo-->
 
         <!--begin::Image-->
         <img
-          class="d-none d-lg-block mx-auto w-275px w-md-50 w-xl-500px mb-10 mb-lg-20"
-          :src="getAssetPath('media/illustrations/sigma-1/3-dark.png')"
+          class="d-none d-lg-block mx-auto w-275px w-md-50 w-xl-500px mt-10 mb-10 mb-lg-10"
+          :src="getAssetPath('media/illustrations/sigma-1/home_1.png')"
           alt="bg"
         />
         <!--end::Image-->
 
         <!--begin::Title-->
         <h1
-          class="d-none d-lg-block text-white fs-2qx fw-bolder text-center mb-7"
+          class="d-none d-lg-block text-white fs-3x fw-bolder text-center mb-7"
         >
-          Cleanroom solutions <br />for a cleaner tomorrow.
+          Transforming the Future of<br /> TIC Industry
         </h1>
         <!--end::Title-->
 
         <!--begin::Text-->
-        <div class="d-none d-lg-block text-white fs-base text-center">
-          At Zeptac, we understand the critical role that cleanliness plays in
-          ensuring the quality and reliability<br />
-          of products produced within a cleanroom environment.
+        <div class="d-none d-lg-block text-white fs-3 text-center">
+          A Scalable, Cloud-Based Software Solution for Testing, Inspection, Calibration & Certification Industry.
         </div>
         <!--end::Text-->
       </div>

@@ -23,7 +23,7 @@
         <!--end::Title-->
 
         <!--begin::Link-->
-        <div class="text-gray-400 fw-semobold fs-4">
+        <div class="text-dark fw-semobold fs-4">
           Enter your email to reset your password.
         </div>
         <!--end::Link-->
@@ -36,7 +36,7 @@
         <Field
           class="form-control form-control-solid"
           type="email"
-          placeholder=""
+          placeholder="Please enter your email address"
           name="email"
           autocomplete="off"
         />
@@ -54,7 +54,8 @@
           type="submit"
           ref="submitButton"
           id="kt_password_reset_submit"
-          class="btn btn-lg btn-primary fw-bold me-4"
+          class="btn btn-lg fw-bold me-4 text-white"
+          style="background-color: #0e91a5;"
         >
           <span class="indicator-label"> Submit </span>
           <span class="indicator-progress">
@@ -65,7 +66,7 @@
           </span>
         </button>
 
-        <router-link to="/login" class="btn btn-lg btn-light-primary fw-bold"
+        <router-link to="/login" class="btn btn-lg btn-secondary fw-bold"
           >Cancel</router-link
         >
       </div>
@@ -115,7 +116,8 @@ export default defineComponent({
       // Send login request
       try {
         // Send login request
-        const data = await store.forgotPassword(values);
+        console.log(values['email'])
+        const data = await store.forgotPassword(values['email']);
 
         // If the reponse was successful
         if (data.success) {
@@ -181,3 +183,13 @@ export default defineComponent({
   },
 });
 </script>
+<style scoped>
+
+.form-control {
+  background-color: var(--bs-gray-300);
+  border-color: var(--bs-gray-300);
+  color: var(--bs-gray-900);
+  transition: color 0.2s ease;
+}
+
+</style>

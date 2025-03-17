@@ -56,6 +56,12 @@ export interface MenuItem {
           bootstrapIcon: "bi-archive",
         },
         {
+          heading: "Feedback Form",
+          route: "/customer/feedbacks",
+          keenthemesIcon: "delivery-24",
+          bootstrapIcon: "bi-archive",
+        },
+        {
           heading: "Contact Support",
           route: "/contactus",
           keenthemesIcon: "delivery-24",

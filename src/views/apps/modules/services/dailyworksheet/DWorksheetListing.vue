@@ -138,20 +138,14 @@
             {{ dailyworksheets.id }}
           </template>
           <template v-slot:rgp_no="{ row: dailyworksheets }">
-            <span class="text-gray-600 text-hover-primary mb-1">
-              {{ dailyworksheets.rgp_no }}
-            </span>
+            {{ dailyworksheets.rgp_no }}
           </template>
           <template v-slot:customer="{ row: dailyworksheets }">
-            <span class="text-gray-600 text-hover-primary mb-1">
-              {{ dailyworksheets?.customer?.company_name || "" }}
-            </span>
+            {{ dailyworksheets?.customer?.company_name || "" }}
           </template>
           <template v-slot:engineer="{ row: dailyworksheets }">
-            <span class="text-gray-600 text-hover-primary mb-1">
-              {{ dailyworksheets?.engineer?.first_name || "" }}
-              {{ dailyworksheets?.engineer?.last_name || "" }}
-            </span>
+            {{ dailyworksheets?.engineer?.first_name || "" }}
+            {{ dailyworksheets?.engineer?.last_name || "" }}
           </template>
           <!-- defualt data -->
           <template v-slot:start_time="{ row: dailyworksheets }">

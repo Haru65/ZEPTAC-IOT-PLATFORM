@@ -1,4 +1,35 @@
 <template>
+<div v-if="User.role_id == 7" class="container mt-4">
+  <div v-if="customerCompanyData && customerCompanyData.length > 0">
+    <div class="row">
+      <div v-for="company in customerCompanyData" :key="company.company_id" class="col-md-12 mb-3">
+        <div class="card p-2 shadow-sm border">
+          <div class="d-flex align-items-center">
+            <!-- Logo (Left) -->
+            <img
+              :src="getCompanyLogo(company.company_id, company.company_logo)"
+              :alt="company.company_name"
+              class="w-25 h-25 rounded border me-3"
+              style="object-fit: contain;"
+            />
+            <!-- Company Details (Right) -->
+            <div>
+              <h5 class="mb-1">{{ company.company_name ?? "" }}</h5>
+              <p class="">Customer: {{ company.customer_company_name }}</p>
+              <p class="">Contact Person: {{ company.customer_name }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No companies found message -->
+  <p v-else class="text-muted text-center">No companies found.</p>
+</div>
+
+
+
   <div v-if="User.role_id == 1 || User.role_id == 2" class="">
     <!--begin::Row-->
     <div class="row p-6" v-if="daysLeft <= 5 && daysLeft >= 0">
@@ -105,6 +136,7 @@ import EnquiriesWidget from "@/components/widgets/mixed/EnquiriesWidget.vue";
 import QuotationWidget from "@/components/widgets/mixed/QuotationWidget.vue";
 import SalesWidget from "@/components/widgets/mixed/SalesWidget.vue";
 import ConversionWidget from "@/components/widgets/mixed/ConversionWidget.vue";
+import { useCustomerStore } from "@/stores/customerStore";
 
 export default defineComponent({
   name: "main-dashboard",
@@ -119,6 +151,14 @@ export default defineComponent({
   setup() {
     const authStore = useAuthStore();
     const User = authStore.GetUser();
+
+    const customerStore = useCustomerStore();
+    const customerCompanyData = customerStore.customerCompanyData; // ✅ No extra computed()
+
+    onMounted(async () => {
+      await customerStore.fetchCustomerCompanyData();
+      console.log("Fetched Data:", customerCompanyData);
+    });
 
     // Computed property to get end date
     const endDate = computed(() => {
@@ -136,11 +176,22 @@ export default defineComponent({
     // Computed property to check if it is a trial
     const isTrial = computed(() => authStore.companyDetails.is_trial);
 
+    const { isCustomer } = authStore;
+    const getCompanyLogo = (companyId, logo) => {
+      if (logo) {
+        return `http://localhost:8000/storage/company/${companyId}/${logo}`;
+      }
+      return "/media/avatars/default.png"; // Ensure this file exists
+    };
+
     return {
       getAssetPath,
       User,
       daysLeft,
       isTrial,
+      isCustomer,
+      customerCompanyData,
+      getCompanyLogo,
     };
   },
 });

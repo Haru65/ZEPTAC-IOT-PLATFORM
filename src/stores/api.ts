@@ -7316,3 +7316,59 @@ export async function DownloadPressureCalibrationInstrument(data: any) {
     }
 
 }
+
+// Download Laminar Air Flow Pdf Report
+export async function DownloadLaminarAirFlow(data: any) {
+    try {
+        // Set necessary headers, if required (e.g., authorization)
+        ApiService.setHeader();
+        
+        // Send GET request to the backend with query params
+        const response = await ApiService.post("download_laminar_air_flow", data, {
+            responseType: 'blob', // This is part of the config, not inside the data
+        });
+
+        // Log the response headers to check content type
+        console.log(response.headers['content-type']);  // Should be 'application/pdf' or 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+        const blob = response.data;
+        if (blob && blob.size > 0) {
+            // Return the blob data (don't download here)
+            return blob;
+        } else {
+            throw new Error("The response file is empty or invalid.");
+        }
+    } catch (errors:any) {
+        // Handle any errors (e.g., API errors)
+        console.error(errors?.response?.data?.message || "An error occurred during export.");
+        throw new Error(errors?.response?.data?.message || "An error occurred during export.");
+    }
+}
+
+// Download BioSafety Cabinet Pdf Report
+export async function DownloadBioSafetyCabinet(data: any) {
+    try {
+        // Set necessary headers, if required (e.g., authorization)
+        ApiService.setHeader();
+        
+        // Send GET request to the backend with query params
+        const response = await ApiService.post("download_biosafety_cabinet", data, {
+            responseType: 'blob', // This is part of the config, not inside the data
+        });
+
+        // Log the response headers to check content type
+        console.log(response.headers['content-type']);  // Should be 'application/pdf' or 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+        const blob = response.data;
+        if (blob && blob.size > 0) {
+            // Return the blob data (don't download here)
+            return blob;
+        } else {
+            throw new Error("The response file is empty or invalid.");
+        }
+    } catch (errors:any) {
+        // Handle any errors (e.g., API errors)
+        console.error(errors?.response?.data?.message || "An error occurred during export.");
+        throw new Error(errors?.response?.data?.message || "An error occurred during export.");
+    }
+}

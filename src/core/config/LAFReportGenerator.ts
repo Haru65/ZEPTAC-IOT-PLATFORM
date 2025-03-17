@@ -1,14 +1,9 @@
-// * This file is used to generate Thermal Report pdf
+// * This file is used to generate LAF Report pdf
 
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { getAssetPath } from "@/core/helpers/assets";
 import moment from "moment";
-import { ref } from "vue";
-
-const imgData = getAssetPath(
-  "media/avatars/blank.png"
-);
 
 const LAFReportGen = async (id, pdfName, reportInfo) => {
   pdfName += `_${id}_laminar_air_flow_report`;
@@ -23,65 +18,118 @@ const LAFReportGen = async (id, pdfName, reportInfo) => {
   
     // Heading
     doc
-    .setFontSize(12)
+    .setFontSize(20)
     .setTextColor(0, 0, 0)
-    .text("Test Certificate", doc.internal.pageSize.width / 2, 0.5, {
+    .text("TEST CERTIFICATE", doc.internal.pageSize.width / 2, 0.5, {
       align: "center",
     });
 
-    const customerAddress = `${reportInfo.value.customer.address1 || ""} ${reportInfo.value.customer.address2 || ""} ${reportInfo.value.customer.city || ""} ${reportInfo.value.customer.pincode || ""} ${reportInfo.value.customer.state || ""} ${reportInfo.value.customer.country || ""}`;
+    // URL of the brand logo
+    const brandLogo = new Image();
+    brandLogo.src = getAssetPath('media/logos/zeptac_logo_footer.png');
+    brandLogo.alt = "zeptac_logo_footer";
 
+    // Function that will add footer to each page
+    const addFooters = (doc) => {
+      const pageCount = doc.internal.getNumberOfPages();
+  
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+  
+        // Header
+
+        // Footer
+
+        // powered by with logo
+        
+        doc.setFontSize(8);
+        doc.text("powered by", 3.80, doc.internal.pageSize.height - 0.3, { align: 'center' });
+        doc.addImage(brandLogo, "PNG", 4.13, doc.internal.pageSize.height - 0.42, 1.2, 0.2, "zeptac_logo_footer");
+        
+        // page number on each page
+        const pageStr = `Page ${i} of ${pageCount}`;
+        doc.setFontSize(8);
+        doc.text(pageStr, doc.internal.pageSize.width - 0.7, doc.internal.pageSize.height - 0.3, { align: 'right' });
+  
+        // console.log(doc.internal.pageSize.width)
+
+        // doc.setTextColor(0, 0, 255);
+        // doc.textWithLink("Zeptac.com", 0.6, doc.internal.pageSize.height - 0.4, { url: 'https://zeptac.com', color: 'black' });
+        doc.setFontSize(9);
+      }
+    };
+        
+    const customerAddress = `${reportInfo.value.customer.address1 || ""} ${reportInfo.value.customer.address2 || ""} ${reportInfo.value.customer.city || ""} ${reportInfo.value.customer.pincode || ""} ${reportInfo.value.customer.state || ""} ${reportInfo.value.customer.country || ""}`;
+    
     const CustomerDetails = [
-      [{ title: `Customer Name & Address\n\n${reportInfo.value.customer.company_name || ""}\n${customerAddress}`, rowSpan: 7}, { title:`Certificate Number : ${reportInfo.value.certificate_number}`}],
-      [{ title:`ULR Number : ${reportInfo.value.ulr_number}`}],
-      [{ title:`SRF Number : ${reportInfo.value.service.srf_no}`}],
-      [{ title:`Date of Receipt : ${reportInfo.value.d_receipt}`}],
-      [{ title:`Date of Testing : ${reportInfo.value.d_testing}`}],
-      [{ title:`Recommended Due Date : ${reportInfo.value.r_due_date}`}],
-      [{ title:`Date of Issue : ${reportInfo.value.d_issue}`}],
+      [
+        {
+          title: `Customer Details\n\n${reportInfo.value.customer.company_name || ""}\n${customerAddress}`,
+          rowSpan: 7,
+        },
+        { title: "Certificate Number" },
+        { title: reportInfo.value.certificate_number || "" }
+      ],
+      [{ title: "ULR Number" }, { title: reportInfo.value.ulr_number || "" }],
+      [{ title: "SRF Number" }, { title: reportInfo.value.service.srf_no || "" }],
+      [{ title: "Date of Receipt" }, { title: reportInfo.value.d_receipt || "" }],
+      [{ title: "Date of Testing" }, { title: reportInfo.value.d_testing || "" }],
+      [{ title: "Recommended Due Date" }, { title: reportInfo.value.r_due_date || "" }],
+      [{ title: "Date of Issue" }, { title: reportInfo.value.d_issue || "" }]
     ];
     
     autoTable(doc, {
       body: CustomerDetails,
       startY:0.7,
       columnStyles: {
-        '0': { cellWidth: 3.635 , halign: "left"},
-        '1': { cellWidth: "auto" },
+        '0': { cellWidth: 3.3 , halign: "left"},
+        '1': { cellWidth: 2.15 , halign: "left"},
+        '2': { cellWidth: "auto", halign: "left" },
       },
+      theme: 'plain',
       margin: { left: 0.5, top: 1.25 },
       bodyStyles: { halign: "left",fontSize: 9, lineColor: [0, 0, 0], textColor: [0, 0, 0]},
       tableLineColor: [0, 0, 0],
-      didDrawCell: (data) => {
-        const { cell, row, column } = data;
-        doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
-      },
     });
 
     // Details of Unit Under Testing
     const UUTHeader = [
-      [{title: `Details of Unit Under Testing`, colSpan:2 }]
+      [{title: `Details of Unit Under Testing`, colSpan:4 }]
     ];
+
     const UUTBody = [
-      [{title: `Description : ${reportInfo.value.description}`}, {title: `Make : ${reportInfo.value.make}`}],
-      [{title: `Identification Number : ${reportInfo.value.id_no}`}, {title: `Model No. : ${reportInfo.value.model_no}`}],
-      [{title: `Testing At : ${reportInfo.value.testing_at}`}, {title: `Serial No. : ${reportInfo.value.serial_no}`}],
-      [{title: `Room Name : ${reportInfo.value.room_name}`}, {title: `Room ID : ${reportInfo.value.room_id}`}],
-    ]
+      [
+        { title: "Description" }, { title: reportInfo.value.description || "" },
+        { title: "Make" }, { title: reportInfo.value.make || "" }
+      ],
+      [
+        { title: "Identification Number" }, { title: reportInfo.value.id_no || "" },
+        { title: "Model No." }, { title: reportInfo.value.model_no || "" }
+      ],
+      [
+        { title: "Testing At" }, { title: reportInfo.value.testing_at || "" },
+        { title: "Serial No." }, { title: reportInfo.value.serial_no || "" }
+      ],
+      [
+        { title: "Room Name" }, { title: reportInfo.value.room_name || "" },
+        { title: "Room ID" }, { title: reportInfo.value.room_id || "" }
+      ]
+    ];
+
     autoTable(doc, {
       head: UUTHeader,
       body: UUTBody,
       columnStyles: {
-        '0': { cellWidth: 3.635},
-        '1': { cellWidth: "auto"},
+        '0': { cellWidth: 1.65 , halign: "left"},
+        '1': { cellWidth: 1.65 , halign: "left"},
+        '2': { cellWidth: 2.1 , halign: "left"},
+        '3': { cellWidth: "auto", halign: "left" },
       },
+      theme: 'plain',
       margin: { left: 0.5, top: 1.25 },
       headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: "left", valign: "middle", fontSize: 9, lineColor: [0, 0, 0]},
       bodyStyles: { halign: "left", fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
       tableLineColor: [0, 0, 0],
-      didDrawCell: (data) => {
-        const { cell, row, column } = data;
-        doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
-      },
     });
 
 
@@ -89,13 +137,19 @@ const LAFReportGen = async (id, pdfName, reportInfo) => {
     // Details of Reference Standard
     const instrumentHeader = [
       [
-        { title: 'Sr.No.', cellWidth: 0.5},{ title: 'Instrument Name', cellWidth: 1.5},{ title: 'Serial No', cellWidth: 1},{ title: 'Done Date', cellWidth: 1},{ title: 'End Date', cellWidth: 1}
+        { title: 'Sr.No.', cellWidth: 0.3},
+        { title: 'Instrument Name', cellWidth: 2.3},
+        { title: 'ID No', cellWidth: 1.2},
+        { title: 'Serial No', cellWidth: 1.2},
+        { title: 'Done Date', cellWidth: 1.2},
+        { title: 'End Date', cellWidth: "auto"}
       ],
     ];
 
     const instrumentBody = reportInfo.value.cleanroom_instruments.map((instrument, i) => [
       (i + 1),
       instrument.name,
+      instrument.instrument_id,
       instrument.serial_no,
       instrument.calibration_date,
       instrument.calibration_due_date,
@@ -104,6 +158,7 @@ const LAFReportGen = async (id, pdfName, reportInfo) => {
     autoTable(doc, {
       head: instrumentHeader,
       body: instrumentBody,
+      theme: "plain",
       margin: { left: 0.5, top: 1.25 },
       headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: "left", valign: "middle", fontSize: 9, lineColor: [0, 0, 0]},
       bodyStyles: { halign: "left", fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
@@ -118,28 +173,38 @@ const LAFReportGen = async (id, pdfName, reportInfo) => {
 
     // Environmental Condition
     const environmentHeader = [
-      [{title: `Environmental Condition`, colSpan:2 }]
+      [{title: `Environmental Condition`, colSpan:4 }]
     ];
     const environmentBody = [
-      [{title: `Temperature °C : ${reportInfo.value.temperature} °C`}, {title: `DownFlow Velocity Test Work Instruction# : AME-L03-W13`}],
-      [{title: `Humidity %RH : ${reportInfo.value.humidity} %`}, {title: `Filter Integrity Test Work Instruction# : AME-L03-W13`}],
-      [{title: `LAF Differential Pressure (P): ${reportInfo.value.differential_pressure}`}, {title: `Particle Count Work Instruction#  : AME-L03-W13`}],
-    ]
+      [
+        { title: "Temperature (°C)" }, { title: `${reportInfo.value.temperature || ""} °C` },
+        { title: "DownFlow Velocity Test Work #" }, { title: "AME-L03-W13" }
+      ],
+      [
+        { title: "Humidity (%RH)" }, { title: `${reportInfo.value.humidity || ""} %` },
+        { title: "Filter Integrity Test Work #" }, { title: "AME-L03-W13" }
+      ],
+      [
+        { title: "LAF Differential Pressure (P)" }, { title: reportInfo.value.differential_pressure || "" },
+        { title: "Particle Count Work #" }, { title: "AME-L03-W13" }
+      ]
+    ];
+    
     autoTable(doc, {
       head: environmentHeader,
       body: environmentBody,
       columnStyles: {
-        '0': { cellWidth: 3.635},
-        '1': { cellWidth: "auto"},
+        '0': { cellWidth: 1.65 , halign: "left"},
+        '1': { cellWidth: 1.65 , halign: "left"},
+        '2': { cellWidth: 2.1 , halign: "left"},
+        '3': { cellWidth: "auto", halign: "left" },
       },
+      theme: 'plain',
       margin: { left: 0.5, top: 1.25 },
       headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: "left", valign: "middle", fontSize: 9, lineColor: [0, 0, 0]},
       bodyStyles: { halign: "left", fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
       tableLineColor: [0, 0, 0],
-      didDrawCell: (data) => {
-        const { cell, row, column } = data;
-        doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
-      },
+
     });
 
     // DownFlow Table
@@ -190,6 +255,7 @@ const LAFReportGen = async (id, pdfName, reportInfo) => {
         '8': { cellWidth: 1},
         '9': { cellWidth:  "auto"},
       },
+      theme: "plain",
       margin: { left: 0.5, top: 1.25 },
       headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: "left", valign: "middle", fontSize: 9, lineColor: [0, 0, 0]},
       bodyStyles: { halign: "left", fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
@@ -232,9 +298,10 @@ const LAFReportGen = async (id, pdfName, reportInfo) => {
         '1': { cellWidth: 0.7},
         '2': { cellWidth: 1.4},
         '3': { cellWidth: 1.4},
-        '4': { cellWidth: 1},
+        '4': { cellWidth: 1.4},
         '5': { cellWidth: "auto"},
       },
+      theme: "plain",
       margin: { left: 0.5, top: 1.25 },
       headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: "left", valign: "middle", fontSize: 9, lineColor: [0, 0, 0]},
       bodyStyles: { halign: "left", fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
@@ -293,6 +360,7 @@ const LAFReportGen = async (id, pdfName, reportInfo) => {
         '8': { cellWidth: 1},
         '9': { cellWidth: "auto"},
       },
+      theme: "plain",
       margin: { left: 0.5, top: 1.25 },
       headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], halign: "left", valign: "middle", fontSize: 9, lineColor: [0, 0, 0]},
       bodyStyles: { halign: "left", fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0]},
@@ -304,29 +372,30 @@ const LAFReportGen = async (id, pdfName, reportInfo) => {
     });
 
 
-    const NotesData = [
-      [{ title: "\u2022 This Testing Certificate relates only to the above UUT & Reported results are valid at the time of and under the stated conditions of measurements." }],
-      [{ title: "\u2022 This report shall not be reproduced in full/ part without prior permission of Aeromech Equipments Private Limited." }],
-      [{ title: "\u2022 The ReTesting interval shall be determined on the user requirements." }],
-      [{ title: "\u2022 The Measurement uncertainty is expressed at 95.45% confidence level with coverage factor k =2." }],
-      [{ title: "\u2022 Testing of the UUT are traceable to National / International Standards." }],
-      [{ title: "\u2022 The above points are Tested as per customer requirements." }],
+    const Note = [ 
+      [
+        {
+          title: `Note :`,
+        }
+      ]
+    ]
+      
+    const NoteData = [
+      [{ title: "1. This Testing Certificate relates only to the above UUT & Reported results are valid at the time of and under the stated conditions of measurements." }],
+      [{ title: "2. This report shall not be reproduced in full/ part without prior permission of Aeromech Equipments Private Limited." }],
+      [{ title: "3. The ReTesting interval shall be determined on the user requirements." }],
+      [{ title: "4. The Measurement uncertainty is expressed at 95.45% confidence level with coverage factor k =2." }],
+      [{ title: "5. Testing of the UUT are traceable to National / International Standards." }],
+      [{ title: "6. The above points are Tested as per customer requirements." }],
     ];
-    
-    const styles = {
-      styles: { halign: 'left' }, // Left-align text
-      columnStyles: { 0: { columnWidth: 'auto' } }, // Adjust column width for the bullet points
-    };
+
     autoTable(doc, {
-      body: NotesData,
-      margin: { left: 0.5, top: 1.25 },
+      theme: "plain",
+      head:Note,
+      body: NoteData,
+      headStyles: { halign: "left",fontSize: 9, lineColor: [0, 0, 0], textColor: [0, 0, 0]},
       bodyStyles: { halign: "left",fontSize: 9, lineColor: [0, 0, 0], textColor: [0, 0, 0]},
       tableLineColor: [0, 0, 0],
-      didDrawCell: (data) => {
-        const { cell, row, column } = data;
-        doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
-      },
-
     });
 
 
@@ -345,31 +414,19 @@ const LAFReportGen = async (id, pdfName, reportInfo) => {
       body: signatureData,
       startY: 10,
       margin: { left: 0.5, top: 1.25 },
-      bodyStyles: { halign: "left",fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0], },
-      tableLineColor: [0, 0, 0],
-      didDrawCell: (data) => {
-        const { cell, row, column } = data;
-        doc.rect(cell.x, cell.y, cell.width, cell.height, 'S');
+      theme: "plain",
+      columnStyles: {
+        '0': { cellWidth: 3.635, halign: "left"},
+        '1': { cellWidth: "auto", halign: "right"},
       },
+      bodyStyles: { fontSize: 9, textColor: [0, 0, 0], lineColor: [0, 0, 0], },
+      tableLineColor: [0, 0, 0],
     });
 
-
-
-    // Creating footer and saving file
-    doc
-      .setFontSize(9)
-      .setTextColor(0, 0, 255)
-      .textWithLink("Zeptac", 0.5, doc.internal.pageSize.height - 0.4, { url: 'https://app.zeptac.com' });
-
-    const printed_date = new Date();
-    const printed_on_date = moment(printed_date).format("YYYY-MM-DD HH:mm:ss");
     
-    doc
-      .setFontSize(8)
-      .setTextColor(0, 0, 0)
-      .setFont('helvetica', "italic")
-      .text(("printed on " + printed_on_date), doc.internal.pageSize.width - 2, doc.internal.pageSize.height - 0.4);
-
+    // Creating footer and saving file      
+    addFooters(doc)
+    
     doc.save(`${pdfName}.pdf`);
 
 };

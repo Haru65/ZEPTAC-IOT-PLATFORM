@@ -36,7 +36,8 @@ body.page-loading {
 }
 
 html[data-bs-theme="dark"] .page-loading .splash-screen {
-    background-color: #151521;
+    /* background-color: #151521; */
+    background-color: #000000;
     color: #ffffff;
 }
 

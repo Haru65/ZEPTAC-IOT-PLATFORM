@@ -84,15 +84,26 @@
           <div class="d-flex flex-lg-row my-3">
             <!-- begin::Download -->
 
-            <span
+            <!-- <span
               class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
             >
               <i
-                @click="downloadLAFReport(bsc.id)"
+                @click="downloadBSCReport(bsc.id)"
                 class="las la-download fs-2"
               ></i>
-            </span>
+            </span> -->
             <!-- end::Download -->
+
+            <!-- begin::download -->
+            <span
+              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
+              data-bs-toggle="tooltip"
+              title="Download BSC Report"
+              @click="downloadPdf(bsc.id)"
+            >
+              <KTIcon icon-name="file-down" icon-class="fs-2" />
+            </span>
+            <!-- end::download -->
 
             <!--begin::Edit-->
             <router-link :to="`/bsc_reports/edit/${bsc.id}`">
@@ -168,8 +179,8 @@ import moment from "moment";
 import Swal from "sweetalert2";
 import {
   deleteBSCReport,
-  DownloadBSCReport,
   getBSCReports,
+  DownloadBioSafetyCabinet,
 } from "@/stores/api";
 import { Identifier } from "@/core/config/WhichUserConfig";
 import { BSCReportGen } from "@/core/config/BSCReportGenerator";
@@ -596,6 +607,7 @@ export default defineComponent({
       cleanroom_instruments: [
         {
           id: "",
+          instrument_id: "",
           name: "",
           make: "",
           description: "",
@@ -607,15 +619,15 @@ export default defineComponent({
       ],
 
       customer: {
-          id: "",
-          name: "",
-          company_name: "",
-          address1: "",
-          address2: "",
-          city: "",
-          pincode: "",
-          state: "",
-          country: "",
+        id: "",
+        name: "",
+        company_name: "",
+        address1: "",
+        address2: "",
+        city: "",
+        pincode: "",
+        state: "",
+        country: "",
       },
 
       service: {
@@ -641,8 +653,9 @@ export default defineComponent({
       },
     });
 
+    /*
     // Download BioSafety Cabinet Report
-    const downloadLAFReport = async (id: any) => {
+    const downloadBSCReport = async (id: any) => {
       try {
         const res = await DownloadBSCReport(id);
 
@@ -691,6 +704,91 @@ export default defineComponent({
         alert("Unable to download the report. Please try again.");
       }
     };
+    */
+
+    const downloadPdf = async (id: any) => {
+      try {
+        // Show initial loading Swal with a generic progress message
+        Swal.fire({
+          title: "Downloading Report",
+          html: `<div class="swal-animation">
+        <p class="swal-text">Please wait...</p>
+        <div class="swal-progress">
+          <div class="swal-progress-bar"></div>
+        </div>
+      </div>`,
+          allowOutsideClick: false, // Prevent closing the Swal while downloading
+          didOpen: () => {
+            Swal.showLoading(); // Show loading animation
+          },
+        });
+
+        // Define the data to send in the request
+        const data = {
+          id: id,
+        };
+
+        // Make the API call using the custom function
+        const response = await DownloadBioSafetyCabinet(data); // This will await the response from the server
+
+        if (response?.success == false) {
+          const errorMessage =
+            response?.message || "Export failed due to server error.";
+          showErrorAlert("Error", errorMessage); // Show specific error
+          console.error("Export Error:", errorMessage);
+          return; // Exit the function if no valid response
+        }
+
+        // Check if the response is successful (non-empty Blob data)
+        if (!response || response.size === 0) {
+          const errorMessage =
+            response?.message || "Download failed due to server error.";
+          showErrorAlert("Error", errorMessage); // Show specific error
+          console.error("Export Error:", errorMessage);
+          return;
+        }
+
+        // Update Swal message for PDF generation progress
+        Swal.update({
+          title: "Generating PDF",
+          html: `<div class="swal-animation">
+        <p class="swal-text">Please wait...</p>
+        <div class="swal-progress">
+          <div class="swal-progress-bar"></div>
+        </div>
+      </div>`,
+        });
+
+        // Trigger the download if the response is valid
+        const fileType = "pdf";
+        const fileName = `biosafety_cabinet_report_${moment().format(
+          "YYYYMMDD_HHmmss"
+        )}.${fileType}`;
+
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(response); // Use the Blob response here
+        link.download = fileName; // Set the filename for download
+        link.click(); // Trigger the download
+
+        // Show success message after the download is triggered
+        Swal.fire({
+          title: "Download Complete",
+          text: "Report generated successfully",
+          icon: "success",
+          timer: 2000, // Show success message for 2 seconds
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } catch (error) {
+        // Handle errors if the download fails
+        console.error("API call error:", error);
+        alert("An error occurred while downloading.");
+        showErrorAlert("Error", "An error occurred while downloading."); // Show specific error
+      } finally {
+        // Ensure the loading animation is stopped if still running
+        // Swal.close();
+      }
+    };
 
     return {
       tableData,
@@ -711,7 +809,7 @@ export default defineComponent({
       identifier,
       filteredTableHeader,
       itemId,
-      downloadLAFReport,
+      downloadPdf,
     };
   },
 });

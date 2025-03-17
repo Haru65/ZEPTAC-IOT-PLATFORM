@@ -92,7 +92,7 @@
             >
               <thead>
                 <tr
-                  class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0"
+                  class="text-start text-gray-600 text-start fw-bold fs-7 text-uppercase gs-0"
                 >
                   <th
                     class="text-start"
@@ -116,7 +116,7 @@
                   </th>
                 </tr>
               </thead>
-              <tbody class="fw-semibold text-gray-600">
+              <tbody class="fw-semibold">
                 <tr v-for="(clause, index) in iso_rule.clauses" :key="index">
                   <td class="text-start">
                     {{ clause.clause_number }}

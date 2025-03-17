@@ -1291,7 +1291,7 @@ export default defineComponent({
               response.message ||
                 "Company details have been successfully updated!"
             );
-            router.push({ name: "company-list" });
+            // router.push({ name: "company-list" });
           } else {
             // Handle API error response
             loading.value = false;
