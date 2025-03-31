@@ -338,17 +338,376 @@ export default defineComponent({
     const submitButtonRef = ref<null | HTMLButtonElement>(null);
 
     const parameters = ref([
-      { id: 1, name: "Low Voltage DC", unit: "mV" },
-      { id: 2, name: "AC Voltage (50Hz)", unit: "V" },
-      { id: 3, name: "DC Voltage", unit: "V" },
-      { id: 4, name: "AC Current", unit: "A" },
-      { id: 5, name: "DC Current", unit: "A" },
-      { id: 6, name: "Resistance (Kohms)", unit: "Kohms" },
-      { id: 7, name: "Resistance (Mohms)", unit: "Mohms" },
-      { id: 8, name: "Resistance (ohms)", unit: "ohms" },
-      { id: 9, name: "DC (mA)", unit: "mA" },
-      { id: 10, name: "AC (mA) (50Hz)", unit: "mA" },
-      { id: 11, name: "DC (µA)", unit: "µA" },
+      {
+        id: 1,
+        name: "Low Voltage DC",
+        unit: "mV",
+        standardReadings: [
+          {
+            value: 1,
+            master_accuracy: 0.00306,
+            master_uncertainty: 0.00055,
+            master_resolution: 0.01,
+          },
+          {
+            value: 10,
+            master_accuracy: 0.00306,
+            master_uncertainty: 0.001,
+            master_resolution: 0.01,
+          },
+          {
+            value: 100,
+            master_accuracy: 0.009,
+            master_uncertainty: 0.0015,
+            master_resolution: 0.1,
+          },
+          {
+            value: 200,
+            master_accuracy: 0.015,
+            master_uncertainty: 0.003,
+            master_resolution: 0.1,
+          },
+          {
+            value: 300,
+            master_accuracy: 0.02274,
+            master_uncertainty: 0.0045,
+            master_resolution: 0.1,
+          },
+        ],
+      },
+      {
+        id: 2,
+        name: "AC Voltage (50Hz)",
+        unit: "V",
+        standardReadings: [
+          {
+            value: 1,
+            master_accuracy: 0.00036,
+            master_uncertainty: 0.00025,
+            master_resolution: 0.0001,
+          },
+          {
+            value: 10,
+            master_accuracy: 0.0036,
+            master_uncertainty: 0.0025,
+            master_resolution: 0.001,
+          },
+          {
+            value: 100,
+            master_accuracy: 0.036,
+            master_uncertainty: 0.025,
+            master_resolution: 0.01,
+          },
+          {
+            value: 500,
+            master_accuracy: 0.18,
+            master_uncertainty: 0.125,
+            master_resolution: 0.05,
+          },
+          {
+            value: 1000,
+            master_accuracy: 0.52,
+            master_uncertainty: 0.18,
+            master_resolution: 0.1,
+          },
+        ],
+      },
+      {
+        id: 3,
+        name: "DC Voltage",
+        unit: "V",
+        standardReadings: [
+          {
+            value: 1,
+            master_accuracy: 0.00036,
+            master_uncertainty: 0.00025,
+            master_resolution: 0.0001,
+          },
+          {
+            value: 10,
+            master_accuracy: 0.0036,
+            master_uncertainty: 0.0025,
+            master_resolution: 0.001,
+          },
+          {
+            value: 100,
+            master_accuracy: 0.036,
+            master_uncertainty: 0.025,
+            master_resolution: 0.01,
+          },
+          {
+            value: 500,
+            master_accuracy: 0.18,
+            master_uncertainty: 0.125,
+            master_resolution: 0.05,
+          },
+          {
+            value: 1000,
+            master_accuracy: 0.52,
+            master_uncertainty: 0.18,
+            master_resolution: 0.1,
+          },
+        ],
+      },
+      {
+        id: 4,
+        name: "AC Current (50Hz)",
+        unit: "A",
+        standardReadings: [
+          {
+            value: 1,
+            master_accuracy: 0.002,
+            master_uncertainty: 0.0005,
+            master_resolution: 0.001,
+          },
+          {
+            value: 2.5,
+            master_accuracy: 0.01,
+            master_uncertainty: 0.003,
+            master_resolution: 0.01,
+          },
+          {
+            value: 5,
+            master_accuracy: 0.005,
+            master_uncertainty: 0.002,
+            master_resolution: 0.01,
+          },
+          {
+            value: 7.5,
+            master_accuracy: 0.007,
+            master_uncertainty: 0.003,
+            master_resolution: 0.01,
+          },
+          {
+            value: 10,
+            master_accuracy: 0.008,
+            master_uncertainty: 0.007,
+            master_resolution: 0.001,
+          },
+        ],
+      },
+      {
+        id: 5,
+        name: "DC Current",
+        unit: "A",
+        standardReadings: [
+          {
+            value: 1,
+            master_accuracy: 0.000424,
+            master_uncertainty: 0.0002,
+            master_resolution: 0.001,
+          },
+          {
+            value: 2.5,
+            master_accuracy: 0.00106,
+            master_uncertainty: 0.0005,
+            master_resolution: 0.0025,
+          },
+          {
+            value: 5,
+            master_accuracy: 0.00212,
+            master_uncertainty: 0.001,
+            master_resolution: 0.005,
+          },
+          {
+            value: 7.5,
+            master_accuracy: 0.00318,
+            master_uncertainty: 0.0015,
+            master_resolution: 0.0075,
+          },
+          {
+            value: 10,
+            master_accuracy: 0.0065,
+            master_uncertainty: 0.003,
+            master_resolution: 0.01,
+          },
+        ],
+      },
+      {
+        id: 6,
+        name: "Resistance (ohms)",
+        unit: "ohms",
+        standardReadings: [
+          {
+            value: 1,
+            master_accuracy: 0.00012,
+            master_uncertainty: 0.00012,
+            master_resolution: 0.01,
+          },
+          {
+            value: 10,
+            master_accuracy: 0.0009,
+            master_uncertainty: 0.0004,
+            master_resolution: 0.03,
+          },
+          {
+            value: 100,
+            master_accuracy: 0.009,
+            master_uncertainty: 0.004,
+            master_resolution: 0.1,
+          },
+          {
+            value: 200,
+            master_accuracy: 0.018,
+            master_uncertainty: 0.008,
+            master_resolution: 0.2,
+          },
+          {
+            value: 300,
+            master_accuracy: 0.027,
+            master_uncertainty: 0.009,
+            master_resolution: 0.001,
+          },
+        ],
+      },
+      {
+        id: 7,
+        name: "Resistance (Kohms)",
+        unit: "Kohms",
+        standardReadings: [
+          {
+            value: 1,
+            master_accuracy: 0.00012,
+            master_uncertainty: 0.00005,
+            master_resolution: 0.001,
+          },
+          {
+            value: 10,
+            master_accuracy: 0.0012,
+            master_uncertainty: 0.0005,
+            master_resolution: 0.01,
+          },
+          {
+            value: 100,
+            master_accuracy: 0.012,
+            master_uncertainty: 0.005,
+            master_resolution: 0.1,
+          },
+          {
+            value: 200,
+            master_accuracy: 0.024,
+            master_uncertainty: 0.01,
+            master_resolution: 0.2,
+          },
+          {
+            value: 300,
+            master_accuracy: 0.036,
+            master_uncertainty: 0.015,
+            master_resolution: 0.01,
+          },
+        ],
+      },
+      {
+        id: 8,
+        name: "Resistance (Mohms)",
+        unit: "Mohms",
+        standardReadings: [
+          {
+            value: 1,
+            master_accuracy: 0.015,
+            master_uncertainty: 0.005,
+            master_resolution: 0.1,
+          },
+          {
+            value: 10,
+            master_accuracy: 0.15,
+            master_uncertainty: 0.05,
+            master_resolution: 0.1,
+          },
+          {
+            value: 15,
+            master_accuracy: 0.225,
+            master_uncertainty: 0.075,
+            master_resolution: 0.1,
+          },
+          {
+            value: 20,
+            master_accuracy: 0.3,
+            master_uncertainty: 0.1,
+            master_resolution: 0.1,
+          },
+          {
+            value: 30,
+            master_accuracy: 0.45,
+            master_uncertainty: 0.15,
+            master_resolution: 0.1,
+          },
+        ],
+      },
+      {
+        id: 9,
+        name: "AC (mA) (50Hz)",
+        unit: "mA",
+        standardReadings: [
+          {
+            value: 1,
+            master_accuracy: 0.00115,
+            master_uncertainty: 0.0003,
+            master_resolution: 0.0001,
+          },
+          {
+            value: 10,
+            master_accuracy: 0.0048,
+            master_uncertainty: 0.0014,
+            master_resolution: 0.001,
+          },
+          {
+            value: 100,
+            master_accuracy: 0.046,
+            master_uncertainty: 0.012,
+            master_resolution: 0.01,
+          },
+          {
+            value: 200,
+            master_accuracy: 0.089,
+            master_uncertainty: 0.065,
+            master_resolution: 0.1,
+          },
+          {
+            value: 300,
+            master_accuracy: 0.152,
+            master_uncertainty: 0.132,
+            master_resolution: 1.0,
+          },
+        ],
+      },
+      {
+        id: 10,
+        name: "DC (mA)",
+        unit: "mA",
+        standardReadings: [
+          {
+            value: 1,
+            master_accuracy: 0.00015,
+            master_uncertainty: 0.00008,
+            master_resolution: 0.0001,
+          },
+          {
+            value: 10,
+            master_accuracy: 0.0005,
+            master_uncertainty: 0.00026,
+            master_resolution: 0.001,
+          },
+          {
+            value: 100,
+            master_accuracy: 0.005,
+            master_uncertainty: 0.0026,
+            master_resolution: 0.01,
+          },
+          {
+            value: 200,
+            master_accuracy: 0.017,
+            master_uncertainty: 0.013,
+            master_resolution: 0.1,
+          },
+          {
+            value: 300,
+            master_accuracy: 0.0355,
+            master_uncertainty: 0.0264,
+            master_resolution: 1.0,
+          },
+        ],
+      },
     ]);
 
     const activeTab = ref(0);
