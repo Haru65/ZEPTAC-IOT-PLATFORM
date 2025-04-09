@@ -25,7 +25,7 @@
         <!-- YEAR WISE DATA -->
 
         <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-semibold text-gray-400"
+          <span class="card-label fw-semibold text-gray-700"
             >Financial Year</span
           >
         </h3>
@@ -134,14 +134,10 @@
           {{ rgps.id }}
         </template>
         <template v-slot:rgp_no="{ row: rgps }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ rgps.rgp_no }}
-          </span>
+          {{ rgps.rgp_no }}
         </template>
         <template v-slot:customer="{ row: rgps }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ rgps?.customer?.company_name || "" }}
-          </span>
+          {{ rgps?.customer?.company_name || "" }}
         </template>
         <!-- defualt data -->
         <template v-slot:engineers="{ row: rgps }">
@@ -200,32 +196,69 @@
         </template>
 
         <template v-slot:actions="{ row: rgps }">
-          <div class="d-flex flex-lg-row">
-            <span
-              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Download RGP"
-              @click="downloadRGP(rgps.id)"
+          <!--begin::Menu Flex-->
+          <div class="dropdown">
+            <a
+              href="#"
+              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              @click.prevent
             >
-              <KTIcon icon-name="file-down" icon-class="fs-2" />
-            </span>
-            <span
-              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Free Up Resources Taken"
-              @click="ReleaseResources(rgps.id)"
+              <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+            </a>
+
+            <!-- Action dropdown menu -->
+            <ul
+              class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
             >
-              <KTIcon icon-name="arrows-circle" icon-class="fs-2" />
-            </span>
-            <span
-              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Delete RGP"
-              @click="deleteItem(rgps.id, false)"
-            >
-              <KTIcon icon-name="trash" icon-class="fs-2" />
-            </span>
+              <!-- Download RGP -->
+              <li>
+                <a
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Download RGP"
+                  @click.prevent="downloadRGP(rgps.id)"
+                >
+                  <KTIcon
+                    icon-name="file-down"
+                    icon-class="fs-3 text-primary"
+                  />
+                  <span class="text-gray-700">Download</span>
+                </a>
+              </li>
+
+              <!-- Free Up -->
+              <li>
+                <a
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-warning cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Free Up Resources Taken"
+                  @click.prevent="ReleaseResources(rgps.id)"
+                >
+                  <KTIcon
+                    icon-name="arrows-circle"
+                    icon-class="fs-3 text-warning"
+                  />
+                  <span class="text-gray-700">Free Up</span>
+                </a>
+              </li>
+
+              <!-- Delete RGP -->
+              <li>
+                <a
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-danger cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Delete RGP"
+                  @click.prevent="deleteItem(rgps.id, false)"
+                >
+                  <KTIcon icon-name="trash" icon-class="fs-3 text-danger" />
+                  <span class="text-danger">Delete</span>
+                </a>
+              </li>
+            </ul>
           </div>
+          <!--end::Menu Flex-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -416,7 +449,7 @@ export default defineComponent({
         columnWidth: 75,
       },
       {
-        columnName: "Actions",
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,

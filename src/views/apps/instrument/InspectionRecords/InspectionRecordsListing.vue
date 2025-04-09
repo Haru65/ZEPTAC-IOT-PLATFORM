@@ -47,44 +47,51 @@
         <template v-slot:serial_no="{ row: inspection_instrument }">
           {{ inspection_instrument.serial_no }}
         </template>
-
-        <template v-slot:inspection_record="{ row: inspection_instrument }">
-          <span
-            class="menu-link px-3"
-            data-toggle="tooltip"
-            title="Add Inspection Record"
-          >
-            <router-link
-              :to="`/inspection_records/add/${inspection_instrument.id}`"
-            >
-              <span
-                class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
-                >+ inspection
-              </span>
-            </router-link>
-          </span>
-        </template>
-
         <template v-slot:actions="{ row: inspection_instrument }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span
-              class="menu-link"
-              data-toggle="tooltip"
-              title="View Inspection Records"
+          <div class="dropdown">
+            <a
+              href="#"
+              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              @click.prevent
             >
-              <router-link
-                :to="`/inspection_records/view/${inspection_instrument.id}`"
-              >
-                <span
-                  class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
-                  >View Inspections
-                </span>
-              </router-link>
-            </span>
+              <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+            </a>
+
+            <!-- Action dropdown menu -->
+            <ul
+              class="dropdown-menu dropdown-menu-end min-w-200px py-2 shadow-sm"
+            >
+              <!-- Add Inspection Record -->
+              <li>
+                <router-link
+                  :to="`/inspection_records/add/${inspection_instrument.id}`"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-success cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Add Inspection Record"
+                >
+                  <KTIcon icon-name="plus" icon-class="fs-3 text-success" />
+                  <span class="text-gray-700">Add Inspection</span>
+                </router-link>
+              </li>
+
+              <!-- View Inspection Records -->
+              <li>
+                <router-link
+                  :to="`/inspection_records/view/${inspection_instrument.id}`"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-info cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="View Inspection Records"
+                >
+                  <KTIcon icon-name="eye" icon-class="fs-3 text-info" />
+                  <span class="text-gray-700">View Inspections</span>
+                </router-link>
+              </li>
+            </ul>
           </div>
-          <!--end::Menu FLex-->
-          <!--end::Menu-->
+          <!--end::Menu Flex-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -167,13 +174,7 @@ export default defineComponent({
         columnWidth: 80,
       },
       {
-        columnName: "Add Inspection Record",
-        columnLabel: "inspection_record",
-        sortEnabled: true,
-        columnWidth: 80,
-      },
-      {
-        columnName: "Actions",
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,

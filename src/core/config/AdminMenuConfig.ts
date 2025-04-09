@@ -47,25 +47,14 @@ const AdminMenuConfig: Array<MenuItem> = [
       },
 
       {
-        sectionTitle: "Non-NABL Report",
-        route: "/",
+        heading: "Non-NABL",
+        route: "/validationreports/list",
         keenthemesIcon: "tablet-text-up",
         bootstrapIcon: "bi-archive",
-
-        sub: [
-          {
-            heading: "Add Non-NABL Report",
-            route: "/validationreports/add",
-          },
-          {
-            heading: "List Non-NABL Report",
-            route: "/validationreports/list",
-          },
-        ],
       },
 
       {
-        sectionTitle: "NABL Report",
+        sectionTitle: "NABL",
         route: "/",
         keenthemesIcon: "file-added",
         bootstrapIcon: "bi-archive",
@@ -101,7 +90,7 @@ const AdminMenuConfig: Array<MenuItem> = [
       },
 
       {
-        heading: "Service Request Form",
+        heading: "Service Request",
         route: "/srf/list",
         keenthemesIcon: "abstract-26",
         bootstrapIcon: "bi-archive",
@@ -114,36 +103,16 @@ const AdminMenuConfig: Array<MenuItem> = [
     route: "thermal",
     pages: [
       {
-        sectionTitle: "Thermal Report",
-        route: "/thermalreport",
+        heading: "Thermal Reports",
+        route: "/thermalreport/list",
         keenthemesIcon: "chart-pie-4",
         bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Add Thermal Report",
-            route: "/thermalreport/add",
-          },
-          {
-            heading: "List Thermal Report",
-            route: "/thermalreport/list",
-          },
-        ],
       },
       {
-        sectionTitle: "Thermal Instrument",
-        route: "/thermalinstrument",
+        heading: "Thermal Instruments",
+        route: "/thermalinstrument/list",
         keenthemesIcon: "thermometer",
         bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Add Thermal Instrument",
-            route: "/thermalinstrument/add",
-          },
-          {
-            heading: "List Thermal Instrument",
-            route: "/thermalinstrument/list",
-          },
-        ],
       },
     ],
   },
@@ -181,104 +150,46 @@ const AdminMenuConfig: Array<MenuItem> = [
     route: "sales",
     pages: [
       {
-        sectionTitle: "Leads",
-        route: "/sales/leads",
+        heading: "Leads",
+        route: "/leads/list",
         keenthemesIcon: "user-tick",
         bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Add Leads",
-            route: "/leads/add",
-          },
-          {
-            heading: "List Leads",
-            route: "/leads/list",
-          },
-          {
-            heading: "Exists Leads",
-            route: "/temp_leads/list",
-          },
-        ],
       },
       {
-        sectionTitle: "Customers",
-        route: "/customers",
+        heading: "Exists Leads",
+        route: "/temp_leads/list",
+        keenthemesIcon: "people",
+        bootstrapIcon: "bi-archive",
+      },
+      {
+        heading: "Customers",
+        route: "/customers/list",
         keenthemesIcon: "user-edit",
         bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Add Customers",
-            route: "/customers/add",
-          },
-          {
-            heading: "List Customers",
-            route: "/customers/list",
-          },
-        ],
       },
       {
-        sectionTitle: "Clients",
-        route: "/clients",
+        heading: "Clients",
+        route: "/clients/list",
         keenthemesIcon: "profile-user",
         bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Add Clients",
-            route: "/clients/add",
-          },
-          {
-            heading: "List Clients",
-            route: "/clients/list",
-          },
-        ],
       },
       {
-        sectionTitle: "Price List Items",
-        route: "/pricelist",
+        heading: "Price List",
+        route: "/pricelist/list",
         keenthemesIcon: "notification-status",
         bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Add Items",
-            route: "/pricelist/add",
-          },
-          {
-            heading: "List Items",
-            route: "/pricelist/list",
-          },
-        ],
       },
       {
-        sectionTitle: "Quotations",
-        route: "/quotations",
+        heading: "Quotations",
+        route: "/quotations/list",
         keenthemesIcon: "note-2",
         bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Add Quotations",
-            route: "/quotations/add",
-          },
-          {
-            heading: "List Quotations",
-            route: "/quotations/list",
-          },
-        ],
       },
       {
-        sectionTitle: "Invoices",
-        route: "/invoices",
+        heading: "Invoices",
+        route: "/invoices/list",
         keenthemesIcon: "menu",
         bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Add Invoices",
-            route: "/invoices/add",
-          },
-          {
-            heading: "List Invoices",
-            route: "/invoices/list",
-          },
-        ],
       },
       {
         heading: "Purchase Orders",
@@ -339,10 +250,6 @@ const AdminMenuConfig: Array<MenuItem> = [
         route: "/",
         bootstrapIcon: "bi-archive",
         sub: [
-          {
-            heading: "Instrument Add",
-            route: "/instruments/add",
-          },
           {
             heading: "Instrument List",
             route: "/instruments/list",
@@ -469,46 +376,16 @@ const AdminMenuConfig: Array<MenuItem> = [
         bootstrapIcon: "bi-archive",
         sub: [
           {
-            sectionTitle: "Method Validation",
-            route: "/",
-            sub: [
-              {
-                heading: "Add Method Validation",
-                route: "/method_validation/add",
-              },
-              {
-                heading: "List Method Validation",
-                route: "/method_validation/list",
-              },
-            ],
+            heading: "Method Validation",
+            route: "/method_validation/list",
           },
           {
-            sectionTitle: "InterLaboratory",
-            route: "/",
-            sub: [
-              {
-                heading: "Add InterLaboratory",
-                route: "/interlaboratory/add",
-              },
-              {
-                heading: "List InterLaboratory",
-                route: "/interlaboratory/list",
-              },
-            ],
+            heading: "InterLaboratory",
+            route: "/interlaboratory/list",
           },
           {
-            sectionTitle: "Replicate Report",
-            route: "/",
-            sub: [
-              {
-                heading: "Add Replicate Report",
-                route: "/replicate_report/add",
-              },
-              {
-                heading: "List Replicate Report",
-                route: "/replicate_report/list",
-              },
-            ],
+            heading: "Replicate Report",
+            route: "/replicate_report/list",
           },
 
         ],
@@ -529,54 +406,17 @@ const AdminMenuConfig: Array<MenuItem> = [
         bootstrapIcon: "bi-archive",
         sub: [
           {
-            sectionTitle: "Employees",
-            route: "/",
-            sub: [
-              {
-                heading: "Add Employee",
-                route: "/employee/add",
-              },
-              {
-                heading: "List Employees",
-                route: "/employee/list",
-              },
-            ],
+            heading: "Employees",
+            route: "/employee/list",
           },
-
           {
-            sectionTitle: "Trainings",
-            route: "/",
-            keenthemesIcon: "educare",
-            bootstrapIcon: "bi-archive",
-            sub: [
-              {
-                heading: "Add Training",
-                route: "/training/add",
-              },
-              {
-                heading: "List Training",
-                route: "/training/list",
-              },
-            ],
+            heading: "Training",
+            route: "/training/list",
           },
-
           {
-            sectionTitle: "Skill Matrix",
-            route: "/",
-            keenthemesIcon: "educare",
-            bootstrapIcon: "bi-archive",
-            sub: [
-              {
-                heading: "Add Skill Matrix",
-                route: "/skill_matrix/add",
-              },
-              {
-                heading: "List Skill Matrix",
-                route: "/skill_matrix/list",
-              },
-            ],
+            heading: "Skill Matrix",
+            route: "/skill_matrix/list",
           },
-
 
         ],
       },
@@ -595,88 +435,40 @@ const AdminMenuConfig: Array<MenuItem> = [
     route: "superadmin",
     pages: [
       {
-        sectionTitle: "Company",
-        route: "/",
+        heading: "Company",
+        route: "/company/list",
         keenthemesIcon: "office-bag",
         bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Add Company",
-            route: "/company/add",
-          },
-          {
-            heading: "List Company",
-            route: "/company/list",
-          },
-        ],
       },
       {
-        sectionTitle: "Users",
-        route: "/users",
+        heading: "Users",
+        route: "/users/list",
         keenthemesIcon: "user",
         bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Add User",
-            route: "/users/add",
-          },
-          {
-            heading: "List Users",
-            route: "/users/list",
-          },
-        ],
       },
       {
-        sectionTitle: "Modules",
-        route: "/module_manager",
+        heading: "Modules",
+        route: "/module_manager/list",
         keenthemesIcon: "data",
         bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Modules Manager",
-            route: "/module_manager/list",
-          },
-        ],
       },
       {
-        sectionTitle: "Permission",
-        route: "/permission_manager",
+        heading: "Permission",
+        route: "/permission_manager/list",
         keenthemesIcon: "check-square",
         bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Permission Manager",
-            route: "/permission_manager/list",
-          },
-        ],
       },
       {
-        sectionTitle: "Activity Logger",
-        route: "/activity_logger",
+        heading: "Activity Logger",
+        route: "/activity_logger/list",
         keenthemesIcon: "notepad-edit",
         bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "Activity Logger",
-            route: "/activity_logger/list",
-          },
-        ],
       },
       {
-        sectionTitle: "ISO Rules",
-        route: "/iso",
+        heading: "ISO Rules",
+        route: "/iso/list",
         keenthemesIcon: "setting-3",
         bootstrapIcon: "bi-archive",
-        sub: [
-          {
-            heading: "ISO Rules Add",
-            route: "/iso/add",
-          },
-          {
-            heading: "ISO Rules List",
-            route: "/iso/list",
-          },
-        ],
       },
     ],
   },

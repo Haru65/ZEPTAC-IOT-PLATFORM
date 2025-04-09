@@ -81,51 +81,65 @@
         </template>
         <template v-slot:actions="{ row: laf }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row my-3">
-            <!-- begin::Download -->
-
-            <!-- <span
-              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
+          <div class="dropdown">
+            <a
+              href="#"
+              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              @click.prevent
             >
-              <i
-                @click="downloadLAFReport(laf.id)"
-                class="las la-download fs-2"
-              ></i>
-            </span> -->
-            <!-- end::Download -->
+              <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+            </a>
 
-            <!-- begin::download -->
-            <span
-              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Download LAF Report"
-              @click="downloadPdf(laf.id)"
+            <!-- Action dropdown menu -->
+            <ul
+              class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
             >
-              <KTIcon icon-name="file-down" icon-class="fs-2" />
-            </span>
-            <!-- end::download -->
+              <!-- Download LAF Report -->
+              <li>
+                <span
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Download LAF Report"
+                  @click="downloadPdf(laf.id)"
+                >
+                  <KTIcon
+                    icon-name="file-down"
+                    icon-class="fs-3 text-primary"
+                  />
+                  <span class="text-gray-700">Download</span>
+                </span>
+              </li>
 
-            <!--begin::Edit-->
-            <router-link :to="`/laf_reports/edit/${laf.id}`">
-              <span
-                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-              >
-                <KTIcon icon-name="pencil" icon-class="fs-2" />
-              </span>
-            </router-link>
-            <!--end::Edit-->
+              <!-- Edit LAF Report -->
+              <li>
+                <router-link
+                  :to="`/laf_reports/edit/${laf.id}`"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-info cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Edit Report"
+                >
+                  <KTIcon icon-name="pencil" icon-class="fs-3 text-info" />
+                  <span class="text-gray-700">Edit</span>
+                </router-link>
+              </li>
 
-            <!--begin::Delete-->
-            <span
-              @click="deleteItem(laf.id, false)"
-              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-            >
-              <KTIcon icon-name="trash" icon-class="fs-2" />
-            </span>
-            <!--end::Delete-->
+              <!-- Delete LAF Report -->
+              <li>
+                <span
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-danger cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Delete Report"
+                  @click="deleteItem(laf.id, false)"
+                >
+                  <KTIcon icon-name="trash" icon-class="fs-3 text-danger" />
+                  <span class="text-danger">Delete</span>
+                </span>
+              </li>
+            </ul>
           </div>
-          <!--end::Menu FLex-->
-          <!--end::Menu-->
+          <!--end::Menu Flex-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -214,7 +228,7 @@ export default defineComponent({
         columnWidth: 155,
       },
       {
-        columnName: "Actions",
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,

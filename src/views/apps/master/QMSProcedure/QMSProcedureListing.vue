@@ -25,7 +25,7 @@
         <!-- YEAR WISE DATA -->
 
         <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-semibold text-gray-400"
+          <span class="card-label fw-semibold text-gray-700"
             >Financial Year</span
           >
         </h3>
@@ -208,31 +208,49 @@
 
         <template v-slot:actions="{ row: qms }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row my-3">
-            <!--begin::Edit-->
-            <router-link :to="`/qms_procedures/edit/${qms.id}`">
-              <span
-                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
-                title="View QMS Procedure"
-              >
-                <KTIcon icon-name="pencil" icon-class="fs-2" />
-              </span>
-            </router-link>
-            <!--end::Edit-->
-
-            <!--begin::Delete-->
-            <span
-              @click="deleteItem(qms.id, false)"
-              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Delete QMS Procedure"
+          <div class="dropdown">
+            <a
+              href="#"
+              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              @click.prevent
             >
-              <KTIcon icon-name="trash" icon-class="fs-2" />
-            </span>
-            <!--end::Delete-->
+              <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+            </a>
+
+            <!-- Action dropdown menu -->
+            <ul
+              class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
+            >
+              <!-- Edit / View QMS Procedure -->
+              <li>
+                <router-link
+                  :to="`/qms_procedures/edit/${qms.id}`"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-info cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="View QMS Procedure"
+                >
+                  <KTIcon icon-name="pencil" icon-class="fs-3 text-info" />
+                  <span class="text-gray-700">Edit</span>
+                </router-link>
+              </li>
+
+              <!-- Delete QMS Procedure -->
+              <li>
+                <a
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-danger cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Delete QMS Procedure"
+                  @click.prevent="deleteItem(qms.id, false)"
+                >
+                  <KTIcon icon-name="trash" icon-class="fs-3 text-danger" />
+                  <span class="text-danger">Delete</span>
+                </a>
+              </li>
+            </ul>
           </div>
-          <!--end::Menu FLex-->
+          <!--end::Menu Flex-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -363,7 +381,7 @@ export default defineComponent({
         columnWidth: 75,
       },
       {
-        columnName: "Actions",
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,

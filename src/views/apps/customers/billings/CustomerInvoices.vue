@@ -25,7 +25,7 @@
         <!-- YEAR WISE DATA -->
 
         <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-semibold text-gray-400"
+          <span class="card-label fw-semibold text-gray-700"
             >Financial Year</span
           >
         </h3>
@@ -64,29 +64,19 @@
         <!-- img data -->
 
         <template v-slot:id="{ row: quotations }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ quotations.id }}
-          </span>
+          {{ quotations.id }}
         </template>
         <template v-slot:quotation_no="{ row: quotations }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ quotations.quotation_no }}
-          </span>
+          {{ quotations.quotation_no }}
         </template>
         <template v-slot:customer="{ row: quotations }">
-          <span
-            v-if="quotations.customer != null"
-            class="text-gray-600 text-hover-primary mb-1"
-          >
+          <span v-if="quotations.customer != null">
             {{ quotations?.customer?.company_name || "" }}
           </span>
           <span v-else> </span>
         </template>
         <template v-slot:client="{ row: quotations }">
-          <span
-            v-if="quotations.client != null"
-            class="text-gray-600 text-hover-primary mb-1"
-          >
+          <span v-if="quotations.client != null">
             {{ quotations.client?.city || "" }}
             {{ quotations.client?.state || "" }}
           </span>
@@ -130,41 +120,56 @@
         </template>
         <template v-slot:actions="{ row: quotations }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span
-              v-if="quotations.status == 4 && identifier == 'Customer'"
-              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Generate Purchase Order"
-              @click="
-                createPurchaseOrder(quotations.id, quotations.quotation_no)
-              "
+          <div class="dropdown">
+            <a
+              href="#"
+              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              @click.prevent
             >
-              <KTIcon icon-name="cheque" icon-class="fs-2" />
-            </span>
+              <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+            </a>
 
-            <span
-              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Download Quotation"
-              @click="downloadQuotation(quotations.id)"
+            <!-- Action dropdown menu -->
+            <ul
+              class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
             >
-              <KTIcon icon-name="file-down" icon-class="fs-2" />
-            </span>
+              <!-- Generate PO (Customer only + status 4) -->
+              <li v-if="quotations.status == 4 && identifier == 'Customer'">
+                <a
+                  href="#"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-success cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Generate Purchase Order"
+                  @click.prevent="
+                    createPurchaseOrder(quotations.id, quotations.quotation_no)
+                  "
+                >
+                  <KTIcon icon-name="cheque" icon-class="fs-3 text-success" />
+                  <span class="text-gray-700">Generate PO</span>
+                </a>
+              </li>
 
-            <!--begin::Edit-->
-            <!-- <router-link :to="`/quotations/edit/${quotations.id}`">
-              <span
-                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
-                title="View Quotation"
-              >
-                <KTIcon icon-name="pencil" icon-class="fs-2" />
-              </span>
-            </router-link> -->
-            <!--end::Edit-->
+              <!-- Download Quotation -->
+              <li>
+                <a
+                  href="#"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-success cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Download Quotation"
+                  @click.prevent="downloadQuotation(quotations.id)"
+                >
+                  <KTIcon
+                    icon-name="file-down"
+                    icon-class="fs-3 text-success"
+                  />
+                  <span class="text-gray-700">Download</span>
+                </a>
+              </li>
+            </ul>
           </div>
-          <!--end::Menu FLex-->
+          <!--end::Menu Flex-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -284,7 +289,7 @@ export default defineComponent({
         columnWidth: 75,
       },
       {
-        columnName: "Actions",
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,

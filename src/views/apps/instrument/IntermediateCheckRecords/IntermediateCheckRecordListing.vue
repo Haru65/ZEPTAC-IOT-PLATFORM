@@ -48,43 +48,51 @@
           {{ intermediate_instrument.serial_no }}
         </template>
 
-        <template v-slot:intermediate_record="{ row: intermediate_instrument }">
-          <span
-            class="menu-link px-3"
-            data-toggle="tooltip"
-            title="Add Intermediate Check Plan"
-          >
-            <router-link
-              :to="`/intermediate_check_records/add/${intermediate_instrument.id}`"
-            >
-              <span
-                class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
-                >+ Check Plan
-              </span>
-            </router-link>
-          </span>
-        </template>
-
         <template v-slot:actions="{ row: intermediate_instrument }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span
-              class="menu-link"
-              data-toggle="tooltip"
-              title="View Intermediate Check Plan"
+          <div class="dropdown">
+            <a
+              href="#"
+              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              @click.prevent
             >
-              <router-link
-                :to="`/intermediate_check_records/view/${intermediate_instrument.id}`"
-              >
-                <span
-                  class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
-                  >View Intermediate Checks
-                </span>
-              </router-link>
-            </span>
+              <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+            </a>
+
+            <!-- Action dropdown menu -->
+            <ul
+              class="dropdown-menu dropdown-menu-end min-w-200px py-2 shadow-sm"
+            >
+              <!-- Add Intermediate Check Plan -->
+              <li>
+                <router-link
+                  :to="`/intermediate_check_records/add/${intermediate_instrument.id}`"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-success cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Add Intermediate Check Plan"
+                >
+                  <KTIcon icon-name="plus" icon-class="fs-3 text-success" />
+                  <span class="text-gray-700">Add Check Plan</span>
+                </router-link>
+              </li>
+
+              <!-- View Intermediate Checks -->
+              <li>
+                <router-link
+                  :to="`/intermediate_check_records/view/${intermediate_instrument.id}`"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-info cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="View Intermediate Check Plan"
+                >
+                  <KTIcon icon-name="eye" icon-class="fs-3 text-info" />
+                  <span class="text-gray-700">View Checks</span>
+                </router-link>
+              </li>
+            </ul>
           </div>
-          <!--end::Menu FLex-->
-          <!--end::Menu-->
+          <!--end::Menu Flex-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -169,13 +177,7 @@ export default defineComponent({
         columnWidth: 80,
       },
       {
-        columnName: "Intermediate Check Record",
-        columnLabel: "intermediate_record",
-        sortEnabled: true,
-        columnWidth: 80,
-      },
-      {
-        columnName: "Actions",
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,

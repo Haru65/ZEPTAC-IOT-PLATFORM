@@ -782,7 +782,7 @@ export default defineComponent({
       is_active: "1",
     });
 
-    const clauses = reactive([]);
+    const clauses = reactive<any>([]);
 
     const clauseDetails = ref({
       audit_schedule_id: "",

@@ -26,7 +26,7 @@
         <!-- YEAR WISE DATA -->
 
         <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-semibold text-gray-400"
+          <span class="card-label fw-semibold text-gray-700"
             >Financial Year</span
           >
         </h3>
@@ -181,7 +181,7 @@
 
         <template v-slot:actions="{ row: thermal_instruments }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
+          <div class="d-flex flex-lg-row my-3">
             <DuplicateInstrumentModal
               :key="thermal_instruments.id"
               :instrumentId="thermal_instruments.id"
@@ -189,58 +189,77 @@
               :heading="thermal_instruments.name"
               @handleDuplicate="HandleDuplicate"
             ></DuplicateInstrumentModal>
-
-            <!--begin::Clone-->
-            <span
-              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              data-toggle="tooltip"
-              title="Clone Instrument"
-              data-bs-toggle="modal"
-              :data-bs-target="
-                '#kt_modal_new_address_' + thermal_instruments.id
-              "
-            >
-              <KTIcon icon-name="copy" icon-class="fs-2" />
-            </span>
-
-            <!--end::Clone-->
-
-            <!--begin::Clone-->
-            <router-link :to="`/cloneinstrument/${thermal_instruments.id}`">
-              <span
-                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
-                title="Clone Instrument"
+            <!--begin::Menu Flex-->
+            <div class="dropdown">
+              <a
+                href="#"
+                class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                @click.prevent
               >
-                <KTIcon icon-name="copy" icon-class="fs-2" />
-              </span>
-            </router-link>
-            <!--end::Clone-->
+                <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+              </a>
 
-            <!--begin::Edit-->
-            <router-link
-              :to="`/thermalinstrument/edit/${thermal_instruments.id}`"
-            >
-              <span
-                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
-                title="View Instrument"
+              <!-- Action dropdown menu -->
+              <ul
+                class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
               >
-                <KTIcon icon-name="pencil" icon-class="fs-2" />
-              </span>
-            </router-link>
-            <!--end::Edit-->
+                <!-- Complete Clone Instrument -->
+                <li>
+                  <a
+                    class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
+                    data-toggle="tooltip"
+                    title="Complete Clone Instrument"
+                    data-bs-toggle="modal"
+                    :data-bs-target="`#kt_modal_new_address_${thermal_instruments.id}`"
+                  >
+                    <KTIcon icon-name="copy" icon-class="fs-3 text-primary" />
+                    <span class="text-gray-700">Complete Clone</span>
+                  </a>
+                </li>
 
-            <!--end::Delete-->
-            <span
-              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Delete Instrument"
-              @click="deleteItem(thermal_instruments.id, false)"
-            >
-              <KTIcon icon-name="trash" icon-class="fs-2" />
-            </span>
-            <!--end::Delete-->
+                <!-- Half Clone Instrument -->
+                <li>
+                  <router-link
+                    :to="`/cloneinstrument/${thermal_instruments.id}`"
+                    class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-warning cursor-pointer"
+                    data-bs-toggle="tooltip"
+                    title="Half Clone Instrument"
+                  >
+                    <KTIcon icon-name="copy" icon-class="fs-3 text-warning" />
+                    <span class="text-gray-700">Half Clone</span>
+                  </router-link>
+                </li>
+
+                <!-- View Instrument -->
+                <li>
+                  <router-link
+                    :to="`/thermalinstrument/edit/${thermal_instruments.id}`"
+                    class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-info cursor-pointer"
+                    data-bs-toggle="tooltip"
+                    title="View Instrument"
+                  >
+                    <KTIcon icon-name="pencil" icon-class="fs-3 text-info" />
+                    <span class="text-gray-700">View</span>
+                  </router-link>
+                </li>
+
+                <!-- Delete Instrument -->
+                <li>
+                  <a
+                    class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-danger cursor-pointer"
+                    data-bs-toggle="tooltip"
+                    title="Delete Instrument"
+                    @click.prevent="deleteItem(thermal_instruments.id, false)"
+                  >
+                    <KTIcon icon-name="trash" icon-class="fs-3 text-danger" />
+                    <span class="text-danger">Delete</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <!--end::Menu Flex-->
           </div>
           <!--end::Menu FLex-->
         </template>
@@ -375,7 +394,7 @@ export default defineComponent({
         columnWidth: 80,
       },
       {
-        columnName: "Actions",
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,

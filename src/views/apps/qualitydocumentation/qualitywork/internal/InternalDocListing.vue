@@ -25,7 +25,7 @@
         <!-- YEAR WISE DATA -->
 
         <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-semibold text-gray-400"
+          <span class="card-label fw-semibold text-gray-700"
             >Financial Year</span
           >
         </h3>
@@ -156,47 +156,68 @@
         <template v-slot:location="{ row: documents }">
           {{ documents.location }}
         </template>
-        <template v-slot:document_file="{ row: documents }">
-          <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <a
-              target="blank"
-              v-bind:href="`https://api.zeptac.com/storage/company/${documents.company_id}/internal_documents/${documents.document_file}`"
-              data-toggle="tooltip"
-              title="Download File"
-              class="border rounded badge py-3 px-4 fs-7 badge-light-primary text-hover-success cursor-pointer"
-              >⤓ File
-            </a>
-          </div>
-          <!--end::Menu FLex-->
-        </template>
         <template v-slot:actions="{ row: documents }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row my-3">
-            <!--begin::Edit-->
-            <router-link :to="`/internaldocuments/edit/${documents.id}`">
-              <span
-                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
-                title="View Internal Document"
-              >
-                <KTIcon icon-name="pencil" icon-class="fs-2" />
-              </span>
-            </router-link>
-            <!--end::Edit-->
-
-            <!--begin::Delete-->
-            <span
-              @click="deleteItem(documents.id, false)"
-              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Delete Internal Document"
+          <div class="dropdown">
+            <a
+              href="#"
+              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              @click.prevent
             >
-              <KTIcon icon-name="trash" icon-class="fs-2" />
-            </span>
-            <!--end::Delete-->
+              <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+            </a>
+
+            <!-- Action dropdown menu -->
+            <ul
+              class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
+            >
+              <!-- Download File -->
+              <li>
+                <a
+                  :href="`https://api.zeptac.com/storage/company/${documents.company_id}/internal_documents/${documents.document_file}`"
+                  target="_blank"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Download File"
+                >
+                  <KTIcon
+                    icon-name="file-down"
+                    icon-class="fs-3 text-primary"
+                  />
+                  <span class="text-gray-700">Download</span>
+                </a>
+              </li>
+
+              <!-- Edit -->
+              <li>
+                <router-link
+                  :to="`/internaldocuments/edit/${documents.id}`"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-info cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Edit Internal Document"
+                >
+                  <KTIcon icon-name="pencil" icon-class="fs-3 text-info" />
+                  <span class="text-gray-700">Edit</span>
+                </router-link>
+              </li>
+
+              <!-- Delete -->
+              <li>
+                <a
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-danger cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Delete Internal Document"
+                  @click.prevent="deleteItem(documents.id, false)"
+                >
+                  <KTIcon icon-name="trash" icon-class="fs-3 text-danger" />
+                  <span class="text-danger">Delete</span>
+                </a>
+              </li>
+            </ul>
           </div>
-          <!--end::Menu FLex-->
+          <!--end::Menu Flex-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -296,12 +317,6 @@ export default defineComponent({
       {
         columnName: "Location",
         columnLabel: "location",
-        sortEnabled: true,
-        columnWidth: 75,
-      },
-      {
-        columnName: "File",
-        columnLabel: "document_file",
         sortEnabled: true,
         columnWidth: 75,
       },

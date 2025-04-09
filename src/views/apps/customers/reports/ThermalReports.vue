@@ -25,7 +25,7 @@
           <!-- YEAR WISE DATA -->
   
           <h3 class="card-title align-items-start flex-column">
-            <span class="card-label fw-semibold text-gray-400"
+            <span class="card-label fw-semibold text-gray-700"
               >Financial Year</span
             >
           </h3>
@@ -206,7 +206,7 @@
           columnWidth: 75,
         },
         {
-          columnName: "Actions",
+          columnName: "Action",
           columnLabel: "actions",
           sortEnabled: false,
           columnWidth: 75,

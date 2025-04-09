@@ -117,41 +117,44 @@
             <!--end::Heading-->
 
             <div class="row mb-6">
-              <div class="form-group col-12">
-                <label
-                  class="d-flex align-items-center fs-5 fw-semobold mb-4 col-lg-4 col-form-label required text-gray-700 text-nowrap"
+              <!--begin::Label-->
+              <label
+                class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
+              >
+                <span>Returnable Gate Pass</span>
+                <i
+                  class="fas fa-exclamation-circle ms-2 fs-7"
+                  data-bs-toggle="tooltip"
+                  title="Select at least one engineer"
+                ></i>
+              </label>
+              <!--end::Label-->
+
+              <!--begin::Col-->
+              <div class="col-lg-8 fv-row">
+                <el-select
+                  v-model="itemDetails.rgp_id"
+                  filterable
+                  placeholder="Please Select GatePass"
+                  @change="fetchRGP(itemDetails.rgp_id)"
                 >
-                  <span>Returnable Gate Pass</span>
-                  <i
-                    class="fas fa-exclamation-circle ms-2 fs-7"
-                    data-bs-toggle="tooltip"
-                    title="Select at least one engineer"
-                  ></i>
-                </label>
-                <div>
-                  <el-select
-                    v-model="itemDetails.rgp_id"
-                    filterable
-                    placeholder="Please Select GatePass"
-                    @change="fetchRGP(itemDetails.rgp_id)"
+                  <el-option
+                    value=""
+                    disabled="disabled"
+                    label="Please Select GatePass"
+                    key=""
                   >
-                    <el-option
-                      value=""
-                      disabled="disabled"
-                      label="Please Select GatePass"
-                      key=""
-                    >
-                      Please Select GatePass</el-option
-                    >
-                    <el-option
-                      v-for="item in RGatePasses"
-                      :key="item.id"
-                      :value="item.id"
-                      :label="item.rgp_no"
-                    />
-                  </el-select>
-                </div>
+                    Please Select GatePass</el-option
+                  >
+                  <el-option
+                    v-for="item in RGatePasses"
+                    :key="item.id"
+                    :value="item.id"
+                    :label="item.rgp_no"
+                  />
+                </el-select>
               </div>
+              <!--end::Col-->
             </div>
 
             <!--begin::Input group-->
@@ -342,7 +345,7 @@
               <div class="form-group col-md-6">
                 <label
                   class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
-                  >Acceptance Criteria for Temperature</label
+                  >Temperature Criteria</label
                 >
                 <Field
                   type="text"
@@ -360,7 +363,7 @@
               <div class="form-group col-md-6">
                 <label
                   class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6 text-nowrap"
-                  >Acceptance Criteria for Humidity</label
+                  >Humidity Criteria</label
                 >
                 <Field
                   type="text"
@@ -399,7 +402,7 @@
 
               <div class="form-group col-md-6">
                 <label
-                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
+                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6 text-nowrap"
                   >Mapping Duration</label
                 >
                 <Field
@@ -439,7 +442,7 @@
 
               <div class="form-group col-md-6">
                 <label
-                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
+                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6 text-nowrap"
                   >Data Logger Used</label
                 >
                 <Field

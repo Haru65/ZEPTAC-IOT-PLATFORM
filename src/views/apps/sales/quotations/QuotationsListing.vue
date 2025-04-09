@@ -26,7 +26,7 @@
         <!-- YEAR WISE DATA -->
 
         <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-semibold text-gray-400"
+          <span class="card-label fw-semibold text-gray-700"
             >Financial Year</span
           >
         </h3>
@@ -126,19 +126,14 @@
         <!-- img data -->
 
         <template v-slot:id="{ row: quotations }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ quotations.id }}
-          </span>
+          {{ quotations.id }}
         </template>
         <template v-slot:quotation_no="{ row: quotations }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ quotations.quotation_no }}
-          </span>
+          {{ quotations.quotation_no }}
         </template>
         <template v-slot:customer="{ row: quotations }">
           <span
             v-if="quotations.customer != null"
-            class="text-gray-600 text-hover-primary mb-1"
           >
             {{ quotations?.customer?.company_name || "" }}
           </span>
@@ -147,7 +142,6 @@
         <template v-slot:client="{ row: quotations }">
           <span
             v-if="quotations.client != null"
-            class="text-gray-600 text-hover-primary mb-1"
           >
             {{ quotations.client?.city || "" }}
             {{ quotations.client?.state || "" }}
@@ -192,47 +186,94 @@
         </template>
         <template v-slot:actions="{ row: quotations }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span
-              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Download Quotation"
-              @click="downloadQuotation(quotations.id)"
+          <div class="dropdown">
+            <a
+              href="#"
+              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              @click.prevent
             >
-              <KTIcon icon-name="file-down" icon-class="fs-2" />
-            </span>
+              <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+            </a>
 
-            <span
-              class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Clone Quotation"
-              @click="dupQuotation(quotations.id)"
+            <!-- Action dropdown menu -->
+            <ul
+              class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
             >
-              <KTIcon icon-name="copy" icon-class="fs-2" />
-            </span>
+              <!-- Download PDF -->
+              <li>
+                <span
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-success cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Download Quotation (PDF)"
+                  @click.prevent="downloadPdf(quotations.id)"
+                >
+                  <KTIcon
+                    icon-name="file-down"
+                    icon-class="fs-3 text-success"
+                  />
+                  <span class="text-gray-700">Download PDF</span>
+                </span>
+              </li>
 
-            <!--begin::Edit-->
-            <router-link :to="`/quotations/edit/${quotations.id}`">
-              <span
-                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
-                title="View Quotation"
-              >
-                <KTIcon icon-name="pencil" icon-class="fs-2" />
-              </span>
-            </router-link>
-            <!--end::Edit-->
+              <!-- Download Quotation -->
+              <!-- <li>
+                <span
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-success cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Download Quotation"
+                  @click.prevent="downloadQuotation(quotations.id)"
+                >
+                  <KTIcon
+                    icon-name="file-down"
+                    icon-class="fs-3 text-success"
+                  />
+                  <span class="text-gray-700">Download Quotation</span>
+                </span>
+              </li> -->
 
-            <span
-              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Delete Quotation"
-              @click="deleteItem(quotations.id, false)"
-            >
-              <KTIcon icon-name="trash" icon-class="fs-2" />
-            </span>
+              <!-- Clone Quotation -->
+              <li>
+                <span
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-success cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Clone Quotation"
+                  @click.prevent="dupQuotation(quotations.id)"
+                >
+                  <KTIcon icon-name="copy" icon-class="fs-3 text-success" />
+                  <span class="text-gray-700">Clone</span>
+                </span>
+              </li>
+
+              <!-- Edit / View Quotation -->
+              <li>
+                <router-link
+                  :to="`/quotations/edit/${quotations.id}`"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-info cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="View Quotation"
+                >
+                  <KTIcon icon-name="pencil" icon-class="fs-3 text-info" />
+                  <span class="text-gray-700">Edit</span>
+                </router-link>
+              </li>
+
+              <!-- Delete Quotation -->
+              <li>
+                <a
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-danger cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Delete Quotation"
+                  @click.prevent="deleteItem(quotations.id, false)"
+                >
+                  <KTIcon icon-name="trash" icon-class="fs-3 text-danger" />
+                  <span class="text-danger">Delete</span>
+                </a>
+              </li>
+            </ul>
           </div>
-          <!--end::Menu FLex-->
+          <!--end::Menu Flex-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -285,6 +326,7 @@ import {
   QuotationSearch,
   getQuotationInfo,
   getCompanyLogo,
+  DownloadQuotation,
 } from "@/stores/api";
 import arraySort from "array-sort";
 import { useAuthStore } from "@/stores/auth";
@@ -352,7 +394,7 @@ export default defineComponent({
         columnWidth: 75,
       },
       {
-        columnName: "Actions",
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,
@@ -1131,7 +1173,9 @@ export default defineComponent({
 
           QuotationInfo.value.date = res.result.date;
           QuotationInfo.value.duedate = res.result.duedate;
-          QuotationInfo.value.enquiry_no = res.result.enquiry_no ? res.result.enquiry_no : "NA" ;
+          QuotationInfo.value.enquiry_no = res.result.enquiry_no
+            ? res.result.enquiry_no
+            : "NA";
           QuotationInfo.value.status = res.result.status;
           QuotationInfo.value.scope_of_work = res.result.scope_of_work;
 
@@ -1251,6 +1295,91 @@ export default defineComponent({
       }
     };
 
+    //  Download the Pdf of Quotation
+    const downloadPdf = async (quotationID) => {
+      try {
+        // Show initial loading Swal with a generic progress message
+        Swal.fire({
+          title: "Downloading Quotation",
+          html: `<div class="swal-animation">
+        <p class="swal-text">Please wait...</p>
+        <div class="swal-progress">
+          <div class="swal-progress-bar"></div>
+        </div>
+      </div>`,
+          allowOutsideClick: false, // Prevent closing the Swal while downloading
+          didOpen: () => {
+            Swal.showLoading(); // Show loading animation
+          },
+        });
+
+        // Define the data to send in the request
+        const data = {
+          id: quotationID,
+        };
+
+        // Make the API call using the custom function
+        const response = await DownloadQuotation(data); // This will await the response from the server
+
+        if (response?.success == false) {
+          const errorMessage =
+            response?.message || "Export failed due to server error.";
+          showErrorAlert("Error", errorMessage); // Show specific error
+          console.error("Export Error:", errorMessage);
+          return; // Exit the function if no valid response
+        }
+
+        // Check if the response is successful (non-empty Blob data)
+        if (!response || response.size === 0) {
+          const errorMessage =
+            response?.message || "Download failed due to server error.";
+          showErrorAlert("Error", errorMessage); // Show specific error
+          console.error("Export Error:", errorMessage);
+          return;
+        }
+
+        // Update Swal message for PDF generation progress
+        Swal.update({
+          title: "Generating PDF",
+          html: `<div class="swal-animation">
+        <p class="swal-text">Please wait...</p>
+        <div class="swal-progress">
+          <div class="swal-progress-bar"></div>
+        </div>
+      </div>`,
+        });
+
+        // Trigger the download if the response is valid
+        const fileType = "pdf";
+        const fileName = `quotation_${moment().format(
+          "YYYYMMDD_HHmmss"
+        )}.${fileType}`;
+
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(response); // Use the Blob response here
+        link.download = fileName; // Set the filename for download
+        link.click(); // Trigger the download
+
+        // Show success message after the download is triggered
+        Swal.fire({
+          title: "Download Complete",
+          text: "Quotation downloaded successfully",
+          icon: "success",
+          timer: 2000, // Show success message for 2 seconds
+          timerProgressBar: true,
+          allowOutsideClick: true,
+        });
+      } catch (error) {
+        // Handle errors if the download fails
+        console.error("API call error:", error);
+        alert("An error occurred while downloading.");
+        showErrorAlert("Error", "An error occurred while downloading."); // Show specific error
+      } finally {
+        // Ensure the loading animation is stopped if still running
+        // Swal.close();
+      }
+    };
+
     return {
       tableData,
       tableHeader,
@@ -1275,6 +1404,7 @@ export default defineComponent({
       filteredTableHeader,
       identifier,
       downloadQuotation,
+      downloadPdf,
 
       selectedYearCache,
       financialYears,

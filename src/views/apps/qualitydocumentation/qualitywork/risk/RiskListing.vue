@@ -25,7 +25,7 @@
         <!-- YEAR WISE DATA -->
 
         <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-semibold text-gray-400"
+          <span class="card-label fw-semibold text-gray-700"
             >Financial Year</span
           >
         </h3>
@@ -190,31 +190,49 @@
         </template>
         <template v-slot:actions="{ row: risk }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row my-3">
-            <!--begin::Edit-->
-            <router-link :to="`/risks/edit/${risk.id}`">
-              <span
-                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
-                title="View Risk"
-              >
-                <KTIcon icon-name="pencil" icon-class="fs-2" />
-              </span>
-            </router-link>
-            <!--end::Edit-->
-
-            <!--begin::Delete-->
-            <span
-              @click="deleteItem(risk.id, false)"
-              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Delete Risk"
+          <div class="dropdown">
+            <a
+              href="#"
+              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              @click.prevent
             >
-              <KTIcon icon-name="trash" icon-class="fs-2" />
-            </span>
-            <!--end::Delete-->
+              <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+            </a>
+
+            <!-- Action dropdown menu -->
+            <ul
+              class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
+            >
+              <!-- Edit Risk -->
+              <li>
+                <router-link
+                  :to="`/risks/edit/${risk.id}`"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-info cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="View Risk"
+                >
+                  <KTIcon icon-name="pencil" icon-class="fs-3 text-info" />
+                  <span class="text-gray-700">Edit</span>
+                </router-link>
+              </li>
+
+              <!-- Delete Risk -->
+              <li>
+                <a
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-danger cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Delete Risk"
+                  @click.prevent="deleteItem(risk.id, false)"
+                >
+                  <KTIcon icon-name="trash" icon-class="fs-3 text-danger" />
+                  <span class="text-danger">Delete</span>
+                </a>
+              </li>
+            </ul>
           </div>
-          <!--end::Menu FLex-->
+          <!--end::Menu Flex-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -405,24 +423,28 @@ export default defineComponent({
           }`
         );
 
-        if(response.success){
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            risk_identification,
-            risk_evaluation,
-            risk_counter,
-            ...rest
-          }) => ({
-            id: id,
-            risk_identification: JSON.parse(risk_identification),
-            risk_evaluation: JSON.parse(risk_evaluation),
-            risk_counter: JSON.parse(risk_counter),
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              risk_identification,
+              risk_evaluation,
+              risk_counter,
+              ...rest
+            }) => ({
+              id: id,
+              risk_identification: JSON.parse(risk_identification),
+              risk_evaluation: JSON.parse(risk_evaluation),
+              risk_counter: JSON.parse(risk_counter),
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
         }
       } catch (error) {
         console.error(error);
@@ -450,24 +472,28 @@ export default defineComponent({
           }`
         );
 
-        if(response.success){
-        more.value = response.result.next_page_url != null ? true : false;
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            risk_identification,
-            risk_evaluation,
-            risk_counter,
-            ...rest
-          }) => ({
-            id: id,
-            risk_identification: JSON.parse(risk_identification),
-            risk_evaluation: JSON.parse(risk_evaluation),
-            risk_counter: JSON.parse(risk_counter),
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          more.value = response.result.next_page_url != null ? true : false;
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              risk_identification,
+              risk_evaluation,
+              risk_counter,
+              ...rest
+            }) => ({
+              id: id,
+              risk_identification: JSON.parse(risk_identification),
+              risk_evaluation: JSON.parse(risk_evaluation),
+              risk_counter: JSON.parse(risk_counter),
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
         }
       } catch (error) {
         console.error(error);
@@ -511,26 +537,30 @@ export default defineComponent({
               : financialYears.value[0]
           }`
         );
-        
-        if(response.success){
-        tableData.value = response.result.data.map(
-          ({
-            id,
-            risk_identification,
-            risk_evaluation,
-            risk_counter,
-            ...rest
-          }) => ({
-            id: id,
-            risk_identification: JSON.parse(risk_identification),
-            risk_evaluation: JSON.parse(risk_evaluation),
-            risk_counter: JSON.parse(risk_counter),
-            ...rest,
-          })
-        );
 
-        more.value = response.result.next_page_url != null ? true : false;
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+        if (response.success) {
+          tableData.value = response.result.data.map(
+            ({
+              id,
+              risk_identification,
+              risk_evaluation,
+              risk_counter,
+              ...rest
+            }) => ({
+              id: id,
+              risk_identification: JSON.parse(risk_identification),
+              risk_evaluation: JSON.parse(risk_evaluation),
+              risk_counter: JSON.parse(risk_counter),
+              ...rest,
+            })
+          );
+
+          more.value = response.result.next_page_url != null ? true : false;
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
         }
       } catch (error) {
         console.error(error);

@@ -101,13 +101,7 @@
       >
         <!-- img data -->
         <template v-slot:profile="{ row: employee }">
-          <div class="d-flex justify-content-start align-items-center">
-            <span style="margin-left: 5.5%">
-              <span class="text-gray-600 text-hover-primary mb-1">
-                {{ employee.first_name + " " + employee.last_name }}
-              </span>
-            </span>
-          </div>
+          {{ employee.first_name + " " + employee.last_name }}
         </template>
         <template v-slot:mobile="{ row: employee }">
           {{ employee.mobile }}
@@ -190,31 +184,49 @@
 
         <template v-slot:actions="{ row: employee }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row my-3">
-            <!--begin::Edit-->
-            <router-link :to="`/employee/edit/${employee.id}`">
-              <span
-                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
-                title="View Employee"
-              >
-                <KTIcon icon-name="pencil" icon-class="fs-2" />
-              </span>
-            </router-link>
-            <!--end::Edit-->
-
-            <!--begin::Delete-->
-            <span
-              @click="deleteItem(employee.id, false)"
-              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Delete Employee"
+          <div class="dropdown">
+            <a
+              href="#"
+              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              @click.prevent
             >
-              <KTIcon icon-name="trash" icon-class="fs-2" />
-            </span>
-            <!--end::Delete-->
+              <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+            </a>
+
+            <!-- Action dropdown menu -->
+            <ul
+              class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
+            >
+              <!-- Edit / View Employee -->
+              <li>
+                <router-link
+                  :to="`/employee/edit/${employee.id}`"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-info cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="View Employee"
+                >
+                  <KTIcon icon-name="pencil" icon-class="fs-3 text-info" />
+                  <span class="text-gray-700">Edit</span>
+                </router-link>
+              </li>
+
+              <!-- Delete Employee -->
+              <li>
+                <a
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-danger cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Delete Employee"
+                  @click.prevent="deleteItem(employee.id, false)"
+                >
+                  <KTIcon icon-name="trash" icon-class="fs-3 text-danger" />
+                  <span class="text-danger">Delete</span>
+                </a>
+              </li>
+            </ul>
           </div>
-          <!--end::Menu FLex-->
+          <!--end::Menu Flex-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -336,7 +348,7 @@ export default defineComponent({
         columnWidth: 75,
       },
       {
-        columnName: "Actions",
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,

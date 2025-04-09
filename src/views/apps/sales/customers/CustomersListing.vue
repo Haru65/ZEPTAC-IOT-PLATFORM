@@ -123,7 +123,7 @@
           v-slot:grant_access="{ row: customer }"
           v-if="identifier == 'Admin' || identifier == 'Company-Admin'"
         >
-        <span
+          <span
             v-if="customer.grant_access == true"
             class="badge py-3 px-4 fs-7 badge-light-success"
             >Yes</span
@@ -146,92 +146,113 @@
         </template>
         <template v-slot:actions="{ row: customer }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row my-3">
-            <div class="dropdown">
-              <button
-                type="button"
-                class="btn btn-sm btn-secondary btn-icon-gray-900 btn-text-gray-900"
-                id="dropdownMenuButton1"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Action
-              </button>
-              <ul
-                class="dropdown-menu dropdown-menu-start"
-                aria-labelledby="dropdownMenuButton1"
-              >
-                <li>
-                  <router-link
-                    class="dropdown-item btn"
-                    data-toggle="tooltip"
-                    title="Provide Login Access"
-                    :to="`/customers/login/${customer.id}`"
-                  >
-                    <KTIcon icon-name="user-tick" icon-class="fs-2" />
-                    Login Access</router-link
-                  >
-                </li>
-                <li>
-                  <span
-                    class="dropdown-item btn"
-                    data-toggle="tooltip"
-                    title="Copy Service Request Link For Calibration"
-                    @click="generateLink(customer.company_id, customer.id)"
-                  >
-                    <KTIcon icon-name="paper-clip" icon-class="fs-2" />
-                    Calibration SRF
-                  </span>
-                </li>
-                <li>
-                  <span
-                    class="dropdown-item btn"
-                    data-toggle="tooltip"
-                    title="Copy Service Request Link For Cleanroom"
-                    @click="copySrfUrl(customer.company_id, customer.id)"
-                  >
-                    <KTIcon icon-name="paper-clip" icon-class="fs-2" />
-                    Cleanroom SRF
-                  </span>
-                </li>
-                <li>
-                  <span
-                    class="dropdown-item btn"
-                    data-toggle="tooltip"
-                    title="Copy Feedback Link"
-                    @click="copyFeedbackUrl(customer.company_id, customer.id)"
-                  >
-                    <KTIcon icon-name="paper-clip" icon-class="fs-2" />
-                    Feedback
-                  </span>
-                </li>
-              </ul>
-            </div>
-
-            <!--begin::Edit-->
-            <router-link :to="`/customers/edit/${customer.id}`">
-              <span
-                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
-                title="View Customer"
-              >
-                <KTIcon icon-name="pencil" icon-class="fs-2" />
-              </span>
-            </router-link>
-            <!--end::Edit-->
-
-            <!--begin::Delete-->
-            <span
-              @click="deleteItem(customer.id, false)"
-              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Delete Customer"
+          <div class="dropdown">
+            <a
+              href="#"
+              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              @click.prevent
             >
-              <KTIcon icon-name="trash" icon-class="fs-2" />
-            </span>
-            <!--end::Delete-->
+              <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+            </a>
+
+            <!-- Action dropdown menu -->
+            <ul
+              class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
+            >
+              <!-- Login Access -->
+              <li>
+                <router-link
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-success cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Provide Login Access"
+                  :to="`/customers/login/${customer.id}`"
+                >
+                  <KTIcon
+                    icon-name="user-tick"
+                    icon-class="fs-3 text-success"
+                  />
+                  <span class="text-gray-700">Login Access</span>
+                </router-link>
+              </li>
+
+              <!-- Calibration SRF Link -->
+              <li>
+                <span
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Copy Service Request Link For Calibration"
+                  @click="generateLink(customer.company_id, customer.id)"
+                >
+                  <KTIcon
+                    icon-name="paper-clip"
+                    icon-class="fs-3 text-primary"
+                  />
+                  <span class="text-gray-700">Calibration SRF</span>
+                </span>
+              </li>
+
+              <!-- Cleanroom SRF Link -->
+              <li>
+                <span
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Copy Service Request Link For Cleanroom"
+                  @click="copySrfUrl(customer.company_id, customer.id)"
+                >
+                  <KTIcon
+                    icon-name="paper-clip"
+                    icon-class="fs-3 text-primary"
+                  />
+                  <span class="text-gray-700">Cleanroom SRF</span>
+                </span>
+              </li>
+
+              <!-- Feedback Link -->
+              <li>
+                <span
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-warning cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Copy Feedback Link"
+                  @click="copyFeedbackUrl(customer.company_id, customer.id)"
+                >
+                  <KTIcon
+                    icon-name="paper-clip"
+                    icon-class="fs-3 text-warning"
+                  />
+                  <span class="text-gray-700">Feedback</span>
+                </span>
+              </li>
+
+              <!-- Edit Customer -->
+              <li>
+                <router-link
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-info cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="View Customer"
+                  :to="`/customers/login/${customer.id}`"
+                >
+                  <KTIcon icon-name="pencil" icon-class="fs-3 text-info" />
+                  <span class="text-gray-700">Edit</span>
+                </router-link>
+              </li>
+
+              <!-- Delete Customer -->
+              <li>
+                <span
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-danger cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Delete Customer"
+                  @click="deleteItem(customer.id, false)"
+                >
+                  <KTIcon icon-name="trash" icon-class="fs-3 text-danger" />
+                  <span class="text-danger">Delete</span>
+                </span>
+              </li>
+            </ul>
           </div>
-          <!--end::Menu FLex-->
+          <!--end::Menu Flex-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -340,7 +361,7 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
-        columnName: "Actions",
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 100,

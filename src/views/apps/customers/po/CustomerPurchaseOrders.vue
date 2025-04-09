@@ -25,7 +25,7 @@
         <!-- YEAR WISE DATA -->
 
         <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-semibold text-gray-400"
+          <span class="card-label fw-semibold text-gray-700"
             >Financial Year</span
           >
         </h3>
@@ -119,9 +119,7 @@
         <!-- img data -->
 
         <template v-slot:id="{ row: po }">
-          <span class="text-gray-600 text-hover-primary mb-1">
-            {{ po.id }}
-          </span>
+          {{ po.id }}
         </template>
         <template v-slot:po_number="{ row: po }">
           {{ po.po_number }}
@@ -130,10 +128,7 @@
           {{ po.quotation_no }}
         </template>
         <template v-slot:customer="{ row: po }">
-          <span
-            v-if="po.customer != null"
-            class="text-gray-600 text-hover-primary mb-1"
-          >
+          <span v-if="po.customer != null">
             {{ po?.customer?.company_name || "" }}
           </span>
           <span v-else> </span>
@@ -193,43 +188,66 @@
         </template>
         <template v-slot:actions="{ row: po }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-
-            <router-link v-if="po.approval_status == '1'" :to="`/customer/orders/edit/${po.id}`">
-              <span
-                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
-                title="Edit Purchase Order"
-              >
-                <KTIcon icon-name="pencil" icon-class="fs-2" />
-              </span>
-            </router-link>
-
-            <!--begin::Download-->
+          <div class="dropdown">
             <a
-              target="blank"
-              v-bind:href="`https://api.zeptac.com/storage/company/${po.company_id}/purchase_orders/${po.po_file}`"
-              class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Download Purchase Order"
+              href="#"
+              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              @click.prevent
             >
-              <KTIcon icon-name="file-down" icon-class="fs-2" />
+              <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
             </a>
-            <!--end::Download-->
 
-            <!--begin::Edit-->
-            <router-link :to="`/purchase-order/edit/${po.id}`">
-              <span
-                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
-                title="View Purchase Order"
-              >
-                <KTIcon icon-name="eye" icon-class="fs-2" />
-              </span>
-            </router-link>
-            <!--end::Edit-->
+            <!-- Action dropdown menu -->
+            <ul
+              class="dropdown-menu dropdown-menu-end min-w-200px py-2 shadow-sm"
+            >
+              <!-- Edit (only if approval_status is '1') -->
+              <li v-if="po.approval_status == '1'">
+                <router-link
+                  :to="`/customer/orders/edit/${po.id}`"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-info cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Edit Purchase Order"
+                >
+                  <KTIcon icon-name="pencil" icon-class="fs-3 text-info" />
+                  <span class="text-gray-700">Edit PO</span>
+                </router-link>
+              </li>
+
+              <!-- Download PO -->
+              <li>
+                <a
+                  :href="`https://api.zeptac.com/storage/company/${po.company_id}/purchase_orders/${po.po_file}`"
+                  target="_blank"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Download Purchase Order"
+                >
+                  <KTIcon
+                    icon-name="file-down"
+                    icon-class="fs-3 text-primary"
+                  />
+                  <span class="text-gray-700">Download</span>
+                </a>
+              </li>
+
+              <!-- View PO -->
+              <li>
+                <router-link
+                  :to="`/purchase-order/edit/${po.id}`"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="View Purchase Order"
+                >
+                  <KTIcon icon-name="eye" icon-class="fs-3 text-primary" />
+                  <span class="text-gray-700">View</span>
+                </router-link>
+              </li>
+            </ul>
           </div>
-          <!--end::Menu FLex-->
+          <!--end::Menu Flex-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -346,7 +364,7 @@ export default defineComponent({
         columnWidth: 75,
       },
       {
-        columnName: "Actions",
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,

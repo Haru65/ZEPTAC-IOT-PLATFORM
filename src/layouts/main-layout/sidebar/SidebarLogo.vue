@@ -18,11 +18,12 @@
         :src="getAssetPath('media/logos/zeptac_white_horizontal.png')"
         class="h-25px app-sidebar-logo-default"
       />
-      <img
+      <!-- If someone want squared logo then add a img with default logo -->
+      <!-- <img
         alt="Logo"
         :src="getAssetPath('media/logos/zeptac_white_horizontal.png')"
         class="h-20px app-sidebar-logo-minimize"
-      />
+      /> -->
     </router-link>
     <!--end::Logo image-->
     <!--begin::Sidebar toggle-->
@@ -71,6 +72,7 @@ onMounted(() => {
     toggleObj.on("kt.toggle.change", function () {
       // Set animation state
       props.sidebarRef?.classList.add("animating");
+      console.log("Im here with sidebarToggleDisplay ", sidebarToggleDisplay);
 
       // Wait till animation finishes
       setTimeout(function () {

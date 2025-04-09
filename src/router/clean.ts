@@ -96,8 +96,8 @@ const routes: Array<RouteRecordRaw> = [
         name: "company-tax",
         component: () => import("@/views/apps/taxes/CompanyTaxListing.vue"),
         meta: {
-          pageTitle: "Tax List",
-          breadcrumbs: ["Tax List"],
+          pageTitle: "Taxes",
+          breadcrumbs: ["Taxes"],
         },
       },
       {
@@ -141,8 +141,8 @@ const routes: Array<RouteRecordRaw> = [
         name: "iso-add",
         component: () => import("@/views/apps/admin/isorules/ISOClausesAdd.vue"),
         meta: {
-          pageTitle: "ISO Clauses Add",
-          breadcrumbs: ["ISO Clauses Add"],
+          pageTitle: "Add ISO Clauses",
+          breadcrumbs: ["Add ISO Clauses"],
         },
       },
       {
@@ -165,8 +165,8 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/apps/admin/isorules/ISOClausesEdit.vue"),
         meta: {
-          pageTitle: "ISO Clauses Edit",
-          breadcrumbs: ["ISO Clauses Edit"],
+          pageTitle: "Edit ISO Clauses",
+          breadcrumbs: ["Edit ISO Clauses"],
         },
       },
 
@@ -176,8 +176,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/admin/companies/CompanyListing.vue"),
         meta: {
-          pageTitle: "Company List",
-          breadcrumbs: ["Company List"],
+          pageTitle: "Company",
+          breadcrumbs: ["Company"],
         },
       },
       {
@@ -185,8 +185,8 @@ const routes: Array<RouteRecordRaw> = [
         name: "company-add",
         component: () => import("@/views/apps/admin/companies/CompanyAdd.vue"),
         meta: {
-          pageTitle: "Company Add",
-          breadcrumbs: ["Company Add"],
+          pageTitle: "Add Company",
+          breadcrumbs: ["Add Company"],
         },
       },
       {
@@ -209,8 +209,8 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/apps/admin/companies/CompanyEdit.vue"),
         meta: {
-          pageTitle: "Company Edit",
-          breadcrumbs: ["Company Edit"],
+          pageTitle: "Edit Company",
+          breadcrumbs: ["Edit Company"],
         },
       },
       {
@@ -258,8 +258,8 @@ const routes: Array<RouteRecordRaw> = [
         name: "users-list",
         component: () => import("@/views/apps/admin/users/UserListing.vue"),
         meta: {
-          pageTitle: "User List",
-          breadcrumbs: ["User List"],
+          pageTitle: "Users",
+          breadcrumbs: ["Users"],
         },
       },
       {
@@ -267,8 +267,8 @@ const routes: Array<RouteRecordRaw> = [
         name: "users-add",
         component: () => import("@/views/apps/admin/users/UserAdd.vue"),
         meta: {
-          pageTitle: "User Add",
-          breadcrumbs: ["User Add"],
+          pageTitle: "Add User",
+          breadcrumbs: ["Add User"],
         },
       },
       {
@@ -291,8 +291,8 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/apps/admin/users/UserEdit.vue"),
         meta: {
-          pageTitle: "User Edit",
-          breadcrumbs: ["User Edit"],
+          pageTitle: "Edit User",
+          breadcrumbs: ["Edit User"],
         },
       },
       {
@@ -301,8 +301,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/hr/employees/EmployeeListing.vue"),
         meta: {
-          pageTitle: "Employee List",
-          breadcrumbs: ["Employee List"],
+          pageTitle: "Employees",
+          breadcrumbs: ["Employees"],
         },
       },
       {
@@ -311,8 +311,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/hr/employees/EmployeeAdd.vue"),
         meta: {
-          pageTitle: "Employee Add",
-          breadcrumbs: ["Employee Add"],
+          pageTitle: "Add Employee",
+          breadcrumbs: ["Add Employee"],
         },
       },
       {
@@ -336,8 +336,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/hr/employees/EmployeeEdit.vue"),
         meta: {
-          pageTitle: "Employee Edit",
-          breadcrumbs: ["Employee Edit"],
+          pageTitle: "Edit Employee",
+          breadcrumbs: ["Edit Employee"],
         },
       },
       {
@@ -345,8 +345,8 @@ const routes: Array<RouteRecordRaw> = [
         name: "temp-leads-list",
         component: () => import("@/views/apps/sales/existsLeads/ExistsLeadsListing.vue"),
         meta: {
-          pageTitle: "Exists List",
-          breadcrumbs: ["Exists List"],
+          pageTitle: "Exists Leads",
+          breadcrumbs: ["Exists Leads"],
         },
       },
 
@@ -371,8 +371,8 @@ const routes: Array<RouteRecordRaw> = [
           }
         },
         meta: {
-          pageTitle: "Leads Edit",
-          breadcrumbs: ["Leads Edit"],
+          pageTitle: "View Lead",
+          breadcrumbs: ["View Lead"],
         },
       },
 
@@ -381,8 +381,8 @@ const routes: Array<RouteRecordRaw> = [
         name: "leads-list",
         component: () => import("@/views/apps/sales/leads/LeadsListing.vue"),
         meta: {
-          pageTitle: "Leads List",
-          breadcrumbs: ["Leads List"],
+          pageTitle: "Leads",
+          breadcrumbs: ["Leads"],
         },
       },
       {
@@ -390,8 +390,8 @@ const routes: Array<RouteRecordRaw> = [
         name: "leads-add",
         component: () => import("@/views/apps/sales/leads/LeadsAdd.vue"),
         meta: {
-          pageTitle: "Leads Add",
-          breadcrumbs: ["Leads Add"],
+          pageTitle: "Add Lead",
+          breadcrumbs: ["Add Lead"],
         },
       },
       {
@@ -415,8 +415,8 @@ const routes: Array<RouteRecordRaw> = [
           }
         },
         meta: {
-          pageTitle: "Leads Edit",
-          breadcrumbs: ["Leads Edit"],
+          pageTitle: "Edit Lead",
+          breadcrumbs: ["Edit Lead"],
         },
       },
 
@@ -427,8 +427,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/sales/customers/CustomersListing.vue"),
         meta: {
-          pageTitle: "Customers List",
-          breadcrumbs: ["Customers List"],
+          pageTitle: "Customers",
+          breadcrumbs: ["Customers"],
         },
       },
       {
@@ -437,8 +437,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/sales/customers/CustomersAdd.vue"),
         meta: {
-          pageTitle: "Customers Add",
-          breadcrumbs: ["Customers Add"],
+          pageTitle: "Add Customer",
+          breadcrumbs: ["Add Customer"],
         },
       },
       {
@@ -463,8 +463,8 @@ const routes: Array<RouteRecordRaw> = [
           }
         },
         meta: {
-          pageTitle: "Customers Edit",
-          breadcrumbs: ["Customers Edit"],
+          pageTitle: "Edit Customer",
+          breadcrumbs: ["Edit Customer"],
         },
       },
       {
@@ -501,8 +501,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/sales/clients/ClientsListing.vue"),
         meta: {
-          pageTitle: "Clients List",
-          breadcrumbs: ["Clients List"],
+          pageTitle: "Clients",
+          breadcrumbs: ["Clients"],
         },
       },
       {
@@ -511,8 +511,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/sales/clients/ClientsAdd.vue"),
         meta: {
-          pageTitle: "Clients Add",
-          breadcrumbs: ["Clients Add"],
+          pageTitle: "Add Client",
+          breadcrumbs: ["Add Client"],
         },
       },
       {
@@ -537,8 +537,8 @@ const routes: Array<RouteRecordRaw> = [
           }
         },
         meta: {
-          pageTitle: "Clients Edit",
-          breadcrumbs: ["Clients Edit"],
+          pageTitle: "Edit Client",
+          breadcrumbs: ["Edit Client"],
         },
       },
 
@@ -559,8 +559,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/sales/pricelist/PriceListAdd.vue"),
         meta: {
-          pageTitle: "Price List Add",
-          breadcrumbs: ["Price List Add"],
+          pageTitle: "Add Price List",
+          breadcrumbs: ["Add Price List"],
         },
       },
       {
@@ -585,8 +585,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/sales/pricelist/PriceListEdit.vue"),
         meta: {
-          pageTitle: "Price List Edit",
-          breadcrumbs: ["Price List Edit"],
+          pageTitle: "Edit Price List",
+          breadcrumbs: ["Edit Price List"],
         },
       },
       {
@@ -595,8 +595,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/sales/quotations/QuotationsListing.vue"),
         meta: {
-          pageTitle: "Quotation List",
-          breadcrumbs: ["Quotation List"],
+          pageTitle: "Quotations",
+          breadcrumbs: ["Quotations"],
         },
       },
       {
@@ -604,8 +604,8 @@ const routes: Array<RouteRecordRaw> = [
         name: "quotation-wrapper",
         component: () => import("@/views/apps/sales/quotations/QuotationWrapper.vue"),
         meta: {
-          pageTitle: "Quotation Add",
-          breadcrumbs: ["Quotation Add"],
+          pageTitle: "Add Quotation",
+          breadcrumbs: ["Add Quotation"],
         },
       },
       {
@@ -629,8 +629,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/sales/quotations/QuotationEditWrapper.vue"),
         meta: {
-          pageTitle: "Quotation Edit",
-          breadcrumbs: ["Quotation Edit"],
+          pageTitle: "Edit Quotation",
+          breadcrumbs: ["Edit Quotation"],
         },
       },
       {
@@ -639,8 +639,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/sales/invoices/InvoicesListing.vue"),
         meta: {
-          pageTitle: "Invoices List",
-          breadcrumbs: ["Invoices List"],
+          pageTitle: "Invoices",
+          breadcrumbs: ["Invoices"],
         },
       },
       {
@@ -648,8 +648,8 @@ const routes: Array<RouteRecordRaw> = [
         name: "invoices-wrapper",
         component: () => import("@/views/apps/sales/invoices/InvoiceWrapper.vue"),
         meta: {
-          pageTitle: "Invoices Add",
-          breadcrumbs: ["Invoices Add"],
+          pageTitle: "Add Invoice",
+          breadcrumbs: ["Add Invoice"],
         },
       },
       {
@@ -672,8 +672,8 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/apps/sales/invoices/InvoiceEditWrapper.vue"),
         meta: {
-          pageTitle: "Invoice Edit",
-          breadcrumbs: ["Invoice Edit"],
+          pageTitle: "Edit Invoice",
+          breadcrumbs: ["Edit Invoice"],
         },
       },
 
@@ -684,8 +684,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/srf/ServiceRequestListing.vue"),
         meta: {
-          pageTitle: "Service Requests List",
-          breadcrumbs: ["Service Requests List"],
+          pageTitle: "Service Requests",
+          breadcrumbs: ["Service Requests"],
         },
       },
 
@@ -697,8 +697,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/instruments/InstrumentsListing.vue"),
         meta: {
-          pageTitle: "Instrument List",
-          breadcrumbs: ["Instrument List"],
+          pageTitle: "Instruments",
+          breadcrumbs: ["Instruments"],
         },
       },
       {
@@ -707,8 +707,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/instruments/InstrumentsAdd.vue"),
         meta: {
-          pageTitle: "Instrument Add",
-          breadcrumbs: ["Instrument Add"],
+          pageTitle: "Add Instrument",
+          breadcrumbs: ["Add Instrument"],
         },
       },
       {
@@ -733,8 +733,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/instruments/InstrumentsEdit.vue"),
         meta: {
-          pageTitle: "Instrument Edit",
-          breadcrumbs: ["Instrument Edit"],
+          pageTitle: "Edit Instrument",
+          breadcrumbs: ["Edit Instrument"],
         },
       },
 
@@ -749,8 +749,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/services/rgp/RGatePassListing.vue"),
         meta: {
-          pageTitle: "Returnable-Gate-Pass List",
-          breadcrumbs: ["Returnable-Gate-Pass List"],
+          pageTitle: "Returnable-Gate-Pass",
+          breadcrumbs: ["Returnable-Gate-Pass"],
         },
       },
       {
@@ -759,8 +759,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/services/rgp/RGatePassAdd.vue"),
         meta: {
-          pageTitle: "Returnable-Gate-Pass Add",
-          breadcrumbs: ["Returnable-Gate-Pass Add"],
+          pageTitle: "Add Returnable-Gate-Pass",
+          breadcrumbs: ["Add Returnable-Gate-Pass"],
         },
       },
 
@@ -771,8 +771,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/services/dailyworksheet/DWorksheetListing.vue"),
         meta: {
-          pageTitle: "Daily Worksheet List",
-          breadcrumbs: ["Daily Worksheet List"],
+          pageTitle: "Daily Worksheets",
+          breadcrumbs: ["Daily Worksheets"],
         },
       },
       {
@@ -781,8 +781,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/services/dailyworksheet/DWorksheetAdd.vue"),
         meta: {
-          pageTitle: "Daily Worksheet Add",
-          breadcrumbs: ["Daily Worksheet Add"],
+          pageTitle: "Add Daily Worksheet",
+          breadcrumbs: ["Add Daily Worksheet"],
         },
       },
       {
@@ -807,8 +807,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/services/dailyworksheet/DWorksheetEdit.vue"),
         meta: {
-          pageTitle: "Daily Worksheet Edit",
-          breadcrumbs: ["Daily Worksheet Edit"],
+          pageTitle: "Edit Daily Worksheet",
+          breadcrumbs: ["Edit Daily Worksheet"],
         },
       },
 
@@ -819,8 +819,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/services/expense/ExpenseSheetListing.vue"),
         meta: {
-          pageTitle: "Expense Sheet List",
-          breadcrumbs: ["Expense Sheet List"],
+          pageTitle: "Expense Sheets",
+          breadcrumbs: ["Expense Sheets"],
         },
       },
       {
@@ -829,8 +829,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/services/expense/ExpenseSheetAdd.vue"),
         meta: {
-          pageTitle: "Expense Sheet Add",
-          breadcrumbs: ["Expense Sheet Add"],
+          pageTitle: "Add Expense Sheet",
+          breadcrumbs: ["Add Expense Sheet"],
         },
       },
       {
@@ -855,8 +855,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/services/expense/ExpenseSheetEdit.vue"),
         meta: {
-          pageTitle: "Expense Sheet Edit",
-          breadcrumbs: ["Expense Sheet Edit"],
+          pageTitle: "Edit Expense Sheet",
+          breadcrumbs: ["Edit Expense Sheet"],
         },
       },
 
@@ -867,8 +867,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/validationreport/ValidationReportListing.vue"),
         meta: {
-          pageTitle: "Non-NABL Report List",
-          breadcrumbs: ["Non-NABL Report List"],
+          pageTitle: "Non-NABL Report",
+          breadcrumbs: ["Non-NABL Report"],
         },
       },
       {
@@ -877,8 +877,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/validationreport/ValidationReportAdd.vue"),
         meta: {
-          pageTitle: "Non-NABL Report Add",
-          breadcrumbs: ["Non-NABL Report Add"],
+          pageTitle: "Add Non-NABL Report",
+          breadcrumbs: ["Non-NABL Report"],
         },
       },
       {
@@ -914,8 +914,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/nablreport/LAF/LaminarAirFlowListing.vue"),
         meta: {
-          pageTitle: "Laminar Air Flow Report List",
-          breadcrumbs: ["Laminar Air Flow Report List"],
+          pageTitle: "Laminar Air Flow",
+          breadcrumbs: ["Laminar Air Flow"],
         },
       },
       {
@@ -924,8 +924,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/nablreport/LAF/LaminarAirFlowAdd.vue"),
         meta: {
-          pageTitle: "Laminar Air Flow Add",
-          breadcrumbs: ["Laminar Air Flow Add"],
+          pageTitle: "Add Laminar Air Flow",
+          breadcrumbs: ["Add Laminar Air Flow"],
         },
       },
       {
@@ -944,8 +944,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/nablreport/LAF/LAFComponents/LAFAdd.vue"),
         meta: {
-          pageTitle: "Laminar Air Flow Report Add",
-          breadcrumbs: ["Laminar Air Flow Report Add"],
+          pageTitle: "Add Laminar Air Flow Report",
+          breadcrumbs: ["Add Laminar Air Flow Report"],
         },
       },
       {
@@ -954,8 +954,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/nablreport/LAF/LAFComponents/LAFEdit.vue"),
         meta: {
-          pageTitle: "Laminar Air Flow Report Edit",
-          breadcrumbs: ["Laminar Air Flow Report Edit"],
+          pageTitle: "Edit Laminar Air Flow Report",
+          breadcrumbs: ["Edit Laminar Air Flow Report"],
         },
       },
 
@@ -967,8 +967,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/nablreport/BSC/BioSafetyCabinetListing.vue"),
         meta: {
-          pageTitle: "BioSafety Cabinet Report List",
-          breadcrumbs: ["BioSafety Cabinet Report List"],
+          pageTitle: "BioSafety Cabinet",
+          breadcrumbs: ["BioSafety Cabinet"],
         },
       },
       {
@@ -977,8 +977,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/nablreport/BSC/BioSafetyCabinetAdd.vue"),
         meta: {
-          pageTitle: "BioSafety Cabinet Add",
-          breadcrumbs: ["BioSafety Cabinet Add"],
+          pageTitle: "Add BioSafety Cabinet",
+          breadcrumbs: ["Add BioSafety Cabinet"],
         },
       },
       {
@@ -997,8 +997,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/nablreport/BSC/BSCComponents/BSCAdd.vue"),
         meta: {
-          pageTitle: "BioSafety Cabinet Report Add",
-          breadcrumbs: ["BioSafety Cabinet Report Add"],
+          pageTitle: "Add BioSafety Cabinet Report",
+          breadcrumbs: ["Add BioSafety Cabinet Report"],
         },
       },
       {
@@ -1007,8 +1007,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/nablreport/BSC/BSCComponents/BSCEdit.vue"),
         meta: {
-          pageTitle: "BioSafety Cabinet Report Edit",
-          breadcrumbs: ["BioSafety Cabinet Report Edit"],
+          pageTitle: "Edit BioSafety Cabinet Report",
+          breadcrumbs: ["Edit BioSafety Cabinet Report"],
         },
       },
 
@@ -1020,8 +1020,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/externalaudit/validationprocedure/ValProcedureListing.vue"),
         meta: {
-          pageTitle: "Validation Procedure List",
-          breadcrumbs: ["Validation Procedure List"],
+          pageTitle: "Validation Procedure",
+          breadcrumbs: ["Validation Procedure"],
         },
       },
       {
@@ -1030,8 +1030,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/externalaudit/validationprocedure/ValProcedureAdd.vue"),
         meta: {
-          pageTitle: "Validation Procedure Add",
-          breadcrumbs: ["Validation Procedure Add"],
+          pageTitle: "Add Validation Procedure",
+          breadcrumbs: ["Add Validation Procedure"],
         },
       },
       {
@@ -1055,8 +1055,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/externalaudit/validationprocedure/ValProcedureEdit.vue"),
         meta: {
-          pageTitle: "Validation Procedure Edit",
-          breadcrumbs: ["Validation Procedure Edit"],
+          pageTitle: "Edit Validation Procedure",
+          breadcrumbs: ["Edit Validation Procedure"],
         },
       },
 
@@ -1067,8 +1067,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/externalaudit/qualityprocedure/QualityProcedureListing.vue"),
         meta: {
-          pageTitle: "Quality Procedure List",
-          breadcrumbs: ["Quality Procedure List"],
+          pageTitle: "Quality Procedure",
+          breadcrumbs: ["Quality Procedure"],
         },
       },
       {
@@ -1077,8 +1077,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/externalaudit/qualityprocedure/QualityProcedureAdd.vue"),
         meta: {
-          pageTitle: "Quality Procedure Add",
-          breadcrumbs: ["Quality Procedure Add"],
+          pageTitle: "Add Quality Procedure",
+          breadcrumbs: ["Add Quality Procedure"],
         },
       },
       {
@@ -1102,8 +1102,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/externalaudit/qualityprocedure/QualityProcedureEdit.vue"),
         meta: {
-          pageTitle: "Quality Procedure Edit",
-          breadcrumbs: ["Quality Procedure Edit"],
+          pageTitle: "Edit Quality Procedure",
+          breadcrumbs: ["Edit Quality Procedure"],
         },
       },
 
@@ -1115,8 +1115,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/customerfeedback/complaint/ComplaintListing.vue"),
         meta: {
-          pageTitle: "Customer Complaint List",
-          breadcrumbs: ["Customer Complaint List"],
+          pageTitle: "Customer Complaints",
+          breadcrumbs: ["Customer Complaints"],
         },
       },
       {
@@ -1125,8 +1125,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/customerfeedback/complaint/ComplaintAdd.vue"),
         meta: {
-          pageTitle: "Customer Complaint Add",
-          breadcrumbs: ["Customer Complaint Add"],
+          pageTitle: "Add Customer Complaint",
+          breadcrumbs: ["Add Customer Complaint"],
         },
       },
       {
@@ -1150,8 +1150,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/customerfeedback/complaint/ComplaintEdit.vue"),
         meta: {
-          pageTitle: "Customer Complaint Edit",
-          breadcrumbs: ["Customer Complaint Edit"],
+          pageTitle: "Edit Customer Complaint",
+          breadcrumbs: ["Edit Customer Complaint"],
         },
       },
 
@@ -1162,8 +1162,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/customerfeedback/feedback/FeedbackFormListing.vue"),
         meta: {
-          pageTitle: "Customer Feedbacks List",
-          breadcrumbs: ["Customer Feedbacks List"],
+          pageTitle: "Customer Feedbacks",
+          breadcrumbs: ["Customer Feedbacks"],
         },
       },
       {
@@ -1187,8 +1187,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/customerfeedback/feedback/FeedbackFormView.vue"),
         meta: {
-          pageTitle: "Customer Feedback Edit",
-          breadcrumbs: ["Customer Feedback Edit"],
+          pageTitle: "Edit Customer Feedback",
+          breadcrumbs: ["Edit Customer Feedback"],
         },
       },
 
@@ -1199,8 +1199,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/hr/training/TrainingListing.vue"),
         meta: {
-          pageTitle: "Training List",
-          breadcrumbs: ["Training List"],
+          pageTitle: "Trainings",
+          breadcrumbs: ["Trainings"],
         },
       },
       {
@@ -1209,8 +1209,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/hr/training/TrainingAdd.vue"),
         meta: {
-          pageTitle: "Training Add",
-          breadcrumbs: ["Training Add"],
+          pageTitle: "Add Training",
+          breadcrumbs: ["Add Training"],
         },
       },
       {
@@ -1234,8 +1234,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/hr/training/TrainingEdit.vue"),
         meta: {
-          pageTitle: "Training Edit",
-          breadcrumbs: ["Training Edit"],
+          pageTitle: "Edit Training",
+          breadcrumbs: ["Edit Training"],
         },
       },
 
@@ -1246,8 +1246,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/hr/skillmatrix/SkillMatrixListing.vue"),
         meta: {
-          pageTitle: "Skill Matrix List",
-          breadcrumbs: ["Skill Matrix List"],
+          pageTitle: "Skill Matrix",
+          breadcrumbs: ["Skill Matrix"],
         },
       },
       {
@@ -1256,8 +1256,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/hr/skillmatrix/SkillMatrixAdd.vue"),
         meta: {
-          pageTitle: "Skill Matrix Add",
-          breadcrumbs: ["Skill Matrix Add"],
+          pageTitle: "Add Skill Matrix",
+          breadcrumbs: ["Add Skill Matrix"],
         },
       },
       {
@@ -1281,8 +1281,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/hr/skillmatrix/SkillMatrixEdit.vue"),
         meta: {
-          pageTitle: "Skill Matrix Edit",
-          breadcrumbs: ["Skill Matrix Edit"],
+          pageTitle: "Edit Skill Matrix",
+          breadcrumbs: ["Edit Skill Matrix"],
         },
       },
 
@@ -1293,8 +1293,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/po/purchaseorder/PurchaseOrderListing.vue"),
         meta: {
-          pageTitle: "Purchase Order List",
-          breadcrumbs: ["Purchase Order List"],
+          pageTitle: "Purchase Orders",
+          breadcrumbs: ["Purchase Orders"],
         },
       },
       {
@@ -1318,8 +1318,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/po/purchaseorder/PurchaseOrderView.vue"),
         meta: {
-          pageTitle: "Purchase Order View",
-          breadcrumbs: ["Purchase Order View"],
+          pageTitle: "View Purchase Order",
+          breadcrumbs: ["View Purchase Order"],
         },
       },
       
@@ -1330,8 +1330,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/po/payment/PoPaymentListing.vue"),
         meta: {
-          pageTitle: "Purchase Order Payment List",
-          breadcrumbs: ["Purchase Order Payment List"],
+          pageTitle: "Purchase Order Payments",
+          breadcrumbs: ["Purchase Order Payments"],
         },
       },
       {
@@ -1340,8 +1340,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/po/payment/PoPaymentAdd.vue"),
         meta: {
-          pageTitle: "Purchase Order Payment Add",
-          breadcrumbs: ["Purchase Order Payment Add"],
+          pageTitle: "Add Purchase Order Payment",
+          breadcrumbs: ["Add Purchase Order Payment"],
         },
       },
       {
@@ -1350,8 +1350,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/po/payment/PoPaymentDirectAdd.vue"),
         meta: {
-          pageTitle: "Purchase Order Payment Add",
-          breadcrumbs: ["Purchase Order Payment Add"],
+          pageTitle: "Add Purchase Order Payment",
+          breadcrumbs: ["Add Purchase Order Payment"],
         },
       },
       {
@@ -1374,8 +1374,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/po/payment/PoPaymentEdit.vue"),
         meta: {
-          pageTitle: "Purchase Order Payment Edit",
-          breadcrumbs: ["Purchase Order Payment Edit"],
+          pageTitle: "Edit Purchase Order Payment",
+          breadcrumbs: ["Edit Purchase Order Payment"],
         },
       },
 
@@ -1387,8 +1387,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/thermal/thermalreports/ThermalReportListing.vue"),
         meta: {
-          pageTitle: "Thermal Report List",
-          breadcrumbs: ["Thermal Report List"],
+          pageTitle: "Thermal Reports",
+          breadcrumbs: ["Thermal Reports"],
         },
       },
       {
@@ -1397,8 +1397,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/thermal/thermalreports/ThermalReportAdd.vue"),
         meta: {
-          pageTitle: "Thermal Report Add",
-          breadcrumbs: ["Thermal Report Add"],
+          pageTitle: "Add Thermal Report",
+          breadcrumbs: ["Add Thermal Report"],
         },
       },
       {
@@ -1433,8 +1433,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/thermal/instruments/ThermalInstrumentListing.vue"),
         meta: {
-          pageTitle: "Thermal Instrument List",
-          breadcrumbs: ["Thermal Instrument List"],
+          pageTitle: "Thermal Instruments",
+          breadcrumbs: ["Thermal Instruments"],
         },
       },
       {
@@ -1443,8 +1443,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/thermal/instruments/ThermalInstrumentAdd.vue"),
         meta: {
-          pageTitle: "Thermal Instrument Add",
-          breadcrumbs: ["Thermal Instrument Add"],
+          pageTitle: "Add Thermal Instrument",
+          breadcrumbs: ["Add Thermal Instrument"],
         },
       },
       {
@@ -1470,8 +1470,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/thermal/instruments/ThermalInstrumentEdit.vue"),
         meta: {
-          pageTitle: "Thermal Instrument Edit",
-          breadcrumbs: ["Thermal Instrument Edit"],
+          pageTitle: "Edit Thermal Instrument",
+          breadcrumbs: ["Edit Thermal Instrument"],
         },
       },
       {
@@ -1507,8 +1507,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/calibration/RefInstrument/RefInstrumentListing.vue"),
         meta: {
-          pageTitle: "Reference Instrument List",
-          breadcrumbs: ["Reference Instrument List"],
+          pageTitle: "Reference Instrument",
+          breadcrumbs: ["Reference Instrument"],
         },
       },
       {
@@ -1517,8 +1517,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/calibration/RefInstrument/RefInstrumentAdd.vue"),
         meta: {
-          pageTitle: "Reference Instrument Add",
-          breadcrumbs: ["Reference Instrument Add"],
+          pageTitle: "Add Reference Instrument",
+          breadcrumbs: ["Add Reference Instrument"],
         },
       },
       {
@@ -1541,8 +1541,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/calibration/RefInstrument/RefInstrumentEdit.vue"),
         meta: {
-          pageTitle: "Reference Instrument Edit",
-          breadcrumbs: ["Reference Instrument Edit"],
+          pageTitle: "Edit Reference Instrument",
+          breadcrumbs: ["Edit Reference Instrument"],
         },
       },
 
@@ -1553,8 +1553,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/calibration/SrfCalibration/SrfCalibrationListing.vue"),
         meta: {
-          pageTitle: "Calibration Records List",
-          breadcrumbs: ["Calibration Records List"],
+          pageTitle: "Calibration Records",
+          breadcrumbs: ["Calibration Records"],
         },
       },
       {
@@ -1606,8 +1606,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/calibration/SrfCalibration/CalibrationInstrument/CalibrationInstrumentEdit.vue"),
         meta: {
-          pageTitle: "Calibration Instrument Edit",
-          breadcrumbs: ["Calibration Instrument Edit"],
+          pageTitle: "Edit Calibration Instrument",
+          breadcrumbs: ["Edit Calibration Instrument"],
         },
       },
 
@@ -1634,8 +1634,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/calibration/SrfCalibration/CalZeptac/calibrationInstrumentWrapper/CalibrationInstrumentEditWrapper.vue"),
         meta: {
-          pageTitle: "Calibration Instrument Edit",
-          breadcrumbs: ["Calibration Instrument Edit"],
+          pageTitle: "View Calibration Instrument",
+          breadcrumbs: ["View Calibration Instrument"],
         },
       },
 
@@ -1646,8 +1646,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/calibration/procedure/CalibrationProcedureListing.vue"),
         meta: {
-          pageTitle: "Calibration Procedure List",
-          breadcrumbs: ["Calibration Procedure List"],
+          pageTitle: "Calibration Procedure",
+          breadcrumbs: ["Calibration Procedure"],
         },
       },
       {
@@ -1656,8 +1656,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/calibration/procedure/CalibrationProcedureAdd.vue"),
         meta: {
-          pageTitle: "Calibration Procedure Add",
-          breadcrumbs: ["Calibration Procedure Add"],
+          pageTitle: "Add Calibration Procedure",
+          breadcrumbs: ["Add Calibration Procedure"],
         },
       },
       {
@@ -1681,8 +1681,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/calibration/procedure/CalibrationProcedureEdit.vue"),
         meta: {
-          pageTitle: "Calibration Procedure Edit",
-          breadcrumbs: ["Calibration Procedure Edit"],
+          pageTitle: "Edit Calibration Procedure",
+          breadcrumbs: ["Edit Calibration Procedure"],
         },
       },
 
@@ -1693,8 +1693,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/supplier/Supplier/SupplierListing.vue"),
         meta: {
-          pageTitle: "Suppliers List",
-          breadcrumbs: ["Suppliers List"],
+          pageTitle: "Suppliers",
+          breadcrumbs: ["Suppliers"],
         },
       },
       {
@@ -1745,8 +1745,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/supplier/Supplier/SupplierEdit.vue"),
         meta: {
-          pageTitle: "Suppliers Edit",
-          breadcrumbs: ["Suppliers Edit"],
+          pageTitle: "Edit Supplier",
+          breadcrumbs: ["Edit Supplier"],
         },
       },
 
@@ -1757,8 +1757,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualityassurance/MethodValidation/MethodValidationListing.vue"),
         meta: {
-          pageTitle: "Method Validation List",
-          breadcrumbs: ["Method Validation List"],
+          pageTitle: "Method Validation",
+          breadcrumbs: ["Method Validation"],
         },
       },
       {
@@ -1767,8 +1767,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
         import("@/views/apps/qualityassurance/MethodValidation/MethodValidationAdd.vue"),
         meta: {
-          pageTitle: "Method Validation Add",
-          breadcrumbs: ["Method Validation Add"],
+          pageTitle: "Add Method Validation",
+          breadcrumbs: ["Add Method Validation"],
         },
       },
       {
@@ -1794,8 +1794,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualityassurance/MethodValidation/MethodValidationEdit.vue"),
         meta: {
-          pageTitle: "Method Validation Edit",
-          breadcrumbs: ["Method Validation Edit"],
+          pageTitle: "Edit Method Validation",
+          breadcrumbs: ["Edit Method Validation"],
         },
       },
 
@@ -1806,8 +1806,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualityassurance/InterLabComparison/InterLabComparisonListing.vue"),
         meta: {
-          pageTitle: "InterLaboratory Comparison List",
-          breadcrumbs: ["InterLaboratory Comparison List"],
+          pageTitle: "InterLaboratory Comparison",
+          breadcrumbs: ["InterLaboratory Comparison"],
         },
       },
       {
@@ -1816,8 +1816,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
         import("@/views/apps/qualityassurance/InterLabComparison/InterLabComparisonAdd.vue"),
         meta: {
-          pageTitle: "InterLaboratory Comparison Add",
-          breadcrumbs: ["InterLaboratory Comparison Add"],
+          pageTitle: "Add InterLaboratory Comparison",
+          breadcrumbs: ["Add InterLaboratory Comparison"],
         },
       },
       {
@@ -1843,8 +1843,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualityassurance/InterLabComparison/InterLabComparisonEdit.vue"),
         meta: {
-          pageTitle: "InterLaboratory Comparison Edit",
-          breadcrumbs: ["InterLaboratory Comparison Edit"],
+          pageTitle: "Edit InterLaboratory Comparison",
+          breadcrumbs: ["Edit InterLaboratory Comparison"],
         },
       },
 
@@ -1855,8 +1855,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualityassurance/ReplicateReport/ReplicateReportListing.vue"),
         meta: {
-          pageTitle: "Replicate Report List",
-          breadcrumbs: ["Replicate Report List"],
+          pageTitle: "Replicate Report",
+          breadcrumbs: ["Replicate Report"],
         },
       },
       {
@@ -1865,8 +1865,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
         import("@/views/apps/qualityassurance/ReplicateReport/ReplicateReportAdd.vue"),
         meta: {
-          pageTitle: "Replicate Report Add",
-          breadcrumbs: ["Replicate Report Add"],
+          pageTitle: "Add Replicate Report",
+          breadcrumbs: ["Add Replicate Report"],
         },
       },
       {
@@ -1892,8 +1892,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualityassurance/ReplicateReport/ReplicateReportEdit.vue"),
         meta: {
-          pageTitle: "Method Validation Edit",
-          breadcrumbs: ["Method Validation Edit"],
+          pageTitle: "Edit Replicate Report",
+          breadcrumbs: ["Edit Replicate Report"],
         },
       },
 
@@ -1906,8 +1906,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/qualitywork/internal/InternalDocListing.vue"),
         meta: {
-          pageTitle: "Internal Document List",
-          breadcrumbs: ["Internal Document List"],
+          pageTitle: "Internal Documents",
+          breadcrumbs: ["Internal Documents"],
         },
       },
       {
@@ -1932,8 +1932,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/qualitywork/internal/InternalDocEdit.vue"),
         meta: {
-          pageTitle: "Internal Document Edit",
-          breadcrumbs: ["Internal Document Edit"],
+          pageTitle: "Edit Internal Document",
+          breadcrumbs: ["Edit Internal Document"],
         },
       },
 
@@ -1943,8 +1943,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/qualitywork/external/ExternalDocListing.vue"),
         meta: {
-          pageTitle: "External Document List",
-          breadcrumbs: ["External Document List"],
+          pageTitle: "External Documents",
+          breadcrumbs: ["External Documents"],
         },
       },
       {
@@ -1969,8 +1969,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/qualitywork/external/ExternalDocEdit.vue"),
         meta: {
-          pageTitle: "External Document Edit",
-          breadcrumbs: ["External Document Edit"],
+          pageTitle: "Edit External Document",
+          breadcrumbs: ["Edit External Document Edit"],
         },
       },
 
@@ -1980,8 +1980,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/qualitywork/ncr/NCRListing.vue"),
         meta: {
-          pageTitle: "Non Conformance Record List",
-          breadcrumbs: ["Non Conformance Record List"],
+          pageTitle: "Non Conformance Records",
+          breadcrumbs: ["Non Conformance Record"],
         },
       },
       {
@@ -2006,8 +2006,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/qualitywork/ncr/NCREdit.vue"),
         meta: {
-          pageTitle: "Non Conformance Record Edit",
-          breadcrumbs: ["Non Conformance Record Edit"],
+          pageTitle: "Edit Non Conformance Record",
+          breadcrumbs: ["Edit Non Conformance Record"],
         },
       },
       
@@ -2017,8 +2017,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/qualitywork/risk/RiskListing.vue"),
         meta: {
-          pageTitle: "Risk Register List",
-          breadcrumbs: ["Risk Register List"],
+          pageTitle: "Risk Registers",
+          breadcrumbs: ["Risk Registers"],
         },
       },
       {
@@ -2027,8 +2027,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/qualitywork/risk/RiskAdd.vue"),
         meta: {
-          pageTitle: "Risk Register",
-          breadcrumbs: ["Risk Register"],
+          pageTitle: "Add Risk Register",
+          breadcrumbs: ["Add Risk Register"],
         },
       },
       {
@@ -2053,8 +2053,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/qualitywork/risk/RiskEdit.vue"),
         meta: {
-          pageTitle: "Risk Register Edit",
-          breadcrumbs: ["Risk Register Edit"],
+          pageTitle: "Edit Risk Register",
+          breadcrumbs: ["Edit Risk Register"],
         },
       },
 
@@ -2064,8 +2064,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/qualitywork/DocumentChange/DocumentChangeListing.vue"),
         meta: {
-          pageTitle: "Document Change Request List",
-          breadcrumbs: ["Document Change Request List"],
+          pageTitle: "Document Change Request",
+          breadcrumbs: ["Document Change Request"],
         },
       },
       {
@@ -2074,8 +2074,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/qualitywork/DocumentChange/DocumentChangeAdd.vue"),
         meta: {
-          pageTitle: "Document Change Request Add",
-          breadcrumbs: ["Document Change Request Add"],
+          pageTitle: "Add Document Change Request",
+          breadcrumbs: ["Add Document Change Request"],
         },
       },
       {
@@ -2100,8 +2100,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/qualitywork/DocumentChange/DocumentChangeEdit.vue"),
         meta: {
-          pageTitle: "Document Change Request Edit",
-          breadcrumbs: ["Document Change Request Edit"],
+          pageTitle: "Edit Document Change Request",
+          breadcrumbs: ["Edit Document Change Request"],
         },
       },
 
@@ -2112,8 +2112,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/qualitywork/improvement/ImprovementListing.vue"),
         meta: {
-          pageTitle: "Improvement Action Plan List",
-          breadcrumbs: ["Improvement Action Plan List"],
+          pageTitle: "Improvement Action Plan",
+          breadcrumbs: ["Improvement Action Plan"],
         },
       },
       {
@@ -2138,8 +2138,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/qualitywork/improvement/ImprovementEdit.vue"),
         meta: {
-          pageTitle: "Improvement Action Plan Edit",
-          breadcrumbs: ["Improvement Action Plan Edit"],
+          pageTitle: "Edit Improvement Action Plan",
+          breadcrumbs: ["Edit Improvement Action Plan"],
         },
       },
 
@@ -2166,8 +2166,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/internalaudit/auditobservation/IAObservationAdd.vue"),
         meta: {
-          pageTitle: "Internal Audit Observation Add",
-          breadcrumbs: ["Internal Audit Observation Add"],
+          pageTitle: "Add Internal Audit Observation",
+          breadcrumbs: ["Add Internal Audit Observation"],
         },
       },
       {
@@ -2176,8 +2176,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/internalaudit/auditobservation/IAObservationListing.vue"),
         meta: {
-          pageTitle: "Internal Audit Observation List",
-          breadcrumbs: ["Internal Audit Observation List"],
+          pageTitle: "Internal Audit Observation",
+          breadcrumbs: ["Internal Audit Observation"],
         },
       },
       {
@@ -2187,8 +2187,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/internalaudit/auditobservation/IAObservationEdit.vue"),
         meta: {
-          pageTitle: "Internal Audit Observation Edit",
-          breadcrumbs: ["Internal Audit Observation Edit"],
+          pageTitle: "Edit Internal Audit Observation",
+          breadcrumbs: ["Edit Internal Audit Observation"],
         },
       },
       {
@@ -2197,8 +2197,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/internalaudit/CorrectiveAction/CorrectiveActionListing.vue"),
         meta: {
-          pageTitle: "Non-Conformance List",
-          breadcrumbs: ["Non-Conformance List"],
+          pageTitle: "Non-Conformances",
+          breadcrumbs: ["Non-Conformances"],
         },
       },
 
@@ -2209,8 +2209,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/internalaudit/IAuditSchedule/IAuditScheduleAdd.vue"),
         meta: {
-          pageTitle: "Internal Audit Schedule Add",
-          breadcrumbs: ["Internal Audit Schedule Add"],
+          pageTitle: "Add Internal Audit Schedule",
+          breadcrumbs: ["Add Internal Audit Schedule"],
         },
       },
       {
@@ -2219,8 +2219,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/internalaudit/IAuditSchedule/IAuditScheduleListing.vue"),
         meta: {
-          pageTitle: "Internal Audit Schedule List",
-          breadcrumbs: ["Internal Audit Schedule List"],
+          pageTitle: "Internal Audit Schedule",
+          breadcrumbs: ["Internal Audit Schedule"],
         },
       },
       {
@@ -2245,8 +2245,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/qualitydocumentation/internalaudit/IAuditSchedule/IAuditScheduleEdit.vue"),
         meta: {
-          pageTitle: "Internal Audit Schedule Edit",
-          breadcrumbs: ["Internal Audit Schedule Edit"],
+          pageTitle: "Edit Internal Audit Schedule",
+          breadcrumbs: ["Edit Internal Audit Schedule"],
         },
       },
       
@@ -2258,8 +2258,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/MRM/ScheduleMRM/ScheduleMRMAdd.vue"),
         meta: {
-          pageTitle: "Schedule MRM",
-          breadcrumbs: ["Schedule MRM"],
+          pageTitle: "Add MRM Schedule",
+          breadcrumbs: ["Add MRM Schedule"],
         },
       },
       {
@@ -2268,8 +2268,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/MRM/ScheduleMRM/ScheduleMRMListing.vue"),
         meta: {
-          pageTitle: "Scheduled MRM List",
-          breadcrumbs: ["Scheduled MRM List"],
+          pageTitle: "MRM Scheduled",
+          breadcrumbs: ["MRM Scheduled"],
         },
       },
       {
@@ -2294,8 +2294,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/MRM/ScheduleMRM/ScheduleMRMEdit.vue"),
         meta: {
-          pageTitle: "Schedule MRM Edit",
-          breadcrumbs: ["Schedule MRM Edit"],
+          pageTitle: "Edit MRM Schedule",
+          breadcrumbs: ["Edit MRM Schedule"],
         },
       },
 
@@ -2322,8 +2322,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/MRM/MinutesMRM/MinutesMRMAdd.vue"),
         meta: {
-          pageTitle: "Minutes Of MRM",
-          breadcrumbs: ["Minutes Of MRM"],
+          pageTitle: "Add MOM",
+          breadcrumbs: ["Add MOM"],
         },
       },
       {
@@ -2332,8 +2332,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/MRM/MinutesMRM/MinutesMRMListing.vue"),
         meta: {
-          pageTitle: "Minutes Of MRM List",
-          breadcrumbs: ["Minutes Of MRM List"],
+          pageTitle: "Minutes Of MRM",
+          breadcrumbs: ["Minutes Of MRM"],
         },
       },
       {
@@ -2358,8 +2358,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/MRM/MinutesMRM/MinutesMRMEdit.vue"),
         meta: {
-          pageTitle: "Minutes Of MRM Edit",
-          breadcrumbs: ["Minutes Of MRM Edit"],
+          pageTitle: "Edit Minutes Of MRM",
+          breadcrumbs: ["Edit Minutes Of MRM"],
         },
       },
 
@@ -2371,8 +2371,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/master/QMSProcedure/QMSProcedureListing.vue"),
         meta: {
-          pageTitle: "QMS Procedure List",
-          breadcrumbs: ["QMS Procedure List"],
+          pageTitle: "QMS Procedures",
+          breadcrumbs: ["QMS Procedures"],
         },
       },
       {
@@ -2397,8 +2397,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/master/QMSProcedure/QMSProcedureEdit.vue"),
         meta: {
-          pageTitle: "QMS Procedure Edit",
-          breadcrumbs: ["QMS Procedure Edit"],
+          pageTitle: "Edit QMS Procedure",
+          breadcrumbs: ["Edit QMS Procedure"],
         },
       },
 
@@ -2409,8 +2409,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/master/WorkInstruction/WorkInstructionListing.vue"),
         meta: {
-          pageTitle: "Work Instruction List",
-          breadcrumbs: ["Work Instruction List"],
+          pageTitle: "Work Instructions",
+          breadcrumbs: ["Work Instructions"],
         },
       },
       {
@@ -2435,8 +2435,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/master/WorkInstruction/WorkInstructionEdit.vue"),
         meta: {
-          pageTitle: "Work Instruction Edit",
-          breadcrumbs: ["Work Instruction Edit"],
+          pageTitle: "Edit Work Instruction",
+          breadcrumbs: ["Edit Work Instruction"],
         },
       },
 
@@ -2447,8 +2447,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/master/FormsAndFormats/FormsAndFormatsListing.vue"),
         meta: {
-          pageTitle: "Forms & Formats List",
-          breadcrumbs: ["Forms & Formats List"],
+          pageTitle: "Forms & Formats",
+          breadcrumbs: ["Forms & Formats"],
         },
       },
       {
@@ -2473,8 +2473,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/master/FormsAndFormats/FormsAndFormatsEdit.vue"),
         meta: {
-          pageTitle: "Forms & Formats Edit",
-          breadcrumbs: ["Forms & Formats Edit"],
+          pageTitle: "Edit Forms & Formats",
+          breadcrumbs: ["Edit Forms & Formats"],
         },
       },
 
@@ -2485,8 +2485,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/master/NABLDocument/NABLDocumentListing.vue"),
         meta: {
-          pageTitle: "NABL Document List",
-          breadcrumbs: ["NABL Document List"],
+          pageTitle: "NABL Documents",
+          breadcrumbs: ["NABL Documents"],
         },
       },
       {
@@ -2511,8 +2511,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/master/NABLDocument/NABLDocumentEdit.vue"),
         meta: {
-          pageTitle: "NABL Document Edit",
-          breadcrumbs: ["NABL Document Edit"],
+          pageTitle: "Edit NABL Document",
+          breadcrumbs: ["Edit NABL Document"],
         },
       },
 
@@ -2523,8 +2523,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/master/NIDocument/NIDocumentListing.vue"),
         meta: {
-          pageTitle: "National-International Document List",
-          breadcrumbs: ["National-International Document List"],
+          pageTitle: "National-International Documents",
+          breadcrumbs: ["National-International Documents"],
         },
       },
       {
@@ -2549,8 +2549,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/master/NIDocument/NIDocumentEdit.vue"),
         meta: {
-          pageTitle: "National-International Document Edit",
-          breadcrumbs: ["National-International Document Edit"],
+          pageTitle: "Edit National-International Document",
+          breadcrumbs: ["Edit National-International Document"],
         },
       },
 
@@ -2561,8 +2561,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/master/Records/RecordsListing.vue"),
         meta: {
-          pageTitle: "Records List",
-          breadcrumbs: ["Records List"],
+          pageTitle: "Records",
+          breadcrumbs: ["Records"],
         },
       },
       {
@@ -2587,8 +2587,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/master/Records/RecordsEdit.vue"),
         meta: {
-          pageTitle: "Records Edit",
-          breadcrumbs: ["Records Edit"],
+          pageTitle: "Edit Record",
+          breadcrumbs: ["Edit Record"],
         },
       },
 
@@ -2600,8 +2600,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/instrument/IntermediateCheckRecords/IntermediateCheckRecordListing.vue"),
         meta: {
-          pageTitle: "Intermediate Check Records List",
-          breadcrumbs: ["Intermediate Check Records List"],
+          pageTitle: "Intermediate Check Records",
+          breadcrumbs: ["Intermediate Check Records"],
         },
       },
       {
@@ -2626,8 +2626,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/instrument/IntermediateCheckRecords/IntermediateCheckRecordAdd.vue"),
         meta: {
-          pageTitle: "Intermediate Check Records Add",
-          breadcrumbs: ["Intermediate Check Records Add"],
+          pageTitle: "Add Intermediate Check Record",
+          breadcrumbs: ["Add Intermediate Check Record"],
         },
       },
       {
@@ -2678,8 +2678,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/instrument/IntermediateCheckRecords/IntermediateCheckRecordEdit.vue"),
         meta: {
-          pageTitle: "Intermediate Check Records Edit",
-          breadcrumbs: ["Intermediate Check Records Edit"],
+          pageTitle: "Edit Intermediate Check Record",
+          breadcrumbs: ["Edit Intermediate Check Record"],
         },
       },
 
@@ -2690,8 +2690,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/instrument/InspectionRecords/InspectionRecordsListing.vue"),
         meta: {
-          pageTitle: "Inspection Records List",
-          breadcrumbs: ["Inspection Records List"],
+          pageTitle: "Inspection Records",
+          breadcrumbs: ["Inspection Records"],
         },
       },
       {
@@ -2716,8 +2716,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/instrument/InspectionRecords/InspectionRecordsAdd.vue"),
         meta: {
-          pageTitle: "Inspection Records Add",
-          breadcrumbs: ["Inspection Records Add"],
+          pageTitle: "Add Inspection Record",
+          breadcrumbs: ["Add Inspection Record"],
         },
       },
       {
@@ -2768,8 +2768,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/instrument/InspectionRecords/InspectionRecordsEdit.vue"),
         meta: {
-          pageTitle: "Inspection Records Edit",
-          breadcrumbs: ["Inspection Records Edit"],
+          pageTitle: "Edit Inspection Record",
+          breadcrumbs: ["Edit Inspection Record"],
         },
       },
 
@@ -2781,8 +2781,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/Planner/PlannerListing.vue"),
         meta: {
-          pageTitle: "Planner List",
-          breadcrumbs: ["Planner List"],
+          pageTitle: "Planners",
+          breadcrumbs: ["Planners"],
         },
       },
       {
@@ -2791,8 +2791,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/Planner/PlannerAdd.vue"),
         meta: {
-          pageTitle: "Planner Add",
-          breadcrumbs: ["Planner Add"],
+          pageTitle: "Add Plan",
+          breadcrumbs: ["Add Plan"],
         },
       },
       {
@@ -2887,8 +2887,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
         import("@/views/apps/Planner/PlannerEdit.vue"),
         meta: {
-          pageTitle: "Planner Edit",
-          breadcrumbs: ["Planner Edit"],
+          pageTitle: "Edit Planner",
+          breadcrumbs: ["Edit Planner"],
         },
       },
 
@@ -2922,8 +2922,8 @@ const routes: Array<RouteRecordRaw> = [
         name: "notifications-list",
         component: () => import("@/views/apps/notification/NotificationListing.vue"),
         meta: {
-          pageTitle: "Notification List",
-          breadcrumbs: ["Notification List"],
+          pageTitle: "Notifications",
+          breadcrumbs: ["Notifications"],
         },
       },
 
@@ -3019,8 +3019,8 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/apps/customers/po/CustomerPurchaseOrderAdd.vue"),
         meta: {
-          pageTitle: "Purchase Orders Add",
-          breadcrumbs: ["Purchase Orders Add"],
+          pageTitle: "Add Purchase Order",
+          breadcrumbs: ["Add Purchase Order"],
         },
       },
       {
@@ -3042,8 +3042,8 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/apps/customers/po/CustomerPurchaseOrderEdit.vue"),
         meta: {
-          pageTitle: "Purchase Orders Edit",
-          breadcrumbs: ["Purchase Orders Edit"],
+          pageTitle: "Edit Purchase Order",
+          breadcrumbs: ["Edit Purchase Order"],
         },
       },
       {
@@ -3084,8 +3084,8 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import("@/views/apps/customers/feedbacks/CustomerFeedbackView.vue"),
         meta: {
-          pageTitle: "Customer Feedback View",
-          breadcrumbs: ["Customer Feedback View"],
+          pageTitle: "View Customer Feedback",
+          breadcrumbs: ["View Customer Feedback"],
         },
       },
 

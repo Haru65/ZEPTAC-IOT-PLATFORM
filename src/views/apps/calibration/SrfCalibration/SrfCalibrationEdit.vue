@@ -543,65 +543,72 @@
             </template>
             <template v-slot:actions="{ row: calibration_instrument }">
               <!--begin::Menu Flex-->
-              <div class="d-flex flex-lg-row my-3">
-                <!-- begin::download -->
-                <!-- <span
-                  class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-                  data-bs-toggle="tooltip"
-                  title="Download Calibration Certificate"
-                  @click="
-                    downloadCalibrationRecordsZip(
-                      calibration_instrument.id,
-                      calibration_instrument.parameter
-                    )
-                  "
+              <div class="dropdown">
+                <a
+                  href="#"
+                  class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  @click.prevent
                 >
-                  <KTIcon icon-name="file-down" icon-class="fs-2" />
-                </span> -->
-                <!-- end::download -->
+                  <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+                </a>
 
-                <!-- begin::download -->
-                <span
-                  class="btn btn-icon btn-active-light-success w-30px h-30px me-3"
-                  data-bs-toggle="tooltip"
-                  title="Download Calibration Certificate"
-                  @click="
-                    downloadPdf(
-                      calibration_instrument.parameter,
-                      calibration_instrument.id
-                    )
-                  "
+                <!-- Action dropdown menu -->
+                <ul
+                  class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
                 >
-                  <KTIcon icon-name="file-down" icon-class="fs-2" />
-                </span>
-                <!-- end::download -->
+                  <!-- Download Calibration Certificate -->
+                  <li>
+                    <span
+                      class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
+                      data-bs-toggle="tooltip"
+                      title="Download Calibration Certificate"
+                      @click="
+                        downloadPdf(
+                          calibration_instrument.parameter,
+                          calibration_instrument.id
+                        )
+                      "
+                    >
+                      <KTIcon
+                        icon-name="file-down"
+                        icon-class="fs-3 text-primary"
+                      />
+                      <span class="text-gray-700">Certificate</span>
+                    </span>
+                  </li>
 
-                <!--begin::Edit-->
-                <router-link
-                  :to="`/calibration-instrument/${calibration_instrument.parameter}/edit/${calibration_instrument.id}`"
-                >
-                  <span
-                    class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                    data-bs-toggle="tooltip"
-                    title="View Calibration Instrument"
-                  >
-                    <KTIcon icon-name="pencil" icon-class="fs-2" />
-                  </span>
-                </router-link>
-                <!--end::Edit-->
+                  <!-- View Calibration Instrument -->
+                  <li>
+                    <router-link
+                      :to="`/calibration-instrument/${calibration_instrument.parameter}/edit/${calibration_instrument.id}`"
+                      class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-info cursor-pointer"
+                      data-bs-toggle="tooltip"
+                      title="View Calibration Instrument"
+                    >
+                      <KTIcon icon-name="pencil" icon-class="fs-3 text-info" />
+                      <span class="text-gray-700">View</span>
+                    </router-link>
+                  </li>
 
-                <!--begin::Delete-->
-                <span
-                  @click="deleteItem(calibration_instrument.id, false)"
-                  class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-                  data-bs-toggle="tooltip"
-                  title="Delete Calibration Instrument"
-                >
-                  <KTIcon icon-name="trash" icon-class="fs-2" />
-                </span>
-                <!--end::Delete-->
+                  <!-- Delete Calibration Instrument -->
+                  <li>
+                    <a
+                      class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-danger cursor-pointer"
+                      data-bs-toggle="tooltip"
+                      title="Delete Calibration Instrument"
+                      @click.prevent="
+                        deleteItem(calibration_instrument.id, false)
+                      "
+                    >
+                      <KTIcon icon-name="trash" icon-class="fs-3 text-danger" />
+                      <span class="text-danger">Delete</span>
+                    </a>
+                  </li>
+                </ul>
               </div>
-              <!--end::Menu FLex-->
+              <!--end::Menu Flex-->
             </template>
           </Datatable>
           <div class="d-flex justify-content-between p-2">
@@ -1038,7 +1045,7 @@ export default defineComponent({
         columnWidth: 125,
       },
       {
-        columnName: "Actions",
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,

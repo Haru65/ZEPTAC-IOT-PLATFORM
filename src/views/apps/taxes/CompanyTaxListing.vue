@@ -248,31 +248,51 @@
         </template>
         <template v-slot:actions="{ row: company_tax }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row my-3">
-            <!--begin::Edit-->
-            <span
-              class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-              data-bs-toggle="modal"
-              data-toggle="tooltip"
-              title="View Tax"
-              data-bs-target="#kt_modal_tax_edit"
-              @click="fillItemData(company_tax)"
+          <div class="dropdown">
+            <a
+              href="#"
+              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              @click.prevent
             >
-              <KTIcon icon-name="pencil" icon-class="fs-2" />
-            </span>
+              <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+            </a>
 
-            <!--begin::Delete-->
-            <span
-              @click="deleteItem(company_tax.id, false)"
-              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Delete Tax"
+            <!-- Action dropdown menu -->
+            <ul
+              class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
             >
-              <KTIcon icon-name="trash" icon-class="fs-2" />
-            </span>
-            <!--end::Delete-->
+              <!-- Edit / View Tax -->
+              <li>
+                <a
+                  href="#"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-info cursor-pointer"
+                  data-bs-toggle="modal"
+                  data-bs-target="#kt_modal_tax_edit"
+                  title="View Tax"
+                  @click.prevent="fillItemData(company_tax)"
+                >
+                  <KTIcon icon-name="pencil" icon-class="fs-3 text-info" />
+                  <span class="text-gray-700">Edit</span>
+                </a>
+              </li>
+
+              <!-- Delete Tax -->
+              <li>
+                <a
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-danger cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Delete Tax"
+                  @click.prevent="deleteItem(company_tax.id, false)"
+                >
+                  <KTIcon icon-name="trash" icon-class="fs-3 text-danger" />
+                  <span class="text-danger">Delete</span>
+                </a>
+              </li>
+            </ul>
           </div>
-          <!--end::Menu FLex-->
+          <!--end::Menu Flex-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -399,7 +419,7 @@ export default defineComponent({
         columnWidth: 100,
       },
       {
-        columnName: "Actions",
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,

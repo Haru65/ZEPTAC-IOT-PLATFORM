@@ -1,5 +1,5 @@
 <template>
-  <tbody class="fw-semibold text-gray-600">
+  <tbody class="fw-semibold text-gray-700">
     <template v-for="(row, i) in data" :key="i">
       <tr>
         <td v-if="checkboxEnabled">

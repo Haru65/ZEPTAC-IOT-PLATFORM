@@ -7401,3 +7401,60 @@ export async function DownloadElectroUncertainty(data: any) {
         throw new Error(errors?.response?.data?.message || "An error occurred during export.");
     }
 }
+
+
+// Download Quotation Pdf
+export async function DownloadQuotation(data: any) {
+    try {
+        // Set necessary headers, if required (e.g., authorization)
+        ApiService.setHeader();
+        
+        // Send GET request to the backend with query params
+        const response = await ApiService.post("download_quotation", data, {
+            responseType: 'blob', // This is part of the config, not inside the data
+        });
+
+        // Log the response headers to check content type
+        console.log(response.headers['content-type']);  // Should be 'application/pdf'
+
+        const blob = response.data;
+        if (blob && blob.size > 0) {
+            // Return the blob data (don't download here)
+            return blob;
+        } else {
+            throw new Error("The response file is empty or invalid.");
+        }
+    } catch (errors:any) {
+        // Handle any errors (e.g., API errors)
+        console.error(errors?.response?.data?.message || "An error occurred during export.");
+        throw new Error(errors?.response?.data?.message || "An error occurred during export.");
+    }
+}
+
+// Download Invoice Pdf
+export async function DownloadInvoice(data: any) {
+    try {
+        // Set necessary headers, if required (e.g., authorization)
+        ApiService.setHeader();
+        
+        // Send GET request to the backend with query params
+        const response = await ApiService.post("download_invoice", data, {
+            responseType: 'blob', // This is part of the config, not inside the data
+        });
+
+        // Log the response headers to check content type
+        console.log(response.headers['content-type']);  // Should be 'application/pdf'
+
+        const blob = response.data;
+        if (blob && blob.size > 0) {
+            // Return the blob data (don't download here)
+            return blob;
+        } else {
+            throw new Error("The response file is empty or invalid.");
+        }
+    } catch (errors:any) {
+        // Handle any errors (e.g., API errors)
+        console.error(errors?.response?.data?.message || "An error occurred during export.");
+        throw new Error(errors?.response?.data?.message || "An error occurred during export.");
+    }
+}

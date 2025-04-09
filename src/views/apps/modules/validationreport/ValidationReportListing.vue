@@ -179,37 +179,66 @@
         </template>
 
         <template v-slot:actions="{ row: validationreports }">
-          <div class="d-flex flex-lg-row">
-            <span
-              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Download Non-NABL Report"
-              @click="downloadReport(validationreports.id)"
+          <!--begin::Menu Flex-->
+          <div class="dropdown">
+            <a
+              href="#"
+              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              @click.prevent
             >
-              <KTIcon icon-name="file-down" icon-class="fs-2" />
-            </span>
-            <!--begin::Edit-->
-            <router-link
-              :to="`/validationreports/edit/${validationreports.id}`"
+              <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+            </a>
+
+            <!-- Action dropdown menu -->
+            <ul
+              class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
             >
-              <span
-                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-bs-toggle="tooltip"
-                title="Edit Non-NABL Report"
-              >
-                <KTIcon icon-name="pencil" icon-class="fs-2" />
-              </span>
-            </router-link>
-            <!--end::Edit-->
-            <span
-              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Delete Non-NABL Report"
-              @click="deleteItem(validationreports.id, false)"
-            >
-              <KTIcon icon-name="trash" icon-class="fs-2" />
-            </span>
+              <!-- Download Non-NABL Report -->
+              <li>
+                <span
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Download Non-NABL Report"
+                  @click="downloadReport(validationreports.id)"
+                >
+                  <KTIcon
+                    icon-name="file-down"
+                    icon-class="fs-3 text-primary"
+                  />
+                  <span class="text-gray-700">Download</span>
+                </span>
+              </li>
+
+              <!-- Edit Non-NABL Report -->
+              <li>
+                <router-link
+                  :to="`/validationreports/edit/${validationreports.id}`"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-info cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Edit Non-NABL Report"
+                >
+                  <KTIcon icon-name="pencil" icon-class="fs-3 text-info" />
+                  <span class="text-gray-700">Edit</span>
+                </router-link>
+              </li>
+
+              <!-- Delete Non-NABL Report -->
+              <li>
+                <span
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-danger cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Delete Non-NABL Report"
+                  @click="deleteItem(validationreports.id, false)"
+                >
+                  <KTIcon icon-name="trash" icon-class="fs-3 text-danger" />
+                  <span class="text-danger">Delete</span>
+                </span>
+              </li>
+            </ul>
           </div>
+          <!--end::Menu Flex-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -549,7 +578,7 @@ export default defineComponent({
         columnWidth: 75,
       },
       {
-        columnName: "Actions",
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,
@@ -921,18 +950,22 @@ export default defineComponent({
         );
 
         if (response.success) {
-        tableData.value = response.result.data.map(
-          ({ id, rgp, test_sizes, report_status, created_at, ...rest }) => ({
-            id: id,
-            customer: { ...rgp.quotation.customer },
-            clientx: { ...rgp.quotation.clientx },
-            test_sizes: { ...test_sizes },
-            report_status: report_status,
-            created_at: moment(created_at).format("DD-MM-YYYY"),
-            ...rest,
-          })
-        );
-        initvalues.value.splice(0, tableData.value.length, ...tableData.value);
+          tableData.value = response.result.data.map(
+            ({ id, rgp, test_sizes, report_status, created_at, ...rest }) => ({
+              id: id,
+              customer: { ...rgp.quotation.customer },
+              clientx: { ...rgp.quotation.clientx },
+              test_sizes: { ...test_sizes },
+              report_status: report_status,
+              created_at: moment(created_at).format("DD-MM-YYYY"),
+              ...rest,
+            })
+          );
+          initvalues.value.splice(
+            0,
+            tableData.value.length,
+            ...tableData.value
+          );
         }
       } catch (error) {
         console.error(error);

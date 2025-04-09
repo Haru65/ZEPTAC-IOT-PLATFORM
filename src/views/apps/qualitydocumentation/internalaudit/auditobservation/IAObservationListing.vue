@@ -25,7 +25,7 @@
         <!-- YEAR WISE DATA -->
 
         <h3 class="card-title align-items-start flex-column">
-          <span class="card-label fw-semibold text-gray-400"
+          <span class="card-label fw-semibold text-gray-700"
             >Financial Year</span
           >
         </h3>
@@ -52,8 +52,7 @@
           v-if="selectedIds.length === 0"
           class="d-flex justify-content-end"
           data-kt-customer-table-toolbar="base"
-        >
-        </div>
+        ></div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->
         <div
@@ -119,49 +118,77 @@
         <template v-slot:meeting_place="{ row: audit_schedule }">
           {{ audit_schedule.meeting_place }}
         </template>
-        <template v-slot:observation="{ row: audit_schedule }">
-          <span 
-            data-toggle="tooltip"
-            title="Add Audit Observation">
-            <router-link :to="`/auditobservations/add/${audit_schedule.id}`" class="btn btn-sm btn-outline btn-outline-info text-nowrap btn-active-light-info">+ Observation
-            </router-link>
-          </span>
-        </template>
-        <template v-slot:non_conformance="{ row: audit_schedule }">
-          <span
-            data-bs-toggle="tooltip"
-            title="View Non-Conformance">
-            <router-link :to="`/non_conformance/list/${audit_schedule.id}`" class="btn btn-sm btn-info text-nowrap">View Non-conformances
-            </router-link>
-          </span>
-        </template>
         <template v-slot:actions="{ row: audit_schedule }">
           <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row my-3">
-            <!--begin::Edit-->
-            <router-link :to="`/auditschedule/edit/${audit_schedule.id}`">
-              <span
-                class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-                data-toggle="tooltip"
-                title="View Audit Schedule"
-              >
-                <KTIcon icon-name="pencil" icon-class="fs-2" />
-              </span>
-            </router-link>
-            <!--end::Edit-->
-
-            <!--begin::Delete-->
-            <span
-              @click="deleteItem(audit_schedule.id, false)"
-              class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-              data-bs-toggle="tooltip"
-              title="Delete Audit Schedule"
+          <div class="dropdown">
+            <a
+              href="#"
+              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              @click.prevent
             >
-              <KTIcon icon-name="trash" icon-class="fs-2" />
-            </span>
-            <!--end::Delete-->
+              <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+            </a>
+
+            <!-- Action dropdown menu -->
+            <ul
+              class="dropdown-menu dropdown-menu-end min-w-200px py-2 shadow-sm"
+            >
+              <!-- Add Audit Observation -->
+              <li>
+                <router-link
+                  :to="`/auditobservations/add/${audit_schedule.id}`"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-success cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Add Audit Observation"
+                >
+                  <KTIcon icon-name="plus" icon-class="fs-3 text-success" />
+                  <span class="text-gray-700">Add Observation</span>
+                </router-link>
+              </li>
+
+              <!-- View Non-Conformance -->
+              <li>
+                <router-link
+                  :to="`/non_conformance/list/${audit_schedule.id}`"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-info cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="View Non-Conformance"
+                >
+                  <KTIcon icon-name="eye" icon-class="fs-3 text-info" />
+                  <span class="text-gray-700">View Non-Conformance</span>
+                </router-link>
+              </li>
+
+              <!-- Edit Audit Schedule -->
+              <li>
+                <router-link
+                  :to="`/auditschedule/edit/${audit_schedule.id}`"
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-warning cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Edit Audit Schedule"
+                >
+                  <KTIcon icon-name="pencil" icon-class="fs-3 text-warning" />
+                  <span class="text-gray-700">Edit Schedule</span>
+                </router-link>
+              </li>
+
+              <!-- Delete Audit Schedule -->
+              <li>
+                <a
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-danger cursor-pointer"
+                  data-bs-toggle="tooltip"
+                  title="Delete Audit Schedule"
+                  @click.prevent="deleteItem(audit_schedule.id, false)"
+                >
+                  <KTIcon icon-name="trash" icon-class="fs-3 text-danger" />
+                  <span class="text-danger">Delete</span>
+                </a>
+              </li>
+            </ul>
           </div>
-          <!--end::Menu FLex-->
+          <!--end::Menu Flex-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -245,19 +272,7 @@ export default defineComponent({
         columnWidth: 200,
       },
       {
-        columnName: "Observation",
-        columnLabel: "observation",
-        sortEnabled: false,
-        columnWidth: 100,
-      },
-      {
-        columnName: "Non-Conformance",
-        columnLabel: "non_conformance",
-        sortEnabled: false,
-        columnWidth: 100,
-      },
-      {
-        columnName: "Actions",
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,
