@@ -749,8 +749,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/services/rgp/RGatePassListing.vue"),
         meta: {
-          pageTitle: "Returnable-Gate-Pass",
-          breadcrumbs: ["Returnable-Gate-Pass"],
+          pageTitle: "Returnable Gate Pass",
+          breadcrumbs: ["Returnable Gate Pass"],
         },
       },
       {
@@ -759,8 +759,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import("@/views/apps/modules/services/rgp/RGatePassAdd.vue"),
         meta: {
-          pageTitle: "Add Returnable-Gate-Pass",
-          breadcrumbs: ["Add Returnable-Gate-Pass"],
+          pageTitle: "Add Returnable Gate Pass",
+          breadcrumbs: ["Add Returnable Gate Pass"],
         },
       },
 

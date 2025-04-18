@@ -210,12 +210,12 @@
                   <a
                     class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
                     data-toggle="tooltip"
-                    title="Complete Clone Instrument"
+                    title="Clone Instrument"
                     data-bs-toggle="modal"
                     :data-bs-target="`#kt_modal_new_address_${thermal_instruments.id}`"
                   >
                     <KTIcon icon-name="copy" icon-class="fs-3 text-primary" />
-                    <span class="text-gray-700">Complete Clone</span>
+                    <span class="text-gray-700">Clone</span>
                   </a>
                 </li>
 

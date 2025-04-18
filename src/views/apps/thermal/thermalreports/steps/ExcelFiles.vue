@@ -1,80 +1,62 @@
 <template>
-  <div class="container">
-    <div class="row">
-      <div class="col-12">
-        <div class="card-box">
-          <div class="row">
-            <div class="col-lg-6 col-xl-6">
-              <h4 class="header-title m-b-30">Uploaded Files</h4>
-            </div>
+  <div class="w-100">
+    <!-- Uploaded Files Header -->
+    <div class="d-flex justify-content-between align-items-center mb-6">
+      <h4 class="fw-bold text-gray-800">Uploaded Files</h4>
+    </div>
+
+    <!-- Files Grid -->
+    <div class="row g-6">
+      <div
+        class="col-md-6 col-12"
+        v-for="(fileItem, index) in $props.filesData"
+        :key="index"
+      >
+        <div class="border rounded overflow-hidden shadow-sm h-100">
+          <!-- File Data Table -->
+          <div class="table-responsive" style="max-height: 300px">
+            <table class="table table-hover table-sm mb-0">
+              <thead class="bg-light">
+                <tr class="fw-semibold fs-7 text-gray-600">
+                  <th class="ps-4">ID</th>
+                  <th>Temperature</th>
+                  <th class="pe-4">Humidity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="r in fileItem.data" :key="r.id">
+                  <td class="ps-4">{{ r.id }}</td>
+                  <td>{{ r.temp }}</td>
+                  <td class="pe-4">{{ r.rh }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
-          <div class="row">
-            <div
-              class="col-lg-6 col-xl-6 col-md-12 col-sm-12"
-              v-for="(fileItem, index) in $props.filesData"
-              :key="index"
-            >
-              <div class="shadow overflow-auto">
-                <div class="table-responsive mt-6" style="max-height: 300px">
-                  <table
-                    class="table table-rounded table-striped border gy-4 gs-4 position-relative"
-                  >
-                    <thead>
-                      <tr
-                        class="fw-semibold fs-9 text-gray-800 border-bottom border-gray-200"
-                      >
-                        <th>ID</th>
-                        <th>Temperature</th>
-                        <th>Humidity</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="r in fileItem.data" :key="r.id">
-                        <td>{{ r.id }}</td>
-                        <td>{{ r.temp }}</td>
-                        <td>{{ r.rh }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <div class="card-header pt-3">
-                  <!--begin::Title-->
-
-                  <h5 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bold text-success fs-9">{{
-                      fileItem.file_name
-                    }}</span>
-                    <span class="text-info mt-1 fw-semibold fs-9"
-                      >Size
-                      {{
-                        (fileItem.file_size / (1024 * 1024)).toFixed(2)
-                      }}
-                      MB</span
-                    >
-                  </h5>
-
-                  <div class="card-toolbar">
-                    <button
-                      class="border border-danger rounded-circle badge m-3 py-3 px-4 bg-danger fs-9 badge-danger text-white cursor-pointer"
-                      data-toggle="tooltip"
-                      title="Remove file"
-                      @click="DeleteFile(index)"
-                    >X
-                    </button>
-                  </div>
-                </div>
-              </div>
+          <!-- File Info Footer -->
+          <div
+            class="d-flex justify-content-between align-items-center p-3 border-top bg-light"
+          >
+            <div>
+              <span class="d-block fw-bold text-success fs-7">{{
+                fileItem.file_name
+              }}</span>
+              <span class="fs-8">
+                {{ (fileItem.file_size / (1024 * 1024)).toFixed(2) }} MB
+              </span>
             </div>
+            <button
+              class="btn btn-icon btn-sm btn-danger"
+              @click="DeleteFile(index)"
+              title="Remove file"
+            >
+              <i class="bi bi-trash fs-6"></i>
+            </button>
           </div>
         </div>
       </div>
-      <!-- end col -->
     </div>
-    <!-- end row -->
   </div>
-  <!-- container -->
 </template>
 
    
@@ -91,7 +73,6 @@ export default defineComponent({
   props: ["filesData"],
 
   setup(props, { emit }) {
-
     const DeleteFile = async (index) => {
       await emit("deleteFile", index);
     };

@@ -11,7 +11,7 @@
     data-bs-focus="false"
   >
     <!--begin::Modal dialog-->
-    <div class="modal-dialog modal-dialog-centered mw-1000px">
+    <div class="modal-dialog modal-dialog-centered mw-650px">
       <!--begin::Modal content-->
       <div class="modal-content">
         <!--begin::Form-->

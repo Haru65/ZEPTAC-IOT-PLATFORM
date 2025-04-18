@@ -48,7 +48,7 @@
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
-        :header="filteredTableHeader"
+        :header="tableHeader"
         :checkbox-enabled="false"
         :items-per-page="limit"
         :items-per-page-dropdown-enabled="false"
@@ -100,88 +100,97 @@
 
         <template v-slot:approval_status="{ row: audit_observation }">
           <div v-if="audit_observation.corrective_action">
+            <!-- Status Badge Only -->
             <span
-              v-if="audit_observation.corrective_action.approval_status == 1"
-              class="badge py-3 px-4 fs-7 badge-light-primary"
-              >{{
+              class="badge py-3 px-4 fs-7"
+              :class="{
+                'badge-light-primary':
+                  audit_observation.corrective_action.approval_status == 1,
+                'badge-light-danger':
+                  audit_observation.corrective_action.approval_status == 2,
+                'badge-light-success':
+                  audit_observation.corrective_action.approval_status == 3,
+              }"
+            >
+              {{
                 GetApprovalStatus(
                   audit_observation.corrective_action.approval_status
                 )
-              }}</span
-            >
-            <span
-              v-if="audit_observation.corrective_action.approval_status == 2"
-              class="badge py-3 px-4 fs-7 badge-light-danger"
-              >{{
-                GetApprovalStatus(
-                  audit_observation.corrective_action.approval_status
-                )
-              }}</span
-            >
-            <span
-              v-if="audit_observation.corrective_action.approval_status == 3"
-              class="badge py-3 px-4 fs-7 badge-light-success"
-              >{{
-                GetApprovalStatus(
-                  audit_observation.corrective_action.approval_status
-                )
-              }}</span
-            >
+              }}
+            </span>
           </div>
           <div v-else>-</div>
         </template>
-
-        <template v-slot:approval_button="{ row: audit_observation }">
-          <div
-            v-if="audit_observation.corrective_action"
-            class="d-flex flex-lg-row"
-          >
-            <button
-              type="button"
-              class="btn btn-sm btn-primary"
-              data-bs-toggle="modal"
-              data-bs-target="#kt_modal_1"
-              @click="fillItemData(audit_observation.corrective_action)"
-            >
-              Open
-            </button>
-          </div>
-          <div v-else></div>
-        </template>
         <template v-slot:actions="{ row: audit_observation }">
-          <!--begin::Menu Flex-->
-          <div class="d-flex flex-lg-row">
-            <span
-              v-if="audit_observation.corrective_action == null"
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="Add Corrective Action"
-              data-bs-toggle="modal"
-              :data-bs-target="'#kt_modal_new_address'"
-              @click="AddCorrecticeAction(audit_observation)"
+          <!--begin::Dropdown Menu-->
+          <div class="dropdown">
+            <a
+              href="#"
+              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              @click.prevent
             >
-              <span
-                class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
-                >+ corrective action
-              </span>
-            </span>
-            <span
-              v-else
-              class="menu-link px-3"
-              data-toggle="tooltip"
-              title="Edit Corrective Action"
-              data-bs-toggle="modal"
-              :data-bs-target="'#kt_modal_new_address_edit'"
-              @click="EditCorrecticeAction(audit_observation.corrective_action)"
+              <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+            </a>
+
+            <!-- Action dropdown menu -->
+            <ul
+              class="dropdown-menu dropdown-menu-end min-w-200px py-2 shadow-sm"
             >
-              <span
-                class="border rounded badge py-3 fs-7 text-hover-gray-700 cursor-pointer"
-                >view corrective action
-              </span>
-            </span>
+              <template
+                v-if="identifier === 'Admin' || identifier === 'Company-Admin'"
+              >
+                <li>
+                  <a
+                    class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
+                    data-bs-toggle="modal"
+                    data-bs-target="#kt_modal_1"
+                    @click="fillItemData(audit_observation.corrective_action)"
+                  >
+                    <KTIcon
+                      icon-name="check-circle"
+                      icon-class="fs-3 text-primary"
+                    />
+                    <span class="text-gray-700">Approve/Reject</span>
+                  </a>
+                </li>
+              </template>
+              <!-- Conditional Corrective Action -->
+              <li v-if="audit_observation.corrective_action == null">
+                <a
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
+                  data-bs-toggle="modal"
+                  :data-bs-target="'#kt_modal_new_address'"
+                  @click="AddCorrecticeAction(audit_observation)"
+                  tooltip=""
+                  title="Add Corrective Action"
+                >
+                  <KTIcon
+                    icon-name="plus-circle"
+                    icon-class="fs-3 text-primary"
+                  />
+                  <span class="text-gray-700">Add Corrective Action</span>
+                </a>
+              </li>
+              <li v-else>
+                <a
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-info cursor-pointer"
+                  data-bs-toggle="modal"
+                  :data-bs-target="'#kt_modal_new_address_edit'"
+                  @click="
+                    EditCorrecticeAction(audit_observation.corrective_action)
+                  "
+                  tooltip=""
+                  title="Edit Corrective Action"
+                >
+                  <KTIcon icon-name="eye" icon-class="fs-3 text-info" />
+                  <span class="text-gray-700">View/Edit Corrective Action</span>
+                </a>
+              </li>
+            </ul>
           </div>
-          <!--end::Menu FLex-->
-          <!--end::Menu-->
+          <!--end::Dropdown Menu-->
         </template>
       </Datatable>
       <div class="d-flex justify-content-between p-2">
@@ -296,16 +305,10 @@ export default defineComponent({
         columnWidth: 100,
       },
       {
-        columnName: "Approval Status",
+        columnName: "Approval",
         columnLabel: "approval_status",
         sortEnabled: false,
-        columnWidth: 75,
-      },
-      {
-        columnName: "Reject/Approve",
-        columnLabel: "approval_button",
-        sortEnabled: false,
-        columnWidth: 75,
+        columnWidth: 80,
       },
       {
         columnName: "Action",
@@ -492,21 +495,6 @@ export default defineComponent({
       }
     }
 
-    const filteredTableHeader = computed(() => {
-      const isAdmin = identifier.value === "Admin";
-      const isCompanyAdmin = identifier.value === "Company-Admin";
-
-      if (isAdmin || isCompanyAdmin) {
-        // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
-        return tableHeader.value;
-      } else {
-        // Otherwise, exclude the 'approval_button' column
-        return tableHeader.value.filter(
-          (column) => column.columnLabel !== "approval_button"
-        );
-      }
-    });
-
     onMounted(async () => {
       await corrective_listing();
     });
@@ -608,7 +596,6 @@ export default defineComponent({
       AddCorrecticeAction,
       EditCorrecticeAction,
       itemId,
-      filteredTableHeader,
       ApprovalStatus,
       GetApprovalStatus,
       itemData,

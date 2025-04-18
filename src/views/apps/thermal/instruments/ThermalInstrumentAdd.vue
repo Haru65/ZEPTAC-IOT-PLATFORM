@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 99%" class="bg-body p-12 rounded">
+  <div style="width: 99%" class="bg-body p-4 rounded">
     <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered">
       <!--begin::Modal content-->
@@ -8,33 +8,23 @@
         <VForm
           id="kt_account_profile_details_form"
           class="form"
+          validate
           :validation-schema="itemDetailsValidator"
+          @submit="submit"
         >
           <!--begin::Card body-->
-          <div class="card-body border-top p-6">
+          <div class="card-body p-4">
             <!--begin::Input group-->
-            <div class="row mb-6" v-if="identifier == 'Admin'">
-              <!--begin::Label-->
-              <label
-                class="col-lg-3 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
-                >Company</label
-              >
-              <!--end::Label-->
-
-              <!--begin::Col-->
-              <div class="col-lg-9 fv-row">
+            <!-- Company Select (Admin Only) -->
+            <div class="row g-6 mb-4" v-if="identifier == 'Admin'">
+              <div class="col-lg-8 col-md-6">
+                <label class="form-label required fw-semibold">Company</label>
                 <el-select
                   v-model="itemDetails.company_id"
                   filterable
-                  placeholder="Please Select Company..."
+                  placeholder="Select Company"
+                  class="w-100 form-control-solid"
                 >
-                  <el-option
-                    disabled="disabled"
-                    value=""
-                    label="Please Select Company..."
-                  >
-                    Please Select Company
-                  </el-option>
                   <el-option
                     v-for="item in Companies"
                     :key="item.id"
@@ -48,35 +38,20 @@
                   </div>
                 </div>
               </div>
-              <!--end::Col-->
             </div>
 
-            <!-- extra fields -->
-            <div class="row mb-6">
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
-                  >Instrument ID.</label
-                >
-                <div class="form-control form-control-lg form-control-solid">
-                  ######
-                </div>
-              </div>
-            </div>
-            <!--end::Input group-->
+            <!-- Instrument Details Row -->
+            <div class="row g-6 mb-4">
 
-            <!-- extra fields -->
-            <div class="row mb-6">
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
-                  >Instument Name</label
+              <div class="col-lg-4 col-md-6 col-12">
+                <label class="form-label required fw-semibold"
+                  >Instrument Name</label
                 >
                 <Field
                   type="text"
                   name="name"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Instrument Model"
+                  class="form-control form-control-solid"
+                  placeholder="Enter Instrument Name"
                   v-model="itemDetails.name"
                 />
                 <div class="fv-plugins-message-container">
@@ -86,16 +61,13 @@
                 </div>
               </div>
 
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
-                  >Make</label
-                >
+              <div class="col-lg-4 col-md-6 col-12">
+                <label class="form-label required fw-semibold">Make</label>
                 <Field
                   type="text"
                   name="make"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Instrument made by... "
+                  class="form-control form-control-solid"
+                  placeholder="Instrument made by..."
                   v-model="itemDetails.make"
                 />
                 <div class="fv-plugins-message-container">
@@ -104,20 +76,13 @@
                   </div>
                 </div>
               </div>
-            </div>
-            <!--end::Input group-->
 
-            <!-- extra fields -->
-            <div class="row mb-6">
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
-                  >Model No.</label
-                >
+              <div class="col-lg-4 col-md-6 col-12">
+                <label class="form-label required fw-semibold">Model No.</label>
                 <Field
                   type="text"
                   name="model_no"
-                  class="form-control form-control-lg form-control-solid"
+                  class="form-control form-control-solid"
                   placeholder="Enter Instrument Model No."
                   v-model="itemDetails.model_no"
                 />
@@ -127,15 +92,15 @@
                   </div>
                 </div>
               </div>
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
+
+              <div class="col-lg-4 col-md-6 col-12">
+                <label class="form-label required fw-semibold"
                   >Serial No.</label
                 >
                 <Field
                   type="text"
                   name="serial_no"
-                  class="form-control form-control-lg form-control-solid"
+                  class="form-control form-control-solid"
                   placeholder="Enter Instrument Serial No."
                   v-model="itemDetails.serial_no"
                 />
@@ -145,20 +110,13 @@
                   </div>
                 </div>
               </div>
-            </div>
-            <!--end::Input group-->
 
-            <!-- extra fields -->
-            <div class="row mb-6">
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
-                  >Range</label
-                >
+              <div class="col-lg-4 col-md-6 col-12">
+                <label class="form-label required fw-semibold">Range</label>
                 <Field
                   type="text"
                   name="ranges"
-                  class="form-control form-control-lg form-control-solid"
+                  class="form-control form-control-solid"
                   placeholder="Enter Instrument ranges"
                   v-model="itemDetails.ranges"
                 />
@@ -169,15 +127,12 @@
                 </div>
               </div>
 
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6"
-                  >Accuracy</label
-                >
+              <div class="col-lg-4 col-md-6 col-12">
+                <label class="form-label required fw-semibold">Accuracy</label>
                 <Field
                   type="text"
                   name="accuracy"
-                  class="form-control form-control-lg form-control-solid"
+                  class="form-control form-control-solid"
                   placeholder="Enter Instrument accuracy"
                   v-model="itemDetails.accuracy"
                 />
@@ -187,80 +142,42 @@
                   </div>
                 </div>
               </div>
-            </div>
-            <!--end::Input group-->
 
-            <div class="row mb-6">
-              <div class="form-group col-md-6 mb-8 mb-sd-8">
-                <label
-                  class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
+              <div class="col-lg-4 col-md-6 col-12">
+                <label class="form-label required fw-semibold"
+                  >Calibration Date</label
                 >
-                  <!--begin::Info-->
-                  <span class="d-block fw-semobold text-start">
-                    <span class="fs-5 fw-bold text-gray-700 text-nowrap"
-                      >Calibration Date</span
-                    >
-                    <div class="block">
-                      <el-date-picker
-                        type="date"
-                        name="calibration_date"
-                        id="calibration_date"
-                        v-model="itemDetails.calibration_date"
-                        placeholder="Pick a Day"
-                        @change="setDates($event, 'calibration_date')"
-                        :editable="false"
-                      />
-                    </div>
-                  </span>
-                  <!--end::Info-->
-                </label>
-                <div
-                  class="fv-plugins-message-container"
-                  v-if="!itemDetails.calibration_date"
-                >
-                  <div class="fv-help-block">
-                    <ErrorMessage name="calibration_date" />
-                  </div>
-                </div>
+                <el-date-picker
+                  type="date"
+                  name="calibration_date"
+                  v-model="itemDetails.calibration_date"
+                  placeholder="Select date"
+                  @change="setDates($event, 'calibration_date')"
+                  class="w-100 form-control-solid"
+                  :editable="false"
+                />
               </div>
 
-              <div class="form-group col-md-6 mb-8 mb-sd-8">
-                <label
-                  class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
+              <div class="col-lg-4 col-md-6 col-12">
+                <label class="form-label required fw-semibold"
+                  >Calibration Due Date</label
                 >
-                  <!--begin::Info-->
-                  <span class="d-block fw-semobold text-start">
-                    <span class="fs-5 fw-bold text-gray-700 text-nowrap"
-                      >Calibration Due Date</span
-                    >
-                    <div class="block">
-                      <el-date-picker
-                        type="date"
-                        name="calibration_due_date"
-                        id="calibration_due_date"
-                        v-model="itemDetails.calibration_due_date"
-                        placeholder="Pick a Day"
-                        @change="setDates($event, 'calibration_due_date')"
-                        :editable="false"
-                      />
-                    </div>
-                  </span>
-                  <!--end::Info-->
-                </label>
-                <div
-                  class="fv-plugins-message-container"
-                  v-if="!itemDetails.calibration_due_date"
-                >
-                  <div class="fv-help-block">
-                    <ErrorMessage name="calibration_due_date" />
-                  </div>
-                </div>
+                <el-date-picker
+                  type="date"
+                  name="calibration_due_date"
+                  v-model="itemDetails.calibration_due_date"
+                  placeholder="Select date"
+                  @change="setDates($event, 'calibration_due_date')"
+                  class="w-100 form-control-solid"
+                  :editable="false"
+                />
               </div>
             </div>
           </div>
-          <div class="modal-footer flex-center">
+          <div class="modal-footer flex-center mt-6">
             <!--begin::Button-->
             <button
+              type="button"
               @click="clear"
               class="btn btn-lg btn-danger w-sd-25 w-lg-25"
             >
@@ -269,10 +186,10 @@
             <!--end::Button-->
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
             <!--begin::Button-->
-            <span
+            <button
+              type="submit"
               :data-kt-indicator="loading ? 'on' : null"
               class="btn btn-lg btn-primary w-sd-25 w-lg-25"
-              @click="submit()"
             >
               <span v-if="!loading" class="indicator-label"> Submit </span>
               <span v-if="loading" class="indicator-progress">
@@ -281,7 +198,7 @@
                   class="spinner-border spinner-border-sm align-middle ms-2"
                 ></span>
               </span>
-            </span>
+            </button>
             <!--end::Button-->
           </div>
           <!--end::Input group-->
@@ -347,10 +264,6 @@ export default defineComponent({
       model_no: Yup.string().required().label("Model No."),
       serial_no: Yup.string().required().label("Serial No."),
       make: Yup.string().required().label("Made by"),
-      calibration_date: Yup.string().required().label("Calibration Date"),
-      calibration_due_date: Yup.string()
-        .required()
-        .label("Calibration Due Date"),
       ranges: Yup.string().required().label("Range"),
       accuracy: Yup.string().required().label("Accuracy"),
     });

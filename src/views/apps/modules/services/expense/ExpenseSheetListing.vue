@@ -206,7 +206,7 @@
           @on-sort="sort"
           @on-items-select="onItemSelect"
           :data="tableData"
-          :header="filteredTableHeader"
+          :header="tableHeader"
           :checkbox-enabled="true"
           :items-per-page="limit"
           :items-per-page-dropdown-enabled="false"
@@ -222,8 +222,8 @@
             {{ expensesheets?.customer?.company_name || "" }}
           </template>
           <template v-slot:engineer="{ row: expensesheets }">
-              {{ expensesheets?.engineer?.first_name || "" }}
-              {{ expensesheets?.engineer?.last_name || "" }}
+            {{ expensesheets?.engineer?.first_name || "" }}
+            {{ expensesheets?.engineer?.last_name || "" }}
           </template>
           <!-- defualt data -->
           <template v-slot:total_amount="{ row: expensesheets }">
@@ -248,33 +248,17 @@
           </template>
 
           <template v-slot:approval_status="{ row: expensesheets }">
+            <!-- Status Badge Only -->
             <span
-              v-if="expensesheets.approval_status == 1"
-              class="badge py-3 px-4 fs-7 badge-light-primary"
-              >{{ GetApprovalStatus(expensesheets.approval_status) }}</span
+              class="badge py-3 px-4 fs-7"
+              :class="{
+                'badge-light-primary': expensesheets.approval_status == 1,
+                'badge-light-danger': expensesheets.approval_status == 2,
+                'badge-light-success': expensesheets.approval_status == 3,
+              }"
             >
-            <span
-              v-if="expensesheets.approval_status == 2"
-              class="badge py-3 px-4 fs-7 badge-light-danger"
-              >{{ GetApprovalStatus(expensesheets.approval_status) }}</span
-            >
-            <span
-              v-if="expensesheets.approval_status == 3"
-              class="badge py-3 px-4 fs-7 badge-light-success"
-              >{{ GetApprovalStatus(expensesheets.approval_status) }}</span
-            >
-          </template>
-
-          <template v-slot:approval_button="{ row: expensesheets }">
-            <button
-              type="button"
-              class="btn btn-sm btn-primary"
-              data-bs-toggle="modal"
-              data-bs-target="#kt_modal_1"
-              @click="fillItemData(expensesheets)"
-            >
-              Open
-            </button>
+              {{ GetApprovalStatus(expensesheets.approval_status) }}
+            </span>
           </template>
 
           <template v-slot:actions="{ row: expensesheets }">
@@ -294,6 +278,27 @@
               <ul
                 class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
               >
+                <template
+                  v-if="
+                    identifier === 'Admin' || identifier === 'Company-Admin' || identifier === 'Site-Incharge'
+                  "
+                >
+                  <li>
+                    <a
+                      class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
+                      data-bs-toggle="modal"
+                      data-bs-target="#kt_modal_1"
+                      @click="fillItemData(expensesheets)"
+                    >
+                      <KTIcon
+                        icon-name="check-circle"
+                        icon-class="fs-3 text-primary"
+                      />
+                      <span class="text-gray-700">Approve/Reject</span>
+                    </a>
+                  </li>
+                </template>
+
                 <!-- Edit / View Expense Sheet -->
                 <li>
                   <router-link
@@ -406,19 +411,19 @@ export default defineComponent({
         columnName: "RGP No.",
         columnLabel: "rgp",
         sortEnabled: true,
+        columnWidth: 100,
+      },
+      {
+        columnName: "Customer",
+        columnLabel: "customer",
+        sortEnabled: true,
         columnWidth: 125,
       },
       {
-        columnName: "Customer Name",
-        columnLabel: "customer",
-        sortEnabled: true,
-        columnWidth: 175,
-      },
-      {
-        columnName: "Engineer Name",
+        columnName: "Engineer",
         columnLabel: "engineer",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 125,
       },
       {
         columnName: "Total Expense",
@@ -433,16 +438,10 @@ export default defineComponent({
         columnWidth: 100,
       },
       {
-        columnName: "Approval Status",
+        columnName: "Approval",
         columnLabel: "approval_status",
         sortEnabled: false,
-        columnWidth: 75,
-      },
-      {
-        columnName: "Reject/Approve",
-        columnLabel: "approval_button",
-        sortEnabled: false,
-        columnWidth: 75,
+        columnWidth: 80,
       },
       {
         columnName: "Action",
@@ -636,22 +635,6 @@ export default defineComponent({
         PagePointer(page.value);
       }
     };
-
-    const filteredTableHeader = computed(() => {
-      const isAdmin = identifier.value === "Admin";
-      const isCompanyAdmin = identifier.value === "Company-Admin";
-      const isSiteIncharge = identifier.value === "Site-Incharge";
-
-      if (isAdmin || isCompanyAdmin || isSiteIncharge) {
-        // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
-        return tableHeader.value;
-      } else {
-        // Otherwise, exclude the 'approval_button' column
-        return tableHeader.value.filter(
-          (column) => column.columnLabel !== "approval_button"
-        );
-      }
-    });
 
     const financialYears = ref(authStore.financialYears); // Generate Financial years list using the auth store function
     const selectedYearCache = ref(
@@ -937,7 +920,6 @@ export default defineComponent({
       Limits,
       formatPrice,
       GetExpenseStatus,
-      filteredTableHeader,
       ApprovalStatus,
       GetApprovalStatus,
       itemData,

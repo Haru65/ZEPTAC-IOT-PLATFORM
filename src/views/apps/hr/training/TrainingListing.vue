@@ -122,7 +122,7 @@
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
-        :header="filteredTableHeader"
+        :header="tableHeader"
         :checkbox-enabled="true"
         :items-per-page="limit"
         :items-per-page-dropdown-enabled="false"
@@ -182,34 +182,19 @@
           >
         </template>
         <template v-slot:approval_status="{ row: training }">
+          <!-- Status Badge Only -->
           <span
-            v-if="training.approval_status == 1"
-            class="badge py-3 px-4 fs-7 badge-light-primary"
-            >{{ GetApprovalStatus(training.approval_status) }}</span
+            class="badge py-3 px-4 fs-7"
+            :class="{
+              'badge-light-primary': training.approval_status == 1,
+              'badge-light-danger': training.approval_status == 2,
+              'badge-light-success': training.approval_status == 3,
+            }"
           >
-          <span
-            v-if="training.approval_status == 2"
-            class="badge py-3 px-4 fs-7 badge-light-danger"
-            >{{ GetApprovalStatus(training.approval_status) }}</span
-          >
-          <span
-            v-if="training.approval_status == 3"
-            class="badge py-3 px-4 fs-7 badge-light-success"
-            >{{ GetApprovalStatus(training.approval_status) }}</span
-          >
+            {{ GetApprovalStatus(training.approval_status) }}
+          </span>
         </template>
 
-        <template v-slot:approval_button="{ row: training }">
-          <button
-            type="button"
-            class="btn btn-sm btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#kt_modal_1"
-            @click="fillItemData(training)"
-          >
-            Open
-          </button>
-        </template>
         <template v-slot:actions="{ row: training }">
           <!--begin::Menu Flex-->
           <div class="dropdown">
@@ -227,6 +212,24 @@
             <ul
               class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
             >
+              <template
+                v-if="identifier === 'Admin' || identifier === 'Company-Admin'"
+              >
+                <li>
+                  <a
+                    class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
+                    data-bs-toggle="modal"
+                    data-bs-target="#kt_modal_1"
+                    @click="fillItemData(training)"
+                  >
+                    <KTIcon
+                      icon-name="check-circle"
+                      icon-class="fs-3 text-primary"
+                    />
+                    <span class="text-gray-700">Approve/Reject</span>
+                  </a>
+                </li>
+              </template>
               <!-- Edit / View Training -->
               <li>
                 <router-link
@@ -355,16 +358,10 @@ export default defineComponent({
         columnWidth: 85,
       },
       {
-        columnName: "Approval Status",
+        columnName: "Approval",
         columnLabel: "approval_status",
         sortEnabled: false,
-        columnWidth: 75,
-      },
-      {
-        columnName: "Reject/Approve",
-        columnLabel: "approval_button",
-        sortEnabled: false,
-        columnWidth: 75,
+        columnWidth: 80,
       },
       {
         columnName: "Action",
@@ -572,21 +569,6 @@ export default defineComponent({
         }, 100);
       }
     }
-
-    const filteredTableHeader = computed(() => {
-      const isAdmin = identifier.value === "Admin";
-      const isCompanyAdmin = identifier.value === "Company-Admin";
-
-      if (isAdmin || isCompanyAdmin) {
-        // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
-        return tableHeader.value;
-      } else {
-        // Otherwise, exclude the 'approval_button' column
-        return tableHeader.value.filter(
-          (column) => column.columnLabel !== "approval_button"
-        );
-      }
-    });
 
     const financialYears = ref(authStore.financialYears); // Generate Financial years list using the auth store function
     const selectedYearCache = ref(
@@ -883,7 +865,6 @@ export default defineComponent({
       PageLimitPoiner,
       GetTrainingStatus,
       GetTrainingMode,
-      filteredTableHeader,
       ApprovalStatus,
       GetApprovalStatus,
       itemData,

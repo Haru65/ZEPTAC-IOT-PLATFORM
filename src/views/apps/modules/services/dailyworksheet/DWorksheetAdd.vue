@@ -1,546 +1,289 @@
 <template>
-  <div style="width: 99%" class="bg-body p-12 rounded">
+  <div style="width: 99%" class="bg-body p-4 rounded">
     <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered">
       <!--begin::Modal content-->
       <div class="modal-content">
-        <!--end::Form-->
         <VForm
           class="form"
           validate
           :validation-schema="worksheetDetailsValidator"
           @submit="submit"
         >
-          <!--begin::Card body-->
-          <div class="card-body p-sd-2 p-lg-9">
-            <!-- extra fields -->
-            <div class="row mb-6">
-              <div class="form-group col-md-6 mb-8 mb-sd-8">
-                <label
-                  class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
-                  >Gate Pass
-                </label>
-                <div>
-                  <el-select
-                    v-model="itemDetails.rgp_id"
-                    filterable
-                    placeholder="Please Select GatePass"
-                    name="rgp_id"
-                    @change="fetchRGP(itemDetails.rgp_id)"
-                  >
-                    <el-option
-                      value=""
-                      disabled="disabled"
-                      label="Please Select GatePass"
-                      key=""
-                    >
-                      Please Select GatePass</el-option
-                    >
-                    <el-option
-                      v-for="item in RGatePasses"
-                      :key="item.id"
-                      :value="item.id"
-                      :label="item.rgp_no"
-                    />
-                  </el-select>
-                  <div
-                    class="fv-plugins-message-container"
-                    v-if="!itemDetails.rgp_id"
-                  >
-                    <div class="fv-help-block">
-                      <ErrorMessage name="rgp_id" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="form-group col-md-6 mb-8 mb-sd-8">
-                <label
-                  class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
-                  >Service Engineer
-                </label>
-                <div>
-                  <el-select
-                    filterable
-                    placeholder="Select Service Engineer..."
-                    name="engineer_id"
-                    v-model="itemDetails.engineer_id"
-                  >
-                    <el-option
-                      value="Select Service Engineer..."
-                      disabled="disabled"
-                      label="Select Service Engineer..."
-                      key=""
-                    >
-                      Select Service Engineer...</el-option
-                    >
-                    <el-option
-                      v-for="engineer in Engineers"
-                      :key="engineer.id"
-                      :value="engineer.id"
-                      :label="`${engineer.first_name} ${engineer.last_name}`"
-                    />
-                  </el-select>
-                  <div
-                    class="fv-plugins-message-container"
-                    v-if="!itemDetails.engineer_id"
-                  >
-                    <div class="fv-help-block">
-                      <ErrorMessage name="engineer_id" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!--end::Input group-->
-
-            <!--begin::Input group-->
-            <div class="row mb-6" v-if="itemDetails.rgp_id">
-              <!--begin::Col-->
-              <div class="col-md-6 fv-row mb-8 mb-sd-8">
-                <!--begin::Label-->
-                <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                  >Customer :</label
+          <div class="card-body p-4">
+            <!-- Row 1 -->
+            <div class="row g-6 mb-4">
+              <div class="col-md-4">
+                <label class="form-label required fw-bold">Gate Pass</label>
+                <el-select
+                  v-model="itemDetails.rgp_id"
+                  filterable
+                  placeholder="Select GatePass"
+                  @change="fetchRGP(itemDetails.rgp_id)"
+                  class="w-100"
                 >
-                <!--end::Label-->
-
-                <!--begin::Input-->
-                <div class="form-control form-control-lg form-control-solid">
-                  <div>
-                    {{ RgpData?.quotation?.customer.company_name || "" }}
-                  </div>
-                  <div class="mt-2 pt-4">
-                    <h6 class="mt-5">Billing Address:</h6>
-                    <div class="mt-2">
-                      <div class="mb-1">
-                        <br />
-                        <span
-                          v-show="RgpData?.quotation?.customer.company_name"
-                        >
-                          {{
-                            `${RgpData?.quotation?.customer.company_name || ""}`
-                          }}
-                        </span>
-                        <br />
-                        <span>
-                          {{ `${RgpData?.quotation?.customer.name}` }}
-                        </span>
-                        <!-- v-if company_data present -->
-                        <div v-show="RgpData?.quotation?.customer.company_name">
-                          <br />
-                          <span>
-                            {{
-                              `${RgpData?.quotation?.customer.address1 || ""}`
-                            }}
-                          </span>
-                          <br />
-                          <span>
-                            {{
-                              `${RgpData?.quotation?.customer.address2 || ""}`
-                            }}
-                          </span>
-                        </div>
-                        <div v-show="RgpData?.quotation?.customer.country">
-                          <span>
-                            {{
-                              `${RgpData?.quotation?.customer.city || ""} - ${
-                                RgpData?.quotation?.customer.pincode || ""
-                              }`
-                            }}
-                          </span>
-                          <br />
-                          <span>
-                            {{
-                              `${RgpData?.quotation?.customer.state || ""} ${
-                                RgpData?.quotation?.customer.country || ""
-                              }`
-                            }}
-                          </span>
-                          <br />
-                        </div>
-                      </div>
-                      <br />
-                    </div>
-                  </div>
-                </div>
-
-                <!--end::Input-->
+                  <el-option
+                    v-for="item in RGatePasses"
+                    :key="item.id"
+                    :value="item.id"
+                    :label="item.rgp_no"
+                  />
+                </el-select>
+                <ErrorMessage name="rgp_id" class="text-danger small" />
               </div>
-              <!--end::Col-->
-              <!--begin::Col-->
-              <div class="col-md-6 fv-row mb-8 mb-sd-8">
-                <!--begin::Label-->
-                <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                  >Client :</label
+
+              <div class="col-md-4">
+                <label class="form-label required fw-bold"
+                  >Service Engineer</label
                 >
-                <!--end::Label-->
-
-                <!--begin::Input-->
-                <div class="form-control form-control-lg form-control-solid">
-                  <div>
-                    {{ RgpData?.quotation?.clientx.company_name }}
-                  </div>
-                  <div class="mt-2 pt-4">
-                    <h6 class="mt-5">Site Address:</h6>
-                    <div class="mt-2">
-                      <div class="mb-1" v-show="RgpData?.quotation?.clientx">
-                        <br />
-                        <span v-show="RgpData?.quotation?.clientx.company_name">
-                          {{
-                            `${RgpData?.quotation?.clientx.company_name || ""}`
-                          }}
-                        </span>
-                        <br />
-                        <span>
-                          {{ `${RgpData?.quotation?.clientx.name || ""}` }}
-                        </span>
-                        <!-- v-if company_data present -->
-                        <div v-show="RgpData?.quotation?.clientx.company_name">
-                          <br />
-                          <span>
-                            {{
-                              `${RgpData?.quotation?.clientx.address1 || ""}`
-                            }}
-                          </span>
-                          <br />
-                          <span>
-                            {{
-                              `${RgpData?.quotation?.clientx.address2 || ""}`
-                            }}
-                          </span>
-                        </div>
-                        <div v-show="RgpData?.quotation?.clientx.country">
-                          <span>
-                            {{
-                              `${RgpData?.quotation?.clientx.city || ""} - ${
-                                RgpData?.quotation?.clientx.pincode || ""
-                              }`
-                            }}
-                          </span>
-                          <br />
-                          <span>
-                            {{
-                              `${RgpData?.quotation?.clientx.state || ""} ${
-                                RgpData?.quotation?.clientx.country || ""
-                              }`
-                            }}
-                          </span>
-                          <br />
-                        </div>
-                      </div>
-                      <br />
-                    </div>
-                  </div>
-                </div>
-
-                <!--end::Input-->
+                <el-select
+                  v-model="itemDetails.engineer_id"
+                  filterable
+                  placeholder="Select Engineer"
+                  class="w-100"
+                >
+                  <el-option
+                    v-for="engineer in Engineers"
+                    :key="engineer.id"
+                    :value="engineer.id"
+                    :label="`${engineer.first_name} ${engineer.last_name}`"
+                  />
+                </el-select>
+                <ErrorMessage name="engineer_id" class="text-danger small" />
               </div>
-              <!--end::Col-->
-            </div>
-            <!--end::Input group-->
 
-            <div class="row mb-6">
-              <div class="form-group col-md-6 mb-8 mb-sd-8">
-                <label
-                  class="btn btn-outline btn-outline-dashed btn-outline-default p-5 d-flex align-items-center"
-                >
-                  <!--begin::Info-->
-                  <span class="d-block fw-semobold text-start">
-                    <span class="text-dark fw-bold d-block fs-4 mb-2"
-                      >Work Status</span
-                    >
+              <div class="col-md-4">
+                <label class="form-label required fw-bold">Work Status</label>
+                <div class="d-flex gap-3 my-6">
+                  <div class="form-check">
                     <input
                       type="radio"
-                      class="btn-check"
-                      name="work_status"
-                      id="1"
+                      class="form-check-input"
+                      id="ongoing"
                       value="1"
                       v-model="itemDetails.work_status"
-                      autocomplete="off"
                     />
-                    <label class="btn btn-outline-primary" for="1"
+                    <label class="form-check-label" for="ongoing"
                       >Ongoing</label
                     >
-
+                  </div>
+                  <div class="form-check">
                     <input
                       type="radio"
-                      class="btn-check"
-                      name="work_status"
-                      id="2"
-                      v-model="itemDetails.work_status"
+                      class="form-check-input"
+                      id="completed"
                       value="2"
-                      autocomplete="off"
+                      v-model="itemDetails.work_status"
                     />
-                    <label class="btn btn-outline-primary" for="2"
+                    <label class="form-check-label" for="completed"
                       >Completed</label
                     >
-                  </span>
-                  <!--end::Info-->
-                </label>
-              </div>
-              <div class="form-group col-md-6 mb-8 mb-sd-8">
-                <label
-                  class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
-                >
-                  <!--begin::Info-->
-                  <span class="d-block fw-semobold text-start">
-                    <span class="text-dark fw-bold d-block fs-4 mb-2"
-                      >Work Date</span
-                    >
-                    <div class="block">
-                      <el-date-picker
-                        type="date"
-                        name="work_date"
-                        id="work_date"
-                        v-model="itemDetails.work_date"
-                        @change="setDates($event, 'work_date')"
-                        placeholder="Pick Work Day"
-                        :editable="false"
-                      />
-                    </div>
-                  </span>
-                  <!--end::Info-->
-                </label>
-                <div
-                  class="fv-plugins-message-container"
-                  v-if="!itemDetails.work_date"
-                >
-                  <div class="fv-help-block">
-                    <ErrorMessage name="work_date" />
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="row mb-6">
-              <div class="form-group col-md-6 mb-8 mb-sd-8">
-                <label
-                  class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
-                >
-                  <!--begin::Info-->
-                  <span class="d-block fw-semobold text-start">
-                    <span class="text-dark fw-bold d-block fs-4 mb-2"
-                      >Work Start Time</span
-                    >
-                    <div class="block">
-                      <el-time-picker
-                        type="time"
-                        id="start_time"
-                        name="start_time"
-                        v-model="itemDetails.start_time"
-                        @change="setDateTiming($event, 'start_time')"
-                        placeholder="Pick start time"
-                        :editable="false"
-                      />
+            <!-- Customer/Client Info Row -->
+            <div class="row g-6 mb-4" v-if="itemDetails.rgp_id">
+              <div class="col-md-6">
+                <div class="border rounded p-3 h-100">
+                  <label class="fw-bold mb-2">Customer</label>
+                  <div class="small">
+                    <div class="fw-semibold">
+                      {{ RgpData?.quotation?.customer.company_name || "" }}
                     </div>
-                  </span>
-                  <!--end::Info-->
-                </label>
-                <div
-                  class="fv-plugins-message-container"
-                  v-if="!itemDetails.start_time"
-                >
-                  <div class="fv-help-block">
-                    <ErrorMessage name="start_time" />
+                    <div class="mt-2 fw-semibold">Billing Address:</div>
+                    <div>
+                      {{ RgpData?.quotation?.customer.name }}<br />
+                      <template
+                        v-if="RgpData?.quotation?.customer.company_name"
+                      >
+                        {{ RgpData?.quotation?.customer.company_name }}<br />
+                        {{ RgpData?.quotation?.customer.address1 }}<br />
+                        {{ RgpData?.quotation?.customer.address2 }}<br />
+                      </template>
+                      <template v-if="RgpData?.quotation?.customer.country">
+                        {{ RgpData?.quotation?.customer.city }} -
+                        {{ RgpData?.quotation?.customer.pincode }}<br />
+                        {{ RgpData?.quotation?.customer.state }}
+                        {{ RgpData?.quotation?.customer.country }}
+                      </template>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="form-group col-md-6 mb-8 mb-sd-8">
-                <label
-                  class="btn btn-outline btn-outline-dashed btn-outline-default p-7 d-flex align-items-center"
-                >
-                  <!--begin::Info-->
-                  <span class="d-block fw-semobold text-start">
-                    <span class="text-dark fw-bold d-block fs-4 mb-2"
-                      >Work Finish Time</span
-                    >
-                    <div class="block">
-                      <el-time-picker
-                        type="time"
-                        name="end_time"
-                        id="end_time"
-                        v-model="itemDetails.end_time"
-                        @change="setDateTiming($event, 'end_time')"
-                        placeholder="Pick end time"
-                        :editable="false"
-                      />
+
+              <div class="col-md-6">
+                <div class="border rounded p-3 h-100">
+                  <label class="fw-bold mb-2">Client</label>
+                  <div class="small">
+                    <div class="fw-semibold">
+                      {{ RgpData?.quotation?.clientx.company_name }}
                     </div>
-                  </span>
-                  <!--end::Info-->
-                </label>
-                <div
-                  class="fv-plugins-message-container"
-                  v-if="!itemDetails.end_time"
-                >
-                  <div class="fv-help-block">
-                    <ErrorMessage name="end_time" />
+                    <div class="mt-2 fw-semibold">Site Address:</div>
+                    <div>
+                      {{ RgpData?.quotation?.clientx.name }}<br />
+                      <template v-if="RgpData?.quotation?.clientx.company_name">
+                        {{ RgpData?.quotation?.clientx.company_name }}<br />
+                        {{ RgpData?.quotation?.clientx.address1 }}<br />
+                        {{ RgpData?.quotation?.clientx.address2 }}<br />
+                      </template>
+                      <template v-if="RgpData?.quotation?.clientx.country">
+                        {{ RgpData?.quotation?.clientx.city }} -
+                        {{ RgpData?.quotation?.clientx.pincode }}<br />
+                        {{ RgpData?.quotation?.clientx.state }}
+                        {{ RgpData?.quotation?.clientx.country }}
+                      </template>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="row mb-6">
-              <div class="form-group col-md-6 mb-8 mb-sd-8">
-                <label
-                  class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
-                  >Scope of Work</label
-                >
+            <!-- Row 2 -->
+            <div class="row g-6 mb-4">
+              <div class="col-md-4">
+                <label class="form-label required fw-bold">Work Date</label>
+                <el-date-picker
+                  v-model="itemDetails.work_date"
+                  type="date"
+                  placeholder="Select date"
+                  @change="setDates($event, 'work_date')"
+                  class="w-100"
+                />
+                <ErrorMessage name="work_date" class="text-danger small" />
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label required fw-bold">Start Time</label>
+                <el-time-picker
+                  v-model="itemDetails.start_time"
+                  placeholder="Select time"
+                  @change="setDateTiming($event, 'start_time')"
+                  class="w-100"
+                />
+                <ErrorMessage name="start_time" class="text-danger small" />
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label required fw-bold">End Time</label>
+                <el-time-picker
+                  v-model="itemDetails.end_time"
+                  placeholder="Select time"
+                  @change="setDateTiming($event, 'end_time')"
+                  class="w-100"
+                />
+                <ErrorMessage name="end_time" class="text-danger small" />
+              </div>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="row g-6 mb-4 mt-4">
+              <div class="col-md-4">
+                <label class="form-label required fw-bold">Scope of Work</label>
                 <Field
-                  type="textarea"
                   as="textarea"
                   name="scope_of_work"
-                  rows="4"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Specify scope of work..."
+                  rows="2"
+                  class="form-control"
                   v-model="itemDetails.scope_of_work"
                 />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="scope_of_work" />
-                  </div>
-                </div>
+                <ErrorMessage name="scope_of_work" class="text-danger small" />
               </div>
-              <div class="form-group col-md-6 mb-8 mb-sd-8">
-                <label
-                  class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
-                  >Problem Faced (if any)</label
-                >
+
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Problem Faced</label>
                 <Field
-                  type="textarea"
                   as="textarea"
                   name="problem"
-                  rows="4"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Specify any problem faced..."
+                  rows="2"
+                  class="form-control"
                   v-model="itemDetails.problem"
                 />
               </div>
+
+              <div class="col-md-4">
+                <label class="form-label required fw-bold">Standard Used</label>
+                <el-select
+                  v-model="itemDetails.standard_used"
+                  filterable
+                  placeholder="Select standard"
+                  class="w-100"
+                >
+                  <el-option
+                    v-for="criteria in AcceptanceCriteria"
+                    :key="criteria.id"
+                    :value="criteria.id"
+                    :label="criteria.certified"
+                  />
+                </el-select>
+                <ErrorMessage name="standard_used" class="text-danger small" />
+              </div>
             </div>
 
-            <div class="row mb-6">
-              <div class="form-group col-md-12 mb-8 mb-sd-8">
-                <label
-                  class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
-                  >Tests Conducted</label
+            <!-- Tests Conducted -->
+            <div class="mb-4">
+              <label class="form-label required fw-bold">Tests Conducted</label>
+              <div class="row g-3">
+                <div
+                  class="col-md-4 col-lg-3 col-6"
+                  v-for="test in ConductedTests"
+                  :key="test.id"
                 >
-                <div class="row">
-                  <div
-                    class="col-lg-3 col-md-4 col-sm-12"
-                    v-for="test in ConductedTests"
-                    :key="test.id"
-                  >
-                    <div class="d-flex align-items-center p-3 m-3">
-                      <!--begin::Checkbox-->
-                      <label
-                        class="form-check form-check-custom form-check-solid me-10"
-                      >
-                        <Field
-                          class="form-check-input border-dark"
-                          type="checkbox"
-                          name="test"
-                          :value="test.test"
-                          :id="test.id"
-                          :v-model="selectedTests"
-                          @click="ToggleCheckBoxForTests($event)"
-                        />
-
-                        <span
-                          class="form-check-label fs-5 fw-semibold text-nowrap text-gray-700"
-                          >{{ test.test }}</span
-                        >
-                      </label>
-                      <!--end::Checkbox-->
-                    </div>
+                  <div class="form-check">
+                    <Field
+                      type="checkbox"
+                      name="test"
+                      :value="test.test"
+                      :id="'test-' + test.id.toString()"
+                      class="form-check-input"
+                      @click="ToggleCheckBoxForTests($event)"
+                    />
+                    <label
+                      class="form-check-label text-gray-700"
+                      :for="'test-' + test.id.toString()"
+                    >
+                      {{ test.test }}
+                    </label>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="row mb-6">
-              <div class="form-group col-12 mb-8">
-                <label
-                  class="col-lg-4 col-form-label fs-5 fw-bold text-gray-700 text-nowrap"
-                  >Any Other Test (if any)</label
-                >
+            <!-- Row 4 -->
+            <div class="row g-4 mb-4">
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Other Test</label>
                 <Field
-                  type="textarea"
                   as="textarea"
                   name="other_test"
-                  rows="3"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Specify the test name..."
+                  rows="2"
+                  class="form-control"
                   v-model="itemDetails.other_test"
                 />
               </div>
-            </div>
 
-            <div class="row mb-6">
-              <div class="form-group col-md-6 mb-8 mb-sd-8">
-                <label
-                  class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
-                  >Standard Used</label
-                >
-                <div>
-                  <el-select
-                    filterable
-                    placeholder="Please Select Standard Used..."
-                    name="acceptance_criteria"
-                    v-model="itemDetails.standard_used"
-                  >
-                    <el-option
-                      value=""
-                      disabled="disabled"
-                      label="Please Select Standard Used..."
-                      key=""
-                    >
-                      Please Select Standard Used...</el-option
-                    >
-                    <el-option
-                      v-for="criteria in AcceptanceCriteria"
-                      :key="criteria.id"
-                      :value="criteria.id"
-                      :label="criteria.certified"
-                    />
-                  </el-select>
-                </div>
-                <div
-                  class="fv-plugins-message-container"
-                  v-if="!itemDetails.standard_used"
-                >
-                  <div class="fv-help-block">
-                    <ErrorMessage name="standard_used" />
-                  </div>
-                </div>
-              </div>
-              <div class="form-group col-md-6 mb-8 mb-sd-8">
-                <label
-                  class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
-                  >Witnessed By</label
-                >
+              <div class="col-md-4">
+                <label class="form-label required fw-bold">Witnessed By</label>
                 <Field
                   type="text"
                   name="witnessed_by"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="witnessed by..."
+                  class="form-control"
                   v-model="itemDetails.witnessed_by"
                 />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="witnessed_by" />
-                  </div>
-                </div>
+                <ErrorMessage name="witnessed_by" class="text-danger small" />
               </div>
             </div>
           </div>
-          <div class="modal-footer flex-center w-100">
+          <div class="modal-footer flex-center mt-6">
             <!--begin::Button-->
             <button
-              id="kt_modal_new_address_submit"
               type="submit"
-              ref="submitButton"
+              :data-kt-indicator="loading ? 'on' : null"
               class="btn btn-lg btn-primary w-sd-25 w-lg-25"
             >
-              <span class="indicator-label"> Save </span>
-              <span class="indicator-progress">
+              <span v-if="!loading" class="indicator-label"> Submit </span>
+              <span v-if="loading" class="indicator-progress">
                 Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
@@ -549,7 +292,6 @@
             </button>
             <!--end::Button-->
           </div>
-          <!--end::Input group-->
         </VForm>
       </div>
     </div>

@@ -1,493 +1,323 @@
 <template>
-  <!--begin::Stepper-->
-  <div
-    class="stepper stepper-pills stepper-column d-flex flex-column flex-xl-row flex-row-fluid"
-    id="kt_modal_create_app_stepper"
-    ref="createAppStepperRef"
-  >
-    <!--begin::Aside-->
-    <div
-      class="card d-flex justify-content-center justify-content-xl-start flex-row-auto w-100 w-xl-300px w-xxl-400px me-9"
-    >
-      <!--begin::Wrapper-->
-      <div class="card-body px-6 px-lg-10 px-xxl-15 py-20">
+  <!--begin::Card-->
+  <div class="card">
+    <!--begin::Card body-->
+    <div class="card-body">
+      <!--begin::Stepper-->
+      <div
+        class="stepper stepper-links d-flex flex-column"
+        id="kt_create_account_stepper"
+        ref="horizontalWizardRef"
+      >
         <!--begin::Nav-->
-        <div class="stepper-nav">
+        <div class="stepper-nav py-5 mt-5">
           <!--begin::Step 1-->
           <div class="stepper-item current" data-kt-stepper-element="nav">
-            <div class="stepper-wrapper">
-              <!--begin::Icon-->
-              <div class="stepper-icon w-40px h-40px">
-                <i class="stepper-check fas fa-check"></i>
-                <span class="stepper-number">1</span>
-              </div>
-              <!--end::Icon-->
-
-              <!--begin::Label-->
-              <div class="stepper-label">
-                <h3 class="stepper-title">Report Details</h3>
-
-                <div class="stepper-desc fw-semobold">fill report details</div>
-              </div>
-              <!--end::Label-->
-            </div>
-
-            <!--begin::Line-->
-            <div class="stepper-line h-40px"></div>
-            <!--end::Line-->
+            <h3 class="stepper-title">Report Details</h3>
           </div>
           <!--end::Step 1-->
 
           <!--begin::Step 2-->
           <div class="stepper-item" data-kt-stepper-element="nav">
-            <div class="stepper-wrapper">
-              <!--begin::Icon-->
-              <div class="stepper-icon w-40px h-40px">
-                <i class="stepper-check fas fa-check"></i>
-                <span class="stepper-number">2</span>
-              </div>
-              <!--end::Icon-->
-
-              <!--begin::Label-->
-              <div class="stepper-label">
-                <h3 class="stepper-title">Thermal Instrument Selection</h3>
-                <div class="stepper-desc fw-semobold text-wrap">
-                  pick unique instruments based on testo CSV files
-                </div>
-              </div>
-              <!--end::Label-->
-            </div>
-            <!--begin::Line-->
-            <div class="stepper-line h-40px"></div>
-            <!--end::Line-->
+            <h3 class="stepper-title">Thermal Instrument Selection</h3>
           </div>
           <!--end::Step 2-->
 
           <!--begin::Step 3-->
           <div class="stepper-item" data-kt-stepper-element="nav">
-            <div class="stepper-wrapper">
-              <!--begin::Icon-->
-              <div class="stepper-icon w-40px h-40px">
-                <i class="stepper-check fas fa-check"></i>
-                <span class="stepper-number">3</span>
-              </div>
-              <!--end::Icon-->
-
-              <!--begin::Label-->
-              <div class="stepper-label">
-                <h3 class="stepper-title">Files</h3>
-                <div class="stepper-desc fw-semobold">
-                  provide testo CSV files based on instrument selected
-                </div>
-              </div>
-              <!--end::Label-->
-            </div>
+            <h3 class="stepper-title">Files</h3>
           </div>
           <!--end::Step 3-->
         </div>
         <!--end::Nav-->
-      </div>
-      <!--end::Wrapper-->
-    </div>
-    <!--begin::Aside-->
 
-    <!--begin::Content-->
-    <div class="card d-flex flex-row-fluid flex-center">
-      <!--begin::Form-->
-      <form
-        class="py-20 w-100 w-xl-100 px-9"
-        novalidate
-        id="kt_create_account_form"
-        @submit="handleStep"
-      >
-        <!--begin::Step 1-->
-        <div class="current" data-kt-stepper-element="content">
-          <!--begin::Wrapper-->
-          <div class="w-100">
-            <!--begin::Heading-->
-            <div class="pb-10 pb-lg-10">
-              <!--begin::Title-->
-              <h2 class="fw-bold d-flex align-items-center text-dark">
-                <span class="badge-light-primary rounded p-3">
-                  Thermal Mapping Report Details
-                </span>
-              </h2>
-              <!--end::Title-->
-            </div>
-            <!--end::Heading-->
+        <!--begin::Form-->
+        <form
+          class="mx-auto w-100 p-2"
+          novalidate
+          id="kt_create_account_form"
+          @submit="handleStep"
+        >
+          <!-- Step 1 -->
+          <div
+            class="current text-gray-800 fs-6"
+            data-kt-stepper-element="content"
+          >
+            <div class="w-100">
+              <!--begin::Heading-->
+              <div class="pb-5 pb-lg-5">
+                <h2 class="fw-bold d-flex align-items-center text-dark">
+                  <span class="badge-light-primary rounded p-3">
+                    Thermal Mapping Report Details
+                  </span>
+                </h2>
+              </div>
+              <!--end::Heading-->
 
-            <div class="row mb-6">
-              <!--begin::Label-->
-              <label
-                class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-              >
-                <span>Returnable Gate Pass</span>
-                <i
-                  class="fas fa-exclamation-circle ms-2 fs-7"
-                  data-bs-toggle="tooltip"
-                  title="Select at least one engineer"
-                ></i>
-              </label>
-              <!--end::Label-->
-
-              <!--begin::Col-->
-              <div class="col-lg-8 fv-row">
-                <el-select
-                  v-model="itemDetails.rgp_id"
-                  filterable
-                  placeholder="Please Select GatePass"
-                  @change="fetchRGP(itemDetails.rgp_id)"
-                >
-                  <el-option
-                    value=""
-                    disabled="disabled"
-                    label="Please Select GatePass"
-                    key=""
+              <!-- Returnable Gate Pass -->
+              <div class="row g-6 mb-4">
+                <div class="col-12">
+                  <label class="form-label required font-semibold"
+                    >Returnable Gate Pass</label
                   >
-                    Please Select GatePass</el-option
+                  <el-select
+                    v-model="itemDetails.rgp_id"
+                    filterable
+                    placeholder="Please Select GatePass"
+                    @change="fetchRGP(itemDetails.rgp_id)"
+                    class="w-100"
                   >
-                  <el-option
-                    v-for="item in RGatePasses"
-                    :key="item.id"
-                    :value="item.id"
-                    :label="item.rgp_no"
+                    <el-option
+                      value=""
+                      disabled="disabled"
+                      label="Please Select GatePass"
+                      key=""
+                    >
+                      Please Select GatePass</el-option
+                    >
+                    <el-option
+                      v-for="item in RGatePasses"
+                      :key="item.id"
+                      :value="item.id"
+                      :label="item.rgp_no"
+                    />
+                  </el-select>
+                </div>
+              </div>
+
+              <!-- Customer/Client Info -->
+              <div class="row g-6 mb-4" v-if="itemDetails.rgp_id">
+                <div class="col-md-6">
+                  <div class="border rounded p-3 h-100">
+                    <label class="font-semibold mb-2">Customer</label>
+                    <div class="small">
+                      <div>
+                        {{ RgpData?.quotation?.customer?.company_name || "" }}
+                      </div>
+                      <div class="mt-2 font-semibold">Billing Address:</div>
+                      <div>
+                        {{ RgpData?.quotation?.customer?.name || "" }}<br />
+                        <template
+                          v-if="RgpData?.quotation?.customer?.company_name"
+                        >
+                          {{ RgpData?.quotation?.customer?.company_name }}<br />
+                          {{ RgpData?.quotation?.customer?.address1 || ""
+                          }}<br />
+                          {{ RgpData?.quotation?.customer?.address2 || ""
+                          }}<br />
+                        </template>
+                        <template v-if="RgpData?.quotation?.customer?.country">
+                          {{ RgpData?.quotation?.customer?.city || "" }} -
+                          {{ RgpData?.quotation?.customer?.pincode || ""
+                          }}<br />
+                          {{ RgpData?.quotation?.customer?.state || "" }}
+                          {{ RgpData?.quotation?.customer?.country || "" }}
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="border rounded p-3 h-100">
+                    <label class="font-semibold mb-2">Client</label>
+                    <div class="small">
+                      <div>
+                        {{ RgpData?.quotation?.clientx?.company_name || "" }}
+                      </div>
+                      <div class="mt-2 font-semibold">Site Address:</div>
+                      <div>
+                        {{ RgpData?.quotation?.clientx?.name || "" }}<br />
+                        <template
+                          v-if="RgpData?.quotation?.clientx?.company_name"
+                        >
+                          {{ RgpData?.quotation?.clientx?.company_name }}<br />
+                          {{ RgpData?.quotation?.clientx?.address1 || ""
+                          }}<br />
+                          {{ RgpData?.quotation?.clientx?.address2 || ""
+                          }}<br />
+                        </template>
+                        <template v-if="RgpData?.quotation?.clientx?.country">
+                          {{ RgpData?.quotation?.clientx?.city || "" }} -
+                          {{ RgpData?.quotation?.clientx?.pincode || "" }}<br />
+                          {{ RgpData?.quotation?.clientx?.state || "" }}
+                          {{ RgpData?.quotation?.clientx?.country || "" }}
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Date/Time Fields -->
+              <div class="row g-6 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label required font-semibold"
+                    >Validation Start Date</label
+                  >
+                  <el-date-picker
+                    type="date"
+                    name="val_start_date"
+                    id="val_start_date"
+                    placeholder="Pick a Day"
+                    @change="setDates($event, 'val_start_date')"
+                    v-model="itemDetails.val_start_date"
+                    :editable="false"
+                    class="w-100"
                   />
-                </el-select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label required font-semibold"
+                    >Start Time</label
+                  >
+                  <el-time-picker
+                    name="start_time"
+                    id="start_time"
+                    v-model="itemDetails.start_time"
+                    placeholder="Pick a Day"
+                    @change="setTimes($event)"
+                    class="w-100"
+                  />
+                </div>
               </div>
-              <!--end::Col-->
-            </div>
 
-            <!--begin::Input group-->
-            <div class="row mb-6" v-if="itemDetails.rgp_id">
-              <!--begin::Col-->
-              <div class="col-md-6 fv-row mb-8 mb-sd-8">
-                <!--begin::Label-->
-                <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                  >Customer :</label
-                >
-                <!--end::Label-->
-
-                <!--begin::Input-->
-                <div class="form-control form-control-lg form-control-solid">
-                  <div>
-                    {{ RgpData?.quotation.customer.company_name || "" }}
-                  </div>
-                  <div class="mt-2 pt-4">
-                    <h6 class="mt-5">Billing Address:</h6>
-                    <div class="mt-2">
-                      <div class="mb-1">
-                        <br />
-                        <span v-show="RgpData?.quotation.customer.company_name">
-                          {{
-                            `${RgpData?.quotation.customer.company_name || ""}`
-                          }}
-                        </span>
-                        <br />
-                        <span>
-                          {{ `${RgpData?.quotation.customer.name || ""}` }}
-                        </span>
-                        <!-- v-if company_data present -->
-                        <div v-show="RgpData?.quotation.customer.company_name">
-                          <br />
-                          <span>
-                            {{
-                              `${RgpData?.quotation.customer.address1 || ""}`
-                            }}
-                          </span>
-                          <br />
-                          <span>
-                            {{
-                              `${RgpData?.quotation.customer.address2 || ""}`
-                            }}
-                          </span>
-                        </div>
-                        <div v-show="RgpData?.quotation.customer.country">
-                          <span>
-                            {{
-                              `${RgpData?.quotation.customer.city || ""} - ${
-                                RgpData?.quotation.customer.pincode || ""
-                              }`
-                            }}
-                          </span>
-                          <br />
-                          <span>
-                            {{
-                              `${RgpData?.quotation.customer.state || ""} ${
-                                RgpData?.quotation.customer.country || ""
-                              }`
-                            }}
-                          </span>
-                          <br />
-                        </div>
-                      </div>
-                      <br />
+              <!-- Criteria Fields -->
+              <div class="row g-6 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label required font-semibold"
+                    >Temperature Criteria</label
+                  >
+                  <Field
+                    type="text"
+                    name="acc_for_temp"
+                    class="form-control form-control-solid"
+                    placeholder="Enter Criteria for Temperature"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="acc_for_temp" />
                     </div>
                   </div>
                 </div>
-
-                <!--end::Input-->
-              </div>
-              <!--end::Col-->
-              <!--begin::Col-->
-              <div class="col-md-6 fv-row mb-8 mb-sd-8">
-                <!--begin::Label-->
-                <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                  >Client :</label
-                >
-                <!--end::Label-->
-
-                <!--begin::Input-->
-                <div class="form-control form-control-lg form-control-solid">
-                  <div>{{ RgpData?.quotation.clientx.company_name || "" }}</div>
-                  <div class="mt-2 pt-4">
-                    <h6 class="mt-5">Site Address:</h6>
-                    <div class="mt-2">
-                      <div class="mb-1" v-show="RgpData?.quotation.clientx">
-                        <br />
-                        <span v-show="RgpData?.quotation.clientx.company_name">
-                          {{
-                            `${RgpData?.quotation.clientx.company_name || ""}`
-                          }}
-                        </span>
-                        <br />
-                        <span>
-                          {{ `${RgpData?.quotation.clientx.name || ""}` }}
-                        </span>
-                        <!-- v-if company_data present -->
-                        <div v-show="RgpData?.quotation.clientx.company_name">
-                          <br />
-                          <span>
-                            {{ `${RgpData?.quotation.clientx.address1 || ""}` }}
-                          </span>
-                          <br />
-                          <span>
-                            {{ `${RgpData?.quotation.clientx.address2 || ""}` }}
-                          </span>
-                        </div>
-                        <div v-show="RgpData?.quotation.clientx.country">
-                          <span>
-                            {{
-                              `${RgpData?.quotation.clientx.city || ""} - ${
-                                RgpData?.quotation.clientx.pincode || ""
-                              }`
-                            }}
-                          </span>
-                          <br />
-                          <span>
-                            {{
-                              `${RgpData?.quotation.clientx.state || ""} ${
-                                RgpData?.quotation.clientx.country || ""
-                              }`
-                            }}
-                          </span>
-                          <br />
-                        </div>
-                      </div>
-                      <br />
+                <div class="col-md-6">
+                  <label class="form-label required font-semibold"
+                    >Humidity Criteria</label
+                  >
+                  <Field
+                    type="text"
+                    name="acc_for_rh"
+                    class="form-control form-control-solid"
+                    placeholder="Enter Criteria for Humidity"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="acc_for_rh" />
                     </div>
                   </div>
                 </div>
-
-                <!--end::Input-->
               </div>
-              <!--end::Col-->
-            </div>
-            <!--end::Input group-->
 
-            <!--begin::Input group-->
-            <div class="row mb-6">
-              <!--begin::Col-->
-              <div class="col-md-6 fv-row mb-8 mb-sd-8">
-                <!--begin::Label-->
-                <label
-                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                  >Validation Start Date</label
-                >
-                <!--end::Label-->
-
-                <!--begin::Input-->
-                <el-date-picker
-                  type="date"
-                  name="val_start_date"
-                  id="val_start_date"
-                  placeholder="Pick a Day"
-                  @change="setDates($event, 'val_start_date')"
-                  v-model="itemDetails.val_start_date"
-                  :editable="false"
-                />
-                <!--end::Input-->
-              </div>
-              <!--end::Col-->
-              <!--begin::Col-->
-              <div class="col-md-6 fv-row mb-8 mb-sd-8">
-                <!--begin::Label-->
-                <label
-                  class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                  >Start Time</label
-                >
-                <!--end::Label-->
-                <!--begin::Input-->
-                <el-time-picker
-                  name="start_time"
-                  id="start_time"
-                  v-model="itemDetails.start_time"
-                  placeholder="Pick a Day"
-                  @change="setTimes($event)"
-                />
-                <!--end::Input-->
-              </div>
-              <!--end::Col-->
-            </div>
-            <!--end::Input group-->
-
-            <!-- extra fields -->
-            <div class="row mb-6">
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
-                  >Temperature Criteria</label
-                >
-                <Field
-                  type="text"
-                  name="acc_for_temp"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Criteria for Temperature"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="acc_for_temp" />
+              <!-- Room/Duration Fields -->
+              <div class="row g-6 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label required font-semibold"
+                    >Room Name</label
+                  >
+                  <Field
+                    type="text"
+                    name="room_name"
+                    class="form-control form-control-solid"
+                    placeholder="Enter Room Name"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="room_name" />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label required font-semibold"
+                    >Mapping Duration</label
+                  >
+                  <Field
+                    type="number"
+                    name="mapping_duration"
+                    class="form-control form-control-solid"
+                    placeholder="Enter Mapping Duraction (in hours)"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="mapping_duration" />
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6 text-nowrap"
-                  >Humidity Criteria</label
-                >
-                <Field
-                  type="text"
-                  name="acc_for_rh"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Criteria for Humidity"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="acc_for_rh" />
+              <!-- Logger Fields -->
+              <div class="row g-6 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label required font-semibold"
+                    >Data Logging Interval</label
+                  >
+                  <Field
+                    type="number"
+                    name="logging_interval"
+                    class="form-control form-control-solid"
+                    placeholder="Enter logging interval (in minutes)"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="logging_interval" />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label required font-semibold"
+                    >Data Logger Used</label
+                  >
+                  <Field
+                    type="text"
+                    name="logger_used"
+                    class="form-control form-control-solid"
+                    placeholder="Number of data loggers used"
+                  />
+                  <div class="fv-plugins-message-container">
+                    <div class="fv-help-block">
+                      <ErrorMessage name="logger_used" />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <!--end::Input group-->
-
-            <!-- extra fields -->
-            <div class="row mb-6">
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
-                  >Room Name</label
-                >
-                <Field
-                  type="text"
-                  name="room_name"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Room Name"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="room_name" />
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6 text-nowrap"
-                  >Mapping Duration</label
-                >
-                <Field
-                  type="number"
-                  name="mapping_duration"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter Mapping Duraction (in hours)"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="mapping_duration" />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!--end::Input group-->
-
-            <!-- extra fields -->
-            <div class="row mb-6">
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-semobold fw-bold text-gray-700 fs-6 text-nowrap"
-                  >Data Logging Interval</label
-                >
-                <Field
-                  type="number"
-                  name="logging_interval"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Enter logging interval (in minutes)"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="logging_interval" />
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-group col-md-6">
-                <label
-                  class="col-lg-4 col-form-label required fw-bold text-gray-700 fw-semobold fs-6 text-nowrap"
-                  >Data Logger Used</label
-                >
-                <Field
-                  type="text"
-                  name="logger_used"
-                  class="form-control form-control-lg form-control-solid"
-                  placeholder="Number of data loggers used"
-                />
-                <div class="fv-plugins-message-container">
-                  <div class="fv-help-block">
-                    <ErrorMessage name="logger_used" />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!--end::Input group-->
           </div>
-          <!--end::Wrapper-->
-        </div>
-        <!--end::Step 1-->
+          <!--end::Step 1-->
 
-        <!--begin::Step 2-->
-        <div data-kt-stepper-element="content">
-          <!--begin::Wrapper-->
-          <div class="w-100">
-            <!--begin::Heading-->
-            <div class="pb-10 pb-lg-10">
-              <!--begin::Title-->
-              <h2 class="fw-bold d-flex align-items-center text-dark">
-                <span class="badge-light-primary rounded p-3">
-                  Instrument Selection
-                </span>
-              </h2>
-              <!--end::Title-->
-            </div>
-            <!--end::Heading-->
+          <!-- Step 2 -->
+          <div
+            class="current text-gray-800 fs-6"
+            data-kt-stepper-element="content"
+          >
+            <div class="w-100">
+              <!--begin::Heading-->
+              <div class="pb-5 pb-lg-5">
+                <h2 class="fw-bold d-flex align-items-center text-dark">
+                  <span class="badge-light-primary rounded p-3">
+                    Instrument Selection
+                  </span>
+                </h2>
+              </div>
+              <!--end::Heading-->
 
-            <div class="card-header border-0 pt-6">
-              <!--begin::Card title-->
-              <div class="card-title flex-md-row flex-lg-row flex-column gap-6">
-                <div class="d-flex align-items-center position-relative my-3">
+              <!-- Instrument Selection Row -->
+              <div class="row g-6 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label font-semibold"
+                    >From Instrument ID</label
+                  >
                   <el-select
                     name="fromInstrumentId"
                     v-model="fromInstrumentId"
-                    class="mw-250px"
+                    class="w-100"
                     placeholder="From Instrument ID"
                     @change="handleFrom"
                   >
@@ -499,13 +329,15 @@
                     />
                   </el-select>
                 </div>
-
-                <div class="d-flex align-items-center position-relative my-3">
+                <div class="col-md-6">
+                  <label class="form-label font-semibold"
+                    >To Instrument ID</label
+                  >
                   <el-select
                     name="toInstrumentId"
                     filterable
                     placeholder="To Instrument ID"
-                    class="mw-250px"
+                    class="w-100"
                     v-model="toInstrumentId"
                     :disabled="disabelRef"
                     @change="handleTo"
@@ -519,175 +351,191 @@
                   </el-select>
                 </div>
               </div>
-              <!--begin::Card title-->
-            </div>
 
-            <div class="card-body pt-0">
-              <TableContent
-                :data="tableData"
-                :header="tableHeader"
-                :items-per-page-dropdown-enabled="false"
-                :loading="loading"
-              >
-                <template v-slot:checked="{ row: thermal_instruments }">
-                  <div
-                    class="form-check form-switch form-check-custom form-check-success form-check-solid"
+              <!-- Table Section -->
+              <div class="row g-6 mb-4">
+                <div class="col-12">
+                  <TableContent
+                    :data="tableData"
+                    :header="tableHeader"
+                    :items-per-page-dropdown-enabled="false"
+                    :loading="loading"
                   >
-                    <input
-                      class="form-check-input w-60px"
-                      type="checkbox"
-                      v-model="thermal_instruments.checked"
-                      @click="
-                        toggleInstrument(
-                          $event,
-                          thermal_instruments.id,
-                          thermal_instruments.instrument_id,
-                          thermal_instruments.name,
-                          thermal_instruments.serial_no,
-                          thermal_instruments.calibration_date,
-                          thermal_instruments.calibration_due_date
-                        )
-                      "
-                    />
-                  </div>
-                </template>
-                <template v-slot:instrument_id="{ row: thermal_instruments }">
-                  {{ thermal_instruments.instrument_id }}
-                </template>
-                <template v-slot:name="{ row: thermal_instruments }">
-                  {{ thermal_instruments.name }}
-                </template>
-                <template v-slot:model_no="{ row: thermal_instruments }">
-                  {{ thermal_instruments.model_no }}
-                </template>
-                <template v-slot:ranges="{ row: thermal_instruments }">
-                  {{ thermal_instruments.ranges }}
-                </template>
-                <template v-slot:accuracy="{ row: thermal_instruments }">
-                  {{ thermal_instruments.accuracy }}
-                </template>
-                <template v-slot:serial_no="{ row: thermal_instruments }">
-                  {{ thermal_instruments.serial_no }}
-                </template>
-                <!-- defualt data -->
-                <template v-slot:make="{ row: thermal_instruments }">
-                  {{ thermal_instruments.make }}
-                </template>
-                <template
-                  v-slot:calibration_date="{ row: thermal_instruments }"
-                >
-                  {{ thermal_instruments.calibration_date }}
-                </template>
-                <template
-                  v-slot:calibration_due_date="{ row: thermal_instruments }"
-                >
-                  {{ thermal_instruments.calibration_due_date }}
-                </template>
-              </TableContent>
-            </div>
-          </div>
-          <!--end::Wrapper-->
-        </div>
-        <!--end::Step 2-->
-
-        <!--begin::Step 3-->
-        <div data-kt-stepper-element="content">
-          <!--begin::Wrapper-->
-          <div class="w-100">
-            <!--begin::Heading-->
-            <div class="pb-10 pb-lg-15">
-              <!--begin::Title-->
-              <h2 class="fw-bold d-flex align-items-center text-dark">
-                Import CSV File
-              </h2>
-              <!--end::Title-->
-            </div>
-            <!--end::Heading-->
-
-            <div class="row mb-6">
-              <div class="form-group col-md-12 mb-8 mb-sd-8">
-                <label
-                  class="col-lg-4 col-form-label required fs-5 fw-bold text-gray-700 text-nowrap"
-                  >Upload File
-                </label>
-                <label
-                  class="btn btn-outline btn-outline-dashed btn-outline-default p-10 d-flex align-items-center position-relative"
-                >
-                  <i
-                    class="bi bi-upload position-absolute fs-1 top-50 start-50 translate-middle"
-                  ></i>
-                  <input
-                    type="file"
-                    accept=".xls"
-                    @change="handleChange"
-                    class="position-absolute top-0 start-0 end-0 bottom-0 opacity-0 w-100 h-100"
-                  />
-                </label>
+                    <template v-slot:checked="{ row: thermal_instruments }">
+                      <div
+                        class="form-check form-switch form-check-custom form-check-success form-check-solid"
+                      >
+                        <input
+                          class="form-check-input w-60px"
+                          type="checkbox"
+                          v-model="thermal_instruments.checked"
+                          @click="
+                            toggleInstrument(
+                              $event,
+                              thermal_instruments.id,
+                              thermal_instruments.instrument_id,
+                              thermal_instruments.name,
+                              thermal_instruments.serial_no,
+                              thermal_instruments.calibration_date,
+                              thermal_instruments.calibration_due_date
+                            )
+                          "
+                        />
+                      </div>
+                    </template>
+                    <template
+                      v-slot:instrument_id="{ row: thermal_instruments }"
+                    >
+                      {{ thermal_instruments.instrument_id }}
+                    </template>
+                    <template v-slot:name="{ row: thermal_instruments }">
+                      {{ thermal_instruments.name }}
+                    </template>
+                    <template v-slot:model_no="{ row: thermal_instruments }">
+                      {{ thermal_instruments.model_no }}
+                    </template>
+                    <template v-slot:ranges="{ row: thermal_instruments }">
+                      {{ thermal_instruments.ranges }}
+                    </template>
+                    <template v-slot:accuracy="{ row: thermal_instruments }">
+                      {{ thermal_instruments.accuracy }}
+                    </template>
+                    <template v-slot:serial_no="{ row: thermal_instruments }">
+                      {{ thermal_instruments.serial_no }}
+                    </template>
+                    <template v-slot:make="{ row: thermal_instruments }">
+                      {{ thermal_instruments.make }}
+                    </template>
+                    <template
+                      v-slot:calibration_date="{ row: thermal_instruments }"
+                    >
+                      {{ thermal_instruments.calibration_date }}
+                    </template>
+                    <template
+                      v-slot:calibration_due_date="{ row: thermal_instruments }"
+                    >
+                      {{ thermal_instruments.calibration_due_date }}
+                    </template>
+                  </TableContent>
+                </div>
               </div>
             </div>
-            <ExcelFiles
-              v-bind:filesData="itemDetails.excel_data"
-              v-on:deleteFile="deleteTheFile"
-            />
           </div>
-          <!--end::Wrapper-->
-        </div>
-        <!--end::Step 3-->
+          <!--end::Step 2-->
 
-        <!--begin::Actions-->
-        <div class="d-flex flex-stack pt-10">
-          <!--begin::Wrapper-->
-          <div class="mr-2">
-            <button
-              type="button"
-              class="btn btn-lg btn-light-primary me-3"
-              data-kt-stepper-action="previous"
-              @click="previousStep"
-            >
-              <KTIcon icon-name="arrow-left" icon-class="fs-4 me-1" />
-              Back
-            </button>
+          <!-- Step 3 -->
+          <div
+            class="text-gray-800 fs-6"
+            data-kt-stepper-element="content"
+          >
+            <div class="w-100">
+              <!--begin::Heading-->
+              <div class="pb-5 pb-lg-5">
+                <h2 class="fw-bold d-flex align-items-center text-dark">
+                  <span class="badge-light-primary rounded p-3">
+                    Import CSV File
+                  </span>
+                </h2>
+              </div>
+              <!--end::Heading-->
+
+              <!-- File Upload Section -->
+              <div class="row g-6 mb-4">
+                <div class="col-12">
+                  <label class="form-label required font-semibold"
+                    >Upload File</label
+                  >
+                  <div
+                    class="border rounded p-3 d-flex justify-content-center align-items-center"
+                    style="min-height: 100px"
+                  >
+                    <label
+                      class="d-flex flex-column align-items-center cursor-pointer"
+                    >
+                      <i class="bi bi-upload fs-1 text-gray-700 mb-2"></i>
+                      <span class="text-gray-700"
+                        >Click to browse or drag files here</span
+                      >
+                      <input
+                        type="file"
+                        accept=".xls"
+                        @change="handleChange"
+                        class="d-none"
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Excel Files Component -->
+              <div class="row g-6 mb-4">
+                <div class="col-12">
+                  <ExcelFiles
+                    v-bind:filesData="itemDetails.excel_data"
+                    v-on:deleteFile="deleteTheFile"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-          <!--end::Wrapper-->
+          <!--end::Step 3-->
 
-          <!--begin::Wrapper-->
-          <div>
-            <button
-              type="button"
-              class="btn btn-lg btn-primary me-3"
-              data-kt-stepper-action="submit"
-              v-if="currentStepIndex === totalSteps - 1"
-              @click="formSubmit()"
-            >
-              <span class="indicator-label">
-                Submit
-                <KTIcon icon-name="arrow-right" icon-class="fs-3 ms-2 me-0" />
-              </span>
-              <span class="indicator-progress">
-                Please wait...
-                <span
-                  class="spinner-border spinner-border-sm align-middle ms-2"
-                ></span>
-              </span>
-            </button>
+          <!--begin::Actions-->
+          <div class="d-flex flex-stack pt-10">
+            <!--begin::Wrapper-->
+            <div class="mr-2">
+              <button
+                type="button"
+                class="btn btn-lg btn-light-primary me-3"
+                data-kt-stepper-action="previous"
+                @click="previousStep"
+              >
+                <KTIcon icon-name="arrow-left" icon-class="fs-4 me-1" />
+                Back
+              </button>
+            </div>
+            <!--end::Wrapper-->
 
-            <button v-else type="submit" class="btn btn-lg btn-primary">
-              Continue
-              <KTIcon icon-name="arrow-right" icon-class="fs-4 ms-2 me-0" />
-            </button>
+            <!--begin::Wrapper-->
+            <div>
+              <button
+                type="button"
+                class="btn btn-lg btn-primary me-3"
+                data-kt-stepper-action="submit"
+                v-if="currentStepIndex === totalSteps - 1"
+                @click="formSubmit()"
+              >
+                <span class="indicator-label">
+                  Submit
+                  <KTIcon icon-name="arrow-right" icon-class="fs-3 ms-2 me-0" />
+                </span>
+                <span class="indicator-progress">
+                  Please wait...
+                  <span
+                    class="spinner-border spinner-border-sm align-middle ms-2"
+                  ></span>
+                </span>
+              </button>
+
+              <button v-else type="submit" class="btn btn-lg btn-primary">
+                Continue
+                <KTIcon icon-name="arrow-right" icon-class="fs-4 ms-2 me-0" />
+              </button>
+            </div>
+            <!--end::Wrapper-->
           </div>
-          <!--end::Wrapper-->
-        </div>
-        <!--end::Actions-->
-      </form>
-      <!--end::Form-->
+          <!--end::Actions-->
+        </form>
+        <!--end::Form-->
+      </div>
+      <!--end::Stepper-->
     </div>
-    <!--end::Content-->
+    <!--end::Card body-->
   </div>
-  <!--end::Stepper-->
+  <!--end::Card-->
 </template>
-  
-  <script lang="ts">
+
+<script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
 import {
   computed,
@@ -701,6 +549,7 @@ import { StepperComponent } from "@/assets/ts/components";
 import { useForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
+
 import moment from "moment";
 import * as xlsx from "xlsx";
 import ExcelFiles from "./steps/ExcelFiles.vue";
@@ -810,10 +659,9 @@ export default defineComponent({
     ExcelFiles,
   },
   props: [],
-  // emits: ["store-excel-file", "deleteExcel"],
   setup() {
-    const createAppStepperRef = ref<HTMLElement | null>(null);
     const _stepperObj = ref<StepperComponent | null>(null);
+    const horizontalWizardRef = ref<HTMLElement | null>(null);
     const currentStepIndex = ref(0);
     const loading = ref(false);
 
@@ -1541,7 +1389,7 @@ export default defineComponent({
       }
 
       _stepperObj.value = StepperComponent.createInsance(
-        createAppStepperRef.value as HTMLElement
+        horizontalWizardRef.value as HTMLElement
       );
     });
 
@@ -1855,7 +1703,7 @@ export default defineComponent({
     };
 
     return {
-      createAppStepperRef,
+      horizontalWizardRef,
       previousStep,
       handleStep,
       formSubmit,

@@ -397,7 +397,7 @@
             @on-sort="sort"
             @on-items-select="onItemSelect"
             :data="tableData"
-            :header="filteredTableHeader"
+            :header="tableHeader"
             :checkbox-enabled="true"
             :items-per-page="limit"
             :items-per-page-dropdown-enabled="false"
@@ -436,56 +436,73 @@
               </div>
             </template>
             <template v-slot:approval_status="{ row: audit_observation }">
+              <!-- Status Badge Only -->
               <span
-                v-if="audit_observation.approval_status == 1"
-                class="badge py-3 px-4 fs-7 badge-light-primary"
-                >{{
-                  GetApprovalStatus(audit_observation.approval_status)
-                }}</span
+                class="badge py-3 px-4 fs-7"
+                :class="{
+                  'badge-light-primary': audit_observation.approval_status == 1,
+                  'badge-light-danger': audit_observation.approval_status == 2,
+                  'badge-light-success': audit_observation.approval_status == 3,
+                }"
               >
-              <span
-                v-if="audit_observation.approval_status == 2"
-                class="badge py-3 px-4 fs-7 badge-light-danger"
-                >{{
-                  GetApprovalStatus(audit_observation.approval_status)
-                }}</span
-              >
-              <span
-                v-if="audit_observation.approval_status == 3"
-                class="badge py-3 px-4 fs-7 badge-light-success"
-                >{{
-                  GetApprovalStatus(audit_observation.approval_status)
-                }}</span
-              >
-            </template>
-
-            <template v-slot:approval_button="{ row: audit_observation }">
-              <button
-                type="button"
-                class="btn btn-sm btn-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#kt_modal_1"
-                @click="fillItemData(audit_observation)"
-              >
-                Open
-              </button>
+                {{ GetApprovalStatus(audit_observation.approval_status) }}
+              </span>
             </template>
 
             <template v-slot:actions="{ row: audit_observation }">
-              <!--begin::Menu Flex-->
-              <div class="d-flex flex-lg-row my-3">
-                <!--begin::Delete-->
-                <span
-                  @click="deleteItem(audit_observation.id, false)"
-                  class="btn btn-icon btn-active-light-danger w-30px h-30px me-3"
-                  data-bs-toggle="tooltip"
-                  title="Delete Observation"
+              <!--begin::Dropdown Menu-->
+              <div class="dropdown">
+                <a
+                  href="#"
+                  class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  @click.prevent
                 >
-                  <KTIcon icon-name="trash" icon-class="fs-2" />
-                </span>
-                <!--end::Delete-->
+                  <KTIcon icon-name="dots-circle-vertical" icon-class="fs-2x" />
+                </a>
+
+                <!-- Action dropdown menu -->
+                <ul
+                  class="dropdown-menu dropdown-menu-end min-w-200px py-2 shadow-sm"
+                >
+                  <!-- Approve/Reject Section (Admin only) -->
+                  <template
+                    v-if="
+                      identifier === 'Admin' || identifier === 'Company-Admin'
+                    "
+                  >
+                    <li>
+                      <a
+                        class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
+                        data-bs-toggle="modal"
+                        data-bs-target="#kt_modal_1"
+                        @click="fillItemData(audit_observation)"
+                      >
+                        <KTIcon
+                          icon-name="check-circle"
+                          icon-class="fs-3 text-primary"
+                        />
+                        <span class="text-gray-700">Approve/Reject</span>
+                      </a>
+                    </li>
+                  </template>
+
+                  <!-- Delete -->
+                  <li>
+                    <a
+                      class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-danger cursor-pointer"
+                      data-bs-toggle="tooltip"
+                      title="Delete Observation"
+                      @click.prevent="deleteItem(audit_observation.id, false)"
+                    >
+                      <KTIcon icon-name="trash" icon-class="fs-3 text-danger" />
+                      <span class="text-danger">Delete</span>
+                    </a>
+                  </li>
+                </ul>
               </div>
-              <!--end::Menu FLex-->
+              <!--end::Dropdown Menu-->
             </template>
           </Datatable>
           <div class="d-flex justify-content-between p-2">
@@ -605,19 +622,13 @@ export default defineComponent({
         columnWidth: 100,
       },
       {
-        columnName: "Approval Status",
+        columnName: "Approval",
         columnLabel: "approval_status",
         sortEnabled: false,
-        columnWidth: 75,
+        columnWidth: 80,
       },
       {
-        columnName: "Reject/Approve",
-        columnLabel: "approval_button",
-        sortEnabled: false,
-        columnWidth: 75,
-      },
-      {
-        columnName: "Actions",
+        columnName: "Action",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 75,
@@ -803,21 +814,6 @@ export default defineComponent({
       clauses: [],
       company_id: User.company_id,
       is_active: 1,
-    });
-
-    const filteredTableHeader = computed(() => {
-      const isAdmin = identifier.value === "Admin";
-      const isCompanyAdmin = identifier.value === "Company-Admin";
-
-      if (isAdmin || isCompanyAdmin) {
-        // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
-        return tableHeader.value;
-      } else {
-        // Otherwise, exclude the 'approval_button' column
-        return tableHeader.value.filter(
-          (column) => column.columnLabel !== "approval_button"
-        );
-      }
     });
 
     onMounted(async () => {
@@ -1092,7 +1088,6 @@ export default defineComponent({
       PageLimitPoiner,
       Limits,
       itemId,
-      filteredTableHeader,
       ApprovalStatus,
       GetApprovalStatus,
       itemData,

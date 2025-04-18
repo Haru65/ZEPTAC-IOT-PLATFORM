@@ -98,7 +98,7 @@
         @on-sort="sort"
         @on-items-select="onItemSelect"
         :data="tableData"
-        :header="filteredTableHeader"
+        :header="tableHeader"
         :checkbox-enabled="true"
         :items-per-page="limit"
         :items-per-page-dropdown-enabled="false"
@@ -183,34 +183,19 @@
           <!--end::Menu FLex-->
         </template>
         <template v-slot:approval_status="{ row: instruments }">
+          <!-- Status Badge Only -->
           <span
-            v-if="instruments.approval_status == 1"
-            class="badge py-3 px-4 fs-7 badge-light-primary"
-            >{{ GetApprovalStatus(instruments.approval_status) }}</span
+            class="badge py-3 px-4 fs-7"
+            :class="{
+              'badge-light-primary': instruments.approval_status == 1,
+              'badge-light-danger': instruments.approval_status == 2,
+              'badge-light-success': instruments.approval_status == 3,
+            }"
           >
-          <span
-            v-if="instruments.approval_status == 2"
-            class="badge py-3 px-4 fs-7 badge-light-danger"
-            >{{ GetApprovalStatus(instruments.approval_status) }}</span
-          >
-          <span
-            v-if="instruments.approval_status == 3"
-            class="badge py-3 px-4 fs-7 badge-light-success"
-            >{{ GetApprovalStatus(instruments.approval_status) }}</span
-          >
+            {{ GetApprovalStatus(instruments.approval_status) }}
+          </span>
         </template>
 
-        <template v-slot:approval_button="{ row: instruments }">
-          <button
-            type="button"
-            class="btn btn-sm btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#kt_modal_1"
-            @click="fillItemData(instruments)"
-          >
-            Open
-          </button>
-        </template>
         <template v-slot:actions="{ row: instruments }">
           <!--begin::Menu Flex-->
           <div class="dropdown">
@@ -228,6 +213,22 @@
             <ul
               class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
             >
+            <template v-if="identifier === 'Admin' || identifier === 'Company-Admin' || identifier === 'Commercial-Executive'">
+              <li>
+                <a
+                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
+                  data-bs-toggle="modal"
+                  data-bs-target="#kt_modal_1"
+                  @click="fillItemData(instruments)"
+                >
+                  <KTIcon
+                    icon-name="check-circle"
+                    icon-class="fs-3 text-primary"
+                  />
+                  <span class="text-gray-700">Approve/Reject</span>
+                </a>
+              </li>
+            </template>
               <!-- Download Instrument -->
               <li>
                 <a
@@ -437,16 +438,10 @@ export default defineComponent({
         columnWidth: 75,
       },
       {
-        columnName: "Approval Status",
+        columnName: "Approval",
         columnLabel: "approval_status",
         sortEnabled: false,
-        columnWidth: 75,
-      },
-      {
-        columnName: "Reject/Approve",
-        columnLabel: "approval_button",
-        sortEnabled: false,
-        columnWidth: 75,
+        columnWidth: 80,
       },
       {
         columnName: "Action",
@@ -595,22 +590,6 @@ export default defineComponent({
         }, 100);
       }
     }
-
-    const filteredTableHeader = computed(() => {
-      const isAdmin = identifier.value === "Admin";
-      const isCompanyAdmin = identifier.value === "Company-Admin";
-      const isComExec = identifier.value === "Commercial-Executive";
-
-      if (isAdmin || isCompanyAdmin || isComExec) {
-        // If the identifier is 'Admin' or 'Company-Admin', include the 'approval_button' column
-        return tableHeader.value;
-      } else {
-        // Otherwise, exclude the 'approval_button' column
-        return tableHeader.value.filter(
-          (column) => column.columnLabel !== "approval_button"
-        );
-      }
-    });
 
     onMounted(async () => {
       await instrument_listing();
@@ -1036,7 +1015,6 @@ export default defineComponent({
       PageLimitPoiner,
       downloadDocument,
       downloadHistoryCard,
-      filteredTableHeader,
       ApprovalStatus,
       GetApprovalStatus,
       itemData,

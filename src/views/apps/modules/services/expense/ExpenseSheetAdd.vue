@@ -4,774 +4,664 @@
     <!--begin::Card body-->
     <div class="card-body">
       <!--begin::Stepper-->
-      <!--begin::Stepper-->
       <div
-        class="stepper stepper-pills stepper-column d-flex flex-column flex-xl-row flex-row-fluid"
-        id="kt_modal_create_app_stepper"
-        ref="createAppStepperRef"
+        class="stepper stepper-links d-flex flex-column"
+        id="kt_create_account_stepper"
+        ref="horizontalWizardRef"
       >
-        <!--begin::Aside-->
-        <div
-          class="d-flex justify-content-center justify-content-xl-start flex-row-auto w-100 w-xl-300px"
-        >
-          <!--begin::Nav-->
-          <div class="stepper-nav ps-lg-10">
-            <!--begin::Step 1-->
-            <div class="stepper-item current" data-kt-stepper-element="nav">
-              <div class="stepper-wrapper">
-                <!--begin::Icon-->
-                <div class="stepper-icon w-40px h-40px">
-                  <i class="stepper-check fas fa-check"></i>
-                  <span class="stepper-number">1</span>
-                </div>
-                <!--end::Icon-->
-
-                <!--begin::Label-->
-                <div class="stepper-label">
-                  <h3 class="stepper-title">Gate Pass</h3>
-
-                  <div class="stepper-desc">pick rgp you have worked on</div>
-                </div>
-                <!--end::Label-->
-              </div>
-
-              <!--begin::Line-->
-              <div class="stepper-line h-40px"></div>
-              <!--end::Line-->
-            </div>
-            <!--end::Step 1-->
-
-            <!--begin::Step 2-->
-            <div class="stepper-item" data-kt-stepper-element="nav">
-              <div class="stepper-wrapper">
-                <!--begin::Icon-->
-                <div class="stepper-icon w-40px h-40px">
-                  <i class="stepper-check fas fa-check"></i>
-                  <span class="stepper-number">2</span>
-                </div>
-                <!--begin::Icon-->
-
-                <!--begin::Label-->
-                <div class="stepper-label">
-                  <h3 class="stepper-title">Expenses</h3>
-
-                  <div class="stepper-desc">provide expense proof</div>
-                </div>
-                <!--begin::Label-->
-              </div>
-
-              <!--begin::Line-->
-              <div class="stepper-line h-40px"></div>
-              <!--end::Line-->
-            </div>
-            <!--end::Step 2-->
-
-            <!--begin::Step 3-->
-            <div class="stepper-item" data-kt-stepper-element="nav">
-              <div class="stepper-wrapper">
-                <!--begin::Icon-->
-                <div class="stepper-icon w-40px h-40px">
-                  <i class="stepper-check fas fa-check"></i>
-                  <span class="stepper-number">3</span>
-                </div>
-                <!--end::Icon-->
-
-                <!--begin::Label-->
-                <div class="stepper-label">
-                  <h3 class="stepper-title">Summary</h3>
-
-                  <div class="stepper-desc">review and submit</div>
-                </div>
-                <!--end::Label-->
-              </div>
-            </div>
-            <!--end::Step 3-->
+        <!--begin::Nav-->
+        <div class="stepper-nav py-5 mt-5">
+          <!--begin::Step 1-->
+          <div class="stepper-item current" data-kt-stepper-element="nav">
+            <h3 class="stepper-title">Gate Pass</h3>
           </div>
-          <!--end::Nav-->
+          <!--end::Step 1-->
+
+          <!--begin::Step 2-->
+          <div class="stepper-item" data-kt-stepper-element="nav">
+            <h3 class="stepper-title">Expenses</h3>
+          </div>
+          <!--end::Step 2-->
+
+          <!--begin::Step 3-->
+          <div class="stepper-item" data-kt-stepper-element="nav">
+            <h3 class="stepper-title">Summary</h3>
+          </div>
+          <!--end::Step 3-->
         </div>
-        <!--begin::Aside-->
+        <!--end::Nav-->
 
-        <!--begin::Content-->
-        <div class="flex-row-fluid py-lg-5 px-lg-15">
-          <!--begin::Form-->
-          <form class="form" id="kt_modal_create_app_form" @submit="handleStep">
-            <!--begin::Step 1-->
-            <div class="current" data-kt-stepper-element="content">
-              <div class="w-100">
-                <div class="row mb-6">
-                  <div class="form-group col-12">
-                    <label
-                      class="d-flex align-items-center fs-5 fw-semobold mb-4 col-lg-4 col-form-label required text-gray-700 text-nowrap"
-                    >
-                      <span>Returnable Gate Pass</span>
-                      <i
-                        class="fas fa-exclamation-circle ms-2 fs-7"
-                        data-bs-toggle="tooltip"
-                        title="Select at least one engineer"
-                      ></i>
-                    </label>
-                    <div>
-                      <el-select
-                        v-model="itemDetails.rgp_id"
-                        filterable
-                        placeholder="Please Select GatePass"
-                        @change="fetchRGP(itemDetails.rgp_id)"
-                      >
-                        <el-option
-                          value=""
-                          disabled="disabled"
-                          label="Please Select GatePass"
-                          key=""
-                        >
-                          Please Select GatePass</el-option
-                        >
-                        <el-option
-                          v-for="item in RGatePasses"
-                          :key="item.id"
-                          :value="item.id"
-                          :label="item.rgp_no"
-                        />
-                      </el-select>
-                    </div>
-                  </div>
+        <!--begin::Form-->
+        <form
+          class="mx-auto w-100 p-2"
+          novalidate
+          id="kt_create_account_form"
+          @submit="handleStep"
+        >
+          <!--begin::Step 1-->
+          <div
+            class="current text-gray-800 fs-6"
+            data-kt-stepper-element="content"
+          >
+            <div class="w-100">
+              <!-- Returnable Gate Pass Selection -->
+              <div class="row g-6 mb-4">
+                <div class="col-12">
+                  <label class="form-label required font-semibold"
+                    >Returnable Gate Pass</label
+                  >
+                  <el-select
+                    v-model="itemDetails.rgp_id"
+                    filterable
+                    placeholder="Please Select GatePass"
+                    @change="fetchRGP(itemDetails.rgp_id)"
+                    class="w-100"
+                  >
+                    <el-option
+                      v-for="item in RGatePasses"
+                      :key="item.id"
+                      :value="item.id"
+                      :label="item.rgp_no"
+                    />
+                    <el-option
+                      value=""
+                      disabled
+                      label="Please Select GatePass"
+                    />
+                  </el-select>
                 </div>
+              </div>
 
-                <!--begin::Input group-->
-                <div class="row mb-6" v-if="itemDetails.rgp_id">
-                  <!--begin::Col-->
-                  <div class="col-md-6 fv-row mb-8 mb-sd-8">
-                    <!--begin::Label-->
-                    <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                      >Customer :</label
-                    >
-                    <!--end::Label-->
-
-                    <!--begin::Input-->
-                    <div
-                      class="form-control form-control-lg form-control-solid"
-                    >
+              <!-- Customer/Client Info -->
+              <div class="row g-6 mb-4" v-if="itemDetails.rgp_id">
+                <div class="col-md-6">
+                  <div class="border rounded p-3 h-100">
+                    <label class="font-semibold mb-2">Customer</label>
+                    <div class="small">
                       <div>
                         {{ RgpData?.quotation.customer.company_name || "" }}
                       </div>
-                      <div class="mt-2 pt-4">
-                        <h6 class="mt-5">Billing Address:</h6>
-                        <div class="mt-2">
-                          <div class="mb-1">
-                            <br />
-                            <span
-                              v-show="RgpData?.quotation.customer.company_name"
-                            >
-                              {{
-                                `${
-                                  RgpData?.quotation.customer.company_name || ""
-                                }`
-                              }}
-                            </span>
-                            <br />
-                            <span>
-                              {{ `${RgpData?.quotation.customer.name || ""}` }}
-                            </span>
-                            <!-- v-if company_data present -->
-                            <div
-                              v-show="RgpData?.quotation.customer.company_name"
-                            >
-                              <br />
-                              <span>
-                                {{
-                                  `${
-                                    RgpData?.quotation.customer.address1 || ""
-                                  }`
-                                }}
-                              </span>
-                              <br />
-                              <span>
-                                {{
-                                  `${
-                                    RgpData?.quotation.customer.address2 || ""
-                                  }`
-                                }}
-                              </span>
-                            </div>
-                            <div v-show="RgpData?.quotation.customer.country">
-                              <span>
-                                {{
-                                  `${
-                                    RgpData?.quotation.customer.city || ""
-                                  } - ${
-                                    RgpData?.quotation.customer.pincode || ""
-                                  }`
-                                }}
-                              </span>
-                              <br />
-                              <span>
-                                {{
-                                  `${RgpData?.quotation.customer.state || ""} ${
-                                    RgpData?.quotation.customer.country || ""
-                                  }`
-                                }}
-                              </span>
-                              <br />
-                            </div>
-                          </div>
-                          <br />
-                        </div>
+                      <div class="mt-2 font-semibold">Billing Address:</div>
+                      <div>
+                        {{ RgpData?.quotation.customer.name || "" }}<br />
+                        <template
+                          v-if="RgpData?.quotation.customer.company_name"
+                        >
+                          {{ RgpData?.quotation.customer.company_name }}<br />
+                          {{ RgpData?.quotation.customer.address1 || "" }}<br />
+                          {{ RgpData?.quotation.customer.address2 || "" }}<br />
+                        </template>
+                        <template v-if="RgpData?.quotation.customer.country">
+                          {{ RgpData?.quotation.customer.city || "" }} -
+                          {{ RgpData?.quotation.customer.pincode || "" }}<br />
+                          {{ RgpData?.quotation.customer.state || "" }}
+                          {{ RgpData?.quotation.customer.country || "" }}
+                        </template>
                       </div>
                     </div>
-
-                    <!--end::Input-->
                   </div>
-                  <!--end::Col-->
-                  <!--begin::Col-->
-                  <div class="col-md-6 fv-row mb-8 mb-sd-8">
-                    <!--begin::Label-->
-                    <label class="fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                      >Client :</label
-                    >
-                    <!--end::Label-->
+                </div>
 
-                    <!--begin::Input-->
-                    <div
-                      class="form-control form-control-lg form-control-solid"
-                    >
+                <div class="col-md-6">
+                  <div class="border rounded p-3 h-100">
+                    <label class="font-semibold mb-2">Client</label>
+                    <div class="small">
                       <div>
                         {{ RgpData?.quotation.clientx.company_name || "" }}
                       </div>
-                      <div class="mt-2 pt-4">
-                        <h6 class="mt-5">Site Address:</h6>
-                        <div class="mt-2">
-                          <div class="mb-1" v-show="RgpData?.quotation.clientx">
-                            <br />
-                            <span
-                              v-show="RgpData?.quotation.clientx.company_name"
-                            >
-                              {{
-                                `${
-                                  RgpData?.quotation.clientx.company_name || ""
-                                }`
-                              }}
-                            </span>
-                            <br />
-                            <span>
-                              {{ `${RgpData?.quotation.clientx.name || ""}` }}
-                            </span>
-                            <!-- v-if company_data present -->
-                            <div
-                              v-show="RgpData?.quotation.clientx.company_name"
-                            >
-                              <br />
-                              <span>
-                                {{
-                                  `${RgpData?.quotation.clientx.address1 || ""}`
-                                }}
-                              </span>
-                              <br />
-                              <span>
-                                {{
-                                  `${RgpData?.quotation.clientx.address2 || ""}`
-                                }}
-                              </span>
-                            </div>
-                            <div v-show="RgpData?.quotation.clientx.country">
-                              <span>
-                                {{
-                                  `${RgpData?.quotation.clientx.city || ""} - ${
-                                    RgpData?.quotation.clientx.pincode || ""
-                                  }`
-                                }}
-                              </span>
-                              <br />
-                              <span>
-                                {{
-                                  `${RgpData?.quotation.clientx.state || ""} ${
-                                    RgpData?.quotation.clientx.country || ""
-                                  }`
-                                }}
-                              </span>
-                              <br />
-                            </div>
-                          </div>
-                          <br />
-                        </div>
+                      <div class="mt-2 font-semibold">Site Address:</div>
+                      <div>
+                        {{ RgpData?.quotation.clientx.name || "" }}<br />
+                        <template
+                          v-if="RgpData?.quotation.clientx.company_name"
+                        >
+                          {{ RgpData?.quotation.clientx.company_name }}<br />
+                          {{ RgpData?.quotation.clientx.address1 || "" }}<br />
+                          {{ RgpData?.quotation.clientx.address2 || "" }}<br />
+                        </template>
+                        <template v-if="RgpData?.quotation.clientx.country">
+                          {{ RgpData?.quotation.clientx.city || "" }} -
+                          {{ RgpData?.quotation.clientx.pincode || "" }}<br />
+                          {{ RgpData?.quotation.clientx.state || "" }}
+                          {{ RgpData?.quotation.clientx.country || "" }}
+                        </template>
                       </div>
                     </div>
-
-                    <!--end::Input-->
-                  </div>
-                  <!--end::Col-->
-                </div>
-                <!--end::Input group-->
-
-                <div class="row mb-6">
-                  <div class="form-group col-12">
-                    <label
-                      class="d-flex align-items-center fs-5 fw-semobold mb-4 col-lg-4 col-form-label required text-gray-700 text-nowrap"
-                    >
-                      <span>Engineers</span>
-                      <i
-                        class="fas fa-exclamation-circle ms-2 fs-7"
-                        data-bs-toggle="tooltip"
-                        title="Select at least one engineer"
-                      ></i>
-                    </label>
-                    <div>
-                      <el-select
-                        filterable
-                        placeholder="Select Service Engineer..."
-                        name="engineer_id"
-                        v-model="itemDetails.engineer_id"
-                        @change="setEngineer"
-                      >
-                        <el-option
-                          value="Select Service Engineer..."
-                          disabled="disabled"
-                          label="Select Service Engineer..."
-                          key=""
-                        >
-                          Select Service Engineer...</el-option
-                        >
-                        <el-option
-                          v-for="engineer in Engineers"
-                          :key="engineer.id"
-                          :value="engineer.id"
-                          :label="`${engineer.first_name} ${engineer.last_name}`"
-                        />
-                      </el-select>
-                    </div>
                   </div>
                 </div>
+              </div>
 
-                <!--begin::Input group-->
-                <div class="row mb-6">
-                  <!--begin::Col-->
-                  <div class="col-md-6 fv-row mb-8 mb-sd-8">
-                    <!--begin::Label-->
-                    <label
-                      class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                      >From Date</label
-                    >
-                    <!--end::Label-->
-
-                    <!--begin::Input-->
-                    <div class="form-control form-control-solid">
-                      {{ RgpData?.date || "" }}
-                    </div>
-                    <!--end::Input-->
-                  </div>
-                  <!--end::Col-->
-                  <!--begin::Col-->
-                  <div class="col-md-6 fv-row mb-8 mb-sd-8">
-                    <!--begin::Label-->
-                    <label
-                      class="required fs-5 fw-bold text-gray-700 text-nowrap mb-2"
-                      >Till Date</label
-                    >
-                    <!--end::Label-->
-                    <!--begin::Input-->
-                    <div class="form-control form-control-solid">
-                      {{ RgpData?.duedate || "" }}
-                    </div>
-                    <!--end::Input-->
-                  </div>
-                  <!--end::Col-->
+              <!-- Engineers Selection -->
+              <div class="row g-6 mb-4">
+                <div class="col-12">
+                  <label class="form-label required font-semibold"
+                    >Engineers</label
+                  >
+                  <el-select
+                    filterable
+                    placeholder="Select Service Engineer..."
+                    name="engineer_id"
+                    v-model="itemDetails.engineer_id"
+                    @change="setEngineer"
+                    class="w-100"
+                  >
+                    <el-option
+                      v-for="engineer in Engineers"
+                      :key="engineer.id"
+                      :value="engineer.id"
+                      :label="`${engineer.first_name} ${engineer.last_name}`"
+                    />
+                    <el-option
+                      value=""
+                      disabled
+                      label="Select Service Engineer..."
+                    />
+                  </el-select>
                 </div>
-                <!--end::Input group-->
+              </div>
+
+              <!-- Date Information -->
+              <div class="row g-6 mb-4">
+                <div class="col-md-6">
+                  <label class="form-label required font-semibold"
+                    >From Date</label
+                  >
+                  <div class="form-control form-control-transparent">
+                    {{ RgpData?.date || "" }}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label required font-semibold"
+                    >Till Date</label
+                  >
+                  <div class="form-control form-control-transparent">
+                    {{ RgpData?.duedate || "" }}
+                  </div>
+                </div>
               </div>
             </div>
-            <!--end::Step 1-->
+          </div>
+          <!--end::Step 1-->
 
-            <!--begin::Step 2-->
-            <div data-kt-stepper-element="content">
-              <div class="w-100">
-                <div class="table-responsive mb-10">
-                  <!--begin::Table-->
-                  <table
-                    class="table g-5 gs-0 mb-0 w-100 fw-bold text-gray-700"
-                    data-kt-element="Selects"
-                  >
-                    <!--begin::Table head-->
-                    <thead>
-                      <tr
-                        class="fs-3 fw-bold text-gray-700 text-uppercase text-center"
-                      >
-                        <th class="">Your Expenses</th>
-                      </tr>
-                    </thead>
-                    <!--end::Table head-->
+          <!--begin::Step 2-->
+          <div class="text-gray-800 fs-6" data-kt-stepper-element="content">
+            <div class="w-100">
+              <div class="table-responsive mb-10">
+                <!--begin::Table-->
+                <table class="table align-middle g-5 gs-0 mb-0 w-100">
+                  <!--begin::Table head-->
+                  <thead>
+                    <tr
+                      class="fs-4 fw-bold text-gray-700 text-uppercase text-center"
+                    >
+                      <th class="min-w-300px">Your Expenses</th>
+                    </tr>
+                  </thead>
+                  <!--end::Table head-->
 
-                    <!--begin::Table body-->
-                    <tbody>
-                      <tr
-                        v-for="(task, index) in itemDetails.expenses"
-                        :key="task.id"
-                        class="w-100"
-                      >
-                        <td class="pt-8 text-nowrap" :key="index">
+                  <!--begin::Table body-->
+                  <tbody>
+                    <tr
+                      v-for="(task, index) in itemDetails.expenses"
+                      :key="task.id"
+                    >
+                      <td class="pt-8">
+                        <div
+                          class="shadow-sm p-6 mb-6 rounded bg-light bg-opacity-10 position-relative"
+                        >
+                          <!-- Numbering Badge -->
                           <div
-                            class="shadow-lg p-5 m-3 fs-4 rounded w-100 border"
+                            class="position-absolute top-0 start-0 translate-middle-y ms-4"
                           >
-                            <div class="row mb-2">
-                              <div
-                                class="form-group col-lg-4 col-sm-6 col-md-6 mb-2 mb-sd-2"
-                              >
-                                <el-date-picker
-                                  type="date"
-                                  :name="'date_' + index"
-                                  class="mb-3 mb-lg-0 min-w-150px"
-                                  v-model="task.date"
-                                  @change="setExpenseDate($event, index)"
-                                  placeholder="Pick a day"
-                                />
-                              </div>
+                            <span
+                              class="badge badge-circle bg-primary text-white fs-5"
+                              >#{{ index + 1 }}</span
+                            >
+                          </div>
 
-                              <div
-                                class="form-group col-lg-8 col-sm-6 col-md-6 mb-2 mb-sd-2"
+                          <!-- Date, Expense Type and Amount in single row -->
+                          <div class="row g-4 mb-4">
+                            <!-- Date -->
+                            <div class="col-12 col-md-4">
+                              <label
+                                class="form-label font-semibold d-block d-md-none"
+                                >Date</label
                               >
-                                <el-select
-                                  :name="'type_' + index"
-                                  filterable
-                                  v-model="task.id"
-                                  @change="setExpenseType($event, index)"
-                                  placeholder="Please Select Expense Type"
-                                >
-                                  <el-option
-                                    value=""
-                                    label="Please Select Item..."
-                                    disabled="disabled"
-                                    key=""
-                                    >Please Select Expense Type</el-option
-                                  >
-                                  <el-option
-                                    v-for="ele in ExpenseTypes"
-                                    :key="ele.id"
-                                    :label="ele.type"
-                                    :value="ele.id"
-                                  />
-                                </el-select>
-                              </div>
+                              <el-date-picker
+                                type="date"
+                                :name="'date_' + index"
+                                v-model="task.date"
+                                @change="setExpenseDate($event, index)"
+                                placeholder="Date"
+                                class="w-100"
+                                :editable="false"
+                              />
                             </div>
-                            <div class="row mb-2">
-                              <div
-                                class="form-group col-lg-4 col-sm-6 col-md-6 mb-2 mb-sd-2"
+
+                            <!-- Expense Type -->
+                            <div class="col-12 col-md-4">
+                              <label
+                                class="form-label font-semibold d-block d-md-none"
+                                >Expense Type</label
                               >
+                              <el-select
+                                :name="'type_' + index"
+                                filterable
+                                v-model="task.id"
+                                @change="setExpenseType($event, index)"
+                                placeholder="Type"
+                                class="w-100"
+                              >
+                                <el-option
+                                  v-for="ele in ExpenseTypes"
+                                  :key="ele.id"
+                                  :label="ele.type"
+                                  :value="ele.id"
+                                />
+                              </el-select>
+                            </div>
+
+                            <!-- Amount -->
+                            <div class="col-12 col-md-4">
+                              <label
+                                class="form-label font-semibold d-block d-md-none"
+                                >Amount</label
+                              >
+                              <div class="input-group">
+                                <span class="input-group-text">₹</span>
                                 <input
                                   type="text"
                                   :name="'amount_' + index"
                                   v-model="task.amount"
                                   @keyup="setExpenseAmount($event, index)"
-                                  class="form-control form-control-lg form-control-solid mb-3 mb-lg-0 min-w-150px"
-                                  placeholder="Enter Amount (₹ 0.00)"
+                                  class="form-control form-control-solid"
+                                  placeholder="0.00"
                                 />
                               </div>
-                              <div
-                                class="form-group col-lg-8 col-sm-6 col-md-6 mb-2 mb-sd-2"
+                            </div>
+                          </div>
+
+                          <!-- Description -->
+                          <div class="row g-4 mb-4">
+                            <div class="col-12">
+                              <label class="form-label font-semibold"
+                                >Description</label
                               >
-                                <input
-                                  type="textarea"
-                                  :name="'description_' + index"
-                                  v-model="task.description"
-                                  rows="2"
-                                  class="form-control form-control-lg form-control-solid"
-                                  placeholder="write more about expense..."
-                                />
-                              </div>
+                              <textarea
+                                :name="'description_' + index"
+                                v-model="task.description"
+                                rows="2"
+                                class="form-control form-control-solid"
+                                placeholder="Expense details..."
+                              ></textarea>
                             </div>
-                            <div class="row mb-2">
-                              <div class="form-group col-lg-12 mb-2 mb-sd-2">
-                                <input
-                                  type="file"
-                                  class="form-control form-control-file form-control-lg form-control-solid"
-                                  :name="'receipt_' + index"
-                                  accept="image/png,jpg,jpeg"
-                                  @change="setExpenseImage($event, index)"
-                                />
-                              </div>
-                            </div>
-                            <div class="row mb-2">
-                              <div class="form-group col-lg-12 mb-2 mb-sd-2">
-                                <div class="border p-2 mt-3">
-                                  <template v-if="task.receipt">
-                                    <img
-                                      :src="
-                                        'data:image/png;base64,' + task.receipt
-                                      "
-                                      class="rounded mx-auto d-block w-200px h-200px"
-                                    />
-                                  </template>
-                                </div>
-                              </div>
+                          </div>
+
+                          <!-- Receipt Upload and Preview -->
+                          <div class="row g-4">
+                            <!-- Receipt Upload -->
+                            <div class="col-12 col-md-6">
+                              <label class="form-label font-semibold"
+                                >Receipt</label
+                              >
+                              <input
+                                type="file"
+                                class="form-control form-control-solid"
+                                :name="'receipt_' + index"
+                                accept="image/png,jpg,jpeg"
+                                @change="setExpenseImage($event, index)"
+                              />
                             </div>
 
-                            <div class="row mb-2">
-                              <div
-                                class="form-group d-flex flex-end col-lg-12 mb-2 mb-sd-2"
+                            <!-- Receipt Preview -->
+                            <div class="col-12 col-md-6" v-if="task.receipt">
+                              <label class="form-label font-semibold"
+                                >Preview</label
                               >
-                                <div>
-                                  <span>
-                                    <i
-                                      @click="RemoveExpense(index)"
-                                      class="bi bi-trash btn btn-light text-gray-700 text-hover-danger mb-1 fs-1"
-                                    ></i>
-                                  </span>
-                                </div>
+                              <div class="rounded p-2 text-center bg-white">
+                                <img
+                                  :src="'data:image/png;base64,' + task.receipt"
+                                  class="img-fluid rounded max-h-150px border"
+                                  alt="Receipt"
+                                />
                               </div>
                             </div>
                           </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                    <!--end::Table body-->
-                    <!--begin::Table foot-->
-                    <tfoot>
-                      <tr
-                        class="border-top border-top-dashed align-top fs-6 fw-bold text-gray-700"
-                      >
-                        <th class="text-primary">
-                          <div class="row m-2">
-                            <div
-                              class="form-group d-flex justify-content-between col-lg-12 mb-2 mb-sd-2"
+
+                          <!-- Delete Button -->
+                          <div class="row mt-4">
+                            <div class="col-12 text-end">
+                              <button
+                                @click="RemoveExpense(index)"
+                                class="btn btn-icon btn-light-danger"
+                                type="button"
+                                title="Remove expense"
+                              >
+                                <i class="bi bi-trash fs-2"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                  <!--end::Table body-->
+
+                  <!-- Table Footer with Add and Total -->
+                  <tfoot>
+                    <tr>
+                      <td class="pt-6">
+                        <div
+                          class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3"
+                        >
+                          <button
+                            @click="addNewItem"
+                            class="btn btn-primary w-100 w-md-auto"
+                            type="button"
+                          >
+                            <i class="bi bi-plus fs-2 me-2"></i>
+                            Add Expense
+                          </button>
+                          <div
+                            class="d-flex align-items-center w-100 w-md-auto justify-content-center justify-content-md-end"
+                          >
+                            <span class="fs-4 fw-semibold text-gray-700 me-3"
+                              >Total:</span
                             >
-                              <div>
-                                <span
-                                  class="btn btn-primary"
-                                  @click="addNewItem"
-                                >
-                                  <KTIcon icon-name="plus" icon-class="fs-2" />
-                                  Expense
-                                </span>
-                              </div>
-                              <div>
-                                <h2 class="fw-bold fs-4 text-dark">
-                                  Total Expense ₹<span
-                                    class="text-primary"
-                                    data-kt-element="grand-total"
-                                    >{{
-                                      itemDetails.total_amount
-                                        ? itemDetails.total_amount
-                                        : "0.0"
-                                    }}</span
-                                  >
-                                </h2>
-                              </div>
-                            </div>
+                            <span class="fs-3 fw-bold text-primary">
+                              ₹{{ itemDetails.total_amount || "0.00" }}
+                            </span>
                           </div>
-                        </th>
-                      </tr>
-                    </tfoot>
-                    <!--end::Table foot-->
-                  </table>
-                </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
               </div>
             </div>
-            <!--end::Step 2-->
+          </div>
+          <!--end::Step 2-->
 
-            <!--begin::Step 3-->
-            <div data-kt-stepper-element="content">
-              <div class="w-100">
-                <h2 class="fw-bold">Summary</h2>
+          <!--begin::Step 3-->
+          <div class="text-gray-800 fs-6" data-kt-stepper-element="content">
+            <div class="w-100">
+              <h2 class="fw-bold text-gray-800 mb-6">Summary</h2>
 
-                <div class="mb-6 mt-6">
-                  <!--begin::Title-->
-                  <h5 class="mb-4">Gate Pass:</h5>
-                  <!--end::Title-->
-
-                  <div class="d-flex flex-wrap py-5">
-                    <!--begin::Row-->
-                    <div class="flex-equal me-5">
-                      <p>
-                        <span class="text-gray-700"> Date: </span>
-                        <span class="text-gray-800">
-                          {{ RgpData?.date || "" }}
-                        </span>
-                      </p>
-                      <p>
-                        <span class="text-gray-700"> RGP No : </span>
-                        <span class="text-gray-800">
-                          {{ RgpData?.rgp_no || "" }}
-                        </span>
-                      </p>
+              <!-- Gate Pass Section -->
+              <div class="card card-flush shadow-sm mb-6">
+                <div class="card-header">
+                  <h3 class="card-title fw-bold">Gate Pass Details</h3>
+                </div>
+                <div class="card-body pt-0">
+                  <div class="row g-6 mb-4">
+                    <!-- Left Column -->
+                    <div class="col-md-6">
+                      <div class="d-flex flex-column gap-4">
+                        <div>
+                          <span class="text-gray-600 fw-semibold d-block mb-1"
+                            >Date:</span
+                          >
+                          <span class="text-gray-800">{{
+                            RgpData?.date || "-"
+                          }}</span>
+                        </div>
+                        <div>
+                          <span class="text-gray-600 fw-semibold d-block mb-1"
+                            >RGP No:</span
+                          >
+                          <span class="text-gray-800">{{
+                            RgpData?.rgp_no || "-"
+                          }}</span>
+                        </div>
+                      </div>
                     </div>
-                    <!--end::Row-->
 
-                    <!--begin::Row-->
-                    <div class="flex-equal">
-                      <p>
-                        <span class="text-gray-700"> Due Date: </span>
-                        <span class="text-gray-800">
-                          {{ RgpData?.duedate || "" }}
-                        </span>
-                      </p>
-                      <p>
-                        <span class="text-gray-700"> Quotation No : </span>
-                        <span class="text-gray-800">
-                          {{ RgpData?.quotation.quotation_no || "" }}
-                        </span>
-                      </p>
+                    <!-- Right Column -->
+                    <div class="col-md-6">
+                      <div class="d-flex flex-column gap-4">
+                        <div>
+                          <span class="text-gray-600 fw-semibold d-block mb-1"
+                            >Due Date:</span
+                          >
+                          <span class="text-gray-800">{{
+                            RgpData?.duedate || "-"
+                          }}</span>
+                        </div>
+                        <div>
+                          <span class="text-gray-600 fw-semibold d-block mb-1"
+                            >Quotation No:</span
+                          >
+                          <span class="text-gray-800">{{
+                            RgpData?.quotation.quotation_no || "-"
+                          }}</span>
+                        </div>
+                      </div>
                     </div>
-                    <!--end::Row-->
                   </div>
+                </div>
+              </div>
 
-                  <div class="d-flex flex-wrap py-5">
-                    <!--begin::Row-->
-                    <div class="flex-equal me-5">
-                      <p>
-                        <span class="text-gray-700"> Customer Name: </span>
-                        <span class="text-gray-800">
-                          {{ RgpData?.quotation.customer.company_name }}
-                        </span>
-                      </p>
-                      <p>
-                        <span class="text-gray-700"> Billing Address: </span>
-                      </p>
-                      <p>
-                        <span class="text-gray-800">
-                          {{ RgpData?.quotation.customer.address1 || "" }}
-                          {{ RgpData?.quotation.customer.address2 || "" }}
-                          {{ RgpData?.quotation.customer.city || "" }}
-                          {{ RgpData?.quotation.customer.pincode || "" }}
-                          {{ RgpData?.quotation.customer.state || "" }}
-                          {{ RgpData?.quotation.customer.country || "" }}
-                        </span>
-                      </p>
+              <!-- Customer/Client Section -->
+              <div class="row g-6 mb-6">
+                <!-- Customer Card -->
+                <div class="col-md-6">
+                  <div class="card card-flush shadow-sm h-100">
+                    <div class="card-header">
+                      <h3 class="card-title fw-bold">Customer Information</h3>
                     </div>
-                    <!--end::Row-->
-
-                    <!--begin::Row-->
-                    <div class="flex-equal">
-                      <p>
-                        <span class="text-gray-700"> Client Name: </span>
-                        <span class="text-gray-800">
-                          {{ RgpData?.quotation.clientx.company_name }}
-                        </span>
-                      </p>
-                      <p>
-                        <span class="text-gray-700"> Site Address: </span>
-                      </p>
-                      <p>
-                        <span class="text-gray-800">
-                          {{ RgpData?.quotation.clientx.address1 || "" }}
-                          {{ RgpData?.quotation.clientx.address2 || "" }}
-                          {{ RgpData?.quotation.clientx.city || "" }}
-                          {{ RgpData?.quotation.clientx.pincode || "" }}
-                          {{ RgpData?.quotation.clientx.state || "" }}
-                          {{ RgpData?.quotation.clientx.country || "" }}
-                        </span>
-                      </p>
+                    <div class="card-body pt-0">
+                      <div class="mb-4">
+                        <span class="text-gray-600 fw-semibold d-block mb-1"
+                          >Name:</span
+                        >
+                        <span class="text-gray-800">{{
+                          RgpData?.quotation.customer.company_name || "-"
+                        }}</span>
+                      </div>
+                      <div>
+                        <span class="text-gray-600 fw-semibold d-block mb-1"
+                          >Billing Address:</span
+                        >
+                        <div class="text-gray-800">
+                          <div>
+                            {{ RgpData?.quotation.customer.name || "" }}
+                          </div>
+                          <template
+                            v-if="RgpData?.quotation.customer.company_name"
+                          >
+                            <div>
+                              {{ RgpData?.quotation.customer.company_name }}
+                            </div>
+                          </template>
+                          <div>
+                            {{ RgpData?.quotation.customer.address1 || "" }}
+                          </div>
+                          <div>
+                            {{ RgpData?.quotation.customer.address2 || "" }}
+                          </div>
+                          <div>
+                            {{ RgpData?.quotation.customer.city || "" }}
+                            <template
+                              v-if="RgpData?.quotation.customer.pincode"
+                            >
+                              - {{ RgpData?.quotation.customer.pincode }}
+                            </template>
+                          </div>
+                          <div>
+                            {{ RgpData?.quotation.customer.state || "" }}
+                            {{ RgpData?.quotation.customer.country || "" }}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <!--end::Row-->
                   </div>
                 </div>
 
-                <div class="mt-6">
-                  <!--begin::Title-->
-                  <h5 class="mb-4">Expenses :</h5>
-                  <!--end::Title-->
-
-                  <!--begin::Product table-->
-                  <div class="table-responsive mh-300px">
-                    <!--begin::Table-->
-                    <table
-                      class="table table-striped table-bordered table-hover align-middle"
-                    >
-                      <!--begin::Table head-->
-                      <thead class="sticky-top bg-light">
-                        <!--begin::Table row-->
-                        <tr
-                          class="border-bottom border-gray-200 text-start text-gray-700 fw-bold fs-7 text-uppercase gs-0"
+                <!-- Client Card -->
+                <div class="col-md-6">
+                  <div class="card card-flush shadow-sm h-100">
+                    <div class="card-header">
+                      <h3 class="card-title fw-bold">Client Information</h3>
+                    </div>
+                    <div class="card-body pt-0">
+                      <div class="mb-4">
+                        <span class="text-gray-600 fw-semibold d-block mb-1"
+                          >Name:</span
                         >
-                          <th class="min-w-50px">#</th>
-                          <th class="min-w-150px">Type</th>
-                          <th class="min-w-125px">Amount</th>
-                          <th class="text-end min-w-125px">Date</th>
-                        </tr>
-                        <!--end::Table row-->
-                      </thead>
-                      <!--end::Table head-->
+                        <span class="text-gray-800">{{
+                          RgpData?.quotation.clientx.company_name || "-"
+                        }}</span>
+                      </div>
+                      <div>
+                        <span class="text-gray-600 fw-semibold d-block mb-1"
+                          >Site Address:</span
+                        >
+                        <div class="text-gray-800">
+                          <div>{{ RgpData?.quotation.clientx.name || "" }}</div>
+                          <template
+                            v-if="RgpData?.quotation.clientx.company_name"
+                          >
+                            <div>
+                              {{ RgpData?.quotation.clientx.company_name }}
+                            </div>
+                          </template>
+                          <div>
+                            {{ RgpData?.quotation.clientx.address1 || "" }}
+                          </div>
+                          <div>
+                            {{ RgpData?.quotation.clientx.address2 || "" }}
+                          </div>
+                          <div>
+                            {{ RgpData?.quotation.clientx.city || "" }}
+                            <template v-if="RgpData?.quotation.clientx.pincode">
+                              - {{ RgpData?.quotation.clientx.pincode }}
+                            </template>
+                          </div>
+                          <div>
+                            {{ RgpData?.quotation.clientx.state || "" }}
+                            {{ RgpData?.quotation.clientx.country || "" }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-                      <!--begin::Table body-->
-                      <tbody class="fw-semobold text-gray-800">
+              <!-- Expenses Section -->
+              <div class="card card-flush shadow-sm">
+                <div class="card-header">
+                  <h3 class="card-title fw-bold">Expenses Summary</h3>
+                </div>
+                <div class="card-body pt-0">
+                  <div class="table-responsive">
+                    <table
+                      class="table table-row-bordered table-row-gray-100 align-middle gs-0 gy-3"
+                    >
+                      <!-- Table Head -->
+                      <thead>
+                        <tr class="fw-bold text-gray-600 border-bottom-1">
+                          <th class="min-w-50px">#</th>
+                          <th class="min-w-200px">Type</th>
+                          <th class="min-w-150px text-end">Amount</th>
+                          <th class="min-w-150px text-end">Date</th>
+                        </tr>
+                      </thead>
+
+                      <!-- Table Body -->
+                      <tbody>
                         <tr
                           v-for="(expense, index) in itemDetails.expenses"
                           :key="index"
                         >
                           <td>{{ index + 1 }}</td>
-                          <td>{{ expense.type }}</td>
-                          <td>{{ expense.amount }}</td>
+                          <td>{{ expense.type || "-" }}</td>
                           <td class="text-end">
-                            {{ expense.date }}
+                            ₹{{ expense.amount || "0.00" }}
                           </td>
+                          <td class="text-end">{{ expense.date || "-" }}</td>
                         </tr>
                       </tbody>
-                      <!--end::Table body-->
-                      <tfoot class="fw-semobold text-gray-800">
+
+                      <!-- Table Footer -->
+                      <tfoot class="fw-bold bg-light">
                         <tr>
-                          <td class="text-end" colspan="2">Total</td>
-                          <td class="text-center">
-                            ₹ {{ itemDetails.total_amount }}
+                          <td colspan="2" class="text-end">Total</td>
+                          <td class="text-end">
+                            ₹{{ itemDetails.total_amount || "0.00" }}
                           </td>
+                          <td></td>
                         </tr>
                       </tfoot>
                     </table>
-                    <!--end::Table-->
                   </div>
-                  <!--end::Product table-->
                 </div>
               </div>
             </div>
-            <!--end::Step 3-->
+          </div>
+          <!--end::Step 3-->
 
-            <!--begin::Actions-->
-            <div class="d-flex flex-stack pt-10">
-              <!--begin::Wrapper-->
-              <div class="me-2">
+          <!-- Stepper Actions -->
+          <div class="d-flex flex-stack pt-15">
+            <!-- Back Button -->
+            <div>
+              <button
+                type="button"
+                class="btn btn-flex btn-outline btn-outline-primary border-primary bg-transparent bg-hover-light-primary"
+                data-kt-stepper-action="previous"
+                @click="previousStep"
+              >
+                <span class="svg-icon svg-icon-3 me-2">
+                  <KTIcon icon-name="arrow-left" icon-class="text-primary" />
+                </span>
+                <span class="fw-semibold text-primary">Back</span>
+              </button>
+            </div>
+
+            <!-- Next/Submit Buttons -->
+            <div>
+              <template v-if="currentStepIndex === totalSteps - 1">
+                <!-- Submit Button (now matching Next style) -->
                 <button
                   type="button"
-                  class="btn btn-lg btn-light-primary me-3"
-                  data-kt-stepper-action="previous"
-                  @click="previousStep()"
-                >
-                  <KTIcon icon-name="arrow-left" icon-class="fs-3 me-1" />
-                  Back
-                </button>
-              </div>
-              <!--end::Wrapper-->
-
-              <!--begin::Wrapper-->
-              <div>
-                <button
-                  type="submit"
-                  class="btn btn-lg btn-primary"
-                  v-if="currentStepIndex === totalSteps - 1"
+                  class="btn btn-flex btn-primary px-6 py-3 shadow-sm"
+                  data-kt-stepper-action="submit"
                   @click="formSubmit()"
                 >
                   <span class="indicator-label">
-                    Submit
-                    <KTIcon
-                      icon-name="arrow-right"
-                      icon-class="fs-3 ms-2 me-0"
-                    />
+                    <span class="fw-bold fs-5 text-white">Submit</span>
+                    <span class="svg-icon svg-icon-2 ms-2">
+                      <KTIcon icon-name="arrow-right" icon-class="text-white" />
+                    </span>
                   </span>
                   <span class="indicator-progress">
-                    Please wait...
+                    <span class="fw-semibold fs-5 text-white">Processing</span>
                     <span
-                      class="spinner-border spinner-border-sm align-middle ms-2"
+                      class="spinner-border spinner-border-sm align-middle ms-2 text-white"
                     ></span>
                   </span>
                 </button>
-
-                <button v-else type="submit" class="btn btn-lg btn-primary">
-                  Continue
-                  <KTIcon icon-name="arrow-right" icon-class="fs-3 ms-1 me-0" />
+              </template>
+              <template v-else>
+                <!-- Continue Button -->
+                <button
+                  type="submit"
+                  class="btn btn-flex btn-primary px-6 py-3 shadow-sm"
+                >
+                  <span class="d-flex align-items-center">
+                    <span class="fw-bold fs-5 text-white">Next</span>
+                    <span class="svg-icon svg-icon-2 ms-2">
+                      <KTIcon icon-name="arrow-right" icon-class="text-white" />
+                    </span>
+                  </span>
                 </button>
-              </div>
-              <!--end::Wrapper-->
+              </template>
             </div>
-            <!--end::Actions-->
-          </form>
-          <!--end::Form-->
-        </div>
-        <!--end::Content-->
+          </div>
+          <!--end::Actions-->
+        </form>
+        <!--end::Form-->
       </div>
-      <!--end::Stepper-->
       <!--end::Stepper-->
     </div>
     <!--end::Card body-->
@@ -874,10 +764,9 @@ interface CreateAccount extends IStep1, IStep2, IStep3 {}
 
 export default defineComponent({
   name: "expensesheet-add",
-  components: {},
   setup() {
-    const createAppStepperRef = ref<HTMLElement | null>(null);
-    const stepperObj = ref<StepperComponent | null>(null);
+    const _stepperObj = ref<StepperComponent | null>(null);
+    const horizontalWizardRef = ref<HTMLElement | null>(null);
     const currentStepIndex = ref(0);
     const loading = ref(false);
 
@@ -1143,8 +1032,8 @@ export default defineComponent({
       // Calling
       await GetOnGoingRGP();
 
-      stepperObj.value = StepperComponent.createInsance(
-        createAppStepperRef.value as HTMLElement
+      _stepperObj.value = StepperComponent.createInsance(
+        horizontalWizardRef.value as HTMLElement
       );
     });
 
@@ -1154,13 +1043,13 @@ export default defineComponent({
       return createAccountSchema[currentStepIndex.value];
     });
 
-    const { resetForm, handleSubmit } = useForm<IStep2 | IStep3>({
+    const { resetForm, handleSubmit } = useForm<IStep1 | IStep2 | IStep3>({
       // validationSchema: currentSchema,
     });
 
     const totalSteps = computed(() => {
-      if (stepperObj.value) {
-        return stepperObj.value.totalStepsNumber;
+      if (_stepperObj.value) {
+        return _stepperObj.value.totalStepsNumber;
       } else {
         return 1;
       }
@@ -1171,11 +1060,11 @@ export default defineComponent({
         if (itemDetails.value.rgp_id && itemDetails.value.engineer_id) {
           currentStepIndex.value++;
 
-          if (!stepperObj.value) {
+          if (!_stepperObj.value) {
             return;
           }
 
-          stepperObj.value.goNext();
+          _stepperObj.value.goNext();
         } else {
           Swal.fire({
             icon: "info",
@@ -1197,11 +1086,11 @@ export default defineComponent({
           } else {
             currentStepIndex.value++;
 
-            if (!stepperObj.value) {
+            if (!_stepperObj.value) {
               return;
             }
 
-            stepperObj.value.goNext();
+            _stepperObj.value.goNext();
           }
         } else {
           Swal.fire({
@@ -1213,13 +1102,13 @@ export default defineComponent({
     });
 
     const previousStep = () => {
-      if (!stepperObj.value) {
+      if (!_stepperObj.value) {
         return;
       }
 
       currentStepIndex.value--;
 
-      stepperObj.value.goPrev();
+      _stepperObj.value.goPrev();
     };
 
     const formSubmit = async () => {
@@ -1290,7 +1179,7 @@ export default defineComponent({
     };
 
     return {
-      createAppStepperRef,
+      horizontalWizardRef,
       previousStep,
       handleStep,
       formSubmit,
