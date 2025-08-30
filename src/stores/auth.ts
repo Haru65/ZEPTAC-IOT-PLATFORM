@@ -13,6 +13,9 @@ export interface User {
   data: string;
   company_details: CompanyDetails;
   role_id: string;
+  meta?: {
+    profile_pic?: string;
+  };
 }
 
 export interface CompanyDetails {
@@ -28,13 +31,35 @@ export interface CompanyDetails {
 
 export const useAuthStore = defineStore("auth", () => {
   const errors = ref({});
-  const user = ref<User>({} as User);
-  const isAuthenticated = ref(JwtService.getToken());
+  const user = ref<User>({
+    first_name: "Demo",
+    last_name: "User",
+    email: "demo@example.com",
+    password: "",
+    api_token: "demo-token",
+    data: "",
+    role_id: "1", // Admin role
+    meta: {
+      profile_pic: ""
+    },
+    company_details: {
+      company_id: 1,
+      company_name: "Demo Company",
+      financial_year_type: "1",
+      is_active: 1,
+      is_trial: false,
+      trial_subscription_start: "",
+      trial_subscription_end: "",
+      billing_format: "standard"
+    }
+  });
+  
+  const isAuthenticated = ref(true); // Always authenticated
 
-  const companyDetails = ref<CompanyDetails>({} as CompanyDetails);
+  const companyDetails = ref<CompanyDetails>(user.value.company_details);
 
-  const selectedFinancialYear = ref<string>(""); 
-  const financialYearType = ref<string>("");
+  const selectedFinancialYear = ref<string>(getCurrentFinancialYear("1")); 
+  const financialYearType = ref<string>("1");
 
   const financialYearsCache = ref<string[]>([]); // Cache for financial years
 
@@ -81,19 +106,29 @@ export const useAuthStore = defineStore("auth", () => {
 
   async function setAuth(authUser: any) {
     //console.log(authUser);
-    isAuthenticated.value = authUser.role_id;
-    user.value = authUser;
-    companyDetails.value = authUser.company_details;
+    isAuthenticated.value = true; // Always set to true in development
+    user.value = {
+      ...authUser,
+      role_id: "1", // Always set as admin in development
+      api_token: "demo-token",
+      company_details: {
+        company_id: 1,
+        company_name: "Demo Company",
+        financial_year_type: "1",
+        is_active: 1,
+        is_trial: false,
+        trial_subscription_start: "",
+        trial_subscription_end: "",
+        billing_format: "standard"
+      }
+    };
+    companyDetails.value = user.value.company_details;
     errors.value = {};
-    JwtService.saveToken(user.value.api_token);
-
-    // ✅ Fetch Customer-Company Data Only for Customer Role
-    if (authUser.role_id == "7") {
-      await customerStore.fetchCustomerCompanyData();
-    }
+    localStorage.setItem('user', JSON.stringify(user.value));
+    localStorage.setItem('isAuthenticated', 'true');
 
     const localFinancialYear = localStorage.getItem("financialYearType");
-    const actualFinancialYear = user.value.company_details["financial_year_type"];
+    const actualFinancialYear = "1"; // Always use type 1 in development
 
     // check whether actual vs local financial year
     if(localFinancialYear != actualFinancialYear){
@@ -147,45 +182,54 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
 
+  // Simplified auth functions for development
   function purgeAuth() {
-    isAuthenticated.value = null;
-    user.value = {} as User;
-    errors.value = [];
-    JwtService.destroyToken();
-    JwtService.destroyUser();
-    companyDetails.value = {} as CompanyDetails;
-    JwtService.destroySelectedYear();
-    JwtService.destroyFinancialType();
-    sessionStorage.removeItem("echoInitialized")
-    sessionStorage.removeItem("echoListenerSet")
-      // ✅ Correctly resetting the store
-    customerStore.resetStore();
+    // Do nothing in development mode - we're always authenticated
+    console.log('Logout attempted - disabled in development mode');
   }
 
-
   async function login(credentials: User) {
-    return ApiService.post("login", credentials)
-      .then(({ data }) => {
-        // console.log(data);
-        setAuth(data);
-        saveUser(data);
+    // Auto-login with demo user in development mode
+    console.log('Auto-login with demo user');
+    
+    // Create demo user data
+    const demoUser = {
+      first_name: credentials.email.split('@')[0] || "Demo",
+      last_name: "User",
+      email: credentials.email,
+      role_id: "1", // Admin role
+      api_token: "demo-token",
+      company_details: {
+        company_id: 1,
+        company_name: "Demo Company",
+        financial_year_type: "1",
+        is_active: 1,
+        is_trial: false,
+        trial_subscription_start: "",
+        trial_subscription_end: "",
+        billing_format: "standard"
+      }
+    };
+    
+    // Set auth state with demo user
+    await setAuth(demoUser);
+    
+    // Initialize financial year settings
+    financialYearType.value = "1";
+    localStorage.setItem('financialYearType', "1");
+    
+    financialYearsCache.value = getAcademicYears(5, "1");
+    
+    selectedFinancialYear.value = getCurrentFinancialYear("1");
+    localStorage.setItem('selectedFinancialYear', selectedFinancialYear.value);
 
-        // If there is no local financial year type, initialize it with the actual value
-        financialYearType.value = user.value.company_details["financial_year_type"];
-        localStorage.setItem('financialYearType', user.value.company_details["financial_year_type"]);
-        
-        financialYearsCache.value = getAcademicYears(5, localStorage.getItem('financialYearType') || user.value.company_details['financial_year_type'] || 2);
-        
-        // Also initialize the selected academic year
-        selectedFinancialYear.value = getCurrentFinancialYear(user.value.company_details["financial_year_type"]);
-        localStorage.setItem('selectedFinancialYear', selectedFinancialYear.value);
-
-
-      })
-      .catch(({ response }) => {
-        console.error(response.data.message);
-        setAuthError(response.data.message);
-      });
+    // Return success response
+    return {
+      data: {
+        success: true,
+        data: demoUser
+      }
+    };
   }
 
 
@@ -194,52 +238,28 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
 
+  // Simplified auth functions for development
   function register(credentials: User) {
-    return ApiService.post("register", credentials)
-      .then(({ data }) => {
-        setAuth(data);
-      })
-      .catch(({ response }) => {
-        console.error(response.data.message);
-        setError(response.data.errors);
-      });
+    console.log('Registration attempted - disabled in development mode');
+    return Promise.resolve({
+      success: true,
+      data: user.value
+    });
   }
-
 
   function forgotPassword(email: string) {
-
-
-    return ApiService.post("forgot_password", { email })
-      .then((response) => {
-        return response.data;
-      })
-      .catch((error) => {
-        return error.response.data
-      });
-
-
+    console.log('Password reset attempted - disabled in development mode');
+    return Promise.resolve({
+      success: true,
+      message: 'Password reset functionality is disabled in development mode'
+    });
   }
 
-
-  // before every page a call is made with a JWT token to request user credentials
+  // Simplified auth verification for development
   function verifyAuth() {
-    //console.log(isAuthenticated.value);
-    if (JwtService.getToken()) {
-      ApiService.setHeader();
-      ApiService.post("verify_token", { api_token: JwtService.getToken() })
-        .then(({ data }) => {
-          setAuth(data);
-        })
-        .catch(({ response }) => {
-          if (response.data.error_code) {
-            console.error(response.data.message);
-            setError(response.data.message);
-            purgeAuth();
-          }
-        });
-    } else {
-      purgeAuth();
-    }
+    // Always authenticated in development mode
+    console.log('Auth verification - always authenticated in development mode');
+    return true;
   }
 
 

@@ -10,8 +10,8 @@
         <!--begin::Avatar-->
         <div class="symbol symbol-50px me-5">
           <img
-            v-if="User.meta.profile_pic"
-            :src="`https://api.zeptac.com/storage/company/${User.company_id}/profile_images/${User.meta.profile_pic}`"
+            v-if="User?.meta?.profile_pic"
+            :src="`https://api.zeptac.com/storage/company/${User.company_details?.company_id}/profile_images/${User.meta.profile_pic}`"
             class="rounded-circle"
             alt="Logo"
           />
@@ -19,7 +19,7 @@
             <span
               :class="`bg-dark text-primary text-uppercase`"
               class="symbol-label fs-3 fw-bold"
-              >{{ User.first_name.charAt(0) || "" }}</span
+              >{{ User?.first_name?.charAt(0) || "" }}</span
             >
           </div>
         </div>
@@ -110,9 +110,12 @@ export default defineComponent({
   setup() {
     const router = useRouter();
     const store = useAuthStore();
-    const User = store.GetUser();
-
-    // console.log("USER :>", User);
+    const User = computed(() => store.GetUser() || {
+      first_name: "",
+      last_name: "",
+      meta: {},
+      company_details: {}
+    });
 
     const signOut = () => {
       store.logout();

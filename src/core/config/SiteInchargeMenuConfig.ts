@@ -21,47 +21,6 @@ export interface MenuItem {
         },
       ],
     },
-    {
-      heading: "CleanRoom Validation",
-      route: "cleanroom",
-      pages: [
-        {
-          sectionTitle: "Validation Service",
-          route: "/",
-          keenthemesIcon: "abstract-35",
-          bootstrapIcon: "bi-archive",
-          sub: [
-            {
-              heading: "Expense Sheet",
-              route: "/expensesheets",
-            },
-          ],
-        },
-  
-        /*
-  
-        {
-          sectionTitle: "External Audit",
-          route: "/",
-          keenthemesIcon: "tablet-ok",
-          bootstrapIcon: "bi-archive",
-  
-          sub: [
-            {
-              heading: "Validation Procedure",
-              route: "/validation",
-            },
-            {
-              heading: "Quality Procedure",
-              route: "/quality",
-            },
-          ],
-        }
-  
-        */
-  
-      ],
-    },
 
   ];
   

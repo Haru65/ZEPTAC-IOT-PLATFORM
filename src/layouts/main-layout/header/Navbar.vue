@@ -2,7 +2,7 @@
   <!--begin::Navbar-->
   <div class="app-navbar flex-shrink-0">
     <!--begin::Notifications-->
-    <div class="app-navbar-item ms-1 ms-md-3" v-if="Identifier != 'Customer'">
+    <div class="app-navbar-item ms-1 ms-md-3">
       <!--begin::Menu- wrapper-->
       <div
         class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-30px h-30px w-md-40px h-md-40px position-relative"
@@ -95,8 +95,8 @@
         data-kt-menu-placement="bottom-end"
       >
         <img
-          v-if="User.meta.profile_pic"
-          :src="`https://api.zeptac.com/storage/company/${User.company_id}/profile_images/${User.meta.profile_pic}`"
+          v-if="User?.meta?.profile_pic"
+          :src="`https://api.zeptac.com/storage/company/${User.company_details.company_id}/profile_images/${User.meta.profile_pic}`"
           class="rounded-circle"
           alt="user"
         />
@@ -104,7 +104,7 @@
           <span
             :class="`bg-dark text-primary text-uppercase`"
             class="symbol-label fs-4 fw-bold"
-            >{{ User.first_name.charAt(0) || "" }}</span
+            >{{ User?.first_name?.charAt(0) || "" }}</span
           >
         </div>
       </div>

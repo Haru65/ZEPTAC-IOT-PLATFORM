@@ -2,6 +2,19 @@
   "name": "portal",
   "version": "0.1.0",
   "private": true,
+  "description": "This template should help get you started developing with Vue 3 in Vite.",
+  "homepage": "https://github.com/Zeptac/ZeptacIOTVueApp#readme",
+  "bugs": {
+    "url": "https://github.com/Zeptac/ZeptacIOTVueApp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zeptac/ZeptacIOTVueApp.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
   "scripts": {
     "dev": "vite --host",
     "build": "run-p type-check build-only",
@@ -32,6 +45,7 @@
     "deepmerge": "^4.2.2",
     "dotenv": "^16.0.3",
     "dropzone": "^5.9.3",
+    "echarts": "^5.6.0",
     "element-plus": "^2.3.6",
     "fabric": "^5.3.0",
     "html2canvas": "^1.4.1",
@@ -61,6 +75,7 @@
     "vue-cookies": "^1.8.3",
     "vue-currency-input": "^2.1.0",
     "vue-easy-lightbox": "^1.16.0",
+    "vue-echarts": "^7.0.3",
     "vue-i18n": "^9.2.2",
     "vue-image-lightbox": "^7.2.0",
     "vue-inline-svg": "^3.1.0",

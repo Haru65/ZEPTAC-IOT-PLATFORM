@@ -20,16 +20,16 @@
     <!--end::Heading-->
 
     <!--begin:Nav-->
-    <div class="row g-0" v-if="Identifier == 'Company-Admin' || Identifier == 'Admin' || Identifier == 'Sales-Person'">
+    <div class="row g-0" v-if="Identifier == 'Company-Admin' || Identifier == 'Admin'">
       <!--begin:Item-->
       <div class="col-6">
         <router-link
-          to="/leads/add"
+          to="/devices"
           class="d-flex flex-column flex-center h-100 p-4 bg-hover-light border-end border-bottom"
         >
-          <KTIcon icon-name="user-tick" icon-class="fs-2x text-success mb-2" />
-          <span class="fs-5 fw-semobold text-gray-800 mb-0">Lead</span>
-          <span class="fs-7 text-primary-400 text-wrap">Generate lead</span>
+          <KTIcon icon-name="router" icon-class="fs-2x text-success mb-2" />
+          <span class="fs-5 fw-semobold text-gray-800 mb-0">Devices</span>
+          <span class="fs-7 text-primary-400 text-wrap">Lorem Text</span>
         </router-link>
       </div>
       <!--end:Item-->
@@ -37,12 +37,12 @@
       <!--begin:Item-->
       <div class="col-6">
         <router-link
-          to="/quotations/add"
+          to="/reports"
           class="d-flex flex-column flex-center h-100 p-4 bg-hover-light border-bottom"
         >
-          <KTIcon icon-name="note-2" icon-class="fs-2x text-success mb-2" />
-          <span class="fs-5 fw-semobold text-gray-800 mb-0">Quotation</span>
-          <span class="fs-7 text-primary-400 text-wrap">Make a quotation</span>
+          <KTIcon icon-name="chart" icon-class="fs-2x text-success mb-2" />
+          <span class="fs-5 fw-semobold text-gray-800 mb-0">Reports</span>
+          <span class="fs-7 text-primary-400 text-wrap">Lorem Text</span>
         </router-link>
       </div>
       <!--end:Item-->
@@ -50,12 +50,12 @@
       <!--begin:Item-->
       <div class="col-6">
         <router-link
-          to="/clients/add"
+          to="/alarms"
           class="d-flex flex-column flex-center h-100 p-4 bg-hover-light border-end border-bottom"
         >
-          <KTIcon icon-name="profile-user" icon-class="fs-2x text-success mb-2" />
-          <span class="fs-5 fw-semobold text-gray-800 mb-0">Client</span>
-          <span class="fs-7 text-primary-400 text-wrap">Add new client</span>
+          <KTIcon icon-name="timer" icon-class="fs-2x text-success mb-2" />
+          <span class="fs-5 fw-semobold text-gray-800 mb-0">Alarm</span>
+          <span class="fs-7 text-primary-400 text-wrap">Lorem Text</span>
         </router-link>
       </div>
       <!--end:Item-->
@@ -63,57 +63,15 @@
       <!--begin:Item-->
       <div class="col-6">
         <router-link
-          to="/pricelist/add"
+          to="/locations"
           class="d-flex flex-column flex-center h-100 p-4 bg-hover-light border-bottom"
         >
           <KTIcon
-            icon-name="notification-status"
+            icon-name="route"
             icon-class="fs-2x text-success mb-2"
           />
-          <span class="fs-5 fw-semobold text-gray-800 mb-0">PriceList</span>
-          <span class="fs-7 text-primary-400 text-wrap">Create pricelist</span>
-        </router-link>
-      </div>
-      <!--end:Item-->
-    </div>
-    <!--end:Nav-->
-    <!--begin:Nav-->
-    <div class="row g-0" v-if="Identifier == 'Company-Admin' || Identifier == 'Admin' || Identifier == 'Site-Incharge' || Identifier == 'Service-Engineer'">
-      <!--begin:Item-->
-      <div class="col-6">
-        <router-link
-          to="/returnablegatepasses/add"
-          class="d-flex flex-column flex-center h-100 p-4 bg-hover-light border-end border-bottom"
-        >
-          <KTIcon icon-name="badge" icon-class="fs-2x text-success mb-2" />
-          <span class="fs-5 fw-semobold text-gray-800 mb-0">RGP</span>
-          <span class="fs-7 text-primary-400 text-wrap">Generate gatepass</span>
-        </router-link>
-      </div>
-      <!--end:Item-->
-
-      <!--begin:Item-->
-      <div class="col-6">
-        <router-link
-          to="/dailyworksheets/add"
-          class="d-flex flex-column flex-center h-100 p-4 bg-hover-light border-bottom"
-        >
-          <KTIcon icon-name="document" icon-class="fs-2x text-success mb-2" />
-          <span class="fs-5 fw-semobold text-gray-800 mb-0">Worksheet</span>
-          <span class="fs-7 text-primary-400 text-wrap">Fill daily worksheet</span>
-        </router-link>
-      </div>
-      <!--end:Item-->
-
-      <!--begin:Item-->
-      <div class="col-6">
-        <router-link
-          to="/expensesheets/add"
-          class="d-flex flex-column flex-center h-100 p-4 bg-hover-light border-end"
-        >
-          <KTIcon icon-name="dollar" icon-class="fs-2x text-success mb-2" />
-          <span class="fs-5 fw-semobold text-gray-800 mb-0">Expense Sheet</span>
-          <span class="fs-7 text-primary-400 text-wrap">Make expense sheet</span>
+          <span class="fs-5 fw-semobold text-gray-800 mb-0">Location</span>
+          <span class="fs-7 text-primary-400 text-wrap">Lorem Text</span>
         </router-link>
       </div>
       <!--end:Item-->

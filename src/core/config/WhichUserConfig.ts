@@ -14,15 +14,9 @@ const Identifier = computed(() => {
         case "2":
             return "Company-Admin";
         case "3":
-            return "Sales-Person";
-        case "4":
             return "Site-Incharge";
-        case "5":
+        case "4":
             return "Service-Engineer";
-        case "6":
-            return "Commercial-Executive";
-        case "7":
-            return "Customer";
         default:
             return false;
     }

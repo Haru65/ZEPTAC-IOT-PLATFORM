@@ -18,10 +18,8 @@ const permissions = {
 const roles = {
     1: "Super Admin",
     2: "Company Admin",
-    3: "Sales Person",
-    4: "Site In-Charge",
-    5: "Service Engineer",
-    6: "Commercial Executive",
+    3: "Site In-Charge",
+    4: "Service Engineer",
 };
 
 const rolesArray = Object.keys(roles).map((id) => ({
@@ -43,10 +41,8 @@ const get_role = (id: number) => {
 
 const c_roles = {
     2: "Company Admin",
-    3: "Sales Person",
-    4: "Site In-Charge",
-    5: "Service Engineer",
-    6: "Commercial Executive",
+    3: "Site In-Charge",
+    4: "Service Engineer",
 };
 
 const c_rolesArray = Object.keys(c_roles).map((id) => ({

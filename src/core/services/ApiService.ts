@@ -2,7 +2,6 @@ import type { App } from "vue";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
 import axios from "axios";
 import VueAxios from "vue-axios";
-import JwtService from "@/core/services/JwtService";
 
 /**
  * @description service to call HTTP request via Axios
@@ -21,32 +20,19 @@ class ApiService {
     ApiService.vueInstance.use(VueAxios, axios);
     ApiService.vueInstance.axios.defaults.baseURL =
       import.meta.env.VITE_APP_API_URL;
+    // Set default headers
+    ApiService.vueInstance.axios.defaults.headers.common["Accept"] = "application/json";
   }
 
   /**
-   * @description set the default HTTP request headers
+   * @description set headers for file uploads
    */
-  public static setHeader(): void {
-    ApiService.vueInstance.axios.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${JwtService.getToken()}`;
-    ApiService.vueInstance.axios.defaults.headers.common["Accept"] =
-      "application/json";
-  }
   public static imgsetHeader(): void {
-    ApiService.vueInstance.axios.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${JwtService.getToken()}`;
-    ApiService.vueInstance.axios.defaults.headers.common["Accept"] =
-      "multipart/form-data";
+    ApiService.vueInstance.axios.defaults.headers.common["Accept"] = "multipart/form-data";
   }
 
   public static patchsetHeader(): void {
-    ApiService.vueInstance.axios.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${JwtService.getToken()}`;
-    ApiService.vueInstance.axios.defaults.headers.common["Accept"] =
-      "application/x-www-form-urlencoded";
+    ApiService.vueInstance.axios.defaults.headers.common["Accept"] = "application/x-www-form-urlencoded";
   }
 
   /**

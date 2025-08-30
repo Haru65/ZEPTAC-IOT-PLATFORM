@@ -9,7 +9,7 @@ export interface MenuItem {
 }
 
 const AdminMenuConfig: Array<MenuItem> = [
-  {
+{
     heading: "Dashboard",
     route: "dashboard",
     pages: [
@@ -19,8 +19,35 @@ const AdminMenuConfig: Array<MenuItem> = [
         keenthemesIcon: "element-11",
         bootstrapIcon: "bi-app-indicator",
       },
+      {
+        heading: "Devices",
+        route: "/devices",
+        keenthemesIcon: "router",
+        bootstrapIcon: "bi-phone",
+      },
+      {
+        heading: "Reports",
+        route: "/reports",
+        keenthemesIcon: "chart",
+        bootstrapIcon: "bi-app-indicator",
+      },
+      {
+        heading: "Alarms",
+        route: "/alarms",
+        keenthemesIcon: "timer",
+        bootstrapIcon: "bi-app-indicator",
+      },
+      {
+        heading: "Location",
+        route: "/locations",
+        keenthemesIcon: "route",
+        bootstrapIcon: "bi-app-indicator",
+      },
     ],
   },
+
+  /*
+
   {
     heading: "CleanRoom Validation",
     route: "cleanroom",
@@ -394,6 +421,9 @@ const AdminMenuConfig: Array<MenuItem> = [
 
     ],
   },
+  
+  */
+
   {
     heading: "HR",
     route: "hr",
@@ -421,12 +451,12 @@ const AdminMenuConfig: Array<MenuItem> = [
         ],
       },
 
-      {
-        heading: "Taxes",
-        route: "/company-tax",
-        keenthemesIcon: "abstract-26",
-        bootstrapIcon: "bi-archive",
-      },
+      // {
+      //   heading: "Taxes",
+      //   route: "/company-tax",
+      //   keenthemesIcon: "abstract-26",
+      //   bootstrapIcon: "bi-archive",
+      // },
 
     ],
   },
@@ -462,12 +492,6 @@ const AdminMenuConfig: Array<MenuItem> = [
         heading: "Activity Logger",
         route: "/activity_logger/list",
         keenthemesIcon: "notepad-edit",
-        bootstrapIcon: "bi-archive",
-      },
-      {
-        heading: "ISO Rules",
-        route: "/iso/list",
-        keenthemesIcon: "setting-3",
         bootstrapIcon: "bi-archive",
       },
     ],

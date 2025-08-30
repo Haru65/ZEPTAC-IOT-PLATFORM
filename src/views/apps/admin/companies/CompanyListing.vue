@@ -110,21 +110,6 @@
             <ul
               class="dropdown-menu dropdown-menu-end min-w-150px py-2 shadow-sm"
             >
-              <!-- API Setting -->
-              <li>
-                <router-link
-                  :to="`/company/apisetting/${company.id}`"
-                  class="dropdown-item d-flex align-items-center gap-3 px-4 py-3 hover-bg-light-primary cursor-pointer"
-                  title="Company API Setting"
-                >
-                  <KTIcon
-                    icon-name="setting-2"
-                    icon-class="fs-3 text-primary"
-                  />
-                  <span class="text-gray-700">API Setting</span>
-                </router-link>
-              </li>
-
               <!-- Modules -->
               <li>
                 <router-link

@@ -1,65 +1,76 @@
 <template>
-  <!--begin::sidebar menu-->
-  <div
-    class="app-sidebar-menu overflow-hidden flex-column-fluid"
-    v-if="sidebarIdentifier === 'Admin'"
-  >
-    <!--begin::Menu wrapper-->
-    <div
-      id="kt_app_sidebar_menu_wrapper"
-      class="app-sidebar-wrapper hover-scroll-overlay-y my-5"
-      data-kt-scroll="true"
-      data-kt-scroll-activate="true"
-      data-kt-scroll-height="auto"
-      data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer"
-      data-kt-scroll-wrappers="#kt_app_sidebar_menu"
-      data-kt-scroll-offset="5px"
-      data-kt-scroll-save-state="true"
-    >
-      <!--begin::Menu-->
-      <div
-        id="#kt_app_sidebar_menu"
-        class="menu menu-column menu-rounded menu-sub-indention px-3"
-        data-kt-menu="true"
-      >
-        <template v-for="(item, i) in AdminMenuConfig" :key="i">
-          <div v-if="item.heading" class="menu-item pt-5">
-            <div class="menu-content">
-              <span class="menu-heading fw-bold text-uppercase fs-7">
-                {{ translate(item.heading) }}
-              </span>
-            </div>
+  <div class="app-sidebar-menu overflow-hidden flex-column-fluid">
+    <div class="app-sidebar-wrapper hover-scroll-overlay-y my-5">
+      <div class="menu menu-column menu-rounded menu-sub-indention px-3">
+        <div v-for="(item, i) in menu" :key="i" class="menu-item pt-5">
+          <div class="menu-content">
+            <span class="menu-heading fw-bold text-uppercase fs-7">
+              {{ item.heading }}
+            </span>
           </div>
-          <template v-for="(menuItem, j) in item.pages" :key="j">
-            <template v-if="menuItem.heading">
-              <div class="menu-item">
-                <router-link
-                  v-if="menuItem.route"
-                  class="menu-link"
-                  active-class="active"
-                  :to="menuItem.route"
-                >
-                  <span
-                    v-if="menuItem.keenthemesIcon || menuItem.bootstrapIcon"
-                    class="menu-icon"
-                  >
-                    <i
-                      v-if="sidebarMenuIcons === 'bootstrap'"
-                      :class="menuItem.bootstrapIcon"
-                      class="bi fs-3"
-                    ></i>
-                    <KTIcon
-                      v-else-if="sidebarMenuIcons === 'keenthemes'"
-                      :icon-name="menuItem.keenthemesIcon"
-                      icon-class="fs-2"
-                    />
-                  </span>
-                  <span class="menu-title">{{
-                    translate(menuItem.heading)
-                  }}</span>
-                </router-link>
-              </div>
-            </template>
+          <div v-for="(page, j) in item.pages" :key="j" class="menu-item">
+            <router-link
+              class="menu-link"
+              active-class="active"
+              :to="page.route"
+            >
+              <span class="menu-icon">
+                <i :class="page.bootstrapIcon" class="bi fs-3"></i>
+              </span>
+              <span class="menu-title">{{ page.heading }}</span>
+            </router-link>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  name: 'sidebar-menu',
+  setup() {
+    const menu = [
+      {
+        heading: 'Dashboard',
+        pages: [
+          {
+            heading: 'Dashboard',
+            route: '/dashboard',
+            bootstrapIcon: 'bi-app-indicator'
+          },
+          {
+            heading: 'Devices',
+            route: '/devices',
+            bootstrapIcon: 'bi-phone'
+          },
+          {
+            heading: 'Reports',
+            route: '/reports',
+            bootstrapIcon: 'bi-file-earmark-text'
+          },
+          {
+            heading: 'Alarms',
+            route: '/alarms',
+            bootstrapIcon: 'bi-bell'
+          },
+          {
+            heading: 'Locations',
+            route: '/locations',
+            bootstrapIcon: 'bi-geo-alt'
+          }
+        ]
+      }
+    ];
+
+    return {
+      menu
+    };
+  }
+});
+</script>
             <div
               v-if="menuItem.sectionTitle && menuItem.route"
               class="menu-item menu-accordion"
@@ -300,166 +311,6 @@
     </div>
     <!--end::Menu wrapper-->
   </div>
-  <!--end::sidebar menu-->
-  <!--begin::sidebar menu-->
-  <div
-    class="app-sidebar-menu overflow-hidden flex-column-fluid"
-    v-if="sidebarIdentifier === 'Sales-Person'"
-  >
-    <!--begin::Menu wrapper-->
-    <div
-      id="kt_app_sidebar_menu_wrapper"
-      class="app-sidebar-wrapper hover-scroll-overlay-y my-5"
-      data-kt-scroll="true"
-      data-kt-scroll-activate="true"
-      data-kt-scroll-height="auto"
-      data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer"
-      data-kt-scroll-wrappers="#kt_app_sidebar_menu"
-      data-kt-scroll-offset="5px"
-      data-kt-scroll-save-state="true"
-    >
-      <!--begin::Menu-->
-      <div
-        id="#kt_app_sidebar_menu"
-        class="menu menu-column menu-rounded menu-sub-indention px-3"
-        data-kt-menu="true"
-      >
-        <template v-for="(item, i) in salesPersonMenu" :key="i">
-          <div v-if="item.heading" class="menu-item pt-5">
-            <div class="menu-content">
-              <span class="menu-heading fw-bold text-uppercase fs-7">
-                {{ translate(item.heading) }}
-              </span>
-            </div>
-          </div>
-          <template v-for="(menuItem, j) in item.pages" :key="j">
-            <template v-if="menuItem.heading">
-              <div class="menu-item">
-                <router-link
-                  v-if="menuItem.route"
-                  class="menu-link"
-                  active-class="active"
-                  :to="menuItem.route"
-                >
-                  <span
-                    v-if="menuItem.keenthemesIcon || menuItem.bootstrapIcon"
-                    class="menu-icon"
-                  >
-                    <i
-                      v-if="sidebarMenuIcons === 'bootstrap'"
-                      :class="menuItem.bootstrapIcon"
-                      class="bi fs-3"
-                    ></i>
-                    <KTIcon
-                      v-else-if="sidebarMenuIcons === 'keenthemes'"
-                      :icon-name="menuItem.keenthemesIcon"
-                      icon-class="fs-2"
-                    />
-                  </span>
-                  <span class="menu-title">{{
-                    translate(menuItem.heading)
-                  }}</span>
-                </router-link>
-              </div>
-            </template>
-            <div
-              v-if="menuItem.sectionTitle && menuItem.route"
-              :class="{ show: hasActiveChildren(menuItem.route) }"
-              class="menu-item menu-accordion"
-              data-kt-menu-sub="accordion"
-              data-kt-menu-trigger="click"
-            >
-              <span class="menu-link">
-                <span
-                  v-if="menuItem.keenthemesIcon || menuItem.bootstrapIcon"
-                  class="menu-icon"
-                >
-                  <i
-                    v-if="sidebarMenuIcons === 'bootstrap'"
-                    :class="menuItem.bootstrapIcon"
-                    class="bi fs-3"
-                  ></i>
-                  <KTIcon
-                    v-else-if="sidebarMenuIcons === 'keenthemes'"
-                    :icon-name="menuItem.keenthemesIcon"
-                    icon-class="fs-2"
-                  />
-                </span>
-                <span class="menu-title">{{
-                  translate(menuItem.sectionTitle)
-                }}</span>
-                <span class="menu-arrow"></span>
-              </span>
-              <div
-                :class="{ show: hasActiveChildren(menuItem.route) }"
-                class="menu-sub menu-sub-accordion"
-              >
-                <template v-for="(item2, k) in menuItem.sub" :key="k">
-                  <div v-if="item2.heading" class="menu-item">
-                    <router-link
-                      v-if="item2.route"
-                      class="menu-link"
-                      active-class="active"
-                      :to="item2.route"
-                    >
-                      <span class="menu-bullet">
-                        <span class="bullet bullet-dot"></span>
-                      </span>
-                      <span class="menu-title">{{
-                        translate(item2.heading)
-                      }}</span>
-                    </router-link>
-                  </div>
-                  <div
-                    v-if="item2.sectionTitle && item2.route"
-                    :class="{ show: hasActiveChildren(item2.route) }"
-                    class="menu-item menu-accordion"
-                    data-kt-menu-sub="accordion"
-                    data-kt-menu-trigger="click"
-                  >
-                    <span class="menu-link">
-                      <span class="menu-bullet">
-                        <span class="bullet bullet-dot"></span>
-                      </span>
-                      <span class="menu-title">{{
-                        translate(item2.sectionTitle)
-                      }}</span>
-                      <span class="menu-arrow"></span>
-                    </span>
-                    <div
-                      :class="{ show: hasActiveChildren(item2.route) }"
-                      class="menu-sub menu-sub-accordion"
-                    >
-                      <template v-for="(item3, k) in item2.sub" :key="k">
-                        <div v-if="item3.heading" class="menu-item">
-                          <router-link
-                            v-if="item3.route"
-                            class="menu-link"
-                            active-class="active"
-                            :to="item3.route"
-                          >
-                            <span class="menu-bullet">
-                              <span class="bullet bullet-dot"></span>
-                            </span>
-                            <span class="menu-title">{{
-                              translate(item3.heading)
-                            }}</span>
-                          </router-link>
-                        </div>
-                      </template>
-                    </div>
-                  </div>
-                </template>
-              </div>
-            </div>
-          </template>
-        </template>
-      </div>
-      <!--end::Menu-->
-    </div>
-    <!--end::Menu wrapper-->
-  </div>
-  <!--end::sidebar menu-->
   <!--end::sidebar menu-->
   <!--begin::sidebar menu-->
   <div
@@ -779,337 +630,6 @@
     <!--end::Menu wrapper-->
   </div>
   <!--end::sidebar menu-->
-
-  <!--begin::sidebar menu-->
-  <div
-    class="app-sidebar-menu overflow-hidden flex-column-fluid"
-    v-if="sidebarIdentifier == 'Commercial-Executive'"
-  >
-    <!--begin::Menu wrapper-->
-    <div
-      id="kt_app_sidebar_menu_wrapper"
-      class="app-sidebar-wrapper hover-scroll-overlay-y my-5"
-      data-kt-scroll="true"
-      data-kt-scroll-activate="true"
-      data-kt-scroll-height="auto"
-      data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer"
-      data-kt-scroll-wrappers="#kt_app_sidebar_menu"
-      data-kt-scroll-offset="5px"
-      data-kt-scroll-save-state="true"
-    >
-      <!--begin::Menu-->
-      <div
-        id="#kt_app_sidebar_menu"
-        class="menu menu-column menu-rounded menu-sub-indention px-3"
-        data-kt-menu="true"
-      >
-        <template v-for="(item, i) in executiveMenu" :key="i">
-          <div v-if="item.heading" class="menu-item pt-5">
-            <div class="menu-content">
-              <span class="menu-heading fw-bold text-uppercase fs-7">
-                {{ translate(item.heading) }}
-              </span>
-            </div>
-          </div>
-          <template v-for="(menuItem, j) in item.pages" :key="j">
-            <template v-if="menuItem.heading">
-              <div class="menu-item">
-                <router-link
-                  v-if="menuItem.route"
-                  class="menu-link"
-                  active-class="active"
-                  :to="menuItem.route"
-                >
-                  <span
-                    v-if="menuItem.keenthemesIcon || menuItem.bootstrapIcon"
-                    class="menu-icon"
-                  >
-                    <i
-                      v-if="sidebarMenuIcons === 'bootstrap'"
-                      :class="menuItem.bootstrapIcon"
-                      class="bi fs-3"
-                    ></i>
-                    <KTIcon
-                      v-else-if="sidebarMenuIcons === 'keenthemes'"
-                      :icon-name="menuItem.keenthemesIcon"
-                      icon-class="fs-2"
-                    />
-                  </span>
-                  <span class="menu-title">{{
-                    translate(menuItem.heading)
-                  }}</span>
-                </router-link>
-              </div>
-            </template>
-            <div
-              v-if="menuItem.sectionTitle && menuItem.route"
-              :class="{ show: hasActiveChildren(menuItem.route) }"
-              class="menu-item menu-accordion"
-              data-kt-menu-sub="accordion"
-              data-kt-menu-trigger="click"
-            >
-              <span class="menu-link">
-                <span
-                  v-if="menuItem.keenthemesIcon || menuItem.bootstrapIcon"
-                  class="menu-icon"
-                >
-                  <i
-                    v-if="sidebarMenuIcons === 'bootstrap'"
-                    :class="menuItem.bootstrapIcon"
-                    class="bi fs-3"
-                  ></i>
-                  <KTIcon
-                    v-else-if="sidebarMenuIcons === 'keenthemes'"
-                    :icon-name="menuItem.keenthemesIcon"
-                    icon-class="fs-2"
-                  />
-                </span>
-                <span class="menu-title">{{
-                  translate(menuItem.sectionTitle)
-                }}</span>
-                <span class="menu-arrow"></span>
-              </span>
-              <div
-                :class="{ show: hasActiveChildren(menuItem.route) }"
-                class="menu-sub menu-sub-accordion"
-              >
-                <template v-for="(item2, k) in menuItem.sub" :key="k">
-                  <div v-if="item2.heading" class="menu-item">
-                    <router-link
-                      v-if="item2.route"
-                      class="menu-link"
-                      active-class="active"
-                      :to="item2.route"
-                    >
-                      <span class="menu-bullet">
-                        <span class="bullet bullet-dot"></span>
-                      </span>
-                      <span class="menu-title">{{
-                        translate(item2.heading)
-                      }}</span>
-                    </router-link>
-                  </div>
-                  <div
-                    v-if="item2.sectionTitle && item2.route"
-                    :class="{ show: hasActiveChildren(item2.route) }"
-                    class="menu-item menu-accordion"
-                    data-kt-menu-sub="accordion"
-                    data-kt-menu-trigger="click"
-                  >
-                    <span class="menu-link">
-                      <span class="menu-bullet">
-                        <span class="bullet bullet-dot"></span>
-                      </span>
-                      <span class="menu-title">{{
-                        translate(item2.sectionTitle)
-                      }}</span>
-                      <span class="menu-arrow"></span>
-                    </span>
-                    <div
-                      :class="{ show: hasActiveChildren(item2.route) }"
-                      class="menu-sub menu-sub-accordion"
-                    >
-                      <template v-for="(item3, k) in item2.sub" :key="k">
-                        <div v-if="item3.heading" class="menu-item">
-                          <router-link
-                            v-if="item3.route"
-                            class="menu-link"
-                            active-class="active"
-                            :to="item3.route"
-                          >
-                            <span class="menu-bullet">
-                              <span class="bullet bullet-dot"></span>
-                            </span>
-                            <span class="menu-title">{{
-                              translate(item3.heading)
-                            }}</span>
-                          </router-link>
-                        </div>
-                      </template>
-                    </div>
-                  </div>
-                </template>
-              </div>
-            </div>
-          </template>
-        </template>
-      </div>
-      <!--end::Menu-->
-    </div>
-    <!--end::Menu wrapper-->
-  </div>
-  <!--end::sidebar menu-->
-
-  <!--begin::sidebar menu-->
-  <div
-    class="app-sidebar-menu overflow-hidden flex-column-fluid"
-    v-if="sidebarIdentifier == 'Customer'"
-  >
-    <!--begin::Menu wrapper-->
-    <div
-      id="kt_app_sidebar_menu_wrapper"
-      class="app-sidebar-wrapper hover-scroll-overlay-y my-5"
-      data-kt-scroll="true"
-      data-kt-scroll-activate="true"
-      data-kt-scroll-height="auto"
-      data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer"
-      data-kt-scroll-wrappers="#kt_app_sidebar_menu"
-      data-kt-scroll-offset="5px"
-      data-kt-scroll-save-state="true"
-    >
-      <!--begin::Menu-->
-      <div
-        id="#kt_app_sidebar_menu"
-        class="menu menu-column menu-rounded menu-sub-indention px-3"
-        data-kt-menu="true"
-      >
-        <div class="menu-item pt-5">
-          <div class="menu-content">
-            <h4 class="menu-heading fw-bold fs-3">
-              {{
-                User.company_details?.company_name ||
-                User.meta?.company_name ||
-                ""
-              }}
-            </h4>
-          </div>
-        </div>
-        <template v-for="(item, i) in CustomerMenuConfig" :key="i">
-          <div v-if="item.heading" class="menu-item pt-5">
-            <div class="menu-content">
-              <span class="menu-heading fw-bold text-uppercase fs-7">
-                {{ translate(item.heading) }}
-              </span>
-            </div>
-          </div>
-          <template v-for="(menuItem, j) in item.pages" :key="j">
-            <template v-if="menuItem.heading">
-              <div class="menu-item">
-                <router-link
-                  v-if="menuItem.route"
-                  class="menu-link"
-                  active-class="active"
-                  :to="menuItem.route"
-                >
-                  <span
-                    v-if="menuItem.keenthemesIcon || menuItem.bootstrapIcon"
-                    class="menu-icon"
-                  >
-                    <i
-                      v-if="sidebarMenuIcons === 'bootstrap'"
-                      :class="menuItem.bootstrapIcon"
-                      class="bi fs-3"
-                    ></i>
-                    <KTIcon
-                      v-else-if="sidebarMenuIcons === 'keenthemes'"
-                      :icon-name="menuItem.keenthemesIcon"
-                      icon-class="fs-2"
-                    />
-                  </span>
-                  <span class="menu-title">{{
-                    translate(menuItem.heading)
-                  }}</span>
-                </router-link>
-              </div>
-            </template>
-            <div
-              v-if="menuItem.sectionTitle && menuItem.route"
-              :class="{ show: hasActiveChildren(menuItem.route) }"
-              class="menu-item menu-accordion"
-              data-kt-menu-sub="accordion"
-              data-kt-menu-trigger="click"
-            >
-              <span class="menu-link">
-                <span
-                  v-if="menuItem.keenthemesIcon || menuItem.bootstrapIcon"
-                  class="menu-icon"
-                >
-                  <i
-                    v-if="sidebarMenuIcons === 'bootstrap'"
-                    :class="menuItem.bootstrapIcon"
-                    class="bi fs-3"
-                  ></i>
-                  <KTIcon
-                    v-else-if="sidebarMenuIcons === 'keenthemes'"
-                    :icon-name="menuItem.keenthemesIcon"
-                    icon-class="fs-2"
-                  />
-                </span>
-                <span class="menu-title">{{
-                  translate(menuItem.sectionTitle)
-                }}</span>
-                <span class="menu-arrow"></span>
-              </span>
-              <div
-                :class="{ show: hasActiveChildren(menuItem.route) }"
-                class="menu-sub menu-sub-accordion"
-              >
-                <template v-for="(item2, k) in menuItem.sub" :key="k">
-                  <div v-if="item2.heading" class="menu-item">
-                    <router-link
-                      v-if="item2.route"
-                      class="menu-link"
-                      active-class="active"
-                      :to="item2.route"
-                    >
-                      <span class="menu-bullet">
-                        <span class="bullet bullet-dot"></span>
-                      </span>
-                      <span class="menu-title">{{
-                        translate(item2.heading)
-                      }}</span>
-                    </router-link>
-                  </div>
-                  <div
-                    v-if="item2.sectionTitle && item2.route"
-                    :class="{ show: hasActiveChildren(item2.route) }"
-                    class="menu-item menu-accordion"
-                    data-kt-menu-sub="accordion"
-                    data-kt-menu-trigger="click"
-                  >
-                    <span class="menu-link">
-                      <span class="menu-bullet">
-                        <span class="bullet bullet-dot"></span>
-                      </span>
-                      <span class="menu-title">{{
-                        translate(item2.sectionTitle)
-                      }}</span>
-                      <span class="menu-arrow"></span>
-                    </span>
-                    <div
-                      :class="{ show: hasActiveChildren(item2.route) }"
-                      class="menu-sub menu-sub-accordion"
-                    >
-                      <template v-for="(item3, k) in item2.sub" :key="k">
-                        <div v-if="item3.heading" class="menu-item">
-                          <router-link
-                            v-if="item3.route"
-                            class="menu-link"
-                            active-class="active"
-                            :to="item3.route"
-                          >
-                            <span class="menu-bullet">
-                              <span class="bullet bullet-dot"></span>
-                            </span>
-                            <span class="menu-title">{{
-                              translate(item3.heading)
-                            }}</span>
-                          </router-link>
-                        </div>
-                      </template>
-                    </div>
-                  </div>
-                </template>
-              </div>
-            </div>
-          </template>
-        </template>
-      </div>
-      <!--end::Menu-->
-    </div>
-    <!--end::Menu wrapper-->
-  </div>
-  <!--end::sidebar menu-->
 </template>
 
 <script lang="ts">
@@ -1120,11 +640,8 @@ import { useAuthStore } from "@/stores/auth";
 import { useFilteredMenu } from "@/core/config/FilteredMenu";
 import AdminMenuConfig from "@/core/config/AdminMenuConfig";
 import CompanyAdminMenuConfig from "@/core/config/CompanyAdminMenuConfig";
-import SalesPersonMenuConfig from "@/core/config/SalesPersonMenuConfig";
 import SiteInchargeMenuConfig from "@/core/config/SiteInchargeMenuConfig";
 import ServiceEngMenuConfig from "@/core/config/ServiceEngMenuConfig";
-import ExecutiveMenuConfig from "@/core/config/ExecutiveMenuConfig";
-import CustomerMenuConfig from "@/core/config/CustomerMenuConfig";
 import { sidebarMenuIcons } from "@/core/helpers/config";
 import { useI18n } from "vue-i18n";
 import { Identifier } from "@/core/config/WhichUserConfig";
@@ -1146,42 +663,53 @@ export default defineComponent({
     const { t, te } = useI18n();
     const route = useRoute();
     const scrollElRef = ref<null | HTMLElement>(null);
-    const sidebarIdentifier = Identifier;
-    const store = useAuthStore();
-
-    const User = store.GetUser();
 
     onMounted(() => {
       if (scrollElRef.value) {
         scrollElRef.value.scrollTop = 0;
       }
-      console.log(User);
     });
 
-    // Define your company_modules array here
-    const company_modules: string[] = User.company_modules;
+    // Use AdminMenuConfig directly for development
+    const AdminMenuConfig = [
+      {
+        heading: "Dashboard",
+        route: "dashboard",
+        pages: [
+          {
+            heading: "Dashboard",
+            route: "/dashboard",
+            keenthemesIcon: "element-11",
+            bootstrapIcon: "bi-app-indicator",
+          },
+          {
+            heading: "Devices",
+            route: "/devices",
+            keenthemesIcon: "router",
+            bootstrapIcon: "bi-phone",
+          },
+          {
+            heading: "Reports",
+            route: "/reports",
+            keenthemesIcon: "chart",
+            bootstrapIcon: "bi-app-indicator",
+          },
+          {
+            heading: "Alarms",
+            route: "/alarms",
+            keenthemesIcon: "timer",
+            bootstrapIcon: "bi-app-indicator",
+          },
+          {
+            heading: "Location",
+            route: "/locations",
+            keenthemesIcon: "route",
+            bootstrapIcon: "bi-app-indicator",
+          },
+        ],
+      },
+    ];
 
-    const companyAdminMenu = useFilteredMenu(
-      CompanyAdminMenuConfig,
-      company_modules
-    );
-
-    const salesPersonMenu = useFilteredMenu(
-      SalesPersonMenuConfig,
-      company_modules
-    );
-
-    const siteInchargeMenu = useFilteredMenu(
-      SiteInchargeMenuConfig,
-      company_modules
-    );
-
-    const serviceEngineerMenu = useFilteredMenu(
-      ServiceEngMenuConfig,
-      company_modules
-    );
-
-    const executiveMenu = useFilteredMenu(ExecutiveMenuConfig, company_modules);
     console.log(User.company_modules);
 
     const translate = (text: string) => {
@@ -1197,25 +725,20 @@ export default defineComponent({
     };
 
     return {
-      User,
       hasActiveChildren,
+      translate,
+      getAssetPath,
+      sidebarMenuIcons,
       AdminMenuConfig,
-      CompanyAdminMenuConfig,
-      SalesPersonMenuConfig,
-      SiteInchargeMenuConfig,
       ServiceEngMenuConfig,
-      ExecutiveMenuConfig,
-      CustomerMenuConfig,
       sidebarMenuIcons,
       translate,
       getAssetPath,
       sidebarIdentifier,
 
       companyAdminMenu,
-      salesPersonMenu,
       serviceEngineerMenu,
       siteInchargeMenu,
-      executiveMenu,
     };
   },
 });
