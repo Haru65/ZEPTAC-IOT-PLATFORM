@@ -67,21 +67,7 @@
       </div>
       <!--end::Form Container-->
 
-      <!--begin::Footer-->
-      <div class="d-flex flex-center flex-wrap px-6 mt-auto mt-lg-10">
-        <!--begin::Links-->
-        <div class="d-flex fw-semibold text-gray-600 fs-base">
-          <a
-            href="https://zeptac.com/contact/"
-            target="_blank"
-            class="px-3 px-lg-5 text-hover-primary"
-          >
-            Contact Us
-          </a>
-        </div>
-        <!--end::Links-->
-      </div>
-      <!--end::Footer-->
+      <!-- Footer removed -->
     </div>
     <!--end::Body-->
   </div>
