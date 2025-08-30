@@ -60,6 +60,7 @@
       <!--end::Menu wrapper-->
     </div>
     <!--end::Quick links-->
+
     <!--begin::Theme mode-->
     <div class="app-navbar-item ms-1 ms-md-3">
       <!--begin::Menu toggle-->
@@ -85,6 +86,7 @@
       <KTThemeModeSwitcher />
     </div>
     <!--end::Theme mode-->
+
     <!--begin::User menu-->
     <div class="app-navbar-item ms-1 ms-md-3" id="kt_header_user_menu_toggle">
       <!--begin::Menu wrapper-->
@@ -95,7 +97,7 @@
         data-kt-menu-placement="bottom-end"
       >
         <img
-          v-if="User?.meta?.profile_pic"
+          v-if="User?.meta?.profile_pic && User?.company_details?.company_id"
           :src="`https://api.zeptac.com/storage/company/${User.company_details.company_id}/profile_images/${User.meta.profile_pic}`"
           class="rounded-circle"
           alt="user"
@@ -112,20 +114,6 @@
       <!--end::Menu wrapper-->
     </div>
     <!--end::User menu-->
-    <!-- 
-    <div
-      class="app-navbar-item d-lg-none ms-2 me-n3"
-      v-tooltip
-      title="Show header menu"
-    >
-      <div
-        class="btn btn-icon btn-active-color-primary w-30px h-30px w-md-35px h-md-35px"
-        id="kt_app_header_menu_toggle"
-      >
-        <KTIcon icon-name="text-align-left" icon-class="fs-2 fs-md-1" />
-      </div>
-    </div>
-     -->
   </div>
   <!--end::Navbar-->
 </template>
@@ -190,7 +178,8 @@ export default defineComponent({
 
     const fetchDueCalibration = async () => {
       try {
-        const company_id = User.company_id;
+        const company_id = User?.company_details?.company_id;
+        if (!company_id) return;
 
         const response = await calibrationNotification(company_id);
 
@@ -201,8 +190,7 @@ export default defineComponent({
                 id,
                 instrument_id,
                 name,
-                calibration_due_date:
-                  moment(calibration_due_date).format("D MMM"),
+                calibration_due_date: moment(calibration_due_date).format("D MMM"),
               })
             );
             calibrationNotificationCount.value = dueCalibration.value
@@ -223,7 +211,8 @@ export default defineComponent({
 
     const fetchDueMaintenance = async () => {
       try {
-        const company_id = User.company_id;
+        const company_id = User?.company_details?.company_id;
+        if (!company_id) return;
 
         const response = await maintenanceNotification(company_id);
 
@@ -255,7 +244,7 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      if (User.role_id !== 7) {
+      if (User && User.role_id !== "7") {
         await fetchDueCalibration();
         await fetchDueMaintenance();
 

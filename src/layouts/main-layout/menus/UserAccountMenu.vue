@@ -117,9 +117,12 @@ export default defineComponent({
       company_details: {}
     });
 
-    const signOut = () => {
-      store.logout();
-      router.push({ name: "login" });
+    const signOut = async () => {
+      try {
+        await store.logout();
+      } catch (error) {
+        console.error('Logout error:', error);
+      }
     };
 
     return {

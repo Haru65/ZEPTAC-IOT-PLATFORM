@@ -4,8 +4,26 @@ import {
   type RouteRecordRaw,
 } from "vue-router";
 import { useConfigStore } from "@/stores/config";
+import { useAuthStore } from "@/stores/auth";
 
 const routes: Array<RouteRecordRaw> = [
+  {
+
+    path: "/auth",
+    component: () => import("@/layouts/AuthLayout.vue"),
+    children: [
+      {
+        path: "login",
+        name: "login",
+        component: () => import("@/views/auth/LoginView.vue"),
+      },
+      {
+        path: "register",
+        name: "register",
+        component: () => import("@/views/auth/RegisterView.vue"),
+      }
+    ],
+  },
   {
     path: "/",
     component: () => import("@/layouts/main-layout/MainLayout.vue"),
@@ -469,7 +487,6 @@ router.beforeEach((to, from, next) => {
   // reset config to initial state
   configStore.resetLayoutConfig();
 
-  // Always allow navigation
   next();
 
   // Scroll page to top on every route change

@@ -79,7 +79,7 @@
           <div class="dropdown">
             <a
               href="#"
-              class="text-gray-700 hover:text-gray-700 cursor-pointer transition-colors"
+              class="text-gray-700 hover:text-gray-700  cursor-pointer transition-colors"
               data-bs-toggle="dropdown"
               aria-expanded="false"
               @click.prevent
