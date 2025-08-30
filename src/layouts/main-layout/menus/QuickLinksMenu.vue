@@ -51,7 +51,7 @@
       <div class="col-6">
         <router-link
           to="/alarms"
-          class="d-flex flex-column flex-center h-100 p-4 bg-hover-light border-end border-bottom"
+          class="d-flex flex-column flex-center h-100 p-4 bg-hover-light border-end border-bottom "
         >
           <KTIcon icon-name="timer" icon-class="fs-2x text-success mb-2" />
           <span class="fs-5 fw-semobold text-gray-800 mb-0">Alarm</span>

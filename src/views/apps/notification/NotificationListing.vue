@@ -370,10 +370,7 @@ export default defineComponent({
       } catch (error) {
         console.error(error);
       } finally {
-        ////console.log("done");
-        setTimeout(() => {
-          loading.value = false;
-        }, 250);
+        loading.value = false;
       }
     };
 
@@ -409,10 +406,7 @@ export default defineComponent({
       } catch (error) {
         console.error(error);
       } finally {
-        ////console.log("done");
-        setTimeout(() => {
-          loading.value = false;
-        }, 250);
+        loading.value = false;
       }
     };
 
