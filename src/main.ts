@@ -28,11 +28,14 @@ function trackRouteChange(toRoute, fromRoute) {
   const eventLabel = `From: ${fromRoute.fullPath} - To: ${toRoute.fullPath}`;
   
   if (typeof window.gtag !== 'undefined') {
+    // Ensure GA config uses cookie_domain: 'auto'
+    window.gtag('config', 'G-XXXXXXX', { cookie_domain: 'auto' }); // Replace G-XXXXXXX with your GA ID
     window.gtag('event', eventName, {
       'event_category': eventCategory,
       'event_label': eventLabel
     });
   }
+  // If you do NOT want GA, comment out or remove the above block safely.
 }
 
 // Add a router guard to track page views

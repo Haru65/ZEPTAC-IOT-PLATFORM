@@ -1,5 +1,6 @@
 <template>
   <div class="row">
+    <!-- Stat Cards -->
     <div class="row g-4">
       <div class="col-lg-3 col-md-6 col-sm-6">
         <StatCardWidget
@@ -67,13 +68,14 @@
       </div>
     </div>
 
+    <!-- India Map -->
     <div class="row g-4">
       <div class="col-12">
         <IndiaMap />
       </div>
     </div>
 
-    <!-- Charts row -->
+    <!-- Charts -->
     <div class="row g-4">
       <div class="col-lg-6 col-12">
         <TemperatureChart
@@ -98,18 +100,37 @@
     </div>
   </div>
 </template>
-  
-  <script lang="ts">
-import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref, watch, computed } from "vue";
+
+<script lang="ts">
+import { defineComponent, ref, computed, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
+
 import { generateStorageUrl } from "@/core/helpers/storageUrl";
+
+// Widgets
 import StatCardWidget from "@/components/iot/component/dashboard/StatCardWidget.vue";
 import TemperatureChart from "@/components/iot/component/dashboard/TemperatureChart.vue";
 import EnergyConsumptionChart from "@/components/iot/component/dashboard/EnergyConsumptionChart.vue";
 import ActiveDeviceChart from "./ActiveDeviceChart.vue";
 import DeviceCardWidget from "@/components/iot/component/dashboard/DeviceCardWidget.vue";
 import IndiaMap from "@/components/iot/component/dashboard/IndiaMap.vue";
+
+// Device Type
+interface Metric {
+  type: string;
+  value: number;
+  icon: string;
+}
+interface Device {
+  id: string;
+  name: string;
+  icon: string;
+  type: string;
+  location: string;
+  status: string;
+  lastSeen: string;
+  metrics: Metric[];
+}
 
 export default defineComponent({
   name: "main-dashboard",
@@ -122,104 +143,116 @@ export default defineComponent({
     IndiaMap,
   },
   setup() {
-      const authStore = useAuthStore();
-      const User = authStore.GetUser();
+    const authStore = useAuthStore();
+    const User = computed(() => authStore.GetUser() ?? null);
 
-      // Fallback: always ensure devices is an array
-      let initialDevices = [
-        {
-          id: "1",
-          name: "Living Room Thermostat",
-          icon: "bi-thermometer-half",
-          type: "sensor",
-          location: "Living Room",
-          status: "online",
-          lastSeen: "2 min ago",
-          metrics: [
-            { type: "temperature", value: 22.5, icon: "bi-thermometer-half" },
-            { type: "battery", value: 75, icon: "bi-battery-half" },
-            { type: "signal", value: 90, icon: "bi-wifi" },
-          ],
-        },
-        {
-          id: "2",
-          name: "Kitchen Smart Light",
-          icon: "bi-lightbulb",
-          type: "light",
-          location: "Kitchen",
-          status: "online",
-          lastSeen: "Just now",
-          metrics: [
-            { type: "battery", value: 80, icon: "bi-battery-half" },
-            { type: "signal", value: 85, icon: "bi-wifi" },
-            { type: "temperature", value: 20, icon: "bi-thermometer-half" },
-          ],
-        },
-        {
-          id: "3",
-          name: "Bedroom Humidity Sensor",
-          icon: "bi-moisture",
-          type: "sensor",
-          location: "Bedroom",
-          status: "warning",
-          lastSeen: "15 min ago",
-          metrics: [
-            { type: "battery", value: 20, icon: "bi-battery" },
-            { type: "signal", value: 45, icon: "bi-wifi" },
-            { type: "temperature", value: 18.5, icon: "bi-thermometer" },
-          ],
-        },
-        {
-          id: "4",
-          name: "Garage Door",
-          icon: "bi-door-closed",
-          type: "door",
-          location: "Garage",
-          status: "offline",
-          lastSeen: "2 days ago",
-          metrics: [
-            { type: "battery", value: 10, icon: "bi-battery" },
-            { type: "signal", value: 0, icon: "bi-wifi-off" },
-            { type: "temperature", value: 10, icon: "bi-thermometer" },
-          ],
-        },
-        {
-          id: "5",
-          name: "Front Porch Camera",
-          icon: "bi-camera-video",
-          type: "camera",
-          location: "Front Porch",
-          status: "online",
-          lastSeen: "5 min ago",
-          metrics: [
-            { type: "battery", value: 85, icon: "bi-battery-half" },
-            { type: "signal", value: 90, icon: "bi-wifi" },
-            { type: "temperature", value: 22, icon: "bi-thermometer" },
-          ],
-        },
-        {
-          id: "6",
-          name: "Backyard Motion Sensor",
-          icon: "bi-door-open",
-          type: "sensor",
-          location: "Backyard",
-          status: "online",
-          lastSeen: "10 min ago",
-          metrics: [
-            { type: "battery", value: 65, icon: "bi-battery-half" },
-            { type: "signal", value: 80, icon: "bi-wifi" },
-            { type: "temperature", value: 18, icon: "bi-thermometer" },
-          ],
-        },
-      ];
+    // Default sample devices
+    const initialDevices: Device[] = [
+      {
+        id: "1",
+        name: "Living Room Thermostat",
+        icon: "bi-thermometer-half",
+        type: "sensor",
+        location: "Living Room",
+        status: "online",
+        lastSeen: "2 min ago",
+        metrics: [
+          { type: "temperature", value: 22.5, icon: "bi-thermometer-half" },
+          { type: "battery", value: 75, icon: "bi-battery-half" },
+          { type: "signal", value: 90, icon: "bi-wifi" },
+        ],
+      },
+      {
+        id: "2",
+        name: "Kitchen Smart Light",
+        icon: "bi-lightbulb",
+        type: "light",
+        location: "Kitchen",
+        status: "online",
+        lastSeen: "Just now",
+        metrics: [
+          { type: "battery", value: 80, icon: "bi-battery-half" },
+          { type: "signal", value: 85, icon: "bi-wifi" },
+          { type: "temperature", value: 20, icon: "bi-thermometer-half" },
+        ],
+      },
+      {
+        id: "3",
+        name: "Bedroom Humidity Sensor",
+        icon: "bi-moisture",
+        type: "sensor",
+        location: "Bedroom",
+        status: "warning",
+        lastSeen: "15 min ago",
+        metrics: [
+          { type: "battery", value: 20, icon: "bi-battery" },
+          { type: "signal", value: 45, icon: "bi-wifi" },
+          { type: "temperature", value: 18.5, icon: "bi-thermometer" },
+        ],
+      },
+      {
+        id: "4",
+        name: "Garage Door",
+        icon: "bi-door-closed",
+        type: "door",
+        location: "Garage",
+        status: "offline",
+        lastSeen: "2 days ago",
+        metrics: [
+          { type: "battery", value: 10, icon: "bi-battery" },
+          { type: "signal", value: 0, icon: "bi-wifi-off" },
+          { type: "temperature", value: 10, icon: "bi-thermometer" },
+        ],
+      },
+      {
+        id: "5",
+        name: "Front Porch Camera",
+        icon: "bi-camera-video",
+        type: "camera",
+        location: "Front Porch",
+        status: "online",
+        lastSeen: "5 min ago",
+        metrics: [
+          { type: "battery", value: 85, icon: "bi-battery-half" },
+          { type: "signal", value: 90, icon: "bi-wifi" },
+          { type: "temperature", value: 22, icon: "bi-thermometer" },
+        ],
+      },
+      {
+        id: "6",
+        name: "Backyard Motion Sensor",
+        icon: "bi-door-open",
+        type: "sensor",
+        location: "Backyard",
+        status: "online",
+        lastSeen: "10 min ago",
+        metrics: [
+          { type: "battery", value: 65, icon: "bi-battery-half" },
+          { type: "signal", value: 80, icon: "bi-wifi" },
+          { type: "temperature", value: 18, icon: "bi-thermometer" },
+        ],
+      },
+    ];
 
-      // If you fetch devices from API, always fallback to []
-      const devices: any = ref(initialDevices || []);
+    const devices = ref<Device[]>(initialDevices);
+
+    // You can later fetch real devices from API safely
+    onMounted(async () => {
+      try {
+        // Example fetch (replace with real API)
+        // const res = await fetch("/api/devices");
+        // const data = await res.json();
+        // devices.value = Array.isArray(data) ? data : [];
+      } catch (err) {
+        console.error("Failed to load devices:", err);
+        devices.value = []; // safe fallback
+      }
+    });
 
     return {
-      getAssetPath,
-      User,
+
       generateStorageUrl,
+      User,
       devices,
     };
   },
