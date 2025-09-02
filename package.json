@@ -67,6 +67,7 @@
     "quill": "^2.0.2",
     "scrollreveal": "^4.0.9",
     "socicon": "^3.0.5",
+    "socket.io-client": "^4.8.1",
     "stable": "^0.1.8",
     "sweetalert2": "^11.4.8",
     "to-words": "^3.6.1",

@@ -1,10 +1,8 @@
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed } from 'vue';
-import mqtt from 'mqtt';
+import { defineComponent, ref, onMounted, computed, onUnmounted } from 'vue';
+import { io, Socket } from 'socket.io-client';
 
-const MAIN_TOPIC = 'devices/234/data';        // Replace this with your actual device topic
-const SIM_TOPIC  = 'devices/123/data';        // Simulated device topic
-const FAILOVER_TIMEOUT_MS = 10_000;           // 10 seconds timeout for main device
+const FAILOVER_TIMEOUT_MS = 10_000; // 10 seconds timeout for main device
 
 export default defineComponent({
   setup() {
@@ -12,6 +10,9 @@ export default defineComponent({
     const simDevice = ref<any>(null);
     const lastMainUpdate = ref<number>(0);
     const now = ref(Date.now());
+    const socket = ref<Socket | null>(null);
+    const connectionStatus = ref<string>('disconnected');
+    const updateInterval = ref<number | null>(null);
 
     // Fallback: Use simulated data if main device is "offline"
     const displayedDevice = computed(() => {
@@ -19,55 +20,64 @@ export default defineComponent({
       return (!timedOut && mainDevice.value) ? mainDevice.value : simDevice.value;
     });
 
-    // Periodically update 'now' so computed property reacts to time
-    setInterval(() => { now.value = Date.now(); }, 1000);
-
     onMounted(() => {
-      const client = mqtt.connect('wss://test.mosquitto.org:8081');
-      client.on('connect', () => {
-        client.subscribe(MAIN_TOPIC);
-        client.subscribe(SIM_TOPIC);
+      // Connect to backend Socket.io server
+      socket.value = io('http://localhost:3001', {
+        withCredentials: true,
+        transports: ['websocket', 'polling']
       });
 
-      client.on('message', (topic, message) => {
-        try {
-          const payload = JSON.parse(message.toString());
-          const deviceData = {
-            id: payload.SN?.toString() ?? "N/A",
-            name: payload.API ?? "",
-            icon: 'bi-device',
-            type: 'sensor',
-            location:
-              payload.LATITUDE && payload.LONGITUDE
-                ? `${payload.LATITUDE}, ${payload.LONGITUDE}` : "",
-            status: payload.EVENT ?? "",
-            lastSeen: payload.TimeStamp ?? "",
-            metrics: Object.keys(payload)
-              .filter(k => !['API', 'EVENT', 'TimeStamp', 'LATITUDE', 'LONGITUDE', 'SN'].includes(k))
-              .map(k => ({
-                type: k,
-                value: parseFloat(payload[k]),
-                icon:
-                  k === 'DCV' || k === 'ACV'
-                    ? 'bi-battery'
-                    : k === 'DCI' || k === 'ACI'
-                    ? 'bi-lightning-charge'
-                    : 'bi-graph-up'
-              })),
-          };
-          if (topic === MAIN_TOPIC) {
-            mainDevice.value = deviceData;
-            lastMainUpdate.value = Date.now();
-          } else if (topic === SIM_TOPIC) {
-            simDevice.value = deviceData;
-          }
-        } catch (e) {
-          console.error('Error parsing MQTT message:', e);
+      // Connection status handling
+      socket.value.on('connect', () => {
+        connectionStatus.value = 'connected';
+        console.log('Connected to backend server');
+      });
+
+      socket.value.on('disconnect', () => {
+        connectionStatus.value = 'disconnected';
+        console.log('Disconnected from backend server');
+      });
+
+      // Handle initial data when client first connects
+      socket.value.on('initialData', (data) => {
+        console.log('Received initial data:', data);
+        if (data.main) {
+          mainDevice.value = data.main;
+          lastMainUpdate.value = data.main.timestamp || Date.now();
+        }
+        if (data.sim) {
+          simDevice.value = data.sim;
         }
       });
+
+      // Handle real-time device updates
+      socket.value.on('deviceUpdate', (update) => {
+        console.log('Device update received:', update);
+        
+        if (update.type === 'main') {
+          mainDevice.value = update.data;
+          lastMainUpdate.value = Date.now();
+        } else if (update.type === 'sim') {
+          simDevice.value = update.data;
+        }
+      });
+
+      // Periodically update 'now' so computed property reacts to time
+      updateInterval.value = setInterval(() => { 
+        now.value = Date.now(); 
+      }, 1000);
     });
 
-    // status and metricClass for badge styling (reuse from previous code if needed)
+    onUnmounted(() => {
+      if (socket.value) {
+        socket.value.disconnect();
+      }
+      if (updateInterval.value) {
+        clearInterval(updateInterval.value);
+      }
+    });
+
+    // Status and metric class computations
     const statusClass = computed(() => {
       const status = displayedDevice.value?.status;
       switch (status) {
@@ -83,16 +93,23 @@ export default defineComponent({
           return 'badge-light-primary';
       }
     });
+
     const metricClass = (metric: any) => {
       if (metric.type.toLowerCase().includes('battery') && metric.value <= 20) return 'text-danger';
       if (metric.type.toLowerCase().includes('signal') && metric.value <= 50) return 'text-warning';
       return 'text-primary';
     };
 
+    const connectionStatusClass = computed(() => {
+      return connectionStatus.value === 'connected' ? 'text-success' : 'text-danger';
+    });
+
     return {
       displayedDevice,
       statusClass,
       metricClass,
+      connectionStatus,
+      connectionStatusClass,
     };
   }
 });
@@ -102,8 +119,12 @@ export default defineComponent({
   <div class="card" v-if="displayedDevice">
     <div class="card-header border-0 pt-6">
       <div class="card-title">
-        <div class="d-flex align-items-center position-relative">
+        <div class="d-flex align-items-center justify-content-between">
           <h3 class="mb-0">Device Details</h3>
+          <span class="badge" :class="connectionStatusClass">
+            <i class="bi bi-circle-fill me-1"></i>
+            {{ connectionStatus }}
+          </span>
         </div>
       </div>
     </div>
@@ -165,9 +186,22 @@ export default defineComponent({
         <div class="col-lg-6">
           <div class="mb-5">
             <h4 class="fs-1 text-gray-800 w-bolder mb-6">Historical Data</h4>
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>
+              Real-time data from MQTT broker via backend server
+            </div>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+  
+  <div v-else class="card">
+    <div class="card-body text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3">Waiting for device data...</p>
     </div>
   </div>
 </template>
