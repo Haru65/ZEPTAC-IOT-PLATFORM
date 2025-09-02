@@ -16,5 +16,8 @@ export default defineConfig({
   base: "/",
   build: {
     chunkSizeWarningLimit: 3000,
+    rollupOptions: {
+      external: ['mqtt']
+    }
   },
 });
