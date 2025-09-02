@@ -122,95 +122,99 @@ export default defineComponent({
     IndiaMap,
   },
   setup() {
-    const authStore = useAuthStore();
-    const User = authStore.GetUser();
+      const authStore = useAuthStore();
+      const User = authStore.GetUser();
 
-    const devices: any = ref([
-      {
-        id: "1",
-        name: "Living Room Thermostat",
-        icon: "bi-thermometer-half",
-        type: "sensor",
-        location: "Living Room",
-        status: "online",
-        lastSeen: "2 min ago",
-        metrics: [
-          { type: "temperature", value: 22.5, icon: "bi-thermometer-half" },
-          { type: "battery", value: 75, icon: "bi-battery-half" },
-          { type: "signal", value: 90, icon: "bi-wifi" },
-        ],
-      },
-      {
-        id: "2",
-        name: "Kitchen Smart Light",
-        icon: "bi-lightbulb",
-        type: "light",
-        location: "Kitchen",
-        status: "online",
-        lastSeen: "Just now",
-        metrics: [
-          { type: "battery", value: 80, icon: "bi-battery-half" },
-          { type: "signal", value: 85, icon: "bi-wifi" },
-          { type: "temperature", value: 20, icon: "bi-thermometer-half" },
-        ],
-      },
-      {
-        id: "3",
-        name: "Bedroom Humidity Sensor",
-        icon: "bi-moisture",
-        type: "sensor",
-        location: "Bedroom",
-        status: "warning",
-        lastSeen: "15 min ago",
-        metrics: [
-          { type: "battery", value: 20, icon: "bi-battery" },
-          { type: "signal", value: 45, icon: "bi-wifi" },
-          { type: "temperature", value: 18.5, icon: "bi-thermometer" },
-        ],
-      },
-      {
-        id: "4",
-        name: "Garage Door",
-        icon: "bi-door-closed",
-        type: "door",
-        location: "Garage",
-        status: "offline",
-        lastSeen: "2 days ago",
-        metrics: [
-          { type: "battery", value: 10, icon: "bi-battery" },
-          { type: "signal", value: 0, icon: "bi-wifi-off" },
-          { type: "temperature", value: 10, icon: "bi-thermometer" },
-        ],
-      },
-      {
-        id: "5",
-        name: "Front Porch Camera",
-        icon: "bi-camera-video",
-        type: "camera",
-        location: "Front Porch",
-        status: "online",
-        lastSeen: "5 min ago",
-        metrics: [
-          { type: "battery", value: 85, icon: "bi-battery-half" },
-          { type: "signal", value: 90, icon: "bi-wifi" },
-          { type: "temperature", value: 22, icon: "bi-thermometer" },
-        ],
-      },
-      {
-        id: "6",
-        name: "Backyard Motion Sensor",
-        icon: "bi-door-open",
-        type: "sensor",
-        location: "Backyard",
-        status: "online",
-        lastSeen: "10 min ago",
-        metrics: [
-          { type: "battery", value: 65, icon: "bi-battery-half" },
-          { type: "signal", value: 80, icon: "bi-wifi" },
-          { type: "temperature", value: 18, icon: "bi-thermometer" },
-        ],
-      },
-    ]);
+      // Fallback: always ensure devices is an array
+      let initialDevices = [
+        {
+          id: "1",
+          name: "Living Room Thermostat",
+          icon: "bi-thermometer-half",
+          type: "sensor",
+          location: "Living Room",
+          status: "online",
+          lastSeen: "2 min ago",
+          metrics: [
+            { type: "temperature", value: 22.5, icon: "bi-thermometer-half" },
+            { type: "battery", value: 75, icon: "bi-battery-half" },
+            { type: "signal", value: 90, icon: "bi-wifi" },
+          ],
+        },
+        {
+          id: "2",
+          name: "Kitchen Smart Light",
+          icon: "bi-lightbulb",
+          type: "light",
+          location: "Kitchen",
+          status: "online",
+          lastSeen: "Just now",
+          metrics: [
+            { type: "battery", value: 80, icon: "bi-battery-half" },
+            { type: "signal", value: 85, icon: "bi-wifi" },
+            { type: "temperature", value: 20, icon: "bi-thermometer-half" },
+          ],
+        },
+        {
+          id: "3",
+          name: "Bedroom Humidity Sensor",
+          icon: "bi-moisture",
+          type: "sensor",
+          location: "Bedroom",
+          status: "warning",
+          lastSeen: "15 min ago",
+          metrics: [
+            { type: "battery", value: 20, icon: "bi-battery" },
+            { type: "signal", value: 45, icon: "bi-wifi" },
+            { type: "temperature", value: 18.5, icon: "bi-thermometer" },
+          ],
+        },
+        {
+          id: "4",
+          name: "Garage Door",
+          icon: "bi-door-closed",
+          type: "door",
+          location: "Garage",
+          status: "offline",
+          lastSeen: "2 days ago",
+          metrics: [
+            { type: "battery", value: 10, icon: "bi-battery" },
+            { type: "signal", value: 0, icon: "bi-wifi-off" },
+            { type: "temperature", value: 10, icon: "bi-thermometer" },
+          ],
+        },
+        {
+          id: "5",
+          name: "Front Porch Camera",
+          icon: "bi-camera-video",
+          type: "camera",
+          location: "Front Porch",
+          status: "online",
+          lastSeen: "5 min ago",
+          metrics: [
+            { type: "battery", value: 85, icon: "bi-battery-half" },
+            { type: "signal", value: 90, icon: "bi-wifi" },
+            { type: "temperature", value: 22, icon: "bi-thermometer" },
+          ],
+        },
+        {
+          id: "6",
+          name: "Backyard Motion Sensor",
+          icon: "bi-door-open",
+          type: "sensor",
+          location: "Backyard",
+          status: "online",
+          lastSeen: "10 min ago",
+          metrics: [
+            { type: "battery", value: 65, icon: "bi-battery-half" },
+            { type: "signal", value: 80, icon: "bi-wifi" },
+            { type: "temperature", value: 18, icon: "bi-thermometer" },
+          ],
+        },
+      ];
+
+      // If you fetch devices from API, always fallback to []
+      const devices: any = ref(initialDevices || []);
 
     return {
       getAssetPath,
