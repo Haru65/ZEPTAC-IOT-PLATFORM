@@ -116,6 +116,8 @@ import DeviceCardWidget from "@/components/iot/component/dashboard/DeviceCardWid
 import IndiaMap from "@/components/iot/component/dashboard/IndiaMap.vue";
 
 // Device Type
+type DeviceStatus = 'online' | 'offline' | 'warning';
+
 interface Metric {
   type: string;
   value: number;
@@ -127,11 +129,11 @@ interface Device {
   icon: string;
   type: string;
   location: string;
-  status: string;
+  status: DeviceStatus;
   lastSeen: string;
   metrics: Metric[];
 }
-
+  
 export default defineComponent({
   name: "main-dashboard",
   components: {
