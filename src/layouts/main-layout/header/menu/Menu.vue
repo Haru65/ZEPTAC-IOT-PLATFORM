@@ -101,7 +101,7 @@
 </template>
 
 <script lang="ts">
-import { getAssetPath } from "@/core/helpers/assets";
+
 import { defineComponent } from "vue";
 import { version } from "@/core/helpers/documentation";
 import { headerMenuDisplay } from "@/core/helpers/config";
@@ -113,7 +113,7 @@ export default defineComponent({
     return {
       version,
       headerMenuDisplay,
-      getAssetPath,
+      
     };
   },
 });

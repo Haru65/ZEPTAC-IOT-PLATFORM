@@ -1,6 +1,5 @@
 <template>
   <div class="row">
-    <!-- Stat Cards -->
     <div class="row g-4">
       <div class="col-lg-3 col-md-6 col-sm-6">
         <StatCardWidget
@@ -68,14 +67,13 @@
       </div>
     </div>
 
-    <!-- India Map -->
     <div class="row g-4">
       <div class="col-12">
         <IndiaMap />
       </div>
     </div>
 
-    <!-- Charts -->
+    <!-- Charts row -->
     <div class="row g-4">
       <div class="col-lg-6 col-12">
         <TemperatureChart
@@ -100,14 +98,12 @@
     </div>
   </div>
 </template>
+  
+  <script lang="ts">
 
-<script lang="ts">
-import { defineComponent, ref, computed, onMounted } from "vue";
+import { defineComponent, onMounted, ref, watch, computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
-
 import { generateStorageUrl } from "@/core/helpers/storageUrl";
-
-// Widgets
 import StatCardWidget from "@/components/iot/component/dashboard/StatCardWidget.vue";
 import TemperatureChart from "@/components/iot/component/dashboard/TemperatureChart.vue";
 import EnergyConsumptionChart from "@/components/iot/component/dashboard/EnergyConsumptionChart.vue";
@@ -115,25 +111,6 @@ import ActiveDeviceChart from "./ActiveDeviceChart.vue";
 import DeviceCardWidget from "@/components/iot/component/dashboard/DeviceCardWidget.vue";
 import IndiaMap from "@/components/iot/component/dashboard/IndiaMap.vue";
 
-// Device Type
-type DeviceStatus = 'online' | 'offline' | 'warning';
-
-interface Metric {
-  type: string;
-  value: number;
-  icon: string;
-}
-interface Device {
-  id: string;
-  name: string;
-  icon: string;
-  type: string;
-  location: string;
-  status: DeviceStatus;
-  lastSeen: string;
-  metrics: Metric[];
-}
-  
 export default defineComponent({
   name: "main-dashboard",
   components: {
@@ -146,10 +123,9 @@ export default defineComponent({
   },
   setup() {
     const authStore = useAuthStore();
-    const User = computed(() => authStore.GetUser() ?? null);
+    const User = authStore.GetUser();
 
-    // Default sample devices
-    const initialDevices: Device[] = [
+    const devices: any = ref([
       {
         id: "1",
         name: "Living Room Thermostat",
@@ -234,27 +210,12 @@ export default defineComponent({
           { type: "temperature", value: 18, icon: "bi-thermometer" },
         ],
       },
-    ];
-
-    const devices = ref<Device[]>(initialDevices);
-
-    // You can later fetch real devices from API safely
-    onMounted(async () => {
-      try {
-        // Example fetch (replace with real API)
-        // const res = await fetch("/api/devices");
-        // const data = await res.json();
-        // devices.value = Array.isArray(data) ? data : [];
-      } catch (err) {
-        console.error("Failed to load devices:", err);
-        devices.value = []; // safe fallback
-      }
-    });
+    ]);
 
     return {
 
-      generateStorageUrl,
       User,
+      generateStorageUrl,
       devices,
     };
   },
