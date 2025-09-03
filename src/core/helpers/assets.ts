@@ -18,6 +18,9 @@ export const getIllustrationsPath = (illustrationName: string): string => {
     `media/illustrations/${illustrationsSet.value}/${illustration}${extension}`
   );
 };
+export const getAssetPath = (path: string): string => {
+  return import.meta.env.BASE_URL + path;
+};
 
 
 // Use import.meta.env.BASE_URL + path directly in your components for asset paths.
