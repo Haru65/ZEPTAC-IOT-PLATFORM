@@ -22,7 +22,7 @@ export default defineComponent({
 
     onMounted(() => {
       // Connect to backend Socket.io server
-      socket.value = io('http://localhost:3001', {
+      socket.value = io('https://zeptac-iot-platform-vp3h-git-main-haru65s-projects.vercel.app', {
         withCredentials: true,
         transports: ['websocket', 'polling']
       });
