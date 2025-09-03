@@ -11,11 +11,11 @@
         data-kt-menu-placement="bottom-end"
       >
         <KTIcon icon-name="message-text-2" icon-class="fs-2 fs-md-1" />
-        <span class="position-absolute translate-middle top-0 start-50"
-          ><span class="badge rounded badge-success animation-blink">
+        <span v-if="TotalNotification > 0" class="position-absolute translate-middle top-0 start-50">
+          <span class="badge rounded badge-success">
             {{ TotalNotification }}
-          </span></span
-        >
+          </span>
+        </span>
       </div>
 
       <KTNotificationMenu
@@ -38,7 +38,7 @@
       >
         <KTIcon icon-name="message-text-2" icon-class="fs-2 fs-md-1" />
         <span
-          class="bullet bullet-dot bg-success h-6px w-6px position-absolute translate-middle top-0 start-50 animation-blink"
+            class="bullet bullet-dot bg-success h-6px w-6px position-absolute translate-middle top-0 start-50"
         ></span>
       </div>
       <!--end::Menu wrapper-->
