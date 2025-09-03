@@ -100,7 +100,7 @@
 </template>
   
   <script lang="ts">
-
+import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref, watch, computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { generateStorageUrl } from "@/core/helpers/storageUrl";
@@ -217,6 +217,7 @@ export default defineComponent({
       User,
       generateStorageUrl,
       devices,
+      getAssetPath,
     };
   },
 });

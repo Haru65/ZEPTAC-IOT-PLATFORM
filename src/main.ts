@@ -29,7 +29,7 @@ function trackRouteChange(toRoute, fromRoute) {
   
   if (typeof window.gtag !== 'undefined') {
     // Ensure GA config uses cookie_domain: 'auto'
-    window.gtag('config', 'G-XXXXXXX', { cookie_domain: 'auto' }); // Replace G-XXXXXXX with your GA ID
+    window.gtag('config', 'G-XXXXXXX', { cookie_domain: window.location.hostname }); // Replace G-XXXXXXX with your GA ID
     window.gtag('event', eventName, {
       'event_category': eventCategory,
       'event_label': eventLabel
