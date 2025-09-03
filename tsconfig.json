@@ -12,7 +12,9 @@
       "@/*": [
         "./src/*"
       ]
-    }
+    },
+    "types": ["node"],
+    "verbatimModuleSyntax": false
   },
   "references": [
     {

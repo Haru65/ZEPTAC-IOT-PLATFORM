@@ -2,6 +2,22 @@ import { createApp } from "vue";
 import { createPinia } from "pinia";
 import { Tooltip } from "bootstrap";
 import App from "./App.vue";
+// main.js - Add this BEFORE creating the Vue app
+const originalJSONParse = JSON.parse;
+JSON.parse = function(text) {
+  try {
+    if (!text || typeof text !== 'string' || text.trim() === '') {
+      console.warn('Empty or invalid JSON data, returning empty object');
+      return {};
+    }
+    return originalJSONParse.call(this, text);
+  } catch (error) {
+    console.error('JSON Parse Error:', error, 'Input:', text);
+    return {};
+  }
+};
+
+// Your Vue app creation code continues here...
 
 /*
 Using the main router without auth checks
@@ -29,9 +45,9 @@ function trackRouteChange(toRoute, fromRoute) {
   
   if (typeof window.gtag !== 'undefined') {
     // Ensure GA config uses cookie_domain: 'auto'
-    window.gtag('config', 'G-XXXXXXX', { cookie_domain: window.location.hostname }); // Replace G-XXXXXXX with your GA ID
+    window.gtag('config', 'G-XXXXXXX', { cookie_domain: `zeptac-iot-platform-vp3h.vercel.app` }); // Replace G-XXXXXXX with your GA ID
     window.gtag('event', eventName, {
-      'event_category': eventCategory,
+      'event_category': eventCategory,  
       'event_label': eventLabel
     });
   }
