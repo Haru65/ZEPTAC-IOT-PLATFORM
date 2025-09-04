@@ -14,9 +14,6 @@ export default defineComponent({
     const connectionStatus = ref<string>('disconnected');
     const updateInterval = ref<number | null>(null);
 
-    // Fallback: Use simulated data if main device is "offline"
-    
-
     onMounted(() => {
       // Connect to backend Socket.io server
       socket.value = io('https://zeptac-demo-backend.onrender.com', {
@@ -50,7 +47,6 @@ export default defineComponent({
       // Handle real-time device updates
       socket.value.on('deviceUpdate', (update) => {
         console.log('Device update received:', update);
-        
         if (update.type === 'main') {
           mainDevice.value = update.data;
           lastMainUpdate.value = Date.now();
@@ -60,8 +56,8 @@ export default defineComponent({
       });
 
       // Periodically update 'now' so computed property reacts to time
-      updateInterval.value = setInterval(() => { 
-        now.value = Date.now(); 
+      updateInterval.value = setInterval(() => {
+        now.value = Date.now();
       }, 1000);
     });
 
@@ -72,6 +68,16 @@ export default defineComponent({
       if (updateInterval.value) {
         clearInterval(updateInterval.value);
       }
+    });
+
+    // Computed property for displaying device with failover
+    const displayedDevice = computed(() => {
+      if (mainDevice.value && now.value - lastMainUpdate.value <= FAILOVER_TIMEOUT_MS) {
+        return mainDevice.value;
+      } else if (simDevice.value) {
+        return simDevice.value;
+      }
+      return null;
     });
 
     // Status and metric class computations
@@ -102,7 +108,7 @@ export default defineComponent({
     });
 
     return {
-      
+      displayedDevice,
       statusClass,
       metricClass,
       connectionStatus,
@@ -192,7 +198,7 @@ export default defineComponent({
       </div>
     </div>
   </div>
-  
+
   <div v-else class="card">
     <div class="card-body text-center">
       <div class="spinner-border text-primary" role="status">

@@ -139,7 +139,7 @@ export default defineComponent({
       },
       {
         id: "2",
-        name: "Sensor 2 ",
+        name: "Sensor 2",
         icon: "bi-thermometer-half",
         type: "thermostat",
         location: "Location 2",
