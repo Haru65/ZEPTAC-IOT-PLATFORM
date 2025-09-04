@@ -128,10 +128,10 @@ export default defineComponent({
     const devices: any = ref([
       {
         id: "1",
-        name: "Living Room Thermostat",
+        name: "Sensor 1",
         icon: "bi-thermometer-half",
         type: "sensor",
-        location: "Living Room",
+        location: "Location 1",
         status: "online",
         lastSeen: "2 min ago",
         metrics: [
@@ -142,10 +142,10 @@ export default defineComponent({
       },
       {
         id: "2",
-        name: "Kitchen Smart Light",
+        name: "Sensor 2",
         icon: "bi-lightbulb",
         type: "light",
-        location: "Kitchen",
+        location: "Location 2",
         status: "online",
         lastSeen: "Just now",
         metrics: [

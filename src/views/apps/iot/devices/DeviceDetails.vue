@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed, onUnmounted } from 'vue';
+import { defineComponent, ref, onMounted, computed, onUnmounted, watch } from 'vue';
+import { reverseGeocode } from '@/utils/reverseGeocode';
 import { io, Socket } from 'socket.io-client';
 
 const FAILOVER_TIMEOUT_MS = 10_000; // 10 seconds timeout for main device
@@ -80,7 +81,47 @@ export default defineComponent({
       return null;
     });
 
-    // Status and metric class computations
+    // Abstract location (sector/district)
+    const abstractLocation = ref('');
+
+    watch(displayedDevice, async (device) => {
+      if (device && typeof device.location === 'string') {
+        // If location is coordinates
+        if (/^-?\d+\.\d+,\s*-?\d+\.\d+$/.test(device.location)) {
+          const [lat, lon] = device.location.split(',').map(s => parseFloat(s.trim()));
+          const data = await reverseGeocode(lat, lon);
+          // Try to extract sector/district/city/town/village
+          let area = '';
+          if (data && data.address) {
+            // Concatenate relevant fields for specificity
+            const parts: string[] = [];
+            if (data.address.city_district) parts.push(data.address.city_district);
+            if (data.address.suburb) parts.push(data.address.suburb);
+            if (data.address.neighbourhood) parts.push(data.address.neighbourhood);
+            if (data.address.city) parts.push(data.address.city);
+            if (data.address.town) parts.push(data.address.town);
+            if (data.address.village) parts.push(data.address.village);
+            if (data.address.state_district) parts.push(data.address.state_district);
+            if (data.address.state) parts.push(data.address.state);
+            if (data.address.county) parts.push(data.address.county);
+            if (data.address.country) parts.push(data.address.country);
+            // Remove duplicates and join
+            area = Array.from(new Set(parts)).join(', ');
+            if (!area && data.display_name) {
+              area = data.display_name.split(',').slice(0,3).join(', ');
+            }
+            if (!area) area = device.location;
+          } else if (data && data.display_name) {
+            area = data.display_name.split(',').slice(0,3).join(', ');
+          } else {
+            area = device.location;
+          }
+          abstractLocation.value = area;
+        } else {
+          abstractLocation.value = device.location;
+        }
+      }
+    }, { immediate: true });
     const statusClass = computed(() => {
       const status = displayedDevice.value?.status;
       switch (status) {
@@ -113,6 +154,7 @@ export default defineComponent({
       metricClass,
       connectionStatus,
       connectionStatusClass,
+      abstractLocation,
     };
   }
 });
@@ -146,7 +188,7 @@ export default defineComponent({
               <div class="row mb-7">
                 <label class="col-lg-4 fw-bold text-muted">Location</label>
                 <div class="col-lg-8">
-                  <span class="fw-bold fs-6 text-gray-800">{{ displayedDevice.location }}</span>
+                  <span class="fw-bold fs-6 text-gray-800">{{ abstractLocation }}</span>
                 </div>
               </div>
               <div class="row mb-7">
