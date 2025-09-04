@@ -7,7 +7,7 @@
           icon-name="hdd-network"
           color="light"
           icon-color="primary"
-          title="6"
+          title="2"
           description="All registered devices"
           heading="Total Devices"
         />
@@ -19,7 +19,7 @@
           icon-name="wifi"
           color="light"
           icon-color="success"
-          title="4"
+          title="2"
           description="Currently online"
           :change-value="5"
           :is-positive="true"
@@ -33,10 +33,10 @@
           icon-name="battery-charging"
           color="light"
           icon-color="danger"
-          title="1"
+          title="0"
           description="Needs attention"
-          :change-value="2"
-          :is-positive="false"
+          :change-value="0"
+          :is-positive="true"
           heading="Low Battery"
         />
       </div>
@@ -47,10 +47,10 @@
           icon-name="exclamation-triangle"
           color="light"
           icon-color="warning"
-          title="2"
+          title="0"
           description="Issues detected"
-          :change-value="1"
-          :is-positive="false"
+          :change-value="0"
+          :is-positive="true"
           heading="Warnings"
         />
       </div>
@@ -152,62 +152,6 @@ export default defineComponent({
           { type: "battery", value: 80, icon: "bi-battery-half" },
           { type: "signal", value: 85, icon: "bi-wifi" },
           { type: "temperature", value: 20, icon: "bi-thermometer-half" },
-        ],
-      },
-      {
-        id: "3",
-        name: "Bedroom Humidity Sensor",
-        icon: "bi-moisture",
-        type: "sensor",
-        location: "Bedroom",
-        status: "warning",
-        lastSeen: "15 min ago",
-        metrics: [
-          { type: "battery", value: 20, icon: "bi-battery" },
-          { type: "signal", value: 45, icon: "bi-wifi" },
-          { type: "temperature", value: 18.5, icon: "bi-thermometer" },
-        ],
-      },
-      {
-        id: "4",
-        name: "Garage Door",
-        icon: "bi-door-closed",
-        type: "door",
-        location: "Garage",
-        status: "offline",
-        lastSeen: "2 days ago",
-        metrics: [
-          { type: "battery", value: 10, icon: "bi-battery" },
-          { type: "signal", value: 0, icon: "bi-wifi-off" },
-          { type: "temperature", value: 10, icon: "bi-thermometer" },
-        ],
-      },
-      {
-        id: "5",
-        name: "Front Porch Camera",
-        icon: "bi-camera-video",
-        type: "camera",
-        location: "Front Porch",
-        status: "online",
-        lastSeen: "5 min ago",
-        metrics: [
-          { type: "battery", value: 85, icon: "bi-battery-half" },
-          { type: "signal", value: 90, icon: "bi-wifi" },
-          { type: "temperature", value: 22, icon: "bi-thermometer" },
-        ],
-      },
-      {
-        id: "6",
-        name: "Backyard Motion Sensor",
-        icon: "bi-door-open",
-        type: "sensor",
-        location: "Backyard",
-        status: "online",
-        lastSeen: "10 min ago",
-        metrics: [
-          { type: "battery", value: 65, icon: "bi-battery-half" },
-          { type: "signal", value: 80, icon: "bi-wifi" },
-          { type: "temperature", value: 18, icon: "bi-thermometer" },
         ],
       },
     ]);

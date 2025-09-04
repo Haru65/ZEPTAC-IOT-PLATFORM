@@ -14,3 +14,12 @@
 .menu-link.active {
   color: #000 !important;
 }
+
+// Sidebar icon hover effect: force icons to black
+.menu-link:hover .menu-icon i,
+.menu-link.active .menu-icon i,
+.menu-link:hover .menu-icon svg,
+.menu-link.active .menu-icon svg {
+  color: #000 !important;
+  fill: #000 !important;
+}
