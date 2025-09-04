@@ -15,10 +15,7 @@ export default defineComponent({
     const updateInterval = ref<number | null>(null);
 
     // Fallback: Use simulated data if main device is "offline"
-    const displayedDevice = computed(() => {
-      const timedOut = now.value - lastMainUpdate.value > FAILOVER_TIMEOUT_MS;
-      return (!timedOut && mainDevice.value) ? mainDevice.value : simDevice.value;
-    });
+    
 
     onMounted(() => {
       // Connect to backend Socket.io server
@@ -105,7 +102,7 @@ export default defineComponent({
     });
 
     return {
-      displayedDevice,
+      
       statusClass,
       metricClass,
       connectionStatus,
@@ -143,7 +140,7 @@ export default defineComponent({
               <div class="row mb-7">
                 <label class="col-lg-4 fw-bold text-muted">Location</label>
                 <div class="col-lg-8">
-                  <span class="fw-bold fs-6 text-gray-800">{{  }}</span>
+                  <span class="fw-bold fs-6 text-gray-800">{{ displayedDevice.location }}</span>
                 </div>
               </div>
               <div class="row mb-7">
