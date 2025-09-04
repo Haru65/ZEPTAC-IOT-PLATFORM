@@ -137,41 +137,31 @@ export default defineComponent({
               <div class="row mb-7">
                 <label class="col-lg-4 fw-bold text-muted">Device Name</label>
                 <div class="col-lg-8">
-                  <span class="fw-bold fs-6 text-gray-800">
-                    {{ displayedDevice.name === 'Kitchen Smart Light' ? 'Kitchen Smart Light' : (displayedDevice.name === 'Living Room Thermostat' ? 'Living Room Thermostat' : displayedDevice.name) }}
-                  </span>
+                  <span class="fw-bold fs-6 text-gray-800">{{ displayedDevice.name }}</span>
                 </div>
               </div>
               <div class="row mb-7">
                 <label class="col-lg-4 fw-bold text-muted">Location</label>
                 <div class="col-lg-8">
-                  <span class="fw-bold fs-6 text-gray-800">
-                    {{ displayedDevice.name === 'Kitchen Smart Light' ? 'Kitchen' : (displayedDevice.name === 'Living Room Thermostat' ? 'Living Room' : displayedDevice.location) }}
-                  </span>
+                  <span class="fw-bold fs-6 text-gray-800">{{  }}</span>
                 </div>
               </div>
               <div class="row mb-7">
                 <label class="col-lg-4 fw-bold text-muted">Type</label>
                 <div class="col-lg-8">
-                  <span class="fw-bold fs-6 text-gray-800">
-                    {{ displayedDevice.name === 'Kitchen Smart Light' ? 'light' : (displayedDevice.name === 'Living Room Thermostat' ? 'thermostat' : displayedDevice.type) }}
-                  </span>
+                  <span class="fw-bold fs-6 text-gray-800">{{ displayedDevice.type }}</span>
                 </div>
               </div>
               <div class="row mb-7">
                 <label class="col-lg-4 fw-bold text-muted">Status</label>
                 <div class="col-lg-8">
-                  <span class="badge" :class="statusClass">
-                    {{ displayedDevice.name === 'Kitchen Smart Light' ? 'online' : (displayedDevice.name === 'Living Room Thermostat' ? 'online' : displayedDevice.status) }}
-                  </span>
+                  <span class="badge" :class="statusClass">{{ displayedDevice.status }}</span>
                 </div>
               </div>
               <div class="row mb-7">
                 <label class="col-lg-4 fw-bold text-muted">Last Seen</label>
                 <div class="col-lg-8">
-                  <span class="fw-bold fs-6 text-gray-800">
-                    {{ displayedDevice.name === 'Kitchen Smart Light' ? '2 min ago' : (displayedDevice.name === 'Living Room Thermostat' ? '5 min ago' : displayedDevice.lastSeen) }}
-                  </span>
+                  <span class="fw-bold fs-6 text-gray-800">{{ displayedDevice.lastSeen }}</span>
                 </div>
               </div>
             </div>

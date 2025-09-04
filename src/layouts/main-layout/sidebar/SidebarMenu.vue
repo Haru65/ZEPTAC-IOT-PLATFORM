@@ -22,27 +22,9 @@
           </div>
         </div>
       </div>
-                        <style scoped>
-                          /* Force sidebar menu text to black, even on hover/active */
-                          .app-sidebar-menu .menu-link,
-                          .app-sidebar-menu .menu-link .menu-title,
-                          .app-sidebar-menu .menu-link .menu-icon,
-                          .app-sidebar-menu .menu-link .menu-bullet {
-                            color: #000 !important;
-                          }
-                          .app-sidebar-menu .menu-link:hover,
-                          .app-sidebar-menu .menu-link.active {
-                            background-color: transparent !important;
-                          }
-                          .app-sidebar-menu .menu-link:hover .menu-title,
-                          .app-sidebar-menu .menu-link.active .menu-title,
-                          .app-sidebar-menu .menu-link:hover .menu-icon,
-                          .app-sidebar-menu .menu-link.active .menu-icon,
-                          .app-sidebar-menu .menu-link:hover .menu-bullet,
-                          .app-sidebar-menu .menu-link.active .menu-bullet {
-                            color: #000 !important;
-                          }
-                        </style>
+<style lang="scss" scoped>
+@import "./sidebar-local-override.scss";
+</style>
     </div>
   </div>
 
@@ -599,14 +581,17 @@
 /* Main hover effect for 90% transparent white background */
 .sidebar-menu .menu-link:hover {
   background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #000 !important;
   transition: all 0.3s ease;
 }
 
 /* Text and icon color on hover - 90% opacity white */
-.sidebar-menu .menu-link:hover .menu-title,
+ .sidebar-menu .menu-link:hover .menu-title {
+  color: #000 !important;
   transition: all 0.3s ease;
   border-radius: 6px;
   margin: 2px 0;
+}
 }
 
 /* Sub-menu hover effects */

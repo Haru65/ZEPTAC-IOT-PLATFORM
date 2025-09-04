@@ -1,0 +1,16 @@
+// Local override for sidebar hover text color
+.app-sidebar-menu .menu-link:hover .menu-title,
+.app-sidebar-menu .menu-link:hover .menu-icon,
+.app-sidebar-menu .menu-link:hover .menu-bullet {
+  color: #000 !important;
+}
+
+.sidebar-menu .menu-link:hover,
+.sidebar-menu .menu-link:hover .menu-title {
+  color: #000 !important;
+}
+
+.menu-link:hover,
+.menu-link.active {
+  color: #000 !important;
+}

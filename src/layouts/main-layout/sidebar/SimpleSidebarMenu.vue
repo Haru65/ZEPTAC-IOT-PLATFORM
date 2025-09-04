@@ -31,7 +31,6 @@
     </div>
   </div>
 </template>
-
 <script lang="ts">
 import { defineComponent, computed } from 'vue';
 import AdminMenuConfig from '@/core/config/AdminMenuConfig';
@@ -47,7 +46,6 @@ export default defineComponent({
         return item.heading === 'Dashboard';
       });
     });
-
     return {
       filteredMenu
     };
@@ -55,7 +53,9 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import "./sidebar-local-override.scss";
+// ...existing code...
 .menu-item {
   margin-bottom: 0.5rem;
 }
@@ -73,7 +73,7 @@ export default defineComponent({
 .menu-link:hover,
 .menu-link.active {
   background-color: #f5f8fa;
-  color: #009ef7;
+  color: #000 !important;
 }
 
 .menu-icon {
