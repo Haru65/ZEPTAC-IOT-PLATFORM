@@ -32,10 +32,9 @@
             <div class="card-body text-center p-6">
               <!-- Device Icon -->
               <div class="mb-4">
-                <i 
-                  :class="getDeviceIcon(device)" 
+                <i
+                  :class="[getDeviceIcon(device), getDeviceIconColor(device)]"
                   style="font-size: 3rem;"
-                  :class="getDeviceIconColor(device)"
                 ></i>
               </div>
               
