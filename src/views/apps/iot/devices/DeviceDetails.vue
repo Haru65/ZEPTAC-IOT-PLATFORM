@@ -24,7 +24,7 @@ export default defineComponent({
       mqttService.initialize();
       
       // Connect to backend Socket.io server
-      socket.value = io('http://localhost:3001', {
+      socket.value = io('https://zeptac-demo-backend.onrender.com', {
         withCredentials: true,
         transports: ['websocket', 'polling']
       });
