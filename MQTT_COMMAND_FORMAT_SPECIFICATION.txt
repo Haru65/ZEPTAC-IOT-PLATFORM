@@ -1,0 +1,219 @@
+===============================================================================
+                    ZEPTAC IOT MQTT COMMAND DATA FORMATS
+===============================================================================
+
+OVERVIEW
+--------
+This document describes the MQTT payload formats for controlling Zeptac IoT 
+devices. All commands use a flat JSON structure with readable field names.
+
+===============================================================================
+BASIC PAYLOAD STRUCTURE
+===============================================================================
+
+All device commands use this format:
+
+{
+  "Unit Id": "123",
+  "Command": "CommandName",
+  "field1": "value1",
+  "field2": "value2",
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Required Fields:
+- "Unit Id": Device identifier (string)
+- "Command": Command type (string)  
+- "timestamp": When command was sent (ISO date)
+- "sender": Who sent the command (always "frontend")
+
+===============================================================================
+DEVICE COMMANDS
+===============================================================================
+
+1. INTERRUPT MODE
+-----------------
+Controls device with start/stop timing and on/off cycles.
+
+{
+  "Unit Id": "123",
+  "Command": "Interrupt",
+  "Start date": "2025-10-13",
+  "Start time": "08:30", 
+  "Stop date": "2025-10-14",
+  "Stop time": "08:13",
+  "On time": 30,
+  "Off time": 30,
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Fields:
+- Start date/time: When to begin (YYYY-MM-DD, HH:MM)
+- Stop date/time: When to end (YYYY-MM-DD, HH:MM)  
+- On time: Seconds device stays on (number)
+- Off time: Seconds device stays off (number)
+
+2. MANUAL MODE
+--------------
+Simple start/stop control.
+
+{
+  "Unit Id": "123",
+  "Command": "Manual",
+  "Action": "start",
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Fields:
+- Action: "start" or "stop"
+
+3. NORMAL MODE
+--------------
+Default operating mode.
+
+{
+  "Unit Id": "123", 
+  "Command": "Normal",
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+4. DPOL MODE
+------------
+Data Polling mode with time range.
+
+{
+  "Unit Id": "123",
+  "Command": "DPOL",
+  "Start date": "2025-10-13",
+  "Start time": "08:30",
+  "End date": "2025-10-14", 
+  "End time": "08:13",
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Fields:
+- Start date/time: When to begin polling
+- End date/time: When to stop polling
+
+5. INST MODE
+------------
+Instantaneous mode with duration setting.
+
+{
+  "Unit Id": "123",
+  "Command": "INST", 
+  "Start date": "2025-10-13",
+  "Start time": "08:30",
+  "Duration": "daily",
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Fields:
+- Start date/time: When to begin
+- Duration: "daily" or "weekly"
+
+6. TIMER CONFIGURATION
+----------------------
+Timer settings with ON and OFF values.
+
+{
+  "Unit Id": "123",
+  "Command": "Timer",
+  "TON": {
+    "field1": "10", "field2": "20", "field3": "30",
+    "field4": "40", "field5": "50", "field6": "60"
+  },
+  "TOFF": {
+    "field1": "15", "field2": "25", "field3": "35", 
+    "field4": "45", "field5": "55", "field6": "65"
+  },
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Fields:
+- TON: Timer ON settings (6 fields with string values)
+- TOFF: Timer OFF settings (6 fields with string values)
+
+7. ELECTRODE CONFIGURATION
+--------------------------
+Sets electrode type for measurements.
+
+{
+  "Unit Id": "123",
+  "Command": "Electrode",
+  "Type": "CuCuSO4",
+  "timestamp": "2025-10-11T11:19:38.508Z", 
+  "sender": "frontend"
+}
+
+Fields:
+- Type: "CuCuSO4", "Zinc", "AgAgSO4", or "Custom"
+
+8. ALARM CONFIGURATION
+----------------------
+Alarm settings with different types.
+
+{
+  "Unit Id": "123",
+  "Command": "Alarm",
+  "setup": {
+    "value": "10.5",
+    "threshold": "15.0", 
+    "enabled": true
+  },
+  "setop": {
+    "value": "8.2",
+    "threshold": "12.0",
+    "enabled": false
+  },
+  "reffcal": {
+    "value": "5.5",
+    "calibration": "1.025",
+    "enabled": true
+  },
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Fields:
+- setup: Set UP alarm (value, threshold, enabled)
+- setop: Set OP alarm (value, threshold, enabled)  
+- reffcal: Reference calibration (value, calibration, enabled)
+
+===============================================================================
+MQTT TOPICS
+===============================================================================
+
+Device Commands: devices/123/commands
+Device Data: devices/123/data  
+Device Status: devices/123/status
+
+===============================================================================
+DATA TYPES
+===============================================================================
+
+- "Unit Id": String (device ID like "123")
+- "Command": String (command name like "Manual", "Timer")
+- Dates: String in YYYY-MM-DD format (like "2025-10-13")
+- Times: String in HH:MM format (like "08:30")
+- Numbers: Integer values (like 30, 60)
+- Booleans: true or false
+- Objects: Nested data like TON/TOFF or alarm configs
+
+===============================================================================
+NOTES
+===============================================================================
+
+- All commands must include Unit Id, Command, timestamp, sender
+- Use readable field names that match the UI
+- Keep structure flat when possible
+- Dates/times in standard formats
+- Device processes commands immediately
+- No response expected back to sender

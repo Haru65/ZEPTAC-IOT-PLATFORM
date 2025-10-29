@@ -4,6 +4,7 @@ import {
   type RouteRecordRaw,
 } from "vue-router";
 import { useConfigStore } from "@/stores/config";
+import { useAuthStore } from "@/stores/auth";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -12,6 +13,7 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: "",
+        name: "home",
         redirect: "/dashboard"
       },
       {
@@ -57,6 +59,15 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Alarms",
           breadcrumbs: ["IOT", "Alarms"],
+        },
+      },
+      {
+        path: "/device-status",
+        name: "device-status",
+        component: () => import("@/components/iot/DeviceStatusDashboard.vue"),
+        meta: {
+          pageTitle: "Device Status Dashboard",
+          breadcrumbs: ["IOT", "Device Status"],
         },
       },
       {
@@ -450,8 +461,41 @@ const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
+    path: "/",
+    component: () => import("@/layouts/AuthLayout.vue"),
+    children: [
+      {
+        path: "/login",
+        name: "login",
+        component: () =>
+          import("@/views/crafted/authentication/basic-flow/SignIn.vue"),
+        meta: {
+          pageTitle: "Login",
+        },
+      },
+      {
+        path: "/register",
+        name: "register", 
+        component: () =>
+          import("@/views/crafted/authentication/basic-flow/SignUp.vue"),
+        meta: {
+          pageTitle: "Register",
+        },
+      },
+      {
+        path: "/password-reset",
+        name: "password-reset",
+        component: () =>
+          import("@/views/crafted/authentication/basic-flow/PasswordReset.vue"),
+        meta: {
+          pageTitle: "Password Reset",
+        },
+      },
+    ],
+  },
+  {
     path: "/:pathMatch(.*)*",
-    redirect: "/dashboard",
+    redirect: "/",
   },
 ];
 
@@ -462,6 +506,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const configStore = useConfigStore();
+  const authStore = useAuthStore();
 
   // current page view title
   document.title = `${to.meta.pageTitle} - ${import.meta.env.VITE_APP_NAME}`;
@@ -469,8 +514,32 @@ router.beforeEach((to, from, next) => {
   // reset config to initial state
   configStore.resetLayoutConfig();
 
-  // Always allow navigation
-  next();
+  // Routes that don't require authentication
+  const publicRoutes = ['login', 'register', 'password-reset'];
+  
+  // Check if the route requires authentication
+  const requiresAuth = !publicRoutes.includes(to.name as string);
+
+  // Handle root path routing based on authentication status
+  if (to.name === 'home' || to.path === '/') {
+    if (authStore.isAuthenticated) {
+      next({ name: 'dashboard' });
+    } else {
+      next({ name: 'login' });
+    }
+    return;
+  }
+
+  if (requiresAuth && !authStore.isAuthenticated) {
+    // Redirect to login if not authenticated
+    next({ name: 'login' });
+  } else if (!requiresAuth && authStore.isAuthenticated) {
+    // Redirect to dashboard if already authenticated and trying to access auth pages
+    next({ name: 'dashboard' });
+  } else {
+    // Allow navigation
+    next();
+  }
 
   // Scroll page to top on every route change
   window.scrollTo({

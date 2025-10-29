@@ -1,0 +1,1102 @@
+===============================================================================
+                    ZEPTAC IOT COMPLETE DOCUMENTATION
+                         MQTT Command Format & Parameter Mapping
+===============================================================================
+
+TABLE OF CONTENTS
+=================
+1. Overview & System Introduction
+2. Basic Payload Structure
+3. Device Control Commands (All 8 Commands)
+4. Parameter Mapping Guide
+5. Command Structure Variations
+6. Data Types & Validation
+7. MQTT Topics & Communication
+8. Implementation Examples
+9. Troubleshooting Guide
+10. Quick Reference
+
+===============================================================================
+1. OVERVIEW & SYSTEM INTRODUCTION
+===============================================================================
+
+WHAT IS THIS DOCUMENT?
+----------------------
+This is the complete technical documentation for the Zeptac IoT MQTT messaging
+system. It covers both the data format specifications and detailed parameter
+mappings that explain which JSON keys correspond to which device parameters.
+
+MQTT MESSAGING SYSTEM
+---------------------
+The Zeptac IoT Platform uses MQTT (Message Queuing Telemetry Transport) to
+communicate with IoT devices. All commands follow a standardized JSON format
+that is both human-readable and device-friendly.
+
+KEY PRINCIPLES
+--------------
+- Flat JSON structure for easy parsing
+- Human-readable field names matching UI displays
+- Consistent standard fields across all commands
+- No acknowledgment required for faster response
+- Self-documenting parameter names
+
+===============================================================================
+2. BASIC PAYLOAD STRUCTURE
+===============================================================================
+
+STANDARD FORMAT
+---------------
+All device commands use this basic structure:
+
+{
+  "Unit Id": "123",
+  "Command": "CommandName",
+  "field1": "value1",
+  "field2": "value2",
+  "timestamp": "2025-10-18T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+REQUIRED FIELDS (Always Present)
+--------------------------------
+Field Name    → Device Parameter    → Data Type    → Description
+"Unit Id"     → Device Identifier   → String       → Target device ID (e.g., "123")
+"Command"     → Command Type        → String       → What operation to perform
+"timestamp"   → Send Time          → ISO Date     → When command was generated
+"sender"      → Source             → String       → Who sent command (always "frontend")
+
+===============================================================================
+3. DEVICE CONTROL COMMANDS
+===============================================================================
+
+3.1 MANUAL MODE COMMAND
+-----------------------
+Purpose: Direct start/stop control for immediate operations
+
+JSON Structure:
+{
+  "Unit Id": "123",
+  "Command": "Manual",
+  "Action": "start",
+  "timestamp": "2025-10-18T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Parameter Mapping:
+JSON Key        → Device Parameter    → Data Type    → Valid Values
+"Unit Id"       → Device ID          → String       → "123"
+"Command"       → Operation          → String       → "Manual"
+"Action"        → Control Action     → String       → "start" or "stop"
+"timestamp"     → Command Time       → ISO Date     → Auto-generated
+"sender"        → Command Source     → String       → "frontend"
+
+Device Logic:
+- If "Action" = "start": Begin manual operation immediately
+- If "Action" = "stop": Stop manual operation immediately
+
+When to Use:
+- Emergency control situations
+- Testing device functionality
+- One-time operations
+- Manual overrides during maintenance
+
+3.2 NORMAL MODE COMMAND
+-----------------------
+Purpose: Return device to default factory operating state
+
+JSON Structure:
+{
+  "Unit Id": "123",
+  "Command": "Normal",
+  "timestamp": "2025-10-18T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Parameter Mapping:
+JSON Key        → Device Parameter    → Data Type    → Description
+"Unit Id"       → Device ID          → String       → Target device identifier
+"Command"       → Operation          → String       → "Normal" (reset command)
+"timestamp"     → Command Time       → ISO Date     → When command was sent
+"sender"        → Command Source     → String       → Always "frontend"
+
+Device Logic:
+- Reset to factory default operation mode
+- Clear any active schedules or manual overrides
+- Return to autonomous operation
+
+When to Use:
+- After manual testing or troubleshooting
+- To clear conflicting schedules
+- System reset after configuration changes
+- Return to standard monitoring mode
+
+3.3 INTERRUPT MODE COMMAND
+--------------------------
+Purpose: Schedule device with precise on/off timing cycles
+
+JSON Structure:
+{
+  "Unit Id": "123",
+  "Command": "Interrupt",
+  "Start date": "2025-10-20",
+  "Start time": "08:30",
+  "Stop date": "2025-10-21",
+  "Stop time": "17:45",
+  "On time": 30,
+  "Off time": 60,
+  "timestamp": "2025-10-18T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Parameter Mapping:
+JSON Key        → Device Parameter    → Data Type    → Example/Format
+"Unit Id"       → Device ID          → String       → "123"
+"Command"       → Operation          → String       → "Interrupt"
+"Start date"    → Begin Date         → Date String  → "2025-10-20" (YYYY-MM-DD)
+"Start time"    → Begin Time         → Time String  → "08:30" (HH:MM)
+"Stop date"     → End Date           → Date String  → "2025-10-21" (YYYY-MM-DD)
+"Stop time"     → End Time           → Time String  → "17:45" (HH:MM)
+"On time"       → Active Duration    → Integer      → 30 (seconds device stays on)
+"Off time"      → Idle Duration      → Integer      → 60 (seconds device stays off)
+"timestamp"     → Command Time       → ISO Date     → Auto-generated
+"sender"        → Command Source     → String       → "frontend"
+
+Device Logic:
+- Wait until "Start date" + "Start time"
+- Begin operation cycles: ON for "On time" seconds, OFF for "Off time" seconds
+- Continue cycling until "Stop date" + "Stop time"
+- Return to idle state after schedule completes
+
+When to Use:
+- Regular monitoring schedules (e.g., daily 6 AM to 6 PM)
+- Energy-efficient operation patterns
+- Compliance monitoring with specific timing requirements
+- Battery-powered devices needing power management
+
+3.4 DPOL MODE COMMAND (Data Polling)
+------------------------------------
+Purpose: Continuous data collection during specific time window
+
+JSON Structure:
+{
+  "Unit Id": "123",
+  "Command": "DPOL",
+  "Start date": "2025-10-20",
+  "Start time": "08:30",
+  "End date": "2025-10-21",
+  "End time": "17:45",
+  "timestamp": "2025-10-18T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Parameter Mapping:
+JSON Key        → Device Parameter    → Data Type    → Example/Format
+"Unit Id"       → Device ID          → String       → "123"
+"Command"       → Operation          → String       → "DPOL"
+"Start date"    → Poll Start Date    → Date String  → "2025-10-20"
+"Start time"    → Poll Start Time    → Time String  → "08:30"
+"End date"      → Poll End Date      → Date String  → "2025-10-21"
+"End time"      → Poll End Time      → Time String  → "17:45"
+"timestamp"     → Command Time       → ISO Date     → Auto-generated
+"sender"        → Command Source     → String       → "frontend"
+
+Device Logic:
+- Begin continuous data polling at "Start date" + "Start time"
+- Collect and transmit data at device's configured interval
+- Continue until "End date" + "End time"
+- Higher frequency data collection than normal operation
+
+When to Use:
+- Research and analysis projects
+- Troubleshooting device or environmental issues
+- Calibration and validation procedures
+- High-resolution data collection periods
+
+3.5 INST MODE COMMAND (Instantaneous)
+-------------------------------------
+Purpose: Scheduled single measurements with repeat patterns
+
+JSON Structure:
+{
+  "Unit Id": "123",
+  "Command": "INST",
+  "Start date": "2025-10-20",
+  "Start time": "08:30",
+  "Duration": "daily",
+  "timestamp": "2025-10-18T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Parameter Mapping:
+JSON Key        → Device Parameter    → Data Type    → Valid Values
+"Unit Id"       → Device ID          → String       → "123"
+"Command"       → Operation          → String       → "INST"
+"Start date"    → Schedule Start     → Date String  → "2025-10-20"
+"Start time"    → Schedule Time      → Time String  → "08:30"
+"Duration"      → Repeat Pattern     → String       → "daily" or "weekly"
+"timestamp"     → Command Time       → ISO Date     → Auto-generated
+"sender"        → Command Source     → String       → "frontend"
+
+Duration Options:
+"daily"  → Repeat every day at the same time
+"weekly" → Repeat every week on the same day and time
+
+Device Logic:
+- Wait until "Start date" + "Start time"
+- Take single instantaneous measurement
+- If "Duration" = "daily": Schedule next measurement for same time tomorrow
+- If "Duration" = "weekly": Schedule next measurement for same day/time next week
+- Continue repeating until new command received
+
+When to Use:
+- Daily health checks at specific times
+- Weekly compliance measurements
+- Regular calibration checks
+- Scheduled maintenance measurements
+
+3.6 TIMER CONFIGURATION COMMAND
+-------------------------------
+Purpose: Configure internal device timing parameters
+
+JSON Structure:
+{
+  "Unit Id": "123",
+  "Command": "Timer",
+  "TON": {
+    "field1": "10", "field2": "20", "field3": "30",
+    "field4": "40", "field5": "50", "field6": "60"
+  },
+  "TOFF": {
+    "field1": "15", "field2": "25", "field3": "35",
+    "field4": "45", "field5": "55", "field6": "65"
+  },
+  "timestamp": "2025-10-18T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Parameter Mapping:
+JSON Key        → Device Parameter    → Data Type    → Description
+"Unit Id"       → Device ID          → String       → Target device
+"Command"       → Operation          → String       → "Timer"
+"TON"           → Timer ON Config    → Object       → ON timing parameters
+"TOFF"          → Timer OFF Config   → Object       → OFF timing parameters
+"timestamp"     → Command Time       → ISO Date     → Auto-generated
+"sender"        → Command Source     → String       → "frontend"
+
+TON Object Fields:
+"field1" → Timer ON Parameter 1  → String → Device-specific timing value
+"field2" → Timer ON Parameter 2  → String → Device-specific timing value
+"field3" → Timer ON Parameter 3  → String → Device-specific timing value
+"field4" → Timer ON Parameter 4  → String → Device-specific timing value
+"field5" → Timer ON Parameter 5  → String → Device-specific timing value
+"field6" → Timer ON Parameter 6  → String → Device-specific timing value
+
+TOFF Object Fields:
+"field1" → Timer OFF Parameter 1 → String → Device-specific timing value
+"field2" → Timer OFF Parameter 2 → String → Device-specific timing value
+"field3" → Timer OFF Parameter 3 → String → Device-specific timing value
+"field4" → Timer OFF Parameter 4 → String → Device-specific timing value
+"field5" → Timer OFF Parameter 5 → String → Device-specific timing value
+"field6" → Timer OFF Parameter 6 → String → Device-specific timing value
+
+Device Logic:
+- Apply TON values to device's internal timer ON registers
+- Apply TOFF values to device's internal timer OFF registers
+- Each field1-field6 corresponds to specific device timer functions
+- Timer settings persist across mode changes
+
+When to Use:
+- Initial device setup and configuration
+- Optimizing device performance for specific applications
+- Adjusting timing for different environmental conditions
+- Fine-tuning measurement intervals and delays
+
+3.7 ELECTRODE CONFIGURATION COMMAND
+-----------------------------------
+Purpose: Set electrode type for electrochemical measurements
+
+JSON Structure:
+{
+  "Unit Id": "123",
+  "Command": "Electrode",
+  "Type": "CuCuSO4",
+  "timestamp": "2025-10-18T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Parameter Mapping:
+JSON Key        → Device Parameter    → Data Type    → Valid Values
+"Unit Id"       → Device ID          → String       → "123"
+"Command"       → Operation          → String       → "Electrode"
+"Type"          → Electrode Type     → String       → See electrode types below
+"timestamp"     → Command Time       → ISO Date     → Auto-generated
+"sender"        → Command Source     → String       → "frontend"
+
+Electrode Type Options:
+"CuCuSO4"  → Copper Sulfate Electrode (most common for corrosion monitoring)
+"Zinc"     → Zinc Reference Electrode (for specific applications)
+"AgAgSO4"  → Silver Sulfate Electrode (high precision measurements)
+"Custom"   → User-Defined Electrode (for specialized electrodes)
+
+Device Logic:
+- Configure measurement circuit for selected electrode type
+- Adjust voltage references and calibration factors
+- Set appropriate measurement ranges
+- Update internal conversion factors
+
+When to Use:
+- Initial device setup with specific electrode hardware
+- Changing electrode types for different applications
+- Calibration and maintenance procedures
+- Switching between measurement modes
+
+3.8 ALARM CONFIGURATION COMMAND
+-------------------------------
+Purpose: Configure device alarm thresholds and behaviors
+
+JSON Structure:
+{
+  "Unit Id": "123",
+  "Command": "Alarm",
+  "setup": {
+    "value": "10.5",
+    "threshold": "15.0",
+    "enabled": true
+  },
+  "setop": {
+    "value": "8.2",
+    "threshold": "12.0",
+    "enabled": false
+  },
+  "reffcal": {
+    "value": "5.5",
+    "calibration": "1.025",
+    "enabled": true
+  },
+  "timestamp": "2025-10-18T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Parameter Mapping:
+JSON Key        → Device Parameter    → Data Type    → Description
+"Unit Id"       → Device ID          → String       → Target device
+"Command"       → Operation          → String       → "Alarm"
+"setup"         → Setup Alarm Config → Object       → Setup alarm parameters
+"setop"         → SetOP Alarm Config → Object       → Operation alarm parameters
+"reffcal"       → RefCal Alarm Config→ Object       → Reference calibration alarms
+"timestamp"     → Command Time       → ISO Date     → Auto-generated
+"sender"        → Command Source     → String       → "frontend"
+
+Setup Alarm Object:
+"value"     → Trigger Value     → String  → Measurement that triggers alarm
+"threshold" → Threshold Limit   → String  → Upper/lower bound for alarm
+"enabled"   → Alarm Active      → Boolean → true = alarm enabled, false = disabled
+
+SetOP Alarm Object:
+"value"     → Trigger Value     → String  → Operation phase trigger value
+"threshold" → Threshold Limit   → String  → Operation phase threshold
+"enabled"   → Alarm Active      → Boolean → Operation alarm on/off
+
+RefCal Alarm Object:
+"value"       → Reference Value → String  → Reference measurement value
+"calibration" → Cal Factor     → String  → Calibration multiplier (e.g., "1.025")
+"enabled"     → Alarm Active   → Boolean → Calibration alarm on/off
+
+Device Logic:
+- Monitor measurements against configured thresholds
+- Trigger alarms when values exceed limits
+- Apply calibration factors to raw measurements
+- Send alarm notifications via configured channels
+
+When to Use:
+- Setting up safety monitoring systems
+- Compliance with regulatory thresholds
+- Early warning systems for equipment protection
+- Quality control and process monitoring
+
+===============================================================================
+4. PARAMETER MAPPING GUIDE
+===============================================================================
+
+COMMAND IDENTIFICATION PROCESS
+------------------------------
+Step 1: Device receives JSON message via MQTT
+Step 2: Parse JSON and extract "Unit Id" field
+Step 3: Verify "Unit Id" matches device identifier
+Step 4: Extract "Command" field to determine operation type
+Step 5: Route to appropriate command handler function
+
+PARAMETER EXTRACTION LOGIC
+--------------------------
+Each command handler expects specific JSON keys:
+
+Manual Mode Handler:
+- Looks for "Action" field
+- Validates value is "start" or "stop"
+- Executes immediate control
+
+Normal Mode Handler:
+- No additional parameters required
+- Executes reset to default state
+
+Interrupt Mode Handler:
+- Extracts date/time fields: "Start date", "Start time", "Stop date", "Stop time"
+- Extracts timing fields: "On time", "Off time"
+- Validates date/time formats and ranges
+- Sets up scheduled operation
+
+DPOL Mode Handler:
+- Extracts polling window: "Start date", "Start time", "End date", "End time"
+- Validates time window is in future
+- Configures continuous data collection
+
+INST Mode Handler:
+- Extracts schedule: "Start date", "Start time", "Duration"
+- Validates duration value ("daily" or "weekly")
+- Sets up repeating measurement schedule
+
+Timer Configuration Handler:
+- Extracts TON object with field1-field6
+- Extracts TOFF object with field1-field6
+- Applies values to internal timer registers
+
+Electrode Configuration Handler:
+- Extracts "Type" field
+- Validates against supported electrode types
+- Configures measurement circuit
+
+Alarm Configuration Handler:
+- Extracts alarm objects: "setup", "setop", "reffcal"
+- Validates threshold values and enable flags
+- Configures monitoring system
+
+===============================================================================
+5. COMMAND STRUCTURE VARIATIONS
+===============================================================================
+
+PATTERN 1: SIMPLE COMMANDS
+--------------------------
+Structure: Standard fields only
+Commands: Normal Mode
+Characteristics:
+- Minimal payload size
+- No additional parameters
+- Fast processing
+- Reset/default operations
+
+Example:
+{
+  "Unit Id": "123",
+  "Command": "Normal",
+  "timestamp": "...",
+  "sender": "frontend"
+}
+
+PATTERN 2: SINGLE PARAMETER COMMANDS
+-----------------------------------
+Structure: Standard fields + one data field
+Commands: Manual Mode, Electrode Configuration
+Characteristics:
+- Simple parameter validation
+- Single action or selection
+- Quick device response
+
+Example:
+{
+  "Unit Id": "123",
+  "Command": "Manual",
+  "Action": "start",
+  "timestamp": "...",
+  "sender": "frontend"
+}
+
+PATTERN 3: MULTI-PARAMETER COMMANDS
+----------------------------------
+Structure: Standard fields + multiple data fields
+Commands: Interrupt Mode, DPOL Mode, INST Mode
+Characteristics:
+- Complex scheduling information
+- Multiple validation steps
+- Time-based operations
+
+Example:
+{
+  "Unit Id": "123",
+  "Command": "Interrupt",
+  "Start date": "2025-10-20",
+  "Start time": "08:30",
+  "Stop date": "2025-10-21",
+  "Stop time": "17:45",
+  "On time": 30,
+  "Off time": 60,
+  "timestamp": "...",
+  "sender": "frontend"
+}
+
+PATTERN 4: NESTED OBJECT COMMANDS
+---------------------------------
+Structure: Standard fields + nested configuration objects
+Commands: Timer Configuration
+Characteristics:
+- Grouped related parameters
+- Complex configuration data
+- Structured validation
+
+Example:
+{
+  "Unit Id": "123",
+  "Command": "Timer",
+  "TON": {"field1": "10", "field2": "20", ...},
+  "TOFF": {"field1": "15", "field2": "25", ...},
+  "timestamp": "...",
+  "sender": "frontend"
+}
+
+PATTERN 5: MIXED STRUCTURE COMMANDS
+----------------------------------
+Structure: Standard fields + simple fields + nested objects
+Commands: Alarm Configuration
+Characteristics:
+- Combination of simple and complex data
+- Multiple configuration sections
+- Advanced feature control
+
+Example:
+{
+  "Unit Id": "123",
+  "Command": "Alarm",
+  "setup": {"value": "10.5", "threshold": "15.0", "enabled": true},
+  "setop": {"value": "8.2", "threshold": "12.0", "enabled": false},
+  "reffcal": {"value": "5.5", "calibration": "1.025", "enabled": true},
+  "timestamp": "...",
+  "sender": "frontend"
+}
+
+===============================================================================
+6. DATA TYPES & VALIDATION
+===============================================================================
+
+STRING FIELDS
+-------------
+Requirements:
+- Must be non-empty strings
+- Case-sensitive matching required
+- UTF-8 encoding supported
+- No length limits unless specified
+
+Examples:
+"Unit Id": "123"           ✓ Valid
+"Command": "Manual"        ✓ Valid
+"Action": "start"          ✓ Valid
+"Type": "CuCuSO4"         ✓ Valid
+
+Common Errors:
+"Unit Id": ""              ✗ Empty string
+"Command": "manual"        ✗ Wrong case
+"Action": "START"          ✗ Wrong case
+
+DATE FIELDS
+-----------
+Format: YYYY-MM-DD (ISO 8601 date format)
+Requirements:
+- Must be valid calendar dates
+- Year must be 4 digits
+- Month must be 01-12
+- Day must be valid for the month
+
+Examples:
+"Start date": "2025-10-20"  ✓ Valid
+"End date": "2025-12-31"    ✓ Valid
+
+Common Errors:
+"Start date": "2025-13-01"  ✗ Invalid month
+"End date": "25-10-20"      ✗ Wrong format
+"Stop date": "2025-02-30"   ✗ Invalid date
+
+TIME FIELDS
+-----------
+Format: HH:MM (24-hour format)
+Requirements:
+- Hours: 00-23
+- Minutes: 00-59
+- Always 5 characters with colon separator
+
+Examples:
+"Start time": "08:30"       ✓ Valid
+"Stop time": "17:45"        ✓ Valid
+"End time": "00:00"         ✓ Valid (midnight)
+"Schedule time": "23:59"    ✓ Valid
+
+Common Errors:
+"Start time": "8:30"        ✗ Missing leading zero
+"Stop time": "17:75"        ✗ Invalid minutes
+"End time": "25:00"         ✗ Invalid hour
+
+INTEGER FIELDS
+--------------
+Requirements:
+- Positive integers only
+- Represent seconds, counts, or quantities
+- No decimal points
+- Range: 1 to 2,147,483,647
+
+Examples:
+"On time": 30               ✓ Valid (30 seconds)
+"Off time": 3600            ✓ Valid (1 hour)
+
+Common Errors:
+"On time": -30              ✗ Negative value
+"Off time": 30.5            ✗ Decimal value
+"duration": 0               ✗ Zero value
+
+BOOLEAN FIELDS
+--------------
+Requirements:
+- Exactly true or false (lowercase)
+- Used for enable/disable flags
+- No string representations
+
+Examples:
+"enabled": true             ✓ Valid
+"active": false             ✓ Valid
+
+Common Errors:
+"enabled": "true"           ✗ String instead of boolean
+"active": 1                 ✗ Number instead of boolean
+"flag": TRUE                ✗ Wrong case
+
+OBJECT FIELDS
+-------------
+Requirements:
+- Must contain required sub-fields
+- Sub-fields follow same validation rules
+- Can be nested structures
+- All required fields must be present
+
+Examples:
+"TON": {                    ✓ Valid
+  "field1": "10",
+  "field2": "20"
+}
+
+"setup": {                  ✓ Valid
+  "value": "10.5",
+  "threshold": "15.0",
+  "enabled": true
+}
+
+ENUM FIELDS
+-----------
+Predefined value sets:
+
+Action Values:
+- "start" ✓
+- "stop" ✓
+
+Duration Values:
+- "daily" ✓
+- "weekly" ✓
+
+Electrode Types:
+- "CuCuSO4" ✓
+- "Zinc" ✓
+- "AgAgSO4" ✓
+- "Custom" ✓
+
+===============================================================================
+7. MQTT TOPICS & COMMUNICATION
+===============================================================================
+
+TOPIC STRUCTURE
+---------------
+Device Commands: devices/{deviceId}/commands
+- Used for: Sending commands to devices
+- Direction: Frontend → Device
+- QoS: 1 (At least once delivery)
+- Retain: false
+
+Device Data: devices/{deviceId}/data
+- Used for: Device telemetry and measurements
+- Direction: Device → Frontend
+- QoS: 0 (Best effort delivery)
+- Retain: false
+
+Device Status: devices/{deviceId}/status
+- Used for: Device health and connection status
+- Direction: Device → Frontend
+- QoS: 1 (At least once delivery)
+- Retain: true (Last status preserved)
+
+COMMUNICATION FLOW
+------------------
+1. Frontend Form Submission
+   - User fills out device configuration form
+   - Frontend validates input data
+   - Form data converted to MQTT JSON format
+
+2. Backend Processing
+   - API endpoint receives form data
+   - Data transformed into standardized MQTT payload
+   - Command published to devices/{deviceId}/commands topic
+   - Immediate HTTP 200 response returned to frontend
+
+3. Device Reception
+   - Device subscribes to devices/{deviceId}/commands topic
+   - Receives MQTT message with JSON payload
+   - Parses JSON and extracts "Unit Id" and "Command"
+   - Routes to appropriate command handler
+   - Executes device configuration or operation
+
+4. No Acknowledgment Required
+   - Backend responds immediately after publishing
+   - No waiting for device confirmation
+   - Faster user experience
+   - Simpler error handling
+
+MQTT BROKER CONFIGURATION
+-------------------------
+Broker: broker.zeptac.com
+Port: 1883
+Authentication: Required
+Username: zeptac_iot
+Password: ZepIOT@123
+Client ID: 123
+Clean Session: true
+Keep Alive: 60 seconds
+
+===============================================================================
+8. IMPLEMENTATION EXAMPLES
+===============================================================================
+
+EXAMPLE 1: DAILY SCHEDULED OPERATION
+------------------------------------
+Scenario: Monitor corrosion every weekday from 6 AM to 6 PM with 5-minute
+measurements every 15 minutes.
+
+Command: Interrupt Mode
+JSON Payload:
+{
+  "Unit Id": "123",
+  "Command": "Interrupt",
+  "Start date": "2025-10-21",  // Monday
+  "Start time": "06:00",       // 6 AM start
+  "Stop date": "2025-10-21",   // Same day
+  "Stop time": "18:00",        // 6 PM stop
+  "On time": 300,              // 5 minutes measurement
+  "Off time": 900,             // 15 minutes wait
+  "timestamp": "2025-10-18T15:30:00.000Z",
+  "sender": "frontend"
+}
+
+Expected Device Behavior:
+- Wait until Monday 6:00 AM
+- Start measurement for 5 minutes
+- Wait 15 minutes
+- Repeat cycle until 6:00 PM
+- Return to idle state
+
+EXAMPLE 2: IMMEDIATE EMERGENCY STOP
+-----------------------------------
+Scenario: Immediately stop all device operations during maintenance.
+
+Command: Manual Mode
+JSON Payload:
+{
+  "Unit Id": "123",
+  "Command": "Manual",
+  "Action": "stop",
+  "timestamp": "2025-10-18T15:30:00.000Z",
+  "sender": "frontend"
+}
+
+Expected Device Behavior:
+- Immediately stop current operation
+- Cancel any scheduled activities
+- Enter manual stop state
+- Wait for next command
+
+EXAMPLE 3: WEEKLY CALIBRATION CHECK
+-----------------------------------
+Scenario: Perform calibration measurement every Friday at 2 PM.
+
+Command: INST Mode
+JSON Payload:
+{
+  "Unit Id": "123",
+  "Command": "INST",
+  "Start date": "2025-10-25",  // Next Friday
+  "Start time": "14:00",       // 2 PM
+  "Duration": "weekly",        // Repeat weekly
+  "timestamp": "2025-10-18T15:30:00.000Z",
+  "sender": "frontend"
+}
+
+Expected Device Behavior:
+- Wait until Friday 2:00 PM
+- Perform single calibration measurement
+- Schedule next measurement for following Friday 2:00 PM
+- Continue weekly pattern
+
+EXAMPLE 4: ALARM SETUP FOR SAFETY MONITORING
+--------------------------------------------
+Scenario: Alert when corrosion exceeds safe limits with email notifications.
+
+Command: Alarm Configuration
+JSON Payload:
+{
+  "Unit Id": "123",
+  "Command": "Alarm",
+  "setup": {
+    "value": "8.0",           // Warning at 8.0 mV
+    "threshold": "10.0",      // Critical at 10.0 mV
+    "enabled": true
+  },
+  "setop": {
+    "value": "12.0",          // Operation limit
+    "threshold": "15.0",      // Shutdown threshold
+    "enabled": true
+  },
+  "reffcal": {
+    "value": "2.5",           // Reference drift
+    "calibration": "1.000",   // No calibration factor
+    "enabled": false          // Disabled for now
+  },
+  "timestamp": "2025-10-18T15:30:00.000Z",
+  "sender": "frontend"
+}
+
+Expected Device Behavior:
+- Monitor measurements continuously
+- Trigger setup alarm if reading >= 8.0 mV
+- Trigger critical alarm if reading >= 10.0 mV
+- Trigger operation alarm if reading >= 12.0 mV
+- Send notifications via configured channels
+
+===============================================================================
+9. TROUBLESHOOTING GUIDE
+===============================================================================
+
+COMMAND NOT EXECUTED
+--------------------
+Symptoms:
+- Device doesn't respond to commands
+- No change in device status
+- Operations don't start as scheduled
+
+Diagnostic Steps:
+1. Verify "Unit Id" matches device identifier exactly
+   - Check for extra spaces, wrong numbers
+   - Ensure case-sensitive match
+
+2. Check "Command" name spelling and capitalization
+   - Must be exact: "Manual", "Normal", "Interrupt", etc.
+   - Not "manual", "MANUAL", or "interrupt"
+
+3. Validate JSON syntax
+   - Use JSON validator to check for syntax errors
+   - Ensure all quotes and brackets are properly matched
+
+4. Confirm all required fields are present
+   - Every command needs Unit Id, Command, timestamp, sender
+   - Check command-specific required fields
+
+Resolution:
+- Fix field values and resend command
+- Verify MQTT broker connectivity
+- Check device logs for error messages
+
+INCORRECT BEHAVIOR
+------------------
+Symptoms:
+- Device executes command but behaves unexpectedly
+- Wrong timing or operation parameters
+- Measurements outside expected ranges
+
+Diagnostic Steps:
+1. Validate data types
+   - Ensure integers are not strings
+   - Check boolean values are true/false, not "true"/"false"
+   - Verify date/time formats
+
+2. Check parameter ranges
+   - Time values must be realistic (On time > 0)
+   - Dates must be in future for scheduled operations
+   - Threshold values must be within device capabilities
+
+3. Verify enum values
+   - Action must be "start" or "stop"
+   - Duration must be "daily" or "weekly"
+   - Electrode types must match supported list
+
+Resolution:
+- Correct data types and ranges
+- Send Normal Mode command to reset device
+- Reconfigure with validated parameters
+
+TIMING ISSUES
+-------------
+Symptoms:
+- Scheduled operations don't start
+- Wrong timing behavior
+- Operations start/stop at unexpected times
+
+Diagnostic Steps:
+1. Check if start time is in the past
+   - Device ignores commands with past start times
+   - Use future dates and times
+
+2. Verify stop time is after start time
+   - End date/time must be later than start date/time
+   - Check for same-day operations with reverse times
+
+3. Consider time zone differences
+   - Device uses local time or UTC
+   - Frontend may send different time zone
+
+4. Verify device clock synchronization
+   - Device clock may be incorrect
+   - Check device time settings
+
+Resolution:
+- Use future dates and correct time ranges
+- Synchronize device clock with server
+- Account for time zone differences
+
+PARAMETER CONFLICTS
+-------------------
+Symptoms:
+- Multiple commands interfering with each other
+- Unexpected mode changes
+- Configuration not applying correctly
+
+Diagnostic Steps:
+1. Check command priority
+   - Manual mode overrides scheduled operations
+   - Normal mode cancels all active commands
+   - Timer/electrode configs apply to current mode
+
+2. Verify only one operation mode active
+   - Don't send Interrupt and DPOL simultaneously
+   - Cancel previous operations before starting new ones
+
+3. Check alarm configuration conflicts
+   - Multiple alarms can be active simultaneously
+   - Ensure threshold values don't conflict
+
+Resolution:
+- Send Normal Mode to clear all operations
+- Send commands in correct sequence
+- Allow time between mode changes
+
+NETWORK CONNECTIVITY ISSUES
+---------------------------
+Symptoms:
+- Commands not reaching device
+- Intermittent device responses
+- Connection timeouts
+
+Diagnostic Steps:
+1. Verify MQTT broker connectivity
+   - Check broker.zeptac.com:1883 accessibility
+   - Test authentication credentials
+
+2. Check device network connection
+   - Verify device has internet connectivity
+   - Test device can reach MQTT broker
+
+3. Monitor MQTT traffic
+   - Use MQTT client tools to monitor topic traffic
+   - Verify messages are being published
+
+Resolution:
+- Fix network connectivity issues
+- Restart MQTT broker if necessary
+- Check firewall settings
+
+===============================================================================
+10. QUICK REFERENCE
+===============================================================================
+
+COMMAND SUMMARY
+---------------
+Manual    | Immediate start/stop control
+Normal    | Reset to default operation
+Interrupt | Scheduled on/off cycles with timing
+DPOL      | Continuous data polling in time window
+INST      | Periodic measurements (daily/weekly)
+Timer     | Configure internal timing parameters
+Electrode | Set electrode type for measurements
+Alarm     | Configure thresholds and notifications
+
+REQUIRED FIELDS FOR ALL COMMANDS
+--------------------------------
+"Unit Id"   → Device identifier (string)
+"Command"   → Command name (string)
+"timestamp" → ISO date when sent (auto-generated)
+"sender"    → Always "frontend" (string)
+
+COMMAND-SPECIFIC FIELDS
+-----------------------
+Manual:    "Action" ("start"/"stop")
+Normal:    (no additional fields)
+Interrupt: "Start date", "Start time", "Stop date", "Stop time", "On time", "Off time"
+DPOL:      "Start date", "Start time", "End date", "End time"
+INST:      "Start date", "Start time", "Duration" ("daily"/"weekly")
+Timer:     "TON" (object), "TOFF" (object)
+Electrode: "Type" ("CuCuSO4"/"Zinc"/"AgAgSO4"/"Custom")
+Alarm:     "setup" (object), "setop" (object), "reffcal" (object)
+
+DATA FORMAT RULES
+-----------------
+Dates:     YYYY-MM-DD (e.g., "2025-10-20")
+Times:     HH:MM (e.g., "08:30", "17:45")
+Integers:  Positive numbers (30, 60, 300)
+Booleans:  true or false (not strings)
+Strings:   Case-sensitive, no spaces
+
+MQTT TOPICS
+-----------
+Commands: devices/123/commands  (frontend → device)
+Data:     devices/123/data      (device → frontend)
+Status:   devices/123/status    (device → frontend)
+
+BROKER CONNECTION
+-----------------
+Host:     broker.zeptac.com
+Port:     1883
+Username: zeptac_iot
+Password: ZepIOT@123
+Client:   123
+
+COMMON ERROR FIXES
+------------------
+Device not responding:    Check Unit Id and Command spelling
+Wrong timing:            Verify date/time formats and future dates
+Parameter ignored:       Check data types (string vs number vs boolean)
+Mode conflict:           Send Normal Mode first, then new command
+Network issues:          Verify MQTT broker connectivity
+
+EMERGENCY PROCEDURES
+--------------------
+Stop all operations:     Manual Mode with "Action": "stop"
+Reset device:            Normal Mode command
+Clear schedules:         Normal Mode, then reconfigure
+
+===============================================================================
+
+DOCUMENT INFORMATION
+====================
+Title: Zeptac IoT Complete Documentation - MQTT Command Format & Parameter Mapping
+Version: 1.0
+Last Updated: October 18, 2025
+Document Type: Final Technical Specification
+Scope: Complete MQTT messaging system for Zeptac IoT Platform
+
+This document combines both the MQTT command format specifications and detailed
+parameter mapping information into one comprehensive reference guide.
+
+For technical support or questions about this documentation, contact:
+Zeptac Technical Support
+Email: support@zeptac.com
+
+===============================================================================

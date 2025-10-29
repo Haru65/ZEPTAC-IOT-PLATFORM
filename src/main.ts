@@ -2,18 +2,42 @@ import { createApp } from "vue";
 import { createPinia } from "pinia";
 import { Tooltip } from "bootstrap";
 import App from "./App.vue";
-// main.js - Add this BEFORE creating the Vue app
+// JSON Parse Error Handling - MUST be before any other imports
 const originalJSONParse = JSON.parse;
 JSON.parse = function(text) {
   try {
-    if (!text || typeof text !== 'string' || text.trim() === '') {
-      console.warn('Empty or invalid JSON data, returning empty object');
+    // Handle empty or invalid inputs
+    if (text === undefined || text === null) {
+      console.warn('JSON.parse called with null/undefined, returning empty object');
       return {};
     }
+    
+    if (typeof text !== 'string') {
+      // If it's already an object, return it
+      if (typeof text === 'object') {
+        return text;
+      }
+      console.warn('JSON.parse called with non-string value:', typeof text, text);
+      return {};
+    }
+    
+    // Handle empty or whitespace-only strings
+    if (text.trim() === '') {
+      console.warn('JSON.parse called with empty string, returning empty object');
+      return {};
+    }
+    
+    // Handle common non-JSON values that might be passed
+    if (text === 'auto' || text === 'end' || text.includes('px') || text.startsWith('#kt_')) {
+      console.warn('JSON.parse called with non-JSON value:', text, 'returning as string');
+      return text;
+    }
+    
     return originalJSONParse.call(this, text);
   } catch (error) {
-    console.error('JSON Parse Error:', error, 'Input:', text);
-    return {};
+    console.warn('JSON Parse Error for input:', text, 'Error:', error.message, 'Returning input as-is');
+    // Return the original text if it's a simple string, otherwise return empty object
+    return typeof text === 'string' ? text : {};
   }
 };
 

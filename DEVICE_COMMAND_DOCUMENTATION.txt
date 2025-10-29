@@ -1,0 +1,458 @@
+===============================================================================
+                    ZEPTAC IOT DEVICE COMMAND DOCUMENTATION
+===============================================================================
+
+OVERVIEW
+--------
+This document describes the MQTT command structure and API endpoints for 
+controlling IoT devices in the Zeptac platform. All commands are sent via 
+MQTT to devices and can be triggered through REST API endpoints.
+
+===============================================================================
+MQTT BROKER CONFIGURATION
+===============================================================================
+
+Broker Details:
+- Host: broker.zeptac.com
+- Port: 1883
+- Username: zeptac_iot
+- Password: ZepIOT@123
+- Client ID: 123 (for device)
+
+MQTT Topics:
+- Command Topic: devices/123/commands (Backend publishes commands here)
+- Data Topic: devices/123/data (Device publishes telemetry data here)
+- Status Topic: devices/123/status (Device publishes connection status here)
+
+===============================================================================
+COMMAND PAYLOAD STRUCTURE
+===============================================================================
+
+All MQTT commands follow this standardized format:
+
+{
+  "command": "<command_type>",
+  "deviceId": "<target_device_id>",
+  "parameters": {
+    // Command-specific parameters (varies by command type)
+  },
+  "timestamp": "<ISO_8601_timestamp>",
+  "sender": "frontend"
+}
+
+Key Descriptions:
+- command: Identifies the type of operation to perform
+- deviceId: Target device identifier (e.g., "123")
+- parameters: Nested object containing command-specific configuration
+- timestamp: When the command was generated (ISO 8601 format)
+- sender: Source of the command (always "frontend" for API-generated commands)
+
+===============================================================================
+DEVICE OPERATING MODES
+===============================================================================
+
+1. INTERRUPT MODE
+-----------------
+Command Type: "interrupt_mode"
+API Endpoint: POST /api/devices/{deviceId}/configure/interrupt-mode
+
+Payload Structure:
+{
+  "command": "interrupt_mode",
+  "deviceId": "123",
+  "parameters": {
+    "mode": "interrupt",
+    "schedule": {
+      "startDateTime": "YYYY-MM-DD HH:MM",
+      "stopDateTime": "YYYY-MM-DD HH:MM",
+      "onTimeSeconds": <integer>,
+      "offTimeSeconds": <integer>
+    },
+    "dateFormat": {
+      "dd": <day>,
+      "mm": <month>,
+      "yy": <year>,
+      "HH": <hour>,
+      "MM": <minute>,
+      "ss": <second>
+    }
+  },
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Required API Body Parameters:
+- startDate: Start date (YYYY-MM-DD)
+- startTime: Start time (HH:MM)
+- stopDate: Stop date (YYYY-MM-DD)
+- stopTime: Stop time (HH:MM)
+- onTime: ON duration in seconds
+- offTime: OFF duration in seconds
+- dateFormat: Optional date format object
+
+2. MANUAL MODE
+--------------
+Command Type: "manual_mode"
+API Endpoint: POST /api/devices/{deviceId}/configure/manual-mode
+
+Payload Structure:
+{
+  "command": "manual_mode",
+  "deviceId": "123",
+  "parameters": {
+    "action": "start|stop"
+  },
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Required API Body Parameters:
+- action: Either "start" or "stop"
+
+3. NORMAL MODE
+--------------
+Command Type: "normal_mode"
+API Endpoint: POST /api/devices/{deviceId}/configure/normal-mode
+
+Payload Structure:
+{
+  "command": "normal_mode",
+  "deviceId": "123",
+  "parameters": {},
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Required API Body Parameters:
+- None (empty object or any additional configuration)
+
+4. DPOL MODE
+------------
+Command Type: "dpol_mode"
+API Endpoint: POST /api/devices/{deviceId}/configure/dpol-mode
+
+Payload Structure:
+{
+  "command": "dpol_mode",
+  "deviceId": "123",
+  "parameters": {
+    "startDate": "YYYY-MM-DD",
+    "startTime": "HH:MM",
+    "endDate": "YYYY-MM-DD",
+    "endTime": "HH:MM",
+    "dateFormat": {
+      "dd": <day>,
+      "mm": <month>,
+      "yy": <year>,
+      "HH": <hour>,
+      "MM": <minute>
+    }
+  },
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Required API Body Parameters:
+- startDate: Start date (YYYY-MM-DD)
+- startTime: Start time (HH:MM)
+- endDate: End date (YYYY-MM-DD)
+- endTime: End time (HH:MM)
+- dateFormat: Optional date format object
+
+5. INST MODE
+------------
+Command Type: "inst_mode"
+API Endpoint: POST /api/devices/{deviceId}/configure/inst-mode
+
+Payload Structure:
+{
+  "command": "inst_mode",
+  "deviceId": "123",
+  "parameters": {
+    "startDate": "YYYY-MM-DD",
+    "startTime": "HH:MM",
+    "duration": "daily|weekly",
+    "dateFormat": {
+      "dd": <day>,
+      "mm": <month>,
+      "yy": <year>,
+      "HH": <hour>,
+      "MM": <minute>
+    }
+  },
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Required API Body Parameters:
+- startDate: Start date (YYYY-MM-DD)
+- startTime: Start time (HH:MM)
+- duration: Either "daily" or "weekly"
+- dateFormat: Optional date format object
+
+===============================================================================
+DEVICE CONFIGURATION COMMANDS
+===============================================================================
+
+6. TIMER CONFIGURATION
+-----------------------
+Command Type: "timer_config"
+API Endpoint: POST /api/devices/{deviceId}/configure/timer
+
+Payload Structure:
+{
+  "command": "timer_config",
+  "deviceId": "123",
+  "parameters": {
+    "ton": {
+      "field1": "<value>",
+      "field2": "<value>",
+      "field3": "<value>",
+      "field4": "<value>",
+      "field5": "<value>",
+      "field6": "<value>"
+    },
+    "toff": {
+      "field1": "<value>",
+      "field2": "<value>",
+      "field3": "<value>",
+      "field4": "<value>",
+      "field5": "<value>",
+      "field6": "<value>"
+    }
+  },
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Required API Body Parameters:
+- ton: Timer ON configuration object with 6 fields
+- toff: Timer OFF configuration object with 6 fields
+
+7. ELECTRODE CONFIGURATION
+---------------------------
+Command Type: "electrode_config"
+API Endpoint: POST /api/devices/{deviceId}/configure/electrode
+
+Payload Structure:
+{
+  "command": "electrode_config",
+  "deviceId": "123",
+  "parameters": {
+    "type": "<electrode_type>"
+  },
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Required API Body Parameters:
+- electrodeType: One of "CuCuSO4", "Zinc", "AgAgSO4", "Custom"
+
+8. ALARM CONFIGURATION
+-----------------------
+Command Type: "alarm_config"
+API Endpoint: POST /api/devices/{deviceId}/configure/alarm
+
+Payload Structure:
+{
+  "command": "alarm_config",
+  "deviceId": "123",
+  "parameters": {
+    "setup": {
+      "value": "<alarm_value>",
+      "threshold": "<threshold_value>",
+      "enabled": true|false
+    },
+    "setop": {
+      "value": "<alarm_value>",
+      "threshold": "<threshold_value>",
+      "enabled": true|false
+    },
+    "reffcal": {
+      "value": "<alarm_value>",
+      "calibration": "<calibration_factor>",
+      "enabled": true|false
+    }
+  },
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "sender": "frontend"
+}
+
+Required API Body Parameters:
+- Alarm configuration object with optional setup, setop, and reffcal sections
+
+===============================================================================
+API ENDPOINTS SUMMARY
+===============================================================================
+
+Base URL: http://localhost:3001/api
+
+Device Configuration Endpoints:
+- POST /devices/{deviceId}/configure/interrupt-mode
+- POST /devices/{deviceId}/configure/manual-mode
+- POST /devices/{deviceId}/configure/normal-mode
+- POST /devices/{deviceId}/configure/dpol-mode
+- POST /devices/{deviceId}/configure/inst-mode
+- POST /devices/{deviceId}/configure/timer
+- POST /devices/{deviceId}/configure/electrode
+- POST /devices/{deviceId}/configure/alarm
+
+Device Status Endpoint:
+- GET /devices/{deviceId}/status
+
+All endpoints require:
+- Content-Type: application/json
+- Valid JSON body with required parameters
+
+Response Format:
+{
+  "success": true,
+  "message": "<confirmation_message>"
+}
+
+===============================================================================
+HISTORICAL PAYLOAD FORMATS (DEPRECATED)
+===============================================================================
+
+Previous Command Format (NO LONGER USED):
+{
+  "commandId": "cmd_1760181418446_nburu2mxm",
+  "timestamp": "2025-10-11T11:16:58.446Z",
+  "command": "manual_mode",
+  "parameters": {
+    "action": "start"
+  }
+}
+
+Key Differences from Current Format:
+- Used "commandId" instead of "deviceId"
+- Did not include "sender" field
+- Simpler parameter structure for some commands
+
+===============================================================================
+DEVICE TELEMETRY DATA FORMAT
+===============================================================================
+
+Sample Device Data (Published to devices/123/data):
+{
+  "LOG": 33,
+  "ACI": "0.0",
+  "LONGITUDE": 0,
+  "DCI": "0.0",
+  "EVENT": "NORMAL",
+  "TimeStamp": "2025-10-11 14:30:25",
+  "ACV": "0.0",
+  "OCV": "0.0",
+  "REF1": "5.00",
+  "REF2": "5.00",
+  "API": "AAAA-BBBB-DDDD",
+  "SPN": 2999000000130205,
+  "LATITUDE": 0,
+  "MODE": "normal",
+  "STATUS": "online"
+}
+
+Device Status Messages (Published to devices/123/status):
+{
+  "status": "online|offline",
+  "timestamp": "2025-10-11T11:19:38.508Z",
+  "clientId": "123",
+  "mode": "current_operating_mode"
+}
+
+===============================================================================
+POWERSHELL TESTING COMMANDS
+===============================================================================
+
+Example PowerShell commands for testing API endpoints:
+
+1. Manual Mode Start:
+$body = @{ action = 'start' } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri 'http://localhost:3001/api/devices/123/configure/manual-mode' -ContentType 'application/json' -Body $body
+
+2. Interrupt Mode Configuration:
+$body = @{
+  startDate = '2025-10-13'
+  startTime = '08:30'
+  stopDate = '2025-10-14'
+  stopTime = '08:13'
+  onTime = 30
+  offTime = 30
+  dateFormat = @{
+    dd = 13
+    mm = 10
+    yy = 25
+    HH = 8
+    MM = 30
+    ss = 0
+  }
+} | ConvertTo-Json -Depth 3
+Invoke-RestMethod -Method Post -Uri 'http://localhost:3001/api/devices/123/configure/interrupt-mode' -ContentType 'application/json' -Body $body
+
+3. Electrode Configuration:
+$body = @{ electrodeType = 'CuCuSO4' } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri 'http://localhost:3001/api/devices/123/configure/electrode' -ContentType 'application/json' -Body $body
+
+4. Get Device Status:
+Invoke-RestMethod -Method Get -Uri 'http://localhost:3001/api/devices/123/status'
+
+===============================================================================
+TROUBLESHOOTING
+===============================================================================
+
+Common Issues and Solutions:
+
+1. 404 Not Found Error:
+   - Ensure API endpoints include "/api/" prefix
+   - Check backend server is running on port 3001
+
+2. Command Timeout (Historical):
+   - Fixed by removing acknowledgment mechanism
+   - All commands now respond immediately
+
+3. TypeScript Build Errors:
+   - Check for syntax errors in mqtt.service.ts
+   - Ensure all interfaces are properly closed
+
+4. MQTT Connection Issues:
+   - Verify broker credentials (zeptac_iot/ZepIOT@123)
+   - Check broker.zeptac.com:1883 connectivity
+   - Ensure device client ID is unique
+
+5. Frontend Not Loading Device Data:
+   - Fixed by implementing safeDevice fallback
+   - UI now renders immediately without waiting for live data
+
+===============================================================================
+IMPLEMENTATION NOTES
+===============================================================================
+
+Backend Architecture:
+- Express.js server with Socket.io for real-time communication
+- MQTT client using mqtt npm package
+- Device configuration controllers handle API endpoints
+- MQTT service publishes commands to devices
+
+Frontend Architecture:
+- Vue.js 3 with TypeScript
+- Axios for API communication
+- Socket.io client for real-time updates
+- Device details component with configuration modals
+
+Key Features:
+- Immediate API responses (no device acknowledgment required)
+- Consistent MQTT command format across all device modes
+- Real-time device data updates via WebSocket
+- Fallback UI rendering when device data unavailable
+
+===============================================================================
+VERSION HISTORY
+===============================================================================
+
+v1.0 - Initial implementation with acknowledgment system
+v1.1 - Removed acknowledgment mechanism for immediate responses
+v1.2 - Standardized MQTT payload format with deviceId and sender fields
+v1.3 - Fixed API endpoint paths and frontend integration
+v1.4 - Enhanced interrupt mode with nested parameter structure
+
+Last Updated: October 11, 2025

@@ -138,8 +138,15 @@ class DrawerComponent {
       this.lastWidth = parseInt(width);
     } else {
       ElementStyleUtil.set(this.element, "width", "");
-      this.element.classList.remove(this.options.baseClass);
-      this.element.classList.remove(`${this.options.baseClass}-${direction}`);
+      const baseClass = this.options.baseClass?.trim();
+      const directionClass = `${baseClass}-${direction}`.trim();
+      
+      if (baseClass && !baseClass.includes(' ')) {
+        this.element.classList.remove(baseClass);
+      }
+      if (directionClass && !directionClass.includes(' ')) {
+        this.element.classList.remove(directionClass);
+      }
       this._hide();
     }
   };
@@ -191,7 +198,12 @@ class DrawerComponent {
     this._deleteOverlay();
     document.body.removeAttribute(`data-kt-drawer-${this.name}`);
     document.body.removeAttribute(`data-kt-drawer`);
-    this.element.classList.remove(`${this.options.baseClass}-on`);
+    
+    const onClass = `${this.options.baseClass}-on`.trim();
+    if (onClass && !onClass.includes(' ')) {
+      this.element.classList.remove(onClass);
+    }
+    
     if (this.toggleElement != null) {
       this.toggleElement.classList.remove("active");
     }

@@ -1,0 +1,530 @@
+===============================================================================
+                        ZEPTAC IOT PLATFORM USER GUIDE
+===============================================================================
+
+WELCOME TO ZEPTAC IOT
+---------------------
+This guide will help you understand and use the Zeptac IoT Platform to monitor
+and control your IoT devices. The platform provides real-time device control,
+data visualization, and alarm management through an easy-to-use web interface.
+
+===============================================================================
+SYSTEM OVERVIEW
+===============================================================================
+
+WHAT IS ZEPTAC IOT?
+-------------------
+Zeptac IoT is a web-based platform that allows you to:
+- Monitor device status and data in real-time
+- Control device operations remotely
+- Set up automated schedules and timers
+- Configure alarms and notifications
+- View historical data and trends
+- Export data for analysis
+
+SYSTEM COMPONENTS
+-----------------
+1. Web Dashboard - Your main control interface
+2. IoT Devices - Physical devices in the field
+3. MQTT Broker - Communication bridge between dashboard and devices
+4. Database - Stores device data and configurations
+
+HOW IT WORKS
+------------
+1. You configure device settings through the web dashboard
+2. Commands are sent instantly to your devices via MQTT messaging
+3. Devices execute commands and send data back
+4. Dashboard displays real-time status and historical data
+5. Alarms notify you when thresholds are exceeded
+
+===============================================================================
+GETTING STARTED
+===============================================================================
+
+ACCESSING THE PLATFORM
+-----------------------
+1. Open your web browser
+2. Navigate to the Zeptac IoT Platform URL
+3. Enter your username and password
+4. Click "Login" to access the dashboard
+
+MAIN DASHBOARD
+--------------
+After logging in, you'll see:
+- Device List: All your connected devices
+- Status Overview: Quick health check of all devices
+- Recent Alerts: Latest alarms or notifications
+- Data Charts: Real-time graphs of key measurements
+
+NAVIGATION MENU
+---------------
+- Dashboard: Main overview page
+- Devices: Detailed device management
+- Data & Analytics: Historical data and reports
+- Alarms: Alert configuration and history
+- Settings: User preferences and system config
+
+===============================================================================
+DEVICE MANAGEMENT
+===============================================================================
+
+VIEWING DEVICE LIST
+-------------------
+1. Click "Devices" in the main menu
+2. You'll see all your devices with:
+   - Device ID and name
+   - Current status (Online/Offline)
+   - Last data received time
+   - Quick action buttons
+
+DEVICE DETAILS PAGE
+-------------------
+Click on any device to see:
+- Real-time measurements and status
+- Device configuration settings
+- Historical data charts
+- Control buttons for immediate actions
+- Recent command history
+
+DEVICE STATUS INDICATORS
+------------------------
+🟢 Green: Device online and functioning normally
+🟡 Yellow: Device online but has warnings
+🔴 Red: Device offline or has critical errors
+⚪ Gray: Device status unknown
+
+===============================================================================
+DEVICE CONTROL MODES
+===============================================================================
+
+MANUAL MODE
+-----------
+Purpose: Direct control for immediate start/stop
+When to use: Testing, emergency control, or one-time operations
+
+How to use:
+1. Go to Device Details page
+2. Click "Manual Control" section
+3. Click "Start" to begin operation immediately
+4. Click "Stop" to end operation immediately
+
+Best for: Quick tests, emergency stops, maintenance mode
+
+NORMAL MODE
+-----------
+Purpose: Return device to default factory settings
+When to use: Reset device after testing or troubleshooting
+
+How to use:
+1. Go to Device Details page
+2. Click "Normal Mode" button
+3. Confirm the action
+4. Device returns to standard operation
+
+Best for: Resetting after manual control, clearing schedules
+
+INTERRUPT MODE
+--------------
+Purpose: Scheduled operation with precise on/off timing
+When to use: Regular monitoring with specific timing patterns
+
+How to use:
+1. Go to Device Details page
+2. Click "Schedule Control" section
+3. Set start date and time
+4. Set stop date and time
+5. Set "On time" (how long device runs)
+6. Set "Off time" (how long device pauses)
+7. Click "Apply Schedule"
+
+Example: Monitor corrosion every day from 6 AM to 6 PM,
+running for 5 minutes, then pausing for 10 minutes
+
+DPOL MODE (Data Polling)
+------------------------
+Purpose: Continuous data collection during specific time window
+When to use: Intensive data gathering for analysis
+
+How to use:
+1. Go to Device Details page
+2. Click "Data Collection" section
+3. Set start date and time for polling
+4. Set end date and time for polling
+5. Click "Start Data Polling"
+
+Best for: Research, troubleshooting, detailed analysis
+
+INST MODE (Instantaneous)
+-------------------------
+Purpose: Single measurements at scheduled times
+When to use: Regular monitoring without continuous operation
+
+How to use:
+1. Go to Device Details page
+2. Click "Measurement Schedule" section
+3. Set start date and time
+4. Choose "Daily" or "Weekly" repetition
+5. Click "Schedule Measurements"
+
+Best for: Daily health checks, weekly reports
+
+===============================================================================
+DEVICE CONFIGURATION
+===============================================================================
+
+TIMER CONFIGURATION
+-------------------
+Purpose: Set internal timing parameters for device operation
+
+How to configure:
+1. Go to Device Details page
+2. Click "Timer Settings" section
+3. Set TON (Timer ON) values:
+   - Field 1-6: Various timing parameters
+4. Set TOFF (Timer OFF) values:
+   - Field 1-6: Various timing parameters
+5. Click "Apply Timer Config"
+
+Note: Timer values depend on your specific device model.
+Consult device manual for parameter meanings.
+
+ELECTRODE CONFIGURATION
+-----------------------
+Purpose: Set electrode type for electrochemical measurements
+
+Available types:
+- CuCuSO4: Copper Sulfate (most common for corrosion)
+- Zinc: Zinc reference electrode
+- AgAgSO4: Silver Sulfate electrode
+- Custom: User-defined electrode
+
+How to configure:
+1. Go to Device Details page
+2. Click "Electrode Settings" section
+3. Select electrode type from dropdown
+4. Click "Apply Electrode Config"
+
+Choose based on your measurement requirements and electrode
+physically connected to the device.
+
+ALARM CONFIGURATION
+-------------------
+Purpose: Set thresholds for automatic alerts
+
+Alarm types:
+- Setup Alarm: Triggers when values exceed setup threshold
+- SetOP Alarm: Triggers during operation phase
+- RefCal Alarm: Triggers when calibration drifts
+
+How to configure:
+1. Go to Device Details page
+2. Click "Alarm Settings" section
+3. For each alarm type:
+   - Set trigger value
+   - Set threshold limit
+   - Enable/disable the alarm
+4. Click "Apply Alarm Config"
+
+Example: Set setup alarm to trigger when corrosion reading
+exceeds 15.0 mV, with trigger value at 10.0 mV.
+
+===============================================================================
+MONITORING AND DATA
+===============================================================================
+
+REAL-TIME MONITORING
+--------------------
+The dashboard shows live data from your devices:
+- Current measurements update every few seconds
+- Status indicators change in real-time
+- Charts show recent trends
+
+Key metrics typically include:
+- Voltage readings
+- Current measurements
+- Temperature
+- Device health status
+
+HISTORICAL DATA
+---------------
+View past data:
+1. Go to "Data & Analytics" menu
+2. Select device and date range
+3. Choose data type (voltage, current, etc.)
+4. View charts and statistics
+
+Use historical data for:
+- Trend analysis
+- Compliance reporting
+- Troubleshooting issues
+- Performance optimization
+
+DATA EXPORT
+-----------
+Export data for external analysis:
+1. Go to "Data & Analytics" menu
+2. Select device and date range
+3. Choose export format (Excel, CSV)
+4. Click "Export Data"
+5. Download file when ready
+
+Exported files include:
+- Timestamp for each measurement
+- All sensor readings
+- Device status information
+- Alarm events
+
+===============================================================================
+ALARMS AND NOTIFICATIONS
+===============================================================================
+
+ALARM TYPES
+-----------
+The system monitors for:
+- Measurement thresholds exceeded
+- Device communication lost
+- Battery low warnings
+- Calibration drift alerts
+- System errors
+
+VIEWING ALARMS
+--------------
+1. Go to "Alarms" menu
+2. See current active alarms
+3. View alarm history
+4. Filter by device or date range
+
+ALARM ACTIONS
+-------------
+When alarm occurs:
+1. Red indicator appears on dashboard
+2. Email notification sent (if configured)
+3. Alarm logged in history
+4. Device may take automatic action
+
+Managing alarms:
+- Click "Acknowledge" to mark as seen
+- Click "Clear" to resolve the issue
+- Click "Disable" to temporarily stop
+
+SETTING UP NOTIFICATIONS
+------------------------
+Configure email alerts:
+1. Go to "Settings" menu
+2. Click "Notification Settings"
+3. Enter email addresses
+4. Choose which alarms to email
+5. Set notification frequency
+
+===============================================================================
+TROUBLESHOOTING
+===============================================================================
+
+DEVICE SHOWS OFFLINE
+--------------------
+Possible causes:
+- Device power lost
+- Network connection issues
+- Device hardware failure
+
+Steps to resolve:
+1. Check device power supply
+2. Verify network connectivity
+3. Contact support if still offline after 30 minutes
+
+COMMANDS NOT WORKING
+--------------------
+Possible causes:
+- Device in wrong mode
+- Network delay
+- Command conflicts
+
+Steps to resolve:
+1. Wait 2-3 minutes for command processing
+2. Try Normal Mode to reset device
+3. Check device status indicator
+4. Retry the command
+
+DATA NOT UPDATING
+-----------------
+Possible causes:
+- Device in wrong mode
+- Measurement schedule not active
+- Sensor issues
+
+Steps to resolve:
+1. Check device mode (should show active operation)
+2. Verify measurement schedule is running
+3. Try Manual Mode to test device response
+
+INCORRECT READINGS
+------------------
+Possible causes:
+- Wrong electrode configuration
+- Calibration drift
+- Sensor contamination
+
+Steps to resolve:
+1. Verify electrode type matches physical setup
+2. Check calibration settings
+3. Consider sensor cleaning/replacement
+
+===============================================================================
+BEST PRACTICES
+===============================================================================
+
+DAILY OPERATIONS
+----------------
+1. Check dashboard for any red alarms
+2. Verify all devices show green status
+3. Review overnight data for anomalies
+4. Acknowledge any resolved alarms
+
+WEEKLY MAINTENANCE
+------------------
+1. Export data for record keeping
+2. Review alarm history for patterns
+3. Check device settings are correct
+4. Update any scheduled measurements
+
+DEVICE SCHEDULING
+-----------------
+1. Use Interrupt Mode for regular monitoring
+2. Use INST Mode for periodic checks
+3. Avoid overlapping schedules on same device
+4. Allow time between different modes
+
+DATA MANAGEMENT
+---------------
+1. Export data regularly for backup
+2. Set meaningful date ranges for analysis
+3. Use consistent measurement schedules
+4. Document any configuration changes
+
+ALARM MANAGEMENT
+----------------
+1. Set realistic thresholds (not too sensitive)
+2. Test alarm settings before deployment
+3. Acknowledge alarms promptly
+4. Investigate root causes, don't just clear
+
+===============================================================================
+SAFETY AND COMPLIANCE
+===============================================================================
+
+ELECTRICAL SAFETY
+-----------------
+- Devices operate at low voltage for safety
+- Follow installation guidelines for wet environments
+- Ensure proper grounding of all equipment
+- Use appropriate PPE when servicing devices
+
+DATA SECURITY
+--------------
+- Log out when finished using the system
+- Don't share login credentials
+- Report any unauthorized access
+- Keep browser updated for security
+
+ENVIRONMENTAL COMPLIANCE
+-------------------------
+- Export data regularly for regulatory reporting
+- Maintain measurement schedules as required
+- Document all alarm events
+- Keep calibration records current
+
+===============================================================================
+GETTING HELP
+===============================================================================
+
+ONLINE RESOURCES
+----------------
+- User Manual: Detailed technical documentation
+- Video Tutorials: Step-by-step operation guides
+- FAQ: Common questions and answers
+- Knowledge Base: Troubleshooting articles
+
+TECHNICAL SUPPORT
+-----------------
+For technical issues:
+- Email: support@zeptac.com
+- Phone: [Support phone number]
+- Live Chat: Available during business hours
+- Remote Support: Screen sharing for complex issues
+
+When contacting support, provide:
+- Your account/company name
+- Device ID having issues
+- Description of the problem
+- Screenshots if helpful
+- Error messages (exact text)
+
+TRAINING
+--------
+Available training options:
+- Online training modules
+- Live webinars
+- On-site training (for large deployments)
+- Custom training for specific applications
+
+SYSTEM UPDATES
+--------------
+The platform is regularly updated with:
+- New features and improvements
+- Security patches
+- Bug fixes
+- Enhanced compatibility
+
+Updates are applied automatically with minimal downtime.
+Major changes will be announced in advance.
+
+===============================================================================
+APPENDIX: QUICK REFERENCE
+===============================================================================
+
+COMMON DEVICE MODES
+-------------------
+Manual: Immediate start/stop control
+Normal: Reset to default operation  
+Interrupt: Scheduled on/off cycles
+DPOL: Continuous data collection
+INST: Periodic measurements
+
+DEVICE STATUS COLORS
+--------------------
+🟢 Green: Online and normal
+🟡 Yellow: Online with warnings
+🔴 Red: Offline or critical error
+⚪ Gray: Status unknown
+
+TYPICAL OPERATION FLOW
+----------------------
+1. Login to platform
+2. Check device status
+3. Configure measurement schedule
+4. Monitor real-time data
+5. Review alarms
+6. Export data as needed
+7. Logout when finished
+
+EMERGENCY PROCEDURES
+--------------------
+To immediately stop a device:
+1. Go to Device Details
+2. Click Manual Mode
+3. Click "Stop"
+4. Verify device shows stopped status
+
+To reset a problematic device:
+1. Go to Device Details  
+2. Click "Normal Mode"
+3. Wait 2-3 minutes
+4. Reconfigure as needed
+
+===============================================================================
+
+For additional help or questions not covered in this guide, please contact
+Zeptac technical support or refer to the online knowledge base.
+
+Last Updated: October 18, 2025
+Version: 1.0

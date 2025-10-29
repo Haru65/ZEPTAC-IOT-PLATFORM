@@ -62,8 +62,8 @@ export const useAuthStore = defineStore("auth", () => {
   
   const user = ref<User>(defaultUser);
   
-  // Authentication state - only auto-authenticated in development
-  const isAuthenticated = ref(isDevelopment ? true : false);
+  // Authentication state - disable auto-auth, require real login
+  const isAuthenticated = ref(false);
   const companyDetails = ref<CompanyDetails>(user.value.company_details);
   const selectedFinancialYear = ref<string>(getCurrentFinancialYear("1")); 
   const financialYearType = ref<string>("1");
@@ -72,17 +72,24 @@ export const useAuthStore = defineStore("auth", () => {
   // Initialize from stored data if available
   function initializeFromStorage() {
     try {
-      const storedUser = localStorage.getItem('user');
-      const storedAuth = localStorage.getItem('isAuthenticated');
+      // For development/testing - always start with clean state
+      // This ensures users see the sign-in page first
+      console.log('🔄 Initializing auth state...');
+      
+      // Clear any existing authentication state
+      isAuthenticated.value = false;
+      user.value = defaultUser;
+      
+      // Clear localStorage to ensure fresh start
+      localStorage.removeItem('user');
+      localStorage.removeItem('isAuthenticated');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      
+      console.log('✅ Auth state cleared - user must sign in');
+      
       const storedFinancialYear = localStorage.getItem('selectedFinancialYear');
       const storedFinancialYearType = localStorage.getItem('financialYearType');
-
-      if (storedUser && storedAuth === 'true') {
-        const parsedUser = JSON.parse(storedUser);
-        user.value = { ...defaultUser, ...parsedUser };
-        companyDetails.value = user.value.company_details;
-        isAuthenticated.value = true;
-      }
 
       if (storedFinancialYear) {
         selectedFinancialYear.value = storedFinancialYear;
@@ -95,7 +102,12 @@ export const useAuthStore = defineStore("auth", () => {
       console.error('Error initializing from storage:', error);
       // Reset to defaults if there's an error
       user.value = defaultUser;
-      isAuthenticated.value = isDevelopment;
+      isAuthenticated.value = false;
+      // Clear storage
+      localStorage.removeItem('user');
+      localStorage.removeItem('isAuthenticated');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
     }
   }
 
@@ -290,19 +302,34 @@ function GetUser() {
 
   async function login(credentials: User) {
     try {
-      if (isDevelopment) {
-        // Auto-login with demo user in development mode
-        console.log('Auto-login with demo user');
+      errors.value = {};
+      
+      // Prepare login payload
+      const loginPayload = {
+        username: credentials.email, // Backend expects username but we'll use email
+        password: credentials.password
+      };
+
+      console.log('🔐 Attempting login with backend...');
+      
+      // Call real backend authentication
+      const response = await ApiService.post('/auth/login', loginPayload);
+      
+      if (response?.data?.success) {
+        const { user: userData, accessToken, refreshToken } = response.data.data;
         
-        const demoUser = {
-          first_name: credentials.email?.split('@')[0] || "Demo",
-          last_name: "User",
-          email: credentials.email || "demo@example.com",
-          role_id: "1",
-          api_token: "demo-token",
+        console.log('✅ Login successful:', userData);
+        
+        // Transform backend user data to frontend format
+        const transformedUser = {
+          first_name: userData.username?.split('@')[0] || userData.username || "User",
+          last_name: "",
+          email: userData.email || credentials.email,
+          role_id: userData.role === 'admin' ? '1' : userData.role === 'operator' ? '2' : '3',
+          api_token: accessToken,
           company_details: {
             company_id: 1,
-            company_name: "Demo Company",
+            company_name: "Zeptac IoT",
             financial_year_type: "1",
             is_active: 1,
             is_trial: false,
@@ -312,8 +339,23 @@ function GetUser() {
           }
         };
         
-        await setAuth(demoUser);
+        // Set authentication state
+        await setAuth(transformedUser);
         
+        // Store tokens securely
+        try {
+          localStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('refreshToken', refreshToken);
+          
+          // Set authorization header for future requests
+          if (ApiService.vueInstance?.axios) {
+            ApiService.vueInstance.axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+          }
+        } catch (error) {
+          console.warn('Could not save tokens to localStorage:', error);
+        }
+        
+        // Set up financial year data
         financialYearType.value = "1";
         try {
           localStorage.setItem('financialYearType', "1");
@@ -333,64 +375,155 @@ function GetUser() {
         return {
           data: {
             success: true,
-            data: demoUser
+            data: transformedUser
           }
         };
       } else {
-        // Production login logic
-        const response = await ApiService.post('/login', credentials);
-        
-        if (response?.data) {
-          await setAuth(response.data);
-          
-          // Set up financial year data
-          const fyType = response.data.company_details?.financial_year_type || "1";
-          financialYearType.value = fyType;
-          financialYearsCache.value = getAcademicYears(5, fyType);
-          selectedFinancialYear.value = getCurrentFinancialYear(fyType);
-          
-          try {
-            localStorage.setItem('financialYearType', fyType);
-            localStorage.setItem('selectedFinancialYear', selectedFinancialYear.value);
-          } catch (error) {
-            console.warn('Could not save to localStorage:', error);
-          }
-          
-          return response;
-        } else {
-          throw new Error('Invalid response from server');
-        }
+        // Handle unsuccessful response
+        errors.value = { general: response.data?.error || 'Login failed' };
+        console.error('❌ Login failed:', response.data);
+        throw new Error(response.data?.error || 'Login failed');
       }
-    } catch (error) {
-      console.error('Login error:', error);
+      
+    } catch (error: any) {
+      console.error('❌ Login error:', error);
+      
+      // Handle different types of errors
+      if (error.response) {
+        // Server responded with error status
+        const errorMsg = error.response.data?.error || error.response.data?.message || 'Login failed';
+        errors.value = { general: errorMsg };
+      } else if (error.request) {
+        // Network error
+        errors.value = { general: 'Network error. Please check your connection and try again.' };
+      } else {
+        // Other error
+        errors.value = { general: 'An unexpected error occurred. Please try again.' };
+      }
+      
       setError(error);
       throw error;
     }
   }
 
   function logout() {
-    purgeAuth();
+    // Clear authentication state
+    isAuthenticated.value = false;
+    user.value = defaultUser;
+    errors.value = {};
+    
+    // Clear localStorage
+    try {
+      localStorage.removeItem('user');
+      localStorage.removeItem('isAuthenticated');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('financialYearType');
+      localStorage.removeItem('selectedFinancialYear');
+    } catch (error) {
+      console.warn('Could not clear localStorage:', error);
+    }
+    
+    // Clear authorization header
+    if (ApiService.vueInstance?.axios) {
+      delete ApiService.vueInstance.axios.defaults.headers.common['Authorization'];
+    }
+    
+    // Clear JWT service tokens if available
+    try {
+      JwtService.destroyToken?.();
+      JwtService.destroyUser?.();
+    } catch (error) {
+      console.warn('Could not destroy JWT token/user:', error);
+    }
+    
+    console.log('🔓 User logged out successfully');
   }
 
   async function register(credentials: User) {
     try {
-      if (isDevelopment) {
-        console.log('Registration attempted - using demo mode');
+      errors.value = {};
+      
+      // Prepare registration payload
+      const registerPayload = {
+        username: credentials.first_name || credentials.email?.split('@')[0] || 'user',
+        email: credentials.email,
+        password: credentials.password,
+        role: 'viewer' // Default role
+      };
+
+      console.log('📝 Attempting registration with backend...');
+      
+      // Call real backend registration
+      const response = await ApiService.post('/auth/register', registerPayload);
+      
+      if (response?.data?.success) {
+        const { user: userData, accessToken, refreshToken } = response.data.data;
+        
+        console.log('✅ Registration successful:', userData);
+        
+        // Transform backend user data to frontend format
+        const transformedUser = {
+          first_name: userData.username || "User",
+          last_name: "",
+          email: userData.email,
+          role_id: userData.role === 'admin' ? '1' : userData.role === 'operator' ? '2' : '3',
+          api_token: accessToken,
+          company_details: {
+            company_id: 1,
+            company_name: "Zeptac IoT",
+            financial_year_type: "1",
+            is_active: 1,
+            is_trial: false,
+            trial_subscription_start: "",
+            trial_subscription_end: "",
+            billing_format: "standard"
+          }
+        };
+        
+        // Set authentication state
+        await setAuth(transformedUser);
+        
+        // Store tokens securely
+        try {
+          localStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('refreshToken', refreshToken);
+          
+          // Set authorization header for future requests
+          if (ApiService.vueInstance?.axios) {
+            ApiService.vueInstance.axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+          }
+        } catch (error) {
+          console.warn('Could not save tokens to localStorage:', error);
+        }
+
         return {
           success: true,
-          data: user.value
+          data: transformedUser
         };
       } else {
-        const response = await ApiService.post('/register', credentials);
-        if (response?.data) {
-          await setAuth(response.data);
-          return response;
-        } else {
-          throw new Error('Invalid response from server');
-        }
+        // Handle unsuccessful response
+        errors.value = { general: response.data?.error || 'Registration failed' };
+        console.error('❌ Registration failed:', response.data);
+        throw new Error(response.data?.error || 'Registration failed');
       }
-    } catch (error) {
-      console.error('Registration error:', error);
+      
+    } catch (error: any) {
+      console.error('❌ Registration error:', error);
+      
+      // Handle different types of errors
+      if (error.response) {
+        // Server responded with error status
+        const errorMsg = error.response.data?.error || error.response.data?.message || 'Registration failed';
+        errors.value = { general: errorMsg };
+      } else if (error.request) {
+        // Network error
+        errors.value = { general: 'Network error. Please check your connection and try again.' };
+      } else {
+        // Other error
+        errors.value = { general: 'An unexpected error occurred. Please try again.' };
+      }
+      
       setError(error);
       throw error;
     }

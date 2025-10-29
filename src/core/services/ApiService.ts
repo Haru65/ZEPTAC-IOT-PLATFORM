@@ -25,6 +25,16 @@ class ApiService {
   }
 
   /**
+   * @description set the default authorization header
+   */
+  public static setHeader(): void {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      ApiService.vueInstance.axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    }
+  }
+
+  /**
    * @description set headers for file uploads
    */
   public static imgsetHeader(): void {

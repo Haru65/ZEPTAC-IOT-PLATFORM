@@ -36,6 +36,16 @@ function toJSON(value: string | JSON): JSON | undefined {
     return undefined;
   }
 
+  // Handle non-JSON strings that should not be parsed
+  if (value === 'auto' || value === 'end' || value.includes('px') || value.startsWith('#kt_') || /^\d+px$/.test(value)) {
+    return undefined;
+  }
+
+  // Only attempt parsing if it looks like JSON (starts with { or [ or is quoted)
+  if (!value.trim().startsWith('{') && !value.trim().startsWith('[') && !value.trim().startsWith('"')) {
+    return undefined;
+  }
+
   // ("'" => "\"");
   const result = value
     .toString()

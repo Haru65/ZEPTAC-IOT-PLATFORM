@@ -61,6 +61,20 @@
         <KTIcon icon-name="plus" icon-class="fs-2" />
         Add Device
       </button>
+      
+      <button 
+        type="button" 
+        class="btn btn-info"
+        @click="showBroadcast = !showBroadcast"
+      >
+        <i class="bi bi-broadcast me-2"></i>
+        {{ showBroadcast ? 'Hide Broadcast' : 'Broadcast Message' }}
+      </button>
+    </div>
+
+    <!-- Broadcast Message Component -->
+    <div v-if="showBroadcast" class="mb-6">
+      <BroadcastMessage />
     </div>
 
     <!-- Devices Grid -->
@@ -86,6 +100,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from "vue";
 import DeviceCardWidget from "@/components/iot/component/dashboard/DeviceCardWidget.vue";
+import BroadcastMessage from "@/components/iot/BroadcastMessage.vue";
 import KTIcon from "@/core/helpers/kt-icon/KTIcon.vue";
 
 // Define the possible status values
@@ -114,12 +129,14 @@ export default defineComponent({
   name: "Devices",
   components: {
     DeviceCardWidget,
+    BroadcastMessage,
     KTIcon,
   },
   setup() {
     // Search and filter state
     const searchQuery = ref("");
     const currentFilter = ref("all");
+    const showBroadcast = ref(false);
 
     // Device data
     const devices = ref<Device[]>([
@@ -183,6 +200,7 @@ export default defineComponent({
     return {
       searchQuery,
       currentFilter,
+      showBroadcast,
       filteredDevices,
       searchItems,
       applyFilter,

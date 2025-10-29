@@ -1,0 +1,488 @@
+===============================================================================
+                    ZEPTAC IOT COMMAND PARAMETER MAPPING GUIDE
+===============================================================================
+
+OVERVIEW
+--------
+This document explains the key-to-parameter mapping for all device commands,
+showing which JSON keys correspond to which device parameters and how different
+commands use different field structures.
+
+===============================================================================
+STANDARD FIELD MAPPING
+===============================================================================
+
+All commands share these standard fields:
+
+JSON Key        → Device Parameter    → Description
+"Unit Id"       → Device Identifier   → Target device ID (e.g. "123")
+"Command"       → Command Type        → What operation to perform
+"timestamp"     → Send Time          → When command was generated
+"sender"        → Source             → Who sent the command (always "frontend")
+
+===============================================================================
+COMMAND-SPECIFIC PARAMETER MAPPING
+===============================================================================
+
+1. INTERRUPT MODE COMMAND
+-------------------------
+Purpose: Schedule device on/off cycles with precise timing
+
+JSON Key        → Device Parameter    → Data Type    → Example
+"Unit Id"       → Device ID          → String       → "123"
+"Command"       → Operation          → String       → "Interrupt"
+"Start date"    → Begin Date         → Date String  → "2025-10-13"
+"Start time"    → Begin Time         → Time String  → "08:30"
+"Stop date"     → End Date           → Date String  → "2025-10-14"
+"Stop time"     → End Time           → Time String  → "17:45"
+"On time"       → Active Duration    → Integer      → 30 (seconds)
+"Off time"      → Idle Duration      → Integer      → 60 (seconds)
+"timestamp"     → Command Time       → ISO Date     → "2025-10-11T11:19:38.508Z"
+"sender"        → Command Source     → String       → "frontend"
+
+Device Logic:
+- Start operation at "Start date" + "Start time"
+- Run cycles of "On time" seconds ON, "Off time" seconds OFF
+- Stop operation at "Stop date" + "Stop time"
+
+2. MANUAL MODE COMMAND
+----------------------
+Purpose: Direct start/stop control without automation
+
+JSON Key        → Device Parameter    → Data Type    → Example
+"Unit Id"       → Device ID          → String       → "123"
+"Command"       → Operation          → String       → "Manual"
+"Action"        → Control Action     → String       → "start" or "stop"
+"timestamp"     → Command Time       → ISO Date     → "2025-10-11T11:19:38.508Z"
+"sender"        → Command Source     → String       → "frontend"
+
+Device Logic:
+- If "Action" = "start": Begin manual operation immediately
+- If "Action" = "stop": Stop manual operation immediately
+
+3. NORMAL MODE COMMAND
+----------------------
+Purpose: Return device to default operating state
+
+JSON Key        → Device Parameter    → Data Type    → Example
+"Unit Id"       → Device ID          → String       → "123"
+"Command"       → Operation          → String       → "Normal"
+"timestamp"     → Command Time       → ISO Date     → "2025-10-11T11:19:38.508Z"
+"sender"        → Command Source     → String       → "frontend"
+
+Device Logic:
+- Reset to factory default operation mode
+- Clear any active schedules or manual overrides
+
+4. DPOL MODE COMMAND
+--------------------
+Purpose: Data polling mode with specific time window
+
+JSON Key        → Device Parameter    → Data Type    → Example
+"Unit Id"       → Device ID          → String       → "123"
+"Command"       → Operation          → String       → "DPOL"
+"Start date"    → Poll Start Date    → Date String  → "2025-10-13"
+"Start time"    → Poll Start Time    → Time String  → "08:30"
+"End date"      → Poll End Date      → Date String  → "2025-10-14"
+"End time"      → Poll End Time      → Time String  → "17:45"
+"timestamp"     → Command Time       → ISO Date     → "2025-10-11T11:19:38.508Z"
+"sender"        → Command Source     → String       → "frontend"
+
+Device Logic:
+- Begin data polling at "Start date" + "Start time"
+- Continue polling until "End date" + "End time"
+- Send data at configured intervals during this window
+
+5. INST MODE COMMAND
+--------------------
+Purpose: Instantaneous measurements with repeat schedule
+
+JSON Key        → Device Parameter    → Data Type    → Example
+"Unit Id"       → Device ID          → String       → "123"
+"Command"       → Operation          → String       → "INST"
+"Start date"    → Schedule Start     → Date String  → "2025-10-13"
+"Start time"    → Schedule Time      → Time String  → "08:30"
+"Duration"      → Repeat Pattern     → String       → "daily" or "weekly"
+"timestamp"     → Command Time       → ISO Date     → "2025-10-11T11:19:38.508Z"
+"sender"        → Command Source     → String       → "frontend"
+
+Device Logic:
+- Start measurements at "Start date" + "Start time"
+- If "Duration" = "daily": Repeat every day at same time
+- If "Duration" = "weekly": Repeat every week at same day/time
+
+6. TIMER CONFIGURATION COMMAND
+-------------------------------
+Purpose: Configure device timing parameters
+
+JSON Key        → Device Parameter    → Data Type    → Example
+"Unit Id"       → Device ID          → String       → "123"
+"Command"       → Operation          → String       → "Timer"
+"TON"           → Timer ON Config    → Object       → {field1: "10", field2: "20", ...}
+"TOFF"          → Timer OFF Config   → Object       → {field1: "15", field2: "25", ...}
+"timestamp"     → Command Time       → ISO Date     → "2025-10-11T11:19:38.508Z"
+"sender"        → Command Source     → String       → "frontend"
+
+TON Object Mapping:
+"field1" → Timer ON Parameter 1  → String → "10"
+"field2" → Timer ON Parameter 2  → String → "20"
+"field3" → Timer ON Parameter 3  → String → "30"
+"field4" → Timer ON Parameter 4  → String → "40"
+"field5" → Timer ON Parameter 5  → String → "50"
+"field6" → Timer ON Parameter 6  → String → "60"
+
+TOFF Object Mapping:
+"field1" → Timer OFF Parameter 1 → String → "15"
+"field2" → Timer OFF Parameter 2 → String → "25"
+"field3" → Timer OFF Parameter 3 → String → "35"
+"field4" → Timer OFF Parameter 4 → String → "45"
+"field5" → Timer OFF Parameter 5 → String → "55"
+"field6" → Timer OFF Parameter 6 → String → "65"
+
+Device Logic:
+- Apply TON values to device's internal timer ON settings
+- Apply TOFF values to device's internal timer OFF settings
+- Each field1-field6 corresponds to specific timer registers
+
+7. ELECTRODE CONFIGURATION COMMAND
+-----------------------------------
+Purpose: Set electrode type for electrochemical measurements
+
+JSON Key        → Device Parameter    → Data Type    → Example
+"Unit Id"       → Device ID          → String       → "123"
+"Command"       → Operation          → String       → "Electrode"
+"Type"          → Electrode Type     → String       → "CuCuSO4"
+"timestamp"     → Command Time       → ISO Date     → "2025-10-11T11:19:38.508Z"
+"sender"        → Command Source     → String       → "frontend"
+
+Electrode Type Mapping:
+"CuCuSO4"  → Copper Sulfate Electrode
+"Zinc"     → Zinc Reference Electrode
+"AgAgSO4"  → Silver Sulfate Electrode
+"Custom"   → User-Defined Electrode
+
+Device Logic:
+- Configure measurement circuit for selected electrode type
+- Adjust voltage references and calibration factors
+- Set appropriate measurement ranges
+
+8. ALARM CONFIGURATION COMMAND
+-------------------------------
+Purpose: Configure device alarm thresholds and behaviors
+
+JSON Key        → Device Parameter    → Data Type    → Example
+"Unit Id"       → Device ID          → String       → "123"
+"Command"       → Operation          → String       → "Alarm"
+"setup"         → Setup Alarm Config → Object       → {value: "10.5", threshold: "15.0", enabled: true}
+"setop"         → SetOP Alarm Config → Object       → {value: "8.2", threshold: "12.0", enabled: false}
+"reffcal"       → RefCal Alarm Config→ Object       → {value: "5.5", calibration: "1.025", enabled: true}
+"timestamp"     → Command Time       → ISO Date     → "2025-10-11T11:19:38.508Z"
+"sender"        → Command Source     → String       → "frontend"
+
+Setup Alarm Object Mapping:
+"value"     → Trigger Value     → String  → "10.5" (measurement that triggers alarm)
+"threshold" → Threshold Limit   → String  → "15.0" (upper/lower bound)
+"enabled"   → Alarm Active      → Boolean → true/false
+
+SetOP Alarm Object Mapping:
+"value"     → Trigger Value     → String  → "8.2"
+"threshold" → Threshold Limit   → String  → "12.0"
+"enabled"   → Alarm Active      → Boolean → true/false
+
+RefCal Alarm Object Mapping:
+"value"       → Reference Value → String  → "5.5"
+"calibration" → Cal Factor     → String  → "1.025" (calibration multiplier)
+"enabled"     → Alarm Active   → Boolean → true/false
+
+Device Logic:
+- Monitor measurements against configured thresholds
+- Trigger alarms when values exceed limits
+- Apply calibration factors to raw measurements
+
+===============================================================================
+COMMAND STRUCTURE VARIATIONS
+===============================================================================
+
+SIMPLE COMMANDS (No Parameters)
+-------------------------------
+Structure: Standard fields only
+Example: Normal Mode
+{
+  "Unit Id": "123",
+  "Command": "Normal",
+  "timestamp": "...",
+  "sender": "frontend"
+}
+
+SINGLE PARAMETER COMMANDS
+-------------------------
+Structure: Standard fields + one data field
+Example: Manual Mode
+{
+  "Unit Id": "123",
+  "Command": "Manual",
+  "Action": "start",
+  "timestamp": "...",
+  "sender": "frontend"
+}
+
+MULTI-PARAMETER COMMANDS
+------------------------
+Structure: Standard fields + multiple data fields
+Example: Interrupt Mode
+{
+  "Unit Id": "123",
+  "Command": "Interrupt",
+  "Start date": "2025-10-13",
+  "Start time": "08:30",
+  "Stop date": "2025-10-14",
+  "Stop time": "17:45",
+  "On time": 30,
+  "Off time": 60,
+  "timestamp": "...",
+  "sender": "frontend"
+}
+
+NESTED OBJECT COMMANDS
+----------------------
+Structure: Standard fields + nested configuration objects
+Example: Timer Configuration
+{
+  "Unit Id": "123",
+  "Command": "Timer",
+  "TON": { "field1": "10", "field2": "20", ... },
+  "TOFF": { "field1": "15", "field2": "25", ... },
+  "timestamp": "...",
+  "sender": "frontend"
+}
+
+MIXED STRUCTURE COMMANDS
+------------------------
+Structure: Standard fields + simple fields + nested objects
+Example: Alarm Configuration
+{
+  "Unit Id": "123",
+  "Command": "Alarm",
+  "setup": { "value": "10.5", "threshold": "15.0", "enabled": true },
+  "setop": { "value": "8.2", "threshold": "12.0", "enabled": false },
+  "reffcal": { "value": "5.5", "calibration": "1.025", "enabled": true },
+  "timestamp": "...",
+  "sender": "frontend"
+}
+
+===============================================================================
+KEY NAMING CONVENTIONS
+===============================================================================
+
+STANDARD KEYS (Always Present)
+------------------------------
+"Unit Id"   → Always identifies target device
+"Command"   → Always identifies operation type
+"timestamp" → Always includes when command was sent
+"sender"    → Always identifies command source
+
+TIME-RELATED KEYS
+-----------------
+"Start date" → Date in YYYY-MM-DD format
+"Start time" → Time in HH:MM format
+"Stop date"  → Date in YYYY-MM-DD format
+"Stop time"  → Time in HH:MM format
+"End date"   → Date in YYYY-MM-DD format
+"End time"   → Time in HH:MM format
+
+DURATION KEYS
+-------------
+"On time"  → Integer seconds for active period
+"Off time" → Integer seconds for inactive period
+"Duration" → String pattern like "daily" or "weekly"
+
+ACTION KEYS
+-----------
+"Action" → String action like "start" or "stop"
+"Type"   → String type selection like electrode types
+
+CONFIGURATION KEYS
+------------------
+"TON"     → Timer ON configuration object
+"TOFF"    → Timer OFF configuration object
+"setup"   → Setup alarm configuration object
+"setop"   → SetOP alarm configuration object
+"reffcal" → Reference calibration configuration object
+
+===============================================================================
+DATA VALIDATION RULES
+===============================================================================
+
+STRING FIELDS
+-------------
+- Must be non-empty strings
+- Case-sensitive matching
+- No special character restrictions
+
+DATE FIELDS
+-----------
+- Must follow YYYY-MM-DD format exactly
+- Must be valid calendar dates
+- Example: "2025-10-13"
+
+TIME FIELDS
+-----------
+- Must follow HH:MM format exactly
+- Must be valid 24-hour time
+- Example: "08:30", "17:45"
+
+INTEGER FIELDS
+--------------
+- Must be positive integers
+- Represent seconds or counts
+- Example: 30, 60, 120
+
+BOOLEAN FIELDS
+--------------
+- Must be exactly true or false
+- Used in alarm configurations
+- Example: true, false
+
+OBJECT FIELDS
+-------------
+- Must contain required sub-fields
+- Sub-fields follow same validation rules
+- Can be nested structures
+
+ENUM FIELDS
+-----------
+Action values: "start", "stop"
+Duration values: "daily", "weekly"
+Electrode types: "CuCuSO4", "Zinc", "AgAgSO4", "Custom"
+
+===============================================================================
+DEVICE PROCESSING LOGIC
+===============================================================================
+
+COMMAND IDENTIFICATION
+----------------------
+1. Device receives JSON message
+2. Extracts "Unit Id" to verify target
+3. Extracts "Command" to determine operation
+4. Routes to appropriate handler function
+
+PARAMETER EXTRACTION
+--------------------
+1. Handler function expects specific keys
+2. Extracts values using exact key names
+3. Validates data types and ranges
+4. Applies default values for missing optional fields
+
+ERROR HANDLING
+--------------
+1. Missing required keys → Command ignored
+2. Invalid data types → Use default values
+3. Out-of-range values → Clamp to valid range
+4. Unknown commands → Log and ignore
+
+EXECUTION ORDER
+---------------
+1. Validate all parameters first
+2. Stop any conflicting operations
+3. Apply new configuration
+4. Start new operation if required
+5. Log command execution
+
+===============================================================================
+TROUBLESHOOTING GUIDE
+===============================================================================
+
+COMMAND NOT EXECUTED
+--------------------
+Check: "Unit Id" matches device ID exactly
+Check: "Command" name spelling and capitalization
+Check: All required fields are present
+Check: JSON syntax is valid
+
+INCORRECT BEHAVIOR
+------------------
+Check: Data types match specifications
+Check: Date/time formats are correct
+Check: Enum values are from valid lists
+Check: Nested objects have required fields
+
+TIMING ISSUES
+-------------
+Check: Start time is not in the past
+Check: Stop time is after start time
+Check: Time zone considerations
+Check: Device clock synchronization
+
+PARAMETER CONFLICTS
+-------------------
+Check: Only one mode command active at a time
+Check: Timer configs don't conflict with schedules
+Check: Alarm thresholds are reasonable
+Check: Electrode type matches measurement mode
+
+===============================================================================
+EXAMPLES BY USE CASE
+===============================================================================
+
+DAILY SCHEDULED OPERATION
+-------------------------
+Use: Interrupt Mode
+Key Parameters:
+- "Start date": Tomorrow's date
+- "Start time": "06:00" (6 AM start)
+- "Stop date": Same as start date
+- "Stop time": "18:00" (6 PM stop)
+- "On time": 300 (5 minutes on)
+- "Off time": 600 (10 minutes off)
+
+IMMEDIATE CONTROL
+-----------------
+Use: Manual Mode
+Key Parameters:
+- "Action": "start" (begin now) or "stop" (end now)
+
+MEASUREMENT SETUP
+-----------------
+Use: Electrode Configuration + INST Mode
+Electrode Parameters:
+- "Type": "CuCuSO4" (for corrosion monitoring)
+INST Parameters:
+- "Start date": Today's date
+- "Start time": "12:00" (noon start)
+- "Duration": "daily" (repeat every day)
+
+ALARM MONITORING
+----------------
+Use: Alarm Configuration
+Key Parameters:
+- "setup": {"value": "10.0", "threshold": "15.0", "enabled": true}
+- Monitor for values above 15.0, trigger at 10.0
+
+===============================================================================
+COMMAND PRIORITY AND CONFLICTS
+===============================================================================
+
+PRIORITY ORDER (Highest to Lowest)
+----------------------------------
+1. Manual Mode (immediate override)
+2. Normal Mode (reset to default)
+3. Interrupt Mode (scheduled operation)
+4. DPOL Mode (data collection)
+5. INST Mode (measurement schedule)
+
+CONFLICT RESOLUTION
+-------------------
+- New command cancels previous operation
+- Timer/Electrode configs apply to current mode
+- Alarm configs run parallel to all modes
+- Multiple alarms can be active simultaneously
+
+CONFIGURATION PERSISTENCE
+-------------------------
+- Timer configurations persist across mode changes
+- Electrode settings persist until changed
+- Alarm configurations persist until disabled
+- Schedule modes (Interrupt, INST) run until completion or override
+
+Last Updated: October 11, 2025
+Document Version: 1.0
