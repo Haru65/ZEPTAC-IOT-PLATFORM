@@ -17,60 +17,65 @@
         />
       </div>
 
-      <!-- Nav Tabs (Filters) -->
-      <ul class="nav nav-tabs mb-5 cursor-pointer">
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            :class="{ active: currentFilter === 'all' }"
-            @click="applyFilter('all')"
-          >
-            All
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            :class="{ active: currentFilter === 'online' }"
-            @click="applyFilter('online')"
-          >
-            Online
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            :class="{ active: currentFilter === 'offline' }"
-            @click="applyFilter('offline')"
-          >
-            Offline
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            :class="{ active: currentFilter === 'warning' }"
-            @click="applyFilter('warning')"
-          >
-            Warning
-          </a>
-        </li>
-      </ul>
-
-      <button type="button" class="btn btn-primary me-3">
-        <KTIcon icon-name="plus" icon-class="fs-2" />
-        Add Device
-      </button>
-      
+      <!-- Add Device Button -->
       <button 
-        type="button" 
-        class="btn btn-info"
-        @click="showBroadcast = !showBroadcast"
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#addDeviceModal"
       >
-        <i class="bi bi-broadcast me-2"></i>
-        {{ showBroadcast ? 'Hide Broadcast' : 'Broadcast Message' }}
+        <i class="bi bi-plus-circle me-2"></i>Add Device
       </button>
     </div>
+
+    <!-- Nav Tabs (Filters) -->
+    <ul class="nav nav-tabs mb-5 cursor-pointer">
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: currentFilter === 'all' }"
+          @click="applyFilter('all')"
+        >
+          All
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: currentFilter === 'online' }"
+          @click="applyFilter('online')"
+        >
+          Online
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: currentFilter === 'offline' }"
+          @click="applyFilter('offline')"
+        >
+          Offline
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: currentFilter === 'warning' }"
+          @click="applyFilter('warning')"
+        >
+          Warning
+        </a>
+      </li>
+    </ul>
+
+    <!-- Broadcast Message Button -->
+    <button 
+      type="button" 
+      class="btn btn-info mb-5"
+      @click="showBroadcast = !showBroadcast"
+    >
+      <i class="bi bi-broadcast me-2"></i>
+      {{ showBroadcast ? 'Hide Broadcast' : 'Broadcast Message' }}
+    </button>
 
     <!-- Broadcast Message Component -->
     <div v-if="showBroadcast" class="mb-6">
@@ -94,13 +99,17 @@
       <p class="fs-5 fw-semibold mb-1">No devices found</p>
       <p class="small">Try adjusting your search or filter criteria.</p>
     </div>
+
+    <!-- Add Device Modal -->
+    <AddDeviceModal @deviceCreated="handleDeviceCreated" />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from "vue";
+import { defineComponent, ref, computed, onMounted } from "vue";
 import DeviceCardWidget from "@/components/iot/component/dashboard/DeviceCardWidget.vue";
 import BroadcastMessage from "@/components/iot/BroadcastMessage.vue";
+import AddDeviceModal from "@/components/iot/AddDeviceModal.vue";
 import KTIcon from "@/core/helpers/kt-icon/KTIcon.vue";
 
 // Define the possible status values
@@ -130,6 +139,7 @@ export default defineComponent({
   components: {
     DeviceCardWidget,
     BroadcastMessage,
+    AddDeviceModal,
     KTIcon,
   },
   setup() {
@@ -137,38 +147,93 @@ export default defineComponent({
     const searchQuery = ref("");
     const currentFilter = ref("all");
     const showBroadcast = ref(false);
+    const loading = ref(true);
+    const error = ref<string | null>(null);
 
-    // Device data
-    const devices = ref<Device[]>([
-      {
-        id: "1",
-        name: "Sensor 1",
-        icon: "bi-lightbulb",
-        type: "light",
-        location: "Location 1",
-        status: "online",
-        lastSeen: "2 min ago",
-        metrics: [
-          { type: "battery", value: 85, icon: "bi-battery-full" },
-          { type: "signal", value: 90, icon: "bi-wifi" },
-          { type: "temperature", value: 22, icon: "bi-thermometer" },
-        ],
-      },
-      {
-        id: "2",
-        name: "Sensor 2",
-        icon: "bi-thermometer-half",
-        type: "thermostat",
-        location: "Location 2",
-        status: "online",
-        lastSeen: "5 min ago",
-        metrics: [
-          { type: "battery", value: 75, icon: "bi-battery-half" },
-          { type: "signal", value: 85, icon: "bi-wifi" },
-          { type: "temperature", value: 20, icon: "bi-thermometer-half" },
-        ],
+    // Device data - now loaded dynamically from backend
+    const devices = ref<Device[]>([]);
+    
+    // Fetch devices from backend
+    const fetchDevices = async () => {
+      try {
+        loading.value = true;
+        error.value = null;
+        console.log('🔍 Fetching devices from API...');
+        
+        const apiUrl = import.meta.env.VITE_APP_API_URL || 'http://localhost:3001/';
+        console.log('📡 API URL:', apiUrl);
+        const response = await fetch(`${apiUrl}api/devices`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('📦 Received from API:', result);
+        
+        // API returns { success, count, devices: [...] }
+        // Transform to match frontend format
+        const transformedDevices = result.devices?.map((device: any) => ({
+          id: device.deviceId,
+          name: device.name,
+          icon: device.icon || 'bi-device',
+          type: 'IoT Sensor',
+          location: device.location,
+          status: device.status,
+          lastSeen: device.lastSeen ? new Date(device.lastSeen).toLocaleString() : 'Never',
+          metrics: [
+            { type: 'battery', value: device.currentData?.battery || 0, icon: 'bi-battery-full' },
+            { type: 'signal', value: device.currentData?.signal || 0, icon: 'bi-wifi' },
+            { type: 'temperature', value: device.currentData?.temperature || 0, icon: 'bi-thermometer' },
+          ]
+        })) || [];
+        
+        devices.value = transformedDevices;
+        console.log('✅ Updated devices.value:', devices.value.length, 'devices');
+      } catch (err: any) {
+        console.error('❌ Error fetching devices:', err);
+        error.value = err.message || 'Failed to load devices from backend';
+        
+        // Fallback to static devices if API fails
+        devices.value = [
+          {
+            id: "123",
+            name: "Sensor 1",
+            icon: "bi-lightbulb",
+            type: "light",
+            location: "Location 1",
+            status: "offline",
+            lastSeen: "Never",
+            metrics: [
+              { type: "battery", value: 0, icon: "bi-battery-full" },
+              { type: "signal", value: 0, icon: "bi-wifi" },
+              { type: "temperature", value: 0, icon: "bi-thermometer" },
+            ],
+          },
+          {
+            id: "234",
+            name: "Sensor 2",
+            icon: "bi-thermometer-half",
+            type: "thermostat",
+            location: "Location 2",
+            status: "offline",
+            lastSeen: "Never",
+            metrics: [
+              { type: "battery", value: 0, icon: "bi-battery-half" },
+              { type: "signal", value: 0, icon: "bi-wifi" },
+              { type: "temperature", value: 0, icon: "bi-thermometer-half" },
+            ],
+          }
+        ];
+      } finally {
+        loading.value = false;
       }
-    ]);
+    };
+    
+    // Load devices on mount
+    onMounted(() => {
+      fetchDevices();
+    });
 
     // Computed property for filtered devices
     const filteredDevices = computed(() => {
@@ -197,14 +262,32 @@ export default defineComponent({
       currentFilter.value = filter;
     };
 
+    const handleDeviceCreated = async (newDevice: any) => {
+      console.log('✅ New device created:', newDevice);
+      // Refresh device list
+      await fetchDevices();
+      console.log('🔄 Device list refreshed');
+    };
+
     return {
+      devices,
       searchQuery,
       currentFilter,
       showBroadcast,
+      loading,
+      error,
       filteredDevices,
       searchItems,
       applyFilter,
+      handleDeviceCreated,
+      fetchDevices,
     };
   },
 });
 </script>
+
+<style scoped>
+.cursor-pointer {
+  cursor: pointer;
+}
+</style>

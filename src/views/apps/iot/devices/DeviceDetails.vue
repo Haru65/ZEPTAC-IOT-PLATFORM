@@ -1,5 +1,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, onUnmounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import ApiService from '@/core/services/ApiService';
 import { reverseGeocode } from '@/utils/reverseGeocode';
 import { io, Socket } from 'socket.io-client';
 import { mqttService, type InterruptModeConfig } from '@/services/mqtt.service';
@@ -11,6 +13,8 @@ export default defineComponent({
   setup() {
     const mainDevice = ref<any>(null);
     const simDevice = ref<any>(null);
+  const deviceSettings = ref<any>(null);
+  const deviceId = ref<string | null>(null);
     const lastMainUpdate = ref<number>(0);
     const now = ref(Date.now());
     const socket = ref<Socket | null>(null);
@@ -20,11 +24,48 @@ export default defineComponent({
 
 
     onMounted(() => {
+      // Get device id from route params
+      const route = useRoute();
+      deviceId.value = (route.params.id as string) || null;
+
+      // Fetch device settings and recent telemetry for this specific device
+      (async () => {
+        try {
+          if (deviceId.value) {
+            ApiService.setHeader();
+            // Device settings (device-management endpoints)
+            try {
+              const settingsResponse = await ApiService.query(`/api/device-management/${deviceId.value}/settings`, {});
+              deviceSettings.value = settingsResponse.data || null;
+            } catch (e) {
+              console.warn('Could not load device settings:', e);
+              deviceSettings.value = null;
+            }
+
+            // Latest telemetry (use telemetry API)
+            try {
+              const telemetryResp = await ApiService.query('/api/telemetry', { params: { deviceId: deviceId.value, limit: 1, sort: '-timestamp' } });
+              if (telemetryResp?.data?.data && telemetryResp.data.data.length > 0) {
+                mainDevice.value = telemetryResp.data.data[0];
+                lastMainUpdate.value = telemetryResp.data.data[0].timestamp || Date.now();
+              }
+            } catch (e) {
+              console.warn('Could not load telemetry for device:', e);
+            }
+          }
+        } catch (err) {
+          console.error('Error during device-specific initialization', err);
+        }
+      })();
       // Initialize MQTT service
       mqttService.initialize();
       
       // Connect to backend Socket.io server
-      socket.value = io('https://zeptac-demo-backend.onrender.com', {
+      const socketUrl = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV)
+        ? 'http://localhost:3001'
+        : 'https://zeptac-demo-backend.onrender.com';
+      // Connect to backend Socket.io server
+      socket.value = io(socketUrl, {
         withCredentials: true,
         transports: ['websocket', 'polling']
       });
@@ -33,6 +74,19 @@ export default defineComponent({
       socket.value.on('connect', () => {
         connectionStatus.value = 'connected';
         console.log('Connected to backend server');
+        // If viewing a specific device, subscribe to its updates
+        try {
+          if (deviceId.value) {
+            // Subscribe using the provided id, and also try a prefixed form commonly used by the sim/backend
+            socket.value?.emit('subscribeDevice', deviceId.value);
+            // If the route id is numeric (e.g. "123"), also subscribe to "DEVICE_123" room which the sim emits to
+            if (/^\d+$/.test(deviceId.value)) {
+              socket.value?.emit('subscribeDevice', `DEVICE_${deviceId.value}`);
+            }
+          }
+        } catch (e) {
+          console.warn('subscribe emit failed', e);
+        }
       });
 
       socket.value.on('disconnect', () => {
@@ -43,23 +97,86 @@ export default defineComponent({
       // Handle initial data when client first connects
       socket.value.on('initialData', (data) => {
         console.log('Received initial data:', data);
-        if (data.main) {
-          mainDevice.value = data.main;
-          lastMainUpdate.value = data.main.timestamp || Date.now();
-        }
-        if (data.sim) {
-          simDevice.value = data.sim;
+        // If server sends device-specific initialData (subscribe flow), accept it only for our device
+        if (deviceId.value) {
+          if (data.main && data.main.id === deviceId.value) {
+            mainDevice.value = data.main;
+            lastMainUpdate.value = data.main.timestamp || Date.now();
+          }
+          if (data.sim && data.sim.id === deviceId.value) {
+            simDevice.value = data.sim;
+          }
+        } else {
+          if (data.main) {
+            mainDevice.value = data.main;
+            lastMainUpdate.value = data.main.timestamp || Date.now();
+          }
+          if (data.sim) {
+            simDevice.value = data.sim;
+          }
         }
       });
 
       // Handle real-time device updates
       socket.value.on('deviceUpdate', (update) => {
-        console.log('Device update received:', update);
-        if (update.type === 'main' || update.type === 'device') {
-          mainDevice.value = update.data;
-          lastMainUpdate.value = Date.now();
-        } else if (update.type === 'sim') {
-          simDevice.value = update.data;
+        try {
+          // Determine the target device id from the incoming update.
+          // Prefer a topic string like 'devices/123/data' if provided, else fall back to payload fields.
+          let updatedId: string | null = null;
+          try {
+            if (update && typeof update.topic === 'string') {
+              const parts = update.topic.split('/').filter(Boolean);
+              if (parts.length >= 2) {
+                // topic format expected: devices/{deviceId}/data
+                updatedId = parts[1];
+              }
+            }
+          } catch (e) {
+            // ignore parsing errors
+          }
+
+          if (!updatedId) {
+            updatedId = update?.data?.id || update?.deviceId || null;
+          }
+
+          // Normalization helper: extract comparable key (strip 'DEVICE_' prefix and non-digits)
+          const norm = (id: string | null) => {
+            if (!id) return null;
+            try {
+              // If id contains digits, return only the digit part to allow matching '123' and 'DEVICE_123'
+              const digits = String(id).match(/\d+/);
+              if (digits) return digits[0];
+              // otherwise return the raw id
+              return String(id);
+            } catch (e) {
+              return String(id);
+            }
+          };
+
+          const updatedKey = norm(updatedId);
+          const routeKey = norm(deviceId.value);
+
+          // If we have a specific deviceId route, only apply updates for that device
+          if (deviceId.value) {
+            if (updatedKey && routeKey && updatedKey === routeKey) {
+              if (update.type === 'main' || update.type === 'device') {
+                mainDevice.value = update.data;
+                lastMainUpdate.value = Date.now();
+              } else if (update.type === 'sim') {
+                simDevice.value = update.data;
+              }
+            }
+          } else {
+            // No specific device requested: apply broadcast updates
+            if (update.type === 'main' || update.type === 'device') {
+              mainDevice.value = update.data;
+              lastMainUpdate.value = Date.now();
+            } else if (update.type === 'sim') {
+              simDevice.value = update.data;
+            }
+          }
+        } catch (err) {
+          console.warn('Error handling deviceUpdate', err);
         }
       });
 
@@ -71,6 +188,15 @@ export default defineComponent({
 
     onUnmounted(() => {
       if (socket.value) {
+        // Unsubscribe from device room if needed
+        try {
+          if (deviceId.value) {
+            socket.value.emit('unsubscribeDevice', deviceId.value);
+            if (/^\d+$/.test(deviceId.value)) {
+              socket.value.emit('unsubscribeDevice', `DEVICE_${deviceId.value}`);
+            }
+          }
+        } catch (e) {}
         socket.value.disconnect();
       }
       if (updateInterval.value) {
@@ -89,6 +215,7 @@ export default defineComponent({
       }
       return null;
     });
+
 
     // Non-blocking safe device used by the template so the UI doesn't wait for live data
     const safeDevice = computed(() => {
@@ -412,8 +539,8 @@ export default defineComponent({
 
         console.log('Sending interrupt mode configuration:', config);
 
-        // Send configuration to device via MQTT
-        const response = await mqttService.setInterruptMode('123', config);
+  // Send configuration to device via MQTT (use current route device id)
+  const response = await mqttService.setInterruptMode(deviceId.value || '123', config);
 
         if (response.success) {
           await Swal.fire({
@@ -492,8 +619,8 @@ export default defineComponent({
           toff: setNoForm.value.toff
         };
 
-        console.log('Sending timer configuration:', config);
-        const response = await mqttService.setTimerConfiguration('123', config);
+  console.log('Sending timer configuration:', config);
+  const response = await mqttService.setTimerConfiguration(deviceId.value || '123', config);
         
         if (response.success) {
           await Swal.fire({
@@ -530,8 +657,8 @@ export default defineComponent({
           return;
         }
 
-        console.log('Sending electrode configuration:', selectedElectrode.value);
-        const response = await mqttService.setElectrodeConfiguration('123', selectedElectrode.value);
+  console.log('Sending electrode configuration:', selectedElectrode.value);
+  const response = await mqttService.setElectrodeConfiguration(deviceId.value || '123', selectedElectrode.value);
         
         if (response.success) {
           await Swal.fire({
@@ -558,8 +685,8 @@ export default defineComponent({
     // Save manual mode action
     const executeManualAction = async (action: 'start' | 'stop') => {
       try {
-        console.log('Sending manual mode action:', action);
-        const response = await mqttService.setManualMode('123', action);
+  console.log('Sending manual mode action:', action);
+  const response = await mqttService.setManualMode(deviceId.value || '123', action);
         
         if (response.success) {
           await Swal.fire({
@@ -586,8 +713,8 @@ export default defineComponent({
     // Save normal mode configuration
     const saveNormalModeConfiguration = async () => {
       try {
-        console.log('Sending normal mode configuration');
-        const response = await mqttService.setNormalMode('123', {});
+  console.log('Sending normal mode configuration');
+  const response = await mqttService.setNormalMode(deviceId.value || '123', {});
         
         if (response.success) {
           await Swal.fire({
@@ -629,8 +756,8 @@ export default defineComponent({
           }
         };
 
-        console.log('Sending DPOL mode configuration:', config);
-        const response = await mqttService.setDpolMode('123', config);
+  console.log('Sending DPOL mode configuration:', config);
+  const response = await mqttService.setDpolMode(deviceId.value || '123', config);
         
         if (response.success) {
           await Swal.fire({
@@ -671,8 +798,8 @@ export default defineComponent({
           }
         };
 
-        console.log('Sending INST mode configuration:', config);
-        const response = await mqttService.setInstMode('123', config);
+  console.log('Sending INST mode configuration:', config);
+  const response = await mqttService.setInstMode(deviceId.value || '123', config);
         
         if (response.success) {
           await Swal.fire({
@@ -718,8 +845,8 @@ export default defineComponent({
           } : undefined
         };
 
-        console.log('Sending alarm configuration:', config);
-        const response = await mqttService.setAlarmConfiguration('123', config);
+  console.log('Sending alarm configuration:', config);
+  const response = await mqttService.setAlarmConfiguration(deviceId.value || '123', config);
         
         if (response.success) {
           await Swal.fire({
@@ -877,6 +1004,17 @@ export default defineComponent({
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+          <div class="mb-5">
+            <h4 class="fs-1 text-gray-800 w-bolder mb-6">Device Settings</h4>
+            <div class="card p-3">
+              <div v-if="deviceSettings">
+                <pre style="white-space: pre-wrap; word-break: break-word;">{{ JSON.stringify(deviceSettings, null, 2) }}</pre>
+              </div>
+              <div v-else>
+                <p class="text-muted">No settings available for this device.</p>
               </div>
             </div>
           </div>
