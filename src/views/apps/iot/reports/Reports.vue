@@ -164,7 +164,7 @@ export default defineComponent({
     const endDate = ref(new Date().toISOString().split('T')[0]); // today
     const dataLimit = ref(100);
 
-    // Load devices list
+    //Load devices list
     const loadDevices = async () => {
       try {
         const response = await ApiService.get('/api/devices');
