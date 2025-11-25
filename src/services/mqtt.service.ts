@@ -106,13 +106,17 @@ class MqttService {
   }
 
   // Device configuration methods using API calls
-  async setInterruptMode(deviceId: string, config: InterruptModeConfig) {
+  /**
+   * Configure interrupt mode via backend HTTP API (not the realtime command).
+   * This calls POST /api/devices/:deviceId/configure/interrupt-mode.
+   */
+  async configureInterruptMode(deviceId: string, config: InterruptModeConfig) {
     try {
       ApiService.setHeader();
       const response = await ApiService.post(`api/devices/${deviceId}/configure/interrupt-mode`, config);
       return response.data;
     } catch (error: any) {
-      console.error('Failed to set interrupt mode:', error);
+      console.error('Failed to configure interrupt mode via API:', error);
       throw new Error(error?.response?.data?.message || 'Failed to configure interrupt mode');
     }
   }
