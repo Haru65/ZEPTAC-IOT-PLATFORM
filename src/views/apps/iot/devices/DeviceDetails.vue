@@ -96,6 +96,12 @@ export default defineComponent({
       // Handle initial data when client first connects
       socket.value.on('initialData', (data) => {
         console.log('Received initial data:', data);
+        
+        // Update connection status from initial data
+        if (data.connectionStatus && data.connectionStatus.device !== undefined) {
+          connectionStatus.value = data.connectionStatus.device ? 'connected' : 'disconnected';
+        }
+        
         // If server sends device-specific initialData (subscribe flow), accept it only for our device
         if (deviceId.value) {
           if (data.main && data.main.id === deviceId.value) {
@@ -168,6 +174,11 @@ export default defineComponent({
                 }
               } else if (update.type === 'sim') {
                 simDevice.value = update.data;
+              } else if (update.type === 'status') {
+                // Handle status-only updates
+                if (update.connectionStatus && update.connectionStatus.device !== undefined) {
+                  connectionStatus.value = update.connectionStatus.device ? 'connected' : 'disconnected';
+                }
               }
             }
           } else {
@@ -182,6 +193,11 @@ export default defineComponent({
               }
             } else if (update.type === 'sim') {
               simDevice.value = update.data;
+            } else if (update.type === 'status') {
+              // Handle status-only updates
+              if (update.connectionStatus && update.connectionStatus.device !== undefined) {
+                connectionStatus.value = update.connectionStatus.device ? 'connected' : 'disconnected';
+              }
             }
           }
         } catch (err) {
