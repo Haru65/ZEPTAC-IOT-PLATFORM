@@ -77,10 +77,12 @@ export interface MessageResponse {
 
 class MqttService {
   private socket: Socket | null = null;
-  private readonly BACKEND_URL = 'http://localhost:3001';
+  // Use environment variable for backend URL, fallback to localhost for development
+  private readonly BACKEND_URL = import.meta.env.VITE_APP_API_URL?.replace(/\/$/, '') || 'http://localhost:3001';
 
   initialize(): Socket {
     if (!this.socket) {
+      console.log('🔌 Connecting to Socket.IO backend:', this.BACKEND_URL);
       this.socket = io(this.BACKEND_URL, {
         withCredentials: true,
         transports: ['websocket', 'polling']
