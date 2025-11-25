@@ -1008,8 +1008,8 @@ export default defineComponent({
                   <div class="card-body p-4">
                     <div class="d-flex flex-column align-items-center">
                       <i :class="[metric.icon, metricClass(metric)]" style="font-size: 2rem"></i>
-                      <h5 class="mt-2 mb-0">{{ metric.value }}</h5>
-                      <p class="text-muted mb-0 text-capitalize">{{ metric.type }}</p>
+                      <p class="text-muted mb-1 text-capitalize">{{ metric.type }}</p>
+                      <h5 class="mt-0 mb-0">{{ metric.value }}</h5>
                     </div>
                   </div>
                 </div>
