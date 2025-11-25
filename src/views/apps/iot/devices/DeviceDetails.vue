@@ -60,12 +60,11 @@ export default defineComponent({
       // Initialize MQTT service
       mqttService.initialize();
       
-      // Connect to backend Socket.io server
-      const socketUrl = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV)
-        ? 'http://localhost:3001'
-        : 'https://zeptac-demo-backend.onrender.com';
-      // Connect to backend Socket.io server
-      socket.value = io(socketUrl, {
+      // Connect to backend Socket.io server - use environment variable
+      const backendUrl = import.meta.env.VITE_APP_API_URL?.replace(/\/$/, '') || 'http://localhost:3001';
+      console.log('🔌 Connecting to Socket.IO backend:', backendUrl);
+      
+      socket.value = io(backendUrl, {
         withCredentials: true,
         transports: ['websocket', 'polling']
       });
@@ -162,6 +161,11 @@ export default defineComponent({
               if (update.type === 'main' || update.type === 'device') {
                 mainDevice.value = update.data;
                 lastMainUpdate.value = Date.now();
+                
+                // Update connection status if provided
+                if (update.connectionStatus && update.connectionStatus.device !== undefined) {
+                  connectionStatus.value = update.connectionStatus.device ? 'connected' : 'disconnected';
+                }
               } else if (update.type === 'sim') {
                 simDevice.value = update.data;
               }
@@ -171,6 +175,11 @@ export default defineComponent({
             if (update.type === 'main' || update.type === 'device') {
               mainDevice.value = update.data;
               lastMainUpdate.value = Date.now();
+              
+              // Update connection status if provided
+              if (update.connectionStatus && update.connectionStatus.device !== undefined) {
+                connectionStatus.value = update.connectionStatus.device ? 'connected' : 'disconnected';
+              }
             } else if (update.type === 'sim') {
               simDevice.value = update.data;
             }
