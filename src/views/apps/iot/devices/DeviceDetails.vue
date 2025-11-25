@@ -189,6 +189,17 @@ export default defineComponent({
         }
       });
 
+      // Listen for dedicated connection status updates
+      socket.value.on('connectionStatus', (status) => {
+        try {
+          if (status && status.device !== undefined) {
+            connectionStatus.value = status.device ? 'connected' : 'disconnected';
+          }
+        } catch (err) {
+          console.warn('Error handling connectionStatus', err);
+        }
+      });
+
       // Periodically update 'now' so computed property reacts to time
       updateInterval.value = setInterval(() => {
         now.value = Date.now();
