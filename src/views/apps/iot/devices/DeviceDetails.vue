@@ -9,6 +9,32 @@ import Swal from 'sweetalert2';
 
 const FAILOVER_TIMEOUT_MS = 10_000; // 10 seconds timeout for main device
 
+// Value mappings for device settings
+const ELECTRODE_MAPPING: Record<string, number> = {
+  'CuCuSO4': 0,
+  'Zinc': 1,
+  'AgAgSO4': 2,
+  'Custom': 3
+};
+
+const MODE_MAPPING: Record<string, number> = {
+  'Normal': 0,
+  'Interrupt': 1,
+  'Manual': 2,
+  'DPOL': 3,
+  'INST': 4
+};
+
+const MANUAL_ACTION_MAPPING: Record<string, number> = {
+  'stop': 0,
+  'start': 1
+};
+
+const INSTANT_MODE_MAPPING: Record<string, number> = {
+  'daily': 0,
+  'weekly': 1
+};
+
 export default defineComponent({
   setup() {
     const mainDevice = ref<any>(null);
