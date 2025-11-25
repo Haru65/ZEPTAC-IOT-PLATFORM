@@ -539,8 +539,8 @@ export default defineComponent({
 
         console.log('Sending interrupt mode configuration:', config);
 
-  // Send configuration to device via MQTT (use current route device id)
-  const response = await mqttService.setInterruptMode(deviceId.value || '123', config);
+        // ✅ Use API-based method that sends COMPLETE settings frame
+        const response = await mqttService.configureInterruptMode(deviceId.value || '123', config);
 
         if (response.success) {
           await Swal.fire({

@@ -107,104 +107,190 @@ class MqttService {
 
   // Device configuration methods using API calls
   /**
-   * Configure interrupt mode via backend HTTP API (not the realtime command).
-   * This calls POST /api/devices/:deviceId/configure/interrupt-mode.
+   * ALL methods now send COMPLETE settings frame in the format:
+   * {
+   *   "Device ID": "123",
+   *   "Message Type": "settings",
+   *   "sender": "Server",
+   *   "CommandId": "uuid",
+   *   "Parameters": { ...complete settings with updated fields... }
+   * }
+   */
+
+  /**
+   * Configure interrupt mode - sends complete settings with updated interrupt fields
    */
   async configureInterruptMode(deviceId: string, config: InterruptModeConfig) {
     try {
       ApiService.setHeader();
       const response = await ApiService.post(`api/devices/${deviceId}/configure/interrupt-mode`, config);
+      console.log('✅ Interrupt mode configured - complete settings frame sent');
       return response.data;
     } catch (error: any) {
-      console.error('Failed to configure interrupt mode via API:', error);
+      console.error('❌ Failed to configure interrupt mode:', error);
       throw new Error(error?.response?.data?.message || 'Failed to configure interrupt mode');
     }
   }
 
+  /**
+   * Set manual mode - sends complete settings with manual mode action
+   */
   async setManualMode(deviceId: string, action: 'start' | 'stop') {
     try {
       ApiService.setHeader();
       const response = await ApiService.post(`api/devices/${deviceId}/configure/manual-mode`, { action });
+      console.log(`✅ Manual mode ${action} - complete settings frame sent`);
       return response.data;
     } catch (error: any) {
-      console.error('Failed to set manual mode:', error);
+      console.error('❌ Failed to set manual mode:', error);
       throw new Error(error?.response?.data?.message || 'Failed to configure manual mode');
     }
   }
 
+  /**
+   * Set normal mode - sends complete settings with normal mode configuration
+   */
   async setNormalMode(deviceId: string, config: any = {}) {
     try {
       ApiService.setHeader();
       const response = await ApiService.post(`api/devices/${deviceId}/configure/normal-mode`, config);
+      console.log('✅ Normal mode configured - complete settings frame sent');
       return response.data;
     } catch (error: any) {
-      console.error('Failed to set normal mode:', error);
+      console.error('❌ Failed to set normal mode:', error);
       throw new Error(error?.response?.data?.message || 'Failed to configure normal mode');
     }
   }
 
+  /**
+   * Set DPOL mode - sends complete settings with updated DPOL fields
+   */
   async setDpolMode(deviceId: string, config: any) {
     try {
       ApiService.setHeader();
       const response = await ApiService.post(`api/devices/${deviceId}/configure/dpol-mode`, config);
+      console.log('✅ DPOL mode configured - complete settings frame sent');
       return response.data;
     } catch (error: any) {
-      console.error('Failed to set DPOL mode:', error);
+      console.error('❌ Failed to set DPOL mode:', error);
       throw new Error(error?.response?.data?.message || 'Failed to configure DPOL mode');
     }
   }
 
+  /**
+   * Set instant mode - sends complete settings with instant mode configuration
+   */
   async setInstMode(deviceId: string, config: any) {
     try {
       ApiService.setHeader();
       const response = await ApiService.post(`api/devices/${deviceId}/configure/inst-mode`, config);
+      console.log('✅ Instant mode configured - complete settings frame sent');
       return response.data;
     } catch (error: any) {
-      console.error('Failed to set INST mode:', error);
+      console.error('❌ Failed to set INST mode:', error);
       throw new Error(error?.response?.data?.message || 'Failed to configure INST mode');
     }
   }
 
+  /**
+   * Set timer configuration - sends complete settings with timer fields
+   */
   async setTimerConfiguration(deviceId: string, config: TimerConfig) {
     try {
       ApiService.setHeader();
       const response = await ApiService.post(`api/devices/${deviceId}/configure/timer`, config);
+      console.log('✅ Timer configured - complete settings frame sent');
       return response.data;
     } catch (error: any) {
-      console.error('Failed to set timer configuration:', error);
+      console.error('❌ Failed to set timer configuration:', error);
       throw new Error(error?.response?.data?.message || 'Failed to configure timer');
     }
   }
 
+  /**
+   * Set electrode configuration - sends complete settings with electrode type
+   */
   async setElectrodeConfiguration(deviceId: string, electrodeType: string) {
     try {
       ApiService.setHeader();
       const response = await ApiService.post(`api/devices/${deviceId}/configure/electrode`, { electrodeType });
+      console.log(`✅ Electrode type ${electrodeType} - complete settings frame sent`);
       return response.data;
     } catch (error: any) {
-      console.error('Failed to set electrode configuration:', error);
+      console.error('❌ Failed to set electrode configuration:', error);
       throw new Error(error?.response?.data?.message || 'Failed to configure electrode');
     }
   }
 
+  /**
+   * Set alarm configuration - sends complete settings with alarm thresholds
+   */
   async setAlarmConfiguration(deviceId: string, config: AlarmConfig) {
     try {
       ApiService.setHeader();
       const response = await ApiService.post(`api/devices/${deviceId}/configure/alarm`, config);
+      console.log('✅ Alarm configured - complete settings frame sent');
       return response.data;
     } catch (error: any) {
-      console.error('Failed to set alarm configuration:', error);
+      console.error('❌ Failed to set alarm configuration:', error);
       throw new Error(error?.response?.data?.message || 'Failed to configure alarm');
     }
   }
 
+  /**
+   * Get current device settings in complete frame format
+   */
+  async getDeviceSettings(deviceId: string) {
+    try {
+      ApiService.setHeader();
+      const response = await ApiService.get(`api/devices/${deviceId}/settings`);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Failed to get device settings:', error);
+      throw new Error(error?.response?.data?.message || 'Failed to get device settings');
+    }
+  }
+
+  /**
+   * Update complete device settings (sends entire payload)
+   */
+  async updateDeviceSettings(deviceId: string, settingsData: any) {
+    try {
+      ApiService.setHeader();
+      const response = await ApiService.put(`api/devices/${deviceId}/settings`, settingsData);
+      console.log('✅ Complete device settings updated and sent');
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Failed to update device settings:', error);
+      throw new Error(error?.response?.data?.message || 'Failed to update device settings');
+    }
+  }
+
+  /**
+   * Update a single setting (sends complete payload with changed setting)
+   */
+  async updateSingleSetting(deviceId: string, setting: string, value: any) {
+    try {
+      ApiService.setHeader();
+      const response = await ApiService.patch(`api/devices/${deviceId}/settings`, { setting, value });
+      console.log(`✅ Setting '${setting}' updated - complete settings frame sent`);
+      return response.data;
+    } catch (error: any) {
+      console.error(`❌ Failed to update setting '${setting}':`, error);
+      throw new Error(error?.response?.data?.message || `Failed to update setting '${setting}'`);
+    }
+  }
+
+  /**
+   * Get device status (legacy method)
+   */
   async getDeviceStatus(deviceId: string) {
     try {
       ApiService.setHeader();
       const response = await ApiService.get(`api/devices/${deviceId}/status`);
       return response.data;
     } catch (error: any) {
-      console.error('Failed to get device status:', error);
+      console.error('❌ Failed to get device status:', error);
       throw new Error(error?.response?.data?.message || 'Failed to get device status');
     }
   }
