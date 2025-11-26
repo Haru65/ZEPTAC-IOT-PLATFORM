@@ -407,14 +407,9 @@ export default defineComponent({
 
     // INST mode form data
     const instForm = ref({
-      startDate: '',
       startTime: '',
-      dd: '',
-      mm: '',
-      yy: '',
-      HH: '',
-      MM: '',
-      duration: 'daily' // daily or weekly
+      endTime: '',
+      frequency: 'daily'
     });
 
     // Electrode selection data
@@ -848,16 +843,9 @@ export default defineComponent({
     const saveInstModeConfiguration = async () => {
       try {
         const config = {
-          startDate: instForm.value.startDate,
           startTime: instForm.value.startTime,
-          duration: instForm.value.duration,
-          dateFormat: {
-            dd: instForm.value.dd,
-            mm: instForm.value.mm,
-            yy: instForm.value.yy,
-            HH: instForm.value.HH,
-            MM: instForm.value.MM
-          }
+          endTime: instForm.value.endTime,
+          frequency: instForm.value.frequency
         };
 
   console.log('Sending INST mode configuration:', config);
@@ -1884,59 +1872,35 @@ export default defineComponent({
             <!-- Left Column -->
             <div class="col-md-6">
               <div class="mb-3">
-                <label class="form-label">Start Date & Time</label>
-                <div class="row g-2">
-                  <div class="col-6">
-                    <input type="date" class="form-control" v-model="instForm.startDate">
-                  </div>
-                  <div class="col-6">
-                    <input type="time" class="form-control" v-model="instForm.startTime">
-                  </div>
-                </div>
+                <label class="form-label">Start Time (HH:MM:SS)</label>
+                <input type="time" step="1" class="form-control" v-model="instForm.startTime" placeholder="00:00:00">
+                <small class="form-text text-muted">Format: Hours:Minutes:Seconds</small>
               </div>
               
               <div class="mb-3">
-                <label class="form-label">Duration Selection</label>
+                <label class="form-label">End Time (HH:MM:SS)</label>
+                <input type="time" step="1" class="form-control" v-model="instForm.endTime" placeholder="00:00:00">
+                <small class="form-text text-muted">Format: Hours:Minutes:Seconds</small>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Frequency</label>
                 <div class="d-flex gap-3">
                   <div class="form-check">
-                    <input class="form-check-input" type="radio" name="duration" id="daily" value="daily" v-model="instForm.duration">
-                    <label class="form-check-label" for="daily">Daily</label>
+                    <input class="form-check-input" type="radio" name="instFrequency" id="instDaily" value="daily" v-model="instForm.frequency">
+                    <label class="form-check-label" for="instDaily">Daily</label>
                   </div>
                   <div class="form-check">
-                    <input class="form-check-input" type="radio" name="duration" id="weekly" value="weekly" v-model="instForm.duration">
-                    <label class="form-check-label" for="weekly">Weekly</label>
+                    <input class="form-check-input" type="radio" name="instFrequency" id="instWeekly" value="weekly" v-model="instForm.frequency">
+                    <label class="form-check-label" for="instWeekly">Weekly</label>
                   </div>
                 </div>
               </div>
             </div>
             
-            <!-- Right Column - Date/Time Format -->
+            <!-- Right Column - Empty for now -->
             <div class="col-md-6">
-              <label class="form-label">Date & Time Format</label>
-              <div class="row g-2 mb-2">
-                <div class="col-4">
-                  <input type="number" class="form-control" placeholder="dd" v-model="instForm.dd" min="1" max="31">
-                  <small class="form-text text-muted">DD</small>
-                </div>
-                <div class="col-4">
-                  <input type="number" class="form-control" placeholder="mm" v-model="instForm.mm" min="1" max="12">
-                  <small class="form-text text-muted">MM</small>
-                </div>
-                <div class="col-4">
-                  <input type="number" class="form-control" placeholder="yy" v-model="instForm.yy" min="0" max="99">
-                  <small class="form-text text-muted">YY</small>
-                </div>
-              </div>
-              <div class="row g-2">
-                <div class="col-6">
-                  <input type="number" class="form-control" placeholder="HH" v-model="instForm.HH" min="0" max="23">
-                  <small class="form-text text-muted">HH</small>
-                </div>
-                <div class="col-6">
-                  <input type="number" class="form-control" placeholder="mm" v-model="instForm.MM" min="0" max="59">
-                  <small class="form-text text-muted">MM</small>
-                </div>
-              </div>
+              <!-- Reserved for future use -->
             </div>
           </div>
         </div>
