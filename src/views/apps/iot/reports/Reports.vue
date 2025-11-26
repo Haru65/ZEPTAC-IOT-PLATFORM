@@ -440,6 +440,22 @@ export default defineComponent({
 
         await Swal.fire({
           title: 'PDF Downloaded',
+          text: 'Your PDF report has been downloaded successfully.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+          timer: 3000
+        });
+      } catch (error) {
+        console.error('❌ PDF export error:', error);
+        Swal.fire({
+          title: 'Export Failed',
+          text: 'Failed to generate PDF. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
+    };
+
     // Export to Excel - Production Grade
     const exportToExcel = async () => {
       try {
