@@ -165,40 +165,43 @@
           <p class="text-muted">Try adjusting your filters or date range</p>
         </div>
 
-        <div v-else class="table-responsive">
-          <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
-            <thead>
-              <tr class="fw-bold text-muted bg-light">
-                <th class="ps-4 min-w-100px">Device ID</th>
-                <th class="min-w-150px">Timestamp</th>
-                <th class="min-w-100px">Event</th>
-                <th class="min-w-100px" v-for="field in dataFields" :key="field">
-                  {{ formatFieldName(field) }}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="record in displayedData" :key="record._id">
-                <td class="ps-4">
-                  <span class="badge badge-light-primary">{{ record.deviceId }}</span>
-                </td>
-                <td>
-                  <div class="d-flex flex-column">
-                    <span class="fw-bold">{{ formatDate(record.timestamp) }}</span>
-                    <span class="text-muted fs-7">{{ formatTime(record.timestamp) }}</span>
-                  </div>
-                </td>
-                <td>
-                  <span :class="getEventBadgeClass(record.event)">{{ record.event }}</span>
-                </td>
-                <td v-for="field in dataFields" :key="field">
-                  {{ formatDataValue(getDataField(record, field)) }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div v-else>
+          <!-- Data Table with Horizontal Scroll Container -->
+          <div style="max-width: 100%; overflow-x: auto;">
+            <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4" style="min-width: 800px;">
+              <thead>
+                <tr class="fw-bold text-muted bg-light">
+                  <th class="ps-4" style="min-width: 120px; position: sticky; left: 0; background: #f3f6f9; z-index: 1;">Device ID</th>
+                  <th style="min-width: 150px;">Timestamp</th>
+                  <th style="min-width: 100px;">Event</th>
+                  <th style="min-width: 120px;" v-for="field in dataFields" :key="field">
+                    {{ formatFieldName(field) }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="record in displayedData" :key="record._id">
+                  <td class="ps-4" style="position: sticky; left: 0; background: white; z-index: 1;">
+                    <span class="badge badge-light-primary">{{ record.deviceId }}</span>
+                  </td>
+                  <td>
+                    <div class="d-flex flex-column">
+                      <span class="fw-bold">{{ formatDate(record.timestamp) }}</span>
+                      <span class="text-muted fs-7">{{ formatTime(record.timestamp) }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span :class="getEventBadgeClass(record.event)">{{ record.event }}</span>
+                  </td>
+                  <td v-for="field in dataFields" :key="field">
+                    {{ formatDataValue(getDataField(record, field)) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           
-          <div class="d-flex justify-content-between align-items-center mt-4">
+          <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-2">
             <span class="text-muted">
               Showing {{ displayedData.length }} of {{ telemetryData.length }} records
             </span>
@@ -320,6 +323,21 @@ export default defineComponent({
       try {
         loading.value = true;
         
+        // Validate dates
+        const start = new Date(startDate.value);
+        const end = new Date(endDate.value);
+        
+        if (start > end) {
+          Swal.fire({
+            title: 'Invalid Date Range',
+            text: 'Start date cannot be after end date.',
+            icon: 'warning',
+            confirmButtonText: 'OK'
+          });
+          loading.value = false;
+          return;
+        }
+
         const params = new URLSearchParams({
           startDate: startDate.value,
           endDate: endDate.value,
@@ -327,7 +345,7 @@ export default defineComponent({
           sort: '-timestamp'
         });
 
-        if (selectedDevice.value) {
+        if (selectedDevice.value && selectedDevice.value.trim() !== '') {
           params.append('deviceId', selectedDevice.value);
         }
 
@@ -345,7 +363,8 @@ export default defineComponent({
               title: 'No Data Found',
               text: 'No telemetry data found for the selected filters. Try adjusting the date range or device filter.',
               icon: 'info',
-              confirmButtonText: 'OK'
+              confirmButtonText: 'OK',
+              timer: 3000
             });
           }
         } else {
@@ -421,22 +440,6 @@ export default defineComponent({
 
         await Swal.fire({
           title: 'PDF Downloaded',
-          text: 'Your PDF report has been downloaded successfully.',
-          icon: 'success',
-          confirmButtonText: 'OK',
-          timer: 3000
-        });
-      } catch (error) {
-        console.error('❌ PDF export error:', error);
-        Swal.fire({
-          title: 'Export Failed',
-          text: 'Failed to generate PDF. Please try again.',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
-      }
-    };
-
     // Export to Excel - Production Grade
     const exportToExcel = async () => {
       try {
@@ -444,6 +447,11 @@ export default defineComponent({
 
         if (!authStore.isAuthenticated) {
           throw new Error('You must be logged in to export data.');
+        }
+
+        // Ensure devices are loaded
+        if (devices.value.length === 0) {
+          await loadDevices();
         }
 
         // Show configuration dialog
@@ -463,7 +471,7 @@ export default defineComponent({
                 <label for="export-device-id" class="form-label fw-bold">Device Filter</label>
                 <select id="export-device-id" class="form-select">
                   <option value="">All Devices</option>
-                  ${devices.value.map(d => `<option value="${d.deviceId}">${d.name} (${d.deviceId})</option>`).join('')}
+                  ${devices.value.map(d => `<option value="${d.deviceId}" ${selectedDevice.value === d.deviceId ? 'selected' : ''}>${d.name || d.deviceId} (${d.deviceId})</option>`).join('')}
                 </select>
               </div>
               <div class="alert alert-info d-flex align-items-center">
@@ -523,7 +531,7 @@ export default defineComponent({
           format: 'download'
         });
 
-        if (exportConfig.deviceId) {
+        if (exportConfig.deviceId && exportConfig.deviceId.trim() !== '') {
           params.append('deviceId', exportConfig.deviceId);
         }
 
@@ -532,6 +540,8 @@ export default defineComponent({
           throw new Error('Authentication token not found. Please login again.');
         }
 
+        console.log('📤 Export URL:', `${API_BASE_URL}/export/telemetry/excel?${params.toString()}`);
+
         // Make API call
         const response = await axios.get(`${API_BASE_URL}/export/telemetry/excel?${params.toString()}`, {
           responseType: 'blob',
@@ -539,8 +549,15 @@ export default defineComponent({
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           },
-          timeout: 60000 // 60 second timeout
+          timeout: 120000 // 2 minute timeout for large exports
         });
+
+        // Check if response is actually an error message
+        if (response.data.type === 'application/json') {
+          const text = await response.data.text();
+          const errorData = JSON.parse(text);
+          throw new Error(errorData.error || 'Export failed');
+        }
 
         // Create download
         const blob = new Blob([response.data], { 
@@ -580,7 +597,8 @@ export default defineComponent({
           confirmButtonText: 'OK',
           customClass: {
             confirmButton: "btn btn-success"
-          }
+          },
+          timer: 5000
         });
 
       } catch (error: any) {
@@ -605,6 +623,22 @@ export default defineComponent({
         } else if (error.code === 'ECONNABORTED') {
           errorMessage = 'Export timeout. Try exporting a smaller date range.';
         } else if (error.message) {
+          errorMessage = error.message;
+        }
+
+        await Swal.fire({
+          title: 'Export Failed',
+          text: errorMessage,
+          icon: 'error',
+          confirmButtonText: 'OK',
+          customClass: {
+            confirmButton: "btn btn-danger"
+          }
+        });
+      } finally {
+        exportLoading.value = false;
+      }
+    };  } else if (error.message) {
           errorMessage = error.message;
         }
 
