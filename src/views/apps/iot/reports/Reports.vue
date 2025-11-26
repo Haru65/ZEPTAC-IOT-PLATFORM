@@ -1,115 +1,210 @@
 <template>
   <div class="w-100">
-    <div class="d-flex justify-content-end align-items-center mb-3 gap-2" style="min-height:48px;">
-      <button
-        class="btn btn-success"
-        @click="exportToExcel"
-        :disabled="exportLoading"
-        style="min-width:140px;"
-      >
-        <i 
-          :class="exportLoading ? 'bi bi-arrow-clockwise spinning me-2' : 'bi bi-file-earmark-spreadsheet me-2'"
-        ></i>
-        {{ exportLoading ? 'Exporting...' : 'Export to Excel' }}
-      </button>
-      <button
-        class="btn btn-primary"
-        @click="exportPDF"
-        style="min-width:120px;"
-      >
-        <i class="bi bi-file-earmark-pdf me-2"></i>
-        Export to PDF
-      </button>
+    <!-- Header with Export Actions -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="page-heading">Device Reports</h1>
+        <p class="text-muted">Generate and export telemetry data reports</p>
+      </div>
+      <div class="d-flex gap-2">
+        <button
+          class="btn btn-success"
+          @click="exportToExcel"
+          :disabled="exportLoading || telemetryData.length === 0"
+        >
+          <i :class="exportLoading ? 'bi bi-arrow-clockwise spinning me-2' : 'bi bi-file-earmark-spreadsheet me-2'"></i>
+          {{ exportLoading ? 'Exporting...' : 'Export to Excel' }}
+        </button>
+        <button
+          class="btn btn-primary"
+          @click="exportPDF"
+          :disabled="telemetryData.length === 0"
+        >
+          <i class="bi bi-file-earmark-pdf me-2"></i>
+          Export PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+      <div class="col-lg-3 col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="symbol symbol-50px me-3">
+                <span class="symbol-label bg-light-primary">
+                  <i class="bi bi-file-text fs-2x text-primary"></i>
+                </span>
+              </div>
+              <div>
+                <div class="fs-7 text-muted">Total Records</div>
+                <div class="fs-2 fw-bold">{{ totalRecords.toLocaleString() }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="symbol symbol-50px me-3">
+                <span class="symbol-label bg-light-success">
+                  <i class="bi bi-hdd-network fs-2x text-success"></i>
+                </span>
+              </div>
+              <div>
+                <div class="fs-7 text-muted">Active Devices</div>
+                <div class="fs-2 fw-bold">{{ uniqueDevices }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="symbol symbol-50px me-3">
+                <span class="symbol-label bg-light-warning">
+                  <i class="bi bi-calendar-range fs-2x text-warning"></i>
+                </span>
+              </div>
+              <div>
+                <div class="fs-7 text-muted">Date Range</div>
+                <div class="fs-6 fw-bold">{{ dateRangeDisplay }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="symbol symbol-50px me-3">
+                <span class="symbol-label bg-light-info">
+                  <i class="bi bi-clock-history fs-2x text-info"></i>
+                </span>
+              </div>
+              <div>
+                <div class="fs-7 text-muted">Last Updated</div>
+                <div class="fs-7 fw-bold">{{ lastUpdated }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Filters and Data Table Section -->
     <div class="card mb-4">
       <div class="card-header">
-        <h3 class="card-title">Device Telemetry Data</h3>
+        <h3 class="card-title">Telemetry Data</h3>
         <div class="card-toolbar">
-          <div class="d-flex align-items-center gap-3">
-            <select v-model="selectedDevice" @change="loadTelemetryData" class="form-select form-select-sm" style="width: 200px;">
+          <div class="d-flex align-items-center gap-3 flex-wrap">
+            <select 
+              v-model="selectedDevice" 
+              @change="loadTelemetryData" 
+              class="form-select form-select-sm" 
+              style="width: 200px;"
+            >
               <option value="">All Devices</option>
-              <option v-for="device in devices" :key="device?.deviceId || Math.random()" :value="device?.deviceId">
-                {{ device?.name || 'Unknown Device' }} ({{ device?.deviceId || 'N/A' }})
+              <option v-for="device in devices" :key="device.deviceId" :value="device.deviceId">
+                {{ device.name }} ({{ device.deviceId }})
               </option>
             </select>
-            <input v-model="startDate" @change="loadTelemetryData" type="date" class="form-control form-control-sm" style="width: 150px;">
-            <input v-model="endDate" @change="loadTelemetryData" type="date" class="form-control form-control-sm" style="width: 150px;">
-            <button @click="loadTelemetryData" class="btn btn-sm btn-primary" :disabled="loading">
+            <input 
+              v-model="startDate" 
+              @change="loadTelemetryData" 
+              type="date" 
+              class="form-control form-control-sm" 
+              style="width: 150px;"
+            >
+            <input 
+              v-model="endDate" 
+              @change="loadTelemetryData" 
+              type="date" 
+              class="form-control form-control-sm" 
+              style="width: 150px;"
+            >
+            <select 
+              v-model="dataLimit" 
+              @change="loadTelemetryData" 
+              class="form-select form-select-sm" 
+              style="width: 120px;"
+            >
+              <option :value="50">50 records</option>
+              <option :value="100">100 records</option>
+              <option :value="500">500 records</option>
+              <option :value="1000">1000 records</option>
+            </select>
+            <button 
+              @click="loadTelemetryData" 
+              class="btn btn-sm btn-primary" 
+              :disabled="loading"
+            >
               <i :class="loading ? 'bi bi-arrow-clockwise spinning' : 'bi bi-arrow-clockwise'"></i>
-            </button>
-            <button @click="loadTestData" class="btn btn-sm btn-outline-secondary">
-              <i class="bi bi-database"></i> Test Data
+              Refresh
             </button>
           </div>
         </div>
       </div>
       <div class="card-body">
-        <div v-if="loading" class="text-center py-4">
+        <div v-if="loading" class="text-center py-5">
           <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
-          <p class="mt-2 text-muted">Loading telemetry data...</p>
+          <p class="mt-3 text-muted">Loading telemetry data...</p>
         </div>
         
-        <div v-else-if="telemetryData.length === 0" class="text-center py-4">
+        <div v-else-if="telemetryData.length === 0" class="text-center py-5">
           <i class="bi bi-inbox fs-1 text-muted"></i>
-          <p class="mt-2 text-muted">No telemetry data found for the selected filters.</p>
-          <div class="mt-3 text-small text-muted">
-            <p>Debug Info:</p>
-            <p>Selected Device: {{ selectedDevice || 'All Devices' }}</p>
-            <p>Date Range: {{ startDate }} to {{ endDate }}</p>
-            <p>Data Limit: {{ dataLimit }}</p>
-            <button @click="loadTestData" class="btn btn-sm btn-outline-primary mt-2">
-              <i class="bi bi-arrow-clockwise"></i> Generate Test Data
-            </button>
-          </div>
+          <p class="mt-3 text-muted fs-5">No telemetry data found</p>
+          <p class="text-muted">Try adjusting your filters or date range</p>
         </div>
 
-        <div v-else class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-          <table class="table table-row-dashed table-row-gray-300 gy-5">
+        <div v-else class="table-responsive">
+          <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
             <thead>
-              <tr class="fw-bold fs-6 text-gray-800">
-                <th>Device ID</th>
-                <th>Timestamp</th>
-                <th>Event</th>
-                <th>Voltage (V)</th>
-                <th>Current (A)</th>
-                <th>Temperature (°C)</th>
-                <th>Humidity (%)</th>
-                <th>Status</th>
+              <tr class="fw-bold text-muted bg-light">
+                <th class="ps-4 min-w-100px">Device ID</th>
+                <th class="min-w-150px">Timestamp</th>
+                <th class="min-w-100px">Event</th>
+                <th class="min-w-100px" v-for="field in dataFields" :key="field">
+                  {{ formatFieldName(field) }}
+                </th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="record in telemetryData" :key="record._id">
-                <td>
+              <tr v-for="record in displayedData" :key="record._id">
+                <td class="ps-4">
                   <span class="badge badge-light-primary">{{ record.deviceId }}</span>
                 </td>
-                <td>{{ formatTimestamp(record.timestamp) }}</td>
+                <td>
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold">{{ formatDate(record.timestamp) }}</span>
+                    <span class="text-muted fs-7">{{ formatTime(record.timestamp) }}</span>
+                  </div>
+                </td>
                 <td>
                   <span :class="getEventBadgeClass(record.event)">{{ record.event }}</span>
                 </td>
-                <td>{{ formatDataValue(record.voltage || record.data?.voltage) }}</td>
-                <td>{{ formatDataValue(record.current || record.data?.current) }}</td>
-                <td>{{ formatDataValue(record.temperature || record.data?.temperature) }}</td>
-                <td>{{ formatDataValue(record.humidity || record.data?.humidity) }}</td>
-                <td>
-                  <span :class="getStatusBadgeClass(record.status || record.data?.status)">
-                    {{ record.status || record.data?.status || 'Unknown' }}
-                  </span>
+                <td v-for="field in dataFields" :key="field">
+                  {{ formatDataValue(getDataField(record, field)) }}
                 </td>
               </tr>
             </tbody>
           </table>
           
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <span class="text-muted">Showing {{ telemetryData.length }} records</span>
-            <div v-if="telemetryData.length >= dataLimit">
-              <span class="text-warning">
-                <i class="bi bi-info-circle"></i>
-                Limited to {{ dataLimit }} records. Use filters to refine results.
-              </span>
+          <div class="d-flex justify-content-between align-items-center mt-4">
+            <span class="text-muted">
+              Showing {{ displayedData.length }} of {{ telemetryData.length }} records
+            </span>
+            <div v-if="telemetryData.length >= dataLimit" class="text-warning">
+              <i class="bi bi-info-circle"></i>
+              Limited to {{ dataLimit }} records. Use filters or export for complete data.
             </div>
           </div>
         </div>
@@ -117,7 +212,7 @@
     </div>
 
     <!-- Charts Section -->
-    <div id="report-content" class="row g-4">
+    <div class="row g-4">
       <div class="col-lg-12">
         <TemperatureHumidityChart
           widget-classes="card-xl-stretch mb-4"
@@ -134,8 +229,8 @@
   </div>
 </template>
     
-  <script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
+<script lang="ts">
+import { defineComponent, ref, onMounted, computed } from "vue";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import axios from "axios";
@@ -157,34 +252,70 @@ export default defineComponent({
     const authStore = useAuthStore();
     
     // Data and filters
-    const telemetryData = ref([]);
-    const devices = ref([]);
+    const telemetryData = ref<any[]>([]);
+    const devices = ref<any[]>([]);
     const selectedDevice = ref('');
-    const startDate = ref(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]); // 7 days ago
-    const endDate = ref(new Date().toISOString().split('T')[0]); // today
+    const startDate = ref(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+    const endDate = ref(new Date().toISOString().split('T')[0]);
     const dataLimit = ref(100);
 
-    //Load devices list
+    // Computed properties
+    const totalRecords = computed(() => telemetryData.value.length);
+    const uniqueDevices = computed(() => {
+      const deviceIds = new Set(telemetryData.value.map(r => r.deviceId));
+      return deviceIds.size;
+    });
+    const dateRangeDisplay = computed(() => {
+      if (!startDate.value || !endDate.value) return 'Not set';
+      const days = Math.ceil((new Date(endDate.value).getTime() - new Date(startDate.value).getTime()) / (1000 * 60 * 60 * 24));
+      return `${days} days`;
+    });
+    const lastUpdated = computed(() => {
+      if (telemetryData.value.length === 0) return 'No data';
+      return new Date().toLocaleTimeString();
+    });
+
+    // Get all unique data fields from telemetry records
+    const dataFields = computed(() => {
+      const fields = new Set<string>();
+      telemetryData.value.forEach(record => {
+        if (record.data) {
+          const dataObj = record.data instanceof Map ? Object.fromEntries(record.data) : record.data;
+          Object.keys(dataObj).forEach(key => fields.add(key));
+        }
+      });
+      return Array.from(fields).sort();
+    });
+
+    const displayedData = computed(() => telemetryData.value.slice(0, dataLimit.value));
+
+    // Load devices list
     const loadDevices = async () => {
       try {
+        ApiService.setHeader();
         const response = await ApiService.get('/api/devices');
-        if (response.data?.success && Array.isArray(response.data.data)) {
-          devices.value = response.data.data.filter(device => device && device.deviceId);
+        
+        // Handle both response formats: {devices: []} or {data: []}
+        const deviceList = response.data?.devices || response.data?.data || [];
+        
+        if (Array.isArray(deviceList) && deviceList.length > 0) {
+          devices.value = deviceList.filter(device => device && device.deviceId);
+          console.log('✅ Loaded', devices.value.length, 'devices');
         } else {
-          throw new Error('Invalid response format');
+          throw new Error('No devices found');
         }
       } catch (error) {
-        console.error('Error loading devices:', error);
-        // Fallback mock devices for demo
-        devices.value = [
-          { deviceId: '123', name: 'Device 123' },
-          { deviceId: '124', name: 'Device 124' },
-          { deviceId: '125', name: 'Device 125' }
-        ];
+        console.error('❌ Error loading devices:', error);
+        Swal.fire({
+          title: 'Warning',
+          text: 'Could not load devices list. You can still view all data.',
+          icon: 'warning',
+          confirmButtonText: 'OK'
+        });
       }
     };
 
-    // Load telemetry data
+    // Load telemetry data from API
     const loadTelemetryData = async () => {
       try {
         loading.value = true;
@@ -192,237 +323,226 @@ export default defineComponent({
         const params = new URLSearchParams({
           startDate: startDate.value,
           endDate: endDate.value,
-          limit: dataLimit.value.toString()
+          limit: dataLimit.value.toString(),
+          sort: '-timestamp'
         });
 
         if (selectedDevice.value) {
           params.append('deviceId', selectedDevice.value);
         }
 
-        console.log('Loading telemetry data with params:', params.toString());
-        console.log('Selected device:', selectedDevice.value);
-        console.log('Date range:', startDate.value, 'to', endDate.value);
+        console.log('📊 Loading telemetry data:', params.toString());
         
-        try {
-          const response = await ApiService.get(`/api/telemetry?${params.toString()}`);
+        ApiService.setHeader();
+        const response = await ApiService.get(`/api/telemetry?${params.toString()}`);
+        
+        if (response.data?.success && Array.isArray(response.data.data)) {
+          telemetryData.value = response.data.data;
+          console.log('✅ Loaded', telemetryData.value.length, 'records');
           
-          if (response.data?.success && response.data.data?.length > 0) {
-            console.log('API response successful, data length:', response.data.data.length);
-            telemetryData.value = response.data.data;
-          } else {
-            console.log('API response empty or unsuccessful, using mock data');
-            telemetryData.value = generateMockData();
+          if (telemetryData.value.length === 0) {
+            Swal.fire({
+              title: 'No Data Found',
+              text: 'No telemetry data found for the selected filters. Try adjusting the date range or device filter.',
+              icon: 'info',
+              confirmButtonText: 'OK'
+            });
           }
-        } catch (apiError) {
-          console.log('API call failed, using mock data:', apiError.message);
-          telemetryData.value = generateMockData();
+        } else {
+          throw new Error('Invalid response format');
         }
 
-      } catch (error) {
-        console.error('Error in loadTelemetryData:', error);
-        telemetryData.value = generateMockData();
+      } catch (error: any) {
+        console.error('❌ Error loading telemetry data:', error);
+        telemetryData.value = [];
+        
+        Swal.fire({
+          title: 'Error Loading Data',
+          text: error.message || 'Failed to load telemetry data. Please check your connection and try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
       } finally {
         loading.value = false;
       }
     };
 
-    // Generate mock data for demo
-    const generateMockData = () => {
-      const mockData = [];
-      const deviceIds = selectedDevice.value ? [selectedDevice.value] : ['123', '124', '125'];
-      const events = ['NORMAL', 'WARNING', 'ALERT', 'INFO'];
-      const statuses = ['active', 'warning', 'error', 'offline'];
-
-      console.log('Generating mock data for devices:', deviceIds);
-      
-      // Generate data within the selected date range
-      const start = new Date(startDate.value);
-      const end = new Date(endDate.value);
-      const timeDiff = end.getTime() - start.getTime();
-      
-      for (let i = 0; i < Math.min(dataLimit.value, 20); i++) {
-        const randomTime = start.getTime() + Math.random() * timeDiff;
-        const timestamp = new Date(randomTime);
-        
-        mockData.push({
-          _id: `mock_${i}`,
-          deviceId: deviceIds[Math.floor(Math.random() * deviceIds.length)],
-          timestamp: timestamp.toISOString(),
-          event: events[Math.floor(Math.random() * events.length)],
-          voltage: (220 + Math.random() * 20).toFixed(2),
-          current: (5 + Math.random() * 10).toFixed(2),
-          temperature: (20 + Math.random() * 15).toFixed(1),
-          humidity: (40 + Math.random() * 30).toFixed(1),
-          status: statuses[Math.floor(Math.random() * statuses.length)]
-        });
-      }
-
-      // Sort by timestamp descending
-      mockData.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-      
-      console.log('Generated mock data:', mockData.length, 'records for devices:', deviceIds);
-      console.log('First record:', mockData[0]);
-      return mockData;
-    };
-
-    // Force load test data
-    const loadTestData = () => {
-      console.log('Forcing test data generation...');
-      telemetryData.value = generateMockData();
-      console.log('Test data loaded:', telemetryData.value.length, 'records');
-    };
-
     // Utility functions
-    const formatTimestamp = (timestamp: string) => {
-      return new Date(timestamp).toLocaleString();
+    const formatDate = (timestamp: string) => {
+      return new Date(timestamp).toLocaleDateString();
+    };
+
+    const formatTime = (timestamp: string) => {
+      return new Date(timestamp).toLocaleTimeString();
     };
 
     const formatDataValue = (value: any) => {
-      if (value === null || value === undefined) return 'N/A';
+      if (value === null || value === undefined) return '-';
       if (typeof value === 'number') return value.toFixed(2);
       return value.toString();
     };
 
+    const formatFieldName = (field: string) => {
+      return field.toUpperCase().replace(/_/g, ' ');
+    };
+
+    const getDataField = (record: any, field: string) => {
+      if (!record.data) return null;
+      const dataObj = record.data instanceof Map ? Object.fromEntries(record.data) : record.data;
+      return dataObj[field];
+    };
+
     const getEventBadgeClass = (event: string) => {
-      switch (event) {
-        case 'NORMAL': return 'badge badge-light-success';
-        case 'WARNING': return 'badge badge-light-warning';
-        case 'ALERT': return 'badge badge-light-danger';
-        case 'INFO': return 'badge badge-light-info';
-        default: return 'badge badge-light-secondary';
-      }
+      const eventMap: Record<string, string> = {
+        'NORMAL': 'badge badge-light-success',
+        'WARNING': 'badge badge-light-warning',
+        'ALERT': 'badge badge-light-danger',
+        'ERROR': 'badge badge-light-danger',
+        'INFO': 'badge badge-light-info'
+      };
+      return eventMap[event] || 'badge badge-light-secondary';
     };
 
-    const getStatusBadgeClass = (status: string) => {
-      switch (status) {
-        case 'active': return 'badge badge-light-success';
-        case 'warning': return 'badge badge-light-warning';
-        case 'error': return 'badge badge-light-danger';
-        case 'offline': return 'badge badge-light-secondary';
-        default: return 'badge badge-light-secondary';
-      }
-    };
-
-    const getDeviceName = (deviceId: string) => {
-      const device = devices.value.find(d => d.deviceId === deviceId);
-      return device ? device.name : deviceId;
-    };
-
-    // Initialize data on mount
-    onMounted(async () => {
-      console.log('Reports component mounted');
-      await loadDevices();
-      await loadTelemetryData();
-      
-      // Ensure we have some data to show
-      if (telemetryData.value.length === 0) {
-        console.log('No data loaded, forcing mock data generation');
-        telemetryData.value = generateMockData();
-      }
-    });
-
+    // Export to PDF
     const exportPDF = async () => {
-      const reportElement = document.getElementById("report-content");
-      if (!reportElement) return;
-      const canvas = await html2canvas(reportElement);
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({ orientation: "landscape" });
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
-      pdf.save("report.pdf");
+      try {
+        const chartsElement = document.querySelector('.row.g-4');
+        if (!chartsElement) {
+          throw new Error('Charts not found');
+        }
+
+        const canvas = await html2canvas(chartsElement as HTMLElement);
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF({ orientation: "landscape" });
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+        pdf.save(`telemetry_report_${new Date().toISOString().split('T')[0]}.pdf`);
+
+        await Swal.fire({
+          title: 'PDF Downloaded',
+          text: 'Your PDF report has been downloaded successfully.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+          timer: 3000
+        });
+      } catch (error) {
+        console.error('❌ PDF export error:', error);
+        Swal.fire({
+          title: 'Export Failed',
+          text: 'Failed to generate PDF. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
     };
 
+    // Export to Excel - Production Grade
     const exportToExcel = async () => {
       try {
         exportLoading.value = true;
 
-        // Check authentication status
         if (!authStore.isAuthenticated) {
-          throw new Error('You must be logged in to export data. Please login and try again.');
+          throw new Error('You must be logged in to export data.');
         }
 
-        // Show date range selection dialog
-        const { value: dateRange } = await Swal.fire({
-          title: 'Export Telemetry Data to Excel',
+        // Show configuration dialog
+        const { value: exportConfig } = await Swal.fire({
+          title: 'Export Telemetry Data',
           html: `
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="start-date" class="form-label">Start Date</label>
-                <input type="date" id="start-date" class="form-control" value="${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}">
+            <div class="text-start">
+              <div class="mb-3">
+                <label for="export-start-date" class="form-label fw-bold">Start Date</label>
+                <input type="date" id="export-start-date" class="form-control" value="${startDate.value}">
               </div>
-              <div class="col-md-6">
-                <label for="end-date" class="form-label">End Date</label>
-                <input type="date" id="end-date" class="form-control" value="${new Date().toISOString().split('T')[0]}">
+              <div class="mb-3">
+                <label for="export-end-date" class="form-label fw-bold">End Date</label>
+                <input type="date" id="export-end-date" class="form-control" value="${endDate.value}">
               </div>
-              <div class="col-12">
-                <label for="device-id" class="form-label">Device ID (Optional)</label>
-                <input type="text" id="device-id" class="form-control" placeholder="Leave empty for all devices">
+              <div class="mb-3">
+                <label for="export-device-id" class="form-label fw-bold">Device Filter</label>
+                <select id="export-device-id" class="form-select">
+                  <option value="">All Devices</option>
+                  ${devices.value.map(d => `<option value="${d.deviceId}">${d.name} (${d.deviceId})</option>`).join('')}
+                </select>
+              </div>
+              <div class="alert alert-info d-flex align-items-center">
+                <i class="bi bi-info-circle me-2"></i>
+                <small>Export will include all telemetry data for the selected period in Excel format.</small>
               </div>
             </div>
           `,
           focusConfirm: false,
           showCancelButton: true,
-          confirmButtonText: 'Export',
+          confirmButtonText: '<i class="bi bi-download me-2"></i>Export',
           cancelButtonText: 'Cancel',
           customClass: {
             confirmButton: "btn btn-success",
             cancelButton: "btn btn-secondary"
           },
+          width: '500px',
           preConfirm: () => {
-            const startDate = (document.getElementById('start-date') as HTMLInputElement).value;
-            const endDate = (document.getElementById('end-date') as HTMLInputElement).value;
-            const deviceId = (document.getElementById('device-id') as HTMLInputElement).value;
+            const exportStartDate = (document.getElementById('export-start-date') as HTMLInputElement).value;
+            const exportEndDate = (document.getElementById('export-end-date') as HTMLInputElement).value;
+            const exportDeviceId = (document.getElementById('export-device-id') as HTMLSelectElement).value;
 
-            if (!startDate || !endDate) {
+            if (!exportStartDate || !exportEndDate) {
               Swal.showValidationMessage('Please select both start and end dates');
               return false;
             }
 
-            if (new Date(startDate) > new Date(endDate)) {
+            if (new Date(exportStartDate) > new Date(exportEndDate)) {
               Swal.showValidationMessage('Start date cannot be after end date');
               return false;
             }
 
-            return { startDate, endDate, deviceId };
+            return { startDate: exportStartDate, endDate: exportEndDate, deviceId: exportDeviceId };
           }
         });
 
-        if (!dateRange) {
+        if (!exportConfig) {
           exportLoading.value = false;
           return;
         }
 
-        // Prepare API endpoint
+        // Show progress
+        Swal.fire({
+          title: 'Exporting Data',
+          html: 'Please wait while we generate your Excel file...',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        // Prepare API call
         const API_BASE_URL = (import.meta.env.VITE_APP_API_URL || 'http://localhost:3001').replace(/\/$/, '');
         const params = new URLSearchParams({
-          startDate: dateRange.startDate,
-          endDate: dateRange.endDate,
+          startDate: exportConfig.startDate,
+          endDate: exportConfig.endDate,
           format: 'download'
         });
 
-        if (dateRange.deviceId) {
-          params.append('deviceId', dateRange.deviceId);
+        if (exportConfig.deviceId) {
+          params.append('deviceId', exportConfig.deviceId);
         }
 
-        // Make API call to export endpoint
         const token = localStorage.getItem('accessToken');
         if (!token) {
-          throw new Error('No authentication token found. Please login again.');
+          throw new Error('Authentication token not found. Please login again.');
         }
 
-        // Set the authorization header using ApiService
-        ApiService.setHeader();
-
+        // Make API call
         const response = await axios.get(`${API_BASE_URL}/export/telemetry/excel?${params.toString()}`, {
           responseType: 'blob',
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
-          }
+          },
+          timeout: 60000 // 60 second timeout
         });
 
-        // Create download link
+        // Create download
         const blob = new Blob([response.data], { 
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
         });
@@ -430,9 +550,9 @@ export default defineComponent({
         const link = document.createElement('a');
         link.href = url;
         
-        // Set filename from response headers or use default
+        // Extract filename from headers or use default
         const contentDisposition = response.headers['content-disposition'];
-        let filename = 'telemetry_data_export.xlsx';
+        let filename = `telemetry_export_${exportConfig.startDate}_to_${exportConfig.endDate}.xlsx`;
         if (contentDisposition) {
           const filenameMatch = contentDisposition.match(/filename="(.+)"/);
           if (filenameMatch) {
@@ -446,10 +566,16 @@ export default defineComponent({
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
 
-        // Show success message
+        // Success message
         await Swal.fire({
           title: 'Export Successful!',
-          text: 'Your Excel file has been downloaded successfully.',
+          html: `
+            <div class="text-center">
+              <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+              <p class="mt-3">Your Excel file has been downloaded successfully.</p>
+              <p class="text-muted small">File: ${filename}</p>
+            </div>
+          `,
           icon: 'success',
           confirmButtonText: 'OK',
           customClass: {
@@ -458,28 +584,26 @@ export default defineComponent({
         });
 
       } catch (error: any) {
-        console.error('Export error:', error);
+        console.error('❌ Export error:', error);
         
         let errorMessage = 'Failed to export data. Please try again.';
         
-        if (error.message && error.message.includes('authentication token')) {
-          errorMessage = 'Authentication failed. Please login again.';
-          // Optionally redirect to login
-          // router.push('/auth/signin');
+        if (error.message && error.message.includes('Authentication token')) {
+          errorMessage = 'Session expired. Please login again.';
         } else if (error.response) {
           if (error.response.status === 401) {
-            errorMessage = 'Authentication failed. Your session may have expired. Please login again.';
+            errorMessage = 'Authentication failed. Please login again.';
           } else if (error.response.status === 403) {
-            errorMessage = 'You do not have permission to export data. Please contact your administrator.';
+            errorMessage = 'You do not have permission to export data.';
           } else if (error.response.status === 404) {
             errorMessage = 'Export service not found. Please contact support.';
           } else if (error.response.status >= 500) {
-            errorMessage = 'Server error occurred. Please try again later or contact support.';
+            errorMessage = 'Server error. Please try again later.';
           } else if (error.response.data && error.response.data.error) {
             errorMessage = error.response.data.error;
           }
-        } else if (error.code === 'NETWORK_ERROR' || error.message.includes('Network')) {
-          errorMessage = 'Network error. Please check your connection and try again.';
+        } else if (error.code === 'ECONNABORTED') {
+          errorMessage = 'Export timeout. Try exporting a smaller date range.';
         } else if (error.message) {
           errorMessage = error.message;
         }
@@ -498,6 +622,13 @@ export default defineComponent({
       }
     };
 
+    // Initialize
+    onMounted(async () => {
+      console.log('📊 Reports module initialized');
+      await loadDevices();
+      await loadTelemetryData();
+    });
+
     return {
       // Export functions
       exportPDF,
@@ -513,14 +644,22 @@ export default defineComponent({
       dataLimit,
       loading,
       
+      // Computed
+      totalRecords,
+      uniqueDevices,
+      dateRangeDisplay,
+      lastUpdated,
+      dataFields,
+      displayedData,
+      
       // Functions
       loadTelemetryData,
-      loadTestData,
-      formatTimestamp,
+      formatDate,
+      formatTime,
       formatDataValue,
-      getEventBadgeClass,
-      getStatusBadgeClass,
-      getDeviceName
+      formatFieldName,
+      getDataField,
+      getEventBadgeClass
     };
   },
 });
