@@ -167,21 +167,21 @@
 
         <div v-else>
           <!-- Data Table with Horizontal Scroll Container -->
-          <div style="max-width: 100%; overflow-x: auto;">
-            <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4" style="min-width: 800px;">
-              <thead>
+          <div style="max-height: 600px; overflow-y: auto; overflow-x: auto;">
+            <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4" style="min-width: 1200px; margin-bottom: 0;">
+              <thead style="position: sticky; top: 0; z-index: 10;">
                 <tr class="fw-bold text-muted bg-light">
-                  <th class="ps-4" style="min-width: 120px; position: sticky; left: 0; background: #f3f6f9; z-index: 1;">Device ID</th>
-                  <th style="min-width: 150px;">Timestamp</th>
-                  <th style="min-width: 100px;">Event</th>
-                  <th style="min-width: 120px;" v-for="field in dataFields" :key="field">
+                  <th class="ps-4" style="min-width: 130px; position: sticky; left: 0; background: #f3f6f9; z-index: 11;">Device ID</th>
+                  <th style="min-width: 160px;">Timestamp</th>
+                  <th style="min-width: 110px;">Event</th>
+                  <th style="min-width: 130px;" v-for="field in dataFields" :key="field">
                     {{ formatFieldName(field) }}
                   </th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="record in displayedData" :key="record._id">
-                  <td class="ps-4" style="position: sticky; left: 0; background: white; z-index: 1;">
+                  <td class="ps-4" style="position: sticky; left: 0; z-index: 9;">
                     <span class="badge badge-light-primary">{{ record.deviceId }}</span>
                   </td>
                   <td>
@@ -557,6 +557,8 @@ export default defineComponent({
         }
 
         console.log('📤 Export URL:', `${API_BASE_URL}/export/telemetry/excel?${params.toString()}`);
+        console.log('🔑 Token present:', !!token);
+        console.log('📋 Export config:', exportConfig);
 
         // Make API call
         const response = await axios.get(`${API_BASE_URL}/export/telemetry/excel?${params.toString()}`, {
@@ -566,6 +568,13 @@ export default defineComponent({
             'Content-Type': 'application/json'
           },
           timeout: 120000 // 2 minute timeout for large exports
+        });
+
+        console.log('✅ Response received:', {
+          status: response.status,
+          statusText: response.statusText,
+          contentType: response.headers['content-type'],
+          dataSize: response.data.size
         });
 
         // Check if response is actually an error message
@@ -619,6 +628,8 @@ export default defineComponent({
 
       } catch (error: any) {
         console.error('❌ Export error:', error);
+        console.error('❌ Error response:', error.response?.data);
+        console.error('❌ Error status:', error.response?.status);
         
         let errorMessage = 'Failed to export data. Please try again.';
         
@@ -633,28 +644,24 @@ export default defineComponent({
             errorMessage = 'Export service not found. Please contact support.';
           } else if (error.response.status >= 500) {
             errorMessage = 'Server error. Please try again later.';
+            // Try to get error message from response blob
+            if (error.response.data instanceof Blob) {
+              try {
+                const text = await error.response.data.text();
+                const errorData = JSON.parse(text);
+                if (errorData.error) {
+                  errorMessage = `Server error: ${errorData.error}`;
+                }
+              } catch (e) {
+                console.log('Could not parse error response');
+              }
+            }
           } else if (error.response.data && error.response.data.error) {
             errorMessage = error.response.data.error;
           }
         } else if (error.code === 'ECONNABORTED') {
           errorMessage = 'Export timeout. Try exporting a smaller date range.';
         } else if (error.message) {
-          errorMessage = error.message;
-        }
-
-        await Swal.fire({
-          title: 'Export Failed',
-          text: errorMessage,
-          icon: 'error',
-          confirmButtonText: 'OK',
-          customClass: {
-            confirmButton: "btn btn-danger"
-          }
-        });
-      } finally {
-        exportLoading.value = false;
-      }
-    };  } else if (error.message) {
           errorMessage = error.message;
         }
 

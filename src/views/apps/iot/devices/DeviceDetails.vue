@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed, onUnmounted, watch } from 'vue';
+import { defineComponent, ref, onMounted, computed, onUnmounted, watch, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import ApiService from '@/core/services/ApiService';
 import { reverseGeocode } from '@/utils/reverseGeocode';
@@ -11,10 +11,11 @@ const FAILOVER_TIMEOUT_MS = 10_000; // 10 seconds timeout for main device
 
 // Value mappings for device settings
 const ELECTRODE_MAPPING: Record<string, number> = {
+  'Cu/cuso4': 0,
   'CuCuSO4': 0,
   'Zinc': 1,
-  'AgAgSO4': 2,
-  'Custom': 3
+  'Ag/AgCl': 2,
+  'AgAgSO4': 2
 };
 
 const MODE_MAPPING: Record<string, number> = {
@@ -47,6 +48,27 @@ export default defineComponent({
     const connectionStatus = ref<string>('disconnected');
     const updateInterval = ref<NodeJS.Timeout | null>(null);
     
+    // Function to refresh device settings from backend
+    const refreshDeviceSettings = async () => {
+      if (!deviceId.value) return;
+      
+      try {
+        ApiService.setHeader();
+        const settingsResponse = await ApiService.query(`/api/device-management/${deviceId.value}/settings`, {});
+        console.log('🔄 [API POLL] Refreshed device settings from API:', settingsResponse);
+        // The response is { success: true, data: {...} }, so we need .data.data
+        const newSettings = settingsResponse.data?.data || null;
+        console.log('💾 [API POLL] Storing deviceSettings:', newSettings);
+        deviceSettings.value = newSettings;
+        
+        // Force reactivity update
+        await nextTick();
+        console.log('🔄 [API POLL] Settings after update:', settingsParams.value);
+      } catch (e) {
+        console.warn('[API POLL] Could not refresh device settings:', e);
+        deviceSettings.value = null;
+      }
+    };
 
 
     onMounted(() => {
@@ -59,25 +81,40 @@ export default defineComponent({
         try {
           if (deviceId.value) {
             ApiService.setHeader();
-            // Device settings (device-management endpoints)
-            try {
-              const settingsResponse = await ApiService.query(`/api/device-management/${deviceId.value}/settings`, {});
-              deviceSettings.value = settingsResponse.data || null;
-            } catch (e) {
-              console.warn('Could not load device settings:', e);
-              deviceSettings.value = null;
-            }
+            
+            // 1. ALWAYS load device settings from database first (persisted data)
+            console.log('📥 Loading device settings from database...');
+            await refreshDeviceSettings();
 
-            // Latest telemetry (use telemetry API)
+            // 2. Load latest telemetry data for Device Controls display
             try {
               const telemetryResp = await ApiService.query('/api/telemetry', { params: { deviceId: deviceId.value, limit: 1, sort: '-timestamp' } });
               if (telemetryResp?.data?.data && telemetryResp.data.data.length > 0) {
-                mainDevice.value = telemetryResp.data.data[0];
-                lastMainUpdate.value = telemetryResp.data.data[0].timestamp || Date.now();
+                const telemetryData = telemetryResp.data.data[0];
+                console.log('📊 Loaded telemetry from database:', telemetryData);
+                mainDevice.value = telemetryData;
+                
+                // Convert timestamp to milliseconds for comparison
+                const timestamp = telemetryData.timestamp;
+                if (timestamp) {
+                  const timestampMs = typeof timestamp === 'string' 
+                    ? new Date(timestamp).getTime() 
+                    : timestamp;
+                  lastMainUpdate.value = timestampMs;
+                } else {
+                  lastMainUpdate.value = Date.now() - (FAILOVER_TIMEOUT_MS + 1000); // Mark as old
+                }
+                console.log('✅ Telemetry data loaded and device controls should show data');
+              } else {
+                console.log('ℹ️ No telemetry data available yet for device');
               }
             } catch (e) {
               console.warn('Could not load telemetry for device:', e);
             }
+            
+            // 3. Settings are now loaded from database and will update via Socket.IO when device sends new data
+            // No continuous polling needed - device sends settings on startup and changes are tracked
+            console.log('✅ Initial data loaded from database');
           }
         } catch (err) {
           console.error('Error during device-specific initialization', err);
@@ -98,14 +135,17 @@ export default defineComponent({
       // Connection status handling
       socket.value.on('connect', () => {
         connectionStatus.value = 'connected';
-        console.log('Connected to backend server');
+        console.log('✅ Socket.IO Connected to backend server');
+        console.log('🔍 Current deviceId from route:', deviceId.value);
         // If viewing a specific device, subscribe to its updates
         try {
           if (deviceId.value) {
             // Subscribe using the provided id, and also try a prefixed form commonly used by the sim/backend
+            console.log('📡 Subscribing to device updates:', deviceId.value);
             socket.value?.emit('subscribeDevice', deviceId.value);
             // If the route id is numeric (e.g. "123"), also subscribe to "DEVICE_123" room which the sim emits to
             if (/^\d+$/.test(deviceId.value)) {
+              console.log('📡 Also subscribing to prefixed device room:', `DEVICE_${deviceId.value}`);
               socket.value?.emit('subscribeDevice', `DEVICE_${deviceId.value}`);
             }
           }
@@ -150,6 +190,7 @@ export default defineComponent({
 
       // Handle real-time device updates
       socket.value.on('deviceUpdate', (update) => {
+        console.log('🔄 Received deviceUpdate event:', update);
         try {
           // Determine the target device id from the incoming update.
           // Prefer a topic string like 'devices/123/data' if provided, else fall back to payload fields.
@@ -190,9 +231,13 @@ export default defineComponent({
           // If we have a specific deviceId route, only apply updates for that device
           if (deviceId.value) {
             if (updatedKey && routeKey && updatedKey === routeKey) {
+              console.log('✅ Device ID matches, updating data. Route:', routeKey, 'Update:', updatedKey);
               if (update.type === 'main' || update.type === 'device') {
+                console.log('📊 Updating device telemetry data:', update.data);
+                console.log('📊 Previous mainDevice:', mainDevice.value);
                 mainDevice.value = update.data;
                 lastMainUpdate.value = Date.now();
+                console.log('📊 New mainDevice:', mainDevice.value);
                 
                 // Update connection status if provided
                 if (update.connectionStatus && update.connectionStatus.device !== undefined) {
@@ -228,6 +273,33 @@ export default defineComponent({
           }
         } catch (err) {
           console.warn('Error handling deviceUpdate', err);
+        }
+      });
+
+      // Listen for real-time device settings updates
+      socket.value.on('deviceSettingsUpdate', (update) => {
+        console.log('📡 Received real-time settings update from socket:', update);
+        console.log('📡 Current device ID:', deviceId.value, 'Update device ID:', update.deviceId);
+        
+        if (update.deviceId === deviceId.value) {
+          // Create the format expected by our deviceSettings ref
+          const formattedSettings = {
+            "Device ID": update.deviceId,
+            "Message Type": "settings",
+            "sender": "Server",
+            "Parameters": update.settings
+          };
+          
+          console.log('⚡ [SOCKET] Updating deviceSettings with real-time data:', formattedSettings);
+          deviceSettings.value = formattedSettings;
+          // Force reactivity update
+          nextTick(() => {
+            console.log('🔄 [SOCKET] Settings updated, current params:', settingsParams.value);
+          });
+          
+          // Refresh from database to ensure persistence after real-time update
+          console.log('🔄 Refreshing from database to confirm persistence');
+          setTimeout(() => refreshDeviceSettings(), 1000);
         }
       });
 
@@ -270,24 +342,104 @@ export default defineComponent({
 
     // Computed property for displaying device with failover
     const displayedDevice = computed(() => {
+      // If we have recent real-time data, use it
       if (mainDevice.value && now.value - lastMainUpdate.value <= FAILOVER_TIMEOUT_MS) {
         return mainDevice.value;
-      } else if (simDevice.value) {
+      }
+      // If we have any mainDevice data (even if not recent), use it for display
+      // This ensures stored telemetry data from DB is still used for device controls
+      else if (mainDevice.value) {
+        // For stored data, ensure metrics are properly formatted
+        const deviceWithMetrics = {
+          ...mainDevice.value,
+          status: mainDevice.value._id ? 'Stored' : 'Offline', // Mark as stored if from DB
+          metrics: mainDevice.value.metrics || getDeviceMetrics(mainDevice.value)
+        };
+        return deviceWithMetrics;
+      }
+      // Fallback to sim device
+      else if (simDevice.value) {
         return simDevice.value;
       }
       return null;
     });
 
 
+    // Helper function to create basic metrics from settings when no telemetry available
+    const getBasicMetricsFromSettings = () => {
+      const params = deviceSettings.value?.Parameters;
+      if (!params) return [];
+      
+      return [
+        { type: "EVENT", value: getEventLabel(params.Event || 0), icon: "bi-exclamation-circle" },
+        { type: "ELECTRODE", value: getElectrodeLabel(params.Electrode || 0), icon: "bi-plug" },
+        { type: "SHUNT_V", value: `${params['Shunt Voltage'] || 0} mV`, icon: "bi-lightning" },
+        { type: "SHUNT_I", value: `${(params['Shunt Current'] || 0) / 1000} A`, icon: "bi-dash-circle" }
+      ];
+    };
+
+    // Helper function to format REF values - show OPEN if above 5.00V
+    const formatRefValue = (value: any) => {
+      if (!value && value !== 0) return '0.00';
+      const numValue = parseFloat(value.toString());
+      if (isNaN(numValue)) return '0.00';
+      return numValue > 5.00 ? 'OPEN' : numValue.toFixed(2);
+    };
+
+    // Helper function to extract metrics from device data (both live and stored)
+    const getDeviceMetrics = (deviceData: any) => {
+      if (!deviceData) return [];
+      
+      // If metrics already exist and are valid, use them
+      if (deviceData.metrics && Array.isArray(deviceData.metrics) && deviceData.metrics.length > 0) {
+        return deviceData.metrics;
+      }
+      
+      // For stored telemetry data, extract from the 'data' field
+      const data = deviceData.data || deviceData;
+      
+      // Provide robust extraction with proper defaults
+      const metrics = [
+        { type: 'LOG', value: data.LOG || data.log || 0, icon: 'bi-journal-text' },
+        { type: 'EVENT', value: data.EVENT || data.event || 'UNKNOWN', icon: 'bi-exclamation-circle' },
+        { type: 'REF1', value: formatRefValue(data.REF1 || data.ref1), icon: 'bi-graph-up' },
+        { type: 'REF2', value: formatRefValue(data.REF2 || data.ref2), icon: 'bi-graph-up' },
+        { type: 'REF3', value: formatRefValue(data.REF3 || data.ref3), icon: 'bi-graph-up' },
+        { type: 'DCV', value: data.DCV || data.dcv || '0.00', icon: 'bi-battery-charging' },
+        { type: 'DCI', value: data.DCI || data.dci || '0.00', icon: 'bi-lightning-charge' },
+        { type: 'ACV', value: data.ACV || data.acv || '0.00', icon: 'bi-battery' },
+        { type: 'ACI', value: data.ACI || data.aci || '0.00', icon: 'bi-lightning' },
+        { type: 'DI1', value: data.DI1 || data.di1 || 0, icon: 'bi-toggle-on' },
+        { type: 'DI2', value: data.DI2 || data.di2 || 0, icon: 'bi-toggle-on' },
+        { type: 'DI3', value: data.DI3 || data.di3 || 0, icon: 'bi-toggle-on' },
+        { type: 'DI4', value: data.DI4 || data.di4 || 0, icon: 'bi-toggle-on' }
+      ];
+      
+      return metrics;
+    };
+
     // Non-blocking safe device used by the template so the UI doesn't wait for live data
     const safeDevice = computed(() => {
-      return displayedDevice.value || {
-        name: 'Unknown Device',
+      if (displayedDevice.value) {
+        // Ensure metrics are properly set for device controls
+        const device = {
+          ...displayedDevice.value,
+          metrics: displayedDevice.value.metrics || getDeviceMetrics(displayedDevice.value)
+        };
+        
+        return device;
+      }
+      
+      // If no telemetry data but we have device settings, create a basic device object
+      const hasSettings = deviceSettings.value?.Parameters && Object.keys(deviceSettings.value.Parameters).length > 0;
+      
+      return {
+        name: hasSettings ? `Device ${deviceId.value}` : 'Unknown Device',
         location: 'N/A',
-        type: 'Unknown',
-        status: 'offline',
-        lastSeen: 'Never',
-        metrics: []
+        type: hasSettings ? 'IoT Sensor' : 'Unknown',
+        status: hasSettings ? 'Configured' : 'offline',
+        lastSeen: hasSettings ? 'Settings Available' : 'Never',
+        metrics: hasSettings ? getBasicMetricsFromSettings() : []
       };
     });
 
@@ -358,10 +510,57 @@ export default defineComponent({
       return connectionStatus.value === 'connected' ? 'text-success' : 'text-danger';
     });
 
+    // Helper functions to convert codes to labels
+    const getElectrodeLabel = (code: number) => {
+      const labels: Record<number, string> = {
+        0: 'Cu/cuso4',
+        1: 'Zinc',
+        2: 'Ag/AgCl'
+      };
+      return labels[code] || 'Unknown';
+    };
+
+    const getEventLabel = (code: number) => {
+      const labels: Record<number, string> = {
+        0: 'Normal',
+        1: 'Interrupt',
+        2: 'Manual',
+        3: 'DEPOL',
+        4: 'Instant'
+      };
+      return labels[code] || 'Unknown';
+    };
+
+    const getInstantModeLabel = (code: number) => {
+      const labels: Record<number, string> = {
+        0: 'Daily',
+        1: 'Weekly'
+      };
+      return labels[code] || 'Unknown';
+    };
+
+    // Computed property for settings parameters
+    const settingsParams = computed(() => {
+      const settings = deviceSettings.value;
+      if (!settings) return {};
+      
+      const params = settings.Parameters || settings.data?.Parameters || settings['Parameters'] || {};
+      console.log('🔄 SettingsParams computed:', {
+        'Shunt Voltage': params['Shunt Voltage'],
+        'Shunt Current': params['Shunt Current'],
+        fullParams: params
+      });
+      return params;
+    });
+
+    const hasSettings = computed(() => {
+      return settingsParams.value !== null && settingsParams.value !== undefined;
+    });
+
     // Modal/Popup functionality
     const showLogModal = ref<boolean>(false);
+    const loggingInterval = ref<string>('00:01:00');
     const showModeModal = ref<boolean>(false);
-    const showSetNoModal = ref<boolean>(false);
     const showElectrodeModal = ref<boolean>(false);
     
     // Mode options and sub-modals
@@ -374,6 +573,8 @@ export default defineComponent({
     const showAlarmSetupModal = ref<boolean>(false);
     const showAlarmSetopModal = ref<boolean>(false);
     const showAlarmReffcalModal = ref<boolean>(false);
+    const showShuntVoltageModal = ref<boolean>(false);
+    const showShuntCurrentModal = ref<boolean>(false);
     const savingConfiguration = ref<boolean>(false);
 
     // Interrupt mode form data
@@ -382,14 +583,8 @@ export default defineComponent({
       startTime: '',
       stopDate: '',
       stopTime: '',
-      onTime: '', // On time in seconds
-      offTime: '', // Off time in seconds
-      dd: '',
-      mm: '',
-      yy: '',
-      HH: '',
-      MM: '',
-      ss: ''
+      onTime: 86400, // On time in seconds (24 hours)
+      offTime: 86400 // Off time in seconds (24 hours)
     });
 
     // DPOL mode form data
@@ -397,18 +592,12 @@ export default defineComponent({
       startDate: '',
       startTime: '',
       endDate: '',
-      endTime: '',
-      dd: '',
-      mm: '',
-      yy: '',
-      HH: '',
-      MM: ''
+      endTime: ''
     });
 
     // INST mode form data
     const instForm = ref({
       startTime: '',
-      endTime: '',
       frequency: 'daily'
     });
 
@@ -417,45 +606,308 @@ export default defineComponent({
 
     // Alarm item form data
     const alarmSetupForm = ref({
-      value: '00.0',
+      value: '0.00',
       unit: '',
-      threshold: '',
       enabled: false
     });
 
+    // Manual mode timer refs - Hours, Minutes, Seconds (default: 24 hours)
+    const onHours = ref<number>(24);
+    const onMinutes = ref<number>(0);
+    const onSeconds = ref<number>(0);
+    const offHours = ref<number>(24);
+    const offMinutes = ref<number>(0);
+    const offSeconds = ref<number>(0);
+
+    // Watch for changes and update autoForm.onTime and autoForm.offTime
+    watch([onHours, onMinutes, onSeconds], () => {
+      autoForm.value.onTime = (onHours.value * 3600) + (onMinutes.value * 60) + onSeconds.value;
+    });
+
+    watch([offHours, offMinutes, offSeconds], () => {
+      autoForm.value.offTime = (offHours.value * 3600) + (offMinutes.value * 60) + offSeconds.value;
+    });
+
+    // Track last processed settings to prevent duplicate updates
+    let lastProcessedSettings: string | null = null;
+
+    // Watch deviceSettings to populate ALL form values from device data
+    watch(deviceSettings, (newSettings) => {
+      console.log('📡 Device settings changed:', newSettings);
+      if (newSettings?.Parameters) {
+        const params = newSettings.Parameters;
+        
+        // Create a stable hash by sorting keys to handle different property orders
+        const createStableHash = (obj: any) => {
+          const sortedKeys = Object.keys(obj).sort();
+          const sortedObj: any = {};
+          sortedKeys.forEach(key => {
+            sortedObj[key] = obj[key];
+          });
+          return JSON.stringify(sortedObj);
+        };
+        
+        const settingsHash = createStableHash(params);
+        
+        // Skip update if settings haven't actually changed
+        if (settingsHash === lastProcessedSettings) {
+          console.log('⏭️ Settings unchanged, skipping form update (hash match)');
+          return;
+        }
+        
+        lastProcessedSettings = settingsHash;
+        
+        const onTime = params['Interrupt ON Time'] || 0;
+        const offTime = params['Interrupt OFF Time'] || 0;
+        
+        // Convert seconds to hours, minutes, seconds for ON time
+        onHours.value = Math.floor(onTime / 3600);
+        onMinutes.value = Math.floor((onTime % 3600) / 60);
+        onSeconds.value = onTime % 60;
+        
+        // Convert seconds to hours, minutes, seconds for OFF time
+        offHours.value = Math.floor(offTime / 3600);
+        offMinutes.value = Math.floor((offTime % 3600) / 60);
+        offSeconds.value = offTime % 60;
+        
+        // Update autoForm values
+        autoForm.value.onTime = onTime;
+        autoForm.value.offTime = offTime;
+        
+        // Update autoForm timestamps if available
+        if (params['Interrupt Start TimeStamp']) {
+          const [date, time] = params['Interrupt Start TimeStamp'].split(' ');
+          if (date && time) {
+            autoForm.value.startDate = date;
+            autoForm.value.startTime = time;
+          }
+        }
+        if (params['Interrupt Stop TimeStamp']) {
+          const [date, time] = params['Interrupt Stop TimeStamp'].split(' ');
+          if (date && time) {
+            autoForm.value.stopDate = date;
+            autoForm.value.stopTime = time;
+          }
+        }
+        
+        // Update dpolForm values
+        if (params['Depolarization Start TimeStamp']) {
+          const [date, time] = params['Depolarization Start TimeStamp'].split(' ');
+          if (date && time) {
+            dpolForm.value.startDate = date;
+            dpolForm.value.startTime = time;
+          }
+        }
+        if (params['Depolarization Stop TimeStamp']) {
+          const [date, time] = params['Depolarization Stop TimeStamp'].split(' ');
+          if (date && time) {
+            dpolForm.value.endDate = date;
+            dpolForm.value.endTime = time;
+          }
+        }
+        
+        // Update instForm values
+        if (params['Instant Mode'] !== undefined) {
+          instForm.value.frequency = params['Instant Mode'] === 0 ? 'daily' : 'weekly';
+        }
+        if (params['Instant Start TimeStamp']) {
+          instForm.value.startTime = params['Instant Start TimeStamp'];
+        }
+        
+        // All forms updated successfully
+      } else {
+        // No device parameters received
+      }
+    }, { immediate: true }); // Removed deep:true to prevent nested property triggers
+
+    // Watch loggingInterval to auto-shift 00:00:00 to meaningful value
+    watch(loggingInterval, (newValue) => {
+      if (newValue === '00:00:00') {
+        // Use nextTick to avoid infinite loop and allow the input to update first
+        nextTick(() => {
+          loggingInterval.value = '00:01:00';
+        });
+      }
+    });
+
+    // Helper functions for timer
+    const formatTotalTime = (hours: number, minutes: number, seconds: number) => {
+      const total = (hours * 3600) + (minutes * 60) + seconds;
+      if (total === 0) return '0 seconds';
+      
+      const parts: string[] = [];
+      if (hours > 0) parts.push(`${hours}h`);
+      if (minutes > 0) parts.push(`${minutes}m`);
+      if (seconds > 0) parts.push(`${seconds}s`);
+      
+      return parts.join(' ') + ` (${total}s total)`;
+    };
+
+    const setOnTime = (hours: number, minutes: number, seconds: number) => {
+      onHours.value = hours;
+      onMinutes.value = minutes;
+      onSeconds.value = seconds;
+    };
+
+    const setOffTime = (hours: number, minutes: number, seconds: number) => {
+      offHours.value = hours;
+      offMinutes.value = minutes;
+      offSeconds.value = seconds;
+    };
+
+    // Helper function to populate Auto/Interrupt form from device settings
+    const populateAutoFormFromSettings = () => {
+      console.log('🔍 DEBUG AUTO: populateAutoFormFromSettings called');
+      
+      if (deviceSettings.value?.Parameters) {
+        const params = deviceSettings.value.Parameters;
+        console.log('🔍 DEBUG AUTO: Available parameters:', Object.keys(params));
+        
+        // Populate timer values if available
+        const onTime = params['Interrupt ON Time'] || 0;
+        const offTime = params['Interrupt OFF Time'] || 0;
+        console.log('🔍 DEBUG AUTO: Timer values - ON:', onTime, 'OFF:', offTime);
+        
+        autoForm.value.onTime = onTime;
+        autoForm.value.offTime = offTime;
+        
+        // CRITICAL: Update timer component values for modal form inputs
+        // Convert ON time seconds to hours, minutes, seconds
+        onHours.value = Math.floor(onTime / 3600);
+        onMinutes.value = Math.floor((onTime % 3600) / 60);
+        onSeconds.value = onTime % 60;
+        
+        // Convert OFF time seconds to hours, minutes, seconds
+        offHours.value = Math.floor(offTime / 3600);
+        offMinutes.value = Math.floor((offTime % 3600) / 60);
+        offSeconds.value = offTime % 60;
+        
+        console.log('🔍 DEBUG AUTO: Converted timer values:', {
+          onHours: onHours.value, onMinutes: onMinutes.value, onSeconds: onSeconds.value,
+          offHours: offHours.value, offMinutes: offMinutes.value, offSeconds: offSeconds.value
+        });
+        
+        // Populate timestamps if available - try both display format and camelCase format
+        const startTimestamp = params['Interrupt Start TimeStamp'] || params['interruptStartTimestamp'];
+        const stopTimestamp = params['Interrupt Stop TimeStamp'] || params['interruptStopTimestamp'];
+        
+        if (startTimestamp) {
+          const [date, time] = startTimestamp.split(' ');
+          console.log('🔍 DEBUG AUTO: Start timestamp split:', { date, time, original: startTimestamp });
+          if (date && time) {
+            autoForm.value.startDate = date;
+            autoForm.value.startTime = time;
+          }
+        }
+        if (stopTimestamp) {
+          const [date, time] = stopTimestamp.split(' ');
+          console.log('🔍 DEBUG AUTO: Stop timestamp split:', { date, time, original: stopTimestamp });
+          if (date && time) {
+            autoForm.value.stopDate = date;
+            autoForm.value.stopTime = time;
+          }
+        }
+        
+        console.log('🔍 DEBUG AUTO: Final autoForm values:', {
+          startDate: autoForm.value.startDate,
+          startTime: autoForm.value.startTime,
+          stopDate: autoForm.value.stopDate,
+          stopTime: autoForm.value.stopTime,
+          onTime: autoForm.value.onTime,
+          offTime: autoForm.value.offTime
+        });
+      } else {
+        console.log('⚠️ DEBUG AUTO: No device settings available');
+      }
+    };
+
+    // Helper function to populate DPOL form from device settings
+    const populateDpolFormFromSettings = () => {
+      if (deviceSettings.value?.Parameters) {
+        const params = deviceSettings.value.Parameters;
+        
+
+        
+        // Populate timestamps if available - try both display format and camelCase format
+        const startTimestamp = params['Depolarization Start TimeStamp'] || params['depolarizationStartTimestamp'];
+        const stopTimestamp = params['Depolarization Stop TimeStamp'] || params['depolarizationStopTimestamp'];
+        
+        if (startTimestamp) {
+          const [date, time] = startTimestamp.split(' ');
+          if (date && time) {
+            dpolForm.value.startDate = date;
+            dpolForm.value.startTime = time;
+          }
+        }
+        if (stopTimestamp) {
+          const [date, time] = stopTimestamp.split(' ');
+          if (date && time) {
+            dpolForm.value.endDate = date;
+            dpolForm.value.endTime = time;
+          }
+        }
+        
+        // DPOL form populated successfully
+      } else {
+        // No device settings available
+      }
+    };
+
+    // Helper function to populate INST form from device settings
+    const populateInstFormFromSettings = () => {
+      console.log('🔍 DEBUG: populateInstFormFromSettings called');
+      console.log('🔍 DEBUG: deviceSettings.value:', deviceSettings.value);
+      
+      if (deviceSettings.value?.Parameters) {
+        const params = deviceSettings.value.Parameters;
+        console.log('🔍 DEBUG: Available parameters:', Object.keys(params));
+        console.log('🔍 DEBUG: Instant Mode value:', params['Instant Mode']);
+        // Try both display format and camelCase format for timestamps
+        const startTime = params['Instant Start TimeStamp'] || params['instantStartTimestamp'];
+        console.log('🔍 DEBUG: Start time value:', startTime);
+        
+        // Populate INST mode settings if available
+        if (params['Instant Mode'] !== undefined) {
+          instForm.value.frequency = params['Instant Mode'] === 0 ? 'daily' : 'weekly';
+          console.log('🔍 DEBUG: Set frequency to:', instForm.value.frequency);
+        }
+        if (startTime) {
+          instForm.value.startTime = startTime;
+          console.log('🔍 DEBUG: Set startTime to:', instForm.value.startTime);
+        }
+        
+        console.log('🔍 DEBUG: Final instForm values:', {
+          frequency: instForm.value.frequency,
+          startTime: instForm.value.startTime
+        });
+      } else {
+        console.log('⚠️ DEBUG: No device settings available');
+      }
+    };
+
     const alarmSetopForm = ref({
-      value: '00.0',
+      value: '0.00',
       unit: '',
-      threshold: '',
       enabled: false
     });
 
     const alarmReffcalForm = ref({
-      value: '00.0',
+      value: '0.00',
       unit: '',
       calibration: '',
       enabled: false
     });
 
-    // SET NO timer configuration data
-    const setNoForm = ref({
-      ton: {
-        field1: '',
-        field2: '',
-        field3: '',
-        field4: '',
-        field5: '',
-        field6: ''
-      },
-      toff: {
-        field1: '',
-        field2: '',
-        field3: '',
-        field4: '',
-        field5: '',
-        field6: ''
-      }
+    // Shunt configuration forms
+    const shuntVoltageForm = ref({
+      value: '25.00'
     });
+    
+    const shuntCurrentForm = ref({
+      value: '99.99'
+    });
+
+
 
     // Functions to open modals
     const openLogModal = () => {
@@ -466,9 +918,7 @@ export default defineComponent({
       showModeModal.value = true;
     };
 
-    const openSetNoModal = () => {
-      showSetNoModal.value = true;
-    };
+
 
     const openElectrodeModal = () => {
       showElectrodeModal.value = true;
@@ -498,21 +948,53 @@ export default defineComponent({
 
     const openAutoModal = () => {
       showModeModal.value = false;
-      showAutoModal.value = true;
+      
+      // CRITICAL: Always populate form with current device settings when opening modal
+      // This ensures data persists even after page refresh
+      populateAutoFormFromSettings();
+      
+      // Show modal with a small delay to ensure reactivity updates
+      nextTick(() => {
+        showAutoModal.value = true;
+        // Modal opened with populated values
+      });
     };
 
     const openManualModal = () => {
       showModeModal.value = false;
-      showManualModal.value = true;
+      
+      // Always populate form with current device settings when opening modal
+      populateAutoFormFromSettings(); // Reuse same function as Manual uses same timer fields
+      
+      // Show modal with a small delay to ensure reactivity updates
+      nextTick(() => {
+        showManualModal.value = true;
+        console.log('🔍 MANUAL modal opened with timer values:', {
+          onHours: onHours.value,
+          onMinutes: onMinutes.value,
+          onSeconds: onSeconds.value,
+          offHours: offHours.value,
+          offMinutes: offMinutes.value,
+          offSeconds: offSeconds.value
+        });
+      });
     };
 
     const openDpolModal = () => {
       showModeModal.value = false;
+      
+      // Always populate form with current device settings when opening modal
+      populateDpolFormFromSettings();
+      
       showDpolModal.value = true;
     };
 
     const openInstModal = () => {
       showModeModal.value = false;
+      
+      // Always populate form with current device settings when opening modal
+      populateInstFormFromSettings();
+      
       showInstModal.value = true;
     };
 
@@ -521,13 +1003,177 @@ export default defineComponent({
       showLogModal.value = false;
     };
 
+    // Logging interval functions
+    const setLoggingInterval = (interval: string) => {
+      // Auto-shift 00:00:00 to minimum meaningful interval
+      if (interval === '00:00:00') {
+        loggingInterval.value = '00:01:00';
+      } else {
+        loggingInterval.value = interval;
+      }
+    };
+
+    const isValidTimeFormat = (time: string) => {
+      const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/;
+      if (!timeRegex.test(time)) return false;
+      
+      // Check if it's 00:00:00 (zero interval)
+      const [hours, minutes, seconds] = time.split(':').map(Number);
+      const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+      
+      // Reject zero intervals as they disable logging
+      return totalSeconds > 0;
+    };
+
+    const formatIntervalDescription = (interval: string) => {
+      if (!isValidTimeFormat(interval)) return 'Invalid format';
+      
+      const [hours, minutes, seconds] = interval.split(':').map(Number);
+      const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+      
+      if (totalSeconds === 0) return 'No logging';
+      if (totalSeconds < 60) return `Every ${totalSeconds} second${totalSeconds !== 1 ? 's' : ''}`;
+      if (totalSeconds < 3600) {
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
+        return secs > 0 ? `Every ${mins}m ${secs}s` : `Every ${mins} minute${mins !== 1 ? 's' : ''}`;
+      }
+      
+      const hrs = Math.floor(totalSeconds / 3600);
+      const mins = Math.floor((totalSeconds % 3600) / 60);
+      const secs = totalSeconds % 60;
+      
+      let desc = `Every ${hrs} hour${hrs !== 1 ? 's' : ''}`;
+      if (mins > 0) desc += ` ${mins}m`;
+      if (secs > 0) desc += ` ${secs}s`;
+      
+      return desc;
+    };
+
+    const saveLoggingInterval = async () => {
+      // Auto-shift 00:00:00 to minimum interval
+      if (loggingInterval.value === '00:00:00') {
+        loggingInterval.value = '00:01:00';
+        Swal.fire({
+          title: 'Interval Adjusted',
+          text: 'Logging interval cannot be 00:00:00 (no logging). Automatically adjusted to 00:01:00 (1 minute).',
+          icon: 'info',
+          confirmButtonText: 'Continue'
+        });
+        return;
+      }
+
+      if (!isValidTimeFormat(loggingInterval.value)) {
+        const [hours, minutes, seconds] = loggingInterval.value.split(':').map(Number);
+        const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+        
+        if (totalSeconds === 0) {
+          Swal.fire({
+            title: 'Invalid Interval',
+            text: 'Logging interval cannot be 00:00:00 as it disables data logging. Please set a minimum interval of 00:00:01.',
+            icon: 'warning',
+            confirmButtonText: 'OK'
+          });
+        } else {
+          Swal.fire({
+            title: 'Invalid Format',
+            text: 'Please enter a valid time format (HH:MM:SS)',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+        }
+        return;
+      }
+
+      try {
+        // Show loading
+        Swal.fire({
+          title: 'Applying Logging Interval',
+          html: `Setting logging interval to <strong>${loggingInterval.value}</strong><br><small>Sending command to device...</small>`,
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        // Convert time to seconds for device
+        const [hours, minutes, seconds] = loggingInterval.value.split(':').map(Number);
+        const intervalInSeconds = hours * 3600 + minutes * 60 + seconds;
+
+        // Prepare logging interval settings for device
+        const loggingSettings = {
+          loggingInterval: intervalInSeconds,
+          loggingIntervalFormatted: loggingInterval.value,
+          description: formatIntervalDescription(loggingInterval.value),
+          lastUpdated: new Date().toISOString()
+        };
+
+        // Save logging interval settings to database and send to device
+        if (deviceId.value) {
+          try {
+            // Save to database using the MQTT service method
+            await mqttService.saveSettingsToDatabase(deviceId.value, {
+              logging: loggingSettings
+            });
+            console.log('💾 [API] Saved logging interval to backend');
+
+            // Send device command via API (this will send MQTT message to device)
+            ApiService.setHeader();
+            const deviceCommand = {
+              commandType: 'set_logging_interval',
+              deviceId: deviceId.value,
+              parameters: {
+                interval: intervalInSeconds,
+                intervalFormatted: loggingInterval.value,
+                description: formatIntervalDescription(loggingInterval.value)
+              },
+              timestamp: new Date().toISOString()
+            };
+            
+            await ApiService.post(`/api/devices/${deviceId.value}/commands/logging`, deviceCommand);
+            console.log('📤 [MQTT] Sent logging interval command via API');
+            
+          } catch (apiError) {
+            console.warn('⚠️ [API] Could not save/send logging interval:', apiError);
+            throw apiError;
+          }
+        }
+
+        // Success message
+        Swal.fire({
+          title: 'Success!',
+          html: `
+            <div class="text-start">
+              <p><strong>Logging interval updated successfully!</strong></p>
+              <hr>
+              <p><i class="bi bi-clock me-2"></i><strong>Interval:</strong> ${loggingInterval.value}</p>
+              <p><i class="bi bi-info-circle me-2"></i><strong>Frequency:</strong> ${formatIntervalDescription(loggingInterval.value)}</p>
+              <p><i class="bi bi-broadcast me-2"></i><strong>Command sent to device</strong> via MQTT</p>
+            </div>
+          `,
+          icon: 'success',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#198754'
+        });
+
+        closeLogModal();
+        
+      } catch (error) {
+        console.error('❌ [LOG INTERVAL] Error:', error);
+        Swal.fire({
+          title: 'Error',
+          text: 'Failed to set logging interval. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
+    };
+
     const closeModeModal = () => {
       showModeModal.value = false;
     };
 
-    const closeSetNoModal = () => {
-      showSetNoModal.value = false;
-    };
+
 
     const closeElectrodeModal = () => {
       showElectrodeModal.value = false;
@@ -540,14 +1186,66 @@ export default defineComponent({
     // Functions to close alarm item modals
     const closeAlarmSetupModal = () => {
       showAlarmSetupModal.value = false;
+      showAlarmModal.value = true; // Return to main alarm modal
+    };
+
+    const saveAlarmSetupModal = () => {
+      // Close setup modal and return to main alarm modal
+      showAlarmSetupModal.value = false;
+      showAlarmModal.value = true;
     };
 
     const closeAlarmSetopModal = () => {
       showAlarmSetopModal.value = false;
+      showAlarmModal.value = true; // Return to main alarm modal
+    };
+
+    const saveAlarmSetopModal = () => {
+      // Close setop modal and return to main alarm modal
+      showAlarmSetopModal.value = false;
+      showAlarmModal.value = true;
     };
 
     const closeAlarmReffcalModal = () => {
       showAlarmReffcalModal.value = false;
+      showAlarmModal.value = true; // Return to main alarm modal
+    };
+
+    const saveAlarmReffcalModal = () => {
+      // Close reffcal modal and return to main alarm modal
+      showAlarmReffcalModal.value = false;
+      showAlarmModal.value = true;
+    };
+
+    // Functions for shunt configuration modals
+    const openShuntVoltageModal = () => {
+      const currentValue = settingsParams.value?.['Shunt Voltage'];
+      if (currentValue) {
+        // If it's already formatted string, use it; otherwise format it
+        shuntVoltageForm.value.value = typeof currentValue === 'string' ? currentValue : parseFloat(currentValue).toFixed(2).padStart(5, '0');
+      } else {
+        shuntVoltageForm.value.value = '25.00';
+      }
+      showShuntVoltageModal.value = true;
+    };
+
+    const closeShuntVoltageModal = () => {
+      showShuntVoltageModal.value = false;
+    };
+
+    const openShuntCurrentModal = () => {
+      const currentValue = settingsParams.value?.['Shunt Current'];
+      if (currentValue) {
+        // If it's already formatted string, use it; otherwise format it
+        shuntCurrentForm.value.value = typeof currentValue === 'string' ? currentValue : parseFloat(currentValue).toFixed(2).padStart(5, '0');
+      } else {
+        shuntCurrentForm.value.value = '99.99';
+      }
+      showShuntCurrentModal.value = true;
+    };
+
+    const closeShuntCurrentModal = () => {
+      showShuntCurrentModal.value = false;
     };
 
     // Functions to close mode sub-modals and return to main mode modal
@@ -583,15 +1281,7 @@ export default defineComponent({
           stopDate: autoForm.value.stopDate,
           stopTime: autoForm.value.stopTime,
           onTime: parseInt(autoForm.value.onTime.toString()),
-          offTime: parseInt(autoForm.value.offTime.toString()),
-          dateFormat: {
-            dd: autoForm.value.dd,
-            mm: autoForm.value.mm,
-            yy: autoForm.value.yy,
-            HH: autoForm.value.HH,
-            MM: autoForm.value.MM,
-            ss: autoForm.value.ss
-          }
+          offTime: parseInt(autoForm.value.offTime.toString())
         };
 
         console.log('Sending interrupt mode configuration:', config);
@@ -600,6 +1290,20 @@ export default defineComponent({
         const response = await mqttService.configureInterruptMode(deviceId.value || '123', config);
 
         if (response.success) {
+          // Save settings to database after successful send
+          try {
+            await mqttService.saveSettingsToDatabase(deviceId.value || '123', {
+              event: 1, // Interrupt mode
+              interruptStartTimestamp: `${config.startDate} ${config.startTime}`,
+              interruptStopTimestamp: `${config.stopDate} ${config.stopTime}`,
+              interruptOnTime: config.onTime,
+              interruptOffTime: config.offTime
+            });
+            console.log('✅ Interrupt mode settings saved to database');
+          } catch (dbError) {
+            console.warn('⚠️ Database save failed (non-critical):', dbError);
+          }
+
           await Swal.fire({
             title: 'Configuration Sent!',
             text: 'Interrupt mode configuration has been sent to the device successfully.',
@@ -607,6 +1311,7 @@ export default defineComponent({
             confirmButtonText: 'OK'
           });
           
+          await refreshDeviceSettings();
           // Close the modal
           closeAutoModal();
           showModeModal.value = false;
@@ -651,11 +1356,184 @@ export default defineComponent({
       showModeModal.value = true;
     };
 
+    // Save shunt configuration functions
+    const saveShuntVoltageConfiguration = async () => {
+      try {
+        if (!deviceId.value) {
+          throw new Error('Device ID is required');
+        }
+
+        const voltage = parseFloat(shuntVoltageForm.value.value);
+        if (voltage < 0.00 || voltage > 99.99) {
+          throw new Error('Voltage must be between 00.00 and 99.99');
+        }
+
+        // Send the formatted string value to preserve leading zeros
+        const formattedVoltage = voltage.toFixed(2).padStart(5, '0');
+        const payload = { shuntVoltage: formattedVoltage };
+
+        console.log('💾 Saving Shunt Voltage configuration:', payload);
+        ApiService.setHeader();
+        const response = await ApiService.post(`/api/devices/${deviceId.value}/configure/shunt-voltage`, payload);
+        
+        if (response.data.success) {
+          await Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: `Shunt voltage set to ${formattedVoltage}`,
+            showConfirmButton: false,
+            timer: 2000
+          });
+          
+          // Force refresh device settings and UI update
+          console.log('🔄 Forcing device settings refresh after voltage update...');
+          await refreshDeviceSettings();
+          
+          // Also update local settings immediately for instant feedback
+          if (deviceSettings.value?.Parameters) {
+            deviceSettings.value.Parameters['Shunt Voltage'] = formattedVoltage;
+          }
+          
+          await nextTick();
+          console.log('🔄 Voltage updated, current settings:', settingsParams.value);
+          closeShuntVoltageModal();
+        }
+      } catch (error: any) {
+        console.error('❌ Error saving Shunt Voltage:', error);
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.response?.data?.message || error.message || 'Failed to save voltage configuration'
+        });
+      }
+    };
+
+    const saveShuntCurrentConfiguration = async () => {
+      try {
+        if (!deviceId.value) {
+          throw new Error('Device ID is required');
+        }
+
+        const current = parseFloat(shuntCurrentForm.value.value);
+        if (current < 0.00 || current > 99.99) {
+          throw new Error('Current must be between 00.00 and 99.99');
+        }
+
+        // Send the formatted string value to preserve leading zeros
+        const formattedCurrent = current.toFixed(2).padStart(5, '0');
+        const payload = { shuntCurrent: formattedCurrent };
+
+        console.log('💾 Saving Shunt Current configuration:', payload);
+        ApiService.setHeader();
+        const response = await ApiService.post(`/api/devices/${deviceId.value}/configure/shunt-current`, payload);
+        
+        if (response.data.success) {
+          await Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: `Shunt current set to ${formattedCurrent}`,
+            showConfirmButton: false,
+            timer: 2000
+          });
+          
+          // Force refresh device settings and UI update
+          console.log('🔄 Forcing device settings refresh after current update...');
+          await refreshDeviceSettings();
+          
+          // Also update local settings immediately for instant feedback
+          if (deviceSettings.value?.Parameters) {
+            deviceSettings.value.Parameters['Shunt Current'] = formattedCurrent;
+          }
+          
+          await nextTick();
+          console.log('🔄 Current updated, current settings:', settingsParams.value);
+          closeShuntCurrentModal();
+        }
+      } catch (error: any) {
+        console.error('❌ Error saving Shunt Current:', error);
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.response?.data?.message || error.message || 'Failed to save current configuration'
+        });
+      }
+    };
+
     // Function to close all modals
+    // Input validation methods
+    const validateVoltageInput = (event: any) => {
+      const value = event.target.value;
+      // Remove any characters that aren't digits or decimal point
+      const cleaned = value.replace(/[^0-9.]/g, '');
+      // Ensure only one decimal point
+      const parts = cleaned.split('.');
+      if (parts.length > 2) {
+        event.target.value = parts[0] + '.' + parts.slice(1).join('');
+      }
+      // Limit to 2 decimal places
+      if (parts[1] && parts[1].length > 2) {
+        event.target.value = parts[0] + '.' + parts[1].substring(0, 2);
+      }
+      shuntVoltageForm.value.value = event.target.value;
+    };
+
+    const formatVoltageInput = (event: any) => {
+      const value = parseFloat(event.target.value);
+      if (!isNaN(value)) {
+        const clamped = Math.min(Math.max(value, 0), 99.99);
+        const formatted = clamped.toFixed(2).padStart(5, '0');
+        event.target.value = formatted;
+        shuntVoltageForm.value.value = formatted;
+      }
+    };
+
+    const validateCurrentInput = (event: any) => {
+      const value = event.target.value;
+      // Remove any characters that aren't digits or decimal point
+      const cleaned = value.replace(/[^0-9.]/g, '');
+      // Ensure only one decimal point
+      const parts = cleaned.split('.');
+      if (parts.length > 2) {
+        event.target.value = parts[0] + '.' + parts.slice(1).join('');
+      }
+      // Limit to 2 decimal places
+      if (parts[1] && parts[1].length > 2) {
+        event.target.value = parts[0] + '.' + parts[1].substring(0, 2);
+      }
+      shuntCurrentForm.value.value = event.target.value;
+    };
+
+    const formatCurrentInput = (event: any) => {
+      const value = parseFloat(event.target.value);
+      if (!isNaN(value)) {
+        const clamped = Math.min(Math.max(value, 0), 99.99);
+        const formatted = clamped.toFixed(2).padStart(5, '0');
+        event.target.value = formatted;
+        shuntCurrentForm.value.value = formatted;
+      }
+    };
+
+    // Display formatting functions for device settings matrix
+    const formatShuntVoltageDisplay = (voltage: any) => {
+      if (!voltage && voltage !== 0) return '25.00 V';
+      if (typeof voltage === 'string') {
+        return `${voltage} V`;
+      }
+      return `${parseFloat(voltage).toFixed(2).padStart(5, '0')} V`;
+    };
+
+    const formatShuntCurrentDisplay = (current: any) => {
+      if (!current && current !== 0) return '99.99 mA';
+      if (typeof current === 'string') {
+        return `${current} mA`;
+      }
+      return `${parseFloat(current).toFixed(2).padStart(5, '0')} mA`;
+    };
+
     const closeAllModals = () => {
       showLogModal.value = false;
       showModeModal.value = false;
-      showSetNoModal.value = false;
+
       showElectrodeModal.value = false;
       showNormalModal.value = false;
       showAutoModal.value = false;
@@ -666,40 +1544,11 @@ export default defineComponent({
       showAlarmSetupModal.value = false;
       showAlarmSetopModal.value = false;
       showAlarmReffcalModal.value = false;
+      showShuntVoltageModal.value = false;
+      showShuntCurrentModal.value = false;
     };
 
-    // Save timer configuration
-    const saveTimerConfiguration = async () => {
-      try {
-        const config = {
-          ton: setNoForm.value.ton,
-          toff: setNoForm.value.toff
-        };
 
-  console.log('Sending timer configuration:', config);
-  const response = await mqttService.setTimerConfiguration(deviceId.value || '123', config);
-        
-        if (response.success) {
-          await Swal.fire({
-            title: 'Timer Configuration Sent!',
-            text: 'Timer settings have been sent to the device.',
-            icon: 'success',
-            confirmButtonText: 'OK'
-          });
-          closeSetNoModal();
-        } else {
-          throw new Error(response.message || 'Configuration failed');
-        }
-      } catch (error: any) {
-        console.error('Error configuring timer:', error);
-        await Swal.fire({
-          title: 'Configuration Failed',
-          text: error.message || 'Failed to configure timer. Please try again.',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
-      }
-    };
 
     // Save electrode configuration
     const saveElectrodeConfiguration = async () => {
@@ -718,12 +1567,24 @@ export default defineComponent({
   const response = await mqttService.setElectrodeConfiguration(deviceId.value || '123', selectedElectrode.value);
         
         if (response.success) {
+          // Save settings to database after successful send
+          try {
+            const electrodeCode = ELECTRODE_MAPPING[selectedElectrode.value] || 0;
+            await mqttService.saveSettingsToDatabase(deviceId.value || '123', {
+              electrode: electrodeCode
+            });
+            console.log('✅ Electrode setting saved to database');
+          } catch (dbError) {
+            console.warn('⚠️ Database save failed (non-critical):', dbError);
+          }
+
           await Swal.fire({
             title: 'Electrode Configuration Sent!',
             text: `${selectedElectrode.value} electrode configuration has been sent to the device.`,
             icon: 'success',
             confirmButtonText: 'OK'
           });
+          await refreshDeviceSettings();
           closeElectrodeModal();
         } else {
           throw new Error(response.message || 'Configuration failed');
@@ -742,22 +1603,37 @@ export default defineComponent({
     // Save manual mode action
     const executeManualAction = async (action: 'start' | 'stop') => {
       try {
-  console.log('Sending manual mode action:', action);
-  const response = await mqttService.setManualMode(deviceId.value || '123', action);
+        console.log('🔧 Manual Mode Action:', action);
+        console.log('📊 Current Timer Values - ON:', autoForm.value.onTime, 'OFF:', autoForm.value.offTime);
+        
+        // First save the timer settings to database and memory
+        const actionCode = MANUAL_ACTION_MAPPING[action] || 0;
+        await mqttService.saveSettingsToDatabase(deviceId.value || '123', {
+          manualModeAction: actionCode,
+          interruptOnTime: autoForm.value.onTime,
+          interruptOffTime: autoForm.value.offTime
+        });
+        console.log('✅ Timer settings saved to database first');
+        
+        // Then send the manual action command
+        const response = await mqttService.setManualMode(deviceId.value || '123', action);
         
         if (response.success) {
           await Swal.fire({
             title: 'Command Sent!',
-            text: `Manual ${action} command has been sent to the device.`,
+            text: `Manual ${action} command has been sent to the device with updated timers.`,
             icon: 'success',
             timer: 2000,
             showConfirmButton: false
           });
+          
+          // Refresh settings to show updated values
+          await refreshDeviceSettings();
         } else {
           throw new Error(response.message || 'Command failed');
         }
       } catch (error: any) {
-        console.error('Error executing manual action:', error);
+        console.error('❌ Error executing manual action:', error);
         await Swal.fire({
           title: 'Command Failed',
           text: error.message || 'Failed to send command to device. Please try again.',
@@ -780,6 +1656,7 @@ export default defineComponent({
             icon: 'success',
             confirmButtonText: 'OK'
           });
+          await refreshDeviceSettings();
           closeNormalModal();
           showModeModal.value = false;
         } else {
@@ -803,26 +1680,32 @@ export default defineComponent({
           startDate: dpolForm.value.startDate,
           startTime: dpolForm.value.startTime,
           endDate: dpolForm.value.endDate,
-          endTime: dpolForm.value.endTime,
-          dateFormat: {
-            dd: dpolForm.value.dd,
-            mm: dpolForm.value.mm,
-            yy: dpolForm.value.yy,
-            HH: dpolForm.value.HH,
-            MM: dpolForm.value.MM
-          }
+          endTime: dpolForm.value.endTime
         };
 
   console.log('Sending DPOL mode configuration:', config);
   const response = await mqttService.setDpolMode(deviceId.value || '123', config);
         
         if (response.success) {
+          // Save settings to database after successful send
+          try {
+            await mqttService.saveSettingsToDatabase(deviceId.value || '123', {
+              event: 3, // DPOL mode
+              depolarizationStartTimestamp: `${config.startDate} ${config.startTime}`,
+              depolarizationStopTimestamp: `${config.endDate} ${config.endTime}`
+            });
+            console.log('✅ DPOL mode settings saved to database');
+          } catch (dbError) {
+            console.warn('⚠️ Database save failed (non-critical):', dbError);
+          }
+
           await Swal.fire({
             title: 'DPOL Mode Configuration Sent!',
             text: 'DPOL mode settings have been sent to the device.',
             icon: 'success',
             confirmButtonText: 'OK'
           });
+          await refreshDeviceSettings();
           closeDpolModal();
           showModeModal.value = false;
         } else {
@@ -844,7 +1727,6 @@ export default defineComponent({
       try {
         const config = {
           startTime: instForm.value.startTime,
-          endTime: instForm.value.endTime,
           frequency: instForm.value.frequency
         };
 
@@ -852,12 +1734,25 @@ export default defineComponent({
   const response = await mqttService.setInstMode(deviceId.value || '123', config);
         
         if (response.success) {
+          // Save settings to database
+          try {
+            const frequencyCode = INSTANT_MODE_MAPPING[instForm.value.frequency] || 0;
+            await mqttService.saveSettingsToDatabase(deviceId.value || '123', {
+              instantMode: frequencyCode,
+              instantStartTimestamp: instForm.value.startTime
+            });
+            console.log('✅ INST mode settings saved to database');
+          } catch (dbError) {
+            console.warn('⚠️ Database save failed (non-critical):', dbError);
+          }
+
           await Swal.fire({
             title: 'INST Mode Configuration Sent!',
             text: 'INST mode settings have been sent to the device.',
             icon: 'success',
             confirmButtonText: 'OK'
           });
+          await refreshDeviceSettings();
           closeInstModal();
           showModeModal.value = false;
         } else {
@@ -874,33 +1769,54 @@ export default defineComponent({
       }
     };
 
-    // Save alarm configuration
+    // Save set value configuration
     const saveAlarmConfiguration = async () => {
       try {
+        // Validate UP and OP values are between -4.00 to 4.00
+        const validateRange = (value: string, name: string) => {
+          const num = parseFloat(value);
+          if (num < -4.00 || num > 4.00) {
+            throw new Error(`${name} value must be between -4.00 and 4.00V`);
+          }
+          return num;
+        };
+
+        let setupValue, setopValue, reffcalValue;
+        
+        if (alarmSetupForm.value.enabled) {
+          setupValue = validateRange(alarmSetupForm.value.value, 'SET UP');
+        }
+        
+        if (alarmSetopForm.value.enabled) {
+          setopValue = validateRange(alarmSetopForm.value.value, 'SET OP');
+        }
+        
+        if (alarmReffcalForm.value.enabled) {
+          reffcalValue = parseFloat(alarmReffcalForm.value.value); // No range limit for FCAL
+        }
+
         const config = {
           setup: alarmSetupForm.value.enabled ? {
-            value: alarmSetupForm.value.value,
-            threshold: alarmSetupForm.value.threshold,
+            value: setupValue,
             enabled: alarmSetupForm.value.enabled
           } : undefined,
           setop: alarmSetopForm.value.enabled ? {
-            value: alarmSetopForm.value.value,
-            threshold: alarmSetopForm.value.threshold,
+            value: setopValue,
             enabled: alarmSetopForm.value.enabled
           } : undefined,
           reffcal: alarmReffcalForm.value.enabled ? {
-            value: alarmReffcalForm.value.value,
+            value: reffcalValue,
             calibration: alarmReffcalForm.value.calibration,
             enabled: alarmReffcalForm.value.enabled
           } : undefined
         };
 
-  console.log('Sending alarm configuration:', config);
+  console.log('Sending set value configuration:', config);
   const response = await mqttService.setAlarmConfiguration(deviceId.value || '123', config);
         
         if (response.success) {
           await Swal.fire({
-            title: 'Alarm Configuration Sent!',
+            title: 'Set Value Configuration Sent!',
             text: 'Alarm settings have been sent to the device.',
             icon: 'success',
             confirmButtonText: 'OK'
@@ -928,9 +1844,20 @@ export default defineComponent({
       connectionStatus,
       connectionStatusClass,
       abstractLocation,
+      getElectrodeLabel,
+      getEventLabel,
+      getInstantModeLabel,
+      deviceSettings,
+      settingsParams,
+      hasSettings,
       showLogModal,
+      loggingInterval,
+      setLoggingInterval,
+      isValidTimeFormat,
+      formatIntervalDescription,
+      saveLoggingInterval,
       showModeModal,
-      showSetNoModal,
+
       showElectrodeModal,
       showNormalModal,
       showAutoModal,
@@ -943,7 +1870,7 @@ export default defineComponent({
       showAlarmReffcalModal,
       openLogModal,
       openModeModal,
-      openSetNoModal,
+
       openElectrodeModal,
       openAlarmModal,
       openAlarmItemModal,
@@ -954,12 +1881,15 @@ export default defineComponent({
       openInstModal,
       closeLogModal,
       closeModeModal,
-      closeSetNoModal,
+
       closeElectrodeModal,
       closeAlarmModal,
       closeAlarmSetupModal,
+      saveAlarmSetupModal,
       closeAlarmSetopModal,
+      saveAlarmSetopModal,
       closeAlarmReffcalModal,
+      saveAlarmReffcalModal,
       closeNormalModal,
       closeAutoModal,
       saveInterruptModeConfiguration,
@@ -973,12 +1903,39 @@ export default defineComponent({
       dpolForm,
       instForm,
       selectedElectrode,
-      setNoForm,
+
       alarmSetupForm,
       alarmSetopForm,
       alarmReffcalForm,
+      // Shunt configuration
+      shuntVoltageForm,
+      shuntCurrentForm,
+      showShuntVoltageModal,
+      showShuntCurrentModal,
+      openShuntVoltageModal,
+      closeShuntVoltageModal,
+      openShuntCurrentModal,
+      closeShuntCurrentModal,
+      saveShuntVoltageConfiguration,
+      saveShuntCurrentConfiguration,
+      validateVoltageInput,
+      formatVoltageInput,
+      validateCurrentInput,
+      formatCurrentInput,
+      formatShuntVoltageDisplay,
+      formatShuntCurrentDisplay,
+      // Manual mode timer
+      onHours,
+      onMinutes,
+      onSeconds,
+      offHours,
+      offMinutes,
+      offSeconds,
+      formatTotalTime,
+      setOnTime,
+      setOffTime,
       // New configuration functions
-      saveTimerConfiguration,
+
       saveElectrodeConfiguration,
       executeManualAction,
       saveNormalModeConfiguration,
@@ -1059,70 +2016,164 @@ export default defineComponent({
           </div>
           <div class="mb-5">
             <h4 class="fs-1 text-gray-800 w-bolder mb-6">Device Settings</h4>
-            <div class="card p-3">
-              <div v-if="deviceSettings">
-                <pre style="white-space: pre-wrap; word-break: break-word;">{{ JSON.stringify(deviceSettings, null, 2) }}</pre>
-              </div>
-              <div v-else>
-                <p class="text-muted">No settings available for this device.</p>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Alarm Control -->
-          <div class="mb-5">
-            <h4 class="fs-1 text-gray-800 w-bolder mb-6">Alarm System</h4>
-            <div class="row justify-content-start">
-              <div class="col-md-6">
-                <div class="card bg-danger cursor-pointer" @click="openAlarmModal">
-                  <div class="card-body p-3 text-center">
-                    <i class="bi bi-exclamation-triangle text-white" style="font-size: 1.8rem"></i>
-                    <h6 class="mt-2 mb-1 text-white">Alarm</h6>
-                    <small class="text-white-75">System Alerts</small>
+            <div v-if="hasSettings">
+              <div class="row g-4">
+                <div class="col-md-4">
+                  <div class="card bg-light">
+                    <div class="card-body p-4">
+                      <div class="d-flex flex-column align-items-center">
+                        <i class="bi bi-plug text-primary" style="font-size: 2rem"></i>
+                        <p class="text-muted mb-1">Electrode</p>
+                        <h6 class="mt-0 mb-0">{{ getElectrodeLabel(settingsParams.Electrode) }}</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card bg-light">
+                    <div class="card-body p-4">
+                      <div class="d-flex flex-column align-items-center">
+                        <i class="bi bi-activity text-success" style="font-size: 2rem"></i>
+                        <p class="text-muted mb-1">Event Mode</p>
+                        <h6 class="mt-0 mb-0">{{ getEventLabel(settingsParams.Event) }}</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card bg-light">
+                    <div class="card-body p-4">
+                      <div class="d-flex flex-column align-items-center">
+                        <i class="bi bi-lightning text-success" style="font-size: 2rem"></i>
+                        <p class="text-muted mb-1">Shunt Voltage</p>
+                        <h6 class="mt-0 mb-0 cursor-pointer text-primary" @click="openShuntVoltageModal">
+                          {{ settingsParams?.['Shunt Voltage'] || '25.00' }} V
+                        </h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card bg-light">
+                    <div class="card-body p-4">
+                      <div class="d-flex flex-column align-items-center">
+                        <i class="bi bi-flash text-primary" style="font-size: 2rem"></i>
+                        <p class="text-muted mb-1">Shunt Current</p>
+                        <h6 class="mt-0 mb-0 cursor-pointer text-primary" @click="openShuntCurrentModal">
+                          {{ settingsParams?.['Shunt Current'] || '99.99' }} mA
+                        </h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card bg-light">
+                    <div class="card-body p-4">
+                      <div class="d-flex flex-column align-items-center">
+                        <i class="bi bi-clock text-primary" style="font-size: 2rem"></i>
+                        <p class="text-muted mb-1">Interrupt ON</p>
+                        <h6 class="mt-0 mb-0">{{ settingsParams['Interrupt ON Time'] || 0 }} s</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card bg-light">
+                    <div class="card-body p-4">
+                      <div class="d-flex flex-column align-items-center">
+                        <i class="bi bi-clock-history text-secondary" style="font-size: 2rem"></i>
+                        <p class="text-muted mb-1">Interrupt OFF</p>
+                        <h6 class="mt-0 mb-0">{{ settingsParams['Interrupt OFF Time'] || 0 }} s</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card bg-light">
+                    <div class="card-body p-4">
+                      <div class="d-flex flex-column align-items-center">
+                        <i class="bi bi-speedometer text-danger" style="font-size: 2rem"></i>
+                        <p class="text-muted mb-1">Instant Mode</p>
+                        <h6 class="mt-0 mb-0">{{ getInstantModeLabel(settingsParams['Instant Mode']) }}</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card bg-light">
+                    <div class="card-body p-4">
+                      <div class="d-flex flex-column align-items-center">
+                        <i class="bi bi-exclamation-triangle text-warning" style="font-size: 2rem"></i>
+                        <p class="text-muted mb-1">Reference Fail</p>
+                        <h6 class="mt-0 mb-0">{{ settingsParams['Reference Fail'] || 0 }} mV</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card bg-light">
+                    <div class="card-body p-4">
+                      <div class="d-flex flex-column align-items-center">
+                        <i class="bi bi-arrow-up-circle text-success" style="font-size: 2rem"></i>
+                        <p class="text-muted mb-1">Reference UP</p>
+                        <h6 class="mt-0 mb-0">{{ settingsParams['Reference UP'] || 0 }} mV</h6>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+            <div v-else>
+              <div class="card p-3">
+                <p class="text-muted mb-0">No settings available for this device.</p>
+              </div>
+            </div>
           </div>
+          
+
         </div>
         <div class="col-lg-6">
           <!-- Device Control Boxes -->
           <div class="mb-5">
             <h4 class="fs-1 text-gray-800 w-bolder mb-6">Device Controls</h4>
             <div class="row g-3">
-              <div class="col-md-6">
-                <div class="card bg-primary cursor-pointer" @click="openLogModal">
-                  <div class="card-body p-4 text-center">
-                    <i class="bi bi-journal-text text-white" style="font-size: 2rem"></i>
-                    <h5 class="mt-2 mb-0 text-white">Log No</h5>
-                    <p class="text-white-50 mb-0">View Logs</p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="card bg-success cursor-pointer" @click="openModeModal">
-                  <div class="card-body p-4 text-center">
-                    <i class="bi bi-gear text-white" style="font-size: 2rem"></i>
-                    <h5 class="mt-2 mb-0 text-white">Mode</h5>
-                    <p class="text-white-50 mb-0">Device Mode</p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="card bg-warning cursor-pointer" @click="openSetNoModal">
-                  <div class="card-body p-4 text-center">
-                    <i class="bi bi-sliders text-white" style="font-size: 2rem"></i>
-                    <h5 class="mt-2 mb-0 text-white">SET NO</h5>
-                    <p class="text-white-50 mb-0">Settings</p>
-                  </div>
-                </div>
-              </div>
+              <!-- 1. Electrode (first according to CSV sequence) -->
               <div class="col-md-6">
                 <div class="card bg-info cursor-pointer" @click="openElectrodeModal">
                   <div class="card-body p-4 text-center">
                     <i class="bi bi-lightning text-white" style="font-size: 2rem"></i>
                     <h5 class="mt-2 mb-0 text-white">Electrode</h5>
                     <p class="text-white-50 mb-0">Electrode Config</p>
+                  </div>
+                </div>
+              </div>
+              <!-- 2. Set Value (renamed from Alarm, second in sequence) -->
+              <div class="col-md-6">
+                <div class="card bg-danger cursor-pointer" @click="openAlarmModal">
+                  <div class="card-body p-4 text-center">
+                    <i class="bi bi-exclamation-triangle text-white" style="font-size: 2rem"></i>
+                    <h5 class="mt-2 mb-0 text-white">Set Value</h5>
+                    <p class="text-white-50 mb-0">Value Settings</p>
+                  </div>
+                </div>
+              </div>
+              <!-- 3. Set Log (renamed from Log No, third in sequence) -->
+              <div class="col-md-6">
+                <div class="card bg-primary cursor-pointer" @click="openLogModal">
+                  <div class="card-body p-4 text-center">
+                    <i class="bi bi-journal-text text-white" style="font-size: 2rem"></i>
+                    <h5 class="mt-2 mb-0 text-white">Set Log</h5>
+                    <p class="text-white-50 mb-0">Logging Settings</p>
+                  </div>
+                </div>
+              </div>
+              <!-- 4. Set Mode (renamed from Mode, fourth in sequence) -->
+              <div class="col-md-6">
+                <div class="card bg-success cursor-pointer" @click="openModeModal">
+                  <div class="card-body p-4 text-center">
+                    <i class="bi bi-gear text-white" style="font-size: 2rem"></i>
+                    <h5 class="mt-2 mb-0 text-white">Set Mode</h5>
+                    <p class="text-white-50 mb-0">Mode Configuration</p>
                   </div>
                 </div>
               </div>
@@ -1140,15 +2191,15 @@ export default defineComponent({
         <div class="modal-header bg-danger">
           <h5 class="modal-title text-white">
             <i class="bi bi-exclamation-triangle me-2"></i>
-            Alarm Configuration
+            Set Value Configuration
           </h5>
           <button type="button" class="btn-close btn-close-white" @click="closeAlarmModal"></button>
         </div>
         <div class="modal-body p-4">
-          <!-- Alarm Configuration Items -->
+          <!-- Set Value Configuration Items -->
           <div class="row">
             <div class="col-md-6">
-              <h6 class="fw-bold mb-4">Alarm Parameters</h6>
+              <h6 class="fw-bold mb-4">Set Value Parameters</h6>
               
               <!-- Set UP -->
               <div class="card border mb-3 cursor-pointer" @click="openAlarmItemModal('setup')">
@@ -1174,6 +2225,24 @@ export default defineComponent({
                   <i class="bi bi-calculator text-info" style="font-size: 2rem"></i>
                   <h6 class="mt-2 mb-1">Ref Fcal</h6>
                   <small class="text-muted">00.0</small>
+                </div>
+              </div>
+
+              <!-- Set Voltage -->
+              <div class="card border mb-3 cursor-pointer" @click="openShuntVoltageModal()">
+                <div class="card-body p-4 text-center">
+                  <i class="bi bi-lightning text-success" style="font-size: 2rem"></i>
+                  <h6 class="mt-2 mb-1">Set Voltage</h6>
+                  <small class="text-muted">{{ settingsParams?.['Shunt Voltage'] || '25.00' }}</small>
+                </div>
+              </div>
+
+              <!-- Set Shunt -->
+              <div class="card border mb-3 cursor-pointer" @click="openShuntCurrentModal()">
+                <div class="card-body p-4 text-center">
+                  <i class="bi bi-flash text-primary" style="font-size: 2rem"></i>
+                  <h6 class="mt-2 mb-1">Set Shunt</h6>
+                  <small class="text-muted">{{ settingsParams?.['Shunt Current'] || '99.99' }}</small>
                 </div>
               </div>
             </div>
@@ -1230,13 +2299,10 @@ export default defineComponent({
           <div class="mb-3">
             <label class="form-label">Set UP Value</label>
             <div class="input-group">
-              <input type="number" class="form-control" v-model="alarmSetupForm.value" step="0.1">
+              <input type="number" class="form-control" v-model="alarmSetupForm.value" step="0.01" min="-4.00" max="4.00">
               <span class="input-group-text">V</span>
             </div>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Threshold</label>
-            <input type="number" class="form-control" v-model="alarmSetupForm.threshold" step="0.1">
+            <small class="text-muted">Range: -4.00V to +4.00V</small>
           </div>
           <div class="form-check">
             <input class="form-check-input" type="checkbox" id="enableSetup" v-model="alarmSetupForm.enabled">
@@ -1247,7 +2313,7 @@ export default defineComponent({
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" @click="closeAlarmSetupModal">Cancel</button>
-          <button type="button" class="btn btn-danger">Save</button>
+          <button type="button" class="btn btn-danger" @click="saveAlarmSetupModal">Save</button>
         </div>
       </div>
     </div>
@@ -1268,13 +2334,10 @@ export default defineComponent({
           <div class="mb-3">
             <label class="form-label">Set OP Value</label>
             <div class="input-group">
-              <input type="number" class="form-control" v-model="alarmSetopForm.value" step="0.1">
+              <input type="number" class="form-control" v-model="alarmSetopForm.value" step="0.01" min="-4.00" max="4.00">
               <span class="input-group-text">V</span>
             </div>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Threshold</label>
-            <input type="number" class="form-control" v-model="alarmSetopForm.threshold" step="0.1">
+            <small class="text-muted">Range: -4.00V to +4.00V</small>
           </div>
           <div class="form-check">
             <input class="form-check-input" type="checkbox" id="enableSetop" v-model="alarmSetopForm.enabled">
@@ -1285,7 +2348,7 @@ export default defineComponent({
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" @click="closeAlarmSetopModal">Cancel</button>
-          <button type="button" class="btn btn-warning">Save</button>
+          <button type="button" class="btn btn-warning" @click="saveAlarmSetopModal">Save</button>
         </div>
       </div>
     </div>
@@ -1323,7 +2386,7 @@ export default defineComponent({
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" @click="closeAlarmReffcalModal">Cancel</button>
-          <button type="button" class="btn btn-info">Save</button>
+          <button type="button" class="btn btn-info" @click="saveAlarmReffcalModal">Save</button>
         </div>
       </div>
     </div>
@@ -1333,15 +2396,99 @@ export default defineComponent({
   <div class="modal fade" tabindex="-1" :class="{ show: showLogModal, 'd-block': showLogModal }" v-if="showLogModal">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Log No Configuration</h5>
-          <button type="button" class="btn-close" @click="closeLogModal"></button>
+        <div class="modal-header bg-primary">
+          <h5 class="modal-title text-white">
+            <i class="bi bi-journal-text me-2"></i>
+            Set Log - Logging Interval Configuration
+          </h5>
+          <button type="button" class="btn-close btn-close-white" @click="closeLogModal"></button>
         </div>
-        <div class="modal-body">
-          <p>Log configuration panel will be implemented here.</p>
+        <div class="modal-body p-4">
+          <div class="alert alert-info mb-4">
+            <i class="bi bi-info-circle me-2"></i>
+            Configure how frequently the device should log and transmit data over MQTT.
+          </div>
+          
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card border-primary">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0">
+                    <i class="bi bi-clock me-2"></i>
+                    Logging Interval
+                  </h6>
+                </div>
+                <div class="card-body">
+                  <div class="row align-items-center">
+                    <div class="col-md-6">
+                      <label class="form-label fw-bold">Logging Interval (HH:MM:SS)</label>
+                      <div class="input-group">
+                        <span class="input-group-text">
+                          <i class="bi bi-stopwatch"></i>
+                        </span>
+                        <input 
+                          type="text" 
+                          class="form-control" 
+                          v-model="loggingInterval"
+                          placeholder="00:01:00"
+                          pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+                          title="Format: HH:MM:SS (e.g., 00:01:30 for 1 minute 30 seconds). Cannot be 00:00:00."
+                        />
+                      </div>
+                      <small class="text-muted">
+                        Format: Hours:Minutes:Seconds (e.g., 00:01:00 = 1 minute)
+                        <span class="text-danger fw-bold">⚠️ Cannot be 00:00:00 (disables logging)</span>
+                      </small>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="bg-light p-3 rounded">
+                        <h6 class="mb-2">Current Setting:</h6>
+                        <div class="d-flex align-items-center">
+                          <span class="badge bg-primary fs-6 me-2">{{ loggingInterval }}</span>
+                          <small class="text-muted">{{ formatIntervalDescription(loggingInterval) }}</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <hr class="my-4">
+                  
+                  <div class="row">
+                    <div class="col-md-12">
+                      <h6 class="mb-3">Quick Presets:</h6>
+                      <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-outline-primary btn-sm" @click="setLoggingInterval('00:00:30')">
+                          30 seconds
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" @click="setLoggingInterval('00:01:00')">
+                          1 minute
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" @click="setLoggingInterval('00:05:00')">
+                          5 minutes
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" @click="setLoggingInterval('00:10:00')">
+                          10 minutes
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" @click="setLoggingInterval('00:30:00')">
+                          30 minutes
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" @click="setLoggingInterval('01:00:00')">
+                          1 hour
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" @click="closeLogModal">Close</button>
+          <button type="button" class="btn btn-secondary" @click="closeLogModal">Cancel</button>
+          <button type="button" class="btn btn-primary" @click="saveLoggingInterval" :disabled="!isValidTimeFormat(loggingInterval)">
+            <i class="bi bi-check-circle me-2"></i>
+            Apply Logging Interval
+          </button>
         </div>
       </div>
     </div>
@@ -1551,13 +2698,13 @@ export default defineComponent({
           <p class="mb-4">Select the electrode type for the device:</p>
           <div class="row g-3">
             <div class="col-md-6">
-              <div class="card cursor-pointer" :class="{ 'border-primary bg-light': selectedElectrode === 'CuCuSO4' }" @click="selectedElectrode = 'CuCuSO4'">
+              <div class="card cursor-pointer" :class="{ 'border-primary bg-light': selectedElectrode === 'Cu/cuso4' }" @click="selectedElectrode = 'Cu/cuso4'">
                 <div class="card-body p-4 text-center">
                   <div class="form-check d-flex justify-content-center">
-                    <input class="form-check-input me-2" type="radio" name="electrode" id="cucuso4" value="CuCuSO4" v-model="selectedElectrode">
+                    <input class="form-check-input me-2" type="radio" name="electrode" id="cucuso4" value="Cu/cuso4" v-model="selectedElectrode">
                   </div>
                   <i class="bi bi-circle text-primary" style="font-size: 2rem"></i>
-                  <h5 class="mt-2 mb-0">CuCuSO₄</h5>
+                  <h5 class="mt-2 mb-0">Cu/cuso4</h5>
                   <p class="text-muted mb-0">Copper Sulfate</p>
                 </div>
               </div>
@@ -1575,29 +2722,18 @@ export default defineComponent({
               </div>
             </div>
             <div class="col-md-6">
-              <div class="card cursor-pointer" :class="{ 'border-primary bg-light': selectedElectrode === 'AgAgSO4' }" @click="selectedElectrode = 'AgAgSO4'">
+              <div class="card cursor-pointer" :class="{ 'border-primary bg-light': selectedElectrode === 'Ag/AgCl' }" @click="selectedElectrode = 'Ag/AgCl'">
                 <div class="card-body p-4 text-center">
                   <div class="form-check d-flex justify-content-center">
-                    <input class="form-check-input me-2" type="radio" name="electrode" id="agagso4" value="AgAgSO4" v-model="selectedElectrode">
+                    <input class="form-check-input me-2" type="radio" name="electrode" id="agagcl" value="Ag/AgCl" v-model="selectedElectrode">
                   </div>
                   <i class="bi bi-diamond text-warning" style="font-size: 2rem"></i>
-                  <h5 class="mt-2 mb-0">Ag,AgSO₄</h5>
-                  <p class="text-muted mb-0">Silver Sulfate</p>
+                  <h5 class="mt-2 mb-0">Ag/AgCl</h5>
+                  <p class="text-muted mb-0">Silver Chloride</p>
                 </div>
               </div>
             </div>
-            <div class="col-md-6">
-              <div class="card cursor-pointer" :class="{ 'border-primary bg-light': selectedElectrode === 'Custom' }" @click="selectedElectrode = 'Custom'">
-                <div class="card-body p-4 text-center">
-                  <div class="form-check d-flex justify-content-center">
-                    <input class="form-check-input me-2" type="radio" name="electrode" id="custom" value="Custom" v-model="selectedElectrode">
-                  </div>
-                  <i class="bi bi-gear text-info" style="font-size: 2rem"></i>
-                  <h5 class="mt-2 mb-0">Custom</h5>
-                  <p class="text-muted mb-0">Custom Configuration</p>
-                </div>
-              </div>
-            </div>
+
           </div>
           
           <!-- Selected Electrode Display -->
@@ -1655,7 +2791,7 @@ export default defineComponent({
         </div>
         <div class="modal-body">
           <div class="row">
-            <!-- Left Column -->
+            <!-- Left Column - Dates and Times -->
             <div class="col-md-6">
               <div class="mb-3">
                 <label class="form-label">Start Date</label>
@@ -1673,51 +2809,115 @@ export default defineComponent({
                 <label class="form-label">Stop Time</label>
                 <input type="time" class="form-control" v-model="autoForm.stopTime">
               </div>
-              
-              <!-- Interrupt Mode Settings -->
-              <div class="mb-3">
-                <label class="form-label">On Time (seconds)</label>
-                <input type="number" class="form-control" v-model="autoForm.onTime" min="1" placeholder="Enter on time in seconds">
-                <small class="form-text text-muted">Duration for which the device stays ON (in seconds)</small>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Off Time (seconds)</label>
-                <input type="number" class="form-control" v-model="autoForm.offTime" min="1" placeholder="Enter off time in seconds">
-                <small class="form-text text-muted">Duration for which the device stays OFF (in seconds)</small>
-              </div>
             </div>
             
-            <!-- Right Column - Date/Time Format -->
-            <div class="col-md-6">
-              <label class="form-label">Date & Time Format</label>
-              <div class="row g-2 mb-2">
-                <div class="col-4">
-                  <input type="number" class="form-control" placeholder="dd" v-model="autoForm.dd" min="1" max="31">
-                  <small class="form-text text-muted">DD</small>
-                </div>
-                <div class="col-4">
-                  <input type="number" class="form-control" placeholder="mm" v-model="autoForm.mm" min="1" max="12">
-                  <small class="form-text text-muted">MM</small>
-                </div>
-                <div class="col-4">
-                  <input type="number" class="form-control" placeholder="yy" v-model="autoForm.yy" min="0" max="99">
-                  <small class="form-text text-muted">YY</small>
+
+          </div>
+
+          <!-- Timer Configuration Section (Shared with Manual Mode) -->
+          <hr class="my-4">
+          <h6 class="mb-3"><i class="bi bi-clock-fill me-2"></i>Interrupt Timer Settings</h6>
+          <div class="timer-config-section">
+            <div class="row g-4">
+              <!-- ON Timer Card -->
+              <div class="col-md-6">
+                <div class="timer-card on-timer">
+                  <div class="timer-card-header">
+                    <i class="bi bi-play-circle-fill"></i>
+                    <span>ON Timer</span>
+                  </div>
+                  <div class="timer-card-body">
+                    <!-- Hours, Minutes, Seconds Inputs -->
+                    <div class="time-input-group">
+                      <div class="time-input-box">
+                        <input type="number" class="time-digit" v-model.number="onHours" min="0" max="23" placeholder="00">
+                        <label>Hours</label>
+                      </div>
+                      <span class="time-separator">:</span>
+                      <div class="time-input-box">
+                        <input type="number" class="time-digit" v-model.number="onMinutes" min="0" max="59" placeholder="00">
+                        <label>Minutes</label>
+                      </div>
+                      <span class="time-separator">:</span>
+                      <div class="time-input-box">
+                        <input type="number" class="time-digit" v-model.number="onSeconds" min="0" max="59" placeholder="00">
+                        <label>Seconds</label>
+                      </div>
+                    </div>
+                    
+                    <!-- Total Seconds Display -->
+                    <div class="total-display on-total">
+                      <i class="bi bi-clock"></i>
+                      <span>{{ formatTotalTime(onHours, onMinutes, onSeconds) }}</span>
+                    </div>
+
+                    <!-- Quick Presets -->
+                    <div class="preset-buttons">
+                      <button @click="setOnTime(24, 0, 0)" class="preset-btn on-preset">1m</button>
+                      <button @click="setOnTime(24, 0, 0)" class="preset-btn on-preset">5m</button>
+                      <button @click="setOnTime(24, 0, 0)" class="preset-btn on-preset">10m</button>
+                      <button @click="setOnTime(24, 0, 0)" class="preset-btn on-preset">30m</button>
+                      <button @click="setOnTime(24, 0, 0)" class="preset-btn on-preset">1h</button>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="row g-2">
-                <div class="col-4">
-                  <input type="number" class="form-control" placeholder="HH" v-model="autoForm.HH" min="0" max="23">
-                  <small class="form-text text-muted">HH</small>
-                </div>
-                <div class="col-4">
-                  <input type="number" class="form-control" placeholder="mm" v-model="autoForm.MM" min="0" max="59">
-                  <small class="form-text text-muted">MM</small>
-                </div>
-                <div class="col-4">
-                  <input type="number" class="form-control" placeholder="ss" v-model="autoForm.ss" min="0" max="59">
-                  <small class="form-text text-muted">SS</small>
+
+              <!-- OFF Timer Card -->
+              <div class="col-md-6">
+                <div class="timer-card off-timer">
+                  <div class="timer-card-header">
+                    <i class="bi bi-stop-circle-fill"></i>
+                    <span>OFF Timer</span>
+                  </div>
+                  <div class="timer-card-body">
+                    <!-- Hours, Minutes, Seconds Inputs -->
+                    <div class="time-input-group">
+                      <div class="time-input-box">
+                        <input type="number" class="time-digit" v-model.number="offHours" min="0" max="23" placeholder="00">
+                        <label>Hours</label>
+                      </div>
+                      <span class="time-separator">:</span>
+                      <div class="time-input-box">
+                        <input type="number" class="time-digit" v-model.number="offMinutes" min="0" max="59" placeholder="00">
+                        <label>Minutes</label>
+                      </div>
+                      <span class="time-separator">:</span>
+                      <div class="time-input-box">
+                        <input type="number" class="time-digit" v-model.number="offSeconds" min="0" max="59" placeholder="00">
+                        <label>Seconds</label>
+                      </div>
+                    </div>
+                    
+                    <!-- Total Seconds Display -->
+                    <div class="total-display off-total">
+                      <i class="bi bi-clock"></i>
+                      <span>{{ formatTotalTime(offHours, offMinutes, offSeconds) }}</span>
+                    </div>
+
+                    <!-- Quick Presets -->
+                    <div class="preset-buttons">
+                      <button @click="setOffTime(0, 1, 0)" class="preset-btn off-preset">1m</button>
+                      <button @click="setOffTime(0, 5, 0)" class="preset-btn off-preset">5m</button>
+                      <button @click="setOffTime(0, 10, 0)" class="preset-btn off-preset">10m</button>
+                      <button @click="setOffTime(0, 30, 0)" class="preset-btn off-preset">30m</button>
+                      <button @click="setOffTime(1, 0, 0)" class="preset-btn off-preset">1h</button>
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Cycle Summary -->
+          <div class="cycle-summary mt-3">
+            <div class="cycle-info">
+              <i class="bi bi-arrow-repeat"></i>
+              <span class="cycle-text">
+                Cycle: <strong class="on-highlight">ON {{ formatTotalTime(onHours, onMinutes, onSeconds) }}</strong>
+                <i class="bi bi-arrow-right mx-2"></i>
+                <strong class="off-highlight">OFF {{ formatTotalTime(offHours, offMinutes, offSeconds) }}</strong>
+              </span>
             </div>
           </div>
         </div>
@@ -1746,26 +2946,133 @@ export default defineComponent({
           <button type="button" class="btn-close" @click="closeManualModal"></button>
         </div>
         <div class="modal-body">
-          <div class="text-center">
-            <div class="row justify-content-center">
-              <div class="col-md-4">
-                <div class="card bg-success cursor-pointer mb-3" @click="executeManualAction('start')">
-                  <div class="card-body p-4 text-center">
-                    <i class="bi bi-play-fill text-white" style="font-size: 3rem"></i>
-                    <h4 class="mt-2 mb-0 text-white">Start</h4>
+          <!-- Timer Configuration Section -->
+          <div class="timer-config-section mb-4">
+            <div class="row g-4">
+              <!-- ON Timer Card -->
+              <div class="col-md-6">
+                <div class="timer-card on-timer">
+                  <div class="timer-card-header">
+                    <i class="bi bi-play-circle-fill"></i>
+                    <span>ON Timer</span>
+                  </div>
+                  <div class="timer-card-body">
+                    <!-- Hours, Minutes, Seconds Inputs -->
+                    <div class="time-input-group">
+                      <div class="time-input-box">
+                        <input type="number" class="time-digit" v-model.number="onHours" min="0" max="23" placeholder="00">
+                        <label>Hours</label>
+                      </div>
+                      <span class="time-separator">:</span>
+                      <div class="time-input-box">
+                        <input type="number" class="time-digit" v-model.number="onMinutes" min="0" max="59" placeholder="00">
+                        <label>Minutes</label>
+                      </div>
+                      <span class="time-separator">:</span>
+                      <div class="time-input-box">
+                        <input type="number" class="time-digit" v-model.number="onSeconds" min="0" max="59" placeholder="00">
+                        <label>Seconds</label>
+                      </div>
+                    </div>
+                    
+                    <!-- Total Seconds Display -->
+                    <div class="total-display on-total">
+                      <i class="bi bi-clock"></i>
+                      <span>{{ formatTotalTime(onHours, onMinutes, onSeconds) }}</span>
+                    </div>
+
+                    <!-- Quick Presets -->
+                    <div class="preset-buttons">
+                      <button @click="setOnTime(24, 0, 0)" class="preset-btn on-preset">1m</button>
+                      <button @click="setOnTime(24, 0, 0)" class="preset-btn on-preset">5m</button>
+                      <button @click="setOnTime(24, 0, 0)" class="preset-btn on-preset">10m</button>
+                      <button @click="setOnTime(24, 0, 0)" class="preset-btn on-preset">30m</button>
+                      <button @click="setOnTime(24, 0, 0)" class="preset-btn on-preset">1h</button>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="col-md-4">
-                <div class="card bg-danger cursor-pointer mb-3" @click="executeManualAction('stop')">
-                  <div class="card-body p-4 text-center">
-                    <i class="bi bi-stop-fill text-white" style="font-size: 3rem"></i>
-                    <h4 class="mt-2 mb-0 text-white">Stop</h4>
+
+              <!-- OFF Timer Card -->
+              <div class="col-md-6">
+                <div class="timer-card off-timer">
+                  <div class="timer-card-header">
+                    <i class="bi bi-stop-circle-fill"></i>
+                    <span>OFF Timer</span>
+                  </div>
+                  <div class="timer-card-body">
+                    <!-- Hours, Minutes, Seconds Inputs -->
+                    <div class="time-input-group">
+                      <div class="time-input-box">
+                        <input type="number" class="time-digit" v-model.number="offHours" min="0" max="23" placeholder="00">
+                        <label>Hours</label>
+                      </div>
+                      <span class="time-separator">:</span>
+                      <div class="time-input-box">
+                        <input type="number" class="time-digit" v-model.number="offMinutes" min="0" max="59" placeholder="00">
+                        <label>Minutes</label>
+                      </div>
+                      <span class="time-separator">:</span>
+                      <div class="time-input-box">
+                        <input type="number" class="time-digit" v-model.number="offSeconds" min="0" max="59" placeholder="00">
+                        <label>Seconds</label>
+                      </div>
+                    </div>
+                    
+                    <!-- Total Seconds Display -->
+                    <div class="total-display off-total">
+                      <i class="bi bi-clock"></i>
+                      <span>{{ formatTotalTime(offHours, offMinutes, offSeconds) }}</span>
+                    </div>
+
+                    <!-- Quick Presets -->
+                    <div class="preset-buttons">
+                      <button @click="setOffTime(0, 1, 0)" class="preset-btn off-preset">1m</button>
+                      <button @click="setOffTime(0, 5, 0)" class="preset-btn off-preset">5m</button>
+                      <button @click="setOffTime(0, 10, 0)" class="preset-btn off-preset">10m</button>
+                      <button @click="setOffTime(0, 30, 0)" class="preset-btn off-preset">30m</button>
+                      <button @click="setOffTime(1, 0, 0)" class="preset-btn off-preset">1h</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <p class="text-muted">Click Start to begin manual operation or Stop to halt the device.</p>
+          </div>
+
+          <!-- Cycle Summary -->
+          <div class="cycle-summary">
+            <div class="cycle-info">
+              <i class="bi bi-arrow-repeat"></i>
+              <span class="cycle-text">
+                Cycle: <strong class="on-highlight">ON {{ formatTotalTime(onHours, onMinutes, onSeconds) }}</strong>
+                <i class="bi bi-arrow-right mx-2"></i>
+                <strong class="off-highlight">OFF {{ formatTotalTime(offHours, offMinutes, offSeconds) }}</strong>
+              </span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-section mt-4">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <button class="action-btn start-btn" @click="executeManualAction('start')">
+                  <i class="bi bi-play-fill"></i>
+                  <div class="btn-content">
+                    <span class="btn-title">START</span>
+                    <span class="btn-subtitle">Begin operation cycle</span>
+                  </div>
+                </button>
+              </div>
+              <div class="col-md-6">
+                <button class="action-btn stop-btn" @click="executeManualAction('stop')">
+                  <i class="bi bi-stop-fill"></i>
+                  <div class="btn-content">
+                    <span class="btn-title">STOP</span>
+                    <span class="btn-subtitle">Halt device immediately</span>
+                  </div>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -1816,34 +3123,7 @@ export default defineComponent({
               </div>
             </div>
             
-            <!-- Right Column - Date/Time Format -->
-            <div class="col-md-6">
-              <label class="form-label">Date & Time Format</label>
-              <div class="row g-2 mb-2">
-                <div class="col-4">
-                  <input type="number" class="form-control" placeholder="dd" v-model="dpolForm.dd" min="1" max="31">
-                  <small class="form-text text-muted">DD</small>
-                </div>
-                <div class="col-4">
-                  <input type="number" class="form-control" placeholder="mm" v-model="dpolForm.mm" min="1" max="12">
-                  <small class="form-text text-muted">MM</small>
-                </div>
-                <div class="col-4">
-                  <input type="number" class="form-control" placeholder="yy" v-model="dpolForm.yy" min="0" max="99">
-                  <small class="form-text text-muted">YY</small>
-                </div>
-              </div>
-              <div class="row g-2">
-                <div class="col-6">
-                  <input type="number" class="form-control" placeholder="HH" v-model="dpolForm.HH" min="0" max="23">
-                  <small class="form-text text-muted">HH</small>
-                </div>
-                <div class="col-6">
-                  <input type="number" class="form-control" placeholder="mm" v-model="dpolForm.MM" min="0" max="59">
-                  <small class="form-text text-muted">MM</small>
-                </div>
-              </div>
-            </div>
+
           </div>
         </div>
         <div class="modal-footer">
@@ -1878,12 +3158,6 @@ export default defineComponent({
               </div>
               
               <div class="mb-3">
-                <label class="form-label">End Time (HH:MM:SS)</label>
-                <input type="time" step="1" class="form-control" v-model="instForm.endTime" placeholder="00:00:00">
-                <small class="form-text text-muted">Format: Hours:Minutes:Seconds</small>
-              </div>
-              
-              <div class="mb-3">
                 <label class="form-label">Frequency</label>
                 <div class="d-flex gap-3">
                   <div class="form-check">
@@ -1912,8 +3186,80 @@ export default defineComponent({
     </div>
   </div>
 
+  <!-- Shunt Voltage Modal -->
+  <div class="modal fade" tabindex="-1" :class="{ show: showShuntVoltageModal, 'd-block': showShuntVoltageModal }" v-if="showShuntVoltageModal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-success">
+          <h5 class="modal-title text-white">
+            <i class="bi bi-lightning me-2"></i>
+            Set Voltage Configuration
+          </h5>
+          <button type="button" class="btn-close btn-close-white" @click="closeShuntVoltageModal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Shunt Voltage Value (00.00 - 99.99)</label>
+            <input 
+              type="number" 
+              class="form-control" 
+              v-model="shuntVoltageForm.value"
+              step="0.01"
+              min="0.00"
+              max="99.99"
+              placeholder="Enter voltage value (e.g., 25.00)"
+              @input="validateVoltageInput"
+              @blur="formatVoltageInput"
+            >
+            <small class="text-muted">Enter values with exactly 2 decimal places (e.g., 25.00, 50.25)</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="closeShuntVoltageModal">Cancel</button>
+          <button type="button" class="btn btn-success" @click="saveShuntVoltageConfiguration">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shunt Current Modal -->
+  <div class="modal fade" tabindex="-1" :class="{ show: showShuntCurrentModal, 'd-block': showShuntCurrentModal }" v-if="showShuntCurrentModal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-primary">
+          <h5 class="modal-title text-white">
+            <i class="bi bi-flash me-2"></i>
+            Set Shunt Configuration
+          </h5>
+          <button type="button" class="btn-close btn-close-white" @click="closeShuntCurrentModal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Shunt Current Value (00.00 - 99.99)</label>
+            <input 
+              type="number" 
+              class="form-control" 
+              v-model="shuntCurrentForm.value"
+              step="0.01"
+              min="0.00"
+              max="99.99"
+              placeholder="Enter current value (e.g., 999.00)"
+              @input="validateCurrentInput"
+              @blur="formatCurrentInput"
+            >
+            <small class="text-muted">Enter values with exactly 2 decimal places (e.g., 999.00, 12.50)</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="closeShuntCurrentModal">Cancel</button>
+          <button type="button" class="btn btn-primary" @click="saveShuntCurrentConfiguration">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal Backdrop -->
-  <div class="modal-backdrop fade show" v-if="showLogModal || showModeModal || showSetNoModal || showElectrodeModal || showNormalModal || showAutoModal || showManualModal || showDpolModal || showInstModal || showAlarmModal || showAlarmSetupModal || showAlarmSetopModal || showAlarmReffcalModal" @click="closeAllModals"></div>
+  <div class="modal-backdrop fade show" v-if="showLogModal || showModeModal || showElectrodeModal || showNormalModal || showAutoModal || showManualModal || showDpolModal || showInstModal || showAlarmModal || showAlarmSetupModal || showAlarmSetopModal || showAlarmReffcalModal || showShuntVoltageModal || showShuntCurrentModal" @click="closeAllModals"></div>
 </template>
 
 <style scoped>
@@ -2028,6 +3374,25 @@ export default defineComponent({
   padding: 0.375rem 0.25rem;
 }
 
+.timer-input-large {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  border: 2px solid #dee2e6;
+  transition: all 0.3s ease;
+}
+
+.timer-input-large:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.3rem rgba(0, 123, 255, 0.15);
+  background-color: #fff;
+}
+
+.timer-display {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 2px solid #dee2e6;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
 .timer-separator {
   font-size: 1.5rem;
   font-weight: bold;
@@ -2056,4 +3421,257 @@ export default defineComponent({
 .border-danger {
   border-color: #dc3545 !important;
 }
+
+/* Manual Mode Timer Styling */
+.timer-config-section {
+  padding: 1rem 0;
+}
+
+.timer-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.timer-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.timer-card-header {
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.on-timer .timer-card-header {
+  background: #28a745;
+  color: white;
+}
+
+.off-timer .timer-card-header {
+  background: #dc3545;
+  color: white;
+}
+
+.timer-card-body {
+  padding: 2rem 1.5rem;
+  background: #f8f9fa;
+}
+
+.time-input-group {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.time-input-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.time-digit {
+  width: 70px;
+  height: 70px;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  border: 3px solid #dee2e6;
+  border-radius: 10px;
+  background: white;
+  font-family: 'Courier New', monospace;
+  transition: all 0.3s ease;
+}
+
+.time-digit:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+  transform: scale(1.05);
+}
+
+.time-input-box label {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+}
+
+.time-separator {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #6c757d;
+  margin: 10px 0;
+}
+
+.total-display {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.on-total {
+  background: #d4edda;
+  border: 2px solid #28a745;
+  color: #155724;
+}
+
+.off-total {
+  background: #f8d7da;
+  border: 2px solid #dc3545;
+  color: #721c24;
+}
+
+.preset-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.preset-btn {
+  padding: 0.5rem 1rem;
+  border: 2px solid;
+  border-radius: 20px;
+  font-weight: 600;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.on-preset {
+  border-color: #28a745;
+  color: #28a745;
+}
+
+.on-preset:hover {
+  background: #28a745;
+  color: white;
+  transform: scale(1.05);
+}
+
+.off-preset {
+  border-color: #dc3545;
+  color: #dc3545;
+}
+
+.off-preset:hover {
+  background: #dc3545;
+  color: white;
+  transform: scale(1.05);
+}
+
+.cycle-summary {
+  background: #e3f2fd;
+  border: 2px solid #2196f3;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.cycle-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+}
+
+.cycle-info i {
+  font-size: 1.5rem;
+  color: #2196f3;
+}
+
+.on-highlight {
+  color: #28a745;
+  padding: 0.25rem 0.5rem;
+  background: rgba(40, 167, 69, 0.1);
+  border-radius: 4px;
+}
+
+.off-highlight {
+  color: #dc3545;
+  padding: 0.25rem 0.5rem;
+  background: rgba(220, 53, 69, 0.1);
+  border-radius: 4px;
+}
+
+.action-section {
+  padding-top: 1rem;
+}
+
+.action-btn {
+  width: 100%;
+  padding: 1.5rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.action-btn i {
+  font-size: 2.5rem;
+}
+
+.btn-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.btn-title {
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+}
+
+.btn-subtitle {
+  font-size: 0.75rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.start-btn {
+  background: #28a745;
+  color: white;
+}
+
+.start-btn:hover {
+  background: #218838;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.stop-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.stop-btn:hover {
+  background: #c82333;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+}
 </style>
+

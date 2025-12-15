@@ -84,8 +84,14 @@ class MqttService {
     if (!this.socket) {
       console.log('🔌 Connecting to Socket.IO backend:', this.BACKEND_URL);
       this.socket = io(this.BACKEND_URL, {
+        transports: ['websocket', 'polling'], // Try websocket first, fallback to polling
+        path: '/socket.io',
         withCredentials: true,
-        transports: ['websocket', 'polling']
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        reconnectionAttempts: 5,
+        upgrade: true
       });
 
       this.socket.on('connect', () => {
@@ -346,6 +352,48 @@ class MqttService {
     };
 
     return this.sendDeviceCommand(command);
+  }
+
+  /**
+   * Save device settings to database
+   * This merges new settings with existing ones and saves to database
+   * Used after user changes settings to persist them
+   */
+  async saveSettingsToDatabase(deviceId: string, settings: any): Promise<any> {
+    try {
+      ApiService.setHeader();
+      const response = await ApiService.post(
+        `/api/device-management/${deviceId}/settings/merge`,
+        {
+          settings,
+          updatedBy: 'user'
+        }
+      );
+      console.log('💾 Settings saved to database:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Failed to save settings to database:', error);
+      // Don't throw - this is non-critical and settings were already sent to device
+      return {
+        success: false,
+        error: error?.response?.data?.message || 'Failed to save settings'
+      };
+    }
+  }
+
+  /**
+   * Get device settings from database
+   */
+  async getSettingsFromDatabase(deviceId: string): Promise<any> {
+    try {
+      ApiService.setHeader();
+      const response = await ApiService.get(`/api/device-management/${deviceId}/settings`);
+      console.log('📋 Settings retrieved from database:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Failed to get settings from database:', error);
+      throw new Error(error?.response?.data?.message || 'Failed to get settings');
+    }
   }
 
   disconnect(): void {

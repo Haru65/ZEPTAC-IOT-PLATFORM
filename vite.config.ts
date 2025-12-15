@@ -20,4 +20,15 @@ export default defineConfig({
       external: ['mqtt']
     }
   },
+  server: {
+    // Fix 404 error on refresh for SPA routing
+    historyApiFallback: true,
+    port: 3000,
+    host: true
+  },
+  preview: {
+    // Fix 404 error on refresh in preview mode
+    port: 3000,
+    host: true
+  }
 });

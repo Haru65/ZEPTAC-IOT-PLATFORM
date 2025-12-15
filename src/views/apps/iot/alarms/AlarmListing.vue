@@ -17,24 +17,35 @@
       </div>
       <!-- Card toolbar -->
       <div class="card-toolbar">
-        <button
-          type="button"
-          class="btn btn-light-primary me-3"
-          data-bs-toggle="modal"
-          data-bs-target="#email_client_modal"
-        >
-          <KTIcon icon-name="sms" icon-class="fs-2" />
-          Email Client
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target="#add_alarm_modal"
-        >
-          <KTIcon icon-name="plus" icon-class="fs-2" />
-          Add Alarm
-        </button>
+        <div class="d-flex gap-2">
+          <button
+            type="button"
+            class="btn btn-danger"
+            @click="clearAllAlarms"
+            :disabled="tableData.length === 0"
+          >
+            <KTIcon icon-name="trash" icon-class="fs-2" />
+            Clear All Alarms
+          </button>
+          <button
+            type="button"
+            class="btn btn-light-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#email_client_modal"
+          >
+            <KTIcon icon-name="sms" icon-class="fs-2" />
+            Email Client
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#add_alarm_modal"
+          >
+            <KTIcon icon-name="plus" icon-class="fs-2" />
+            Add Alarm
+          </button>
+        </div>
       </div>
     </div>
     <div class="card-body pt-0">
@@ -272,88 +283,7 @@ export default defineComponent({
       { columnName: "Actions", columnLabel: "actions", sortEnabled: false, columnWidth: 100 },
     ]);
 
-    const dummyData: IAlarm[] = [
-      { 
-        id: 1, 
-        name: "High Temp Alert", 
-        device_name: "Sensor A", 
-        unit_no: "U001",
-        location: "Room 101", 
-        parameter: "Temperature", 
-        alarm_type: "Critical Temperature",
-        status: "Active", 
-        severity: "critical",
-        pv_values: { pv1: 85.2, pv2: 34.1, pv3: 12.5, pv4: 67.8, pv5: 23.4, pv6: 45.6 },
-        notification_config: { sms_numbers: ["+1234567890", "+0987654321"], email_ids: ["admin@company.com", "tech@company.com"] },
-        link: "/device-details/1",
-        created_at: "2025-06-20 10:00:00", 
-        last_modified: "2025-06-20 10:00:00" 
-      },
-      { 
-        id: 2, 
-        name: "Low Pressure", 
-        device_name: "Sensor B", 
-        unit_no: "U002",
-        location: "Room 102", 
-        parameter: "Pressure", 
-        alarm_type: "Pressure Drop",
-        status: "Inactive", 
-        severity: "warning",
-        pv_values: { pv1: 45.1, pv2: 67.2, pv3: 23.8, pv4: 89.3, pv5: 12.7, pv6: 56.4 },
-        notification_config: { sms_numbers: ["+1234567890"], email_ids: ["maintenance@company.com"] },
-        link: "/device-details/2",
-        created_at: "2025-06-21 12:00:00", 
-        last_modified: "2025-06-21 12:00:00" 
-      },
-      { 
-        id: 3, 
-        name: "Vibration Warning", 
-        device_name: "Motor X", 
-        unit_no: "U003",
-        location: "Factory Floor", 
-        parameter: "Vibration", 
-        alarm_type: "Mechanical Vibration",
-        status: "Active", 
-        severity: "warning",
-        pv_values: { pv1: 12.3, pv2: 45.6, pv3: 78.9, pv4: 23.1, pv5: 67.4, pv6: 34.8 },
-        notification_config: { sms_numbers: ["+1234567890", "+0987654321"], email_ids: ["operations@company.com"] },
-        link: "/device-details/3",
-        created_at: "2025-06-22 14:00:00", 
-        last_modified: "2025-06-22 14:00:00" 
-      },
-      { 
-        id: 4, 
-        name: "Battery Mode", 
-        device_name: "UPS 1", 
-        unit_no: "U004",
-        location: "Server Room", 
-        parameter: "Power", 
-        alarm_type: "Power Backup",
-        status: "Active", 
-        severity: "battery",
-        pv_values: { pv1: 98.5, pv2: 87.2, pv3: 76.1, pv4: 65.4, pv5: 54.3, pv6: 43.2 },
-        notification_config: { sms_numbers: ["+1234567890"], email_ids: ["it@company.com"] },
-        link: "/device-details/4",
-        created_at: "2025-06-24 11:00:00", 
-        last_modified: "2025-06-24 11:00:00" 
-      },
-      { 
-        id: 5, 
-        name: "Normal Operation", 
-        device_name: "Pump Y", 
-        unit_no: "U005",
-        location: "Pipeline 1", 
-        parameter: "Flow Rate", 
-        alarm_type: "Flow Monitoring",
-        status: "Active", 
-        severity: "ok",
-        pv_values: { pv1: 25.4, pv2: 78.9, pv3: 34.7, pv4: 56.2, pv5: 89.1, pv6: 12.6 },
-        notification_config: { sms_numbers: [], email_ids: ["flow@company.com"] },
-        link: "/device-details/5",
-        created_at: "2025-06-25 08:00:00", 
-        last_modified: "2025-06-25 08:00:00" 
-      }
-    ];
+    const dummyData: IAlarm[] = [];
 
     const tableData = ref<IAlarm[]>([...dummyData]);
     const initValues = ref<IAlarm[]>([...dummyData]);
@@ -400,6 +330,49 @@ export default defineComponent({
           confirmButtonText: "Ok, got it!",
           customClass: { confirmButton: "btn btn-primary" },
         });
+      }
+    };
+
+    const clearAllAlarms = async () => {
+      if (tableData.value.length === 0) {
+        Swal.fire({
+          title: "No Alarms",
+          text: "There are no alarms to clear.",
+          icon: "info",
+          buttonsStyling: false,
+          confirmButtonText: "Ok, got it!",
+          customClass: { confirmButton: "btn btn-primary" },
+        });
+        return;
+      }
+
+      const result = await Swal.fire({
+        title: "Clear All Alarms?",
+        text: `This will permanently delete all ${tableData.value.length} alarm(s). This action cannot be undone!`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "red",
+        confirmButtonText: "Yes, clear all!",
+        cancelButtonText: "No, cancel!",
+      });
+
+      if (result.isConfirmed) {
+        const alarmsCount = tableData.value.length;
+        tableData.value = [];
+        initValues.value = [];
+        
+        Swal.fire({
+          title: "Cleared!",
+          text: `All ${alarmsCount} alarm(s) have been cleared successfully.`,
+          icon: "success",
+          buttonsStyling: false,
+          confirmButtonText: "Ok, got it!",
+          customClass: { confirmButton: "btn btn-primary" },
+        });
+        
+        // Reset pagination
+        page.value = 1;
+        updateTableData();
       }
     };
 
@@ -635,6 +608,7 @@ export default defineComponent({
       page,
       addAlarm,
       deleteItem,
+      clearAllAlarms,
       updateLimit,
       viewAlarmDetails,
       sendSMSAlert,

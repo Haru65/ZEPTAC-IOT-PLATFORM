@@ -655,27 +655,27 @@ export default defineComponent({
           {
             heading: 'Dashboard',
             route: '/dashboard',
-            bootstrapIcon: 'bi-app-indicator'
+            bootstrapIcon: 'bi-speedometer2'
           },
           {
             heading: 'Devices',
             route: '/devices',
-            bootstrapIcon: 'bi-phone'
+            bootstrapIcon: 'bi-cpu'
           },
           {
             heading: 'Reports',
             route: '/reports',
-            bootstrapIcon: 'bi-file-earmark-text'
+            bootstrapIcon: 'bi-graph-up'
           },
           {
             heading: 'Alarms',
             route: '/alarms',
-            bootstrapIcon: 'bi-bell'
+            bootstrapIcon: 'bi-exclamation-triangle'
           },
           {
             heading: 'Locations',
             route: '/locations',
-            bootstrapIcon: 'bi-geo-alt'
+            bootstrapIcon: 'bi-map'
           }
         ]
       }

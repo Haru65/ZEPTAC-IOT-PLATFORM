@@ -285,7 +285,7 @@ const handleSubmit = async () => {
   try {
     loading.value = true;
     
-    const apiUrl = import.meta.env.VITE_APP_API_URL || 'http://localhost:3001/';
+    const apiUrl = (import.meta.env.VITE_APP_API_URL || 'http://localhost:3001').replace(/\/$/, '');
     
     // Prepare complete MQTT device data
     const deviceData = {
@@ -305,7 +305,7 @@ const handleSubmit = async () => {
       commandTopic: `devices/${formData.deviceId}/commands`
     };
     
-    const response = await axios.post(`${apiUrl}api/devices`, deviceData);
+    const response = await axios.post(`${apiUrl}/api/devices`, deviceData);
     
     success.value = `MQTT Device "${formData.deviceName}" created successfully!\nRoute: ${response.data.device.route}\nData Topic: devices/${formData.deviceId}/data`;
     

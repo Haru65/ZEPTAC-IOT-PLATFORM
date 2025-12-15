@@ -43,7 +43,16 @@
       </div>
     </div>
 
-    <div class="mt-3 pt-2 border-top d-flex justify-content-end">
+    <div class="mt-3 pt-2 border-top d-flex justify-content-between align-items-center">
+      <button 
+        @click="handleRemoveDevice" 
+        class="btn btn-outline-danger btn-sm"
+        :disabled="isRemoving"
+      >
+        <i class="bi bi-trash me-1"></i>
+        {{ isRemoving ? 'Removing...' : 'Remove' }}
+      </button>
+      
       <router-link 
         :to="{ name: 'device-details', params: { id: id }}" 
         class="btn btn-link btn-sm text-primary p-0"
@@ -55,7 +64,7 @@
 </template>
   
   <script lang="ts">
-import { defineComponent, computed } from "vue";
+import { defineComponent, computed, ref } from "vue";
 
 type DeviceStatus = "online" | "offline" | "warning" | "critical";
 
@@ -67,6 +76,7 @@ interface Metric {
 
 export default defineComponent({
   name: "DeviceCardWidget",
+  emits: ['deviceRemoved'],
   props: {
     id: { type: String, required: true },
     name: { type: String, required: true },
@@ -85,7 +95,42 @@ export default defineComponent({
     },
     lastSeen: { type: String, required: true },
   },
-  setup(props) {
+  setup(props, { emit }) {
+    const isRemoving = ref(false);
+    
+    const handleRemoveDevice = async () => {
+      if (isRemoving.value) return;
+      
+      const confirmed = confirm(`Are you sure you want to remove device "${props.name}"? This action cannot be undone.`);
+      if (!confirmed) return;
+      
+      try {
+        isRemoving.value = true;
+        console.log(`🗑️ Removing device: ${props.name} (ID: ${props.id})`);
+        
+        const apiUrl = (import.meta.env.VITE_APP_API_URL || 'http://localhost:3001').replace(/\/$/, '');
+        const response = await fetch(`${apiUrl}/api/devices/${props.id}`, {
+          method: 'DELETE',
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to remove device: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Device removed successfully:', result);
+        
+        // Emit event to parent component
+        emit('deviceRemoved', { id: props.id, name: props.name });
+        
+      } catch (error: any) {
+        console.error('❌ Error removing device:', error);
+        alert(`Failed to remove device: ${error.message}`);
+      } finally {
+        isRemoving.value = false;
+      }
+    };
+    
     const statusLabel = computed(() => {
       const labels: Record<DeviceStatus, string> = {
         online: "Online",
@@ -129,6 +174,8 @@ export default defineComponent({
       statusClass,
       statusDotClass,
       metricClass,
+      isRemoving,
+      handleRemoveDevice,
     };
   },
 });

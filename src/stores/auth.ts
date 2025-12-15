@@ -315,6 +315,8 @@ function GetUser() {
       // Call real backend authentication
       const response = await ApiService.post('/auth/login', loginPayload);
       
+      console.log('📡 Backend response:', response);
+      
       if (response?.data?.success) {
         const { user: userData, accessToken, refreshToken } = response.data.data;
         
@@ -390,15 +392,31 @@ function GetUser() {
       
       // Handle different types of errors
       if (error.response) {
-        // Server responded with error status
-        const errorMsg = error.response.data?.error || error.response.data?.message || 'Login failed';
-        errors.value = { general: errorMsg };
+        console.log('❌ Full error response:', error.response);
+        console.log('❌ Response data:', error.response.data);
+        
+        // Extract error message from response
+        const responseData = error.response.data;
+        let errorMessage = 'Login failed';
+        
+        if (responseData && typeof responseData === 'object') {
+          // Try to get the error message from various possible fields
+          errorMessage = responseData.error || responseData.message || responseData.msg || 'Login failed';
+        } else if (typeof responseData === 'string') {
+          errorMessage = responseData;
+        }
+        
+        console.log('❌ Extracted error message:', errorMessage);
+        errors.value = { general: errorMessage };
+        
       } else if (error.request) {
-        // Network error
+        // Network error - no response received
+        console.error('❌ Network error:', error.request);
         errors.value = { general: 'Network error. Please check your connection and try again.' };
       } else {
-        // Other error
-        errors.value = { general: 'An unexpected error occurred. Please try again.' };
+        // Something else happened
+        console.error('❌ Other error:', error.message);
+        errors.value = { general: error.message || 'An unexpected error occurred. Please try again.' };
       }
       
       setError(error);
@@ -513,8 +531,8 @@ function GetUser() {
       
       // Handle different types of errors
       if (error.response) {
-        // Server responded with error status
-        const errorMsg = error.response.data?.error || error.response.data?.message || 'Registration failed';
+        // Server responded with error status - use exact backend message
+        const errorMsg = error.response.data?.error || 'Login failed';
         errors.value = { general: errorMsg };
       } else if (error.request) {
         // Network error

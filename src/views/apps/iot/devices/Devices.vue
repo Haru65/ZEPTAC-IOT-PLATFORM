@@ -89,7 +89,7 @@
         v-for="device in filteredDevices"
         :key="device.id"
       >
-        <DeviceCardWidget v-bind="device" />
+        <DeviceCardWidget v-bind="device" @deviceRemoved="handleDeviceRemoved" />
       </div>
     </div>
 
@@ -160,9 +160,9 @@ export default defineComponent({
         error.value = null;
         console.log('🔍 Fetching devices from API...');
         
-        const apiUrl = import.meta.env.VITE_APP_API_URL || 'http://localhost:3001/';
+        const apiUrl = (import.meta.env.VITE_APP_API_URL || 'http://localhost:3001').replace(/\/$/, '');
         console.log('📡 API URL:', apiUrl);
-        const response = await fetch(`${apiUrl}api/devices`);
+        const response = await fetch(`${apiUrl}/api/devices`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -268,6 +268,16 @@ export default defineComponent({
       await fetchDevices();
       console.log('🔄 Device list refreshed');
     };
+    
+    const handleDeviceRemoved = async (removedDevice: { id: string; name: string }) => {
+      console.log('✅ Device removed:', removedDevice);
+      
+      // Remove device from local state immediately for better UX
+      devices.value = devices.value.filter(device => device.id !== removedDevice.id);
+      
+      // Optional: Show success message
+      console.log(`🔄 Device "${removedDevice.name}" removed from list`);
+    };
 
     return {
       devices,
@@ -280,6 +290,7 @@ export default defineComponent({
       searchItems,
       applyFilter,
       handleDeviceCreated,
+      handleDeviceRemoved,
       fetchDevices,
     };
   },
