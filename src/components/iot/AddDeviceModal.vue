@@ -1,358 +1,421 @@
 <template>
-  <div class="modal fade" id="addDeviceModal" tabindex="-1" aria-labelledby="addDeviceModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addDeviceModalLabel">
-            <i class="bi bi-plus-circle me-2"></i>Add New Device
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        
-        <div class="modal-body">
-          <form @submit.prevent="handleSubmit">
-            <!-- Device ID -->
-            <div class="mb-4">
-              <label for="deviceId" class="form-label required">Device ID</label>
-              <input
-                type="text"
-                class="form-control"
-                id="deviceId"
-                v-model="formData.deviceId"
-                placeholder="e.g., 456, 567, etc."
-                required
-                :disabled="loading"
-              />
-              <div class="form-text">Unique identifier for the device</div>
+  <teleport to="body">
+    <!-- Modal Overlay -->
+    <div v-if="isOpen" class="add-device-modal-overlay" @click.self="closeModal">
+      <div class="add-device-modal-dialog">
+        <div class="add-device-modal-content">
+          <!-- Header -->
+          <div class="add-device-modal-header">
+            <h5>Add New Device</h5>
+            <button type="button" class="close-btn" @click="closeModal">×</button>
+          </div>
+
+          <!-- Body -->
+          <div class="add-device-modal-body">
+            <div class="form-group">
+              <label>Device ID *</label>
+              <input v-model="form.deviceId" type="text" placeholder="456" />
             </div>
 
-            <!-- Device Name -->
-            <div class="mb-4">
-              <label for="deviceName" class="form-label required">Device Name</label>
-              <input
-                type="text"
-                class="form-control"
-                id="deviceName"
-                v-model="formData.deviceName"
-                placeholder="e.g., Sensor 4, Temperature Monitor"
-                required
-                :disabled="loading"
-              />
+            <div class="form-group">
+              <label>Device Name *</label>
+              <input v-model="form.deviceName" type="text" placeholder="Sensor 1" />
             </div>
 
-            <!-- MQTT Broker URL -->
-            <div class="mb-4">
-              <label for="mqttBroker" class="form-label required">MQTT Broker URL</label>
-              <input
-                type="text"
-                class="form-control"
-                id="mqttBroker"
-                v-model="formData.mqttBroker"
-                placeholder="e.g., mqtt://broker.zeptac.com:1883"
-                required
-                :disabled="loading"
-              />
-              <div class="form-text">MQTT broker address with port</div>
+            <div class="form-group">
+              <label>Location</label>
+              <input v-model="form.location" type="text" placeholder="Building A" />
             </div>
 
-            <!-- MQTT Username -->
-            <div class="mb-4">
-              <label for="mqttUsername" class="form-label required">MQTT Username</label>
-              <input
-                type="text"
-                class="form-control"
-                id="mqttUsername"
-                v-model="formData.mqttUsername"
-                placeholder="e.g., zeptac_iot"
-                required
-                :disabled="loading"
-              />
-            </div>
-
-            <!-- MQTT Password -->
-            <div class="mb-4">
-              <label for="mqttPassword" class="form-label required">MQTT Password</label>
-              <input
-                type="password"
-                class="form-control"
-                id="mqttPassword"
-                v-model="formData.mqttPassword"
-                placeholder="Enter MQTT password"
-                required
-                :disabled="loading"
-              />
-            </div>
-
-            <!-- MQTT Topic Prefix (Auto-generated) -->
-            <div class="mb-4">
-              <label for="topicPrefix" class="form-label">MQTT Topic Prefix</label>
-              <input
-                type="text"
-                class="form-control"
-                id="topicPrefix"
-                :value="`devices/${formData.deviceId}`"
-                disabled
-              />
-              <div class="form-text">Auto-generated from Device ID</div>
-            </div>
-
-            <!-- Data Topic (Auto-generated) -->
-            <div class="mb-4">
-              <label for="dataTopic" class="form-label">Data Topic</label>
-              <input
-                type="text"
-                class="form-control"
-                id="dataTopic"
-                :value="`devices/${formData.deviceId}/data`"
-                disabled
-              />
-              <div class="form-text">Device will publish data to this topic</div>
-            </div>
-
-            <!-- Command Topic (Auto-generated) -->
-            <div class="mb-4">
-              <label for="commandTopic" class="form-label">Command Topic</label>
-              <input
-                type="text"
-                class="form-control"
-                id="commandTopic"
-                :value="`devices/${formData.deviceId}/commands`"
-                disabled
-              />
-              <div class="form-text">Server will send commands to this topic</div>
-            </div>
-
-            <!-- Location -->
-            <div class="mb-4">
-              <label for="location" class="form-label">Location</label>
-              <input
-                type="text"
-                class="form-control"
-                id="location"
-                v-model="formData.location"
-                placeholder="e.g., 28.7041, 77.1025 or Building A - Floor 2"
-                :disabled="loading"
-              />
-            </div>
-
-            <!-- Device Type -->
-            <div class="mb-4">
-              <label for="deviceType" class="form-label">Device Type</label>
-              <select
-                class="form-select"
-                id="deviceType"
-                v-model="formData.deviceType"
-                :disabled="loading"
-              >
-                <option value="IoT Sensor">IoT Sensor</option>
-                <option value="Temperature Sensor">Temperature Sensor</option>
-                <option value="Humidity Sensor">Humidity Sensor</option>
-                <option value="Pressure Sensor">Pressure Sensor</option>
-                <option value="Motion Sensor">Motion Sensor</option>
-                <option value="Light Sensor">Light Sensor</option>
-                <option value="Custom Device">Custom Device</option>
+            <div class="form-group">
+              <label>Device Type</label>
+              <select v-model="form.deviceType">
+                <option>IoT Sensor</option>
+                <option>Temperature Sensor</option>
+                <option>Other</option>
               </select>
             </div>
 
-            <!-- Icon Selection -->
-            <div class="mb-4">
-              <label class="form-label">Icon</label>
-              <div class="d-flex flex-wrap gap-2">
-                <button
-                  v-for="icon in availableIcons"
-                  :key="icon.value"
-                  type="button"
-                  class="btn btn-sm btn-outline-primary"
-                  :class="{ active: formData.icon === icon.value }"
-                  @click="formData.icon = icon.value"
-                  :disabled="loading"
-                >
-                  <i :class="icon.value"></i> {{ icon.label }}
-                </button>
-              </div>
-            </div>
 
-            <!-- Color Selection -->
-            <div class="mb-4">
-              <label class="form-label">Color</label>
-              <div class="d-flex flex-wrap gap-2">
-                <button
-                  v-for="color in availableColors"
-                  :key="color.value"
-                  type="button"
-                  class="btn btn-sm"
-                  :style="{ backgroundColor: color.value, color: '#fff' }"
-                  :class="{ 'border border-3 border-dark': formData.color === color.value }"
-                  @click="formData.color = color.value"
-                  :disabled="loading"
-                >
-                  {{ color.label }}
-                </button>
-              </div>
-            </div>
 
-            <!-- Description -->
-            <div class="mb-4">
-              <label for="description" class="form-label">Description</label>
-              <textarea
-                class="form-control"
-                id="description"
-                v-model="formData.description"
-                rows="3"
-                placeholder="Optional description of the device"
-                :disabled="loading"
-              ></textarea>
+            <!-- Collapsible MQTT Section -->
+            <div class="mqtt-section">
+              <button type="button" class="mqtt-toggle" @click="showMqtt = !showMqtt">
+                {{ showMqtt ? '−' : '+' }} MQTT Configuration
+              </button>
+
+              <div v-if="showMqtt" class="mqtt-fields">
+                <div class="form-group">
+                  <label>Broker URL *</label>
+                  <input v-model="form.mqttBroker" type="text" placeholder="mqtt://broker.zeptac.com:1883" />
+                </div>
+
+                <div class="form-group">
+                  <label>Username *</label>
+                  <input v-model="form.mqttUsername" type="text" placeholder="zeptac_iot" />
+                </div>
+
+                <div class="form-group">
+                  <label>Password *</label>
+                  <input v-model="form.mqttPassword" type="password" placeholder="••••••" />
+                </div>
+              </div>
             </div>
 
             <!-- Error Message -->
-            <div v-if="error" class="alert alert-danger">
-              <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
-            </div>
+            <div v-if="error" class="error-box">{{ error }}</div>
+          </div>
 
-            <!-- Success Message -->
-            <div v-if="success" class="alert alert-success">
-              <i class="bi bi-check-circle me-2"></i>{{ success }}
-            </div>
-          </form>
-        </div>
-        
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" :disabled="loading">
-            Cancel
-          </button>
-          <button type="button" class="btn btn-primary" @click="handleSubmit" :disabled="loading">
-            <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
-            <i v-else class="bi bi-plus-circle me-2"></i>
-            {{ loading ? 'Creating...' : 'Create Device' }}
-          </button>
+          <!-- Footer -->
+          <div class="add-device-modal-footer">
+            <button type="button" class="btn-cancel" @click="closeModal" :disabled="loading">
+              Cancel
+            </button>
+            <button type="button" class="btn-submit" @click="handleSubmit" :disabled="loading">
+              {{ loading ? 'Creating...' : 'Create Device' }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </teleport>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, defineExpose, defineProps } from 'vue';
 import axios from 'axios';
+
+console.log('🟦 AddDeviceModal component loaded');
+
+const props = defineProps({
+  clusters: {
+    type: Array,
+    default: () => []
+  },
+  zones: {
+    type: Array,
+    default: () => []
+  },
+  selectedZoneId: {
+    type: String,
+    default: null
+  }
+});
 
 const emit = defineEmits(['deviceCreated']);
 
+const isOpen = ref(false);
 const loading = ref(false);
-const error = ref<string | null>(null);
-const success = ref<string | null>(null);
+const error = ref('');
+const showMqtt = ref(false);
 
-const formData = reactive({
+const form = reactive({
   deviceId: '',
   deviceName: '',
-  mqttBroker: 'mqtt://broker.zeptac.com:1883',
-  mqttUsername: 'zeptac_iot',
-  mqttPassword: '',
   location: '',
   deviceType: 'IoT Sensor',
-  icon: 'bi-device',
-  color: '#007bff',
-  description: ''
+  mqttBroker: 'mqtt://broker.zeptac.com:1883',
+  mqttUsername: 'zeptac_iot',
+  mqttPassword: ''
 });
 
-const availableIcons = [
-  { label: 'Device', value: 'bi-device' },
-  { label: 'Lightbulb', value: 'bi-lightbulb' },
-  { label: 'Thermometer', value: 'bi-thermometer-half' },
-  { label: 'Water', value: 'bi-water' },
-  { label: 'CPU', value: 'bi-cpu' },
-  { label: 'Speedometer', value: 'bi-speedometer2' },
-];
+const openModal = () => {
+  console.log('� MODAL: Opening...');
+  console.time('modal-open');
+  isOpen.value = true;
+  console.log('🟢 MODAL: isOpen set to true');
+  showMqtt.value = false;
+  console.log('🟢 MODAL: showMqtt set to false');
+  console.timeEnd('modal-open');
+  console.log('🟢 MODAL: Fully opened');
+};
 
-const availableColors = [
-  { label: 'Blue', value: '#007bff' },
-  { label: 'Green', value: '#28a745' },
-  { label: 'Orange', value: '#fd7e14' },
-  { label: 'Red', value: '#dc3545' },
-  { label: 'Purple', value: '#6f42c1' },
-  { label: 'Teal', value: '#20c997' },
-];
+const closeModal = () => {
+  if (!loading.value) {
+    console.log('🔴 MODAL: Closing...');
+    isOpen.value = false;
+    resetForm();
+    console.log('🔴 MODAL: Closed');
+  }
+};
+
+const resetForm = () => {
+  form.deviceId = '';
+  form.deviceName = '';
+  form.location = '';
+  form.deviceType = 'IoT Sensor';
+  form.mqttBroker = 'mqtt://broker.zeptac.com:1883';
+  form.mqttUsername = 'zeptac_iot';
+  form.mqttPassword = '';
+  error.value = '';
+};
 
 const handleSubmit = async () => {
-  error.value = null;
-  success.value = null;
+  error.value = '';
 
-  // Validation
-  if (!formData.deviceId || !formData.deviceName || !formData.mqttBroker || !formData.mqttUsername || !formData.mqttPassword) {
-    error.value = 'Device ID, Name, MQTT Broker, Username, and Password are required';
+  if (!form.deviceId) {
+    error.value = 'Device ID is required';
+    return;
+  }
+  if (!form.deviceName) {
+    error.value = 'Device Name is required';
+    return;
+  }
+  if (!form.mqttBroker) {
+    error.value = 'MQTT Broker is required';
     return;
   }
 
+  loading.value = true;
+
   try {
-    loading.value = true;
-    
     const apiUrl = (import.meta.env.VITE_APP_API_URL || 'http://localhost:3001').replace(/\/$/, '');
     
-    // Prepare complete MQTT device data
-    const deviceData = {
-      deviceId: formData.deviceId,
-      deviceName: formData.deviceName,
-      location: formData.location || 'Unknown Location',
-      deviceType: formData.deviceType,
-      icon: formData.icon,
-      color: formData.color,
-      description: formData.description,
-      mqttBroker: formData.mqttBroker,
-      mqttUsername: formData.mqttUsername,
-      mqttPassword: formData.mqttPassword,
-      topicPrefix: `devices/${formData.deviceId}`,
-      dataTopic: `devices/${formData.deviceId}/data`,
-      statusTopic: `devices/${formData.deviceId}/status`,
-      commandTopic: `devices/${formData.deviceId}/commands`
-    };
-    
-    const response = await axios.post(`${apiUrl}/api/devices`, deviceData);
-    
-    success.value = `MQTT Device "${formData.deviceName}" created successfully!\nRoute: ${response.data.device.route}\nData Topic: devices/${formData.deviceId}/data`;
-    
-    console.log('✅ MQTT Device created:', response.data);
-    
-    // Reset form
-    setTimeout(() => {
-      formData.deviceId = '';
-      formData.deviceName = '';
-      formData.mqttBroker = 'mqtt://broker.zeptac.com:1883';
-      formData.mqttUsername = 'zeptac_iot';
-      formData.mqttPassword = '';
-      formData.location = '';
-      formData.deviceType = 'IoT Sensor';
-      formData.icon = 'bi-device';
-      formData.color = '#007bff';
-      formData.description = '';
-      success.value = null;
-      
-      // Emit event to parent
-      emit('deviceCreated', response.data.device);
-      
-      // Close modal
-      const modal = document.getElementById('addDeviceModal');
-      if (modal) {
-        const bsModal = (window as any).bootstrap.Modal.getInstance(modal);
-        bsModal?.hide();
-      }
-    }, 2000);
-    
+    console.log('📤 Creating device...');
+    const response = await axios.post(`${apiUrl}/api/devices`, {
+      deviceId: form.deviceId,
+      deviceName: form.deviceName,
+      location: form.location || 'Unknown',
+      deviceType: form.deviceType,
+      icon: 'bi-device',
+      color: '#6c757d',
+      description: '',
+      mqttBroker: form.mqttBroker,
+      mqttUsername: form.mqttUsername,
+      mqttPassword: form.mqttPassword,
+      topicPrefix: `devices/${form.deviceId}`,
+      dataTopic: `devices/${form.deviceId}/data`,
+      statusTopic: `devices/${form.deviceId}/status`,
+      commandTopic: `devices/${form.deviceId}/commands`
+    });
+
+    console.log('✅ Device created');
+    emit('deviceCreated', response.data.device || response.data);
+    closeModal();
   } catch (err: any) {
-    console.error('Error creating MQTT device:', err);
-    error.value = err.response?.data?.error || 'Failed to create MQTT device';
+    console.error('❌ Error:', err);
+    error.value = err.response?.data?.error || err.message || 'Failed to create device';
   } finally {
     loading.value = false;
   }
 };
+
+defineExpose({ openModal, closeModal });
 </script>
 
 <style scoped>
-.required::after {
-  content: " *";
-  color: red;
+.add-device-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
 }
 
-.btn.active {
-  border: 2px solid #0d6efd;
-  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+.add-device-modal-dialog {
+  width: 100%;
+  max-width: 450px;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.add-device-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f5f5f5;
+  flex-shrink: 0;
+}
+
+.add-device-modal-header h5 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+.add-device-modal-body {
+  padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.add-device-modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  background: #f5f5f5;
+  flex-shrink: 0;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.35rem;
+  color: #333;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+}
+
+.form-select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.form-group input[type="color"] {
+  height: 2.5rem;
+  padding: 0.25rem;
+  cursor: pointer;
+}
+
+.mqtt-section {
+  margin-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 1rem;
+}
+
+.mqtt-toggle {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0;
+  margin-bottom: 0.5rem;
+}
+
+.mqtt-toggle:hover {
+  text-decoration: underline;
+}
+
+.mqtt-fields {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-left: 3px solid #007bff;
+}
+
+.error-box {
+  background: #fee;
+  color: #c33;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
+
+.btn-cancel,
+.btn-submit {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background: #d0d0d0;
+}
+
+.btn-submit {
+  background: #007bff;
+  color: white;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cluster-input-wrapper {
+  position: relative;
+}
+
+.cluster-input {
+  width: 100%;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+.d-block {
+  display: block !important;
+}
+
+.mt-1 {
+  margin-top: 0.25rem !important;
 }
 </style>
+
+
+

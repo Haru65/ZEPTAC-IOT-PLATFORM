@@ -64,39 +64,53 @@
       </ul>
     </div>
 
-    <!-- Variable Toggle Buttons -->
+    <!-- Parameter Filter - Single Select -->
     <div class="card-body py-3 border-bottom">
-      <div class="d-flex align-items-center justify-content-between mb-3">
-        <span class="text-muted fw-semibold fs-7">Select Parameters:</span>
-        <button 
-          class="btn btn-sm btn-light-primary"
-          @click="toggleAll"
+      <div class="d-flex align-items-center gap-3 flex-wrap">
+        <label class="text-muted fw-semibold fs-7 mb-0" style="min-width: 120px;">Select Parameter:</label>
+        <select 
+          v-model="selectedParameter" 
+          class="form-select form-select-sm"
+          style="max-width: 250px;"
         >
-          <i class="bi bi-check2-all me-1"></i>
-          {{ allEnabled ? 'Deselect All' : 'Select All' }}
-        </button>
+          <option value="">-- Select a Parameter --</option>
+          <option 
+            v-for="param in parameters" 
+            :key="param.key" 
+            :value="param.key"
+          >
+            {{ param.label }} ({{ param.unit }})
+          </option>
+        </select>
+        <div v-if="selectedParameter" class="ms-auto">
+          <span class="badge" :class="`bg-${getSelectedParameterColor()}`">
+            <i class="bi bi-graph-up me-1"></i>
+            {{ getSelectedParameterLabel() }}
+          </span>
+        </div>
       </div>
-      <div class="parameter-grid">
-        <button
-          v-for="param in parameters"
-          :key="param.key"
-          type="button"
-          class="parameter-btn"
-          :class="[
-            param.enabled ? `parameter-btn-active parameter-btn-${param.color}` : 'parameter-btn-inactive'
-          ]"
-          @click="toggleParameter(param.key)"
-        >
-          <span class="parameter-icon" :class="`bg-${param.color}`">
-            <i class="bi bi-graph-up"></i>
-          </span>
-          <span class="parameter-label">
-            <span class="parameter-name">{{ param.label }}</span>
-            <span class="parameter-status">
-              <i class="bi" :class="param.enabled ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
-            </span>
-          </span>
-        </button>
+      <!-- Parameter Info Display -->
+      <div v-if="selectedParameter" class="mt-3 p-2 bg-light rounded">
+        <div class="row g-2">
+          <div class="col-auto">
+            <small class="text-muted">
+              <i class="bi bi-rulers me-1"></i>
+              <strong>Range:</strong> {{ getSelectedParameterRange() }}
+            </small>
+          </div>
+          <div class="col-auto">
+            <small class="text-muted">
+              <i class="bi bi-diagram-3 me-1"></i>
+              <strong>Unit:</strong> {{ getSelectedParameterUnit() }}
+            </small>
+          </div>
+          <div class="col-auto">
+            <small class="text-muted">
+              <i class="bi bi-graph-up me-1"></i>
+              <strong>Data Points:</strong> {{ dataPointsCount }}
+            </small>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -201,13 +215,15 @@ export default defineComponent({
     
     // Parameter toggle states
     const parameters = ref([
-      { key: "ref1", label: "REF1", enabled: true, color: "primary" },
-      { key: "ref2", label: "REF2", enabled: true, color: "success" },
-      { key: "ref3", label: "REF3", enabled: true, color: "info" },
-      { key: "dcv", label: "DCV", enabled: true, color: "warning" },
-      { key: "dci", label: "DCI", enabled: true, color: "danger" },
-      { key: "acv", label: "ACV", enabled: true, color: "purple" },
+      { key: "ref1", label: "REF1", unit: "V", enabled: false, color: "primary", min: -5, max: 5 },
+      { key: "ref2", label: "REF2", unit: "V", enabled: false, color: "success", min: -5, max: 5 },
+      { key: "ref3", label: "REF3", unit: "V", enabled: false, color: "info", min: -5, max: 5 },
+      { key: "dcv", label: "DCV", unit: "VDC", enabled: false, color: "warning", min: 0, max: 101 },
+      { key: "dci", label: "DCI", unit: "A", enabled: false, color: "danger", min: 0, max: 1000 },
+      { key: "acv", label: "ACV", unit: "VAC", enabled: false, color: "purple", min: 0, max: 400 },
     ]);
+
+    const selectedParameter = ref("");
 
     const fetchDeviceData = async () => {
       try {
@@ -309,6 +325,40 @@ export default defineComponent({
       });
     };
 
+    // Get selected parameter info
+    const getSelectedParameterInfo = () => {
+      return parameters.value.find(p => p.key === selectedParameter.value);
+    };
+
+    const getSelectedParameterLabel = () => {
+      const param = getSelectedParameterInfo();
+      return param ? param.label : "";
+    };
+
+    const getSelectedParameterUnit = () => {
+      const param = getSelectedParameterInfo();
+      return param ? param.unit : "";
+    };
+
+    const getSelectedParameterColor = () => {
+      const param = getSelectedParameterInfo();
+      return param ? param.color : "primary";
+    };
+
+    const getSelectedParameterRange = () => {
+      const param = getSelectedParameterInfo();
+      if (!param) return "";
+      return `${param.min} to ${param.max} ${param.unit}`;
+    };
+
+    const dataPointsCount = computed(() => {
+      if (!selectedParameter.value) return 0;
+      const filteredData = selectedDeviceFilter.value
+        ? deviceData.value.filter(item => String(item.deviceId) === String(selectedDeviceFilter.value))
+        : deviceData.value;
+      return filteredData.length;
+    });
+
     onMounted(() => {
       loadDevicesList();
       fetchDeviceData();
@@ -323,62 +373,55 @@ export default defineComponent({
     }, { deep: true });
 
     const chartSeries = computed(() => {
+      // If no parameter is selected, return empty series
+      if (!selectedParameter.value) {
+        return [];
+      }
+
       // Filter data based on selected device
       const filteredData = selectedDeviceFilter.value
         ? deviceData.value.filter(item => String(item.deviceId) === String(selectedDeviceFilter.value))
         : deviceData.value;
       
-      const dataMap = {
-        ref1: [] as number[],
-        ref2: [] as number[],
-        ref3: [] as number[],
-        dcv: [] as number[],
-        dci: [] as number[],
-        acv: [] as number[],
-      };
+      const dataArray: number[] = [];
 
-      // Use filtered data, not all data
+      // Get data for the selected parameter only
       filteredData.forEach((item) => {
-        dataMap.ref1.push(parseFloat(item.ref1) || 0);
-        dataMap.ref2.push(parseFloat(item.ref2) || 0);
-        dataMap.ref3.push(parseFloat(item.ref3) || 0);
-        dataMap.dcv.push(parseFloat(item.dcv) || 0);
-        dataMap.dci.push(parseFloat(item.dci) || 0);
-        dataMap.acv.push(parseFloat(item.acv) || 0);
+        const value = parseFloat(item[selectedParameter.value as keyof typeof item]) || 0;
+        dataArray.push(value);
       });
 
-      // Filter based on enabled parameters
-      const series: any[] = [];
-      parameters.value.forEach((param) => {
-        if (param.enabled) {
-          series.push({
-            name: param.label,
-            data: dataMap[param.key as keyof typeof dataMap]
-          });
-        }
-      });
+      // Get the parameter info for the label
+      const paramInfo = getSelectedParameterInfo();
+      const label = paramInfo ? `${paramInfo.label} (${paramInfo.unit})` : selectedParameter.value;
 
-      return series;
+      // Return single series with the selected parameter
+      return [{
+        name: label,
+        data: dataArray
+      }];
     });
 
     const chartOptions = computed<ApexOptions>(() => {
       const labelColor = "gray";
       const gridColor = getCSSVariableValue("--bs-gray-500");
       
-      // Generate colors based on enabled parameters
-      const colors = parameters.value
-        .filter(p => p.enabled)
-        .map(p => {
-          const colorMap: Record<string, string> = {
-            primary: getCSSVariableValue("--bs-primary"),
-            success: getCSSVariableValue("--bs-success"),
-            info: getCSSVariableValue("--bs-info"),
-            warning: getCSSVariableValue("--bs-warning"),
-            danger: getCSSVariableValue("--bs-danger"),
-            purple: getCSSVariableValue("--bs-purple"),
-          };
-          return colorMap[p.color] || getCSSVariableValue("--bs-primary");
-        });
+      // Get the selected parameter info for Y-axis configuration
+      const selectedParamInfo = getSelectedParameterInfo();
+      
+      // Generate colors based on selected parameter
+      let colors: string[] = [];
+      if (selectedParameter.value && selectedParamInfo) {
+        const colorMap: Record<string, string> = {
+          primary: getCSSVariableValue("--bs-primary"),
+          success: getCSSVariableValue("--bs-success"),
+          info: getCSSVariableValue("--bs-info"),
+          warning: getCSSVariableValue("--bs-warning"),
+          danger: getCSSVariableValue("--bs-danger"),
+          purple: getCSSVariableValue("--bs-purple"),
+        };
+        colors = [colorMap[selectedParamInfo.color] || getCSSVariableValue("--bs-primary")];
+      }
 
       return {
         chart: {
@@ -456,6 +499,9 @@ export default defineComponent({
           },
         },
         yaxis: {
+          min: selectedParamInfo?.min || undefined,
+          max: selectedParamInfo?.max || undefined,
+          tickAmount: 5,
           labels: {
             style: {
               colors: labelColor,
@@ -463,6 +509,14 @@ export default defineComponent({
             },
             formatter: (value) => {
               return value?.toFixed(2) || "0.00";
+            },
+          },
+          title: {
+            text: selectedParamInfo ? `${selectedParamInfo.label} (${selectedParamInfo.unit})` : "",
+            style: {
+              color: labelColor,
+              fontSize: "12px",
+              fontWeight: 600,
             },
           },
         },
@@ -483,6 +537,22 @@ export default defineComponent({
             formatter: (value) => {
               return value?.toFixed(2) || "0.00";
             },
+            title: {
+              formatter: () => selectedParamInfo?.label || "Value",
+            },
+          },
+          marker: {
+            show: true,
+          },
+        },
+        noData: {
+          text: selectedParameter.value ? "No data available for selected parameter" : "Please select a parameter to view",
+          align: "center",
+          verticalAlign: "middle",
+          offsetY: 0,
+          style: {
+            color: labelColor,
+            fontSize: "14px",
           },
         },
       };
@@ -506,6 +576,12 @@ export default defineComponent({
       selectedDeviceFilter,
       availableDevices,
       onDeviceFilterChange,
+      selectedParameter,
+      getSelectedParameterLabel,
+      getSelectedParameterColor,
+      getSelectedParameterRange,
+      getSelectedParameterUnit,
+      dataPointsCount,
     };
   },
 });
@@ -649,6 +725,32 @@ export default defineComponent({
   color: var(--bs-primary);
 }
 
+/* Styles for parameter filter section */
+.form-select-sm {
+  font-size: 0.875rem;
+  padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+}
+
+.badge {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+}
+
+.rounded {
+  border-radius: 0.375rem !important;
+}
+
+small {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 @media (max-width: 992px) {
   .parameter-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -675,6 +777,16 @@ export default defineComponent({
   
   .parameter-name {
     font-size: 13px;
+  }
+  
+  .d-flex.align-items-center.gap-3.flex-wrap {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .form-select-sm {
+    width: 100% !important;
+    max-width: 100% !important;
   }
 }
 

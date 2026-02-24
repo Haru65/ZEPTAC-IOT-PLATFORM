@@ -16,12 +16,13 @@
           {{ exportLoading ? 'Exporting...' : 'Export to Excel' }}
         </button>
         <button
-          class="btn btn-primary"
-          @click="exportPDF"
+          class="btn btn-danger"
+          @click="clearTelemetryData"
           :disabled="telemetryData.length === 0"
+          title="Clear all loaded telemetry data"
         >
-          <i class="bi bi-file-earmark-pdf me-2"></i>
-          Export PDF
+          <i class="bi bi-trash me-2"></i>
+          Clear Data
         </button>
       </div>
     </div>
@@ -231,7 +232,7 @@
                     </div>
                   </td>
                   <td class="py-1;">
-                    <span class="text-muted small">{{ formatDataValue(record.event) }}</span>
+                    <span class="text-muted small">{{ formatModeDisplay(record.event) }}</span>
                   </td>
                   <td class="py-1;">
                     <span class="text-muted small">{{ formatDataValue(getDataField(record, 'acv') || getDataField(record, 'ACV')) }}</span>
@@ -663,6 +664,27 @@ export default defineComponent({
       return String(event || 'UNKNOWN');
     };
 
+    // Helper function to format mode display (rename INT to UNIT ON/OFF)
+    const formatModeDisplay = (event: any) => {
+      const eventStr = String(event || '').toUpperCase().trim();
+      
+      // Rename INT to UNIT ON/UNIT OFF based on the event value
+      if (eventStr === 'INT' || eventStr === 'INTERRUPT') {
+        return 'UNIT ON';
+      } else if (eventStr.includes('INT') && eventStr.includes('ON')) {
+        return 'UNIT ON';
+      } else if (eventStr.includes('INT') && eventStr.includes('OFF')) {
+        return 'UNIT OFF';
+      } else if (eventStr.includes('INTERRUPT') && eventStr.includes('ON')) {
+        return 'UNIT ON';
+      } else if (eventStr.includes('INTERRUPT') && eventStr.includes('OFF')) {
+        return 'UNIT OFF';
+      }
+      
+      // For other modes, return as-is
+      return formatDataValue(event);
+    };
+
     // Helper function to get badge class for event type
     const getEventBadgeClass = (event: any) => {
       const eventType = getEventTypeName(event);
@@ -915,7 +937,14 @@ export default defineComponent({
     const formatDataValue = (value: any) => {
       if (value === null || value === undefined) return '-';
       if (typeof value === 'number') return value.toFixed(2);
-      return value.toString();
+      
+      let stringValue = value.toString();
+      
+      // Rename Set OP to Set O/P and Set UP to U/P
+      stringValue = stringValue.replace(/Set OP/gi, 'Set O/P');
+      stringValue = stringValue.replace(/Set UP/gi, 'U/P');
+      
+      return stringValue;
     };
 
     const formatFieldName = (field: string) => {
@@ -929,6 +958,10 @@ export default defineComponent({
       
       // Handle Digital Output column (both short and long names)
       if (lowerField === 'do' || lowerField === 'digital output') return 'DO';
+      
+      // Handle Set OP/UP renaming
+      if (lowerField === 'set op' || lowerField === 'setop') return 'Set O/P';
+      if (lowerField === 'set up' || lowerField === 'setup') return 'U/P';
       
       // Default formatting
       return field.toUpperCase().replace(/_/g, ' ');
@@ -1000,39 +1033,6 @@ export default defineComponent({
     };
 
     // Export to PDF
-    const exportPDF = async () => {
-      try {
-        const chartsElement = document.querySelector('.row.g-4');
-        if (!chartsElement) {
-          throw new Error('Charts not found');
-        }
-
-        const canvas = await html2canvas(chartsElement as HTMLElement);
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF({ orientation: "landscape" });
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
-        pdf.save(`telemetry_report_${new Date().toISOString().split('T')[0]}.pdf`);
-
-        await Swal.fire({
-          title: 'PDF Downloaded',
-          text: 'Your PDF report has been downloaded successfully.',
-          icon: 'success',
-          confirmButtonText: 'OK',
-          timer: 3000
-        });
-      } catch (error) {
-        console.error('❌ PDF export error:', error);
-        Swal.fire({
-          title: 'Export Failed',
-          text: 'Failed to generate PDF. Please try again.',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
-      }
-    };
-
     // Export to Excel - Production Grade
     const exportToExcel = async () => {
       try {
@@ -1154,11 +1154,25 @@ export default defineComponent({
           dataSize: response.data.size
         });
 
-        // Check if response is actually an error message
-        if (response.data.type === 'application/json') {
+        // Check content type header to see if this is an error response
+        const contentType = response.headers['content-type'] || '';
+        if (contentType.includes('application/json')) {
+          // This is a JSON error response, not an Excel file
+          try {
+            const text = await response.data.text();
+            const errorData = JSON.parse(text);
+            throw new Error(errorData.error || errorData.message || 'Export failed');
+          } catch (parseErr) {
+            throw new Error('Invalid server response during export');
+          }
+        }
+
+        // Validate blob size (should be > 1KB for valid Excel file)
+        if (response.data.size < 1024) {
+          console.warn('⚠️ Blob size too small:', response.data.size);
           const text = await response.data.text();
-          const errorData = JSON.parse(text);
-          throw new Error(errorData.error || 'Export failed');
+          console.warn('Blob content:', text);
+          throw new Error('Invalid Excel file generated. Server may have encountered an error.');
         }
 
         // Create download
@@ -1207,8 +1221,10 @@ export default defineComponent({
         console.error('❌ Export error:', error);
         console.error('❌ Error response:', error.response?.data);
         console.error('❌ Error status:', error.response?.status);
+        console.error('❌ Error message:', error.message);
         
         let errorMessage = 'Failed to export data. Please try again.';
+        let detailedMessage = '';
         
         if (error.message && error.message.includes('Authentication token')) {
           errorMessage = 'Session expired. Please login again.';
@@ -1219,19 +1235,25 @@ export default defineComponent({
             errorMessage = 'You do not have permission to export data.';
           } else if (error.response.status === 404) {
             errorMessage = 'Export service not found. Please contact support.';
+          } else if (error.response.status === 400) {
+            errorMessage = 'Invalid request parameters. Please check your filters.';
+            if (error.response.data?.error) {
+              detailedMessage = error.response.data.error;
+            }
           } else if (error.response.status >= 500) {
-            errorMessage = 'Server error. Please try again later.';
-            // Try to get error message from response blob
+            errorMessage = 'Server error during export.';
             if (error.response.data instanceof Blob) {
               try {
                 const text = await error.response.data.text();
                 const errorData = JSON.parse(text);
                 if (errorData.error) {
-                  errorMessage = `Server error: ${errorData.error}`;
+                  detailedMessage = errorData.error;
                 }
               } catch (e) {
-                console.log('Could not parse error response');
+                console.log('Could not parse blob error response:', e);
               }
+            } else if (error.response.data?.error) {
+              detailedMessage = error.response.data.error;
             }
           } else if (error.response.data && error.response.data.error) {
             errorMessage = error.response.data.error;
@@ -1244,7 +1266,7 @@ export default defineComponent({
 
         await Swal.fire({
           title: 'Export Failed',
-          text: errorMessage,
+          html: detailedMessage ? `<div class="text-start"><p>${errorMessage}</p><p class="text-muted small"><strong>Details:</strong> ${detailedMessage}</p></div>` : errorMessage,
           icon: 'error',
           confirmButtonText: 'OK',
           customClass: {
@@ -1363,6 +1385,115 @@ export default defineComponent({
       }
     };
 
+    // Clear all telemetry data
+    const clearTelemetryData = async () => {
+      Swal.fire({
+        title: 'Permanently Delete Telemetry Data?',
+        html: `
+          <div class="text-start">
+            <p class="mb-3">This will <strong>permanently delete</strong> the telemetry data matching your current filters:</p>
+            <ul class="mb-3">
+              <li><strong>Date Range:</strong> ${startDate.value} to ${endDate.value}</li>
+              ${selectedDevice.value ? `<li><strong>Device:</strong> ${selectedDevice.value}</li>` : '<li><strong>Device:</strong> All Devices</li>'}
+              ${selectedMode.value ? `<li><strong>Mode:</strong> ${selectedMode.value}</li>` : '<li><strong>Mode:</strong> All Modes</li>'}
+              <li><strong>Records to Delete:</strong> ${telemetryData.value.length}</li>
+            </ul>
+            <div class="alert alert-danger d-flex align-items-center">
+              <i class="bi bi-exclamation-triangle me-2"></i>
+              <small><strong>Warning:</strong> This action is permanent and cannot be undone. Deleted data will be removed from the database.</small>
+            </div>
+            <p class="mb-0 text-muted">Type <strong>DELETE</strong> below to confirm:</p>
+          </div>
+        `,
+        input: 'text',
+        inputPlaceholder: 'Type DELETE to confirm',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Permanently Delete',
+        cancelButtonText: 'Cancel',
+        customClass: {
+          confirmButton: "btn btn-danger",
+          cancelButton: "btn btn-secondary"
+        },
+        preConfirm: (inputValue) => {
+          if (inputValue !== 'DELETE') {
+            Swal.showValidationMessage('Please type DELETE to confirm deletion');
+            return false;
+          }
+          return true;
+        }
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            // Show loading state
+            Swal.fire({
+              title: 'Deleting Data...',
+              html: 'Please wait while we permanently delete your telemetry data...',
+              allowOutsideClick: false,
+              didOpen: () => {
+                Swal.showLoading();
+              }
+            });
+
+            // Build delete request
+            const params = new URLSearchParams({
+              startDate: startDate.value,
+              endDate: endDate.value,
+              confirmDelete: 'true'
+            });
+
+            if (selectedDevice.value && selectedDevice.value.trim() !== '') {
+              params.append('deviceId', selectedDevice.value);
+            }
+
+            if (selectedMode.value && selectedMode.value.trim() !== '') {
+              params.append('mode', selectedMode.value);
+            }
+
+            console.log('🗑️ Sending delete request:', params.toString());
+
+            ApiService.setHeader();
+            const response = await axios.delete(
+              `${(import.meta.env.VITE_APP_API_URL || 'http://localhost:3001').replace(/\/$/, '')}/api/telemetry?${params.toString()}`,
+              {
+                headers: {
+                  'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                }
+              }
+            );
+
+            console.log('✅ Delete response:', response.data);
+
+            if (response.data?.success) {
+              const deletedCount = response.data.data?.deletedCount || 0;
+              
+              // Clear UI data
+              telemetryData.value = [];
+              
+              Swal.fire({
+                title: 'Deleted Successfully!',
+                html: `<p><strong>${deletedCount} record(s)</strong> have been permanently deleted from the database.</p>`,
+                icon: 'success',
+                confirmButtonText: 'OK',
+                timer: 3000
+              });
+            } else {
+              throw new Error(response.data?.error || 'Unknown error during deletion');
+            }
+
+          } catch (error) {
+            console.error('❌ Error deleting telemetry data:', error);
+            Swal.fire({
+              title: 'Deletion Failed',
+              text: error.response?.data?.error || error.message || 'Failed to delete telemetry data. Please try again.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
+          }
+        }
+      });
+    };
+
     // Clear accumulated event data (manual reset)
     const clearAccumulatedEvents = () => {
       Swal.fire({
@@ -1409,10 +1540,10 @@ export default defineComponent({
 
     return {
       // Export functions
-      exportPDF,
       exportToExcel,
       exportEventReport,
       clearAccumulatedEvents,
+      clearTelemetryData,
       exportLoading,
       
       // Data and state
@@ -1444,6 +1575,7 @@ export default defineComponent({
       formatDate,
       formatTime,
       formatDataValue,
+      formatModeDisplay,
       formatFieldName,
       formatLocation,
       getDataField,

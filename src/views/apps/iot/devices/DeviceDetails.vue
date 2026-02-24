@@ -72,7 +72,7 @@ export default defineComponent({
       // Electrode configuration
       electrodeToPayload: (electrodeType: string) => {
         const electrodeCode = ELECTRODE_MAPPING[electrodeType] || 0;
-        const defaultRefFail = electrodeType === 'Zinc' ? -0.80 : 0.30;
+        const defaultRefFail = electrodeType === 'Zinc' ? 0.80 : -0.30;
         return {
           electrode: electrodeCode,
           referenceFail: defaultRefFail,
@@ -96,9 +96,9 @@ export default defineComponent({
       
       // Shunt current configuration
       shuntCurrentToPayload: (current: string) => {
-        const currentNum = parseFloat(current);
+        const currentNum = parseInt(current);
         return {
-          shuntCurrent: currentNum.toFixed(1).padStart(4, '0')
+          shuntCurrent: String(currentNum).padStart(3, '0')
         };
       },
       
@@ -450,6 +450,19 @@ export default defineComponent({
       // Get device id from route params
       const route = useRoute();
       deviceId.value = (route.params.id as string) || null;
+
+      // Load custom DI names from localStorage
+      if (deviceId.value) {
+        const savedNames = localStorage.getItem(`device_${deviceId.value}_di_names`);
+        if (savedNames) {
+          try {
+            diNames.value = JSON.parse(savedNames);
+            console.log('📦 Loaded custom DI names:', diNames.value);
+          } catch (e) {
+            console.error('Failed to load saved DI names:', e);
+          }
+        }
+      }
 
       // Fetch device settings and recent telemetry for this specific device
       (async () => {
@@ -875,7 +888,7 @@ export default defineComponent({
       return numValue >= 4.00 ? 'OPEN' : numValue.toFixed(2);
     };
 
-    // Helper function to format voltage values (Set UP, Set OP, Reference Fail)
+    // Helper function to format voltage values (U/P, Set O/P, Reference Fail)
     // Converts integer format (123 → 1.23 or -800 → -8.00) to decimal format if needed
     const formatVoltageValue = (value: any, decimals: number = 2) => {
       if (!value && value !== 0) return '0.00';
@@ -888,6 +901,51 @@ export default defineComponent({
       }
       
       return numValue.toFixed(decimals);
+    };
+
+    // Display function for SET U/P that applies correct sign based on electrode type
+    const formatSetUpDisplayValue = (value: any) => {
+      const baseValue = formatVoltageValue(value, 2);
+      if (baseValue === '0.00') return baseValue;
+      
+      const numValue = parseFloat(baseValue);
+      const electrodeCode = settingsParams.value?.Electrode;
+      
+      // Cu/CuSO4 (0) and Ag/AgCl (2) need negative display
+      if (electrodeCode === 0 || electrodeCode === 2) {
+        return Math.abs(numValue) > 0 ? `-${Math.abs(numValue).toFixed(2)}` : '0.00';
+      }
+      // Zinc (1) shows as positive
+      return Math.abs(numValue).toFixed(2);
+    };
+
+    // Display function for SET O/P that applies correct sign (always negative)
+    const formatSetOpDisplayValue = (value: any) => {
+      const baseValue = formatVoltageValue(value, 2);
+      if (baseValue === '0.00') return baseValue;
+      
+      const numValue = parseFloat(baseValue);
+      // Always show as negative for SET O/P
+      return Math.abs(numValue) > 0 ? `-${Math.abs(numValue).toFixed(2)}` : '0.00';
+    };
+
+    // Display function for Reference Fail that applies correct sign based on electrode type
+    const formatRefFailDisplayValue = (value: any) => {
+      const baseValue = formatVoltageValue(value, 2);
+      if (baseValue === '0.00') return baseValue;
+      
+      const electrodeCode = settingsParams.value?.Electrode;
+      
+      // Cu/CuSO4 (0) and Ag/AgCl (2) show as -0.30
+      if (electrodeCode === 0 || electrodeCode === 2) {
+        return '-0.30';
+      }
+      // Zinc (1) shows as 0.80
+      if (electrodeCode === 1) {
+        return '0.80';
+      }
+      
+      return baseValue;
     };
 
     // Helper function to map digital I/O values
@@ -1058,8 +1116,29 @@ export default defineComponent({
           }
         }
         
-        // If we have valid coordinates, perform reverse geocoding
+        // If we have valid coordinates, call backend reverse geocoding first
         if (lat !== null && lon !== null && lat !== 0 && lon !== 0) {
+          try {
+            // Call backend to reverse geocode with deviceId so it gets stored
+            const baseUrl = (import.meta.env.VITE_APP_API_URL || 'http://localhost:3001').replace(/\/$/, '');
+            const response = await fetch(`${baseUrl}/api/devices/reverse-geocode`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ lat, lng: lon, deviceId: deviceId.value })
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              if (data.location) {
+                abstractLocation.value = data.location;
+                return;
+              }
+            }
+          } catch (error) {
+            console.warn('Backend reverse geocoding failed, falling back to frontend:', error);
+          }
+
+          // Fallback to frontend reverse geocoding if backend fails
           const data = await reverseGeocode(lat, lon);
           // Try to extract sector/district/city/town/village
           let area = '';
@@ -1115,6 +1194,27 @@ export default defineComponent({
       if (metric.type.toLowerCase().includes('battery') && metric.value <= 20) return 'text-danger';
       if (metric.type.toLowerCase().includes('signal') && metric.value <= 50) return 'text-warning';
       return 'text-primary';
+    };
+
+    // Get background color for metric card (especially for color blocks like DO)
+    const getMetricCardBackground = (metric: any) => {
+      // Digital Output: ON = green, OFF = red
+      if (metric.type.includes('DO') && typeof metric.value === 'string') {
+        return metric.value === 'ON' ? 'bg-success' : 'bg-danger';
+      }
+      // Digital Input: CLOSE = green, OPEN = red
+      if (metric.type.includes('DI') && typeof metric.value === 'string') {
+        return metric.value === 'CLOSE' ? 'bg-success' : 'bg-danger';
+      }
+      return 'bg-light';
+    };
+
+    // Get text color for metric card (white text for colored backgrounds)
+    const getMetricCardTextColor = (metric: any) => {
+      if ((metric.type.includes('DO') || metric.type.includes('DI')) && typeof metric.value === 'string') {
+        return 'text-white';
+      }
+      return 'text-dark';
     };
 
     const connectionStatusClass = computed(() => {
@@ -1179,19 +1279,21 @@ export default defineComponent({
       return currentMode.value === modeCode;
     };
 
-    // Computed property for Set UP range text based on electrode type
+    // Computed property for U/P range text based on electrode type
+    // Note: Display shows positive values
     const setUpRangeText = computed(() => {
       const electrodeCode = settingsParams.value?.Electrode;
       if (electrodeCode === 1) {
-        return '-0.50 to -0.10 for Zinc';
+        return '0.10 to 0.50 for Zinc';
       } else if (electrodeCode === 2) {
         return '0.60 to 1.00 for Ag/AgCl';
       } else {
-        return '0.60 to 1.00 for Cu/cuso4';
+        return '0.60 to 1.00 for Cu/CuSO4';
       }
     });
 
-    // Computed property for Set OP range text based on electrode type
+    // Computed property for Set O/P range text based on electrode type
+    // Note: Display shows positive values
     const setOpRangeText = computed(() => {
       const electrodeCode = settingsParams.value?.Electrode;
       if (electrodeCode === 1) {
@@ -1199,37 +1301,39 @@ export default defineComponent({
       } else if (electrodeCode === 2) {
         return '1.20 to 3.00 for Ag/AgCl';
       } else {
-        return '1.20 to 3.00 for Cu/cuso4';
+        return '1.20 to 3.00 for Cu/CuSO4';
       }
     });
 
-    // Helper function to get Set UP min/max based on electrode type
+    // Helper function to get U/P min/max based on electrode type
+    // Note: Returns positive values for display; actual storage applies negation for Cu/CuSO4 and Ag/AgCl
     const getSetUpLimits = () => {
       const electrodeCode = settingsParams.value?.Electrode;
       if (electrodeCode === 1) {
-        // Zinc: -0.50 to -0.10
-        return { min: -0.50, max: -0.10 };
+        // Zinc: 0.10 to 0.50 (positive, stored as-is)
+        return { min: 0.10, max: 0.50, needsNegation: false };
       } else if (electrodeCode === 2) {
-        // Ag/AgCl: 0.60 to 1.00
-        return { min: 0.60, max: 1.00 };
+        // Ag/AgCl: 0.60 to 1.00 (displayed positive, stored negative)
+        return { min: 0.60, max: 1.00, needsNegation: true };
       } else {
-        // Cu/cuso4: 0.60 to 1.00 (default)
-        return { min: 0.60, max: 1.00 };
+        // Cu/CuSO4: 0.60 to 1.00 (displayed positive, stored negative, default)
+        return { min: 0.60, max: 1.00, needsNegation: true };
       }
     };
 
-    // Helper function to get Set OP min/max based on electrode type
+    // Helper function to get Set O/P min/max based on electrode type
+    // Note: Returns positive values for display; always negated for storage
     const getSetOpLimits = () => {
       const electrodeCode = settingsParams.value?.Electrode;
       if (electrodeCode === 1) {
-        // Zinc: 0.10 to 1.90
-        return { min: 0.10, max: 1.90 };
+        // Zinc: 0.10 to 1.90 (displayed positive, stored as -0.10 to -1.90)
+        return { min: 0.10, max: 1.90, needsNegation: true };
       } else if (electrodeCode === 2) {
-        // Ag/AgCl: 1.20 to 3.00
-        return { min: 1.20, max: 3.00 };
+        // Ag/AgCl: 1.20 to 3.00 (displayed positive, stored as -1.20 to -3.00)
+        return { min: 1.20, max: 3.00, needsNegation: true };
       } else {
-        // Cu/cuso4: 1.20 to 3.00 (default)
-        return { min: 1.20, max: 3.00 };
+        // Cu/CuSO4: 1.20 to 3.00 (displayed positive, stored as -1.20 to -3.00, default)
+        return { min: 1.20, max: 3.00, needsNegation: true };
       }
     };
 
@@ -1238,6 +1342,7 @@ export default defineComponent({
     const loggingInterval = ref<string>('00:01:00');
     const showModeModal = ref<boolean>(false);
     const showElectrodeModal = ref<boolean>(false);
+    const showRenameModal = ref<boolean>(false);
     
     // Mode options and sub-modals
     const showNormalModal = ref<boolean>(false);
@@ -1281,6 +1386,14 @@ export default defineComponent({
 
     // Electrode selection data
     const selectedElectrode = ref<string>('');
+
+    // Digital Input Names (custom rename)
+    const diNames = ref<{ [key: string]: string }>({
+      DI1: 'DI 1',
+      DI2: 'DI 2',
+      DI3: 'DI 3',
+      DI4: 'DI 4'
+    });
 
     // Alarm item form data
     const alarmSetupForm = ref({
@@ -1473,9 +1586,10 @@ export default defineComponent({
         autoForm.value.offTime = offTime;
         
         // CRITICAL: Update timer component values for modal form inputs
+        // Divide by 10 for correct display (device sends 1900 which displays as 190.0 seconds)
         // Format seconds with one decimal place (0000.0 format)
-        onSeconds.value = (onTime || 0).toFixed(1);
-        offSeconds.value = (offTime || 0).toFixed(1);
+        onSeconds.value = ((onTime || 0) / 10).toFixed(1);
+        offSeconds.value = ((offTime || 0) / 10).toFixed(1);
         
         console.log('🔍 DEBUG AUTO: Converted timer values:', {
           onSeconds: onSeconds.value,
@@ -1632,7 +1746,7 @@ export default defineComponent({
     });
     
     const shuntCurrentForm = ref({
-      value: '99.99'
+      value: '999'
     });
 
 
@@ -1682,16 +1796,18 @@ export default defineComponent({
       // Populate all alarm forms with current device settings when opening main alarm modal
       const setupValue = settingsParams.value?.['Reference UP'];
       if (setupValue !== undefined && setupValue !== null) {
-        const formattedValue = parseFloat(setupValue).toFixed(2);
-        alarmSetupForm.value.value = formattedValue;
+        // Display actual value as stored (may be negative or positive)
+        const displayValue = parseFloat(setupValue).toFixed(2);
+        alarmSetupForm.value.value = Math.abs(parseFloat(displayValue)).toFixed(2); // Show as positive for input
       } else {
         alarmSetupForm.value.value = '0.00';
       }
       
       const setopValue = settingsParams.value?.['Reference OP'];
       if (setopValue !== undefined && setopValue !== null) {
-        const formattedValue = parseFloat(setopValue).toFixed(2);
-        alarmSetopForm.value.value = formattedValue;
+        // Display actual value as stored (always negative, convert to positive for display)
+        const displayValue = parseFloat(setopValue).toFixed(2);
+        alarmSetopForm.value.value = Math.abs(parseFloat(displayValue)).toFixed(2); // Show as positive for input
       } else {
         alarmSetopForm.value.value = '0.00';
       }
@@ -1722,8 +1838,9 @@ export default defineComponent({
         // Populate from current settings
         const setupValue = settingsParams.value?.['Reference UP'];
         if (setupValue !== undefined && setupValue !== null) {
-          const formattedValue = formatVoltageValue(setupValue);
-          alarmSetupForm.value.value = formattedValue;
+          // Extract actual value and convert to positive for input (user sees positive)
+          const actualValue = parseFloat(setupValue);
+          alarmSetupForm.value.value = Math.abs(actualValue).toFixed(2);
         } else {
           alarmSetupForm.value.value = '0.00';
         }
@@ -1732,8 +1849,9 @@ export default defineComponent({
         // Populate from current settings
         const setopValue = settingsParams.value?.['Reference OP'];
         if (setopValue !== undefined && setopValue !== null) {
-          const formattedValue = formatVoltageValue(setopValue);
-          alarmSetopForm.value.value = formattedValue;
+          // Extract actual value and convert to positive for input (user sees positive)
+          const actualValue = parseFloat(setopValue);
+          alarmSetopForm.value.value = Math.abs(actualValue).toFixed(2);
         } else {
           alarmSetopForm.value.value = '0.00';
         }
@@ -1830,7 +1948,8 @@ export default defineComponent({
     };
 
     const isValidTimeFormat = (time: string) => {
-      const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/;
+      // Allow 24:00:00 as special case for 24 hours, plus normal format (00:00 to 23:59:59)
+      const timeRegex = /^(24:00:00|([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9])$/;
       if (!timeRegex.test(time)) return false;
       
       // Check if it's 00:00:00 (zero interval)
@@ -1944,7 +2063,59 @@ export default defineComponent({
       showModeModal.value = false;
     };
 
+    const openRenameModal = () => {
+      // Load custom names from localStorage if available
+      const savedNames = localStorage.getItem(`device_${deviceId.value}_di_names`);
+      if (savedNames) {
+        try {
+          diNames.value = JSON.parse(savedNames);
+        } catch (e) {
+          console.error('Failed to load saved DI names:', e);
+        }
+      }
+      showRenameModal.value = true;
+    };
 
+    const closeRenameModal = () => {
+      showRenameModal.value = false;
+    };
+
+    const saveRenameModal = async () => {
+      try {
+        // Validate that names are not empty
+        for (const [key, name] of Object.entries(diNames.value)) {
+          if (!name || name.trim().length === 0) {
+            await Swal.fire({
+              title: 'Validation Error',
+              text: `${key} cannot have an empty name`,
+              icon: 'warning',
+              confirmButtonText: 'OK'
+            });
+            return;
+          }
+        }
+
+        // Save to localStorage
+        localStorage.setItem(`device_${deviceId.value}_di_names`, JSON.stringify(diNames.value));
+
+        await Swal.fire({
+          title: 'Success!',
+          text: 'Digital Input names have been updated.',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        });
+
+        closeRenameModal();
+      } catch (error) {
+        console.error('Error saving DI names:', error);
+        await Swal.fire({
+          title: 'Error',
+          text: 'Failed to save Digital Input names. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
+    };
 
     const closeElectrodeModal = () => {
       showElectrodeModal.value = false;
@@ -1967,7 +2138,7 @@ export default defineComponent({
         if (isNaN(setupValue)) {
           await Swal.fire({
             title: 'Validation Error',
-            text: 'SET UP value must be a valid number',
+            text: 'U/P value must be a valid number',
             icon: 'error',
             confirmButtonText: 'OK'
           });
@@ -1981,34 +2152,37 @@ export default defineComponent({
         if (setupValue < limits.min || setupValue > limits.max) {
           await Swal.fire({
             title: 'Validation Error',
-            text: `SET UP value must be between ${limits.min} and ${limits.max}V (${setUpRangeText.value})`,
+            text: `U/P value must be between ${limits.min} and ${limits.max}V (${setUpRangeText.value})`,
             icon: 'error',
             confirmButtonText: 'OK'
           });
           return;
         }
 
-        console.log('📝 [CACHE] Staging SET UP configuration:', setupValue);
-        console.log(`   Value: ${setupValue} (Range: ${limits.min} to ${limits.max})`);
+        // Convert to negative if required by electrode type
+        const storedValue = limits.needsNegation ? -setupValue : setupValue;
+        
+        console.log('📝 [CACHE] Staging U/P configuration:', setupValue);
+        console.log(`   Display Value: ${setupValue}, Stored Value: ${storedValue} (Range: ${limits.min} to ${limits.max})`);
         
         // Stage Reference UP parameter via caching system
-        stageSettingUpdate('Reference UP', setupValue);
+        stageSettingUpdate('Reference UP', storedValue);
         
         updatePendingChangesDisplay();
 
         await Swal.fire({
-          title: 'SET UP Staged!',
-          text: `SET UP set to ${setupValue.toFixed(2)}V\n\nClick "Apply All Settings" to send to device.`,
+          title: 'U/P Staged!',
+          text: `U/P set to ${setupValue.toFixed(2)}V\n\nClick "Apply All Settings" to send to device.`,
           icon: 'success',
           confirmButtonText: 'OK'
         });
         showAlarmSetupModal.value = false;
         showAlarmModal.value = false;
       } catch (error: any) {
-        console.error('❌ Error staging SET UP:', error);
+        console.error('❌ Error staging U/P:', error);
         await Swal.fire({
           title: 'Configuration Failed',
-          text: error.message || 'Failed to stage SET UP. Please try again.',
+          text: error.message || 'Failed to stage U/P. Please try again.',
           icon: 'error',
           confirmButtonText: 'OK'
         });
@@ -2027,7 +2201,7 @@ export default defineComponent({
         if (isNaN(setopValue)) {
           await Swal.fire({
             title: 'Validation Error',
-            text: 'SET OP value must be a valid number',
+            text: 'Set O/P value must be a valid number',
             icon: 'error',
             confirmButtonText: 'OK'
           });
@@ -2041,34 +2215,37 @@ export default defineComponent({
         if (setopValue < limits.min || setopValue > limits.max) {
           await Swal.fire({
             title: 'Validation Error',
-            text: `SET OP value must be between ${limits.min} and ${limits.max}V (${setOpRangeText.value})`,
+            text: `Set O/P value must be between ${limits.min} and ${limits.max}V (${setOpRangeText.value})`,
             icon: 'error',
             confirmButtonText: 'OK'
           });
           return;
         }
 
-        console.log('📝 [CACHE] Staging SET OP configuration:', setopValue);
-        console.log(`   Value: ${setopValue} (Range: ${limits.min} to ${limits.max})`);
+        // Convert to negative (always negated for storage)
+        const storedValue = -setopValue;
+        
+        console.log('📝 [CACHE] Staging Set O/P configuration:', setopValue);
+        console.log(`   Display Value: ${setopValue}, Stored Value: ${storedValue} (Range: ${limits.min} to ${limits.max})`);
         
         // Stage Reference OP parameter via caching system
-        stageSettingUpdate('Reference OP', setopValue);
+        stageSettingUpdate('Reference OP', storedValue);
         
         updatePendingChangesDisplay();
 
         await Swal.fire({
-          title: 'SET OP Staged!',
-          text: `SET OP set to ${setopValue.toFixed(2)}V\n\nClick "Apply All Settings" to send to device.`,
+          title: 'Set O/P Staged!',
+          text: `Set O/P set to ${setopValue.toFixed(2)}V\n\nClick "Apply All Settings" to send to device.`,
           icon: 'success',
           confirmButtonText: 'OK'
         });
         showAlarmSetopModal.value = false;
         showAlarmModal.value = false;
       } catch (error: any) {
-        console.error('❌ Error staging SET OP:', error);
+        console.error('❌ Error staging Set O/P:', error);
         await Swal.fire({
           title: 'Configuration Failed',
-          text: error.message || 'Failed to stage SET OP. Please try again.',
+          text: error.message || 'Failed to stage Set O/P. Please try again.',
           icon: 'error',
           confirmButtonText: 'OK'
         });
@@ -2201,14 +2378,14 @@ export default defineComponent({
         // Format using the display function to ensure proper resolution conversion
         const displayValue = formatShuntCurrentDisplay(currentValue);
         // Remove the " A" suffix for the form value
-        const numValue = parseFloat(displayValue);
+        const numValue = parseInt(displayValue);
         if (!isNaN(numValue)) {
-          shuntCurrentForm.value.value = numValue.toFixed(1).padStart(4, '0');
+          shuntCurrentForm.value.value = String(numValue).padStart(3, '0');
         } else {
-          shuntCurrentForm.value.value = '99.9';
+          shuntCurrentForm.value.value = '999';
         }
       } else {
-        shuntCurrentForm.value.value = '99.9';
+        shuntCurrentForm.value.value = '999';
       }
       
       console.log('📊 [SHUNT] Opened modal with current value:', currentValue, 'formatted:', shuntCurrentForm.value.value);
@@ -2408,12 +2585,12 @@ export default defineComponent({
         }
 
         const current = parseFloat(shuntCurrentForm.value.value);
-        if (isNaN(current) || current < 0.0 || current > 99.9) {
-          throw new Error('Current must be between 00.0 and 99.9');
+        if (isNaN(current) || current < 0 || current > 999) {
+          throw new Error('Current must be between 000 and 999');
         }
 
-        // Convert to integer format: multiply by 10 (23.7 → 237)
-        const integerFormat = Math.round(current * 10);
+        // Use value as-is (integer format: 0-999)
+        const integerFormat = Math.round(current);
         console.log('📝 [CACHE] Staging Shunt Current configuration:', current, '→', integerFormat);
         stageSettingUpdate('Shunt Current', integerFormat);
         
@@ -2422,7 +2599,7 @@ export default defineComponent({
         await Swal.fire({
           icon: 'success',
           title: 'Shunt Current Staged!',
-          text: `Shunt current set to ${current.toFixed(1)}A.\n\nClick "Apply All Settings" to send to device.`,
+          text: `Shunt current set to ${Math.round(current)}A.\n\nClick "Apply All Settings" to send to device.`,
           showConfirmButton: false,
           timer: 2000
         });
@@ -2467,71 +2644,41 @@ export default defineComponent({
     };
 
     const validateCurrentInput = (event: any) => {
-      let value = event.target.value.replace(/[^\d.]/g, '');
+      let value = event.target.value.replace(/[^\d]/g, '');
       
-      // Remove multiple decimal points
-      const cleaned = value.replace(/\.+/g, '.');
-      const parts = cleaned.split('.');
-      if (parts.length > 2) {
-        value = parts[0] + '.' + parts.slice(1).join('');
-      }
-      
-      // Auto-add decimal after 2 digits if not present
-      if (!value.includes('.') && value.length >= 2) {
-        value = value.substring(0, 2) + '.' + value.substring(2);
-      }
-      
-      // Limit to 1 decimal place
-      if (parts[1] && parts[1].length > 1) {
-        value = parts[0] + '.' + parts[1].substring(0, 1);
-      }
-      
-      // Limit total length to 4 chars (00.0)
-      if (value.length > 4) {
-        value = value.substring(0, 4);
+      // Limit total length to 3 chars (999)
+      if (value.length > 3) {
+        value = value.substring(0, 3);
       }
       
       event.target.value = value;
       shuntCurrentForm.value.value = value;
-      console.log('📝 [SHUNT] Input value:', value, 'parsed:', parseFloat(value));
+      console.log('📝 [SHUNT] Input value:', value, 'parsed:', parseInt(value));
     };
 
     const formatCurrentInput = (event: any) => {
       let value = event.target.value.trim();
-      if (value === '' || value === '.') {
-        value = '00.0';
+      if (value === '') {
+        value = '000';
       } else {
-        const num = parseFloat(value);
+        const num = parseInt(value);
         if (!isNaN(num)) {
-          const clamped = Math.min(Math.max(num, 0), 99.9);
-          value = clamped.toFixed(1).padStart(4, '0');
+          const clamped = Math.min(Math.max(num, 0), 999);
+          value = String(clamped).padStart(3, '0');
         }
       }
       event.target.value = value;
       shuntCurrentForm.value.value = value;
-      console.log('📝 [SHUNT] Formatted value:', value, 'parsed:', parseFloat(value));
+      console.log('📝 [SHUNT] Formatted value:', value, 'parsed:', parseInt(value));
     };
 
-    // Input handlers for Set UP/OP (0.00 format - 2 decimal places exactly)
+    // Input handlers for U/P/Set O/P (0.00 format - 2 decimal places exactly)
+    // Note: All inputs are displayed as positive values
     const handleSetupInput = (event: any) => {
       let value = event.target.value;
       
-      // Only allow digits, minus sign, and decimal point
-      let cleanedValue = value.replace(/[^\d.-]/g, '');
-      
-      // Handle minus sign (only at the beginning)
-      if (cleanedValue.includes('-')) {
-        const minusIndex = cleanedValue.indexOf('-');
-        if (minusIndex > 0) {
-          cleanedValue = '-' + cleanedValue.replace(/-/g, '');
-        } else if (minusIndex === 0 && cleanedValue.length > 1 && cleanedValue[1] === '.') {
-          // Valid: "-." format
-        } else if (minusIndex > 0 || cleanedValue.lastIndexOf('-') !== minusIndex) {
-          // Remove extra minus signs
-          cleanedValue = cleanedValue.replace(/-/g, '');
-          if (value[0] === '-') cleanedValue = '-' + cleanedValue;
-        }
-      }
+      // Only allow digits and decimal point (NO minus sign - users enter positive)
+      let cleanedValue = value.replace(/[^\d.]/g, '');
       
       // Remove multiple decimal points, keep only the first
       const parts = cleanedValue.split('.');
@@ -2541,16 +2688,8 @@ export default defineComponent({
       
       // Auto-insert decimal point after first digit
       if (cleanedValue && !cleanedValue.includes('.')) {
-        if (cleanedValue === '-') {
-          // Allow "-" as user might type "-0"
-        } else if (cleanedValue.length >= 2) {
-          // If 2+ digits without decimal, auto-insert after first digit (or after minus)
-          const hasNegative = cleanedValue[0] === '-';
-          const digitsOnly = hasNegative ? cleanedValue.slice(1) : cleanedValue;
-          
-          if (digitsOnly.length >= 1) {
-            cleanedValue = (hasNegative ? '-' : '') + digitsOnly[0] + '.' + digitsOnly.slice(1);
-          }
+        if (cleanedValue.length >= 2) {
+          cleanedValue = cleanedValue[0] + '.' + cleanedValue.slice(1);
         }
       }
       
@@ -2562,9 +2701,9 @@ export default defineComponent({
         }
       }
       
-      // Limit total length (max: "-4.00" = 5 chars)
-      if (cleanedValue.length > 5) {
-        cleanedValue = cleanedValue.substring(0, 5);
+      // Limit total length (max: "1.00" = 4 chars)
+      if (cleanedValue.length > 4) {
+        cleanedValue = cleanedValue.substring(0, 4);
       }
       
       event.target.value = cleanedValue;
@@ -2573,12 +2712,13 @@ export default defineComponent({
 
     const formatSetupInput = (event: any) => {
       let value = event.target.value.trim();
-      if (value === '' || value === '-' || value === '-.') {
+      if (value === '' || value === '.' || value === '0.') {
         value = '0.00';
       } else {
         const num = parseFloat(value);
         if (!isNaN(num)) {
-          const clamped = Math.min(Math.max(num, -4.0), 4.0);
+          const limits = getSetUpLimits();
+          const clamped = Math.min(Math.max(num, limits.min), limits.max);
           value = clamped.toFixed(2);
         } else {
           value = '0.00';
@@ -2648,12 +2788,13 @@ export default defineComponent({
 
     const formatSetopInput = (event: any) => {
       let value = event.target.value.trim();
-      if (value === '' || value === '-' || value === '-.') {
+      if (value === '' || value === '.' || value === '0.') {
         value = '0.00';
       } else {
         const num = parseFloat(value);
         if (!isNaN(num)) {
-          const clamped = Math.min(Math.max(num, -4.0), 4.0);
+          const limits = getSetOpLimits();
+          const clamped = Math.min(Math.max(num, limits.min), limits.max);
           value = clamped.toFixed(2);
         } else {
           value = '0.00';
@@ -2674,18 +2815,11 @@ export default defineComponent({
 
     const formatShuntCurrentDisplay = (current: any) => {
       if (!current && current !== 0) return '9.9 A';
-      let numValue = parseFloat(current);
-      if (isNaN(numValue)) return '9.9 A';
+      let numValue = parseInt(current);
+      if (isNaN(numValue)) return '999 A';
       
-      // Shunt current can be in two formats:
-      // 1. Integer format from cache/staged changes: 999 (means 99.9A) - needs /10
-      // 2. Decimal format from database: "99.9" - no conversion needed
-      // Distinguish by checking if value >= 100 (integer format) or < 100 (decimal format)
-      if (numValue >= 100) {
-        numValue = numValue / 10;
-      }
-      
-      return `${numValue.toFixed(1)} A`;
+      // Shunt current is now in integer format: 0-999 Amperes (direct value, no conversion)
+      return `${numValue} A`;
     };
 
     const closeAllModals = () => {
@@ -2710,13 +2844,13 @@ export default defineComponent({
     const getDefaultReferenceFail = (electrodeType: string): number => {
       switch (electrodeType) {
         case 'Zinc':
-          return -0.80;  // Zinc electrode
+          return 0.80;  // Zinc electrode
         case 'Cu/cuso4':
         case 'CuCuSO4':
         case 'Ag/AgCl':
         case 'AgAgSO4':
         default:
-          return 0.30;   // Cu/CuSO4 and Ag/AgCl electrodes
+          return -0.30;   // Cu/CuSO4 and Ag/AgCl electrodes
       }
     };
 
@@ -2945,8 +3079,8 @@ export default defineComponent({
           return num;
         };
 
-        const setupValue = validateRange(alarmSetupForm.value.value, 'SET UP');
-        const setopValue = validateRange(alarmSetopForm.value.value, 'SET OP');
+        const setupValue = validateRange(alarmSetupForm.value.value, 'U/P');
+        const setopValue = validateRange(alarmSetopForm.value.value, 'Set O/P');
         const reffcalValue = parseFloat(alarmReffcalForm.value.value);
 
         console.log('📝 [CACHE] Staging Alarm Configuration');
@@ -2980,6 +3114,8 @@ export default defineComponent({
       safeDevice,
       statusClass,
       metricClass,
+      getMetricCardBackground,
+      getMetricCardTextColor,
       connectionStatus,
       connectionStatusClass,
       abstractLocation,
@@ -3035,6 +3171,12 @@ export default defineComponent({
       closeLogModal,
       closeModeModal,
 
+      showRenameModal,
+      openRenameModal,
+      closeRenameModal,
+      saveRenameModal,
+      diNames,
+
       closeElectrodeModal,
       closeAlarmModal,
       closeAlarmSetupModal,
@@ -3083,13 +3225,16 @@ export default defineComponent({
       formatShuntVoltageDisplay,
       formatShuntCurrentDisplay,
       formatVoltageValue,
+      formatSetUpDisplayValue,
+      formatSetOpDisplayValue,
+      formatRefFailDisplayValue,
       // Manual mode timer
       onSeconds,
       offSeconds,
       formatTotalTime,
       setOnTime,
       setOffTime,
-      // Input handlers for Set UP/OP values
+      // Input handlers for U/P/Set O/P values
       handleSetupInput,
       formatSetupInput,
       handleSetopInput,
@@ -3191,15 +3336,27 @@ export default defineComponent({
         <!-- TOP RIGHT: Device Matrix -->
         <div class="col-lg-6">
           <div class="mb-5">
-            <h4 class="fs-1 text-gray-800 w-bolder mb-6">Device Matrix</h4>
+            <div class="d-flex justify-content-between align-items-center mb-6">
+              <h4 class="fs-1 text-gray-800 w-bolder mb-0">Device Matrix</h4>
+              <button 
+                class="btn btn-sm btn-outline-primary" 
+                @click="openRenameModal"
+                title="Rename Digital Inputs (DI 1-4)"
+              >
+                <i class="bi bi-pencil me-1"></i>
+                Rename
+              </button>
+            </div>
             <div class="row g-3">
               <div class="col-md-3" v-for="metric in (safeDevice.metrics || [])" :key="metric.type">
-                <div class="card bg-light">
+                <div :class="['card', getMetricCardBackground(metric)]" style="border: none; transition: all 0.3s ease;">
                   <div class="card-body p-3">
                     <div class="d-flex flex-column align-items-center">
-                      <i :class="[metric.icon, metricClass(metric)]" style="font-size: 1.5rem"></i>
-                      <p class="text-muted mb-1 text-capitalize" style="font-size: 0.85rem">{{ metric.type }}</p>
-                      <h6 class="mt-0 mb-0">{{ metric.value }}</h6>
+                      <i :class="[metric.icon, metric.type.includes('DO') || metric.type.includes('DI') ? 'text-white' : metricClass(metric)]" style="font-size: 1.5rem"></i>
+                      <p :class="['mb-1', 'text-capitalize', getMetricCardTextColor(metric)]" style="font-size: 0.85rem">
+                        {{ metric.type.startsWith('DI') ? diNames[metric.type] : (metric.type.startsWith('DO') ? 'Digital Output' : metric.type) }}
+                      </p>
+                      <h6 :class="[`mt-0 mb-0`, getMetricCardTextColor(metric)]">{{ metric.value }}</h6>
                     </div>
                   </div>
                 </div>
@@ -3312,7 +3469,7 @@ export default defineComponent({
                       <div class="d-flex flex-column align-items-center">
                         <i class="bi bi-clock text-primary" style="font-size: 1.5rem"></i>
                         <p class="text-muted mb-1" style="font-size: 0.85rem">Interrupt ON</p>
-                        <h6 class="mt-0 mb-0">{{ (parseFloat(settingsParams['Interrupt ON Time']) || 0).toFixed(1) }} s</h6>
+                        <h6 class="mt-0 mb-0">{{ ((parseFloat(settingsParams['Interrupt ON Time']) || 0) / 10).toFixed(1) }} s</h6>
                       </div>
                     </div>
                   </div>
@@ -3323,7 +3480,7 @@ export default defineComponent({
                       <div class="d-flex flex-column align-items-center">
                         <i class="bi bi-clock-history text-secondary" style="font-size: 1.5rem"></i>
                         <p class="text-muted mb-1" style="font-size: 0.85rem">Interrupt OFF</p>
-                        <h6 class="mt-0 mb-0">{{ (parseFloat(settingsParams['Interrupt OFF Time']) || 0).toFixed(1) }} s</h6>
+                        <h6 class="mt-0 mb-0">{{ ((parseFloat(settingsParams['Interrupt OFF Time']) || 0) / 10).toFixed(1) }} s</h6>
                       </div>
                     </div>
                   </div>
@@ -3334,7 +3491,7 @@ export default defineComponent({
                       <div class="d-flex flex-column align-items-center">
                         <i class="bi bi-exclamation-triangle text-warning" style="font-size: 1.5rem"></i>
                         <p class="text-muted mb-1" style="font-size: 0.85rem">Reference Fail</p>
-                        <h6 class="mt-0 mb-0">{{ settingsParams?.['Reference Fail'] !== undefined ? formatVoltageValue(settingsParams['Reference Fail'], 2) : '0.00' }}V</h6>
+                        <h6 class="mt-0 mb-0">{{ settingsParams?.['Reference Fail'] !== undefined ? formatRefFailDisplayValue(settingsParams['Reference Fail']) : '0.00' }}V</h6>
                       </div>
                     </div>
                   </div>
@@ -3345,7 +3502,7 @@ export default defineComponent({
                       <div class="d-flex flex-column align-items-center">
                         <i class="bi bi-arrow-up-circle text-success" style="font-size: 1.5rem"></i>
                         <p class="text-muted mb-1" style="font-size: 0.85rem">Reference UP</p>
-                        <h6 class="mt-0 mb-0">{{ settingsParams?.['Reference UP'] !== undefined ? formatVoltageValue(settingsParams['Reference UP']) : '0.00' }}V</h6>
+                        <h6 class="mt-0 mb-0">{{ settingsParams?.['Reference UP'] !== undefined ? formatSetUpDisplayValue(settingsParams['Reference UP']) : '0.00' }}V</h6>
                       </div>
                     </div>
                   </div>
@@ -3355,8 +3512,8 @@ export default defineComponent({
                     <div class="card-body p-3">
                       <div class="d-flex flex-column align-items-center">
                         <i class="bi bi-gear text-primary" style="font-size: 1.5rem"></i>
-                        <p class="text-muted mb-1" style="font-size: 0.85rem">Reference OP</p>
-                        <h6 class="mt-0 mb-0">{{ settingsParams?.['Reference OP'] !== undefined ? formatVoltageValue(settingsParams['Reference OP']) : '0.00' }}V</h6>
+                        <p class="text-muted mb-1" style="font-size: 0.85rem">REFERENCE O/P</p>
+                        <h6 class="mt-0 mb-0">{{ settingsParams?.['Reference OP'] !== undefined ? formatSetOpDisplayValue(settingsParams['Reference OP']) : '0.00' }}V</h6>
                       </div>
                     </div>
                   </div>
@@ -3391,21 +3548,21 @@ export default defineComponent({
             <div class="col-md-6">
               <h6 class="fw-bold mb-4">SET REFERENCE VALUES</h6>
               
-              <!-- Set UP -->
+              <!-- SET U/P -->
               <div class="card border mb-3 cursor-pointer" @click="openAlarmItemModal('setup')">
                 <div class="card-body p-4 text-center">
                   <i class="bi bi-arrow-up-circle text-danger" style="font-size: 2rem"></i>
-                  <h6 class="mt-2 mb-1">Set UP</h6>
-                  <small class="text-muted">{{ settingsParams?.['Reference UP'] !== undefined ? formatVoltageValue(settingsParams['Reference UP']) : '0.00' }}V</small>
+                  <h6 class="mt-2 mb-1">SET U/P</h6>
+                  <small class="text-muted">{{ settingsParams?.['Reference UP'] !== undefined ? formatSetUpDisplayValue(settingsParams['Reference UP']) : '0.00' }}V</small>
                 </div>
               </div>
 
-              <!-- Set OP -->
+              <!-- SET O/P -->
               <div class="card border mb-3 cursor-pointer" @click="openAlarmItemModal('setop')">
                 <div class="card-body p-4 text-center">
                   <i class="bi bi-arrow-down-circle text-warning" style="font-size: 2rem"></i>
-                  <h6 class="mt-2 mb-1">Set OP</h6>
-                  <small class="text-muted">{{ settingsParams?.['Reference OP'] !== undefined ? formatVoltageValue(settingsParams['Reference OP']) : '0.00' }}V</small>
+                  <h6 class="mt-2 mb-1">SET O/P</h6>
+                  <small class="text-muted">{{ settingsParams?.['Reference OP'] !== undefined ? formatSetOpDisplayValue(settingsParams['Reference OP']) : '0.00' }}V</small>
                 </div>
               </div>
 
@@ -3414,7 +3571,7 @@ export default defineComponent({
                 <div class="card-body p-4 text-center">
                   <i class="bi bi-exclamation-triangle text-secondary" style="font-size: 2rem"></i>
                   <h6 class="mt-2 mb-1">Reference Fail</h6>
-                  <small class="text-muted">{{ settingsParams?.['Reference Fail'] !== undefined ? formatVoltageValue(settingsParams['Reference Fail'], 2) : '0.00' }}V</small>
+                  <small class="text-muted">{{ settingsParams?.['Reference Fail'] !== undefined ? formatRefFailDisplayValue(settingsParams['Reference Fail']) : '0.00' }}V</small>
                   <small class="d-block text-muted mt-2" style="font-size: 0.75rem;"><em>(Auto-set with Electrode)</em></small>
                 </div>
               </div>
@@ -3458,14 +3615,20 @@ export default defineComponent({
         <div class="modal-header bg-danger">
           <h5 class="modal-title text-white">
             <i class="bi bi-arrow-up-circle me-2"></i>
-            Set UP Configuration
+            U/P Configuration
           </h5>
           <button type="button" class="btn-close btn-close-white" @click="closeAlarmSetupModal"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label">Set UP Value</label>
+            <!-- Show negative label for Cu/CuSO4 (0) and Ag/AgCl (2) -->
+            <label class="form-label" v-if="settingsParams?.Electrode === 0 || settingsParams?.Electrode === 2">
+              U/P Value <span class="badge bg-danger">Stored as Negative</span>
+            </label>
+            <label class="form-label" v-else>U/P Value</label>
             <div class="input-group">
+              <!-- Show negative symbol for Cu/CuSO4 and Ag/AgCl -->
+              <span v-if="settingsParams?.Electrode === 0 || settingsParams?.Electrode === 2" class="input-group-text text-danger fw-bold">−</span>
               <input 
                 type="text" 
                 class="form-control" 
@@ -3473,7 +3636,7 @@ export default defineComponent({
                 placeholder="0.00"
                 @input="handleSetupInput"
                 @blur="formatSetupInput"
-                maxlength="5"
+                maxlength="4"
               >
               <span class="input-group-text">V</span>
             </div>
@@ -3495,14 +3658,18 @@ export default defineComponent({
         <div class="modal-header bg-warning">
           <h5 class="modal-title text-dark">
             <i class="bi bi-arrow-down-circle me-2"></i>
-            Set OP Configuration
+            Set O/P Configuration
           </h5>
           <button type="button" class="btn-close" @click="closeAlarmSetopModal"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label">Set OP Value</label>
+            <label class="form-label">
+              Set O/P Value <span class="badge bg-warning text-dark">Stored as Negative</span>
+            </label>
             <div class="input-group">
+              <!-- Always show negative symbol for Set O/P (always stored as negative) -->
+              <span class="input-group-text text-warning fw-bold">−</span>
               <input 
                 type="text" 
                 class="form-control" 
@@ -3510,7 +3677,7 @@ export default defineComponent({
                 placeholder="0.00"
                 @input="handleSetopInput"
                 @blur="formatSetopInput"
-                maxlength="5"
+                maxlength="4"
               >
               <span class="input-group-text">V</span>
             </div>
@@ -3542,9 +3709,9 @@ export default defineComponent({
             <strong>Reference Fail is automatically set based on the selected Electrode type.</strong>
             <br/>
             <small class="mt-2 d-block">
-              • Cu/CuSO4: 0.30V<br/>
-              • Zinc: -0.80V<br/>
-              • Ag/AgCl: 0.30V
+              • Cu/CuSO4: -0.30V<br/>
+              • Zinc: 0.80V<br/>
+              • Ag/AgCl: -0.30V
             </small>
           </div>
           <div class="mb-3">
@@ -3654,6 +3821,9 @@ export default defineComponent({
                         <button class="btn btn-outline-primary btn-sm" @click="setLoggingInterval('01:00:00')">
                           1 hour
                         </button>
+                        <button class="btn btn-outline-primary btn-sm" @click="setLoggingInterval('24:00:00')">
+                          24 hours
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -3667,6 +3837,74 @@ export default defineComponent({
           <button type="button" class="btn btn-primary" @click="saveLoggingInterval" :disabled="!isValidTimeFormat(loggingInterval)">
             <i class="bi bi-check-circle me-2"></i>
             Apply Logging Interval
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rename Digital Inputs Modal -->
+  <div class="modal fade" tabindex="-1" :class="{ show: showRenameModal, 'd-block': showRenameModal }" v-if="showRenameModal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-primary">
+          <h5 class="modal-title text-white">
+            <i class="bi bi-pencil me-2"></i>
+            Rename Digital Inputs (DI 1-4)
+          </h5>
+          <button type="button" class="btn-close btn-close-white" @click="closeRenameModal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="alert alert-info mb-4">
+            <i class="bi bi-info-circle me-2"></i>
+            Customize the names of your Digital Input channels for easier identification.
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label fw-bold">DI 1 Name</label>
+            <input 
+              v-model="diNames.DI1" 
+              type="text" 
+              class="form-control" 
+              placeholder="Enter custom name for DI 1"
+            />
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label fw-bold">DI 2 Name</label>
+            <input 
+              v-model="diNames.DI2" 
+              type="text" 
+              class="form-control" 
+              placeholder="Enter custom name for DI 2"
+            />
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label fw-bold">DI 3 Name</label>
+            <input 
+              v-model="diNames.DI3" 
+              type="text" 
+              class="form-control" 
+              placeholder="Enter custom name for DI 3"
+            />
+          </div>
+
+          <div class="form-group mb-0">
+            <label class="form-label fw-bold">DI 4 Name</label>
+            <input 
+              v-model="diNames.DI4" 
+              type="text" 
+              class="form-control" 
+              placeholder="Enter custom name for DI 4"
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="closeRenameModal">Cancel</button>
+          <button type="button" class="btn btn-primary" @click="saveRenameModal">
+            <i class="bi bi-check-circle me-2"></i>
+            Save Names
           </button>
         </div>
       </div>
@@ -4276,17 +4514,17 @@ export default defineComponent({
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label">Shunt Current Value (00.0 - 99.9)</label>
+            <label class="form-label">Shunt Current Value (000 - 999)</label>
             <input 
               type="text" 
               class="form-control" 
               v-model="shuntCurrentForm.value"
-              placeholder="Enter current value (e.g., 99.0)"
+              placeholder="Enter current value (e.g., 999)"
               @input="validateCurrentInput"
               @blur="formatCurrentInput"
-              maxlength="4"
+              maxlength="3"
             >
-            <small class="text-muted">Format: 00.0 (Auto-adds decimal after 2 digits, max 4 characters)</small>
+            <small class="text-muted">Format: 000-999 Amperes (max 3 digits)</small>
           </div>
         </div>
         <div class="modal-footer">

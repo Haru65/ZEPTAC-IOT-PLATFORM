@@ -184,12 +184,40 @@ export default defineComponent({
       }
     };
 
-    // Reverse geocoding is now handled by backend to avoid CORS issues
-    // Location data comes from server with coordinates already converted to location names
+    // Process device locations using backend reverse geocoding
     const processDeviceLocations = async () => {
       for (const device of devices.value) {
-        // Just use location as provided by backend
-        device.displayLocation = device.location || 'N/A';
+        const location = device.location || 'N/A';
+        
+        // Check if location is coordinates (decimal format)
+        const decimalMatch = location.match(/^(-?\d+\.?\d*),\s*(-?\d+\.?\d*)$/);
+        if (decimalMatch) {
+          const lat = parseFloat(decimalMatch[1]);
+          const lng = parseFloat(decimalMatch[2]);
+          
+          try {
+            // Call backend reverse geocoding with deviceId so it gets stored
+            const baseUrl = (import.meta.env.VITE_APP_API_URL || 'http://localhost:3001').replace(/\/$/, '');
+            const response = await fetch(`${baseUrl}/api/devices/reverse-geocode`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ lat, lng, deviceId: device.deviceId })
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              device.displayLocation = data.location || location;
+            } else {
+              device.displayLocation = location;
+            }
+          } catch (error) {
+            console.warn('Failed to reverse geocode location:', error);
+            device.displayLocation = location;
+          }
+        } else {
+          // Location is already a place name or invalid
+          device.displayLocation = location;
+        }
       }
     };
 

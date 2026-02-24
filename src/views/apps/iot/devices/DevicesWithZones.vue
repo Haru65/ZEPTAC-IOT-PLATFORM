@@ -19,31 +19,42 @@
 
       <!-- Buttons Group -->
       <div class="d-flex gap-2 flex-wrap">
-        <!-- Add Zone Button (Zone View) -->
+        <!-- Add Zone Button (Zone View Only) -->
         <button 
-          v-if="showZoneView"
+          v-show="showZoneView"
+          type="button"
           class="btn btn-success"
           @click="showAddZoneModal = true"
         >
           <i class="bi bi-plus-circle me-2"></i>Add Zone
         </button>
 
-        <!-- Add Device Button (Device View) -->
+        <!-- Remove Zone Button (Zone View Only) -->
         <button 
-          v-if="!showZoneView"
-          class="btn btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target="#addDeviceModal"
+          v-show="showZoneView"
+          type="button"
+          class="btn btn-danger"
+          @click="showRemoveZoneModal = true"
         >
-          <i class="bi bi-plus-circle me-2"></i>Add Device
+          <i class="bi bi-trash me-2"></i>Remove Zone
         </button>
 
-        <!-- Toggle Cluster View Button -->
+        <!-- Add Cluster Button (Zone View Only) -->
         <button 
+          v-show="showZoneView"
+          type="button"
+          class="btn btn-warning"
+          @click="showAddClusterModal = true"
+        >
+          <i class="bi bi-plus-circle me-2"></i>Add Cluster
+        </button>
+
+        <!-- Show/Hide Clusters Button -->
+        <button 
+          type="button"
           class="btn"
           :class="showClusterView ? 'btn-info' : 'btn-outline-info'"
           @click="showClusterView = !showClusterView"
-          title="Toggle Zone Cluster Overlay View"
         >
           <i class="bi bi-diagram-2 me-2"></i>{{ showClusterView ? 'Hide' : 'Show' }} Clusters
         </button>
@@ -158,14 +169,23 @@
       </ul>
 
       <!-- Broadcast Message Button -->
-      <button 
-        type="button" 
-        class="btn btn-info mb-5"
-        @click="showBroadcast = !showBroadcast"
-      >
-        <i class="bi bi-broadcast me-2"></i>
-        {{ showBroadcast ? 'Hide Broadcast' : 'Broadcast Message' }}
-      </button>
+      <div class="mb-5 d-flex gap-2">
+        <button 
+          type="button" 
+          class="btn btn-primary"
+          @click="openAddDeviceModal"
+        >
+          <i class="bi bi-plus-circle me-2"></i>Add Device
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-info"
+          @click="showBroadcast = !showBroadcast"
+        >
+          <i class="bi bi-broadcast me-2"></i>
+          {{ showBroadcast ? 'Hide Broadcast' : 'Broadcast Message' }}
+        </button>
+      </div>
 
       <!-- Broadcast Message Component -->
       <div v-if="showBroadcast" class="mb-6">
@@ -191,27 +211,31 @@
       </div>
     </div>
 
-    <!-- Zone Cluster Overlay Component -->
-    <div v-if="showClusterView" class="mb-6">
+    <!-- Zone Cluster Overlay Component - Only rendered and computed when active -->
+    <div v-if="showClusterView && !selectedZone && allDevices.length > 0" class="mb-6">
       <ZoneClusterOverlay 
+        :key="'cluster-' + allDevices.length"
         :devices="allDevices" 
         @clusterSelected="handleClusterSelected"
       />
     </div>
 
     <!-- Add Zone Modal -->
-    <div v-if="showAddZoneModal" class="modal fade d-block" style="background: rgba(0,0,0,0.5);">
+    <div v-if="showAddZoneModal" class="modal-backdrop"></div>
+    <div v-if="showAddZoneModal" class="modal d-block">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Add New Zone</h5>
-            <button type="button" class="btn-close" @click="showAddZoneModal = false"></button>
+            <button type="button" class="btn-close" @click="showAddZoneModal = false" title="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
-          <div class="modal-body">
-            <form @submit.prevent="addNewZone">
+          <form @submit.prevent="addNewZone">
+            <div class="modal-body">
               <!-- Zone Name -->
               <div class="mb-3">
-                <label for="zoneName" class="form-label">Zone Name</label>
+                <label for="zoneName" class="form-label fw-bold">Zone Name <span class="text-danger">*</span></label>
                 <input 
                   v-model="newZoneForm.name"
                   type="text" 
@@ -224,7 +248,7 @@
 
               <!-- Zone Description -->
               <div class="mb-3">
-                <label for="zoneDescription" class="form-label">Description</label>
+                <label for="zoneDescription" class="form-label fw-bold">Description</label>
                 <textarea 
                   v-model="newZoneForm.description"
                   class="form-control" 
@@ -236,37 +260,165 @@
 
               <!-- Zone Color -->
               <div class="mb-3">
-                <label for="zoneColor" class="form-label">Zone Color</label>
-                <div class="d-flex gap-2 flex-wrap">
+                <label class="form-label fw-bold">Zone Color</label>
+                <div class="d-flex gap-2 flex-wrap mb-2">
                   <button 
                     v-for="color in availableColors"
                     :key="color"
                     type="button"
                     class="color-picker"
-                    :style="{ backgroundColor: color, border: newZoneForm.color === color ? '3px solid #000' : 'none' }"
+                    :style="{ 
+                      backgroundColor: color, 
+                      border: newZoneForm.color === color ? '3px solid #333' : '2px solid #dee2e6',
+                      boxShadow: newZoneForm.color === color ? '0 0 8px rgba(0,0,0,0.3)' : 'none'
+                    }"
                     @click="newZoneForm.color = color"
+                    title="Select this color"
                   ></button>
                 </div>
                 <input 
                   v-model="newZoneForm.color"
                   type="text" 
-                  class="form-control mt-2" 
+                  class="form-control" 
                   id="zoneColor"
                   placeholder="#007bff"
                 />
               </div>
-            </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" @click="showAddZoneModal = false">Cancel</button>
+              <button type="submit" class="btn btn-success">
+                <i class="bi bi-plus-circle me-2"></i>Add Zone
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Cluster Modal -->
+    <div v-if="showAddClusterModal" class="modal-backdrop"></div>
+    <div v-if="showAddClusterModal" class="modal d-block">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add New Cluster</h5>
+            <button type="button" class="btn-close" @click="showAddClusterModal = false" title="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <form @submit.prevent="addNewCluster">
+            <div class="modal-body">
+              <!-- Cluster Name -->
+              <div class="mb-3">
+                <label for="clusterName" class="form-label fw-bold">Cluster Name <span class="text-danger">*</span></label>
+                <input 
+                  v-model="newClusterForm.name"
+                  type="text" 
+                  class="form-control" 
+                  id="clusterName"
+                  placeholder="e.g., Main Hall Cluster, Office Zone"
+                  required
+                />
+              </div>
+
+              <!-- Cluster Description -->
+              <div class="mb-3">
+                <label for="clusterDescription" class="form-label fw-bold">Description</label>
+                <textarea 
+                  v-model="newClusterForm.description"
+                  class="form-control" 
+                  id="clusterDescription"
+                  rows="3"
+                  placeholder="Enter cluster description..."
+                ></textarea>
+              </div>
+
+              <!-- Cluster Color -->
+              <div class="mb-3">
+                <label class="form-label fw-bold">Cluster Color</label>
+                <div class="d-flex gap-2 flex-wrap mb-2">
+                  <button 
+                    v-for="color in availableColors"
+                    :key="color"
+                    type="button"
+                    class="color-picker"
+                    :style="{ 
+                      backgroundColor: color, 
+                      border: newClusterForm.color === color ? '3px solid #333' : '2px solid #dee2e6',
+                      boxShadow: newClusterForm.color === color ? '0 0 8px rgba(0,0,0,0.3)' : 'none'
+                    }"
+                    @click="newClusterForm.color = color"
+                    title="Select this color"
+                  ></button>
+                </div>
+                <input 
+                  v-model="newClusterForm.color"
+                  type="text" 
+                  class="form-control" 
+                  id="clusterColor"
+                  placeholder="#fd7e14"
+                />
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" @click="showAddClusterModal = false">Cancel</button>
+              <button type="submit" class="btn btn-warning">
+                <i class="bi bi-plus-circle me-2"></i>Add Cluster
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Remove Zone Modal -->
+    <div v-if="showRemoveZoneModal" class="modal-backdrop"></div>
+    <div v-if="showRemoveZoneModal" class="modal d-block">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Remove Zone</h5>
+            <button type="button" class="btn-close" @click="showRemoveZoneModal = false" title="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="zoneToRemove" class="form-label fw-bold">Select Zone to Remove <span class="text-danger">*</span></label>
+              <select 
+                v-model="zoneToDelete"
+                @change="(e) => { console.log('🔄 Zone selected:', zoneToDelete); }"
+                class="form-control" 
+                id="zoneToRemove"
+              >
+                <option :value="null">-- Select a zone to remove --</option>
+                <option v-for="zone in zones" :key="zone.id || zone._id" :value="zone">
+                  {{ zone.name }} ({{ zone.deviceCount }} devices)
+                </option>
+              </select>
+              <small class="text-muted d-block mt-2">
+                <strong>Warning:</strong> This will delete the selected zone and cannot be undone.
+              </small>
+            </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="showAddZoneModal = false">Cancel</button>
-            <button type="button" class="btn btn-primary" @click="addNewZone">Add Zone</button>
+            <button type="button" class="btn btn-secondary" @click="showRemoveZoneModal = false">Cancel</button>
+            <button 
+              type="button" 
+              class="btn btn-danger"
+              @click="() => { console.log('🔴 REMOVE BUTTON CLICKED'); removeZone(); }"
+              :disabled="!zoneToDelete"
+            >
+              <i class="bi bi-trash me-2"></i>Remove Zone
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Add Device Modal -->
-    <AddDeviceModal @deviceCreated="handleDeviceCreated" />
+    <AddDeviceModal ref="addDeviceModalRef" :zones="zones" @deviceCreated="handleDeviceCreated" />
   </div>
 </template>
 
@@ -278,6 +430,7 @@ import AddDeviceModal from "@/components/iot/AddDeviceModal.vue";
 import ZoneClusterOverlay from "@/components/iot/component/ZoneClusterOverlay.vue";
 import KTIcon from "@/core/helpers/kt-icon/KTIcon.vue";
 import ApiService from "@/core/services/ApiService";
+import Swal from "sweetalert2";
 
 // Interfaces
 interface Zone {
@@ -322,6 +475,10 @@ export default defineComponent({
     const showZoneView = ref(true);
     const showClusterView = ref(false);
     const showAddZoneModal = ref(false);
+    const showAddClusterModal = ref(false);
+    const showRemoveZoneModal = ref(false);
+    const zoneToDelete = ref<Zone | null>(null);
+    const addDeviceModalRef = ref<any>(null);
     const selectedZone = ref<Zone | null>(null);
     const selectedCluster = ref<any>(null);
     const cardHovered = ref<string | null>(null);
@@ -341,6 +498,13 @@ export default defineComponent({
       color: "#007bff"
     });
 
+    // Cluster form state
+    const newClusterForm = ref({
+      name: "",
+      description: "",
+      color: "#fd7e14"
+    });
+
     // Available colors for zone selection
     const availableColors = [
       "#007bff", // Blue
@@ -357,54 +521,77 @@ export default defineComponent({
     const zones = ref<Zone[]>([]);
     const devices = ref<Device[]>([]);
     const allDevices = ref<Device[]>([]); // Store all devices, we'll filter by zone
+    const clusters = ref<any[]>([]); // Cluster list
 
     // Fetch zones from backend or generate mock data
     const fetchZones = async () => {
       try {
         loading.value = true;
-        console.log('🔍 Fetching zones...');
+        console.log('🔍 Fetching zones from API...');
         
-        // For now, we'll create zones based on device locations
-        // In the future, you can fetch this from an API endpoint
-        const apiUrl = (import.meta.env.VITE_APP_API_URL || 'http://localhost:3001').replace(/\/$/, '');
-        
-        // Mock zones - customize as needed
-        const mockZones: Zone[] = [
-          {
-            id: "zone-1",
-            name: "Zone 1",
-            description: "Primary monitoring zone",
-            color: "#007bff",
-            deviceCount: 0
-          },
-          {
-            id: "zone-2",
-            name: "Zone 2",
-            description: "Secondary monitoring zone",
-            color: "#28a745",
-            deviceCount: 0
-          },
-          {
-            id: "zone-3",
-            name: "Zone 3",
-            description: "Tertiary monitoring zone",
-            color: "#ffc107",
-            deviceCount: 0
-          },
-          {
-            id: "zone-4",
-            name: "Zone 4",
-            description: "Backup monitoring zone",
-            color: "#dc3545",
-            deviceCount: 0
+        try {
+          // Try to fetch zones from API
+          const response = await ApiService.query('/api/zones', {});
+          console.log('📦 Received zones from API:', response.data);
+          
+          if (response.data.zones && Array.isArray(response.data.zones) && response.data.zones.length > 0) {
+            zones.value = response.data.zones;
+            console.log('✅ Zones loaded from API:', zones.value.length);
+          } else {
+            // Initialize default zones if none exist
+            console.log('⚠️ No zones found, initializing defaults...');
+            const initResponse = await ApiService.query('/api/zones/init/defaults', {});
+            if (initResponse.data.zones) {
+              zones.value = initResponse.data.zones;
+              console.log('✅ Default zones initialized:', zones.value.length);
+            }
           }
-        ];
-
-        zones.value = mockZones;
-        console.log('✅ Zones loaded:', zones.value.length);
+        } catch (apiError) {
+          // Fallback to mock zones if API is not available
+          console.warn('⚠️ API unavailable, using fallback zones:', apiError.message);
+          const mockZones: Zone[] = [
+            {
+              id: 'zone-1',
+              name: 'Zone 1',
+              description: 'Primary monitoring zone',
+              color: '#007bff',
+              deviceCount: 0
+            },
+            {
+              id: 'zone-2',
+              name: 'Zone 2',
+              description: 'Secondary monitoring zone',
+              color: '#28a745',
+              deviceCount: 0
+            },
+            {
+              id: 'zone-3',
+              name: 'Zone 3',
+              description: 'Tertiary monitoring zone',
+              color: '#ffc107',
+              deviceCount: 0
+            },
+            {
+              id: 'zone-4',
+              name: 'Zone 4',
+              description: 'Backup monitoring zone',
+              color: '#dc3545',
+              deviceCount: 0
+            }
+          ];
+          zones.value = mockZones;
+        }
+        
+        // Auto-select the first zone for initial display
+        if (zones.value.length > 0 && !selectedZone.value) {
+          selectedZone.value = zones.value[0];
+          console.log('✅ Auto-selected first zone:', selectedZone.value.name);
+        }
       } catch (err: any) {
         console.error('❌ Error fetching zones:', err);
         error.value = err.message || 'Failed to load zones';
+      } finally {
+        loading.value = false;
       }
     };
 
@@ -419,23 +606,32 @@ export default defineComponent({
         
         // Transform API response
         const result = response.data;
-        const transformedDevices = result.devices?.map((device: any, index: number) => {
-          // Assign devices to zones in round-robin fashion
-          const zoneIndex = index % zones.value.length;
-          return {
-            id: device.deviceId,
-            name: device.name,
-            icon: device.icon || 'bi-device',
-            type: 'IoT Sensor',
-            location: device.location,
-            status: device.status,
-            lastSeen: device.lastSeen ? new Date(device.lastSeen).toLocaleString() : 'Never',
-            metrics: [],
-            zoneId: zones.value[zoneIndex]?.id || "zone-1"
-          };
-        }) || [];
+        let transformedDevices: Device[] = [];
+        
+        if (result.devices && Array.isArray(result.devices)) {
+          transformedDevices = result.devices.map((device: any, index: number) => {
+            // Assign devices to zones in round-robin fashion
+            const zoneIndex = index % zones.value.length;
+            const assignedZone = zones.value[zoneIndex]?.id || "zone-1";
+            
+            return {
+              id: device.deviceId || device.id,
+              name: device.name,
+              icon: device.icon || 'bi-device',
+              type: 'IoT Sensor',
+              location: device.location,
+              displayLocation: device.location,
+              status: device.status,
+              lastSeen: device.lastSeen ? new Date(device.lastSeen).toLocaleString() : 'Never',
+              metrics: [],
+              zoneId: assignedZone,
+              deviceId: device.deviceId || device.id
+            };
+          });
+        }
         
         allDevices.value = transformedDevices;
+        console.log('✅ Transformed devices:', allDevices.value.length, 'devices');
         
         // Update device counts in zones
         zones.value = zones.value.map(zone => ({
@@ -443,9 +639,7 @@ export default defineComponent({
           deviceCount: transformedDevices.filter(d => d.zoneId === zone.id).length
         }));
         
-        // Process location data for all devices
-        await processDeviceLocations();
-        
+        console.log('✅ Updated zones with device counts');
         console.log('✅ Updated devices.value:', allDevices.value.length, 'devices');
       } catch (err: any) {
         console.error('❌ Error fetching devices:', err);
@@ -529,8 +723,34 @@ export default defineComponent({
 
     const handleDeviceCreated = async (newDevice: any) => {
       console.log('✅ New device created:', newDevice);
-      await fetchDevices();
-      console.log('🔄 Device list refreshed');
+      
+      // Add device to the list optimistically (no API call needed)
+      const deviceToAdd = {
+        id: newDevice.deviceId || newDevice.id,
+        name: newDevice.name || newDevice.deviceName,
+        icon: newDevice.icon || 'bi-device',
+        type: 'IoT Sensor',
+        location: newDevice.location || 'Unknown Location',
+        displayLocation: newDevice.location || 'Unknown Location',
+        status: newDevice.status || 'offline',
+        lastSeen: 'Just now',
+        metrics: [],
+        zoneId: selectedZone.value?.id || zones.value[0]?.id || 'zone-1',
+        deviceId: newDevice.deviceId || newDevice.id
+      };
+      
+      // Add to local list immediately (optimistic update)
+      allDevices.value.push(deviceToAdd);
+      
+      // Update zone device count
+      zones.value = zones.value.map(zone => {
+        if (zone.id === deviceToAdd.zoneId) {
+          return { ...zone, deviceCount: zone.deviceCount + 1 };
+        }
+        return zone;
+      });
+      
+      console.log('✅ Device added optimistically to zone:', deviceToAdd.zoneId);
     };
     
     const handleDeviceRemoved = async (removedDevice: { id: string; name: string }) => {
@@ -548,46 +768,239 @@ export default defineComponent({
       console.log(`🔄 Device "${removedDevice.name}" removed from list`);
     };
 
-    const addNewZone = () => {
+    const addNewZone = async () => {
       if (!newZoneForm.value.name.trim()) {
+        console.warn('⚠️ Zone name is required');
         alert('Please enter a zone name');
         return;
       }
 
-      const newZone: Zone = {
-        id: `zone-${Date.now()}`,
-        name: newZoneForm.value.name,
-        description: newZoneForm.value.description,
-        color: newZoneForm.value.color,
-        deviceCount: 0
-      };
+      try {
+        loading.value = true;
+        console.log('🔷 Creating new zone...');
 
-      zones.value.push(newZone);
-      console.log('✅ New zone created:', newZone);
+        const zoneData = {
+          name: newZoneForm.value.name.trim(),
+          description: newZoneForm.value.description.trim(),
+          color: newZoneForm.value.color,
+          deviceCount: 0
+        };
 
-      // Reset form
-      newZoneForm.value = {
-        name: "",
-        description: "",
-        color: "#007bff"
-      };
+        // Save to backend
+        const response = await ApiService.post('/api/zones', zoneData);
+        console.log('✅ Zone created successfully:', response.data);
 
-      // Close modal
-      showAddZoneModal.value = false;
+        const newZone = response.data.zone;
 
-      // Show success message
-      alert(`Zone "${newZone.name}" created successfully!`);
+        // Add to local list
+        zones.value.push(newZone);
+        console.log('📊 Total zones now:', zones.value.length);
+
+        // Reset form
+        newZoneForm.value = {
+          name: "",
+          description: "",
+          color: "#007bff"
+        };
+
+        // Close modal
+        showAddZoneModal.value = false;
+        console.log('🔄 Zone modal closed');
+
+        // Return to zone view to show new zone
+        showZoneView.value = true;
+        selectedZone.value = null;
+        console.log('🔄 Returned to zone view');
+
+        // Show success message
+        setTimeout(() => {
+          alert(`Zone "${newZone.name}" created successfully!`);
+        }, 300);
+      } catch (err: any) {
+        console.error('❌ Error creating zone:', err);
+        alert(`Failed to create zone: ${err.response?.data?.error || err.message}`);
+      } finally {
+        loading.value = false;
+      }
+    };
+    const addNewCluster = async () => {
+      if (!newClusterForm.value.name.trim()) {
+        console.warn('⚠️ Cluster name is required');
+        alert('Please enter a cluster name');
+        return;
+      }
+
+      try {
+        loading.value = true;
+        console.log('🟠 Creating new cluster...');
+
+        const clusterData = {
+          name: newClusterForm.value.name.trim(),
+          description: newClusterForm.value.description.trim(),
+          color: newClusterForm.value.color,
+          zoneId: selectedZone.value?.id,
+          devices: []
+        };
+
+        // Add to local list immediately (optimistic update)
+        const newCluster = {
+          id: `cluster-${Date.now()}`,
+          ...clusterData
+        };
+
+        clusters.value.push(newCluster);
+        console.log('📊 Total clusters now:', clusters.value.length);
+
+        // Reset form
+        newClusterForm.value = {
+          name: "",
+          description: "",
+          color: "#fd7e14"
+        };
+
+        // Close modal
+        showAddClusterModal.value = false;
+        console.log('🔄 Cluster modal closed');
+
+        // Show success message
+        setTimeout(() => {
+          alert(`Cluster "${newCluster.name}" created successfully!`);
+        }, 300);
+      } catch (err: any) {
+        console.error('❌ Error creating cluster:', err);
+        alert(`Failed to create cluster: ${err.message}`);
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    const removeZone = async () => {
+      console.log('🔴 removeZone function called');
+      console.log('zoneToDelete.value:', zoneToDelete.value);
+      
+      if (!zoneToDelete.value) {
+        console.log('❌ zoneToDelete is null or undefined!');
+        Swal.fire({
+          icon: 'warning',
+          title: 'No Selection',
+          text: 'Please select a zone to remove'
+        });
+        return;
+      }
+
+      console.log('✅ Zone is selected, proceeding with deletion');
+      
+      const confirmed = await Swal.fire({
+        icon: 'warning',
+        title: 'Delete Zone?',
+        html: `<p>Are you sure you want to delete the zone <strong>"${zoneToDelete.value.name}"</strong>?</p><p class="text-danger">This action cannot be undone.</p>`,
+        confirmButtonText: 'Delete',
+        confirmButtonColor: '#dc3545',
+        cancelButtonText: 'Cancel',
+        showCancelButton: true
+      });
+
+      console.log('⚠️ User confirmation:', confirmed.isConfirmed);
+
+      if (!confirmed.isConfirmed) {
+        console.log('❌ User cancelled deletion');
+        return;
+      }
+
+      try {
+        loading.value = true;
+        console.log('🗑️ Deleting zone:', zoneToDelete.value);
+        console.log('🗑️ Zone ID:', zoneToDelete.value.id);
+        console.log('🗑️ Zone _id:', zoneToDelete.value._id);
+
+        // Call API to delete zone - try both id and _id
+        const apiUrl = (import.meta.env.VITE_APP_API_URL || 'http://localhost:3001').replace(/\/$/, '');
+        const zoneIdToUse = zoneToDelete.value.id || zoneToDelete.value._id;
+        const deleteUrl = `${apiUrl}/api/zones/${zoneIdToUse}`;
+        
+        console.log('🔗 Delete URL:', deleteUrl);
+        
+        const response = await fetch(deleteUrl, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        console.log('📦 Response status:', response.status);
+        console.log('📦 Response ok:', response.ok);
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error('❌ API Error:', errorData);
+          throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('✅ API Response:', result);
+
+        // Remove from local list
+        zones.value = zones.value.filter(z => z.id !== zoneToDelete.value?.id && z._id !== zoneToDelete.value?._id);
+        console.log(`✅ Zone "${zoneToDelete.value.name}" deleted successfully`);
+        console.log(`📋 Total zones now: ${zones.value.length}`);
+
+        // Reset form and close modal
+        zoneToDelete.value = null;
+        showRemoveZoneModal.value = false;
+
+        // Show success message
+        Swal.fire({
+          icon: 'success',
+          title: 'Deleted!',
+          text: 'Zone has been deleted successfully.',
+          timer: 2000
+        });
+      } catch (err: any) {
+        console.error('❌ Error deleting zone:', err);
+        console.error('❌ Error stack:', err.stack);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `Failed to delete zone: ${err.message}`
+        });
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    const openAddDeviceModal = () => {
+      console.log('� BUTTON CLICKED');
+      console.log('🟢 Modal ref exists:', !!addDeviceModalRef.value);
+      console.log('🟢 Modal ref:', addDeviceModalRef.value);
+      
+      if (addDeviceModalRef.value) {
+        console.log('🟢 Calling openModal()...');
+        try {
+          addDeviceModalRef.value.openModal();
+          console.log('🟢 openModal() called successfully');
+        } catch (err) {
+          console.error('🔴 Error calling openModal:', err);
+        }
+      } else {
+        console.error('🔴 Modal ref is null/undefined!');
+      }
     };
 
     return {
       showZoneView,
       showClusterView,
       showAddZoneModal,
+      showAddClusterModal,
+      showRemoveZoneModal,
+      addDeviceModalRef,
       selectedZone,
       selectedCluster,
+      zoneToDelete,
       zones,
       devices,
       allDevices,
+      clusters,
+      zoneDevices,
       searchQuery,
       currentFilter,
       showBroadcast,
@@ -595,6 +1008,7 @@ export default defineComponent({
       error,
       cardHovered,
       newZoneForm,
+      newClusterForm,
       availableColors,
       filteredZones,
       filteredDevices,
@@ -602,10 +1016,13 @@ export default defineComponent({
       goBackToZones,
       searchItems,
       applyFilter,
+      openAddDeviceModal,
       handleDeviceCreated,
       handleDeviceRemoved,
       handleClusterSelected,
       addNewZone,
+      addNewCluster,
+      removeZone,
     };
   },
 });
@@ -625,6 +1042,15 @@ export default defineComponent({
 .zone-card:hover {
   border-color: #007bff;
   background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 100%);
+}
+
+/* Increase zone name text size by 2px and style for dark theme */
+.zone-card .card-title {
+  font-size: 1.375rem; /* Increased from 1.25rem by 2px */
+}
+
+html[data-bs-theme="dark"] .zone-card .card-title {
+  color: #000;
 }
 
 .cursor-pointer {
@@ -659,5 +1085,99 @@ export default defineComponent({
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Modal Styling */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1050;
+}
+
+.modal.d-block {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+}
+
+.modal-dialog {
+  position: relative;
+  margin: auto;
+  z-index: 1060;
+  max-width: 500px;
+  width: 90%;
+  pointer-events: auto;
+}
+
+.modal-dialog-centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header .btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  color: #000;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  padding: 1.5rem;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Form styling in modal */
+.modal-body .form-control,
+.modal-body .form-label {
+  font-size: 0.95rem;
+}
+
+.modal-body .form-label {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.modal-body .form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 </style>

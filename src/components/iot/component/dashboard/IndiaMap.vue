@@ -41,6 +41,9 @@ interface DeviceLocation {
   lastSeen: number;
   isActive: boolean;
   location?: string;
+  dcv?: string;  // DC Voltage
+  dci?: string;  // DC Current
+  ref1?: string; // REF 1 Value
 }
 
 export default defineComponent({
@@ -131,6 +134,10 @@ export default defineComponent({
       const mapData = await Promise.all(
         onlyActiveDevices.map(async (device) => {
           const geocodedLocation = await geocodeDeviceLocation(device);
+          
+          // Extract all sensor data from currentData
+          const sensorData = device.currentData || {};
+          
           return {
             name: device.name || `Device ${device.deviceId}`,
             value: [device.longitude, device.latitude, 1],
@@ -138,6 +145,7 @@ export default defineComponent({
             isActive: device.isActive,
             lastSeen: device.lastSeen,
             location: geocodedLocation,
+            currentData: sensorData  // Pass all sensor data directly
           };
         })
       );
@@ -149,13 +157,22 @@ export default defineComponent({
           formatter: (params: any) => {
             const data = params.data;
             const lastSeenTime = data.lastSeen ? new Date(data.lastSeen).toLocaleString() : 'Unknown';
+            
+            // Extract specific sensor values from currentData
+            const sensorData = data.currentData || {};
+            const dcv = sensorData.DCV || sensorData.dcv || 'N/A';
+            const dci = sensorData.DCI || sensorData.dci || 'N/A';
+            const ref1 = sensorData.REF1 || sensorData.ref1 || 'N/A';
+            
             return `
               <div>
                 <strong>${data.name}</strong><br/>
                 Device ID: ${data.deviceId}<br/>
                 Status: ${data.isActive ? '<span style="color: #28a745;">Active</span>' : '<span style="color: #dc3545;">Inactive</span>'}<br/>
                 Location: ${data.location || 'N/A'}<br/>
-                Coordinates: ${params.value[1].toFixed(4)}, ${params.value[0].toFixed(4)}<br/>
+                DCV: ${dcv}<br/>
+                DCI: ${dci}<br/>
+                REF1: ${ref1}<br/>
                 Last Seen: ${lastSeenTime}
               </div>
             `;
@@ -192,7 +209,7 @@ export default defineComponent({
       };
     };
 
-    // Fetch devices from API
+    // Fetch devices from API with full details
     const fetchDevicesForMap = async () => {
       try {
         const apiUrl = import.meta.env.VITE_APP_API_URL || "http://localhost:3001";
@@ -202,13 +219,16 @@ export default defineComponent({
         console.log("📡 Fetched devices from API:", data);
         
         if (data.success && data.devices) {
-          // Transform API response to map format
+          // Transform API response to map format with full device details
           activeDevices.value = data.devices.map((device: any) => {
             // Parse coordinates from location if it's in "lat, lon" format
             const coordMatch = device.location?.match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/);
             const isActive = device.status === 'online';
             
             console.log(`📍 Device ${device.deviceId}: status="${device.status}", isActive=${isActive}`);
+            
+            // Extract sensor/parameter data from currentData
+            const sensorData = device.currentData || {};
             
             if (coordMatch) {
               return {
@@ -218,7 +238,10 @@ export default defineComponent({
                 longitude: parseFloat(coordMatch[2]),
                 lastSeen: new Date(device.lastSeen).getTime(),
                 isActive: isActive,
-                location: device.location
+                location: device.location,
+                status: device.status,
+                currentData: sensorData,  // Include all sensor/parameter data from database
+                ...sensorData  // Spread sensor data for easy access
               };
             } else {
               // Location is already geocoded, use dummy coordinates for Mumbai
@@ -229,7 +252,10 @@ export default defineComponent({
                 longitude: 72.8777,
                 lastSeen: new Date(device.lastSeen).getTime(),
                 isActive: isActive,
-                location: device.location
+                location: device.location,
+                status: device.status,
+                currentData: sensorData,  // Include all sensor/parameter data from database
+                ...sensorData  // Spread sensor data for easy access
               };
             }
           });
@@ -307,11 +333,16 @@ export default defineComponent({
       socket.on("activeDevicesLocations", async (data: any) => {
         console.log("📍 Socket.IO received active devices locations:", data);
         
-        // Ensure devices have isActive property
-        activeDevices.value = (data.devices || []).map((device: any) => ({
-          ...device,
-          isActive: device.isActive ?? (device.status === 'online')
-        }));
+        // Ensure devices have full data including sensor information
+        activeDevices.value = (data.devices || []).map((device: any) => {
+          const sensorData = device.currentData || {};
+          return {
+            ...device,
+            isActive: device.isActive ?? (device.status === 'online'),
+            currentData: sensorData,  // Include sensor data from database
+            ...sensorData  // Spread sensor data
+          };
+        });
         
         console.log(`🎯 Updating map with ${activeDevices.value.length} devices from socket`);
         await updateMapWithActiveDevices();
@@ -321,10 +352,13 @@ export default defineComponent({
       socket.on("deviceLocationUpdate", async (data: DeviceLocation) => {
         console.log("📍 Socket.IO received device location update:", data);
         
-        // Ensure device has isActive property
+        // Extract and format device data with sensor information
+        const sensorData = data.currentData || {};
         const deviceData = {
           ...data,
-          isActive: data.isActive ?? (data.status === 'online')
+          isActive: data.isActive ?? (data.status === 'online'),
+          currentData: sensorData,  // Include sensor data from database
+          ...sensorData  // Spread sensor data
         };
         
         // Update or add device in the active devices list

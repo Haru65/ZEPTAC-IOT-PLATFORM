@@ -244,7 +244,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, onUnmounted } from "vue";
+import { defineComponent, ref, computed, onMounted, onUnmounted, shallowRef, watch } from "vue";
 
 type DeviceStatus = "online" | "offline" | "warning" | "critical";
 
@@ -281,6 +281,10 @@ export default defineComponent({
     const animatingCluster = ref(false);
     let animationInterval: NodeJS.Timeout | null = null;
 
+    // Use shallowRef to store memoized clusters
+    const memoizedClusters = shallowRef<Cluster[]>([]);
+    let previousDevicesHash = "";
+
     // Cluster colors palette
     const clusterColors = [
       "#007bff", // Blue
@@ -292,6 +296,13 @@ export default defineComponent({
       "#fd7e14", // Orange
       "#6f42c1", // Purple
     ];
+
+    // Generate a simple hash of devices to check if they've changed
+    const getDevicesHash = (devices: Device[]): string => {
+      if (!devices.length) return "";
+      // Use device IDs to create a quick hash
+      return devices.map(d => d.id).join("|");
+    };
 
     // Clustering algorithm - Group devices by location
     const clusterDevices = (devices: Device[]): Cluster[] => {
@@ -344,7 +355,18 @@ export default defineComponent({
       return { lat: avgLat, lng: avgLng };
     };
 
-    const clusters = computed(() => clusterDevices(props.devices));
+    // Memoized clusters with hash-based comparison
+    const clusters = computed(() => {
+      const currentHash = getDevicesHash(props.devices as Device[]);
+      
+      // Only recalculate if devices have actually changed
+      if (currentHash !== previousDevicesHash) {
+        previousDevicesHash = currentHash;
+        memoizedClusters.value = clusterDevices(props.devices as Device[]);
+      }
+      
+      return memoizedClusters.value;
+    });
 
     const getClusterCardStyle = (cluster: Cluster) => ({
       transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -371,19 +393,51 @@ export default defineComponent({
 
       if (animatingCluster.value) {
         let colorIndex = 0;
-        animationInterval = setInterval(() => {
-          const clusterElements = document.querySelectorAll(".cluster-card");
-          clusterElements.forEach((el, index) => {
-            const element = el as HTMLElement;
-            if (index === colorIndex % clusterElements.length) {
+        const animationDuration = 800; // milliseconds between animations
+        let lastAnimationTime = Date.now();
+
+        // Use requestAnimationFrame for smoother, non-blocking animation
+        const animateFrame = () => {
+          const now = Date.now();
+          
+          // Only animate if the duration has passed
+          if (now - lastAnimationTime >= animationDuration) {
+            // Queue animation on next available frame to avoid blocking
+            requestAnimationFrame(() => {
+              if (!animatingCluster.value) return; // Exit if animation was stopped
+
+              const clusterElements = document.querySelectorAll(".cluster-card");
+              if (clusterElements.length === 0) {
+                animationInterval = requestAnimationFrame(animateFrame);
+                return;
+              }
+
+              const elementIndex = colorIndex % clusterElements.length;
+              const element = clusterElements[elementIndex] as HTMLElement;
+              
+              // Use CSS class toggle instead of direct manipulation
               element.classList.add("pulse-animation");
-              setTimeout(() => element.classList.remove("pulse-animation"), 600);
-            }
-          });
-          colorIndex++;
-        }, 800);
+              
+              setTimeout(() => {
+                element.classList.remove("pulse-animation");
+              }, 600);
+
+              colorIndex++;
+              lastAnimationTime = now;
+            });
+          }
+
+          if (animatingCluster.value) {
+            animationInterval = requestAnimationFrame(animateFrame);
+          }
+        };
+
+        animationInterval = requestAnimationFrame(animateFrame);
       } else {
-        if (animationInterval) clearInterval(animationInterval);
+        if (animationInterval) {
+          cancelAnimationFrame(animationInterval as any);
+          animationInterval = null;
+        }
       }
     };
 

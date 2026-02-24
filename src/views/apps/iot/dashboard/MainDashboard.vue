@@ -42,17 +42,6 @@
       </div>
     </div>
 
-    <!-- Devices Grid -->
-    <div v-if="devices.length > 0" class="row g-4">
-      <div
-        class="col-lg-4 col-md-6 col-sm-12"
-        v-for="device in devices"
-        :key="device.id"
-      >
-        <DeviceCardWidget v-bind="device" />
-      </div>
-    </div>
-
     <div class="row g-4">
       <div class="col-12">
         <IndiaMap />
@@ -67,7 +56,6 @@ import { defineComponent, onMounted, ref, watch, computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { generateStorageUrl } from "@/core/helpers/storageUrl";
 import StatCardWidget from "@/components/iot/component/dashboard/StatCardWidget.vue";
-import DeviceCardWidget from "@/components/iot/component/dashboard/DeviceCardWidget.vue";
 import IndiaMap from "@/components/iot/component/dashboard/IndiaMap.vue";
 import { reverseGeocode } from "@/utils/reverseGeocode";
 
@@ -75,7 +63,6 @@ export default defineComponent({
   name: "main-dashboard",
   components: {
     StatCardWidget,
-    DeviceCardWidget,
     IndiaMap,
   },
   setup() {

@@ -16,8 +16,24 @@ export default defineConfig({
   base: "/",
   build: {
     chunkSizeWarningLimit: 3000,
+    // Enable asset hashing for cache busting
+    assetsInlineLimit: 4096,
     rollupOptions: {
-      external: ['mqtt']
+      external: ['mqtt'],
+      output: {
+        assetFileNames: (assetInfo) => {
+          // Add hash to all assets including images for cache busting
+          let extType = assetInfo.name.split('.').pop()
+          if (/png|jpe?g|gif|tiff|bmp|ico/i.test(extType)) {
+            extType = 'img'
+          } else if (/woff|woff2|eot|ttf|otf/i.test(extType)) {
+            extType = 'fonts'
+          } else if (/\.css$/i.test(assetInfo.name)) {
+            extType = 'css'
+          }
+          return `assets/${extType}/[name]-[hash][extname]`
+        }
+      }
     }
   },
   server: {
@@ -29,6 +45,9 @@ export default defineConfig({
   preview: {
     // Fix 404 error on refresh in preview mode
     port: 3000,
-    host: true
+    host: true,
+    headers: {
+      'Cache-Control': 'public, max-age=0, must-revalidate'
+    }
   }
 });

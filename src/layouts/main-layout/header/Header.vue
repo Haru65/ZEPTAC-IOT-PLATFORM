@@ -15,19 +15,9 @@
       >
         <router-link to="/">
           <img
-            v-if="themeMode === 'light' && layout === 'light-header'"
-            alt="Logo"
-            :src="getAssetPath('media/logos/zeptac_gradient_horizontal.png')"
-            class="h-10px h-lg-20px app-sidebar-logo-default theme-light-show"
-          />
-          <img
-            v-if="
-              layout === 'dark-header' ||
-              (themeMode === 'dark' && layout === 'light-header')
-            "
-            alt="Logo"
-            :src="getAssetPath('media/logos/zeptac_white_horizontal.png')"
-            class="h-10px h-lg-20px app-sidebar-logo-default"
+            alt="Krinston Logo"
+            :src="getAssetPath('media/logos/krinston.png')"
+            class="h-20px h-lg-25px app-sidebar-logo-default"
           />
         </router-link>
       </div>
@@ -50,16 +40,9 @@
         <div class="d-flex align-items-center flex-grow-1 flex-lg-grow-0">
           <router-link to="/" class="d-lg-none">
             <img
-              v-if="themeMode === 'light'"
-              alt="Logo"
-              :src="getAssetPath('media/logos/zeptac_gradient_horizontal.png')"
-              class="h-20px"
-            />
-            <img
-              v-else
-              alt="Logo"
-              :src="getAssetPath('media/logos/zeptac_white_horizontal.png')"
-              class="h-20px"
+              alt="Krinston Logo"
+              :src="getAssetPath('media/logos/krinston.png')"
+              class="h-25px"
             />
           </router-link>
         </div>

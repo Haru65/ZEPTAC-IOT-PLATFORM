@@ -3,7 +3,7 @@
     <!-- Search & Filters Row -->
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-5 gap-3">
       <!-- Search Input -->
-      <div class="position-relative w-100 w-sm-auto">
+      <div class="position-relative" style="flex: 1; min-width: 250px;">
         <KTIcon
           icon-name="magnifier"
           icon-class="fs-1 position-absolute top-50 translate-middle-y ms-3"
@@ -18,13 +18,14 @@
       </div>
 
       <!-- Add Device Button -->
-      <button 
-        class="btn btn-primary"
-        data-bs-toggle="modal"
-        data-bs-target="#addDeviceModal"
-      >
-        <i class="bi bi-plus-circle me-2"></i>Add Device
-      </button>
+      <div style="flex-shrink: 0;">
+        <button 
+          class="btn btn-primary"
+          @click="openAddDeviceModal"
+        >
+          <i class="bi bi-plus-circle me-2"></i>Add Device
+        </button>
+      </div>
     </div>
 
     <!-- Nav Tabs (Filters) -->
@@ -86,7 +87,7 @@
     </div>
 
     <!-- Add Device Modal -->
-    <AddDeviceModal @deviceCreated="handleDeviceCreated" />
+    <AddDeviceModal ref="addDeviceModalRef" :zones="zones" @deviceCreated="handleDeviceCreated" />
   </div>
 </template>
 
@@ -132,10 +133,36 @@ export default defineComponent({
     const currentFilter = ref("all");
     const loading = ref(true);
     const error = ref<string | null>(null);
+    const addDeviceModalRef = ref<any>(null);
 
     // Device data - now loaded dynamically from backend
     const devices = ref<Device[]>([]);
     const locationCache = ref<Map<string, string>>(new Map());
+    const zones = ref<any[]>([]);
+    
+    // Fetch zones from backend
+    const fetchZones = async () => {
+      try {
+        console.log('🔍 Fetching zones from API...');
+        const apiUrl = (import.meta.env.VITE_APP_API_URL || 'http://localhost:3001').replace(/\/$/, '');
+        const response = await fetch(`${apiUrl}/api/zones`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('📦 Received zones:', result);
+        
+        // Handle both direct array and nested zones property
+        const zoneList = Array.isArray(result) ? result : (result.zones || []);
+        zones.value = zoneList;
+        console.log(`✅ Loaded ${zoneList.length} zones`);
+      } catch (err: any) {
+        console.warn('⚠️ Error fetching zones:', err);
+        zones.value = [];
+      }
+    };
     
     // Fetch devices from backend
     const fetchDevices = async () => {
@@ -310,6 +337,7 @@ export default defineComponent({
     // Load devices on mount
     onMounted(() => {
       fetchDevices();
+      fetchZones();
     });
 
     // Computed property for filtered devices
@@ -339,6 +367,12 @@ export default defineComponent({
       currentFilter.value = filter;
     };
 
+    const openAddDeviceModal = () => {
+      if (addDeviceModalRef.value) {
+        addDeviceModalRef.value.openModal();
+      }
+    };
+
     const handleDeviceCreated = async (newDevice: any) => {
       console.log('✅ New device created:', newDevice);
       // Refresh device list
@@ -358,6 +392,7 @@ export default defineComponent({
 
     return {
       devices,
+      zones,
       searchQuery,
       currentFilter,
       loading,
@@ -365,6 +400,7 @@ export default defineComponent({
       filteredDevices,
       searchItems,
       applyFilter,
+      openAddDeviceModal,
       handleDeviceCreated,
       handleDeviceRemoved,
       fetchDevices,
@@ -376,5 +412,32 @@ export default defineComponent({
 <style scoped>
 .cursor-pointer {
   cursor: pointer;
+}
+
+.btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0051a8;
+}
+
+.btn-primary i {
+  font-size: 1rem;
 }
 </style>
